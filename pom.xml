@@ -6,7 +6,7 @@
 
     <groupId>com.lsxy</groupId>
     <artifactId>yunhuni</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <modules>
         <module>app-portal</module>
         <module>app-area-server</module>
@@ -17,9 +17,11 @@
         <module>resources</module>
         <module>service-framework</module>
         <module>service-yunhuni</module>
-        <module>module-core</module>
-        <module>module-api-framework</module>
-        <module>module-api-yunhuni</module>
+        <module>module-framework-api</module>
+        <module>module-yunhuni-api</module>
+        <module>module-framework-core</module>
+        <module>module-framework-web</module>
+        <module>module-framework-mq</module>
     </modules>
     <packaging>pom</packaging>
 
