@@ -35,7 +35,7 @@ public class RedisCacheManager {
 	 private static String redisCode = "utf-8"; 
 
 	    /**
-	     * @param key
+	     * @param keys
 	     */
 	    
 		public long del(final String... keys) {

@@ -19,14 +19,14 @@ import com.lsxy.framework.cache.manager.RedisCacheManager;
  *
  * @author tandy
  */
-@Component
-@Lazy(value = false)
+//@Component
+//@Lazy(value = false)
 public class AppMonitor {
 
     private Log logger = LogFactory.getLog(AppMonitor.class);
     private String key = SystemConfig.getProperty("system.id");
 
-    @Autowired
+//    @Autowired
     private RedisCacheManager redisCacheManager;
 
     private Thread t = new Thread(new Runnable() {
@@ -53,7 +53,7 @@ public class AppMonitor {
         }
     }
 
-    @PreDestroy
+//    @PreDestroy
     public void destroy() {
         this.t.interrupt();
     }

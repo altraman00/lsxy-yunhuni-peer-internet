@@ -268,7 +268,7 @@ public class Tenant extends IdEntity{
 		this.createDt = createDt;
 	}
 
-	@OneToOne(mappedBy = "tenant", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(mappedBy = "tenant", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@NotFound(action=NotFoundAction.IGNORE)
 	public TenantCompany getTenantCompany() {
 		return tenantCompany;
