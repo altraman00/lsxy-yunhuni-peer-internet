@@ -25,6 +25,8 @@
         <module>module-framework-core</module>
         <module>module-framework-web</module>
         <module>module-framework-mq</module>
+        <module>module-framework-cache</module>
+        <module>module-framework-config</module>
     </modules>
     <packaging>pom</packaging>
     <dependencyManagement>
@@ -41,11 +43,11 @@
     <distributionManagement>
         <repository>
             <id>nexus-lsxy-release</id>
-            <url>http://192.168.1.136:8081/nexus/content/repositories/releases/</url>
+            <url>http://nexus.liushuixingyun.com/nexus/content/repositories/releases/</url>
         </repository>
         <snapshotRepository>
             <id>nexus-lsxy-snapshot</id>
-            <url>http://192.168.1.136:8081/nexus/content/repositories/snapshots/</url>
+            <url>http://nexus.liushuixingyun.com/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -54,6 +56,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>

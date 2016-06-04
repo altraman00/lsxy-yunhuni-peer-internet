@@ -12,4 +12,11 @@
     <artifactId>module-framework-core</artifactId>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-config</artifactId>
+            <version>1.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
