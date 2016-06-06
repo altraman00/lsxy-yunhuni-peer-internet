@@ -6,7 +6,7 @@
 
     <groupId>com.lsxy</groupId>
     <artifactId>yunhuni</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <properties>
         <spring-security-version>3.2.5.RELEASE</spring-security-version>
     </properties>
@@ -27,10 +27,46 @@
         <module>module-framework-mq</module>
         <module>module-framework-cache</module>
         <module>module-framework-config</module>
+        <module>app-portal-api</module>
     </modules>
     <packaging>pom</packaging>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-core</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-cache</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-web</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-mq</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-config</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-api</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-yunhuni-api</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,12 +15,12 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-core</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-mq</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-config</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

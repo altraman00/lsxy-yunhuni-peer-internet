@@ -85,112 +85,6 @@ public class Tenant extends IdEntity{
 	// 创建时间
 	private Date createDt = new Date();
 
-	// 公司信息
-	private TenantCompany tenantCompany;
-
-
-	// 租户管理员在和声云微信中的openid
-//	private String hsyWeixinOpenid;
-
-	// 租户管理员在和声云中的unionId
-//	private String hsyWeixinUnionId;
-
-	// 客服二维码5个,逗号分隔，可用来获取二维码图片
-	// https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=token
-//	private String kfEwmTokens;
-
-	// 审核人
-//	private String checker;
-
-	// 审核时间
-//	private Date checkTime;
-
-	// 审核意见回复
-//	private String checkReply;
-	
-//	// 快捷回复配置
-//	private Set<TenantQuickReply> quickReplys;
-//	
-//	// 是否开通微信渠道：0：否；1：开通
-//	private Integer useWeixin = 1;
-//
-//	// 是否开通微博渠道：0：否；1：开通
-//	private Integer useWeibo = 1;
-//
-//	// 是否开通淘宝渠道：0：否；1：开通
-//	private Integer useTaobao = 0;
-
-	// 是否开通京东渠道：0：否；1：开通
-//	private Integer useJd = 0;
-	
-	// 是否开通座席-PC端：0：否；1：开通
-//	private Integer useZxPC = 1;
-//	
-//	// 是否开通座席-微信服务号端：0：否；1：开通
-//	private Integer useZxWX = 0;
-//	
-//	// 是否开通座席-微博端：0：否；1：开通
-//	private Integer useZxWeibo = 0;
-	
-	// 注册场景（来源）
-//	private Integer sceneId;
-	
-//	// 租户座席
-//	private Set<TenantZX> tenantZx;
-	
-//	@Column(name = "checker")
-//	public String getChecker() {
-//		return checker;
-//	}
-//
-//	public void setChecker(String checker) {
-//		this.checker = checker;
-//	}
-//
-//	@Column(name = "check_time")
-//	public Date getCheckTime() {
-//		return checkTime;
-//	}
-//
-//	public void setCheckTime(Date checkTime) {
-//		this.checkTime = checkTime;
-//	}
-//
-//	@Column(name = "check_reply")
-//	public String getCheckReply() {
-//		return checkReply;
-//	}
-//
-//	public void setCheckReply(String checkReply) {
-//		this.checkReply = checkReply;
-//	}
-//
-//	@Column(name = "tenant_kf_ewm_tokens")
-//	public String getKfEwmTokens() {
-//		return kfEwmTokens;
-//	}
-//
-//	public void setKfEwmTokens(String kfEwmTokens) {
-//		this.kfEwmTokens = kfEwmTokens;
-//	}
-//
-//	@Column(name = "tenant_wx_hsy_openid")
-//	public String getHsyWeixinOpenid() {
-//		return hsyWeixinOpenid;
-//	}
-//
-//	public void setHsyWeixinOpenid(String hsyWeixinOpenid) {
-//		this.hsyWeixinOpenid = hsyWeixinOpenid;
-//	}
-//	
-//	@Column(name="tenant_wx_hsy_unionid")
-//	public String getHsyWeixinUnionId() {
-//		return hsyWeixinUnionId;
-//	}
-//
-//	public void setHsyWeixinUnionId(String hsyWeixinUnionId) {
-//		this.hsyWeixinUnionId = hsyWeixinUnionId;
-//	}
 
 	public static String[] toJsonProperties = new String[] { "id", "tenantUn",
 			"tenantName", "tenantStatus", "tenantRemark", "tenantKind",
@@ -268,15 +162,6 @@ public class Tenant extends IdEntity{
 		this.createDt = createDt;
 	}
 
-	@OneToOne(mappedBy = "tenant", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@NotFound(action=NotFoundAction.IGNORE)
-	public TenantCompany getTenantCompany() {
-		return tenantCompany;
-	}
-
-	public void setTenantCompany(TenantCompany tenantCompany) {
-		this.tenantCompany = tenantCompany;
-	}
 //
 //	@OneToMany(mappedBy = "tenant", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 //	@JsonIgnore

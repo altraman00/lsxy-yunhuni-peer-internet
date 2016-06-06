@@ -1,8 +1,6 @@
 package com.hesyun.framework.tenant.service;
 
-import com.hesyun.framework.tenant.exceptions.MatchedMultiPersonException;
 import com.hesyun.framework.tenant.model.Account;
-import com.hesyun.framework.tenant.model.AccountRole;
 import com.lsxy.framework.core.BaseService;
 import com.lsxy.framework.core.security.SecurityUser;
 
@@ -10,8 +8,11 @@ import java.util.List;
 
 public interface AccountService extends BaseService<Account> {
 
-	boolean isMobileExist(String mobile, String userName);
-
+	/**
+	 * 制定手机号是否已经被注册
+	 * @param mobile 指定手机号
+	 * @return 被注册 true 否则 false
+     */
 	boolean isMobileExist(String mobile);
 
 	/**
@@ -20,10 +21,8 @@ public interface AccountService extends BaseService<Account> {
 	 * @param loginName
 	 *            loginName可以是email，也可以是userName
 	 * @return
-	 * @throws MatchedMultiPersonException
 	 */
-	Account findPersonByLoginName(String loginName)
-			throws MatchedMultiPersonException;
+	Account findAccountByLoginName(String loginName);
 
 	/**
 	 * 判断指定的属性对应的值是否已经存在数据,用于唯一性验证
@@ -128,11 +127,6 @@ public interface AccountService extends BaseService<Account> {
 	Account findPersonByNumOrName(String tenantid, String person);
 
 	Account findPersonByName(String tenantid, String name);
-
-	List<String> executeNativeSqlQuery(String sql);
-	
-	List<AccountRole> findPersonRoles(String personid);
-	
 	/**
 	 * 判断指定的person是否是管理员角色
 	 * @param person
