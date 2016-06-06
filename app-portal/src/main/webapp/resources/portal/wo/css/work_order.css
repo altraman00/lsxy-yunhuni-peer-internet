@@ -1,0 +1,72 @@
+	img{border:none 0}
+	li{list-style:none}
+	input,textarea{outline:none}
+	.order{width:100%;float:right;}
+	.order-btn{width:96%;margin:30px auto;padding-bottom:30px;overflow:hidden;border-radius:4px;background: white;border:solid 1px #ccc;}
+	.order-btn dt{height:34px;color:#3d3d3d;line-height:34px;margin-bottom:30px;background: #f5faf2;border-bottom:solid 1px #ccc;}
+	.order-btn dd{float:left;cursor:pointer;width:80px;height:80px;color:white;margin:0 8px;background: #e9da60;text-align:center;}
+	.order-btn img{margin-top:14px;}
+	.order-list{margin:30px 0;width:96%;margin:0 auto;color:#5a5959}
+	.order-list td{display:inline-block;padding:8px 10px;border-bottom:solid 1px #ccc;}
+	.order-list a:hover{text-decoration:underline;}
+
+	a{text-decoration:none;outline:none}
+	img{border:none 0}
+	li{list-style:none}
+	input,textarea{outline:none}
+	
+	.new-order{position:relative;float:right;width:100%;height:100%}
+	.back{display:block;width:42px;height:24px;line-height:24px;text-align:center;color:white;background: #9ecd6d;margin:20px 0 20px 22px;border-radius:2px}
+	.back:before{
+		content:'';
+		display:block;
+		position:absolute;
+		width:0;
+		height:0;
+		margin:-1px 0 0 -25px;
+		border-radius:2px;
+		border:solid 13px transparent;
+		border-right-color:#9ecd6d;
+	}
+	.new-order h1{height:40px;color:#80c379;line-height:40px;border-bottom:solid 2px #80c379}
+	.new-order h1 span{float:right;color:#333}
+	.new-order-btn{float:right;margin:20px auto;overflow:hidden}
+	.new-order-btn li{float:left;border-radius:2px;margin:0 10px}
+	.new-order-btn a{display:inline-block;padding:4px 14px; color:white;background: #8accaa;border-radius:4px}
+	.new-order-btn a:hover{background:#82bf9f}
+	.order-cols{clear:both;width:100%;border:solid 1px #d1e5c6;background: #f5faf2;margin-bottom:40px}
+	.order-cols dt,.order-submit dt{height:34px;text-align:left;color:#3d3d3d;line-height:34px;margin-bottom:30px;border-bottom:solid 1px #d1e5c6}
+	
+	/*input控件*/
+	.order-input{clear:both;width:75%;margin:0 auto 26px auto;overflow:hidden}
+	.order-input input{float:right;width:70%;text-indent:10px;height:24px;border:solid 1px #dee1dd}
+	.order-input label{float:left;color:#3d3d3d}
+
+	/*textarea控件*/
+	.order-textarea{clear:both;width:75%;margin:0 auto 26px auto;overflow:hidden}
+	.order-textarea label{float: left;color:#3d3d3d}
+	.order-textarea textarea{float:right;width:70%;height:120px;resize:none;border:solid 1px #dee1dd}
+
+	/*file控件*/
+	.order-file{clear:both;width:75%;margin:0 auto 26px auto;overflow:hidden}
+	.order-file input{float:right;width:65%;height:24px}
+	.order-file label{float:left;color:#3d3d3d}
+
+	/*radio控件*/
+	.order-radio{clear:both;width:75%;margin:0 auto 26px auto;overflow:hidden}
+	.order-radio label{float: left;color:#3d3d3d}
+	.order-radio input{float:left;width:5%;margin-left:12%}	
+	
+	.order-submit{display:none;position:absolute;left:15%;top:20%;right:15%;bottom:50%;width:70%;overflow:hidden;text-align:center;background:white;height:230px}
+	.order-submit-close{position:absolute;right:5px;top:5px;cursor:pointer}
+	.order-submit a{display:inline-block;padding:4px 14px; color:white;background: #9ecd6d;border-radius:4px}
+	.order-submit a:hover{background: #95c267}
+	.mask{display:none;position:absolute;left:0;right:0;top:0;bottom:0;background: rgba(0,0,0,0.6)}
+
+	.multi-opt{float:right;width:70%;min-height:28px;overflow:auto;background: white;}
+	.multi-opt:focus{outline:none;border:solid 1px #ccc}	
+	.multi-opt li{position:relative;float:left;height:22px;overflow:hidden;margin:4px;padding:2px 24px 2px 4px;color:#3B73AF;background: #ededed;border-radius:4px;white-space: nowrap;}
+	.multi-opt li:hover i{display:block}
+	.multi-opt i{display:none;cursor:pointer;position:absolute;right:4px;top:4px;width:16px;height:16px;background:url(img/mclose.png) no-repeat center}
+	
+	.form-horizontal .form-group{margin-right:0px; margin-left:15px}

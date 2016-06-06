@@ -1,0 +1,81 @@
+<div class="new-order">
+	<a class="back" onclick="workOrderBack()" href="javascript:;">返回</a>
+	<div>
+		<h1>
+			&nbsp;&nbsp;基本工单<span class='hesyun_wo_number'></span>
+		</h1>
+		<ul class="new-order-btn">
+			<li><a href="javascript:;" class='hesyun_wo_save_button'>保存</a></li>
+			<li><a href="javascript:;" onclick="order_show()">提交给</a></li>
+		</ul>
+	</div>
+	
+	<!-- 工单提交给 -->
+	<div class="mask" id="order-mask"></div>
+	<div class="order-submit" id="order-submit">
+		<dt style="position: relative; background: #9ecd6d;">
+			&nbsp;&nbsp;提交给… <img class="order-submit-close" id="sub-close"
+				src="http://www.hesyun.net/res/resources/images/sub_close.png" onclick="order_out()" />
+		</dt>
+		<div>
+			<div class="order-input hesyun_wo_skill">
+				<label for='skillCodes'>技能组</label>
+				<div class='medium'>
+					<span> <select name='skillCodes' class='hesyun_skill_group'>
+							<option value="" SELECTED>&nbsp</option>
+					</select> <i></i>
+					</span>
+				</div>
+			</div>
+			<div class="order-input">
+				<label for="hesyun_wo_persons">发送给指定的客服：</label>
+				<input id="hesyun_wo_persons" type="text" data-provide="typeahead">
+			</div>
+			<a class="submit hesyun_wo_send_button" href="javascript:;">提交</a>
+		</div>
+	</div>
+
+<!-- 	<div class='hesyun_wo_skill' class='element-select'>
+		<label for='skillCodes'>技能组</label>
+		<div class='medium'>
+			<span>
+				<select name='skillCodes' class='hesyun_skill_group'>
+					<option value ="" SELECTED>&nbsp</option>
+				</select>
+				<i></i>
+			</span>
+		</div>
+	</div>
+	<div>
+		<label for="hesyun_wo_persons">发送给指定的客服：</label>
+		<input id="hesyun_wo_persons" type="text" data-provide="typeahead">
+	</div>
+	<div style='text-align: right'>
+		<button class='hesyun_wo_save_button'>保存</button>
+		<button class='hesyun_wo_send_button' style='margin-left:10px'>发送</button>
+	</div> -->
+	<div class='element-separator'><hr><h3 class='section-break-title'></h3></div>
+	<div id="hesyun_wo_form_template"></div>
+
+</div>
+
+<script>
+	function g(id){
+		return document.getElementById(id);
+	}
+	var a=g("order-mask");
+	var b=g("order-submit");
+	function order_show(){
+		a.style.display="block";
+		b.style.display="block";
+	}
+	function order_out(){
+		a.style.display="none";
+		b.style.display="none";
+	}	
+	
+	function workOrderBack() {
+		$('.new-order').remove();
+		$('.order-btn').show();
+	}
+</script>

@@ -1,0 +1,16 @@
+html,body{width:100%;font-size:14px;font-family:'微软雅黑';background:white}
+body,h1,h2,p{margin:0;padding:0}
+a{text-decoration:none}
+img,input{outline:none}
+img{border:none 0}
+.account{width:600px;overflow:hidden;margin:80px auto}
+.account h1{color:#50514f;font-size:18px}
+.account p{margin:20px 0 30px 0;color:#50514f;padding-left:24px;background:url(../img/tips.png) no-repeat left center}
+.account p a{color:#2e93fb}
+.account p a:hover{text-decoration:underline}
+.account img{float:left;padding:30px 0 0 10px}
+form{float:right;width:60%;overflow:hidden;margin-top:10px}	
+label{clear:right;float:left;margin:6% 0}
+input{float:right;width:260px;height:40px;margin:4% 0;vertical-align:middle;border:solid 1px #e3e3e3;border-radius:6px;padding:0 10px;font-family:'微软雅黑'}
+.button{float:right;width:280px;height:44px;color:white;background:#56b383;cursor:pointer;font:16px '微软雅黑'}
+.button:hover{background:#4a9970}
