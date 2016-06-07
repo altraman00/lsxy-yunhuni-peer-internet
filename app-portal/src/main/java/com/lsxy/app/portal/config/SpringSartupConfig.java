@@ -1,4 +1,4 @@
-package com.lsxy.app.portal;
+package com.lsxy.app.portal.config;
 
 import com.lsxy.framework.config.SystemConfig;
 import org.springframework.context.annotation.Bean;

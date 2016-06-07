@@ -2,8 +2,6 @@ package com.lsxy.app.portal.web;
 
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestResponse;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -21,11 +19,6 @@ import static com.lsxy.framework.web.rest.RestResponse.failed;
 @RestController
 @RequestMapping("/config")
 public class LogConfigController {
-
-    private static final Log logger = LogFactory.getLog(LogConfigController.class);
-
-
-
 
     @RequestMapping("/log/{package}/{level}")
     public RestResponse configLog(@PathVariable("package") String p, @PathVariable("level") String l) {
@@ -51,6 +44,5 @@ public class LogConfigController {
        }
         result = RestResponse.failed("1234","asdf");
         return result;
-
     }
 }

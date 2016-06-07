@@ -60,14 +60,14 @@
 			document.getElementById("imgValidateCode").src="${ctx}/vc/get?dt="+(new Date().getTime());
 		}
 		function submitForm(){
-			if($("#j_username").val() == ""){
+			if($("#username").val() == ""){
 				showError("请输入用户名！");
-				$("#j_username").focus();
+				$("#username").focus();
 				return;
 			} 
-			if($("#j_password").val() == ""){
+			if($("#password").val() == ""){
 				showError("请输入密码！");
-				$("#j_password").focus();
+				$("#password").focus();
 				return;
 			}
 			<%
@@ -98,17 +98,17 @@
 
         <form  id="loginForm" method="post" action="${ctx}/login" >
 			<input type="hidden"  name="${_csrf.parameterName}"   value="${_csrf.token}"/>
-            <input styletype="text"  class="username" placeholder="邮箱地址" id="j_username" name="j_username" value="${param.j_username }" onkeydown="if(event.keyCode == 13){document.getElementById('j_password').focus();}">
+            <input styletype="text"  class="username" placeholder="邮箱地址" id="username" name="username" value="${param.username }" onkeydown="if(event.keyCode == 13){document.getElementById('password').focus();}">
             <p class="tips">&nbsp;&nbsp;亲，请检查用户名或密码!</p>
-            <input type="password" class="password" placeholder="密码" id="j_password" name="j_password" type="password"  value="${param.j_password }" >
+            <input type="password" class="password" placeholder="密码" id="password" name="password" type="password"  value="${param.password }" >
             <input type="Captcha" class="Captcha"  placeholder="验证码" maxlength="4"  id="validateCode" name="validateCode"  value="${param.validateCode }" onkeydown="if(event.keyCode == 13){submitForm();}" >
             <img alt="" src="${ctx}/vc/get" id="imgValidateCode" style="cursor: pointer;width: 80px;padding-top: 0px;margin:28px 0px 0px 15px;" onclick="javascript:changeCode();" title="看不清？请点击图片更换验证码">
             <a class="forgot" href="${ctx}/common/forgetPassword">忘记密码？</a>
             <input class="remember" type="checkbox"> 
             <p class="rember">记住我</p>  
             <span id="errorMsg"><%=errorMsg %></span>
-            <button type="button" class="submit_button" onclick="submitForm();" >登录</button>
-		</form>
+            <button type="button" class="submit_button" onclick="submitForm();" >登录</button>            
+        </form>
         <p class="rights">Copy Rights © 2013-2014 &nbsp;版权所有 All Rights Reserved 京ICP备&nbsp;14034791号</p>
     </div>	
     

@@ -1,5 +1,6 @@
 package com.lsxy.app.portal;
 
+import com.lsxy.app.portal.config.SpringSartupConfig;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
