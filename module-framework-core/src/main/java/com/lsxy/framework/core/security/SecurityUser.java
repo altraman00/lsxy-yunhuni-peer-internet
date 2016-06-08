@@ -15,14 +15,11 @@ public class SecurityUser implements Serializable{
 	/**
 	 * 自定义Authentication对象，使得Subject除了携带用户的登录名外还可以携带更多信息.
 	 */
-	private String loginName;
 	private String name;
 	private String id;
 	private String type;
 	private String tenantUn;
-	private String roles;
 	private String tenantName;
-	private String roleNames;
 	private String number;
 	private String userName;
 
@@ -34,17 +31,6 @@ public class SecurityUser implements Serializable{
 		this.number = number;
 	}
 
-	public String getRoleNames() {
-		return roleNames;
-	}
-
-	public void setRoleNames(String roleNames) {
-		this.roleNames = roleNames;
-	}
-
-	private Map<String, Boolean> authMap;
-	
-	
 
 	public String getTenantName() {
 		return tenantName;
@@ -75,48 +61,16 @@ public class SecurityUser implements Serializable{
 	}
 
 
-	/**
-	 * 是否超级管理员管理员
-	 * @return
-	 */
-	public boolean getIsAdmin(){
-		return this.getLoginName().equals(SystemConfig.getProperty("root.username"));
-	}
-	
-	/**
-	 * 是否为租户管理员
-	 */
-	public boolean getIsTenantAdmin() {
-		return this.roles.indexOf("ROLE_TENANT_ADMIN")>=0;
-	}
 
-	/**
-	 * 是否为和声云运营管理员
-	 */
-	public boolean isHsyOperator() {
-		return this.roles.indexOf("ROLE_HSY_OPERATE")>=0;
-	}
-
-
-	public SecurityUser(String id, String loginName, String name, String tenantUn,String tenantName, String roles, String userName) {
-		this.loginName = loginName;
+	public SecurityUser(String id, String userName, String name, String tenantUn,String tenantName) {
+		this.userName = userName;
 		this.name = name;
 		this.id = id;
 		this.tenantUn = tenantUn;
 		this.tenantName = tenantName;
-		this.roles = roles;
-		this.userName = userName;
 	}
 	
 
-
-	public String getRoles() {
-		return roles;
-	}
-
-	public String getLoginName() {
-		return loginName;
-	}
 
 	/**
 	 */
@@ -129,11 +83,4 @@ public class SecurityUser implements Serializable{
 		return name;
 	}
 
-	public Map<String, Boolean> getAuthMap() {
-		return authMap;
-	}
-
-	public void setAuthMap(Map<String, Boolean> authMap) {
-		this.authMap = authMap;
-	}
 }

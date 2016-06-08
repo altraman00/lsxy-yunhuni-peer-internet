@@ -7,6 +7,7 @@ import com.lsxy.framework.core.utils.EncryptDecryptData;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.Assert;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -18,11 +19,12 @@ import java.util.Date;
 /**
  * Servlet Filter implementation class SecurityFilter
  */
-public class SecurityFilter implements Filter {
+public abstract class SecurityFilter implements Filter {
 	private Log logger = LogFactory.getLog(SecurityFilter.class);
 	public String[] excludePath = null;
+
     /**
-     * Default constructor. 
+     * Default constructor.
      */
     public SecurityFilter() {
         // TODO Auto-generated constructor stub
@@ -46,78 +48,47 @@ public class SecurityFilter implements Filter {
 		requrl = requrl.replace(request.getContextPath(), "");
 		Object currentUser = request.getSession().getAttribute("currentUser");
 		String username = request.getRemoteUser();
-		logger.debug("remote user :" + username);
-		
-		boolean isAnonymous = (currentUser == null?true:false);
+		if(logger.isDebugEnabled()){
+			logger.debug(String.format("remote user :" + username));
+		}
+
+//		boolean isAnonymous = (currentUser == null?true:false);
 		try {
 			if(currentUser != null){
 //				logger.debug("currentUser != null");
 				SecurityUser su = (SecurityUser) currentUser;
-				if(!su.getLoginName().equals(username)){
+				if(!su.getUserName().equals(username)){
 					currentUser = null;
 				}
 			}
-			
+
 			if(currentUser == null){
-//				logger.debug("currentUser == null");
 				if(StringUtil.isNotEmpty(username)){
-//					PersonManager personManager = (PersonManager) SpringContextUtil.getBean("personManager");
-//					Person person = personManager.findPersonByLoginName(username);
-//					if(person != null) {
-//						String userName = person.getUserName();
-//						if (!"admin".equals(userName)) {
-//							Tenant tenant = person.getTenant();
-//							String tenantUn = "";
-//							String tenantName = "";
-//							if(tenant != null){
-//								tenantUn = tenant.getTenantUn();
-//								tenantName = tenant.getTenantName();
-//							}
-//
-//							Set<TenantRole> tenantRoles = person.getRoles();
-//							Map<String, Boolean> authMap = new HashMap<String, Boolean>();
-//
-//							for (TenantRole tenantRole : tenantRoles) {
-//								Set<Permission> pers = tenantRole.getPermissions();
-//								for (Permission per : pers) {
-//									authMap.put(per.getModulePath(), true);
-//								}
-//							}
-//
-//							SecurityUser user = new SecurityUser(person.getId(), person.getUserName(),person.getName(), tenantUn,tenantName, person.getRoleCodes());
-//							user.setRoleNames(person.getRoleNames());
-//							user.setNumber(person.getNumber());
-//							user.setAuthMap(authMap);
-//
-//							request.getSession().setAttribute("currentUser", user);
-//							request.getSession().setAttribute("currentPerson", person);
-//						} else {
-//							SecurityUser user = new SecurityUser(person.getId(), person.getUserName(),person.getName(), "", "", "ROLE_ADMIN");
-//							user.setRoleNames("和声管理员");
-//							user.setNumber("0");
-//							request.getSession().setAttribute("currentUser", user);
-//							request.getSession().setAttribute("currentPerson", person);
-//						}
-//						this.createHesyunToken(request,response,person.getUserName());
+					SecurityUserRepository sur = getSecurityUserRepository();
+					if(sur != null){
+						SecurityUser su = sur.loadSecurityUser(username);
+						request.getSession().setAttribute("currentUser", su);
 //						isAnonymous = false;
-//					} else {
-//						isAnonymous = true;
-//					}
+					}else{
+						logger.error("未有正确设置SecurityUserRepository");
+					}
+
+
 				} else {
-					isAnonymous = true;
+//					isAnonymous = true;
 				}
 			}
-			
-			
-			if(isAnonymous){
-				logger.debug("the request is annonymouse access");
-				if(!isExcludePath(request,requrl)){
-					logger.debug("the request uri is not in exclude path,goto the login page");
-					String url ="/login.jsp";
-					request.getRequestDispatcher(url).forward(request, response);
-					return;
-				}
-			}
+
+
+//			if(isAnonymous){
+//				logger.debug("the request is annonymouse access");
+//				if(!isExcludePath(request,requrl)){
+//					logger.debug("the request uri is not in exclude path,goto the login page");
+//					String url ="/login.jsp";
+//					request.getRequestDispatcher(url).forward(request, response);
+//					return;
+//				}
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -125,14 +96,23 @@ public class SecurityFilter implements Filter {
 	}
 
 	/**
+	 * 通过抽象方法注入SecurityUserRepository的实现
+	 * @return
+	 *      SecurityUserRepository的具体实现
+     */
+	public abstract SecurityUserRepository getSecurityUserRepository();
+
+	/**
 	 * 是否是被排除的路径
-	 * @param request 
+	 * @param request
 	 * @return
 	 */
 	private boolean isExcludePath(HttpServletRequest request, String requrl) {
-		for (String p : excludePath) {
-			if(requrl.startsWith(p.trim())){
-				return true;
+		if(excludePath != null){
+			for (String p : excludePath) {
+				if(requrl.startsWith(p.trim())){
+					return true;
+				}
 			}
 		}
 		return false;
@@ -143,9 +123,11 @@ public class SecurityFilter implements Filter {
 	 */
 	public void init(FilterConfig fConfig) throws ServletException {
 		String excludePaths = fConfig.getInitParameter("excludePaths");
-		excludePath = excludePaths.split("\n");
+		if(StringUtil.isNotEmpty(excludePaths)){
+			excludePath = excludePaths.split("\n");
+		}
 	}
-	
+
 //
 	/**
 	 * 创建和声云Token cookie
@@ -167,20 +149,20 @@ public class SecurityFilter implements Filter {
 			} catch (Exception ex){
 				ex.printStackTrace();
 			}
-			
+
 		}
 	}
-	
+
 
 	/**
 	 * 从请求对新中获取hsytoken cookie value
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 */
 	private String getHsyToken(HttpServletRequest request) {
 		String token = null;
-		
+
 		Cookie[] cookies = request.getCookies();
 		if(cookies != null){
 			for (Cookie cookie : cookies) {

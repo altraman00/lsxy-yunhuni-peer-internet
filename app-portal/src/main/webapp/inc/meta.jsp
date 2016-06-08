@@ -14,22 +14,40 @@
 	pageContext.setAttribute("resPrefixUrl",resPrefixUrl);
 
 	String vt = SystemConfig.getVersionStamp();
-	String token = UUIDGenerator.uuid();
-	request.getSession().setAttribute("token", token);
-	
+
 	String rootUrl = SystemConfig.getProperty("portal.system.root.url");
+	String devModel = SystemConfig.getProperty("system.developModel","true");
+
+	SecurityUser currentUser = (SecurityUser)request.getSession().getAttribute("currentUser");
+	String _tenantName = null;
+	if(currentUser != null){
+		_tenantName = currentUser.getTenantName();
+	}
+
 %>
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="cache-control" content="no-cache">
-<meta http-equiv="expires" content="0">   
-<meta name="token" content="<%=token%>">
+<meta http-equiv="expires" content="0">
 
-<link rel="icon" href="<%=rootUrl %>/favicon.ico" type="image/x-icon" />
+<link href='${resPrefixUrl}/resources/images/favicon.ico' type="image/x-icon" rel="shortcut icon">
 <link rel="shortcut icon" href="<%=rootUrl %>/favicon.ico" type="image/x-icon" />
 
-<script type="text/javascript" src="${resPrefixUrl}/common/scripts/common.js?vt=<%=vt%>"></script>
+<link href="${resPrefixUrl}/common/scripts/bootstrap-3.3.0-dist/css/bootstrap.css" rel="stylesheet">
+<link href="${resPrefixUrl}/common/css/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="${resPrefixUrl}/common/css/main.css" rel="stylesheet">
+
+<script src="${resPrefixUrl}/common/scripts/jquery/jquery-1.11.1.min.js"></script>
+<script src="${resPrefixUrl}/common/scripts/jquery/jquery.json.min.js"></script>
+<script src="${resPrefixUrl}/common/scripts/jquery/jquery.bootstrap.min.js"></script>
+<script src="${resPrefixUrl}/common/scripts/bootstrap-validation/bootstrap3-validation.js"></script>
+<script src="${resPrefixUrl}/common/scripts/bootstrap-3.3.0-dist/js/bootstrap.min.js"></script>
+<script src="${resPrefixUrl}/common/scripts/jquery/jquery.form.js"></script>
+
+<script src="${resPrefixUrl}/common/scripts/common.js?vt=<%=vt%>"  type="text/javascript" ></script>
+<script src="${resPrefixUrl}/common/scripts/browser.js?vt=<%=vt%>"  type="text/javascript" ></script>
+
 <%
 if(userAgent.toLowerCase().indexOf("firefox")>=0){
 	%>
@@ -47,6 +65,11 @@ String agent = request.getHeader("User-Agent");
 	if (checkMobile()) {
 		window.location.href = ctx + "/mobile/open/mobileAccessDenied.jsp";
 	}
+
+	//检测浏览器版本，低于ie9.0给予提示
+	checkBrowser(function(){
+		window.location.href = ctx + "/open/browser";
+	})
 </script>
 
 

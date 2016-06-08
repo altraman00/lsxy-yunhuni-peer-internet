@@ -19,15 +19,11 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter{
 
     private Log logger = LogFactory.getLog(SpringMvcConfig.class);
 
-    @Autowired
-    private MyComponent my;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
         if(logger.isDebugEnabled()){
             logger.debug("添加静态资源文件映射");
-            logger.debug("~~~~~~~~~~~~~~~~~:"+my.getUserName());
         }
         registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
 
@@ -47,4 +43,5 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter{
         registry.addViewController("/login");
         registry.addViewController("/console/index");
     }
+
 }

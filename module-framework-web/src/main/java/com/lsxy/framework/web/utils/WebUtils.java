@@ -268,7 +268,7 @@ public class WebUtils {
 			
 			SecurityUser su = (SecurityUser) request.getSession().getAttribute("currentUser");
 	        if(su == null){
-	        	su = new SecurityUser("0", "Anonymouse", "匿名", "null","null", "null","null");
+	        	su = new SecurityUser("0", "Anonymouse", "匿名", "null","null");
 	        }
 	        resultMap.put("currentUser", su);
 	        resultMap.put("dt", new Date());
