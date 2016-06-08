@@ -18,7 +18,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 
 /**
  * 消息监听 监听到的消息调用对应的handle进行处理 handle类名符合以下命名规则才能找到对应的handle类
- * com.hesyun.web.portal.mq.handles.[topicName的第二部分].[topicName中的事件名称部分]Handle
+ * com.hesyun.comm.portal.mq.handles.[topicName的第二部分].[topicName中的事件名称部分]Handle
  *
  */
 @Component("mqMessageListener")

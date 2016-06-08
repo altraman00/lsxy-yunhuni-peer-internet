@@ -167,7 +167,7 @@
             <version>3.3.2</version>
         </dependency>
 
-        <!-- j2ee web spec -->
+        <!-- j2ee comm spec -->
         <!-- http://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
         <dependency>
             <groupId>javax.servlet</groupId>

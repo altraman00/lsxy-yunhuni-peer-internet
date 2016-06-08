@@ -55,7 +55,7 @@ public class Account extends IdEntity {
 //	private String wxHsyOpenid;			//租户用户关注的和声云的openid,客服没有该id,租户管理员有该id,和声云管理员有该id
 //	private String wxUnionId;	//用户对应和声云unionid
 //	private String fixrole;	//角色			//固有角色
-//	private Set<Role> roles;	//角色
+//	private Set<TenantRole> roles;	//角色
 
 	public static int PERSON_STATUS_WAITFORCHECK = 0;    //待审核
 	public static int PERSON_STATUS_LOCKED = 1;            //禁用

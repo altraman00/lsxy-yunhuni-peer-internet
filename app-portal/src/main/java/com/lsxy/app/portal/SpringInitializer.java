@@ -1,6 +1,6 @@
 package com.lsxy.app.portal;
 
-import com.lsxy.app.portal.config.SpringSartupConfig;
+import com.lsxy.app.portal.config.SpringStartupConfig;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -16,7 +16,7 @@ import javax.servlet.ServletRegistration;
 
  package com.websystique.springmvc.configuration;
 
- import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+ import org.springframework.comm.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
  public class HelloWorldInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -42,7 +42,7 @@ public class SpringInitializer implements WebApplicationInitializer{
     @Override
     public void onStartup(ServletContext container) throws ServletException {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        ctx.register(SpringSartupConfig.class);
+        ctx.register(SpringStartupConfig.class);
 
         ctx.setServletContext(container);
 
