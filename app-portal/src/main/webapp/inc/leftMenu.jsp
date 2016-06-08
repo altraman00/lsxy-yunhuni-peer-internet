@@ -21,7 +21,7 @@
 				style="background: url(${resPrefixUrl}/common/images/icon_menu_set.png) no-repeat;"></i>用户中心
 		</dt>
 		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/customers">账号</a>
+			<a href="${ctx}/console/account/index">账号</a>
 		</dd>
 		<dd class="menu_item">
 			<a href="${ctx}/tenant/admin/customer/customerlabels">费用中心</a>
