@@ -1,8 +1,6 @@
 package com.lsxy.app.portal.console.account;
 
-import com.alibaba.fastjson.JSONObject;
 import com.lsxy.framework.web.rest.RestResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
