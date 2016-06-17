@@ -1,9 +1,10 @@
-package com.lsxy.app.portal.rest.config;
+package com.lsxy.app.portal.config;
 
-import com.lsxy.app.portal.rest.security.SpringSecurityConfig;
+import com.lsxy.app.portal.security.SpringSecurityConfig;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.SecurityConfig;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**

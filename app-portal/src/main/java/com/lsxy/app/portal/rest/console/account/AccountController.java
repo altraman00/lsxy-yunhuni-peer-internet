@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest.console.account;
+package com.lsxy.app.portal.console.account;
 
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.stereotype.Controller;
@@ -12,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping("/console/account")
 public class AccountController {
+
+
 
     @RequestMapping("/index")
     public ModelAndView index(){

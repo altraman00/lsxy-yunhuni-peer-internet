@@ -45,7 +45,7 @@ function logout(){
 		</li> 
 
 		<li>
-			<a href="${ctx }/">退出</a>
+			<a href="javascript:logout();">退出</a>
 		</li>
       </ul>
     </div><!-- /.navbar-collapse -->

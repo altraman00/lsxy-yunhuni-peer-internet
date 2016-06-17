@@ -1,7 +1,8 @@
-package com.lsxy.app.portal.rest;
+package com.lsxy.app.portal;
 
-import com.lsxy.app.portal.rest.config.SpringStartupConfig;
+import com.lsxy.app.portal.config.SpringStartupConfig;
 import com.lsxy.framework.core.web.SpringContextUtil;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;

@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest.tenant.web;
+package com.lsxy.app.portal.tenant.web;
 
 import com.lsxy.framework.web.web.AbstractController;
 import org.springframework.stereotype.Controller;

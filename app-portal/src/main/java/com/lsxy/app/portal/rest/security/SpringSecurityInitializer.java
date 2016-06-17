@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest.security;
+package com.lsxy.app.portal.security;
 
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 

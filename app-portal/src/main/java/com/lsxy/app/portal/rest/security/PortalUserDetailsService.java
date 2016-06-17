@@ -1,6 +1,6 @@
-package com.lsxy.app.portal.rest.security;
+package com.lsxy.app.portal.security;
 
-import com.lsxy.framework.tenant.model.TenantRole;
+import com.hesyun.framework.tenant.model.TenantRole;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
