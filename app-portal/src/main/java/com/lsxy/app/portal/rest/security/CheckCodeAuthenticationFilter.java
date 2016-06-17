@@ -1,12 +1,11 @@
-package com.lsxy.app.portal.security;
+package com.lsxy.app.portal.rest.security;
 
-import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.app.portal.rest.comm.PortalConstants;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

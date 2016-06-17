@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.comm;
+package com.lsxy.app.portal.rest.comm;
 
 /**
  * Created by liups on 2016/6/16.

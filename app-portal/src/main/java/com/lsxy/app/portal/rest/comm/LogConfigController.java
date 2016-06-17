@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.comm;
+package com.lsxy.app.portal.rest.comm;
 
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestResponse;

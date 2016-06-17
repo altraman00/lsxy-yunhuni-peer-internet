@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.comm;
+package com.lsxy.app.portal.rest.comm;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.config;
+package com.lsxy.app.portal.rest.config;
 
 import com.lsxy.app.portal.security.MyComponent;
 import org.apache.commons.logging.Log;

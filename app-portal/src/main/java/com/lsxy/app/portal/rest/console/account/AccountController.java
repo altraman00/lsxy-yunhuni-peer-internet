@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.console.account;
+package com.lsxy.app.portal.rest.console.account;
 
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.stereotype.Controller;

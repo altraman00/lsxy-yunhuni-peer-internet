@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.security;
+package com.lsxy.app.portal.rest.security;
 
 import com.lsxy.framework.core.security.SecurityUser;
 import com.lsxy.framework.web.security.SecurityUserRepository;

@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.security;
+package com.lsxy.app.portal.rest.security;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;

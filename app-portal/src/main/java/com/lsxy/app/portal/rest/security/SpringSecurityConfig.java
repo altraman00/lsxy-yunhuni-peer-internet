@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.security;
+package com.lsxy.app.portal.rest.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

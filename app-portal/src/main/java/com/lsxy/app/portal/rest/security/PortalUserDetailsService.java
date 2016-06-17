@@ -1,7 +1,7 @@
-package com.lsxy.app.portal.security;
+package com.lsxy.app.portal.rest.security;
 
-import com.hesyun.framework.tenant.model.TenantRole;
 import com.lsxy.framework.core.utils.PasswordUtil;
+import com.lsxy.framework.tenant.model.TenantRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -26,7 +26,7 @@ public class PortalUserDetailsService implements UserDetailsService{
         return user;
     }
 
-    private List<GrantedAuthority> buildUserAuthority(TenantRole ... roles) {
+    private List<GrantedAuthority> buildUserAuthority(TenantRole... roles) {
         List<GrantedAuthority> Result = new ArrayList<>();
         for (TenantRole role : roles) {
             Result.add(new SimpleGrantedAuthority(role.getRoleName()));
