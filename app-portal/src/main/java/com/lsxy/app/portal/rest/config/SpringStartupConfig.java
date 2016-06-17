@@ -1,6 +1,6 @@
 package com.lsxy.app.portal.rest.config;
 
-import com.lsxy.app.portal.security.SpringSecurityConfig;
+import com.lsxy.app.portal.rest.security.SpringSecurityConfig;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
