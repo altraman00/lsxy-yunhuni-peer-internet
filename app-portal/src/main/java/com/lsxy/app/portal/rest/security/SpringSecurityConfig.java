@@ -4,10 +4,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.dao.ReflectionSaltSource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -33,13 +35,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         }
         String loginPage = "/login";
         String logoutPage = "/logout";
+        String checkCodeFailurePage = "/login?er=vcer";
         String loginFailurePage = "/login?er=true";
         String loginSuccessPage = "/console/index";
         http.authorizeRequests()
                 .antMatchers("/console/**").access("hasRole('ROLE_TENANT_USER')")
                 .and()
                     //增加自定义的登录校验过滤器
-                    .addFilterBefore(new CheckCodeAuthenticationFilter(loginPage,loginFailurePage),UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(new CheckCodeAuthenticationFilter(loginPage,checkCodeFailurePage),UsernamePasswordAuthenticationFilter.class)
                     .formLogin().loginPage(loginPage)
                     .failureUrl(loginFailurePage)
                     .defaultSuccessUrl(loginSuccessPage)
@@ -65,9 +68,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         rss.setUserPropertyToUse("username");
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setSaltSource(rss);
-
         provider.setUserDetailsService(userDetailsService);
-
         provider.setPasswordEncoder(getPasswordEncode());
 
         provider.setHideUserNotFoundExceptions(false);

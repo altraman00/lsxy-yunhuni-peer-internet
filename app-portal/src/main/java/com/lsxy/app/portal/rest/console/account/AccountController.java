@@ -24,7 +24,7 @@ public class AccountController {
         return mav;
     }
 
-    /**\
+    /**
      *
      * @return
      */

@@ -13,6 +13,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -31,6 +32,7 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res=(HttpServletResponse)response;
+
         if ("POST".equalsIgnoreCase(req.getMethod())&&servletPath.equals(req.getServletPath())){
             String expect = (String) req.getSession().getAttribute(PortalConstants.VC_KEY);
             if(expect == null){
