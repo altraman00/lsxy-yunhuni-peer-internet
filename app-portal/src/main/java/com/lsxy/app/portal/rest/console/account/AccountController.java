@@ -13,6 +13,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/console/account")
 public class AccountController {
 
+
+
     @RequestMapping("/index")
     public ModelAndView index(){
         ModelAndView mav = new ModelAndView();
@@ -22,7 +24,7 @@ public class AccountController {
         return mav;
     }
 
-    /**\
+    /**
      *
      * @return
      */

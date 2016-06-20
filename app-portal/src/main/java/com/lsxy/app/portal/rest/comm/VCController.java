@@ -79,7 +79,7 @@ public class VCController {
             }
         }
         //将认证码存入session
-        request.getSession().setAttribute("SystemCode",sRand);
+        request.getSession().setAttribute(PortalConstants.VC_KEY,sRand);
 
         g.dispose();
         //输出图象到页面
@@ -101,7 +101,7 @@ public class VCController {
     @RequestMapping("/check")
     public String checkCode(HttpServletRequest request){
         String code  = request.getParameter("code");
-        String SystemCode = (String) request.getSession().getAttribute("SystemCode");
+        String SystemCode = (String) request.getSession().getAttribute(PortalConstants.VC_KEY);
         if(SystemCode.equalsIgnoreCase(code))
             return "true";
         else
