@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.tenant.model.Account;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -13,7 +14,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 @RestController
 public class AccountController extends AbstractRestController {
 
-    @RequestMapping("/")
+    @RequestMapping(value = "/returnAccount",method = RequestMethod.POST)
     public Account restMyAccountInfo(){
         return new Account();
     }
