@@ -2,16 +2,14 @@ package com.lsxy.app.portal.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authentication.dao.ReflectionSaltSource;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
 /**
  * Created by Tandy on 2016/6/7.
@@ -28,12 +26,28 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             logger.debug("初始化Spring Security安全框架");
         }
 
+
         http.authorizeRequests()
                 .antMatchers("/*").permitAll()
                 .antMatchers("/rest/**").access("hasRole('ROLE_TENANT_USER')")
-                .and().csrf().disable();
+                .and().httpBasic()
+                .and().csrf().disable()
+        ;
+
+        http.addFilter(headerAuthenticationFilter());
     }
 
+    @Bean
+    public TokenPreAuthenticationFilter headerAuthenticationFilter() throws Exception {
+        return new TokenPreAuthenticationFilter(authenticationManager());
+    }
+
+
+    private AuthenticationProvider preAuthenticationProvider() {
+        PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
+//        provider.setPreAuthenticatedUserDetailsService(new KanBanAuthenticationUserDetailsService());
+        return provider;
+    }
 
     /**
      * 配置加密机制,以及加密盐值
@@ -54,7 +68,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //        provider.setHideUserNotFoundExceptions(false);
 //
 //        auth.authenticationProvider(provider);
-        super.configure(auth);
+        auth.inMemoryAuthentication().withUser("user001").password("123").roles("TENANT_USER");
+
+//        super.configure(auth);
 
     }
 
