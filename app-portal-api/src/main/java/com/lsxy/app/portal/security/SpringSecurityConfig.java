@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
 /**
@@ -32,6 +33,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/rest/**").access("hasRole('ROLE_TENANT_USER')")
                 .and().httpBasic()
                 .and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         ;
 
         http.addFilter(headerAuthenticationFilter());
@@ -45,7 +47,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private AuthenticationProvider preAuthenticationProvider() {
         PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
-//        provider.setPreAuthenticatedUserDetailsService(new KanBanAuthenticationUserDetailsService());
+        provider.setPreAuthenticatedUserDetailsService(new TokenAuthenticationUserDetailsService());
         return provider;
     }
 
@@ -67,7 +69,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //
 //        provider.setHideUserNotFoundExceptions(false);
 //
-//        auth.authenticationProvider(provider);
+        auth.authenticationProvider(preAuthenticationProvider());
         auth.inMemoryAuthentication().withUser("user001").password("123").roles("TENANT_USER");
 
 //        super.configure(auth);

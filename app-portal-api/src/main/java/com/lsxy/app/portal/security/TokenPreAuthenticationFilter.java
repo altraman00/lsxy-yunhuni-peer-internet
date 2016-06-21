@@ -14,6 +14,7 @@ public class TokenPreAuthenticationFilter extends AbstractPreAuthenticatedProces
     public static final String SSO_CREDENTIALS = "N/A";
 
     public TokenPreAuthenticationFilter(AuthenticationManager authenticationManager) {
+        setAuthenticationManager(authenticationManager);
     }
 
 
