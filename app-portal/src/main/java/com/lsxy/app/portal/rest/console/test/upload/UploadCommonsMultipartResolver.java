@@ -1,6 +1,5 @@
-package com.lsxy.app.portal.rest.console.upload;
+package com.lsxy.app.portal.rest.console.test.upload;
 
-import com.lsxy.app.portal.rest.console.upload.UploadListener;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -13,7 +12,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/6/20.
+ * Created by zhangxb on 2016/6/20.
  */
 public class UploadCommonsMultipartResolver extends CommonsMultipartResolver {
 

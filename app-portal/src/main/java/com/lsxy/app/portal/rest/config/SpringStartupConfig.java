@@ -1,6 +1,6 @@
 package com.lsxy.app.portal.rest.config;
 
-import com.lsxy.app.portal.rest.console.upload.UploadCommonsMultipartResolver;
+import com.lsxy.app.portal.rest.console.test.upload.UploadCommonsMultipartResolver;
 import com.lsxy.app.portal.rest.security.SpringSecurityConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

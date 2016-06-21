@@ -98,7 +98,7 @@
                 }
             }
             var progressStatusText = document.getElementById("progressBar");
-            xmlhttp.open("get","${ctx}/file/status",true);
+            xmlhttp.open("get","${ctx}/test/upload/status",true);
             /**此处Header设置非常重要，必须设置Content-type类型，负责会报错误
              */
             xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -139,7 +139,7 @@
                 }
             }
             var progressStatusText = document.getElementById("progressBar");
-            xmlhttp.open("get","${ctx}/file/cancel",true);
+            xmlhttp.open("get","${ctx}/test/upload/cancel",true);
             xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             //xmlhttp.setRequestHeader("Content-type", "multipart/form-data");
             xmlhttp.onreadystatechange = function(){
@@ -171,13 +171,13 @@
 
 
         <div> <h2>上传文件</h2></div>
-       <form  action="${ctx}/file/upload" enctype="multipart/form-data" method="post" onsubmit="return startUpload();" >
-                    <input type="file" multiple name="file" id="file" size="40"/><br>
-                    <input type="submit" name="uploadButton" id="uploadButton" value="开始上传"/>
-                    <input type="button" name="cancelUploadButton" id="cancelUploadButton" value="取消上传" onclick="return cancelUpload();"/><br>
-                </form>
-                    <div id="progressBar">
-                    </div>
+       <form  action="${ctx}/test/upload/upload" enctype="multipart/form-data" method="post" onsubmit="return startUpload();" >
+           <input type="file" multiple name="file" id="file" size="40"/><br>
+           <input type="submit" name="uploadButton" id="uploadButton" value="开始上传"/>
+           <input type="button" name="cancelUploadButton" id="cancelUploadButton" value="取消上传" onclick="return cancelUpload();"/><br>
+       </form>
+        <div id="progressBar">
+        </div>
 
     </div>
 </div>

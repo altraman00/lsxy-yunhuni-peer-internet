@@ -1,10 +1,11 @@
-package com.lsxy.app.portal.rest.console.upload;
+package com.lsxy.app.portal.rest.console.test.upload;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/6/20.
+ * 一次文件上传对象
+ * Created by zhangxb on 2016/6/20.
  */
 public class UploadEntity {
 

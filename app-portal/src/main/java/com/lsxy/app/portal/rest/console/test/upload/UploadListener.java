@@ -1,11 +1,12 @@
-package com.lsxy.app.portal.rest.console.upload;
+package com.lsxy.app.portal.rest.console.test.upload;
 
 import org.apache.commons.fileupload.ProgressListener;
 
 import javax.servlet.http.HttpSession;
 
 /**
- * Created by Administrator on 2016/6/20.
+ * 文件上传监听
+ * Created by zhangxb on 2016/6/20.
  */
 public class UploadListener implements ProgressListener {
 
@@ -14,8 +15,8 @@ public class UploadListener implements ProgressListener {
     }
     public UploadListener(HttpSession _session) {
         session=_session;
-        UploadEntity ps = new UploadEntity();
-        session.setAttribute("upload_ps", ps);
+        UploadEntity fuploadStatus = new UploadEntity();
+        session.setAttribute("upload_ps", fuploadStatus);
     }
     public void update(long pBytesRead, long pContentLength, int pItems) {
         UploadEntity fuploadStatus = (UploadEntity) session.getAttribute("upload_ps");

@@ -42,7 +42,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .logout().logoutSuccessUrl("/login")
                 .and()
-                    .csrf().ignoringAntMatchers("/file/*");
+                    .csrf().ignoringAntMatchers("/test/upload/*");
     }
 
 
