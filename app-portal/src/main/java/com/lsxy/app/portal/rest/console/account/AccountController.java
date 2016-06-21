@@ -2,6 +2,8 @@ package com.lsxy.app.portal.rest.console.account;
 
 import com.lsxy.app.portal.rest.security.PortalAuthenticationSuccessHandler;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,12 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/console/account")
 public class AccountController {
 
-
+    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
     @RequestMapping("/index")
     public ModelAndView index(HttpServletRequest request){
-        Object attribute = request.getSession().getAttribute(PortalAuthenticationSuccessHandler.SSO_TOKEN);
-        System.out.println("***********tocken=" + attribute);
+        if(logger.isDebugEnabled()){
+            Object attribute = request.getSession().getAttribute(PortalAuthenticationSuccessHandler.SSO_TOKEN);
+            logger.debug("调试登录tocken,{}",attribute);
+        }
         ModelAndView mav = new ModelAndView();
 
         mav.addObject("a","b");
