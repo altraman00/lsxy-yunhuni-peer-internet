@@ -67,7 +67,11 @@
         <%@include file="/inc/leftMenu.jsp" %>
     </div>
     <div class="col_main">
-       sdfsdfsdfsdf
+       账户管理<br/>
+        <a href="${ctx}/console/account/securitySettings">安全设置</a><br>
+        <a href="${ctx}/console/account/information">基本资料</a><br>
+        <a href="${ctx}/console/account/certification">实名认证</a><br>
+        <a href="${ctx}/test/upload/index">文件上传</a><br>
     </div>
 </div>
 <%@include file="/inc/footer.jsp" %>

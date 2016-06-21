@@ -53,7 +53,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .csrf()
                     //登录登出不用csrf
-                    .ignoringAntMatchers(loginPage,logoutPage);
+                    .ignoringAntMatchers(loginPage,logoutPage,"/test/upload/*");
 //                .and()
 //                    .exceptionHandling().accessDeniedPage("/exception/403");
     }
