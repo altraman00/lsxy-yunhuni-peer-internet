@@ -41,14 +41,16 @@ public class PreUserDetailsService implements AuthenticationUserDetailsService {
     @Override
     public UserDetails loadUserDetails(Authentication token) throws UsernameNotFoundException {
         String principal = (String) token.getPrincipal();
+        User user = null;
         if(!StringUtils.isEmpty(principal)) {
             //此处应根据token从Redis获取用户并组装成UserDetails返回（principal为tocken） AbstractAuthenticationToken
             if("user-tocken".equals(principal)){
-                User user = new User("user",PasswordUtil.springSecurityPasswordEncode("password","user"),true,true,true,true,roles("ROLE_TENANT_USER"));
-                return user;
+                user = new User("user",PasswordUtil.springSecurityPasswordEncode("password","user"),true,true,true,true,roles("ROLE_TENANT_USER"));
             }
         }
-        return null;
-
+        if(user == null){
+            throw new UsernameNotFoundException(principal);
+        }
+        return user;
     }
 }
