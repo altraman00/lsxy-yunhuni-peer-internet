@@ -15,7 +15,7 @@ import java.util.UUID;
 @RestController
 public class LoginController {
     /**
-     * 登录接口（注：登录接口不要带tocken验证头，即X-Auth-Token，否则会报异常进不来）
+     * 登录接口
      * @return
      */
     @RequestMapping(path="/login",method = RequestMethod.POST)
