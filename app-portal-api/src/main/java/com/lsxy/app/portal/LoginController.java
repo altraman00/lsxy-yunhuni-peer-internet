@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,7 +22,7 @@ public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @RequestMapping(path="/login",method = RequestMethod.POST)
-    public RestResponse login(){
+    public RestResponse login(@RequestParam String username,@RequestParam String password){
 
         UserRestToken token = new UserRestToken();
         return RestResponse.success(token);
