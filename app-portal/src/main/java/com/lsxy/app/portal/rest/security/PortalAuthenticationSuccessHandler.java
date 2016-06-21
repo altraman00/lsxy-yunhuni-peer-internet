@@ -1,5 +1,8 @@
 package com.lsxy.app.portal.rest.security;
 
+import com.lsxy.app.portal.rest.console.account.AccountController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
@@ -13,12 +16,15 @@ import java.io.IOException;
  * Created by liups on 2016/6/21.
  */
 public class PortalAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
     public static final String SSO_TOKEN = "X-Auth-Token";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         super.onAuthenticationSuccess(request, response, authentication);
-        logger.debug("user login success:"+authentication.getName());
+        if(logger.isDebugEnabled()){
+            logger.debug("user login success:{}",authentication.getName());
+        }
         //将tocken保存到session
         Object details = authentication.getDetails();
         if(details instanceof String){

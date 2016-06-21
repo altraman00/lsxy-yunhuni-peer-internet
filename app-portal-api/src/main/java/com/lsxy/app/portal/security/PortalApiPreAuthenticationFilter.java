@@ -8,11 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Created by liups on 2016/6/20.
  */
-public class PortalPreAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter{
+public class PortalApiPreAuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter{
     public static final String SSO_TOKEN = "X-Auth-Token";
     public static final String SSO_CREDENTIALS = "N/A";
 
-    public PortalPreAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public PortalApiPreAuthenticationFilter(AuthenticationManager authenticationManager) {
         setAuthenticationManager(authenticationManager);
     }
 

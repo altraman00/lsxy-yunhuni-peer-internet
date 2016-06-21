@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 @RestController
 public class AccountController extends AbstractRestController {
 
-    @RequestMapping(value = "/returnAccount",method = RequestMethod.POST)
+    @RequestMapping(value = "/")
     public Account restMyAccountInfo(){
         return new Account();
     }

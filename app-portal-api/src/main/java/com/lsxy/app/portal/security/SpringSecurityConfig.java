@@ -8,16 +8,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.dao.ReflectionSaltSource;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
-import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 
 /**
  * Created by Tandy on 2016/6/7.
@@ -29,7 +28,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Autowired
-    AuthenticationUserDetailsService userDetailsService;
+    AuthenticationUserDetailsService preUserDetailsService;
+
+    @Autowired
+    UserDetailsService daoUserDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,49 +45,55 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/*").permitAll()
                 .and().addFilter(headerAuthenticationFilter())
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//                .and()
-//                .httpBasic();
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .httpBasic();
     }
 
 
     @Bean
-    public PortalPreAuthenticationFilter headerAuthenticationFilter() throws Exception {
-        return new PortalPreAuthenticationFilter(authenticationManager());
+    public PortalApiPreAuthenticationFilter headerAuthenticationFilter() throws Exception {
+        return new PortalApiPreAuthenticationFilter(authenticationManager());
     }
 
+    /**
+     * 配置校验器
+     * @param builder
+     * @throws Exception
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder builder) throws Exception {
-        builder.authenticationProvider(preAuthenticationProvider());
+        builder.authenticationProvider(getPreAuthenticationProvider());
+        builder.authenticationProvider(getDaoAuthenticationProvider());
     }
 
-    private AuthenticationProvider preAuthenticationProvider() {
+    private AuthenticationProvider getPreAuthenticationProvider() {
         PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
-        provider.setPreAuthenticatedUserDetailsService(userDetailsService);
+        provider.setPreAuthenticatedUserDetailsService(preUserDetailsService);
+        return provider;
+    }
+
+    private AuthenticationProvider getDaoAuthenticationProvider(){
+        ReflectionSaltSource rss = new ReflectionSaltSource();
+        rss.setUserPropertyToUse("username");
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setSaltSource(rss);
+        provider.setUserDetailsService(daoUserDetailsService);
+        provider.setHideUserNotFoundExceptions(false);
+        provider.setPasswordEncoder(getPasswordEncode());
         return provider;
     }
 
 
-
     /**
-     * 配置加密机制,以及加密盐值
-     * @param auth
-     * @throws Exception
+     * MD5加密器
+     * @return
      */
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        ReflectionSaltSource rss = new ReflectionSaltSource();
-//        rss.setUserPropertyToUse("username");
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setSaltSource(rss);
-//
-//        provider.setUserDetailsService(userDetailsService);
-//
-//        provider.setHideUserNotFoundExceptions(false);
-//
-//        auth.authenticationProvider(provider);
-//        super.configure(auth);
-//    }
+    private org.springframework.security.authentication.encoding.PasswordEncoder getPasswordEncode() {
+        ShaPasswordEncoder encode =  new org.springframework.security.authentication.encoding.ShaPasswordEncoder(256);
+        encode.setEncodeHashAsBase64(true);
+        return encode;
+    }
 
 }
 

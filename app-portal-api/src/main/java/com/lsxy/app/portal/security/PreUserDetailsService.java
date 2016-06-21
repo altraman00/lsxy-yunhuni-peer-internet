@@ -16,8 +16,8 @@ import java.util.List;
 /**
  * Created by Tandy on 2016/6/7.
  */
-@Service("userDetailsService")
-public class PortalApiUserDetailsService implements AuthenticationUserDetailsService {
+@Service("preUserDetailsService")
+public class PreUserDetailsService implements AuthenticationUserDetailsService {
 
 
     private List<GrantedAuthority> buildUserAuthority(TenantRole... roles) {
