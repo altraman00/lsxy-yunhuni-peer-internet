@@ -1,10 +1,13 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.lsxy.app.portal.rest.security.PortalAuthenticationSuccessHandler;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by Tandy on 2016/6/8.
@@ -16,7 +19,9 @@ public class AccountController {
 
 
     @RequestMapping("/index")
-    public ModelAndView index(){
+    public ModelAndView index(HttpServletRequest request){
+        Object attribute = request.getSession().getAttribute(PortalAuthenticationSuccessHandler.SSO_TOKEN);
+        System.out.println("***********tocken=" + attribute);
         ModelAndView mav = new ModelAndView();
 
         mav.addObject("a","b");
