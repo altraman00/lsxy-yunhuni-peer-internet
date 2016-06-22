@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest;
 
+import com.lsxy.framework.tenant.model.Tenant;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,4 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/tenant")
 public class TenantController {
+
+    @RequestMapping("/")
+    public Tenant getTenantInfo(){
+        return new Tenant();
+    }
 }
