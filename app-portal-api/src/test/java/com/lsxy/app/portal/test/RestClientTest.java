@@ -1,23 +1,26 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
+import com.lsxy.framework.tenant.model.Account;
+import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
-import org.apache.commons.collections.MapUtils;
+import com.lsxy.framework.web.rest.UserRestToken;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.omg.PortableServer.REQUEST_PROCESSING_POLICY_ID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.security.RunAs;
-import java.awt.print.Book;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.lsxy.framework.web.rest.RestRequest.buildSecurityRequest;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
  * Created by Tandy on 2016/6/21.
@@ -33,17 +36,26 @@ public class RestClientTest {
 
     private RestTemplate restTemplate = new TestRestTemplate();
 
-    @Test
-    public void login() {
+//    @Test
+    public void login() throws UnsupportedEncodingException {
         String url = restPrefixUrl + "/login";
-        Map<String,String> formParams = new HashMap<>();
+        Map<String,Object> formParams = new HashMap<>();
         formParams.put("username","tanchang");
         formParams.put("password","123");
 
-        MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
-        formParams.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(formParams, key, "")));
-        String restResponse = restTemplate.postForObject(url,requestEntity,String.class);
-        System.out.println(restResponse);
+        RestResponse<?> x = RestRequest.buildRequest().post(url,formParams,UserRestToken.class);
+
+//        MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
+//        formParams.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(formParams, key, "")));
+//        String restResponse = restTemplate.postForObject(url,requestEntity,String.class);
+    }
+
+    @Test
+    public void account(){
+        String url = restPrefixUrl + "/rest/account/";
+        RestResponse<Account> x = RestRequest.buildSecurityRequest("123").get(url, Account.class);
+        System.out.println(x);
+
     }
 
 }

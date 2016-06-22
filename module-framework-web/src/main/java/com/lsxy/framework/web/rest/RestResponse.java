@@ -3,8 +3,10 @@ package com.lsxy.framework.web.rest;
 /**
  * Created by Tandy on 2016/6/6.
  * 提供统一的REST相应对象封装
+ * data 用于提供返回对象的封装
+ *
  */
-public class RestResponse {
+public class RestResponse<T> {
     //是否请求成功
     private boolean success;
 
@@ -15,10 +17,18 @@ public class RestResponse {
     private String errorMsg;
 
     //如果success = true,可提供返回对象，也可以不提供
-    private Object result;
+    private T data;
 
     public boolean isSuccess() {
         return success;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
     }
 
     public void setSuccess(boolean success) {
@@ -41,24 +51,17 @@ public class RestResponse {
         this.errorMsg = errorMsg;
     }
 
-    public Object getResult() {
-        return result;
-    }
-
-    public void setResult(Object result) {
-        this.result = result;
-    }
 
     /**
      * 提供成功的静态方法，方便使用
-     * @param result 希望作为返回值输出的结果对象
+     * @param data 希望作为返回值输出的结果对象
      * @return
      *                  返回success为true的相应对象
      */
-    public static RestResponse success(Object result){
+    public static RestResponse success(Object data){
         RestResponse restResponse = new RestResponse();
         restResponse.setSuccess(true);
-        restResponse.setResult(result);
+        restResponse.setData(data);
         return restResponse;
     }
 
