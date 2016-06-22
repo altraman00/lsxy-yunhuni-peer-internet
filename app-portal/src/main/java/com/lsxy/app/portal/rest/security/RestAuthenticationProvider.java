@@ -12,11 +12,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ public class RestAuthenticationProvider implements AuthenticationProvider, Initi
             tocken = UUID.randomUUID().toString();
         }
         if(!StringUtils.isEmpty(tocken)){
-            Authentication successAuthentication = createSuccessAuthentication(username, authentication,tocken);
+            Authentication successAuthentication = createSuccessAuthentication(username, authentication,roles("ROLE_TENANT_USER"),tocken);
             return successAuthentication;
         }else{
             //这个类不要return null,以异常的形式处理结果
@@ -63,15 +63,15 @@ public class RestAuthenticationProvider implements AuthenticationProvider, Initi
     }
 
     protected Authentication createSuccessAuthentication(Object principal,
-                                                         Authentication authentication,String tocken) {
+                                                         Authentication authentication, Collection<? extends GrantedAuthority> authorities,String tocken) {
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(
-                principal, authentication.getCredentials(),roles("ROLE_TENANT_USER"));
+                principal, authentication.getCredentials(),authorities);
         result.setDetails(tocken);
         return result;
     }
 
     private List<GrantedAuthority> roles(String... roles) {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(
+        List<GrantedAuthority> authorities = new ArrayList<>(
                 roles.length);
         for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority( role));

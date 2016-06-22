@@ -44,7 +44,7 @@
 						<input type="text" name="validateCode" placeholder="验证码" class="form-control" id="form-code">
 					</div>
 					<div class="col-md-6 remove-padding border">
-						<span class="img-code"><img src="${ctx}/vc/get?dt=<%=System.currentTimeMillis()%>" id="imgValidateCode"/></span>
+						<span class="code-img"><img src="${ctx}/vc/get?dt=<%=System.currentTimeMillis()%>" id="imgValidateCode"/></span>
 					</div>
 				</div>
 
@@ -166,6 +166,10 @@
 
 		$('#imgValidateCode').click(function() {
 			$("#imgValidateCode").prop("src","${ctx}/vc/get?dt="+(new Date().getTime()));
+		});
+
+		$('input').keyup(function(){
+			$('.tips').hide();
 		});
 
 	});
