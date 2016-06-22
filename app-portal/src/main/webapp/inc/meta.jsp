@@ -1,3 +1,5 @@
+<%@page import="com.lsxy.framework.core.utils.DateUtils"%>
+<%@page import="java.util.Date"%>
 <%@page import="com.lsxy.framework.core.utils.UUIDGenerator"%>
 <%@page import="com.lsxy.framework.core.security.SecurityUser"%>
 <%@page import="com.lsxy.framework.config.SystemConfig"%>
@@ -9,9 +11,8 @@
 	String sToday = DateUtils.formatDate(today, "yyyy-MM-dd HH:mm:ss");
 	request.setAttribute("today", sToday);
 	String userAgent = request.getHeader("User-Agent");
-	String resPrefixUrl = SystemConfig.getProperty("global.resPrefixUrl",request.getContextPath());
-
-	pageContext.setAttribute("resPrefixUrl",resPrefixUrl);
+//	String resPrefixUrl = SystemConfig.getProperty("global.resPrefixUrl",request.getContextPath());
+//	pageContext.setAttribute("resPrefixUrl",resPrefixUrl);
 
 	String vt = SystemConfig.getVersionStamp();
 

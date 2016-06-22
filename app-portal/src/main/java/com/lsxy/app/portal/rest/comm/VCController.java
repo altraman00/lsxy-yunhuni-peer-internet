@@ -97,16 +97,16 @@ public class VCController {
         return new Color(r,g,b);
     }
 
-    @ResponseBody
-    @RequestMapping("/check")
-    public String checkCode(HttpServletRequest request){
-        String code  = request.getParameter("code");
-        String SystemCode = (String) request.getSession().getAttribute(PortalConstants.VC_KEY);
-        if(SystemCode.equalsIgnoreCase(code))
-            return "true";
-        else
-            return "false";
-    }
+//    @ResponseBody
+//    @RequestMapping("/check")
+//    public String checkCode(HttpServletRequest request){
+//        String code  = request.getParameter("code");
+//        String SystemCode = (String) request.getSession().getAttribute(PortalConstants.VC_KEY);
+//        if(SystemCode.equalsIgnoreCase(code))
+//            return "true";
+//        else
+//            return "false";
+//    }
 
 
 }
