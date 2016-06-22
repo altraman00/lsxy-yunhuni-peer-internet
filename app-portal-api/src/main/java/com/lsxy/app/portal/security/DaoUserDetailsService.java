@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest.security;
+package com.lsxy.app.portal.security;
 
 import com.lsxy.framework.tenant.model.TenantRole;
 import com.lsxy.framework.core.utils.PasswordUtil;
@@ -14,14 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Tandy on 2016/6/7.
+ * Created by liups on 2016/6/21.
  */
-@Service("userDetailsService")
-public class PortalUserDetailsService implements UserDetailsService{
-
+@Service("daoUserDetailsService")
+public class DaoUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //此处临时固定，后面调用jREST接口
+        //此处临时固定，后面调用数据库查询
         User user = new User("user",PasswordUtil.springSecurityPasswordEncode("password","user"),true,true,true,true,roles("ROLE_TENANT_USER"));
         return user;
     }
@@ -31,12 +30,11 @@ public class PortalUserDetailsService implements UserDetailsService{
         for (TenantRole role : roles) {
             Result.add(new SimpleGrantedAuthority(role.getRoleName()));
         }
-         return Result;
+        return Result;
     }
 
-
     private List<GrantedAuthority> roles(String... roles) {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(
+        List<GrantedAuthority> authorities = new ArrayList<>(
                 roles.length);
         for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority( role));
