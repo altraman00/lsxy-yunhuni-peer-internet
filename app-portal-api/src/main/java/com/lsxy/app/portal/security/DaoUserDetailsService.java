@@ -1,6 +1,5 @@
 package com.lsxy.app.portal.security;
 
-import com.lsxy.framework.tenant.model.TenantRole;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,13 +24,6 @@ public class DaoUserDetailsService implements UserDetailsService {
         return user;
     }
 
-    private List<GrantedAuthority> buildUserAuthority(TenantRole ... roles) {
-        List<GrantedAuthority> Result = new ArrayList<>();
-        for (TenantRole role : roles) {
-            Result.add(new SimpleGrantedAuthority(role.getRoleName()));
-        }
-        return Result;
-    }
 
     private List<GrantedAuthority> roles(String... roles) {
         List<GrantedAuthority> authorities = new ArrayList<>(

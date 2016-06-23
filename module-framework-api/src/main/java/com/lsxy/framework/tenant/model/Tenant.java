@@ -22,9 +22,9 @@ import com.lsxy.framework.core.utils.JSONUtil;
  * @author WangYun
  * 
  */
-@Entity
-@Table(schema="hsy_service_tenant",name = "tb_tenant")
-@XmlRootElement
+//@Entity
+//@Table(schema="hsy_service_tenant",name = "tb_tenant")
+//@XmlRootElement
 public class Tenant extends IdEntity{
 	private static final long serialVersionUID = 1L;
 

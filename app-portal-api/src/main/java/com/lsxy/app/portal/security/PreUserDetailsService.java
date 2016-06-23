@@ -1,8 +1,6 @@
 package com.lsxy.app.portal.security;
 
 import com.lsxy.framework.core.utils.PasswordUtil;
-import com.lsxy.framework.tenant.model.TenantRole;
-import com.lsxy.framework.web.rest.UserRestToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,14 +17,6 @@ import java.util.List;
 @Service("preUserDetailsService")
 public class PreUserDetailsService implements AuthenticationUserDetailsService {
 
-
-    private List<GrantedAuthority> buildUserAuthority(TenantRole... roles) {
-        List<GrantedAuthority> Result = new ArrayList<>();
-        for (TenantRole role : roles) {
-            Result.add(new SimpleGrantedAuthority(role.getRoleName()));
-        }
-         return Result;
-    }
 
 
     private List<GrantedAuthority> roles(String... roles) {

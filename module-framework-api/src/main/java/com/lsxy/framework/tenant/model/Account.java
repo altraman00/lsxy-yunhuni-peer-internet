@@ -9,8 +9,8 @@ import javax.persistence.*;
  * 租户用户
  * @author tandy
  */
-@Entity
-@Table(schema = "hsy_service_tenant", name = "tb_tenant_account")
+//@Entity
+//@Table(schema = "hsy_service_tenant", name = "tb_tenant_account")
 public class Account extends IdEntity {
 	/**
 	 *
