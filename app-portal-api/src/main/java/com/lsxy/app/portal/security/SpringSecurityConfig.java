@@ -14,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 
@@ -25,13 +24,8 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
-
-
     @Autowired
-    AuthenticationUserDetailsService preUserDetailsService;
-
-    @Autowired
-    UserDetailsService daoUserDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -40,48 +34,57 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             logger.debug("初始化Spring Security安全框架");
         }
 
+
         http.authorizeRequests()
-                .antMatchers("/rest/**").access("hasRole('ROLE_TENANT_USER')")
                 .antMatchers("/*").permitAll()
-                .and().addFilter(headerAuthenticationFilter())
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .httpBasic();
+                .antMatchers("/rest/**").access("hasRole('ROLE_TENANT_USER')")
+                .and().httpBasic()
+                .and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+        ;
+
+        http.addFilter(headerAuthenticationFilter());
+    }
+
+    @Bean
+    public TokenPreAuthenticationFilter headerAuthenticationFilter() throws Exception {
+        return new TokenPreAuthenticationFilter(authenticationManager());
     }
 
 
-    @Bean
-    public PortalApiPreAuthenticationFilter headerAuthenticationFilter() throws Exception {
-        return new PortalApiPreAuthenticationFilter(authenticationManager());
+    private AuthenticationProvider preAuthenticationProvider() {
+        PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
+        provider.setPreAuthenticatedUserDetailsService(new TokenAuthenticationUserDetailsService());
+        return provider;
     }
 
     /**
      * 配置校验器
-     * @param builder
+     * @param auth
      * @throws Exception
      */
     @Override
-    protected void configure(AuthenticationManagerBuilder builder) throws Exception {
-        builder.authenticationProvider(getPreAuthenticationProvider());
-        builder.authenticationProvider(getDaoAuthenticationProvider());
-    }
-
-    private AuthenticationProvider getPreAuthenticationProvider() {
-        PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
-        provider.setPreAuthenticatedUserDetailsService(preUserDetailsService);
-        return provider;
-    }
-
-    private AuthenticationProvider getDaoAuthenticationProvider(){
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         ReflectionSaltSource rss = new ReflectionSaltSource();
         rss.setUserPropertyToUse("username");
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setSaltSource(rss);
-        provider.setUserDetailsService(daoUserDetailsService);
-        provider.setHideUserNotFoundExceptions(false);
+
+        provider.setUserDetailsService(userDetailsService);
+
         provider.setPasswordEncoder(getPasswordEncode());
-        return provider;
+
+        provider.setHideUserNotFoundExceptions(false);
+
+        auth.authenticationProvider(preAuthenticationProvider());
+        auth.authenticationProvider(provider);
+
+
+
+//        auth.inMemoryAuthentication().withUser("user001").password("123").roles("TENANT_USER");
+
+//        super.configure(auth);
+
     }
 
 

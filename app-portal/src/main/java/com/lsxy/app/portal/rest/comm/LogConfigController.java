@@ -14,7 +14,6 @@ import static com.lsxy.framework.web.rest.RestResponse.failed;
 /**
  * Created by Tandy on 2016/6/6.
  * 可动态设置log4j的日志级别
- *  修改点东西
  */
 @RestController
 @RequestMapping("/config")
