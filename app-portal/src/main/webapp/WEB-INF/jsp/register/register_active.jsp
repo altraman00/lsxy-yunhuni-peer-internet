@@ -10,7 +10,7 @@
     <!--bootstrap.css-->
     <link   href="${resPrefixUrl }/bower_components/bootstrap/dist/css/bootstrap.css"  rel="stylesheet" type="text/css"  />
     <!--index.css-->
-    <link href="${resPrefixUrl }/stylesheets/screen.css" rel="stylesheet"  type="text/css" />
+    <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
     <!--vaildator.css-->
     <link rel="stylesheet" href="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.css">
 

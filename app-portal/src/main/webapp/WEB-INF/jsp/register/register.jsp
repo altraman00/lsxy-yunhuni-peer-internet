@@ -10,7 +10,7 @@
     <!--bootstrap.css-->
     <link   href="${resPrefixUrl }/bower_components/bootstrap/dist/css/bootstrap.css"  rel="stylesheet" type="text/css"  />
     <!--index.css-->
-    <link href="${resPrefixUrl }/stylesheets/screen.css" rel="stylesheet"  type="text/css" />
+    <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
     <!--vaildator.css-->
     <link rel="stylesheet" href="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.min.css">
 
@@ -66,7 +66,13 @@
                             <a id="validateBtn"  class="btn btn-primary  btn-form">注册</a>
                         </div>
                     </div>
+                    <!--提示-->
                 </form:form>
+                <div class="form-group">
+                    <div class="col-lg-9 col-lg-offset-3">
+                        <span id="showtips" class="tips-error" style="display: none" >用户名已经存在</span>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -143,6 +149,32 @@
         //异步发送验证码
         $.get(ctx + "/mc/send",{"mobile":mobile});
     }
+
+
+    //检验账号是否注册
+    function reg_isexit(){
+        var bol = false;
+        var username = $('#form-username').val();
+        var mobile = $('#form-mobile').val();
+        var email = $('#form-email').val();
+        $.ajax({
+            type: "get",
+            url: ctx + "/info_check",
+            data: { username: username,mobile:mobile,email:email },   //id
+            async: false,
+            datatype: "json",
+            success: function(result) {
+                if(result.flag){
+                    bol = true;
+                }else{
+                    //显示showtips
+                    tipsmsg(result.err);
+                }
+            }
+        });
+        return bol;
+    }
+
 </script>
 
 </body>

@@ -6,6 +6,7 @@ import com.lsxy.app.portal.rest.exceptions.RegisterException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Nonnull;
@@ -30,9 +31,19 @@ public class RegisterController {
      * 检查注册信息是否已被使用
      */
     @RequestMapping(value = "/info_check" , method = RequestMethod.GET)
-    public boolean infoCheck(String type,String data){
+    @ResponseBody
+    public Map infoCheck(@Nonnull String username, @Nonnull String mobile,@Nonnull String email){
+        Map<String,Object> result = new HashMap<>();
+        result.put("flag",true);
         //此处调用用户注册验证微服务
-        return regInfoCheck(type,data);
+        try {
+            regInfoCheck(username,mobile,email);
+        } catch (RegisterException e) {
+            //提示信息：手机验证没通过
+            result.put("err",e.getMessage());
+            result.put("flag",false);
+        }
+        return result;
     }
 
     /**
@@ -121,7 +132,7 @@ public class RegisterController {
 
 
     //模拟微服务校验
-    private static boolean regInfoCheck(String username,String mobile,String email){
+    private static void regInfoCheck(String username,String mobile,String email){
         if(!regInfoCheck("username", username)){
             //提示信息：用户名已被注册
             throw new RegisterException("注册失败，用户名已被注册");
@@ -134,7 +145,6 @@ public class RegisterController {
             //提示信息：邮箱已被注册
             throw new RegisterException("注册失败，邮箱已被注册");
         }
-        return true;
     }
 
     //模拟微服务校验
