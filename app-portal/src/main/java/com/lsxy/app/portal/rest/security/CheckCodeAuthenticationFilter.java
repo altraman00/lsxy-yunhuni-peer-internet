@@ -13,13 +13,17 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
  * Created by liups on 2016/6/17.
  */
 class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+    //验证码超时
+    public static final String VC_OVERTIME = "验证码超时";
+
+    //验证码错误
+    public static final String VC_ERROR = "验证码错误";
 
     private String servletPath;
     public CheckCodeAuthenticationFilter(String servletPath,String failureUrl) {
@@ -36,10 +40,12 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
         if ("POST".equalsIgnoreCase(req.getMethod())&&servletPath.equals(req.getServletPath())){
             String expect = (String) req.getSession().getAttribute(PortalConstants.VC_KEY);
             if(expect == null){
-                unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(PortalConstants.VC_OVERTIME));
+                unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_OVERTIME));
                 return;
             }else if(!expect.equalsIgnoreCase(req.getParameter(PortalConstants.VC_KEY))){
-                unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(PortalConstants.VC_ERROR));
+                unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_ERROR));
+                //图形验证码一次验证不过就清空
+                req.getSession().removeAttribute(PortalConstants.VC_KEY);
                 return;
             }
         }

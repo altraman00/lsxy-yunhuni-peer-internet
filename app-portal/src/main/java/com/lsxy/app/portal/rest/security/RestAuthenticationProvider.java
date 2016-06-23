@@ -5,6 +5,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -15,6 +16,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,25 +48,30 @@ public class RestAuthenticationProvider implements AuthenticationProvider, Initi
         Object password = authentication.getCredentials();
 
         //此处调用restApi进行登录，并对登录结果进行处理
-        String tocken = UUID.randomUUID().toString();
+        String tocken = null;
+        if("user".equals(username)&&"password".equals(password)){
+            tocken = UUID.randomUUID().toString();
+        }
         if(!StringUtils.isEmpty(tocken)){
-            Authentication successAuthentication = createSuccessAuthentication(username, authentication,tocken);
+            Authentication successAuthentication = createSuccessAuthentication(username, authentication,roles("ROLE_TENANT_USER"),tocken);
             return successAuthentication;
+        }else{
+            //这个类不要return null,以异常的形式处理结果
+            throw new BadCredentialsException("密码错误,或账号被锁定");
         }
 
-        return null;
     }
 
     protected Authentication createSuccessAuthentication(Object principal,
-                                                         Authentication authentication,String tocken) {
+                                                         Authentication authentication, Collection<? extends GrantedAuthority> authorities,String tocken) {
         UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(
-                principal, authentication.getCredentials(),roles("ROLE_TENANT_USER"));
+                principal, authentication.getCredentials(),authorities);
         result.setDetails(tocken);
         return result;
     }
 
     private List<GrantedAuthority> roles(String... roles) {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(
+        List<GrantedAuthority> authorities = new ArrayList<>(
                 roles.length);
         for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority( role));
