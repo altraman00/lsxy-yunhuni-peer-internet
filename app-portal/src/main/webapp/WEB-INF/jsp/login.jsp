@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+	<%@include file="/inc/meta.jsp" %>
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>登陆</title>
 	<!--bootstrap.css-->
 	<link   href="${resPrefixUrl }/bower_components/bootstrap/dist/css/bootstrap.css"  rel="stylesheet" type="text/css"  />
 	<!--index.css-->
@@ -14,6 +14,7 @@
 	<!--vaildator.css-->
 	<link rel="stylesheet" href="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.css">
 
+	<title>登陆</title>
 </head>
 <body class="login-bg">
 <!--  container -->
@@ -44,7 +45,7 @@
 						<input type="text" name="validateCode" placeholder="验证码" class="form-control" id="form-code">
 					</div>
 					<div class="col-md-6 remove-padding border">
-						<span class="code-img"><img src="${ctx}/vc/get?dt=<%=System.currentTimeMillis()%>" id="imgValidateCode"/></span>
+						<span class="code-img"><img src="${ctx}/vc/get?dt=${currentTime}" id="imgValidateCode"/></span>
 					</div>
 				</div>
 
@@ -62,7 +63,7 @@
 
 			<div class="row margin-block"  >
 				<div class="col-sm-12 text-center" >
-					<a href="register.html" class="register">还没注册账号，注册新账号</a>
+					<a href="${ctx}/reg/register_page" class="register">还没注册账号，注册新账号</a>+
 				</div>
 			</div>
 			<div class="row margin-block" >
@@ -94,82 +95,13 @@
 <!--bootstrapvalidator-->
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
 
+<script src="${resPrefixUrl }/js/register/login.js" ></script>
+
 <script type="text/javascript">
 	$(document).ready(function() {
-		$('#defaultForm').bootstrapValidator({
-			message: '',
-			feedbackIcons: {
-				valid: 'glyphicon glyphicon-ok',
-				invalid: 'glyphicon glyphicon-remove',
-				validating: 'glyphicon glyphicon-refresh'
-			},
-			fields: {
-				username: {
-					message: '用户名无效',
-					validators: {
-						notEmpty: {
-							message: '用户名不能位空'
-						},
-						stringLength: {
-							min: 4,
-							max: 30,
-							message: '用户名必须大于4，小于30个字'
-						},
-						regexp: {
-							regexp: /^[a-zA-Z0-9_\.]+$/,
-							message: '用户名只能由字母、数字、点和下划线组成'
-						},
-						different: {
-							field: 'password',
-							message: '用户名和密码不能相同'
-						}
-					}
-				},
-				validateCode: {
-					validators: {
-						notEmpty: {
-							message: '验证码不能为空'
-						},
-						stringLength: {
-							min: 4,
-							max: 4,
-							message: '请输入4位数的验证码'
-						}
-					}
-				},
-				password: {
-					validators: {
-						notEmpty: {
-							message: '密码不能位空'
-						},
-						identical: {
-							field: 'confirmPassword',
-							message: '两次密码不一致'
-						},
-						stringLength: {
-							min: 6,
-							max: 18,
-							message: '密码必须大于6，小于18个字'
-						},
-						different: {
-							field: 'username',
-							message: '用户名和密码不能相同'
-						}
-					}
-				}
-			}
-		});
-
-		$('#resetBtn').click(function() {
-			$('#defaultForm').data('bootstrapValidator').resetForm(true);
-		});
 
 		$('#imgValidateCode').click(function() {
 			$("#imgValidateCode").prop("src","${ctx}/vc/get?dt="+(new Date().getTime()));
-		});
-
-		$('input').keyup(function(){
-			$('.tips').hide();
 		});
 
 	});
