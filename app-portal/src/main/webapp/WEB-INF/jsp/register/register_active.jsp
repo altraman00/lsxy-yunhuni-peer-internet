@@ -38,13 +38,15 @@
                 <p class="col-lg-offset-1 text-center register-active">账号激活初始化登陆密码</p>
             </div>
             <div class="row">
-                <form:form role="form" action="${ctx}/reg/" method="post" class="register-form" id="defaultForm">
+                <form:form role="form" action="${ctx}/reg/active" method="post" class="register-form" id="defaultForm">
+                    <!-- 防止表单重复提交要加这个隐藏变量 -->
+                    <input type="hidden" name="submission_token" value="${submission_token}" />
                     <div class="form-group">
                         <lable class="col-lg-2 text-right">会员名称</lable>
                         <div class="col-lg-9 ">
                             <input type="text" name="username" value="${username}" class="form-control input-form" id="form-username" disabled />
-                            <input type="text" name="uid" value="${uid}" class="form-control input-form" />
-                            <input type="text" name="code" value="${code}" class="form-control input-form" />
+                            <input type="hidden" name="uid" value="${uid}" class="form-control input-form" />
+                            <input type="hidden" name="code" value="${code}" class="form-control input-form" />
                             <p class="tips"></p>
                         </div>
                     </div>

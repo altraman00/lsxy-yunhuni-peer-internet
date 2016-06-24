@@ -40,6 +40,8 @@
             </div>
             <div class="row">
                 <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" >
+                    <!-- 防止表单重复提交要加这个隐藏变量 -->
+                    <input type="hidden" name="submission_token" value="${submission_token}" />
                     <div class="form-group">
                         <lable class="col-lg-3 text-right">会员名称</lable>
                         <div class="col-md-9 ">

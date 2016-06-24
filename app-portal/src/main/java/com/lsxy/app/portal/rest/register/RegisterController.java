@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest.register;
 import com.lsxy.app.portal.rest.comm.MobileCodeChecker;
 import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.exceptions.RegisterException;
+import com.lsxy.app.portal.rest.security.AvoidDuplicateSubmission;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class RegisterController {
 
     @RequestMapping(value = "/register_page",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成token的方法用这个
     public ModelAndView registerPage(){
         return new ModelAndView("register/register");
     }
@@ -50,6 +52,7 @@ public class RegisterController {
      * 用户注册
      */
     @RequestMapping(value = "/register",method = RequestMethod.POST)
+    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView register(HttpServletRequest request,@Nonnull String username, @Nonnull String mobile,@Nonnull String email){
         Map<String,String> model = new HashMap<>();
         String erInfo = "erInfo";
@@ -91,10 +94,11 @@ public class RegisterController {
      * 用户激活，跳转到用户密码设置页面
      */
     @RequestMapping(value = "/mail_active",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成token的方法用这个
     public ModelAndView mailActive(String uid,String username,String code){
         Map<String,String> model = new HashMap();
         //用户是否已激活
-        boolean isActive = "123456789".equals(uid);//模拟激活
+        boolean isActive = "12345678".equals(uid);//模拟激活
         if(isActive){
             //已经激活
             model.put("info","该账户已经激活");
@@ -109,7 +113,8 @@ public class RegisterController {
     }
 
     @RequestMapping(value = "/active",method = RequestMethod.POST)
-    public ModelAndView active(String uid,String username,String code,String password){
+    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
+    public ModelAndView active(String uid,String code,String password){
         Map<String,String> model = new HashMap();
         //判断用户激活条件是否合格
 
@@ -120,7 +125,7 @@ public class RegisterController {
         //帐务数据创建
 
         //返回激活结果页面
-        boolean isActive = "123456789".equals(uid)&&"username".equals(username)&&"123456".equals(code);//模拟各个条件
+        boolean isActive = "123456789".equals(uid)&&"123456".equals(code);//模拟各个条件
         if(isActive){
             model.put("info","激活成功");
             return new ModelAndView("register/register_active_result",model);
