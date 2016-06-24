@@ -69,8 +69,8 @@
 			<div class="row margin-block" >
 				<div class="col-sm-12 text-center " >
 					<c:if test="${not empty param.er}">
-						<c:if test="${param.er eq 'true'}"><a class="tips" >密码错误,或账号被锁定</a></c:if>
-						<c:if test="${param.er eq 'vcer'}"><a class="tips" >验证码错误</a></c:if>
+						<c:if test="${param.er eq 'true'}"><a class="tips-error" >密码错误,或账号被锁定</a></c:if>
+						<c:if test="${param.er eq 'vcer'}"><a class="tips-error" >验证码错误</a></c:if>
 
 					</c:if>
 

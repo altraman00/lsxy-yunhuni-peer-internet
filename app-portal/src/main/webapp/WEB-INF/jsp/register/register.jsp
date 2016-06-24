@@ -86,7 +86,7 @@
 <!--/footer-->
 <!--modal-->
 <div class="shadow-bg" id="shadow-bg"  ></div>
-<div id="modal-mobile" class="modal-mobile">
+<div id="modal-mobile" class="modal-phone">
     <div class="title">验证手机号</div>
     <div class="content">
         <div class="input">
@@ -96,6 +96,7 @@
             <div class="code-title">验证码 :</div>
             <input class="code form-control" type="text" name="mobileCode" id="mobileCode"/>
             <button class="code-button" id="send-code" >发送验证码</button>
+            <span id="mobileCodeTips" class="tips-error" style="display: none" ></span>
         </div>
     </div>
     <div class="footer">
@@ -126,19 +127,19 @@
             function(data){
                 switch (data){
                     case 0:
-                        alert('验证码错误，请重新输入');
+                        tipsmsg("验证码错误，请重新输入","mobileCodeTips");
                         break;
                     case 1:
                         document.getElementById('defaultForm').submit();
                         break;
                     case 2:
-                        alert('此验证码达到最大验证次数，请重新获取');
+                        tipsmsg("此验证码达到最大验证次数，请重新获取","mobileCodeTips");
                         break;
                     case 3:
-                        alert('验证码过期，请重新获取');
+                        tipsmsg("验证码过期，请重新获取","mobileCodeTips");
                         break;
                     default:
-                        alert('系统繁忙，请稍候！');
+                        tipsmsg("系统繁忙，请稍候！","mobileCodeTips");
                 }
         });
 
@@ -159,7 +160,7 @@
         var email = $('#form-email').val();
         $.ajax({
             type: "get",
-            url: ctx + "/info_check",
+            url: ctx + "/reg/info_check",
             data: { username: username,mobile:mobile,email:email },   //id
             async: false,
             datatype: "json",
@@ -174,6 +175,7 @@
         });
         return bol;
     }
+
 
 </script>
 
