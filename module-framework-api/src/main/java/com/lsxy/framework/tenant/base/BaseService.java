@@ -1,15 +1,14 @@
-package com.lsxy.framework.core;
+package com.lsxy.framework.tenant.base;
+
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.Page;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.utils.Page;
-
 @SuppressWarnings("rawtypes")
-public interface BaseService <T>{
+public interface BaseService<T>{
 	
 
 
