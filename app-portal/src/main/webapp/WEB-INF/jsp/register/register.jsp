@@ -4,16 +4,10 @@
 <html lang="en" class="no-js">
 <head>
     <%@include file="/inc/meta.jsp" %>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--bootstrap.css-->
-    <link   href="${resPrefixUrl }/bower_components/bootstrap/dist/css/bootstrap.css"  rel="stylesheet" type="text/css"  />
+
+
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
-    <!--vaildator.css-->
-    <link rel="stylesheet" href="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.min.css">
-
     <title>注册</title>
 </head>
 <body class="register-bg">
