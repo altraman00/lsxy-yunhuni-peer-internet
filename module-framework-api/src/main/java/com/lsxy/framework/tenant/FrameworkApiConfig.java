@@ -10,5 +10,5 @@ import org.springframework.boot.orm.jpa.EntityScan;
  * portal - api /MainClass.java有使用方式
  */
 @EntityScan()
-public class FrameworkAPIConfig {
+public class FrameworkApiConfig {
 }
