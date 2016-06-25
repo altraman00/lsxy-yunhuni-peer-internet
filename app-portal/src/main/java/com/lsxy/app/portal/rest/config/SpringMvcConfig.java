@@ -1,7 +1,9 @@
 package com.lsxy.app.portal.rest.config;
 
+import com.lsxy.app.portal.rest.security.AvoidDuplicateSubmissionInterceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
@@ -23,6 +25,17 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter{
         }
         registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
 
+    }
+
+    //添加自定义的拦截器
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(getAvoidDuplicateSubmissionInterceptor());
+    }
+
+    @Bean
+    public AvoidDuplicateSubmissionInterceptor getAvoidDuplicateSubmissionInterceptor(){
+        return new AvoidDuplicateSubmissionInterceptor();
     }
 
     @Override

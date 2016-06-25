@@ -2,8 +2,9 @@
 <%@include file="/inc/import.jsp"%>
 <html>
 	<head>
+		<%@include file="/inc/meta.jsp"%>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<%@include file="/inc/mobile/meta_bootstrap.jsp"%>
+		<%--<%@include file="/inc/mobile/meta_bootstrap.jsp"%>--%>
 	</head>
 	<body>
 		<div class="container" style="margin-top:20px;">

@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Created by Tandy on 2016/6/7.
@@ -40,9 +41,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .failureUrl(loginFailurePage)
                     .defaultSuccessUrl(loginSuccessPage)
                     .successHandler(getPortalAuthenticationSuccessHandler())
-//                .usernameParameter("username").passwordParameter("password")
                 .and()
-                    .logout().logoutSuccessUrl(loginPage)
+                    //默认的登陆只支持post请求，这里改变登出的路径匹配器，使其支持get请求
+                    .logout().logoutRequestMatcher(new AntPathRequestMatcher(logoutPage)).logoutSuccessUrl(loginPage)
                 .and()
                     .csrf()
                     //登录登出不用csrf
