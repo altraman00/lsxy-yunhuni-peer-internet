@@ -41,7 +41,7 @@
 <link href="${resPrefixUrl }/css/style.css" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="${resPrefixUrl }/css/app.v2.css" type="text/css" />
 <link rel="stylesheet" href="${resPrefixUrl }/css/own.css" type="text/css"/>
-<link rel="stylesheet" href="${resPrefixUrl }//stylesheets/screen.css" type="text/css" media="screen" charset="utf-8">
+<link rel="stylesheet" href="${resPrefixUrl }/stylesheets/screen.css" type="text/css" media="screen" charset="utf-8">
 <!--bootstrap css-->
 <link rel="stylesheet" href="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.css">
 
