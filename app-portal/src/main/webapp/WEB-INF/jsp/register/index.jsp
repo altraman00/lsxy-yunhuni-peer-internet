@@ -112,7 +112,6 @@
 
     /*确认*/
     $('#modal-sendmobile').click(function(){
-        alert('确认验证码是否正确，提交表单');
         var mobileCode = $("#mobileCode").val();
         if(mobileCode == ""){
             tipsmsg("请填入验证码","mobileCodeTips");

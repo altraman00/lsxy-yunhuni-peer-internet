@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.forgetpassword;
 
 import com.lsxy.app.portal.rest.comm.MobileCodeChecker;
+import com.lsxy.app.portal.rest.comm.MobileCodeUtils;
 import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.security.AvoidDuplicateSubmission;
 import org.springframework.stereotype.Controller;
@@ -51,9 +52,9 @@ public class ForgetPasswordController {
 
         //TODO 发送邮件（参数是一个UUID），并将其存到数据库（redis?）
         String key = UUID.randomUUID().toString();
-//        model.put("key",key);
-        model.put("key","123456");
+
         //返回发送邮件成功的页面
+        model.put("email",email);
         return new ModelAndView("forget/mail_success",model);
     }
 
@@ -72,7 +73,7 @@ public class ForgetPasswordController {
         return model;
     }
 
-    @RequestMapping(value = "/mail",method = RequestMethod.GET)
+    @RequestMapping(value = "/reset_pwd_mail",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView resetPasswordByEmail(HttpServletRequest request,String key){
         Map<String,String> model = new HashMap<>();
@@ -94,13 +95,19 @@ public class ForgetPasswordController {
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView resetPasswordByMobile(HttpServletRequest request){
         Map<String,String> model = new HashMap<>();
-        MobileCodeChecker mobileCode = (MobileCodeChecker) request.getSession().getAttribute(PortalConstants.MC_KEY);
-        boolean pass = mobileCode.isPass();
-        if(pass){
-            request.getSession().setAttribute(ALLOW_RESET_PASSWORD,true);
-            request.getSession().setAttribute(RESET_MOBILE,mobileCode.getMobile());
-            model.put(RESET_TYPE,"mobile");
-            return new ModelAndView("forget/reset_password",model);
+        MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+        if(checker != null){
+            if(checker.isPass()){
+                request.getSession().setAttribute(ALLOW_RESET_PASSWORD,true);
+                request.getSession().setAttribute(RESET_MOBILE,checker.getMobile());
+                //将手机验证码删除
+                MobileCodeUtils.removeMobileCodeChecker(request);
+                model.put(RESET_TYPE,"mobile");
+                return new ModelAndView("forget/reset_password",model);
+            }else{
+                model.put("erInfo","验证无效");
+                return new ModelAndView("forget/reset_fail",model);
+            }
         }else{
             model.put("erInfo","验证凭证已过期");
             return new ModelAndView("forget/reset_fail",model);
@@ -121,6 +128,7 @@ public class ForgetPasswordController {
                     //TODO 调用根据邮箱重设密码微服务
 
                     isReset = true;
+
                 }else{
                     model.put(erInfoKey,"凭证已过期");
                 }
@@ -140,6 +148,10 @@ public class ForgetPasswordController {
             model.put(erInfoKey,"页面已过期");
         }
         if(isReset){
+            //设置完后将缓存删掉
+            request.getSession().removeAttribute(ALLOW_RESET_PASSWORD);
+            request.getSession().removeAttribute(RESET_MOBILE);
+            request.getSession().removeAttribute(RESET_EMAIL);
             return new ModelAndView("forget/reset_success",model);
         }else{
             return new ModelAndView("forget/reset_fail",model);

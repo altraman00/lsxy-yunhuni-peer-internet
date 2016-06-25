@@ -19,11 +19,8 @@ public class MCController {
     @ResponseBody
     public void getMobileCode(HttpServletRequest request,String mobile){
         if(!StringUtils.isEmpty(mobile)){
-
-            Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
-            if(obj != null && obj instanceof MobileCodeChecker){
-                MobileCodeChecker checker = (MobileCodeChecker) obj;
-                //判断是否超过时间间隔(没到达时间间隔，则直接返回)
+            MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+            if(checker != null){
                 if(System.currentTimeMillis() < (checker.getCreateTime() + MobileCodeChecker.TIME_INTERVAL)){
                     return;
                 }
@@ -34,7 +31,7 @@ public class MCController {
             if(!StringUtils.isEmpty(mobileCode)){
                 MobileCodeChecker mobileCodeChecker = new MobileCodeChecker(mobile,mobileCode);
                 //存到session里
-                request.getSession().setAttribute(PortalConstants.MC_KEY,mobileCodeChecker);
+                MobileCodeUtils.setMobileCodeChecker(request,mobileCodeChecker);
             }
         }
 
@@ -48,10 +45,8 @@ public class MCController {
     public byte checkMobileCode(HttpServletRequest request, String mc){
         //检查手机验证码
         if(!StringUtils.isEmpty(mc)){
-            MobileCodeChecker checker;
-            Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
-            if(obj != null && obj instanceof MobileCodeChecker){
-                checker = (MobileCodeChecker) obj;
+            MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+            if(checker != null){
                 return MobileCodeChecker.checkCode(mc,checker);
             }else{
                 return MobileCodeChecker.STATUS_OVER_TIME;

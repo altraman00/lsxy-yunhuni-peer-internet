@@ -80,7 +80,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <button type="submit"  id="modal-sendmobile" class="btn btn-primary  btn-form btn-mobile-submit">找回密码</button>
+                                <a id="mobileBtn" class="btn btn-primary  btn-form btn-mobile-submit">找回密码</a>
                             </div>
                         </div>
                         </form:form>
@@ -109,13 +109,13 @@
 <script src="${resPrefixUrl }/js/register/reg.js" ></script>
 <script>
 
-    /*确认*/
-    $('#modal-sendmobile').click(function(){
+    function reg_code(){
+//        var mobileCode = $("#code").val();
+//        if(mobileCode == ""){
+//            tipsmsg("请填入验证码","mobileCodeTips");
+//            return;
+//        }
         var mobileCode = $("#code").val();
-        if(mobileCode == ""){
-            tipsmsg("请填入验证码","mobileCodeTips");
-            return;
-        }
         $.get(ctx + "/mc/check", {"mc":mobileCode},
                 function(data){
                     switch (data){
@@ -135,8 +135,8 @@
                             tipsmsg("系统繁忙，请稍候！","mobileCodeTips");
                     }
                 });
+    }
 
-    });
 
     function send_mobile_code(){
         var mobile = $("input[name='mobile']").val();
@@ -156,7 +156,7 @@
                         bol = true;
                     }else{
                         //显示showtips
-                        tipsmsg(result.err);
+                        tipsmsg(result.err,"mobileCodeTips");
                     }
                 }
             });

@@ -28,7 +28,7 @@
             <br/>
             <p>以下为云呼你重置密码的安全链接，如果您没有发起重置密码的请求，请不用理会该邮件，谢谢！</p>
             <br/>
-            <a href="#">http://localhost/forget/resetpassword?key=${key}</a>
+            <a href="#">http://localhost/forget/resetpassword?key=123456</a>
             <br/>
             <br/>
             <br/>

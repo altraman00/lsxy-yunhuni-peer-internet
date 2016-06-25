@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.register;
 
 import com.lsxy.app.portal.rest.comm.MobileCodeChecker;
+import com.lsxy.app.portal.rest.comm.MobileCodeUtils;
 import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.exceptions.RegisterException;
 import com.lsxy.app.portal.rest.security.AvoidDuplicateSubmission;
@@ -59,21 +60,21 @@ public class RegisterController {
         String erPage = "register/fail";
         String successPage = "register/success";
         //获取手机验证码
-        Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
-        if(obj != null && obj instanceof MobileCodeChecker){
-            MobileCodeChecker checker = (MobileCodeChecker) obj;
+        MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+        if(checker != null){
             if(checker.getMobile().equals(mobile) && checker.isPass()){
                 try {
                     //TODO 此处调用用户注册验证微服务
                     regInfoCheck(username,mobile,email);
                 } catch (RegisterException e) {
-                    //提示信息：手机验证没通过
                     model.put(erInfo,e.getMessage());
                     return new ModelAndView(erPage,model);
                 }
 
                 //TODO 所有信息验证通过，保存用户注册信息并发邮件通知
 
+                //将手机验证码删除
+                MobileCodeUtils.removeMobileCodeChecker(request);
 
                 //返回页面，通知查收邮件激活账号
                 model.put("email",email);
@@ -88,6 +89,7 @@ public class RegisterController {
             model.put(erInfo,"手机验证码过期");
             return new ModelAndView(erPage,model);
         }
+
     }
 
     /**
