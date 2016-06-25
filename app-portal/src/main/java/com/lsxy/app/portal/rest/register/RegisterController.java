@@ -2,7 +2,6 @@ package com.lsxy.app.portal.rest.register;
 
 import com.lsxy.app.portal.rest.comm.MobileCodeChecker;
 import com.lsxy.app.portal.rest.comm.MobileCodeUtils;
-import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.exceptions.RegisterException;
 import com.lsxy.app.portal.rest.security.AvoidDuplicateSubmission;
 import org.springframework.stereotype.Controller;

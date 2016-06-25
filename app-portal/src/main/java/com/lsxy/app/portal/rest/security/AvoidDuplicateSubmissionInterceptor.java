@@ -1,9 +1,5 @@
 package com.lsxy.app.portal.rest.security;
 
-import com.lsxy.app.portal.rest.console.account.AccountController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 

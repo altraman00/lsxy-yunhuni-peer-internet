@@ -2,7 +2,6 @@ package com.lsxy.app.portal.rest.forgetpassword;
 
 import com.lsxy.app.portal.rest.comm.MobileCodeChecker;
 import com.lsxy.app.portal.rest.comm.MobileCodeUtils;
-import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.security.AvoidDuplicateSubmission;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;

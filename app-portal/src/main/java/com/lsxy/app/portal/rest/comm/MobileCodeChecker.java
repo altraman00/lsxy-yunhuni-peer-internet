@@ -2,8 +2,6 @@ package com.lsxy.app.portal.rest.comm;
 
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
-
 /**
  * Created by liups on 2016/6/23.
  */
