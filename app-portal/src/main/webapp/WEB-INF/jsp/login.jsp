@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+	<title>登陆</title>
 	<%@include file="/inc/meta.jsp" %>
 	<!--index.css-->
 	<link href="${resPrefixUrl }/stylesheets/login.css" rel="stylesheet"  type="text/css" />
-	<title>登陆</title>
 </head>
 <body class="login-bg">
 <!--  container -->
@@ -46,7 +46,7 @@
 						<input type="checkbox" class="remember-check" />   记住我
 					</div>
 					<div class="col-md-6 remove-padding border text-right">
-						<a href="#">忘记密码?</a>
+						<a href="${ctx}/forget/index">忘记密码?</a>
 					</div>
 				</div>
 
@@ -55,7 +55,7 @@
 
 			<div class="row margin-block"  >
 				<div class="col-sm-12 text-center" >
-					<a href="${ctx}/reg/register_page" class="register">还没注册账号，注册新账号</a>+
+					<a href="${ctx}/reg/index" class="register">还没注册账号，注册新账号</a>+
 				</div>
 			</div>
 			<div class="row margin-block" >

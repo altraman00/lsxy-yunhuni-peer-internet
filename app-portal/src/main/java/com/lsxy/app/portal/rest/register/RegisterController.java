@@ -23,10 +23,10 @@ import java.util.Map;
 @RequestMapping("/reg")
 public class RegisterController {
 
-    @RequestMapping(value = "/register_page",method = RequestMethod.GET)
-    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成token的方法用这个
+    @RequestMapping(value = "/index",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView registerPage(){
-        return new ModelAndView("register/register");
+        return new ModelAndView("register/index");
     }
 
     /**
@@ -37,8 +37,8 @@ public class RegisterController {
     public Map infoCheck(@Nonnull String username, @Nonnull String mobile,@Nonnull String email){
         Map<String,Object> result = new HashMap<>();
         result.put("flag",true);
-        //此处调用用户注册验证微服务
         try {
+            //TODO 此处调用用户注册验证微服务
             regInfoCheck(username,mobile,email);
         } catch (RegisterException e) {
             //提示信息：手机验证没通过
@@ -56,15 +56,15 @@ public class RegisterController {
     public ModelAndView register(HttpServletRequest request,@Nonnull String username, @Nonnull String mobile,@Nonnull String email){
         Map<String,String> model = new HashMap<>();
         String erInfo = "erInfo";
-        String erPage = "register/register_fail";
-        String successPage = "register/register_success";
+        String erPage = "register/fail";
+        String successPage = "register/success";
         //获取手机验证码
         Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
         if(obj != null && obj instanceof MobileCodeChecker){
             MobileCodeChecker checker = (MobileCodeChecker) obj;
             if(checker.getMobile().equals(mobile) && checker.isPass()){
-                //此处调用用户注册验证微服务
                 try {
+                    //TODO 此处调用用户注册验证微服务
                     regInfoCheck(username,mobile,email);
                 } catch (RegisterException e) {
                     //提示信息：手机验证没通过
@@ -72,7 +72,7 @@ public class RegisterController {
                     return new ModelAndView(erPage,model);
                 }
 
-                //所有信息验证通过，保存用户注册信息并发邮件通知
+                //TODO 所有信息验证通过，保存用户注册信息并发邮件通知
 
 
                 //返回页面，通知查收邮件激活账号
@@ -94,21 +94,21 @@ public class RegisterController {
      * 用户激活，跳转到用户密码设置页面
      */
     @RequestMapping(value = "/mail_active",method = RequestMethod.GET)
-    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成token的方法用这个
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView mailActive(String uid,String username,String code){
         Map<String,String> model = new HashMap();
-        //用户是否已激活
+        //TODO 用户是否已激活
         boolean isActive = "12345678".equals(uid);//模拟激活
         if(isActive){
             //已经激活
             model.put("info","该账户已经激活");
-            return new ModelAndView("register/register_active_result",model);
+            return new ModelAndView("register/active_result",model);
         }else{
             //没有激活,前往激活页面
             model.put("uid",uid);
             model.put("username",username);
             model.put("code",code);
-            return new ModelAndView("register/register_active",model);
+            return new ModelAndView("register/active",model);
         }
     }
 
@@ -116,22 +116,22 @@ public class RegisterController {
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView active(String uid,String code,String password){
         Map<String,String> model = new HashMap();
-        //判断用户激活条件是否合格
+        //TODO 判断用户激活条件是否合格
 
-        //修改激活状态
+        //TODO 修改激活状态
 
-        //创建主鉴权账号
+        //TODO 创建主鉴权账号
 
-        //帐务数据创建
+        //TODO 帐务数据创建
 
         //返回激活结果页面
         boolean isActive = "123456789".equals(uid)&&"123456".equals(code);//模拟各个条件
         if(isActive){
             model.put("info","激活成功");
-            return new ModelAndView("register/register_active_result",model);
+            return new ModelAndView("register/active_result",model);
         }else{
             model.put("info","激活失败：某些原因");
-            return new ModelAndView("register/register_active_result",model);
+            return new ModelAndView("register/active_result",model);
         }
     }
 

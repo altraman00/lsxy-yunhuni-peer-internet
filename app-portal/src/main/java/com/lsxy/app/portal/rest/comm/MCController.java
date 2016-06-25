@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/mc")
 @Controller
 public class MCController {
-
     /**
      * 发送手机验证码，并存到session里
      */
@@ -20,8 +19,18 @@ public class MCController {
     @ResponseBody
     public void getMobileCode(HttpServletRequest request,String mobile){
         if(!StringUtils.isEmpty(mobile)){
+
+            Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
+            if(obj != null && obj instanceof MobileCodeChecker){
+                MobileCodeChecker checker = (MobileCodeChecker) obj;
+                //判断是否超过时间间隔(没到达时间间隔，则直接返回)
+                if(System.currentTimeMillis() < (checker.getCreateTime() + MobileCodeChecker.TIME_INTERVAL)){
+                    return;
+                }
+            }
+
             //此处调用发送手机验证码服务并返回验证码
-            String mobileCode = "123456";
+            String mobileCode = "1234";
             if(!StringUtils.isEmpty(mobileCode)){
                 MobileCodeChecker mobileCodeChecker = new MobileCodeChecker(mobile,mobileCode);
                 //存到session里
@@ -51,4 +60,6 @@ public class MCController {
             return MobileCodeChecker.STATUS_ERR_CODE;
         }
     }
+
+
 }

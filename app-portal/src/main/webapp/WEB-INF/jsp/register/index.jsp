@@ -3,12 +3,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+    <title>注册</title>
     <%@include file="/inc/meta.jsp" %>
-
-
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
-    <title>注册</title>
 </head>
 <body class="register-bg">
 <!--  container -->
@@ -117,7 +115,8 @@
         alert('确认验证码是否正确，提交表单');
         var mobileCode = $("#mobileCode").val();
         if(mobileCode == ""){
-            alert('请填入验证码');
+            tipsmsg("请填入验证码","mobileCodeTips");
+            return;
         }
         $.get(ctx + "/mc/check", {"mc":mobileCode},
             function(data){
@@ -145,6 +144,7 @@
         var mobile = $("input[name='mobile']").val();
         //异步发送验证码
         $.get(ctx + "/mc/send",{"mobile":mobile});
+        return true;
     }
 
 
@@ -159,7 +159,7 @@
             url: ctx + "/reg/info_check",
             data: { username: username,mobile:mobile,email:email },   //id
             async: false,
-            datatype: "json",
+            dataType: "json",
             success: function(result) {
                 if(result.flag){
                     bol = true;

@@ -2,6 +2,8 @@ package com.lsxy.app.portal.rest.comm;
 
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
+
 /**
  * Created by liups on 2016/6/23.
  */
@@ -13,10 +15,13 @@ public class MobileCodeChecker {
 
     public static int CHECK_MAX_NUM = 5;  //验证最大次数
 
+    public static long TIME_INTERVAL = 50000; //发送验证码的最小间隔(前端设置了60秒，这里设置50秒)
+
     private String mobile;
     private String checkCode;
     private int checkNum = 0;
     private boolean isPass = false;
+    private long createTime = System.currentTimeMillis();
 
     public MobileCodeChecker(String mobile, String checkCode) {
         this.mobile = mobile;
@@ -72,6 +77,10 @@ public class MobileCodeChecker {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public long getCreateTime(){
+        return createTime;
     }
 
 }
