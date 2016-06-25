@@ -32,17 +32,14 @@
 	var resPrefixUrl = "${resPrefixUrl}";
 </script>
 
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--bootstrap.css-->
+<link   href="${resPrefixUrl }/bower_components/bootstrap/dist/css/bootstrap.css"  rel="stylesheet" type="text/css"  />
+<!--vaildator.css-->
+<link rel="stylesheet" href="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.min.css">
+
+
 
 <title><%=SystemConfig.getProperty("portal.system.title") %></title>
-<meta charset="UTF-8" />
-<meta name="description" content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<!-- Custom CSS -->
-<link href="${resPrefixUrl }/css/style.css" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="${resPrefixUrl }/css/app.v2.css" type="text/css" />
-<link rel="stylesheet" href="${resPrefixUrl }/css/own.css" type="text/css"/>
-<link rel="stylesheet" href="${resPrefixUrl }//stylesheets/screen.css" type="text/css" media="screen" charset="utf-8">
-<!--bootstrap css-->
-<link rel="stylesheet" href="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.css">
-
-<!--[if lt IE 9]> <script src="${resPrefixUrl }/js/ie/html5shiv.js" cache="false"></script> <script src="${resPrefixUrl }/js/ie/respond.min.js" cache="false"></script> <script src="${resPrefixUrl }/js/ie/excanvas.js" cache="false"></script> <![endif]-->

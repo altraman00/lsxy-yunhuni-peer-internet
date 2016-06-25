@@ -1,117 +1,58 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8" isELIgnored="false"%>
-
-<div class="menu_box" id="menuBar">
-	<dl class="menu no_extra">
-		<dt class="menu_title">
-			<i class="icon_menu"
-				style="background: url(${resPrefixUrl}/common/images/icon_menu_set.png) no-repeat;"></i>首页
-		</dt>
-		<dd class="menu_item">
-			<a href="${ctx}/console/index">首页</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/console/xtdt">系统动态</a>
-		</dd>
-
-	</dl>
-	<dl class="menu">
-		<dt class="menu_title">
-			<i class="icon_menu"
-				style="background: url(${resPrefixUrl}/common/images/icon_menu_set.png) no-repeat;"></i>用户中心
-		</dt>
-		<dd class="menu_item">
-			<a href="${ctx}/console/account/index">账号</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/customer/customerlabels">费用中心</a>
-		</dd>
-
-	</dl>
-	<dl class="menu ">
-		<dt class="menu_title">
-			<i class="icon_menu"
-				style="background: url(${resPrefixUrl}/common/images/icon_menu_channel.png) no-repeat;"></i>开发者中心
-		</dt>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/channel/channellist">应用管理</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/zx/zxset">放音文件管理</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/zx/zxset">测试号码管理</a>
-		</dd>
-	</dl>
-	<dl class="menu">
-		<dt class="menu_title">
-			<i class="icon_menu"
-				style="background: url(${resPrefixUrl}/common/images/icon_menu_set.png) no-repeat;"></i>资源中心
-		</dt>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">号码池列表</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">测试号码绑定</a>
-		</dd>
-	</dl>
-	<dl class="menu">
-		<dt class="menu_title">
-			<i class="icon_menu"
-			   style="background: url(${resPrefixUrl}/common/images/icon_menu_set.png) no-repeat;"></i>消息中心
-		</dt>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">通知公告</a>
-		</dd>
-	</dl>
-	<dl class="menu">
-		<dt class="menu_title">
-			<i class="icon_menu"
-			   style="background: url(${resPrefixUrl}/common/images/icon_menu_set.png) no-repeat;"></i>客服中心
-		</dt>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">问题反馈</a>
-		</dd>
-	</dl>
-	<dl class="menu">
-		<dt class="menu_title">
-			<i class="icon_menu"
-			   style="background: url(${resPrefixUrl}/common/images/icon_menu_set.png) no-repeat;"></i>统计查询
-		</dt>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">近15天消费统计</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">应用消费情况</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">单向外呼详单查询</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">双向外呼详单查询</a>
-		</dd>
-		<dd class="menu_item">
-			<a href="${ctx}/tenant/admin/systemset/basic?tab=basic">电话会议查询</a>
-		</dd>
-	</dl>
-</div>
-<script>
-	(function() {
-		$('#menuBar').find('.menu').each(function() {
-			if ($(this).find('dd').length == 0) {
-				$(this).remove();
-			}
-		});
-		
-		if (!$('#menuBar').find('.menu:first').hasClass('no_extra')) {
-			$('#menuBar').find('.menu:first').addClass('no_extra');
-		}
-	})();
-
-	$(document).ready(function(){
-		$(".menu_item a[href='"+location.pathname+"']").parent().addClass("selected");
-	});
-
-
-	
-</script>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
+<section class="w-f">
+	<header class="head bg_green lter text-center clearfix">
+		<a id='togglerMiniSidebar' href="#nav" data-toggle="class:nav-xs" class="text-center btn btn_b">
+			<img class="img-shrink" src="${resPrefixUrl }/images/index/shrink.png"/>
+		</a>
+	</header>
+	<section class="w-f" id="top_h">
+		<div class="slim-scroll" data-height="auto" data-disable-fade-out="true" data-distance="0" data-size="5px" data-color="#2a9a88"> <!-- nav -->
+			<nav class="nav-primary nav_green hidden-xs">
+				<ul class="list">
+					<li class=""> <a href="#" class="side-menu-link" > <i class="fa fa-caret-down icon"> </i><span>用户中心</span> </a>
+						<ul class="nav lt list">
+							<li>
+								<a data-toggle="tooltip" data-placement='right' class="active" title='账号管理' href="${ctx}/console/account/safety/index">
+									<i class="fa fa-user icon"></i> <span>账号管理</span>
+								</a>
+							</li>
+							<li>
+								<a data-toggle="tooltip" data-placement='right' title='费用管理' href="no_service.html">
+									<i class="fa fa-database icon" aria-hidden="true"> </i>
+									<span>费用管理</span> </a>
+							</li>
+						</ul>
+					</li>
+					<li class="">
+						<a href="#" class="side-menu-link">
+							<i class="fa fa-caret-down icon"> </i><span>开发者中心</span> </a>
+						<ul class="nav lt list">
+							<li>
+								<a data-toggle="tooltip" data-placement='right' title='应用管理' href="fee.html"> <i class="fa fa-desktop icon"></i> <span>应用管理</span> </a>
+							</li>
+							<li>
+								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="message.html"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
+							</li>
+						</ul>
+					</li>
+					<li class="border-top">
+						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="#" class="canbehover" >
+							<i class="fa fa-envelope" icon"> </i>
+							<span>消息中心</span>
+						</a>
+					</li>
+					<li class="border-top" >
+						<a data-toggle="tooltip" data-placement='right' title='客服中心' href="#" class="canbehover" >
+							<i class="fa fa-comment-o icon"> </i>
+							<span>客服中心</span> </a>
+					</li>
+					<li class="border-top" >
+						<a data-toggle="tooltip" data-placement='right' title='统计查询' href="#" class="canbehover" >
+							<i class="fa fa-clock-o icon"> </i>
+							<span>统计查询</span> </a>
+					</li>
+				</ul>
+			</nav>
+			<!-- / nav --> </div>
+	</section>
+</section>
