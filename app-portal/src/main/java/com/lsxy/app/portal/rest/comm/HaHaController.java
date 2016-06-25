@@ -2,6 +2,7 @@ package com.lsxy.app.portal.rest.comm;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -16,4 +17,11 @@ public class HaHaController {
 
         return mav;
     }
+
+    @RequestMapping(path = "/postxx",method = RequestMethod.POST)
+    public String postChinese(String xx){
+        return xx;
+    }
+
+
 }
