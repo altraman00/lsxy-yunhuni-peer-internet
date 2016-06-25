@@ -110,11 +110,6 @@
 <script>
 
     function reg_code(){
-//        var mobileCode = $("#code").val();
-//        if(mobileCode == ""){
-//            tipsmsg("请填入验证码","mobileCodeTips");
-//            return;
-//        }
         var mobileCode = $("#code").val();
         $.get(ctx + "/mc/check", {"mc":mobileCode},
                 function(data){
