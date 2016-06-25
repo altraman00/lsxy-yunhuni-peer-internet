@@ -4,6 +4,7 @@ import com.lsxy.app.portal.rest.config.SpringStartupConfig;
 import com.lsxy.framework.core.web.SpringContextUtil;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
@@ -46,7 +47,10 @@ public class SpringInitializer implements WebApplicationInitializer{
         ctx.register(SpringStartupConfig.class);
 
         ctx.setServletContext(container);
+        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding("UTF-8");
 
+        container.addFilter("characterEncodingFilter",characterEncodingFilter).addMappingForUrlPatterns(null,false,"/*");
         ServletRegistration.Dynamic servlet = container.addServlet("dispatcher", new DispatcherServlet(ctx));
 
         servlet.setLoadOnStartup(1);
