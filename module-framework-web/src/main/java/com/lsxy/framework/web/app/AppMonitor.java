@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.cache.manager.RedisCacheManager;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 
 /**
  * 应用程序监控
@@ -22,7 +22,7 @@ public class AppMonitor {
     private String key = SystemConfig.getProperty("system.id");
 
 //    @Autowired
-    private RedisCacheManager redisCacheManager;
+    private RedisCacheService redisCacheService;
 
     private Thread t = new Thread(new Runnable() {
         @Override
@@ -30,7 +30,7 @@ public class AppMonitor {
             while (true) {
                 try {
                     Thread.sleep(5000);
-                    redisCacheManager.set("monitor_" + key, "OK", 5);
+                    redisCacheService.set("monitor_" + key, "OK", 5);
                 } catch (InterruptedException e) {
                     logger.debug("系统监控线程停止：monitor_" + key);
                     break;

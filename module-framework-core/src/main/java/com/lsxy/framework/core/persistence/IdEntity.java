@@ -1,6 +1,8 @@
 package com.lsxy.framework.core.persistence;
 
 
+import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serializable;
 
 import javax.persistence.Column;
@@ -48,6 +50,7 @@ public abstract class IdEntity implements Serializable{
 //	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	//@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	@GeneratedValue(generator = "system-uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	public String getId() {
 		return id;
 	}

@@ -1,87 +1,76 @@
 package com.lsxy.framework.base;
 
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.persistence.BaseDaoInterface;
+import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.HqlUtil;
+import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.tenant.base.BaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+@SuppressWarnings({"unchecked","rawtypes"})
+public abstract class AbstractService<T> implements BaseService<T> {
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+	private Logger logger = LoggerFactory.getLogger(AbstractService.class);
 
-import com.hesyun.core.persistence.BaseDaoInterface;
-import com.hesyun.core.utils.BeanUtils;
-import com.hesyun.core.utils.HqlUtil;
-import com.hesyun.core.utils.Page;
+	public abstract BaseDaoInterface<T,Serializable> getDao();
 
-/**
- * 抽象manager
- * @author tandy
- *
- * @param <T>
- */
-@SuppressWarnings({"rawtypes"})
-public abstract class AbstractService<T> {
-	private Log logger = LogFactory.getLog(AbstractService.class);
-	
-	protected abstract BaseDaoInterface<T,Serializable> getDao();
-	
-	
-	@PersistenceContext  
-	 private EntityManager em; 
-	
-	protected EntityManager getEm() {
+	@PersistenceContext
+	private EntityManager em;
+
+	public EntityManager getEm() {
 		return em;
 	}
 
-	/**
-	 * 实体数量
-	 * @return
-	 */
-	public long count(){
-		Class<T> x = this.getRealClass();
-		String hql = "select count(*) from "+x.getName()+" obj where obj.deleted=false";
-		Query query = em.createQuery(hql);
-		Long count = (Long) query.getSingleResult();
-		return count;
+	public void setEm(EntityManager em) {
+		this.em = em;
 	}
-	
-	/**
-	 * 保存
-	 * @param entity
-	 */
-	public T save(T entity){
-		T  obj = this.getDao().save(entity);
-		return obj;
+
+	@Override
+	public T findById(String id) {
+		return getDao().findOne(id);
 	}
-//	
-//	/**
-//	 * 删除所有对象
-//	 */
-//	public void cleanAll(){
-//		this.getDao().deleteAll();
-//	}
-//	
-//	/**
-//	 * 根据标识删除对象
-//	 * @param id
-//	 */
-//	public void delete(Serializable id){
-//		this.getDao().delete(id);
-//	}
-//	
-//	/**
-//	 * 删除对象
-//	 * @param object
-//	 */
-//	public void delete(T object){
-//		this.getDao().delete(object);
-//	}
-	
+
+	@Override
+	public long count() {
+		return getDao().count();
+	}
+
+	@Override
+	public T save(T entity) {
+		return getDao().save(entity);
+	}
+
+	@Override
+	public void delete(Serializable id) throws IllegalAccessException, InvocationTargetException {
+		this.logicDelete(id);
+	}
+
+	@Override
+	public void delete(T entity) throws IllegalAccessException, InvocationTargetException {
+		this.logicDelete(entity);
+	}
+
+	@Override
+	public Iterable<T> list() {
+		return this.getDao().findAll();
+	}
+
+	@Override
+	public Page pageList(int pageNo, int pageSize) {
+		return null;
+	}
+
 	/**
 	 * 根据id逻辑删除实体对象
 	 * @param id
@@ -107,10 +96,10 @@ public abstract class AbstractService<T> {
 //			this.getEm().detach(obj);
 		}
 	}
-	
+
+
 	/**
 	 * 根据条件执行逻辑删除
-	 * @param clazz
 	 * @param property
 	 * @param value
 	 */
@@ -124,8 +113,44 @@ public abstract class AbstractService<T> {
 		logger.debug("hql:"+hql);
 		logger.debug("result:"+count);
 	}
-	
-	
+
+	@SuppressWarnings("unchecked")
+	private Class<T> getRealClass() {
+		Type genType = this.getClass().getGenericSuperclass();
+		Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+		return (Class<T>) params[0];
+	}
+
+	@Override
+	public List list(String hql, Object... params) {
+		Query query = this.getEm().createQuery(hql);
+		for (int i = 0; i < params.length; i++) {
+			Object object = params[i];
+			query.setParameter(i+1, object);
+		}
+		return query.getResultList();
+	}
+
+	@Override
+	public Page pageList(String hql, int pageNo, int pageSize, Object... params) {
+		return this.findByCustom(hql,true, pageNo, pageSize,params);
+	}
+
+	@Override
+	public T findUnique(String hql, Object ... params)
+			throws MatchMutiEntitiesException {
+		List<T> results = findByCustomWithParams(hql, params);
+		if(results.size() == 0)
+			return null;
+		if(results.size()>1)
+			throw new MatchMutiEntitiesException();
+		else{
+			return results.get(0);
+		}
+	}
+
+
+
 	/**
 	 * 自定义查询方法，不带分页,默认排除掉deleted数据
 	 * @param jpql
@@ -135,7 +160,7 @@ public abstract class AbstractService<T> {
 	public List findByCustomWithParams(String jpql,Object ... params){
 		return this.findByCustomWithParams(jpql,true, params);
 	}
-	
+
 	/**
 	 * from LoginLog ll where ll.personId='' order by ll.dt desc
 	 */
@@ -157,29 +182,24 @@ public abstract class AbstractService<T> {
 	public Page findByCustom(String jpql,int pageNo,int pageSize){
 		return this.findByCustom(jpql,true, pageNo, pageSize);
 	}
-	
-	/**
-	 * 获取最后一页数据
-	 * @param jpql
-	 * @param pageSize
-	 * @return
-	 */
-	public Page findLastPageByCustom(String jpql,int pageSize){
-		return this.findLastPageByCustom(jpql, true, pageSize);
-	}
+
 	/**
 	 * from LoginLog ll where ll.personId='' order by ll.dt desc
 	 */
-	public Page findByCustom(String jpql,boolean excludeDeleted,int pageNo,int pageSize){
+	public Page findByCustom(String jpql,boolean excludeDeleted,int pageNo,int pageSize,Object ... params){
 		logger.debug("findByCustom:"+jpql);
 		if(excludeDeleted)
 			jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
 		pageNo--;
 		String countJpql = " select count (*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
 		Query query = this.em.createQuery(countJpql);
+		for (int i = 0; i < params.length; i++) {
+			Object object = params[i];
+			query.setParameter(i+1, object);
+		}
 		Object obj = query.getSingleResult();
 		long totalCount = (Long) obj;
-		
+
 		query = this.em.createQuery(jpql);
 		query.setMaxResults(pageSize);
 		query.setFirstResult(pageNo*pageSize);
@@ -187,40 +207,5 @@ public abstract class AbstractService<T> {
 		Page page = new Page((pageNo)*pageSize+1,totalCount,pageSize,list);
 		return page;
 	}
-	
-	/**
-	 * 获取最后一页数据
-	 * @param jpql
-	 * @param pageSize
-	 * @return
-	 */
-	public Page findLastPageByCustom(String jpql,boolean excludeDeleted,int pageSize){
-		logger.debug("findByCustom:"+jpql);
-		if(excludeDeleted)
-			jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
-		String countJpql = " select count (*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
-		Query query = this.em.createQuery(countJpql);
-		Object obj = query.getSingleResult();
-		int totalCount =((Long) obj).intValue();
-		int lastPageNo = totalCount/pageSize+(totalCount%pageSize == 0?0:1);
-		query = this.em.createQuery(jpql);
-		query.setMaxResults(pageSize);
-		query.setFirstResult(lastPageNo*pageSize);
-		List list = query.getResultList();
-		Page page = new Page((lastPageNo)*pageSize+1,totalCount,pageSize,list);
-		return page;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private Class<T> getRealClass() {   
-        Type genType = this.getClass().getGenericSuperclass();   
-        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();   
-        return (Class<T>) params[0];
-    }
-	
-	public T findById(String id){
-		return this.getDao().findOne(id);
-	}
-	
-	
+
 }
