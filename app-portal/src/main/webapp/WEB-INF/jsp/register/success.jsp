@@ -3,14 +3,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+    <title>注册成功</title>
     <%@include file="/inc/meta.jsp" %>
-
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
-    <title>
-        <c:if test="${not empty info}">${info}</c:if>
-        <c:if test="${empty info}">激活成功</c:if>
-    </title>
 </head>
 <body class="register-bg">
 <!--  container -->
@@ -29,7 +25,8 @@
     <div class="row box">
         <div class="col-md-12 text-center">
             <img src="${resPrefixUrl }/images/register/icon_12.png"/>
-            <p class="p">${info}<a href="${ctx}/login">立即登录</a></p>
+            <p class="p">账号注册成功，请24小时内前往邮箱收取邮件激活账号 ${email}</p>
+            <p><a href="#">去邮箱收取邮件</a></p>
         </div>
     </div>
 </div>

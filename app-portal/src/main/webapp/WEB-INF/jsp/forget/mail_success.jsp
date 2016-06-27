@@ -3,10 +3,13 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+    <title>忘记密码</title>
+
     <%@include file="/inc/meta.jsp" %>
+
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
-    <title>注册成功</title>
+
 </head>
 <body class="register-bg">
 <!--  container -->
@@ -15,7 +18,7 @@
     <div class="box">
         <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png"/>
         <div class="text">
-            如果有云呼你账号，<a href="${ctx }/login">立即登录</a>
+            如果有云呼你账号，<a href="${ctx}/login">立即登录</a> <a href="${ctx}/reg/index">立即注册</a>
         </div>
     </div>
 </div>
@@ -24,9 +27,11 @@
 <div class="register_container">
     <div class="row box">
         <div class="col-md-12 text-center">
-            <img src="${resPrefixUrl }/images/register/icon_12.png"/>
-            <p class="p">账号注册成功，请24小时内前往邮箱收取邮件激活账号 ${email}</p>
-            <p><a href="#">去邮箱收取邮件</a></p>
+            <div class="email-box">
+                <img src="${resPrefixUrl }/images/index/mail.png"/>
+                <p class="p">您的初始化密码安全链接已发送至邮箱地址：</p>
+                <p><a href="mailto:${email}">去邮箱收取邮件</a></p>
+            </div>
         </div>
     </div>
 </div>

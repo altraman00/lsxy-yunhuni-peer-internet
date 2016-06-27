@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
+    <title>用户激活</title>
     <%@include file="/inc/meta.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
-    <title>用户激活</title>
 </head>
 <body class="register-bg">
 <!--  container -->

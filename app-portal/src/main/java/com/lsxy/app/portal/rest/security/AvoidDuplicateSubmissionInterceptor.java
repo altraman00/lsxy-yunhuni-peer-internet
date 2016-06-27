@@ -1,9 +1,5 @@
 package com.lsxy.app.portal.rest.security;
 
-import com.lsxy.app.portal.rest.console.account.AccountController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -30,16 +26,18 @@ public class AvoidDuplicateSubmissionInterceptor extends HandlerInterceptorAdapt
             Method method = handlerMethod.getMethod();
             AvoidDuplicateSubmission annotation = method.getAnnotation(AvoidDuplicateSubmission.class);
             if (annotation != null) {
-                boolean needSaveSession = annotation.needSaveToken();
-                if (needSaveSession) {
-                    request.getSession(false).setAttribute(SUBMISSION_TOKEN, UUID.randomUUID().toString());
-                }
+                //为了应对执行的方法同时有检验和生成token的功能，应该先检验，再生成token
                 boolean needRemoveSession = annotation.needRemoveToken();
                 if (needRemoveSession) {
                     if (isRepeatSubmit(request)) {
                         return false;
                     }
                     request.getSession(false).removeAttribute(SUBMISSION_TOKEN);
+                }
+
+                boolean needSaveSession = annotation.needSaveToken();
+                if (needSaveSession) {
+                    request.getSession(false).setAttribute(SUBMISSION_TOKEN, UUID.randomUUID().toString());
                 }
             }
             return true;
