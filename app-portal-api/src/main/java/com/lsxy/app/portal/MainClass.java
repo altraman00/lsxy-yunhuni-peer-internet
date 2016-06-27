@@ -5,12 +5,13 @@ import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.tenant.FrameworkApiConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 /**
  * Created by Tandy on 2016/6/13.
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class})
 public class MainClass {
 
