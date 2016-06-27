@@ -77,7 +77,7 @@ public class RestRequest {
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
      * @return
      */
-    public <T> RestResponse<T> get(String url, Class<T> responseDataType, String... uriparams) {
+    public <T> RestResponse<T> get(String url, Class<T> responseDataType, Object... uriparams) {
         RestResponse<T> restResponse = null;
         HttpHeaders headers = new HttpHeaders();
         if (StringUtil.isNotEmpty(this.securityToken)) {
