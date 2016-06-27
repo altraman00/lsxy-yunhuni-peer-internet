@@ -232,17 +232,51 @@
 <!--must-->
 <script>
     function sendCode(){
+        //todo
         alert("发送验证码");
     }
+<<<<<<< Updated upstream
 
+=======
+    function  safetyPost(url,param) {
+        alert(param);
+
+        alert(2);
+    }
+>>>>>>> Stashed changes
     $('.modalSuer1').click(function(){
         var psw = $('.password').val();
         if(psw.length<6 || psw.length>18){
             showmsg('密码必须大于6，小于18个字符','moadltips1');return;
         }
+<<<<<<< Updated upstream
         alert('密码正确');
         $('.addmobile1').hide();
         $('.addmobile2').show();
+=======
+        var param = {};
+        //验证密码
+        $.ajax({
+            url : "${ctx}/console/account/safety/validation_psw",
+            type : 'post',
+            async: false,//使用同步的方式,true为异步方式
+            data : {'oldPws':psw,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(data){
+                alert(data.msg);
+                alert(data.sucess)
+                if(data.sucess==2) {
+                    $('.addmobile1').hide();
+                    $('.addmobile2').show();
+                }
+            },
+            fail:function(){
+                alert('密码验证失败，请重试')
+            }
+        });
+        //alert('密码正确');
+
+>>>>>>> Stashed changes
     });
 
     $('.modalSuer2').click(function(){
@@ -253,6 +287,10 @@
         if(code.length!=4){
             showmsg('请输入四位数的验证码','moadltips2'); return false;
         }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         alert('检验验证码是否正确 , 绑定手机');
         $('.cancel').click();
     });
