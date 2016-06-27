@@ -1,5 +1,9 @@
 package com.lsxy.app.portal.rest.security;
 
+import com.lsxy.app.portal.rest.comm.PortalConstants;
+import com.lsxy.framework.web.rest.RestRequest;
+import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.framework.web.rest.UserRestToken;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -15,10 +19,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by liups on 2016/6/21.
@@ -44,19 +45,25 @@ public class RestAuthenticationProvider implements AuthenticationProvider, Initi
         // Determine username
         String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED"
                 : authentication.getName();
-
         Object password = authentication.getCredentials();
-
         //此处调用restApi进行登录，并对登录结果进行处理
-        String tocken = null;
-        if("username".equals(username)&&"password".equals(password)){
-            tocken = UUID.randomUUID().toString();
+        String url = PortalConstants.REST_PREFIX_URL + "/login";
+        Map<String,Object> formParams = new HashMap<>();
+        formParams.put("username",username);
+        formParams.put("password",password);
+        String token = null;
+        RestResponse<UserRestToken> response = RestRequest.buildRequest().post(url,formParams,UserRestToken.class);
+        if(response != null){
+            UserRestToken data = response.getData();
+            if(data != null){
+                token = data.getToken();
+            }
         }
-        if (StringUtils.isEmpty(tocken)) {
+        if (StringUtils.isEmpty(token)) {
             //这个类不要return null,以异常的形式处理结果
             throw new BadCredentialsException("密码错误,或账号被锁定");
         } else {
-            return createSuccessAuthentication(username, authentication,roles("ROLE_TENANT_USER"),tocken);
+            return createSuccessAuthentication(username, authentication,roles("ROLE_TENANT_USER"),token);
         }
 
     }

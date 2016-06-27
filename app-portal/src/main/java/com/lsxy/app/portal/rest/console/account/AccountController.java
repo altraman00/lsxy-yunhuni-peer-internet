@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.security.PortalAuthenticationSuccessHandler;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class AccountController {
     @RequestMapping("/index")
     public ModelAndView index(HttpServletRequest request){
         if(logger.isDebugEnabled()){
-            Object attribute = request.getSession().getAttribute(PortalAuthenticationSuccessHandler.SSO_TOKEN);
+            Object attribute = request.getSession().getAttribute(PortalConstants.SSO_TOKEN);
             logger.debug("调试登录tocken,{}",attribute);
         }
         ModelAndView mav = new ModelAndView();
