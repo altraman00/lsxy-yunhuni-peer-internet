@@ -21,21 +21,30 @@ public class InformationController {
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        InformationEditVo informationEditVo = new InformationEditVo("金融","12313","www.baidu.com","广东省","广州市","天河创意园","020-12345678");
-        request.getSession().setAttribute("informationEditVo",informationEditVo);
+
+        InformationEditVo informationEditVo = (InformationEditVo)request.getSession().getAttribute("informationEditVo");
+        if(informationEditVo==null) {
+            informationEditVo =  new InformationEditVo("金融", "12313", "www.baidu.com", "广东省", "广州市", "天河创意园", "020-12345678");
+            request.getSession().setAttribute("informationEditVo",informationEditVo);
+        }
         mav.addObject("informationEditVo",informationEditVo);
         mav.setViewName("/console/account/information/index");
         return mav;
     }
     @RequestMapping(value="/edit" ,method = RequestMethod.POST)
-    public ModelAndView edit(HttpServletRequest request, HttpServletResponse response, InformationEditVo informationEditVo ){
-
-        response.setCharacterEncoding("UTF-8");
+    public ModelAndView edit(HttpServletRequest request, InformationEditVo informationEditVo ){
         ModelAndView mav = new ModelAndView();
-        String test = request.getParameter("informationEditVo.business");
-        request.getSession().setAttribute("informationEditVo",informationEditVo);
-        mav.addObject("informationEditVo",informationEditVo);
-        mav.addObject("succes","修改成功"+informationEditVo.toString()+"--"+test);
+        //todo 修改数据库数据
+        int status = 0;
+        //todo 0修改成功 -1表示失败
+        if(status==0) {
+            request.getSession().setAttribute("informationEditVo", informationEditVo);
+            mav.addObject("informationEditVo", informationEditVo);
+            mav.addObject("msg", "修改成功！");
+        }else{
+            mav.addObject("informationEditVo", informationEditVo);
+            mav.addObject("msg", "修改失败！");
+        }
         mav.setViewName("/console/account/information/index");
         return mav;
     }

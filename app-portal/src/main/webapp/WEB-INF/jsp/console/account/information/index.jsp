@@ -131,7 +131,6 @@
                                             <div class="col-md-9">
                                                 <button id="validateBtn" type="submit" class="validateBtnNormal btn btn-primary  btn-form">保存</button>
                                                 <%--<a id="validateBtn" onclick="" class="validateBtnNormal btn btn-primary  btn-form">保存</a>--%>
-                                                <span> ${succes}</span>
                                             </div>
                                         </div>
                                     </form:form>
@@ -165,6 +164,8 @@
         // myselect.selectmenu("refresh");
         // myselect = $(".area");
     }
+    var msg = '${msg}';
+    if(msg==''){}else{alert(msg);}
 
 
 </script>
