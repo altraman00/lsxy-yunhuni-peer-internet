@@ -2,7 +2,9 @@ package com.lsxy.app.portal.rest.comm;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/mc")
 @Controller
 public class MCController {
-
     /**
      * 发送手机验证码，并存到session里
      */
@@ -20,12 +21,19 @@ public class MCController {
     @ResponseBody
     public void getMobileCode(HttpServletRequest request,String mobile){
         if(!StringUtils.isEmpty(mobile)){
+            MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+            if(checker != null){
+                if(System.currentTimeMillis() < (checker.getCreateTime() + MobileCodeChecker.TIME_INTERVAL)){
+                    return;
+                }
+            }
+
             //此处调用发送手机验证码服务并返回验证码
-            String mobileCode = "123456";
+            String mobileCode = "1234";
             if(!StringUtils.isEmpty(mobileCode)){
                 MobileCodeChecker mobileCodeChecker = new MobileCodeChecker(mobile,mobileCode);
                 //存到session里
-                request.getSession().setAttribute(PortalConstants.MC_KEY,mobileCodeChecker);
+                MobileCodeUtils.setMobileCodeChecker(request,mobileCodeChecker);
             }
         }
 
@@ -39,10 +47,8 @@ public class MCController {
     public byte checkMobileCode(HttpServletRequest request, String mc){
         //检查手机验证码
         if(!StringUtils.isEmpty(mc)){
-            MobileCodeChecker checker;
-            Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
-            if(obj != null && obj instanceof MobileCodeChecker){
-                checker = (MobileCodeChecker) obj;
+            MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+            if(checker != null){
                 return MobileCodeChecker.checkCode(mc,checker);
             }else{
                 return MobileCodeChecker.STATUS_OVER_TIME;
@@ -51,4 +57,6 @@ public class MCController {
             return MobileCodeChecker.STATUS_ERR_CODE;
         }
     }
+
+
 }
