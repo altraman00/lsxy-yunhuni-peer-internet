@@ -49,15 +49,14 @@ public class RestAuthenticationProvider implements AuthenticationProvider, Initi
 
         //此处调用restApi进行登录，并对登录结果进行处理
         String tocken = null;
-        if("user".equals(username)&&"password".equals(password)){
+        if("username".equals(username)&&"password".equals(password)){
             tocken = UUID.randomUUID().toString();
         }
-        if(!StringUtils.isEmpty(tocken)){
-            Authentication successAuthentication = createSuccessAuthentication(username, authentication,roles("ROLE_TENANT_USER"),tocken);
-            return successAuthentication;
-        }else{
+        if (StringUtils.isEmpty(tocken)) {
             //这个类不要return null,以异常的形式处理结果
             throw new BadCredentialsException("密码错误,或账号被锁定");
+        } else {
+            return createSuccessAuthentication(username, authentication,roles("ROLE_TENANT_USER"),tocken);
         }
 
     }

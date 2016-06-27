@@ -3,8 +3,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <%@include file="/inc/meta.jsp" %>
     <meta charset="utf-8" />
-    <title>云分销</title>
     <meta name="description" content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <!-- Custom CSS -->
@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="${resPrefixUrl }/css/own.css" type="text/css"/>
     <link rel="stylesheet" href="${resPrefixUrl }/stylesheets/screen.css" type="text/css" media="screen" charset="utf-8">
     <!--[if lt IE 9]> <script src="${resPrefixUrl }/js/ie/html5shiv.js" cache="false"></script> <script src="${resPrefixUrl }/js/ie/respond.min.js" cache="false"></script> <script src="${resPrefixUrl }/js/ie/excanvas.js" cache="false"></script> <![endif]-->
+    <title>云分销</title>
 </head>
 <body>
 <section class="vbox">
@@ -60,7 +61,7 @@
                     <span class="arrow top"></span>
                     <li> <a href="#">设置</a> </li>
                     <li> <a href="${resPrefixUrl }/profile.html">简介</a> </li>
-                    <li> <a href="${resPrefixUrl }/modal.lockme.html" data-toggle="ajaxModal" >退出</a> </li>
+                    <li> <a href="${ctx}/logout" >退出</a> </li>
                 </ul>
             </li>
         </ul>
