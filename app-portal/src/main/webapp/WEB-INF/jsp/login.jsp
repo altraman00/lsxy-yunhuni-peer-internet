@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-	<title>登陆</title>
-	<%@include file="/inc/meta.jsp" %>
+	<%@include file="/inc/metaLogin.jsp" %>
 	<!--index.css-->
 	<link href="${resPrefixUrl }/stylesheets/login.css" rel="stylesheet"  type="text/css" />
+	<title>登陆</title>
 </head>
 <body class="login-bg">
 <!--  container -->
