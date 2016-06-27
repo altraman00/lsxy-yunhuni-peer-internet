@@ -8,7 +8,7 @@ public class Constants {
 	/**
 	 * 配置文件 
 	 */
-	public static final String DEFAULT_CONFIG_FILE="/config.properties";
+	public static final String DEFAULT_CONFIG_FILE="/application.properties";
 
 	
 }
