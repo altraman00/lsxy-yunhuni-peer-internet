@@ -1,7 +1,10 @@
 package com.lsxy.framework.core.exceptions;
 
-public class MatchMutiEntitiesException extends Exception {
+public class MatchMutiEntitiesException extends LsxyRuntimeException {
 
+	public MatchMutiEntitiesException(){
+//		super(AllErrors.MatchMutiEntitiesException);
+	}
 	/**
 	 * 
 	 */

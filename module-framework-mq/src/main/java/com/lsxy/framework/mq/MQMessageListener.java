@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
-import com.lsxy.framework.cache.manager.RedisCacheManager;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.StringUtil;
 
@@ -28,7 +28,7 @@ public class MQMessageListener implements MessageListener {
 	private static Log logger = LogFactory.getLog(MQMessageListener.class);
 
 	@Autowired
-	private RedisCacheManager redisCacheManager;
+	private RedisCacheService redisCacheService;
 	
 	@Autowired
 	private MQHandlerFactory mqHandlerFactory;
@@ -63,14 +63,14 @@ public class MQMessageListener implements MessageListener {
 						return;
 					}
 					//执行互斥处理消息
-					String flagValue = redisCacheManager.get(cacheKey);
+					String flagValue = redisCacheService.get(cacheKey);
 					if(StringUtil.isNotEmpty(flagValue)){
 						logger.debug("["+uuid+"]缓存中已被设置标记，该消息被"+flagValue+"处理了");
 					}else{
 						try {
 							logger.debug("["+uuid+"]准备处理该消息:"+uuid);
-							redisCacheManager.setTransactionFlag(cacheKey,sysid);
-							String currentCacheValue = redisCacheManager.get(cacheKey);
+							redisCacheService.setTransactionFlag(cacheKey,sysid);
+							String currentCacheValue = redisCacheService.get(cacheKey);
 							logger.debug("["+uuid+"]当前cacheValue:"+currentCacheValue);
 							if(currentCacheValue.equals(sysid)){
 								logger.debug("["+uuid+"]马上处理该消息："+uuid);
@@ -79,7 +79,7 @@ public class MQMessageListener implements MessageListener {
 								logger.debug("["+uuid+"]标记位不一致"+currentCacheValue+"  vs "+ sysid);
 							}
 						} catch (TransactionExecFailedException e) {
-							String tmp = redisCacheManager.get("mq_event__"+uuid);
+							String tmp = redisCacheService.get("mq_event__"+uuid);
 							logger.debug("["+uuid+"]设置标记位异常了，该消息被"+tmp+"处理了");
 						}
 					}

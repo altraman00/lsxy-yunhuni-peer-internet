@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @SuppressWarnings({"unchecked","rawtypes"})
-public class RedisCacheManager {
+public class RedisCacheService {
 	
 	  //加锁标志
 //    public static final String LOCKED = "TRUE";
@@ -28,7 +28,7 @@ public class RedisCacheManager {
     //默认超时时间（毫秒）
 //    public static final long DEFAULT_TIME_OUT = 3000;
 
-	private final static Log logger = LogFactory.getLog(RedisCacheManager.class);
+	private final static Log logger = LogFactory.getLog(RedisCacheService.class);
     @Autowired
     private RedisTemplate redisTemplate;
     
@@ -71,7 +71,7 @@ public class RedisCacheManager {
 	    /**
 	     * @param key
 	     * @param value
-	     * @param liveTime
+	     * @param liveTime  过期时间单位为秒
 	     */
 	    public void set(String key, String value, long liveTime) {
 	        this.set(key.getBytes(), value.getBytes(), liveTime);

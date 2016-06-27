@@ -10,21 +10,30 @@ import javax.persistence.*;
  * @author tandy
  */
 @Entity
-@Table(schema = "hsy_service_tenant", name = "tb_tenant_account")
+@Table(schema = "db_lsxy_base", name = "tb_base_account")
 public class Account extends IdEntity {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private String userName;
+	private Tenant tenant;                //所属租户
+	private String mobile;                //移动手机
 	private String email;                    //电子邮件
 	private String password;            //密码
-	private String mobile;                //移动手机
-	private int status;                    //账号状态			租户用户状态：0-未激活 1-LOCK 2-正常  3-异常
-	private Tenant tenant;                //所属租户
-	private String tenantUn;        // 租户标识
-	private String headImgUrl;            //头像url
 	private String mm;
+
+	private int status;                    //账号状态			租户用户状态：0-未激活 1-LOCK 2-正常  3-异常
+
+	@Column(name = "username")
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	@Column(name = "mm")
 	@JsonIgnore
@@ -37,14 +46,6 @@ public class Account extends IdEntity {
 	}
 
 
-	@Column(name = "headimgurl")
-	public String getHeadImgUrl() {
-		return headImgUrl;
-	}
-
-	public void setHeadImgUrl(String headImgUrl) {
-		this.headImgUrl = headImgUrl;
-	}
 
 
 	@Column(name = "email")
@@ -88,17 +89,6 @@ public class Account extends IdEntity {
 
 
 
-	@Transient
-	public boolean validatePassword(String password2) {
-		return false;
-	}
-
-	@Transient
-	@JsonIgnore
-	public String getPlaintextPassword() {
-		return this.password;
-	}
-
 	@ManyToOne
 	@JoinColumn(name = "tenant_id")
 	public Tenant getTenant() {
@@ -111,14 +101,6 @@ public class Account extends IdEntity {
 
 
 
-	@Column(name = "tenantun")
-	public String getTenantUn() {
-		return tenantUn;
-	}
-
-	public void setTenantUn(String tenantUn) {
-		this.tenantUn = tenantUn;
-	}
 
 
 }
