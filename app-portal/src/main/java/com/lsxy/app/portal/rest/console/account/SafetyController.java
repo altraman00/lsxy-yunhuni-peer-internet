@@ -25,10 +25,24 @@ public class SafetyController {
         mav.setViewName("/console/account/safety/index");
         return mav;
     }
-    @RequestMapping(value="/edit" ,method = RequestMethod.POST)
-    public ModelAndView edit(HttpServletRequest request ){
+    @RequestMapping(value="/index_psw" )
+    public ModelAndView index_psw(HttpServletRequest request ){
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/console/account/safety/index");
+        mav.setViewName("/console/account/safety/edit_psw");
+        return mav;
+    }
+    @RequestMapping(value="/edit_psw" ,method = RequestMethod.POST)
+    public ModelAndView edit_psw(HttpServletRequest request ){
+        ModelAndView mav = new ModelAndView();
+        //todo 修改数据库数据
+        int status = 0;
+        //todo 0修改成功 -1表示失败
+        if(status==0) {
+            mav.addObject("msg", "修改成功！");
+        }else{
+            mav.addObject("msg", "修改失败！");
+        }
+        mav.setViewName("/console/account/safety/edit_psw");
         return mav;
     }
 }

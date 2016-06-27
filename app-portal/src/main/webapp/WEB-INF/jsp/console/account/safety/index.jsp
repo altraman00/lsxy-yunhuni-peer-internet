@@ -111,7 +111,7 @@
                                             <div class="col-md-2 right">
                                                 <span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span>
                                                 <span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span>
-                                                <a class="personal-edit" href="${resPrefixUrl }/personal_edit_psw.html">修改</a>
+                                                <a class="personal-edit" href="${ctx}/console/account/safety/index_psw">修改</a>
                                             </div>
                                         </div>
                                         <div class="row dotted-line personal-box">
@@ -173,8 +173,28 @@
 
 
 <!---mobilebox-->
-<div class="shadow-bg" id="show-bg"  style="display: block"  ></div>
-<div id="mobilebox" class="modal-box" style="display: inline-block;">
+<div class="shadow-bg" id="show-bg"  style="display: none"></div>
+<div id="mobilebox" class="modal-box" style="display: none;">
+    <div class="addmobile1" style="display: ">
+        <div class="title">操作确认<a class="close_a modalCancel"></a></div>
+        <div class="content" >
+            <div class="tips-box">
+                确认是本账号操作，请再次输入用户名密码
+            </div>
+            <div class="input">
+                <input class=" form-control password" type="password" name="" placeholder="请输入当前登录用户密码   " />
+            </div>
+            <div class="input">
+                <div class="tips-error moadltips1" style="display: none">密码有误</div>
+            </div>
+        </div>
+        <div class="footer">
+            <a  class="cancel modalCancel">返回</a>
+            <a  class="sure modalSuer1">确认</a>
+        </div>
+    </div>
+
+
     <div class="addmobile2" style="display: none">
         <div class="title">重新绑定手机号<a class="close_a modalCancel"></a></div>
         <div class="content">
@@ -187,29 +207,15 @@
                 <button class="code-button" id="send-code" >发送验证码</button>
             </div>
             <div class="input">
-                <div class="tips-error" style="display: none">请先填写手机号码</div>
+                <div class="tips-error moadltips2" style="display: none">请先填写手机号码</div>
             </div>
         </div>
         <div class="footer">
             <a class="cancel modalCancel">返回</a>
-            <a class="sure modalSuer1">确认</a>
+            <a class="sure modalSuer2">确认</a>
         </div>
     </div>
-    <div class="addmobile1" style="display: ">
-        <div class="title">操作确认<a class="close_a modalCancel"></a></div>
-        <div class="content" >
-            <div class="tips-box">
-                确认是本账号操作，请再次输入用户名密码
-            </div>
-            <div class="input">
-                <input class=" form-control" type="text" name="" placeholder="请输入当前登录用户密码   " />
-            </div>
-        </div>
-        <div class="footer">
-            <a  class="cancel modalCancel">返回</a>
-            <a  class="sure modalSuer2">确认</a>
-        </div>
-    </div>
+
 </div>
 
 
@@ -222,12 +228,36 @@
 <script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
 <script src="${resPrefixUrl }/js/include.js"></script>
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
-<script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
+<script src="${resPrefixUrl }/s/personal/account.js"></script><!--must-->
 <!--must-->
 <script>
     function sendCode(){
         alert("发送验证码");
     }
+
+    $('.modalSuer1').click(function(){
+        var psw = $('.password').val();
+        if(psw.length<6 || psw.length>18){
+            showmsg('密码必须大于6，小于18个字符','moadltips1');return;
+        }
+        alert('密码正确');
+        $('.addmobile1').hide();
+        $('.addmobile2').show();
+    });
+
+    $('.modalSuer2').click(function(){
+        if(!regMobile()){
+            showmsg('请输入正确的手机格式','moadltips2'); return false;
+        }
+        var code = $('.modalCode').val();
+        if(code.length!=4){
+            showmsg('请输入四位数的验证码','moadltips2'); return false;
+        }
+        alert('检验验证码是否正确 , 绑定手机');
+        $('.cancel').click();
+    });
+
+
 </script>
 
 
