@@ -59,9 +59,7 @@
                             </div>
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
-                                    <form:form role="form" action="${ctx}/console/account/auth/edit"   method="post" class="register-form" id="personalAuthForm" >
-                                        <%--<input type="hidden"  name="${_csrf.parameterName}"   value="${_csrf.token}"/>--%>
-                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                    <form:form role="form" action="${ctx}/console/account/auth/edit?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data"  method="post" class="register-form" id="personalAuthForm" >
                                         ${msg}
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用行业：</lable>
@@ -97,8 +95,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">持证照片：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="file" id="id_photoFile"  name="id_photoFile" onclick="id_photoFileUp()" placeholder="" class="form-control input-form limitImageFile"   />
-                                                    <input type="hidden" name="id_photo" id="id_photo" />
+                                                    <input type="file" id="file"  name="file"  placeholder="" class="form-control input-form limitImageFile"   />
                                                     <p class="tips">证件图片大小2m以内，图片格式要求是jpg、jpeg、gif、png、bmp </p>
                                                     <div class="row">
                                                         <div class="">
@@ -167,7 +164,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="file"placeholder="" name="type01_prop01File" class="form-control input-form limitImageFile"   />
+                                                    <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
                                                     <p class="tips">将原件或盖章的复印件扫描、拍照后上传，图片格式要求是jpg、jpeg、gif、png、bmp </p>
                                                 </div>
                                                 <!-- <span class="btn btn&#45;default btn&#45;file"> 浏览 <input type="file"> </span> -->
@@ -188,7 +185,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label">税务登记：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="file" placeholder="" name="type03_prop02File" class="form-control input-form limitImageFile"   />
+                                                    <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
                                                     <p class="tips">证件图片大小2m以内，图片格式要求是jpg、jpeg、gif、png、bmp </p>
                                                 </div>
                                                 <!-- <span class="btn btn&#45;default btn&#45;file"> 浏览 <input type="file"> </span> -->
@@ -196,7 +193,7 @@
                                             <div class="form-group">
 
                                                 <div class="col-md-9">
-                                                    <a id="validateBtn" class="validateBtnExtend btn btn-primary  btn-form">保存</a>
+                                                    <a  onclick="id_photoFileUp()" id="validateBtn" class="validateBtnExtend btn btn-primary  btn-form">保存</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -219,9 +216,7 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/personal/auth.js'></script>
 <script type="text/javascript">
     function id_photoFileUp(){
-        var form =     document.getElementById("personalAuthForm");
-        form.setAttribute("enctype","multipart/form-data");
-        form.setAttribute("action","${cxt}/console/account/auth/index");
+        var form = document.getElementById("personalAuthForm");
         form.submit();
 
     }

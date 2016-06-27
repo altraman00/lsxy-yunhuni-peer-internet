@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by Administrator on 2016/6/25.
  */
-public class AuthEditVo implements Serializable {
+public class AuthVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -148,7 +148,7 @@ public class AuthEditVo implements Serializable {
 
     @Override
     public String toString() {
-        return "AuthEditVo{" +
+        return "AuthVo{" +
                 "idType='" + idType + '\'' +
                 ", privatename='" + privatename + '\'' +
                 ", id_number='" + id_number + '\'' +
