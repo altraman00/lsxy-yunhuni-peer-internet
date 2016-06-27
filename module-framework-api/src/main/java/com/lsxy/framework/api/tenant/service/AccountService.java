@@ -1,8 +1,8 @@
-package com.lsxy.framework.tenant.service;
+package com.lsxy.framework.api.tenant.service;
 
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.tenant.base.BaseService;
-import com.lsxy.framework.tenant.model.Account;
+import com.lsxy.framework.api.base.BaseService;
 
 public interface AccountService extends BaseService<Account> {
 

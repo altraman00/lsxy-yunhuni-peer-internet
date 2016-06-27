@@ -5,7 +5,7 @@ import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.HqlUtil;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.tenant.base.BaseService;
+import com.lsxy.framework.api.base.BaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
