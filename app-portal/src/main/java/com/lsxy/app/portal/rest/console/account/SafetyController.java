@@ -26,6 +26,11 @@ public class SafetyController {
     private static final String RESULT_FIAL = "-2";//处理结果-失败
     private static final Integer EDIT_FIAL = -1;//数据库操作，-1表示失败
 
+    /**
+     * 安全设置首页
+     * @param request
+     * @return
+     */
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
@@ -45,15 +50,18 @@ public class SafetyController {
      * @return
      */
     @RequestMapping(value="/index_psw" )
-    public ModelAndView index_psw(){
+    public ModelAndView indexPsw(){
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/console/account/safety/edit_psw");
         return mav;
     }
 
-
+    /**
+     *  修改密码方法
+     * @return
+     */
     @RequestMapping(value="/edit_psw" ,method = RequestMethod.POST)
-    public ModelAndView edit_psw(HttpServletRequest request ){
+    public ModelAndView editPsw( ){
         ModelAndView mav = new ModelAndView();
         //TODO 修改数据库数据返回处理结果
         int status = 0;
@@ -67,10 +75,14 @@ public class SafetyController {
         return mav;
     }
 
-
+    /**
+     * 验证密码方法
+     * @param oldPws 用户输入的密码
+     * @return
+     */
     @RequestMapping(value="/validation_psw" ,method = RequestMethod.POST)
     @ResponseBody
-    public Map validation_psw(String oldPws ){
+    public Map validationPsw(String oldPws ){
        HashMap map = new HashMap();
         //TODO  查询数据库获取当前用户密码
         String pws = "A123456";
@@ -85,9 +97,16 @@ public class SafetyController {
         return map;
     }
 
+
+    /**
+     *  绑定手机号码
+     * @param mobile 新手机号码
+     * @param request
+     * @return
+     */
     @RequestMapping(value="/edit_mobile" ,method = RequestMethod.POST)
     @ResponseBody
-    public Map edit_mobile(String mobile ,HttpServletRequest request ){
+    public Map editMobile(String mobile ,HttpServletRequest request ){
         HashMap map = new HashMap();
         //TODO  对数据修改用户密码，
         int status = 0;//-1表示数据库修改失败
