@@ -11,12 +11,18 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
- * Created by Tandy on 2016/6/7.
+ * Created by zhangxb on 2016/6/28.
+ * 多文件上传配置类
  */
-@ComponentScan("com.lsxy.app.portal")
-@EnableWebMvc
 @Configuration
-@Import(SpringSecurityConfig.class)
-public class SpringStartupConfig {
-
+public class MultiFileUploadConfig {
+    @Bean
+    public CommonsMultipartResolver multipartResolver(){
+        CommonsMultipartResolver resolver = new UploadCommonsMultipartResolver();
+        int size = Integer.valueOf( SystemConfig.getProperty("portal.realauth.resource.upload.maxsize"));
+        if(size>0) {
+            resolver.setMaxUploadSize(size*1024*1024);//此处单位是b,1024*1024=1M
+        }
+        return resolver;
+    }
 }
