@@ -37,4 +37,9 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         }
         return account;
     }
+
+    @Override
+    public Account findPersonByLoginName(String userName) throws MatchMutiEntitiesException {
+        return accountDao.findByUserName(userName);
+    }
 }

@@ -7,6 +7,7 @@ import com.lsxy.framework.tenant.service.AccountService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +24,7 @@ public class AccountController extends AbstractRestController {
 
     @RequestMapping("/")
     public RestResponse restMyAccountInfo(){
+
         Account account = new Account();
         account.setId("1234123412341234");
         return RestResponse.success(account);

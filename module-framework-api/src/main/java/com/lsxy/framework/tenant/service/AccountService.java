@@ -13,4 +13,7 @@ public interface AccountService extends BaseService<Account> {
      * @return
      */
     Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException;
+
+
+    Account findPersonByLoginName(String userLoginName) throws MatchMutiEntitiesException;
 }

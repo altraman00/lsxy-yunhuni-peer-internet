@@ -12,4 +12,5 @@ import java.io.Serializable;
  */
 public interface AccountDao extends BaseDaoInterface<Account, Serializable> {
     public Account findById(String id);
+    public Account findByUserName(String userName);
 }

@@ -54,7 +54,7 @@ public class RestClientTest {
     public void account(){
         String url = restPrefixUrl + "/rest/account/";
         String token = "1234";
-        RestResponse<Account> x = RestRequest.buildSecurityRequest(token).get(url, Account.class);
+        RestResponse<Account> x = RestRequest.buildSecurityRequest(token).get(url, null,Account.class);
         System.out.println(x);
 
     }
