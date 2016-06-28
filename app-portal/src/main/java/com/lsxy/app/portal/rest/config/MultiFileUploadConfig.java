@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * Created by zhangxb on 2016/6/28.
- * 多文件上传过滤器
+ * 多文件上传配置类
  */
 @Configuration
 public class MultiFileUploadConfig {
