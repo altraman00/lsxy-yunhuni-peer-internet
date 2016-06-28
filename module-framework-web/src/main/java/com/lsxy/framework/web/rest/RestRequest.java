@@ -110,7 +110,9 @@ public class RestRequest {
     public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Map<String, Object> params, Class<T> responseDataType,String... uriparams){
         RestResponse<T> restResponse = null;
         MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
-        params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
+        if(params != null){
+            params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
+        }
         HttpHeaders headers = new HttpHeaders();
         if (StringUtil.isNotEmpty(this.securityToken)) {
             headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);

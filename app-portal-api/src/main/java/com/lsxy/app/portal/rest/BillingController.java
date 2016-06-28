@@ -21,9 +21,9 @@ public class BillingController extends AbstractRestController {
     private BillingService billingService;
 
     @RequestMapping("/get")
-    public RestResponse restMyAccountInfo(String username,String password) throws Exception{
+    public RestResponse getBilling() throws Exception{
         Account currentAccount = getCurrentAccount();
-        Billing billing = billingService.getBiilingByUserName(currentAccount.getUserName());
+        Billing billing = billingService.findBillingByUserName(currentAccount.getUserName());
         return RestResponse.success(billing);
     }
 }

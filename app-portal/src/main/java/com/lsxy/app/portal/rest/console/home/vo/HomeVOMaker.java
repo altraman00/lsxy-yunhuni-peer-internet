@@ -17,10 +17,8 @@ public class HomeVOMaker {
         HomeVO vo = new HomeVO();
         //此处调用restApi
         String url = PortalConstants.REST_PREFIX_URL + "/rest/billing/get";
-        Map<String,Object> formParams = new HashMap<>();
-        formParams.put("username","user001");
-        formParams.put("password","password");
-        RestResponse<Billing> response = RestRequest.buildSecurityRequest(token).post(url,formParams,Billing.class);
+//        Map<String,Object> formParams = new HashMap<>();
+        RestResponse<Billing> response = RestRequest.buildSecurityRequest(token).post(url,null,Billing.class);
 
         //获取余额
         Billing balance = response.getData();

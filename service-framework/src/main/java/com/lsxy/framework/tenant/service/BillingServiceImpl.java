@@ -1,5 +1,6 @@
 package com.lsxy.framework.tenant.service;
 
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.service.AbstractService;
 import com.lsxy.framework.tenant.dao.AccountDao;
@@ -30,15 +31,21 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
 
 
     @Override
-    public Billing getBiilingByUserName(String username) {
+    public Billing findBillingByUserName(String username) throws MatchMutiEntitiesException {
         Billing billing = null;
         Account account = accountDao.findByUserName(username);
         if(account != null){
             Tenant tenant = account.getTenant();
             if(tenant != null){
-                billing = tenant.getBilling();
+                billing = findBillingByTenantId(tenant.getId());
             }
         }
         return billing;
+    }
+
+    @Override
+    public Billing findBillingByTenantId(String tenantId) throws MatchMutiEntitiesException {
+        String hql = "from Billing obj where obj.tenant.id=?1";
+        return this.findUnique(hql,tenantId);
     }
 }
