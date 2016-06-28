@@ -21,15 +21,15 @@ import java.io.File;
 @RequestMapping("/console/account/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    private  static final Integer AUTH_WAIT = 0;
-    private  static final Integer AUTH_COMPANY_FAIL = -2;
-    private  static final Integer AUTH_COMPANY_SUCESS = 2;
-    private  static final Integer AUTH_ONESELF_FAIL = -1;
-    private  static final Integer AUTH_ONESELF_SUCESS = 1;
-    private static final String UPLOAD_TYPE_FILE = "file";
-    private static final String UPLOAD_TYPE_OSS = "oss";
-    private static final Integer AUTH_COMPANY=1;
-    private static final Integer AUTH_ONESELF=0;
+    private  static final Integer AUTH_WAIT = 0;//认证等待中
+    private  static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
+    private  static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
+    private  static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
+    private  static final Integer AUTH_ONESELF_SUCESS = 1;//个人认证成功
+    private static final String UPLOAD_TYPE_FILE = "file";//文件上传类型之file
+    private static final String UPLOAD_TYPE_OSS = "oss";//文件上传类型之oss
+    private static final Integer AUTH_COMPANY=1;//认证类型-企业认证
+    private static final Integer AUTH_ONESELF=0;//认证类型-个人认证
 
 
     @RequestMapping("/index" )
@@ -43,23 +43,26 @@ public class AuthController {
             mav.setViewName("/console/account/auth/index");
         }else {
             int authStatus = Integer.valueOf(status);
-            if (authStatus == AUTH_WAIT) {
+            if (AUTH_WAIT ==authStatus ) {
                 //TODO 审核中
                 mav.setViewName("/console/account/auth/wait");
-            } else if (AUTH_ONESELF_SUCESS == 1) {
+            } else if (AUTH_ONESELF_SUCESS == authStatus) {
                 //TODO 个人实名认证
                 mav.setViewName("/console/account/auth/sucess");
-            } else if (AUTH_COMPANY_SUCESS == 2) {
+            } else if (AUTH_COMPANY_SUCESS == authStatus) {
                 //TODO 企业实名认证
                 mav.setViewName("/console/account/auth/sucess");
-            } else if (AUTH_ONESELF_FAIL == -1) {
+            } else if (AUTH_ONESELF_FAIL == authStatus) {
                 //TODO 个人实名认证失败
                 mav.addObject("msg","身份证与名称不符合，请重新提交资料认证");
                 mav.setViewName("/console/account/auth/fail");
-            } else if (AUTH_COMPANY_FAIL == -2) {
+            } else if (AUTH_COMPANY_FAIL == authStatus) {
                 //TODO 企业实名认证失败
                 mav.addObject("msg","上传资料不符合要求，请重新提交资料认证");
                 mav.setViewName("/console/account/auth/fail");
+            }else{
+                // 未实名认证
+                mav.setViewName("/console/account/auth/index");
             }
         }
         return mav;
@@ -89,14 +92,10 @@ public class AuthController {
         if (null != multipartfiles && multipartfiles.length > 0) {
             //遍历并保存文件
             if(Integer.valueOf(type)==0){
-                String tempPath = UploadFile(multipartfiles[0]);
-                authVo.setIdPhoto(tempPath);
+                authVo.setIdPhoto(UploadFile(multipartfiles[0]));
             }else if(Integer.valueOf(type)==1){
-                MultipartFile file = multipartfiles[1];
-                String tempPath = UploadFile(multipartfiles[1]);
-                authVo.setType01Prop01(tempPath);
-                tempPath = UploadFile(multipartfiles[2]);
-                authVo.setType03Prop02(tempPath);
+                authVo.setType01Prop01(UploadFile(multipartfiles[1]));
+                authVo.setType03Prop02(UploadFile(multipartfiles[2]));
             }
         }
         ModelAndView mav = new ModelAndView();
@@ -107,8 +106,8 @@ public class AuthController {
             //TODO 企业认证类型
         }
         mav.addObject("type",type);
-        mav.addObject("msg",authVo.toString());
-        request.getSession().setAttribute("authStatus","0");
+        mav.addObject("msg",authVo.toString());//此处返回仅用于测试
+        request.getSession().setAttribute("authStatus",AUTH_WAIT);
         request.getSession().setAttribute("authEditVo",authVo.toString());
         mav.setViewName("/console/account/auth/index");
         return mav;
