@@ -7,5 +7,5 @@
  %>
 
 <%
- response.sendRedirect( request.getContextPath() +"/console/index");
+ response.sendRedirect( request.getContextPath() +"/console/home/index");
 %>
