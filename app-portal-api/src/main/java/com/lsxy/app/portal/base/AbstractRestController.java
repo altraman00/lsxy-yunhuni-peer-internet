@@ -1,6 +1,6 @@
 package com.lsxy.app.portal.base;
 
-import com.lsxy.framework.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.Account;
 
 /**
  * Created by Tandy on 2016/6/14.
