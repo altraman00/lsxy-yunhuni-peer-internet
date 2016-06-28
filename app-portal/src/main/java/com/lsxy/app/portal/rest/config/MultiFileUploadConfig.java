@@ -11,7 +11,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
- * Created by Tandy on 2016/6/7.
+ * Created by zhangxb on 2016/6/28.
+ * 多文件上传过滤器
  */
 @Configuration
 public class MultiFileUploadConfig {
