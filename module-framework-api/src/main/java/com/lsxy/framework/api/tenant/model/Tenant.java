@@ -1,4 +1,4 @@
-package com.lsxy.framework.tenant.model;
+package com.lsxy.framework.api.tenant.model;
 
 import com.lsxy.framework.core.persistence.IdEntity;
 

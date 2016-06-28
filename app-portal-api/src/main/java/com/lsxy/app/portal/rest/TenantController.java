@@ -1,6 +1,6 @@
 package com.lsxy.app.portal.rest;
 
-import com.lsxy.framework.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

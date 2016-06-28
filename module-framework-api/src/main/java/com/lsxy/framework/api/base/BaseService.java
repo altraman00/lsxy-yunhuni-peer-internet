@@ -1,4 +1,4 @@
-package com.lsxy.framework.tenant.base;
+package com.lsxy.framework.api.base;
 
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;

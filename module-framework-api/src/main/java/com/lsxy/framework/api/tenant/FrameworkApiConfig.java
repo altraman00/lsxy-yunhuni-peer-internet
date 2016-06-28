@@ -1,4 +1,4 @@
-package com.lsxy.framework.tenant;
+package com.lsxy.framework.api.tenant;
 
 import org.springframework.boot.orm.jpa.EntityScan;
 
