@@ -4,21 +4,15 @@ import com.lsxy.app.portal.rest.comm.MobileCodeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import static javafx.scene.input.KeyCode.R;
-import static javax.swing.text.html.CSS.getAttribute;
 
 /**
  * Created by zhangxb on 2016/6/24.
@@ -28,6 +22,9 @@ import static javax.swing.text.html.CSS.getAttribute;
 @RequestMapping("/console/account/safety")
 public class SafetyController {
     private static final Logger logger = LoggerFactory.getLogger(SafetyController.class);
+    private static final String RESULT_SUCESS = "2";//处理结果-成功
+    private static final String RESULT_FIAL = "-2";//处理结果-失败
+    private static final Integer EDIT_FIAL = -1;//数据库操作，-1表示失败
 
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
@@ -42,8 +39,13 @@ public class SafetyController {
         mav.setViewName("/console/account/safety/index");
         return mav;
     }
+
+    /**
+     * 修改密码首页
+     * @return
+     */
     @RequestMapping(value="/index_psw" )
-    public ModelAndView index_psw(HttpServletRequest request ){
+    public ModelAndView index_psw(){
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/console/account/safety/edit_psw");
         return mav;
@@ -53,10 +55,10 @@ public class SafetyController {
     @RequestMapping(value="/edit_psw" ,method = RequestMethod.POST)
     public ModelAndView edit_psw(HttpServletRequest request ){
         ModelAndView mav = new ModelAndView();
-        //todo 修改数据库数据
+        //TODO 修改数据库数据返回处理结果
         int status = 0;
-        //todo 0修改成功 -1表示失败
-        if(status==0) {
+        //TODO 0修改成功 -1表示失败
+        if(status != EDIT_FIAL) {
             mav.addObject("msg", "修改成功！");
         }else{
             mav.addObject("msg", "修改失败！");
@@ -70,14 +72,14 @@ public class SafetyController {
     @ResponseBody
     public Map validation_psw(String oldPws ){
        HashMap map = new HashMap();
-        //todo  获取当前用户密码
+        //TODO  查询数据库获取当前用户密码
         String pws = "A123456";
-        //todo 0修改成功 -1表示失败
+        //验证密码
         if(pws.equalsIgnoreCase(oldPws)) {
-            map.put("sucess", "2");
+            map.put("sucess", RESULT_SUCESS);
             map.put("msg", "密码验证通过！");
         }else{
-            map.put("sucess", "-2！");
+            map.put("sucess", RESULT_FIAL);
             map.put("msg", "密码验证失败！");
         }
         return map;
@@ -87,18 +89,18 @@ public class SafetyController {
     @ResponseBody
     public Map edit_mobile(String mobile ,HttpServletRequest request ){
         HashMap map = new HashMap();
-        //todo  对数据修改用户密码，
+        //TODO  对数据修改用户密码，
         int status = 0;//-1表示数据库修改失败
         // 2修改成功 -2表示失败
-        if(status!=-1) {
+        if(status!=EDIT_FIAL) {
             SafetyVo safetyVo = (SafetyVo)request.getSession().getAttribute("safetyVo");
             safetyVo.setMobile(mobile);
             safetyVo.setIsMobile("1");
             request.getSession().setAttribute("safetyVo",safetyVo);
-            map.put("sucess", "2");
+            map.put("sucess", RESULT_SUCESS);
             map.put("msg", "新手机绑定成功！");
         }else{
-            map.put("sucess", "-2！");
+            map.put("sucess", RESULT_FIAL);
             map.put("msg", "新手机绑定失败！");
         }
         //将手机验证码删除
