@@ -31,7 +31,11 @@ public class AuthController {
     private static final Integer AUTH_COMPANY=1;//认证类型-企业认证
     private static final Integer AUTH_ONESELF=0;//认证类型-个人认证
 
-
+    /**
+     * 实名认证首页
+     * @param request
+     * @return
+     */
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
@@ -67,6 +71,12 @@ public class AuthController {
         }
         return mav;
     }
+
+    /**
+     * 上次文件方法
+     * @param file
+     * @return
+     */
     private String UploadFile(MultipartFile file){
         String tempPath ="";
         try{
@@ -75,22 +85,30 @@ public class AuthController {
             String savePath ="";
             if(UPLOAD_TYPE_FILE.equals(svaeType)){
                 //上传到文件到指定位置
-                savePath = SystemConfig.getProperty("portal.realauth.resource.upload."+UPLOAD_TYPE_FILE+".path");
+                savePath = SystemConfig.getProperty("portal.realauth.resource.upload.file.path");
                 tempPath = savePath + file.getOriginalFilename();
                 file.transferTo(new File(tempPath));
-
             }else if(UPLOAD_TYPE_OSS.equals(svaeType)) {
+                //TODO OSS上创
             }
         }catch(Exception e){
 
         }
         return tempPath;
     }
+
+    /**
+     * 实名认证方法
+     * @param request
+     * @param authVo
+     * @param type
+     * @param multipartfiles
+     * @return
+     */
     @RequestMapping(value="/edit" ,method = RequestMethod.POST)
     public ModelAndView edit(HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles){
-            //保存文件的目录
+        //对上次文件进行处理
         if (null != multipartfiles && multipartfiles.length > 0) {
-            //遍历并保存文件
             if(Integer.valueOf(type)==0){
                 authVo.setIdPhoto(UploadFile(multipartfiles[0]));
             }else if(Integer.valueOf(type)==1){
