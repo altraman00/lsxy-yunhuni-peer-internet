@@ -42,7 +42,8 @@ public abstract class SY_SoapServerCallbackHandler {
      * auto generated Axis2 call back method for get method
      * override this method for handling normal response from get operation
      */
-    public void receiveResultget(GetResponseDocument result) {
+    public void receiveResultget(
+        SY_SoapServerStub.GetResponse result) {
     }
 
     /**
@@ -57,7 +58,7 @@ public abstract class SY_SoapServerCallbackHandler {
      * override this method for handling normal response from uppasswd operation
      */
     public void receiveResultuppasswd(
-        UppasswdResponseDocument result) {
+        SY_SoapServerStub.UppasswdResponse result) {
     }
 
     /**
@@ -71,7 +72,8 @@ public abstract class SY_SoapServerCallbackHandler {
      * auto generated Axis2 call back method for __set method
      * override this method for handling normal response from __set operation
      */
-    public void receiveResult__set(SetResponseDocument result) {
+    public void receiveResult__set(
+        SY_SoapServerStub.__setResponse result) {
     }
 
     /**
@@ -86,7 +88,7 @@ public abstract class SY_SoapServerCallbackHandler {
      * override this method for handling normal response from getreport operation
      */
     public void receiveResultgetreport(
-        GetreportResponseDocument result) {
+        SY_SoapServerStub.GetreportResponse result) {
     }
 
     /**
@@ -101,7 +103,7 @@ public abstract class SY_SoapServerCallbackHandler {
      * override this method for handling normal response from getreply operation
      */
     public void receiveResultgetreply(
-        GetreplyResponseDocument result) {
+        SY_SoapServerStub.GetreplyResponse result) {
     }
 
     /**
@@ -115,7 +117,8 @@ public abstract class SY_SoapServerCallbackHandler {
      * auto generated Axis2 call back method for __isset method
      * override this method for handling normal response from __isset operation
      */
-    public void receiveResult__isset(IssetResponseDocument result) {
+    public void receiveResult__isset(
+        SY_SoapServerStub.__issetResponse result) {
     }
 
     /**
@@ -129,7 +132,8 @@ public abstract class SY_SoapServerCallbackHandler {
      * auto generated Axis2 call back method for __get method
      * override this method for handling normal response from __get operation
      */
-    public void receiveResult__get(GetResponseDocument2 result) {
+    public void receiveResult__get(
+        SY_SoapServerStub.__getResponse result) {
     }
 
     /**
@@ -144,7 +148,7 @@ public abstract class SY_SoapServerCallbackHandler {
      * override this method for handling normal response from __destruct operation
      */
     public void receiveResult__destruct(
-        DestructResponseDocument result) {
+        SY_SoapServerStub.__destructResponse result) {
     }
 
     /**
@@ -159,7 +163,7 @@ public abstract class SY_SoapServerCallbackHandler {
      * override this method for handling normal response from getbalance operation
      */
     public void receiveResultgetbalance(
-        GetbalanceResponseDocument result) {
+        SY_SoapServerStub.GetbalanceResponse result) {
     }
 
     /**
@@ -173,7 +177,8 @@ public abstract class SY_SoapServerCallbackHandler {
      * auto generated Axis2 call back method for __call method
      * override this method for handling normal response from __call operation
      */
-    public void receiveResult__call(CallResponseDocument result) {
+    public void receiveResult__call(
+        SY_SoapServerStub.__callResponse result) {
     }
 
     /**
@@ -188,7 +193,7 @@ public abstract class SY_SoapServerCallbackHandler {
      * override this method for handling normal response from sendmsg operation
      */
     public void receiveResultsendmsg(
-        SendmsgResponseDocument result) {
+        SY_SoapServerStub.SendmsgResponse result) {
     }
 
     /**
