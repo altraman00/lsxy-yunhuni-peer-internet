@@ -7,4 +7,9 @@ public class SmsServiceImpl01 implements SmsService{
     public boolean sendsms(String to, String msg) {
         return false;
     }
+
+    @Override
+    public int balance() {
+        return 0;
+    }
 }

@@ -3,4 +3,5 @@
  */
 public interface SmsService {
     public boolean sendsms(String to,String msg);
+    public int balance();
 }
