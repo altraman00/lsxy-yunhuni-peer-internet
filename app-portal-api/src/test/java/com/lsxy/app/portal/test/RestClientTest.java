@@ -7,7 +7,6 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.omg.PortableServer.REQUEST_PROCESSING_POLICY_ID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
@@ -19,8 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lsxy.framework.web.rest.RestRequest.buildSecurityRequest;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
  * Created by Tandy on 2016/6/21.
@@ -54,7 +51,7 @@ public class RestClientTest {
     public void account(){
         String url = restPrefixUrl + "/rest/account/";
         String token = "1234";
-        RestResponse<Account> x = RestRequest.buildSecurityRequest(token).get(url, null,Account.class);
+        RestResponse<Account> x = RestRequest.buildSecurityRequest(token).get(url, Account.class);
         System.out.println(x);
 
     }

@@ -6,6 +6,7 @@ import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.tenant.dao.AccountDao;
 import com.lsxy.framework.tenant.model.Account;
+import com.lsxy.framework.tenant.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,9 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
     @Override
-    public Account findPersonByLoginName(String userName) throws MatchMutiEntitiesException {
+    public Account findAccountByUserName(String userName) throws MatchMutiEntitiesException {
         return accountDao.findByUserName(userName);
     }
+
+
 }

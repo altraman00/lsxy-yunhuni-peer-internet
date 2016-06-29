@@ -4,6 +4,7 @@ import java.util.List;
 
 
 /**
+ * 首页VO
  * Created by liups on 2016/6/27.
  */
 public class HomeVO {
@@ -20,7 +21,7 @@ public class HomeVO {
 
     private Integer conferenceRemain;         //会议剩余量（分钟）
 
-    private String resApi;                  //restApi
+    private String restApi;                  //restApi
 
     private String secretKey;               //secretKey
 
@@ -74,12 +75,12 @@ public class HomeVO {
         this.conferenceRemain = conferenceRemain;
     }
 
-    public String getResApi() {
-        return resApi;
+    public String getRestApi() {
+        return restApi;
     }
 
-    public void setResApi(String resApi) {
-        this.resApi = resApi;
+    public void setRestApi(String restApi) {
+        this.restApi = restApi;
     }
 
     public String getSecretKey() {

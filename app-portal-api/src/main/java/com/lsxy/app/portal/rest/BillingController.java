@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
+ * 账务RestApi接口
  * Created by liups on 2016/6/28.
  */
 @RequestMapping("/rest/billing")
@@ -20,10 +21,13 @@ public class BillingController extends AbstractRestController {
     @Autowired
     private BillingService billingService;
 
+    /**
+     * 查找当前用户所属租户的账务
+     * @throws Exception
+     */
     @RequestMapping("/get")
     public RestResponse getBilling() throws Exception{
-        Account currentAccount = getCurrentAccount();
-        Billing billing = billingService.findBillingByUserName(currentAccount.getUserName());
+        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
         return RestResponse.success(billing);
     }
 }

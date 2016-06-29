@@ -6,6 +6,7 @@ import com.lsxy.framework.tenant.model.Tenant;
 import javax.persistence.*;
 
 /**
+ * 账务
  * Created by liups on 2016/6/27.
  */
 @Entity

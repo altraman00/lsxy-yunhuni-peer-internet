@@ -6,6 +6,8 @@ package com.lsxy.app.portal.rest.console.home.vo;
 public class AppStateVO {
     private String appId;               //appId
 
+    private String name;             //应用名称
+
     private boolean status;             //应用上线状态
 
     private Integer callOfHour;         //1小时内呼叫量
@@ -20,6 +22,14 @@ public class AppStateVO {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isStatus() {

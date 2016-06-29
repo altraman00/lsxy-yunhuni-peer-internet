@@ -4,7 +4,6 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.tenant.model.Account;
 import com.lsxy.framework.tenant.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 
@@ -17,7 +16,11 @@ public abstract class AbstractRestController {
     AccountService accountService;
     protected Account getCurrentAccount() throws MatchMutiEntitiesException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return accountService.findPersonByLoginName(user.getUsername());
+        return accountService.findAccountByUserName(user.getUsername());
     }
 
+    protected String getCurrentAccountUserName(){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return user.getUsername();
+    }
 }

@@ -6,6 +6,7 @@ import com.lsxy.framework.core.service.AbstractService;
 import com.lsxy.framework.tenant.model.Account;
 import com.lsxy.framework.tenant.model.Tenant;
 import com.lsxy.framework.tenant.service.AccountService;
+import com.lsxy.framework.tenant.service.TenantService;
 import com.lsxy.yuhuni.billing.model.Billing;
 import com.lsxy.yuhuni.billing.service.BillingService;
 import com.lsxy.yunhuni.billing.dao.BillingDao;
@@ -25,6 +26,9 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private TenantService tenantService;
+
     @Override
     public BaseDaoInterface<Billing, Serializable> getDao() {
         return billingDao;
@@ -34,12 +38,9 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
     @Override
     public Billing findBillingByUserName(String username) throws MatchMutiEntitiesException {
         Billing billing = null;
-        Account account = accountService.findPersonByLoginName(username);
-        if(account != null){
-            Tenant tenant = account.getTenant();
-            if(tenant != null){
-                billing = findBillingByTenantId(tenant.getId());
-            }
+        Tenant tenant = tenantService.findTenantByUserName(username);
+        if(tenant != null){
+            billing = findBillingByTenantId(tenant.getId());
         }
         return billing;
     }
