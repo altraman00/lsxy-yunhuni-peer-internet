@@ -71,23 +71,23 @@
                                             <lable class="col-md-3 text-right">应用行业：</lable>
                                             <div class="col-md-4 ">
                                                 <select name="industry" id="" class="form-control">
-                                                    <option value="互联网" <c:if test="${informationEditVo.industry == '互联网'}"> selected</c:if> >互联网</option>
-                                                    <option value="餐饮" <c:if test="${informationEditVo.industry == '餐饮'}"> selected</c:if> >餐饮</option>
-                                                    <option value="金融" <c:if test="${informationEditVo.industry == '金融'}"> selected</c:if> >金融</option>
+                                                    <option value="互联网" <c:if test="${informationVo.industry == '互联网'}"> selected</c:if> >互联网</option>
+                                                    <option value="餐饮" <c:if test="${informationVo.industry == '餐饮'}"> selected</c:if> >餐饮</option>
+                                                    <option value="金融" <c:if test="${informationVo.industry == '金融'}"> selected</c:if> >金融</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">主要业务：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="business" placeholder="" value="${informationEditVo.business}  "
+                                                <input type="text" name="business" placeholder="" value="${informationVo.business}  "
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">网站：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" placeholder="" value="${informationEditVo.url}"
+                                                <input type="text" name="url" placeholder="" value="${informationVo.url}"
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
@@ -112,7 +112,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">通讯地址：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="address" placeholder="" value="${informationEditVo.address}"
+                                                <input type="text" name="address" placeholder="" value="${informationVo.address}"
                                                        class="form-control input-form notEmpty" />
                                             </div>
                                         </div>
@@ -121,7 +121,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">联系电话：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" placeholder="例如:20-88888888" value="${informationEditVo.mobile}" name="mobile"
+                                                <input type="text" placeholder="例如:20-88888888" value="${informationVo.mobile}" name="mobile"
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
@@ -157,7 +157,7 @@
 <script>
     function initPCAS()
     {
-        new PCAS("province","city","${informationEditVo.province}","${informationEditVo.city}");
+        new PCAS("province","city","${informationVo.province}","${informationVo.city}");
         var myselect = $(".province");
         // myselect.selectmenu("refresh");
         myselect = $(".city");

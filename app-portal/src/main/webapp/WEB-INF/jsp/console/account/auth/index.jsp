@@ -60,7 +60,6 @@
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
                                     <form:form role="form" action="${ctx}/console/account/auth/edit?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data"  method="post" class="register-form" id="personalAuthForm" >
-                                        ${msg}
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用行业：</lable>
                                             <div class="auth_select col-md-4 ">
@@ -73,14 +72,14 @@
                                                 <input type="hidden"  name="privateId">
                                                 <lable class="col-md-3 text-right">真实姓名：</lable>
                                                 <div class="col-md-4 ">
-                                                    <input type="text" name="privatename" placeholder="" class="form-control input-form"   />
+                                                    <input type="text" name="privateName" placeholder="" class="form-control input-form"   />
                                                     <p class="tips">与所使用认证的证件一致的姓名名称</p>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">证件类型：</lable>
                                                 <div class="col-md-4">
-                                                    <select class="form-control" name="id_number">
+                                                    <select class="form-control" name="idType" >
                                                         <option value="0">身份证</option>
                                                         <option value="1">身份证</option>
                                                     </select>
@@ -89,7 +88,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">证件号码：</lable>
                                                 <div class="col-md-4" >
-                                                    <input type="text"  placeholder="" class="form-control input-form"  />
+                                                    <input type="text" name="idNumber" placeholder="" class="form-control input-form"  />
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -112,8 +111,7 @@
                                                 <div class="form-group">
 
                                                     <div class="col-md-9">
-                                                        <a id="validateBtnPersonal"  onclick="id_photoFileUp()" class="validateBtnNormal btn btn-primary  btn-form">保存</a>
-
+                                                        <button  type="submit"   class="validateBtnNormal btn btn-primary  btn-form">保存</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -193,7 +191,7 @@
                                             <div class="form-group">
 
                                                 <div class="col-md-9">
-                                                    <a  onclick="id_photoFileUp()" id="validateBtn" class="validateBtnExtend btn btn-primary  btn-form">保存</a>
+                                                    <button type="submit"   class="validateBtnExtend btn btn-primary  btn-form">保存</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -218,8 +216,9 @@
     function id_photoFileUp(){
         var form = document.getElementById("personalAuthForm");
         form.submit();
-
     }
+    var msg = '${msg}';
+    if(msg==''){}else{alert(msg);}
 </script>
 </body>
 </html>

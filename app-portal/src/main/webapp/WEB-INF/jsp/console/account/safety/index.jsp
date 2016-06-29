@@ -318,7 +318,7 @@
                         data : {'mobile':mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
-                            //alert(data.msg);
+
                             if(data.sucess==2) {
                                 alert(sType[result]+', 绑定手机');
                                 window.location.href="${ctx}/console/account/safety/index";

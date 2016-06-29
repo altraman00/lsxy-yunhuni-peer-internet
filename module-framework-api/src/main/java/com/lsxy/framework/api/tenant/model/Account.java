@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lsxy.framework.core.persistence.IdEntity;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * 租户用户
@@ -17,6 +18,7 @@ public class Account extends IdEntity {
 	 */
 	private static final long serialVersionUID = 1L;
 
+
 	private String userName;
 	private Tenant tenant;                //所属租户
 	private String mobile;                //移动手机
@@ -25,6 +27,29 @@ public class Account extends IdEntity {
 	private String mm;
 
 	private int status;                    //账号状态			租户用户状态：0-未激活 1-LOCK 2-正常  3-异常
+
+	private String address;//地址
+
+	private String phone;//非绑定电话
+
+	private String industry;//应用行业
+
+	private String business;//主要业务
+
+	private String url;//网站
+
+	private String province;//省份
+
+	private String city;//城市
+	private Date createTime;//创建时间
+	@Column(name = "create_time")
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
 
 	@Column(name = "username")
 	public String getUserName() {
@@ -99,8 +124,80 @@ public class Account extends IdEntity {
 		this.tenant = tenant;
 	}
 
+	@Column(name = "phone")
+	public String getPhone() {
+		return phone;
+	}
 
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	@Column(name = "address")
+	public String getAddress() {
+		return address;
+	}
 
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	@Column(name = "industry")
+	public String getIndustry() {
+		return industry;
+	}
 
+	public void setIndustry(String industry) {
+		this.industry = industry;
+	}
+	@Column(name = "business")
+	public String getBusiness() {
+		return business;
+	}
 
+	public void setBusiness(String business) {
+		this.business = business;
+	}
+	@Column(name = "url")
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	@Column(name = "province")
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+	@Column(name = "city")
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	@Override
+	public String toString() {
+		return "Account{" +
+				"userName='" + userName + '\'' +
+				", tenant=" + tenant.toString() +
+				", mobile='" + mobile + '\'' +
+				", email='" + email + '\'' +
+				", password='" + password + '\'' +
+				", mm='" + mm + '\'' +
+				", status=" + status +
+				", address='" + address + '\'' +
+				", phone='" + phone + '\'' +
+				", industry='" + industry + '\'' +
+				", business='" + business + '\'' +
+				", url='" + url + '\'' +
+				", province='" + province + '\'' +
+				", city='" + city + '\'' +
+				'}';
+	}
 }

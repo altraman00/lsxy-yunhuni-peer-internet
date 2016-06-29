@@ -1,11 +1,14 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.lsxy.framework.api.tenant.model.Account;
+
 import java.io.Serializable;
 
 /**
- * Created by Administrator on 2016/6/25.
+ * Created by zhangxb on 2016/6/25.
+ * 基本资料VO对象
  */
-public class InformationEditVo implements Serializable {
+public class InformationVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private String industry;
@@ -16,11 +19,20 @@ public class InformationEditVo implements Serializable {
     private String address;
     private String mobile;
 
-    public InformationEditVo() {
+    public InformationVo() {
 
     }
 
-    public InformationEditVo(String industry, String business, String url, String province, String city, String address, String mobile) {
+    public InformationVo(Account account) {
+        this.province = account.getProvince();
+        this.industry = account.getIndustry();
+        this.business = account.getBusiness();
+        this.url = account.getUrl();
+        this.city = account.getCity();
+        this.address = account.getAddress();
+        this.mobile = account.getMobile();
+    }
+    public InformationVo(String industry, String business, String url, String province, String city, String address, String mobile) {
         this.province = province;
         this.industry = industry;
         this.business = business;
@@ -92,7 +104,7 @@ public class InformationEditVo implements Serializable {
 
     @Override
     public String toString() {
-        return "InformationEditVo{" +
+        return "InformationVo{" +
                 "industry='" + industry + '\'' +
                 ", business='" + business + '\'' +
                 ", url='" + url + '\'' +

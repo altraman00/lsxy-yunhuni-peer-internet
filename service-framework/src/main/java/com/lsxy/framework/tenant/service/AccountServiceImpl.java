@@ -7,6 +7,8 @@ import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.tenant.dao.AccountDao;
 import com.lsxy.framework.api.tenant.model.Account;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,4 +40,17 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         }
         return account;
     }
+
+    @Override
+    public Account findByUserName(String userName) {
+        try {
+            String hql = "from Account obj where obj.userName=?1";
+            Account account = this.findUnique(hql, userName);
+            return account;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
+
 }

@@ -1,6 +1,12 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.RealnameCorp;
+import com.lsxy.framework.api.tenant.model.RealnamePrivate;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.web.rest.RestRequest;
+import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -12,6 +18,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.apache.zookeeper.ZooDefs.OpCode.auth;
 
 /**
  * Created by zhangxb on 2016/6/24.
@@ -21,7 +31,8 @@ import java.io.File;
 @RequestMapping("/console/account/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    private  static final Integer AUTH_WAIT = 0;//认证等待中
+    private  static final Integer AUTH_WAIT = 100;//个人认证等待中
+    private  static final Integer  AUTH_NO= 0;//未认证
     private  static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
     private  static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
     private  static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
@@ -30,7 +41,9 @@ public class AuthController {
     private static final String UPLOAD_TYPE_OSS = "oss";//文件上传类型之oss
     private static final Integer AUTH_COMPANY=1;//认证类型-企业认证
     private static final Integer AUTH_ONESELF=0;//认证类型-个人认证
-
+    private static final String IS_FALSE = "-1";//表示失败
+    private static final String IS_TRUE = "1";//表示成功
+    private String restPrefixUrl = SystemConfig.getProperty("portal.restful.url");
     /**
      * 实名认证首页
      * @param request
@@ -40,15 +53,24 @@ public class AuthController {
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
         //TODO 获取实名认证的状态
-        String status = (String)request.getSession().getAttribute("authStatus");
-        status="";
-        if(status==null||status.length()==0){
+        String userName = "user001";
+        //调resr接口
+        String url = restPrefixUrl + "/rest/account/findByUserName";
+        String token = "1234";
+        Map map = new HashMap();
+        map.put("userName",userName);
+        RestResponse<Account> restResponse = RestRequest.buildSecurityRequest(token).post(url,map, Account.class);
+        Account account = restResponse.getData();
+        Tenant tenant = account.getTenant();
+        if(tenant==null){//未实名认证
             // 未实名认证
             mav.setViewName("/console/account/auth/index");
         }else {
-            int authStatus = Integer.valueOf(status);
-            if (AUTH_WAIT ==authStatus ) {
-                //TODO 审核中
+            int authStatus  = tenant.getIsRealAuth();
+            if(AUTH_NO==authStatus) {
+                mav.setViewName("/console/account/auth/index");
+            }if (AUTH_WAIT ==authStatus ) {
+                //审核中
                 mav.setViewName("/console/account/auth/wait");
             } else if (AUTH_ONESELF_SUCESS == authStatus) {
                 //TODO 个人实名认证
@@ -107,6 +129,7 @@ public class AuthController {
      */
     @RequestMapping(value="/edit" ,method = RequestMethod.POST)
     public ModelAndView edit(HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles){
+
         //对上次文件进行处理
         if (null != multipartfiles && multipartfiles.length > 0) {
             if(Integer.valueOf(type)==0){
@@ -116,18 +139,69 @@ public class AuthController {
                 authVo.setType03Prop02(UploadFile(multipartfiles[2]));
             }
         }
-        ModelAndView mav = new ModelAndView();
+
+        String userName = "user001";
+        String token = "1234";
+        String  status = IS_TRUE;//默认操作成功
         if(Integer.valueOf(type)==AUTH_ONESELF){
-            //TODO 提交个人实名认证操作
+            String url = restPrefixUrl + "/rest/account/auth/privateAuth";
+            Map map = getRealnamePrivaateParams(authVo,userName,AUTH_WAIT);
+            RestResponse<RealnamePrivate> restResponse = RestRequest.buildSecurityRequest(token).post(url,map, RealnamePrivate.class);
+            RealnamePrivate realnamePrivate = restResponse.getData();
+            if(realnamePrivate==null){
+                status = IS_FALSE;
+            }
         }else if(Integer.valueOf(type)==AUTH_COMPANY){
-            //TODO 提交企业实名认证操作
-            //TODO 企业认证类型
+            //调resr接口
+            String url = restPrefixUrl + "/rest/account/auth/corpAuth";
+            Map map = getRealnameCorpParams(authVo,userName,AUTH_WAIT);
+            RestResponse<RealnameCorp> restResponse = RestRequest.buildSecurityRequest(token).post(url,map, RealnameCorp.class);
+            RealnameCorp realnameCorp = restResponse.getData();
+            if(realnameCorp==null){
+                status = IS_FALSE;
+            }
         }
-        mav.addObject("type",type);
-        mav.addObject("msg",authVo.toString());//此处返回仅用于测试
-        request.getSession().setAttribute("authStatus",AUTH_WAIT);
-        request.getSession().setAttribute("authEditVo",authVo.toString());
-        mav.setViewName("/console/account/auth/index");
-        return mav;
+        if(IS_TRUE.equals(status)){
+            return  new ModelAndView("redirect:/console/account/auth/index");
+        }else{
+            ModelAndView mav = new ModelAndView();
+            mav.addObject("msg","操作失败，请稍后重试");
+            mav.setViewName("/console/account/auth/index");
+            return mav;
+        }
+
+
+    }
+
+    /**
+     * 组装个人实名认证的信息
+     * @param authVo 实名认证vo对象
+     * @param userName 用户名
+     * @return
+     */
+    private Map getRealnamePrivaateParams(AuthVo authVo,String userName,int status){
+        Map map = new HashMap();
+        map.put("userName",userName);//用户账号
+        map.put("status",status);//状态
+        map.put("name",authVo.getPrivateName());//姓名
+        map.put("idNumber", authVo.getIdNumber());//身份证号
+        map.put("idPhoto",authVo.getIdPhoto());//身份证照片
+        map.put("idType", authVo.getIdType());//证件类型
+        return map;
+    }
+    private Map getRealnameCorpParams(AuthVo authVo,String userName,int status){
+        Map map = new HashMap();
+        map.put("userName",userName);//用户账号
+        map.put("status",status);//状态
+        map.put("corpName",authVo.getCorpName());//企业名称
+        map.put("addr",authVo.getAddr());//企业地址
+        map.put("fieldCode",authVo.getFieldCode());//所属行业
+        map.put("authType",authVo.getAuthType());//认证类型
+        map.put("type01Prop01",authVo.getType01Prop01());//[一照一码]营业执照照片
+        map.put("type01Prop02",authVo.getType01Prop02());//[一照一码]统一社会信用代码
+        map.put("type02Prop01",authVo.getType02Prop01());//[三证合一]注册号
+        map.put("type02Prop02",authVo.getType02Prop02());//[三证合一]税务登记证号
+        map.put("type03Prop02",authVo.getType03Prop02());//[三证分离]税务登记证照片
+        return map;
     }
 }

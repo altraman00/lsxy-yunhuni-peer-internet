@@ -1,8 +1,8 @@
 package com.lsxy.framework.api.tenant.service;
 
+import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.api.base.BaseService;
 
 public interface AccountService extends BaseService<Account> {
 
@@ -13,4 +13,14 @@ public interface AccountService extends BaseService<Account> {
      * @return
      */
     Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException;
+
+    /**
+     * 根据用户名获取用户对象
+     * @param userName 用户名
+     * @return
+     */
+    Account findByUserName(String userName);
+
+
+
 }
