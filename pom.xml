@@ -28,6 +28,7 @@
         <module>module-framework-cache</module>
         <module>module-framework-config</module>
         <module>app-portal-api</module>
+        <module>module-framework-sms</module>
     </modules>
     <packaging>pom</packaging>
     <dependencyManagement>
