@@ -75,26 +75,11 @@ public class RestRequest {
      * @param url              get 请求的目标url 地址
      * @param responseDataType 请求返回对象restresponse中data属性的数据类型
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
+     * @param uriparams        url自动匹配替换的参数，如url为api/{a}/{b},参数为["1","2"],则解析的url为api/1/2，使用Map参数时，遵循按key匹配
      * @return
      */
-    public <T> RestResponse<T> get(String url, Class<T> responseDataType, Object... uriparams) {
-        RestResponse<T> restResponse = null;
-        HttpHeaders headers = new HttpHeaders();
-        if (StringUtil.isNotEmpty(this.securityToken)) {
-            headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
-        }
-        HttpEntity entity = new HttpEntity(headers);
-        HttpEntity<RestResponse> response = this.restTemplate.exchange(url, HttpMethod.GET, entity, RestResponse.class, uriparams);
-        if (response != null) {
-            restResponse = response.getBody();
-
-            if (restResponse.isSuccess() && restResponse.getData() != null && responseDataType != null) {
-                ObjectMapper mapper = new ObjectMapper();
-                T obj = mapper.convertValue(restResponse.getData(), responseDataType);
-                restResponse.setData(obj);
-            }
-        }
-        return restResponse;
+    public <T> RestResponse<T> get(String url,Class<T> responseDataType, String... uriparams) {
+        return exchange(url,HttpMethod.GET,null,responseDataType,uriparams);
     }
 
     /**
@@ -107,15 +92,38 @@ public class RestRequest {
      * @return
      */
 
-    public <T> RestResponse<T> post(String url, Map<String, Object> params, Class<T> responseDataType) {
+    public <T> RestResponse<T> post(String url, Map<String, Object> params, Class<T> responseDataType, String... uriparams) {
+        return exchange(url,HttpMethod.POST,params,responseDataType,uriparams);
+    }
 
+    /**
+     * 公用的代码抽取
+     * @param url              请求的目标url 地址
+     * @param httpMethod       请求的方式
+     * @param params           请求参数
+     * @param responseDataType 请求返回对象restresponse中data属性的数据类型
+     * @param <T>              用户指定rest response返回对象中data属性的数据对象类
+     * @return
+     */
+    public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Map<String, Object> params, Class<T> responseDataType,String... uriparams){
+        RestResponse<T> restResponse = null;
         MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
-        params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
-        RestResponse<T> restResponse = restTemplate.postForObject(url, requestEntity, RestResponse.class);
-        if (restResponse.isSuccess() && restResponse.getData() != null && responseDataType != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            T obj = mapper.convertValue(restResponse.getData(), responseDataType);
-            restResponse.setData(obj);
+        if(params != null){
+            params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
+        }
+        HttpHeaders headers = new HttpHeaders();
+        if (StringUtil.isNotEmpty(this.securityToken)) {
+            headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
+        }
+        HttpEntity entity = new HttpEntity(requestEntity,headers);
+        HttpEntity<RestResponse> response = this.restTemplate.exchange(url, httpMethod, entity, RestResponse.class,uriparams);
+        if (response != null) {
+            restResponse = response.getBody();
+            if (restResponse.isSuccess() && restResponse.getData() != null && responseDataType != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                T obj = mapper.convertValue(restResponse.getData(), responseDataType);
+                restResponse.setData(obj);
+            }
         }
         return restResponse;
     }
