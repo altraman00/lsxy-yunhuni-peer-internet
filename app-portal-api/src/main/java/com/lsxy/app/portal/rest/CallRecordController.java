@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 public class CallRecordController extends AbstractRestController {
     @Autowired
-    CallRecordService callRecordService;
+    private CallRecordService callRecordService;
 
     /**
      * 查找应用当前呼叫数据

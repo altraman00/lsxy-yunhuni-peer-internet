@@ -8,6 +8,7 @@ import com.lsxy.yuhuni.apicertificate.model.ApiCertificateChangeLog;
 import com.lsxy.yuhuni.apicertificate.service.ApiCertificateChangeLogService;
 import com.lsxy.yunhuni.apicertificate.dao.ApiCertificateChangeLogDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Date;
 /**
  * Created by liups on 2016/6/29.
  */
+@Service
 public class ApiCertificateChangeLogServiceImpl extends AbstractService<ApiCertificateChangeLog> implements ApiCertificateChangeLogService {
     @Autowired
     ApiCertificateChangeLogDao apiCertificateChangeLogDao;

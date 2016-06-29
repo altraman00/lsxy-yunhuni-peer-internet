@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.tenant.model.Account;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
 import com.lsxy.yuhuni.apicertificate.service.ApiCertificateService;
@@ -16,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rest/api_cert")
 @RestController
 public class ApiCertificateController extends AbstractRestController {
+
     @Autowired
-    ApiCertificateService apiCertificateService;
+    private ApiCertificateService apiCertificateService;
 
     /**
      * 查找当前用户所属租户的鉴权账号（凭证）

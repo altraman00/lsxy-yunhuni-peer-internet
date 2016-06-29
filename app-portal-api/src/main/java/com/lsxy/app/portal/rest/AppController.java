@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 public class AppController extends AbstractRestController {
     @Autowired
-    AppService appService;
+    private AppService appService;
 
     /**
      * 查找当前用户的应用

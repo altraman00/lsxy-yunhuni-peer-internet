@@ -28,7 +28,7 @@ public class CallRecord extends IdEntity {
     private Date callEndTime;   //呼叫结束时间
     private double cost;        //成本价
 
-    @Column(name = "call_id")
+    @Column(name = "area_id")
     public String getAreaId() {
         return areaId;
     }

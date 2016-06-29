@@ -4,9 +4,7 @@ import com.lsxy.framework.core.persistence.IdEntity;
 import com.lsxy.framework.tenant.model.Tenant;
 import com.lsxy.yuhuni.app.model.App;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by liups on 2016/6/29.
@@ -31,7 +29,8 @@ public class Session extends IdEntity {
         this.status = status;
     }
 
-    @Column(name = "app_id")
+    @ManyToOne
+    @JoinColumn(name = "app_id")
     public App getApp() {
         return app;
     }
@@ -40,7 +39,8 @@ public class Session extends IdEntity {
         this.app = app;
     }
 
-    @Column(name = "tenant_id")
+    @ManyToOne
+    @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
     }

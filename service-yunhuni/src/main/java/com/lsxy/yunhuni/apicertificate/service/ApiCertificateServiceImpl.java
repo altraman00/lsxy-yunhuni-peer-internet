@@ -3,9 +3,7 @@ package com.lsxy.yunhuni.apicertificate.service;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.service.AbstractService;
-import com.lsxy.framework.tenant.model.Account;
 import com.lsxy.framework.tenant.model.Tenant;
-import com.lsxy.framework.tenant.service.AccountService;
 import com.lsxy.framework.tenant.service.TenantService;
 import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
 import com.lsxy.yuhuni.apicertificate.service.ApiCertificateChangeLogService;
@@ -32,8 +30,6 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
     @Autowired
     private ApiCertificateChangeLogService apiCertificateChangeLogService;
 
-    @Autowired
-    private AccountService accountService;
     @Autowired
     private TenantService tenantService;
 

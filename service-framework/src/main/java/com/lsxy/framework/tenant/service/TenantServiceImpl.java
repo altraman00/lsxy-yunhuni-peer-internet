@@ -7,12 +7,14 @@ import com.lsxy.framework.tenant.dao.TenantDao;
 import com.lsxy.framework.tenant.model.Account;
 import com.lsxy.framework.tenant.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 
 /**
  * Created by liups on 2016/6/29.
  */
+@Service
 public class TenantServiceImpl extends AbstractService<Tenant> implements TenantService{
     @Autowired
     private AccountService accountService;
