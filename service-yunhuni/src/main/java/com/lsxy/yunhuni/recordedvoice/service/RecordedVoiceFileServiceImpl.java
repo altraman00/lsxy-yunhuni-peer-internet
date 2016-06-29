@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Service
 public class RecordedVoiceFileServiceImpl extends AbstractService<RecordedVoiceFile> implements RecordedVoiceFileService {
     @Autowired
-    RecordedVoiceFileDao recordedVoiceFileDao;
+    private RecordedVoiceFileDao recordedVoiceFileDao;
     @Override
     public BaseDaoInterface<RecordedVoiceFile, Serializable> getDao() {
         return this.recordedVoiceFileDao;

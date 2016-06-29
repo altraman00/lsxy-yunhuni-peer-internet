@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.apicertificate.service;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.service.AbstractService;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.tenant.model.Tenant;
 import com.lsxy.framework.tenant.service.TenantService;
 import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
@@ -64,7 +65,7 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
         ApiCertificate cert = findApiCertificateByUserName(userName);
         Long count = apiCertificateChangeLogService.countTodayCertChangeLogByCert(cert);
         if(count < SK_CHANGE_COUNT_OF_DAY){
-            String secretKey = UUID.randomUUID().toString();
+            String secretKey = UUIDGenerator.uuid();
             apiCertificateChangeLogService.insertApiCertificateChangeLog(cert,secretKey,CERT_CHANGE_TYPE_UUID);
             cert.setSecretKey(secretKey);
             this.save(cert);

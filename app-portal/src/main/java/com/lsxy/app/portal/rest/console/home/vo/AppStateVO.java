@@ -8,13 +8,13 @@ public class AppStateVO {
 
     private String name;             //应用名称
 
-    private boolean status;             //应用上线状态
+    private Integer status;             //应用上线状态
 
     private Integer callOfHour;         //1小时内呼叫量
 
     private Integer callOfDay;          //1天内呼叫量
 
-    private Integer concurrencyOfDay;   //当天呼叫并发
+    private Integer currentCall;   //当前呼叫并发
 
     public String getAppId() {
         return appId;
@@ -32,11 +32,11 @@ public class AppStateVO {
         this.name = name;
     }
 
-    public boolean isStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -56,11 +56,11 @@ public class AppStateVO {
         this.callOfDay = callOfDay;
     }
 
-    public Integer getConcurrencyOfDay() {
-        return concurrencyOfDay;
+    public Integer getCurrentCall() {
+        return currentCall;
     }
 
-    public void setConcurrencyOfDay(Integer concurrencyOfDay) {
-        this.concurrencyOfDay = concurrencyOfDay;
+    public void setCurrentCall(Integer currentCall) {
+        this.currentCall = currentCall;
     }
 }

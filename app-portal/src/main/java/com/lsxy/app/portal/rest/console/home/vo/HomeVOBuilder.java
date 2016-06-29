@@ -4,10 +4,10 @@ import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
-import com.lsxy.yuhuni.app.model.App;
 import com.lsxy.yuhuni.billing.model.Billing;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,11 +49,25 @@ public class HomeVOBuilder {
         vo.setSecretKey(cert.getSecretKey());
 
         //调用应用RestApi
+        //app列表url
         String appListUrl = PortalConstants.REST_PREFIX_URL + "/rest/app/list";
+        //应用统计
+        String appStatisticsUrl = PortalConstants.REST_PREFIX_URL + "/rest/callrecord/current_record_statistics?appId={a}";
         RestResponse<List> appResponse = RestRequest.buildSecurityRequest(token).get(appListUrl, List.class);
         List<Map> appList = appResponse.getData();
+        List<AppStateVO> appStateVOs = new ArrayList<>();
         for(Map app:appList){
-            String id = (String) app.get("id");
+            AppStateVO appStateVO = new AppStateVO();
+            String appId = (String) app.get("id");
+            appStateVO.setAppId(appId);
+            appStateVO.setName((String) app.get("name"));
+            appStateVO.setStatus((Integer) app.get("status"));
+            RestResponse<Map> statisticsResponse = RestRequest.buildSecurityRequest(token).get(appStatisticsUrl, Map.class,appId);
+            Map map = statisticsResponse.getData();
+            appStateVO.setCallOfDay((Integer) map.get("dayCount"));
+            appStateVO.setCallOfHour((Integer) map.get("hourCount"));
+            appStateVO.setCurrentCall((Integer) map.get("currentSession"));
+            appStateVOs.add(appStateVO);
         }
 
         return vo;

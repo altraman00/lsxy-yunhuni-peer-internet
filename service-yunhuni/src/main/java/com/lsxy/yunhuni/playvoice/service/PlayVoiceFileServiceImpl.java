@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Service
 public class PlayVoiceFileServiceImpl extends AbstractService<PlayVoiceFile> implements PlayVoiceFileService {
     @Autowired
-    PlayVoiceFileDao playVoiceFileDao;
+    private PlayVoiceFileDao playVoiceFileDao;
     @Override
     public BaseDaoInterface<PlayVoiceFile, Serializable> getDao() {
         return this.playVoiceFileDao;
