@@ -2,6 +2,7 @@ package com.lsxy.framework.core.utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
 
@@ -11,7 +12,7 @@ import org.apache.commons.lang.ArrayUtils;
  * @author ajax
  * @author tantyou
  */
-public class Page implements Serializable {
+public class Page<T> implements Serializable {
 
 	/**
 	 *  
@@ -24,7 +25,7 @@ public class Page implements Serializable {
 
 	private long start; // 当前页第一条数据在List中的位置,从0开始
 
-	private Object data; // 当前页中存放的记录,类型一般为List
+	private List<T> data; // 当前页中存放的记录,类型一般为List
 
 	private long totalCount; // 总记录数
 
@@ -44,7 +45,7 @@ public class Page implements Serializable {
 	 * @param pageSize  本页容量
 	 * @param data	  本页包含的数据
 	 */
-	public Page(long start, long totalSize, int pageSize, Object data) {
+	public Page(long start, long totalSize, int pageSize, List<T> data) {
 		this.pageSize = pageSize;
 		this.start = start;
 		this.totalCount = totalSize;
@@ -86,7 +87,7 @@ public class Page implements Serializable {
 	/**
 	 * 取当前页中的记录.
 	 */
-	public Object getResult() {
+	public List<T> getResult() {
 		return data;
 	}
 

@@ -76,6 +76,7 @@ public class RestRequest {
      * @param responseDataType 请求返回对象restresponse中data属性的数据类型
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
      * @return
+     * http://xxxx/{}/{}{}{}/?a={}&c={}&d={}
      */
     public <T> RestResponse<T> get(String url, Class<T> responseDataType, Object... uriparams) {
         RestResponse<T> restResponse = null;

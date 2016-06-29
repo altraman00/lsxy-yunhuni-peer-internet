@@ -22,7 +22,7 @@ public interface BaseService<T>{
 	
 	public Iterable<T> list();
 
-	public Page pageList(int pageNo, int pageSize);
+	public Page<T> pageList(int pageNo, int pageSize);
 	
 	public Iterable<T> list(String hql, Object... objects);
 
