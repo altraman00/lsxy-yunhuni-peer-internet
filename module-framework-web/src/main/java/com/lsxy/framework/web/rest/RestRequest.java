@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.T;
-
 /**
  * Created by Tandy on 2016/6/22.
  * YUNHUNI REST API 请求对象
@@ -75,13 +73,13 @@ public class RestRequest {
      * rest api get request method
      *
      * @param url              get 请求的目标url 地址
-     * @param params           请求参数
      * @param responseDataType 请求返回对象restresponse中data属性的数据类型
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
+     * @param uriparams        url自动匹配替换的参数，如url为api/{a}/{b},参数为["1","2"],则解析的url为api/1/2，使用Map参数时，遵循按key匹配
      * @return
      */
-    public <T> RestResponse<T> get(String url, Map<String, Object> params,Class<T> responseDataType, String... uriparams) {
-        return exchange(url,HttpMethod.GET,params,responseDataType,uriparams);
+    public <T> RestResponse<T> get(String url,Class<T> responseDataType, String... uriparams) {
+        return exchange(url,HttpMethod.GET,null,responseDataType,uriparams);
     }
 
     /**

@@ -1,13 +1,14 @@
-package com.lsxy.framework.tenant.service;
+package com.lsxy.yunhuni.billing.service;
 
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.service.AbstractService;
-import com.lsxy.framework.tenant.dao.AccountDao;
-import com.lsxy.framework.tenant.dao.BillingDao;
 import com.lsxy.framework.tenant.model.Account;
-import com.lsxy.framework.tenant.model.Billing;
 import com.lsxy.framework.tenant.model.Tenant;
+import com.lsxy.framework.tenant.service.AccountService;
+import com.lsxy.yuhuni.billing.model.Billing;
+import com.lsxy.yuhuni.billing.service.BillingService;
+import com.lsxy.yunhuni.billing.dao.BillingDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,12 @@ import java.io.Serializable;
  * Created by liups on 2016/6/28.
  */
 @Service
-public class BillingServiceImpl extends AbstractService<Billing> implements BillingService{
+public class BillingServiceImpl extends AbstractService<Billing> implements BillingService {
     @Autowired
     private BillingDao billingDao;
 
     @Autowired
-    private AccountDao accountDao;
+    private AccountService accountService;
 
     @Override
     public BaseDaoInterface<Billing, Serializable> getDao() {
@@ -33,7 +34,7 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
     @Override
     public Billing findBillingByUserName(String username) throws MatchMutiEntitiesException {
         Billing billing = null;
-        Account account = accountDao.findByUserName(username);
+        Account account = accountService.findPersonByLoginName(username);
         if(account != null){
             Tenant tenant = account.getTenant();
             if(tenant != null){

@@ -14,11 +14,11 @@ public class HomeVO {
 
     private Integer lineNum ;               //当前线路数量
 
-    private Integer voice_remain;           //语音剩余量（分钟）
+    private Integer voiceRemain;           //语音剩余量（分钟）
 
-    private Integer sms_remain;             //短信剩余量（条）
+    private Integer smsRemain;             //短信剩余量（条）
 
-    private Integer meeting_remain;         //会议剩余量（分钟）
+    private Integer conferenceRemain;         //会议剩余量（分钟）
 
     private String resApi;                  //restApi
 
@@ -50,28 +50,28 @@ public class HomeVO {
         this.lineNum = lineNum;
     }
 
-    public Integer getVoice_remain() {
-        return voice_remain;
+    public Integer getVoiceRemain() {
+        return voiceRemain;
     }
 
-    public void setVoice_remain(Integer voice_remain) {
-        this.voice_remain = voice_remain;
+    public void setVoiceRemain(Integer voiceRemain) {
+        this.voiceRemain = voiceRemain;
     }
 
-    public Integer getSms_remain() {
-        return sms_remain;
+    public Integer getSmsRemain() {
+        return smsRemain;
     }
 
-    public void setSms_remain(Integer sms_remain) {
-        this.sms_remain = sms_remain;
+    public void setSmsRemain(Integer smsRemain) {
+        this.smsRemain = smsRemain;
     }
 
-    public Integer getMeeting_remain() {
-        return meeting_remain;
+    public Integer getConferenceRemain() {
+        return conferenceRemain;
     }
 
-    public void setMeeting_remain(Integer meeting_remain) {
-        this.meeting_remain = meeting_remain;
+    public void setConferenceRemain(Integer conferenceRemain) {
+        this.conferenceRemain = conferenceRemain;
     }
 
     public String getResApi() {

@@ -1,8 +1,8 @@
-package com.lsxy.framework.tenant.service;
+package com.lsxy.yuhuni.billing.service;
 
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.service.BaseService;
-import com.lsxy.framework.tenant.model.Billing;
+import com.lsxy.yuhuni.billing.model.Billing;
 
 /**
  * Created by liups on 2016/6/28.

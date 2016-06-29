@@ -1,14 +1,15 @@
-package com.lsxy.framework.tenant.dao;
+package com.lsxy.yunhuni.billing.dao;
 
 
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.framework.tenant.model.Billing;
+import com.lsxy.yuhuni.billing.model.Billing;
 
 import java.io.Serializable;
 
 /**
  * Created by liups on 2016/6/28.
  */
+
 public interface BillingDao extends BaseDaoInterface<Billing, Serializable> {
 
 }
