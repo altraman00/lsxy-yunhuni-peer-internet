@@ -4,6 +4,7 @@ import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.lsxy.framework.core.utils.PasswordUtil.springSecurityPasswordEncode;
 import static javafx.scene.input.KeyCode.T;
 import static org.apache.zookeeper.Environment.list;
 
@@ -52,5 +54,13 @@ public class AccountController extends AbstractRestController {
         List<Account> result = xx.getResult();
         return RestResponse.success(result);
     }
-
+    /**
+     *
+     * @return
+     */
+    @RequestMapping("/test003")
+    public RestResponse test003(){
+        Page<Account> xx = accountService.pageList(1,10);
+        return RestResponse.success(xx);
+    }
 }

@@ -79,4 +79,11 @@ public class RestResponse<T> {
         return restResponse;
     }
 
+    public <T> RestResponse<T> cloneOne() {
+        RestResponse restResponse = new RestResponse();
+        restResponse.setSuccess(this.isSuccess());
+        restResponse.setErrorMsg(this.getErrorMsg());
+        restResponse.setErrorCode(this.getErrorCode());
+        return restResponse;
+    }
 }

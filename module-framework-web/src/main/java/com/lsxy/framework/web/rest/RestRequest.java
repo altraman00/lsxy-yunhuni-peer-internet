@@ -2,6 +2,7 @@ package com.lsxy.framework.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static javafx.scene.input.KeyCode.O;
 
 /**
  * Created by Tandy on 2016/6/22.
@@ -98,6 +101,44 @@ public class RestRequest {
         return restResponse;
     }
 
+    public <T> RestResponse<List<T>> getList(String url, Class<T> responseDataType, Object... uriparams) {
+        RestResponse<List> resultResponse = get(url, List.class, uriparams);
+        List<Object> list = resultResponse.getData();
+        List<T> xxList = new ArrayList<T>();
+        RestResponse<List<T>> resultResponse2 = resultResponse.cloneOne();
+        for (Object obj:list){
+            if(obj instanceof  Map){
+                ObjectMapper mapper = new ObjectMapper();
+                T mapperObject = mapper.convertValue(obj, responseDataType);
+                if(mapperObject != null){
+                    xxList.add(mapperObject);
+                }
+            }
+        }
+        resultResponse2.setData(xxList);
+        return resultResponse2;
+    }
+
+    public <T> RestResponse<Page<T>> getPage(String url, Class<T> responseDataType, Object... uriparams) {
+        RestResponse<Page> resultResponse = get(url, Page.class, uriparams);
+        Page<Object> page = resultResponse.getData();
+        List<T> xxList = new ArrayList<T>();
+        RestResponse<Page<T>> resultResponse2 = resultResponse.cloneOne();
+
+
+        for (Object obj:page.getResult()){
+            if(obj instanceof  Map){
+                ObjectMapper mapper = new ObjectMapper();
+                T mapperObject = mapper.convertValue(obj, responseDataType);
+                if(mapperObject != null){
+                    xxList.add(mapperObject);
+                }
+            }
+        }
+        Page<T> page2 = new Page<T>(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),xxList);
+        resultResponse2.setData(page2);
+        return resultResponse2;
+    }
     /**
      * rest api post request method
      *
