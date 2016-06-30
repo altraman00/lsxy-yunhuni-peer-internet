@@ -40,6 +40,7 @@ public class PreUserDetailsService implements AuthenticationUserDetailsService<P
             //此处应根据token从Redis获取用户并组装成UserDetails返回（principal为tocken） AbstractAuthenticationToken
             String username = cacheManager.get(principal);
             if(!StringUtils.isEmpty(username)){
+                cacheManager.expire(principal,30*60);
                 user = new User(username,"",true,true,true,true,roles("ROLE_TENANT_USER"));
             }
         }
