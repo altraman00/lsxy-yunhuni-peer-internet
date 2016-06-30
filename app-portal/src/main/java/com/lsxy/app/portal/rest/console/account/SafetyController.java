@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.lsxy.app.portal.rest.base.AbstractPortalController;
 import com.lsxy.app.portal.rest.comm.MobileCodeUtils;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
@@ -23,7 +24,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/console/account/safety")
-public class SafetyController {
+public class SafetyController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(SafetyController.class);
 
     private static final String IS_ERROR = "-2";//表示密码错误
@@ -41,7 +42,7 @@ public class SafetyController {
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        RestResponse<Account> restResponse = findByUsername();
+        RestResponse<Account> restResponse = findByUsername(request);
         Account account = restResponse.getData();
         SafetyVo safetyVo = new SafetyVo(account);
         request.getSession().setAttribute("safetyVo",safetyVo);
@@ -54,9 +55,8 @@ public class SafetyController {
      * 获取用户信息的rest请求
      * @return
      */
-    private RestResponse findByUsername(){
-        String userName = "user001";
-        String token = "1234";
+    private RestResponse findByUsername(HttpServletRequest request){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl +  "/rest/account/find_by_username";
         Map map = new HashMap();
         return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
@@ -79,9 +79,9 @@ public class SafetyController {
      * @return
      */
     @RequestMapping(value="/edit_psw" ,method = RequestMethod.POST)
-    public ModelAndView editPsw( String oldPassword,String newPassword){
+    public ModelAndView editPsw(HttpServletRequest request, String oldPassword,String newPassword){
         ModelAndView mav = new ModelAndView();
-        RestResponse<String> restResponse = savePassword(oldPassword, newPassword);
+        RestResponse<String> restResponse = savePassword(request,oldPassword, newPassword);
         String status = restResponse.getData();
         //TODO 0修改成功 -1表示失败
         if(IS_TRUE.equals(status) ){
@@ -99,14 +99,12 @@ public class SafetyController {
      * @param newPassword 新密码
      * @return
      */
-    private RestResponse savePassword(String oldPassword,String newPassword){
-        String userName = "user001";
-        String token = "1234";
+    private RestResponse savePassword(HttpServletRequest request,String oldPassword,String newPassword){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl + "/rest/account/safety/save_password";
         Map map = new HashMap();
         map.put("oldPassword",oldPassword);
         map.put("newPassword",newPassword);
-        map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map,  String.class);
     }
 
@@ -117,10 +115,10 @@ public class SafetyController {
      */
     @RequestMapping(value="/validation_psw" ,method = RequestMethod.POST)
     @ResponseBody
-    public Map validationPsw(String oldPws ){
+    public Map validationPsw(HttpServletRequest request,String oldPws ){
        HashMap hs = new HashMap();
 
-        RestResponse<String> restResponse = validationPassword(oldPws);
+        RestResponse<String> restResponse = validationPassword(request,oldPws);
         String result = restResponse.getData();
         //验证密码
         if(IS_TRUE.equals(result)) {
@@ -138,13 +136,11 @@ public class SafetyController {
      * @param oldPws
      * @return
      */
-    private RestResponse validationPassword(String oldPws){
-        String userName = "user001";
-        String token = "1234";
+    private RestResponse validationPassword(HttpServletRequest request,String oldPws){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/account/safety/validation_password";
         Map map = new HashMap();
         map.put("password",oldPws);
-        map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map,  String.class);
     }
 
@@ -158,8 +154,7 @@ public class SafetyController {
     @ResponseBody
     public Map editMobile(String mobile ,HttpServletRequest request ){
         HashMap hs = new HashMap();
-
-        RestResponse<Account> restResponse = saveMobile(mobile);
+        RestResponse<Account> restResponse = saveMobile(request,mobile);
         Account account = restResponse.getData();
         String status = IS_FALSE;
         if(mobile.equals(account.getMobile())){
@@ -186,13 +181,11 @@ public class SafetyController {
      * @param mobile 手机号码
      * @return
      */
-    private RestResponse<Account> saveMobile(String mobile) {
-        String userName = "user001";
-        String token = "1234";
+    private RestResponse<Account> saveMobile(HttpServletRequest request,String mobile) {
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl +  "/rest/account/safety/save_mobile";
         Map map = new HashMap();
         map.put("mobile",mobile);
-        map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
     }
 

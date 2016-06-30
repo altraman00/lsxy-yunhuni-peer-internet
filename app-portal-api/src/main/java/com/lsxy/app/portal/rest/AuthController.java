@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest;
 
+import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -21,7 +22,7 @@ import java.util.HashMap;
  */
 @RequestMapping("/rest/account/auth")
 @RestController
-public class AuthController {
+public class AuthController extends AbstractRestController {
     @Autowired
     private RealnamePrivateService realnaePrivateService;
     @Autowired
@@ -36,11 +37,11 @@ public class AuthController {
 
     /**
      * 获取实名认证状态
-     * @param userName 用户名
      * @return
      */
     @RequestMapping("/find_auth_status")
-    public RestResponse findAuthStatus(String userName) throws MatchMutiEntitiesException {
+    public RestResponse findAuthStatus() throws MatchMutiEntitiesException {
+        String userName = getCurrentAccountUserName();
         HashMap map = new HashMap();
         //获取租户对象
         Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
@@ -68,13 +69,13 @@ public class AuthController {
     }
     /**
      * 个人实名认证方法
-     * @param userName 用户名
      * @param status 认证状态
      * @param realnamePrivate 个人实名认证
      * @return
      */
     @RequestMapping("/save_private_auth")
-    private RestResponse svePrivateAuth(String userName, String status, RealnamePrivate realnamePrivate) throws MatchMutiEntitiesException {
+    private RestResponse svePrivateAuth( String status, RealnamePrivate realnamePrivate) throws MatchMutiEntitiesException {
+        String userName = getCurrentAccountUserName();
         //获取租户对象
         Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         tenant.setIsRealAuth(Integer.valueOf(status));
@@ -87,13 +88,13 @@ public class AuthController {
 
     /**
      企业实名认证
-     * @param userName 用户名
      * @param status 认证状态
      * @param realnameCorp 企业认证对象
      * @return
      */
     @RequestMapping("/save_corp_auth")
-    public RestResponse saveCorpAuth( String userName,String status,RealnameCorp realnameCorp) throws MatchMutiEntitiesException {
+    public RestResponse saveCorpAuth( String status,RealnameCorp realnameCorp) throws MatchMutiEntitiesException {
+        String userName = getCurrentAccountUserName();
         //获取租户对象
         Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         tenant.setIsRealAuth(Integer.valueOf(status));

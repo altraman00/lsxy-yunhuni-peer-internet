@@ -29,7 +29,8 @@ public class InformationController extends AbstractRestController {
      * return
      */
     @RequestMapping("/save_information")
-    public RestResponse saveInformation(String userName,Account account) throws MatchMutiEntitiesException {
+    public RestResponse saveInformation(Account account) throws MatchMutiEntitiesException {
+        String userName = getCurrentAccountUserName();
         Account oldAccount = accountService.findAccountByUserName(userName);
         try {
             BeanUtils.copyProperties2(oldAccount, account, false);

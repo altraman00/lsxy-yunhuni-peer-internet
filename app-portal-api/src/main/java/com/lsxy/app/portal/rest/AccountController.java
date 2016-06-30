@@ -8,7 +8,6 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,12 +34,11 @@ public class AccountController extends AbstractRestController {
 
     /**
      * 根据用户名获取用户对象
-     * @param userName 用户名
      * @return
      */
     @RequestMapping("/find_by_username")
-    public RestResponse findByUserName(String userName) throws MatchMutiEntitiesException {
-        Account account = accountService.findAccountByUserName(userName);
+    public RestResponse findByUserName() throws MatchMutiEntitiesException {
+        Account account = accountService.findAccountByUserName(getCurrentAccountUserName());
         return RestResponse.success(account);
     }
 

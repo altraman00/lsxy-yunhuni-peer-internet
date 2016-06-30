@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.console.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lsxy.app.portal.rest.base.AbstractPortalController;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -22,7 +23,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/console/account/information")
-public class InformationController {
+public class InformationController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
 
@@ -35,7 +36,7 @@ public class InformationController {
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
 
-        RestResponse<Account> restResponse = findByUsername();
+        RestResponse<Account> restResponse = findByUsername(request);
         Account account = restResponse.getData();
        InformationVo informationVo = new InformationVo(account);
 
@@ -48,12 +49,10 @@ public class InformationController {
      * 查询用户信息的rest请求
      * @return
      */
-    private RestResponse findByUsername(){
-        String token = "1234";
-        String userName = "user001";
+    private RestResponse findByUsername(HttpServletRequest request){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/account/find_by_username";
         Map map = new HashMap();
-        map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, Account.class);
     }
     /**
@@ -67,7 +66,7 @@ public class InformationController {
         ModelAndView mav = new ModelAndView();
         //修改数据库数据
 
-        RestResponse<Account> restResponse = saveInformation(informationVo);
+        RestResponse<Account> restResponse = saveInformation(request,informationVo);
         Account account = restResponse.getData();
 
         if(account!=null) {
@@ -88,13 +87,12 @@ public class InformationController {
      * @param informationVo 基本资料vo对象
      * @return
      */
-    private RestResponse saveInformation( InformationVo informationVo){
-        String token = "1234";
-        String userName = "user001";
+    private RestResponse saveInformation( HttpServletRequest request,InformationVo informationVo){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/account/information/save_information";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(informationVo, Map.class);
-        map.put("userName",userName);
+
         return  RestRequest.buildSecurityRequest(token).post(uri,map, Account.class);
     }
 

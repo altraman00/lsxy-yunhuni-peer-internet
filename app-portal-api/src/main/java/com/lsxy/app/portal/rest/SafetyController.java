@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest;
 
+import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
@@ -16,18 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/rest/account/safety")
 @RestController
-public class SafetyController {
+public class SafetyController extends AbstractRestController {
     @Autowired
     private AccountService accountService;
 
     /**
-     * 验证手机号码是否正确
-     * @param userName 用户名
+     * 验证密码是否正确
      * @param password 待验证密码
      * @return
      */
     @RequestMapping("/validation_password")
-    public RestResponse validationPassword(String userName,String password) throws MatchMutiEntitiesException {
+    public RestResponse validationPassword(String password) throws MatchMutiEntitiesException {
+        String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
         if(password!=null&&password.length()>0){
             password =   PasswordUtil.springSecurityPasswordEncode(password,userName);
@@ -40,12 +41,12 @@ public class SafetyController {
 
     /**
      * 修改绑定手机号码
-     * @param userName 用户名
      * @param mobile 新绑定手机号码
      * @return
      */
     @RequestMapping("/save_mobile")
-    public RestResponse saveMobile(String userName,String mobile) throws MatchMutiEntitiesException {
+    public RestResponse saveMobile( String mobile) throws MatchMutiEntitiesException {
+        String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
         account.setMobile(mobile);
         account = accountService.save(account);
@@ -54,13 +55,13 @@ public class SafetyController {
 
     /**
      * 修改密码方法
-     * @param userName 用户名
      * @param oldPassword 旧密码
      * @param newPassword 新密码
      * @return
      */
     @RequestMapping("/save_password")
-    public RestResponse savePassword(String userName,String oldPassword,String newPassword) throws MatchMutiEntitiesException {
+    public RestResponse savePassword(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
+        String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
         if(oldPassword!=null&&oldPassword.length()>0){
             // 密码加密

@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.console.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lsxy.app.portal.rest.base.AbstractPortalController;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.config.SystemConfig;
@@ -26,7 +27,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("/console/account/auth")
-public class AuthController {
+public class AuthController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private  static final Integer AUTH_WAIT = 0;//个人认证等待中
     private  static final Integer  AUTH_NO= 100;//未认证
@@ -54,7 +55,7 @@ public class AuthController {
         String userName = "user001";
         //调resr接口
 
-        RestResponse<HashMap> restResponse = findAuthStatus();
+        RestResponse<HashMap> restResponse = findAuthStatus(request);
         HashMap hs = restResponse.getData();
         if(hs==null){//未实名认证
             // 未实名认证
@@ -95,12 +96,10 @@ public class AuthController {
      * 获取后台状态的rest请求方法
      * @return
      */
-    private RestResponse findAuthStatus(){
-        String token = "1234";
-        String userName = "user001";
+    private RestResponse findAuthStatus(HttpServletRequest request){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl + "/rest/account/auth/find_auth_status";
         Map map = new HashMap();
-        map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, HashMap.class);
     }
     /**
@@ -152,14 +151,14 @@ public class AuthController {
 
         String  status = IS_TRUE;//默认操作成功
         if(Integer.valueOf(type)==AUTH_ONESELF){
-            RestResponse<RealnamePrivate> restResponse = savePrivateAuth(authVo);
+            RestResponse<RealnamePrivate> restResponse = savePrivateAuth(request,authVo);
             RealnamePrivate realnamePrivate = restResponse.getData();
             if (realnamePrivate == null) {
                 status = IS_FALSE;
             }
 
         }else if(Integer.valueOf(type)==AUTH_COMPANY){
-            RestResponse<RealnameCorp> restResponse = saveCorpAuth(authVo);
+            RestResponse<RealnameCorp> restResponse = saveCorpAuth(request,authVo);
             RealnameCorp realnameCorp = restResponse.getData();
             if (realnameCorp == null) {
                 status = IS_FALSE;
@@ -180,13 +179,11 @@ public class AuthController {
      * @param authVo 实名认证ao
      * @return
      */
-    private RestResponse savePrivateAuth(AuthVo authVo){
-        String token = "1234";
-        String userName = "user001";
+    private RestResponse savePrivateAuth(HttpServletRequest request,AuthVo authVo){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl +  "/rest/account/auth/save_private_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
-        map.put("userName",userName);
         map.put("status",AUTH_WAIT);//状态
         map.put("name",authVo.getPrivateName());//姓名
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnamePrivate.class);
@@ -197,15 +194,13 @@ public class AuthController {
      * @param authVo 实名认证ao
      * @return
      */
-    private RestResponse saveCorpAuth(AuthVo authVo){
-        String token = "1234";
-        String userName = "user001";
+    private RestResponse saveCorpAuth(HttpServletRequest request, AuthVo authVo){
+        String token = getSecurityToken(request);
         String uri = restPrefixUrl + "/rest/account/auth/save_corp_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
         map.put("status",AUTH_WAIT);//状态
         map.put("name",authVo.getCorpName());//企业名称
-        map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnameCorp.class);
     }
 
