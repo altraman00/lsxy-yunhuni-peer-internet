@@ -41,8 +41,7 @@ public class SafetyController {
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        String url =  "/rest/account/find_by_username";
-        RestResponse<Account> restResponse = restResponseUtils(url,null, Account.class);
+        RestResponse<Account> restResponse = findByUsername();
         Account account = restResponse.getData();
         SafetyVo safetyVo = new SafetyVo(account);
         request.getSession().setAttribute("safetyVo",safetyVo);
@@ -50,6 +49,19 @@ public class SafetyController {
         mav.setViewName("/console/account/safety/index");
         return mav;
     }
+
+    /**
+     * 获取用户信息的rest请求
+     * @return
+     */
+    private RestResponse findByUsername(){
+        String userName = "user001";
+        String token = "1234";
+        String uri = restPrefixUrl +  "/rest/account/find_by_username";
+        Map map = new HashMap();
+        return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
+    }
+
 
     /**
      * 修改密码首页
@@ -69,13 +81,7 @@ public class SafetyController {
     @RequestMapping(value="/edit_psw" ,method = RequestMethod.POST)
     public ModelAndView editPsw( String oldPassword,String newPassword){
         ModelAndView mav = new ModelAndView();
-
-        String url =   "/rest/account/safety/save_password";
-        Map map = new HashMap();
-        map.put("oldPassword",oldPassword);
-        map.put("newPassword",newPassword);
-        RestResponse<String> restResponse = restResponseUtils(url,map, String.class);
-
+        RestResponse<String> restResponse = savePassword(oldPassword, newPassword);
         String status = restResponse.getData();
         //TODO 0修改成功 -1表示失败
         if(IS_TRUE.equals(status) ){
@@ -88,6 +94,23 @@ public class SafetyController {
     }
 
     /**
+     * 保存密码的rest请求
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @return
+     */
+    private RestResponse savePassword(String oldPassword,String newPassword){
+        String userName = "user001";
+        String token = "1234";
+        String uri = restPrefixUrl + "/rest/account/safety/save_password";
+        Map map = new HashMap();
+        map.put("oldPassword",oldPassword);
+        map.put("newPassword",newPassword);
+        map.put("userName",userName);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map,  String.class);
+    }
+
+    /**
      * 验证密码方法
      * @param oldPws 用户输入的密码
      * @return
@@ -96,10 +119,8 @@ public class SafetyController {
     @ResponseBody
     public Map validationPsw(String oldPws ){
        HashMap hs = new HashMap();
-        String url =  "/rest/account/safety/validation_password";
-        Map map = new HashMap();
-        map.put("password",oldPws);
-        RestResponse<String> restResponse = restResponseUtils(url,map, String.class);
+
+        RestResponse<String> restResponse = validationPassword(oldPws);
         String result = restResponse.getData();
         //验证密码
         if(IS_TRUE.equals(result)) {
@@ -112,6 +133,20 @@ public class SafetyController {
         return hs;
     }
 
+    /**
+     * 验证密码的rest方法
+     * @param oldPws
+     * @return
+     */
+    private RestResponse validationPassword(String oldPws){
+        String userName = "user001";
+        String token = "1234";
+        String uri = restPrefixUrl +   "/rest/account/safety/validation_password";
+        Map map = new HashMap();
+        map.put("password",oldPws);
+        map.put("userName",userName);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map,  String.class);
+    }
 
     /**
      *  绑定手机号码
@@ -124,10 +159,7 @@ public class SafetyController {
     public Map editMobile(String mobile ,HttpServletRequest request ){
         HashMap hs = new HashMap();
 
-        String url =  "/rest/account/safety/save_mobile";
-        Map map = new HashMap();
-        map.put("mobile",mobile);
-        RestResponse<Account> restResponse = restResponseUtils(url,map, Account.class);
+        RestResponse<Account> restResponse = saveMobile(mobile);
         Account account = restResponse.getData();
         String status = IS_FALSE;
         if(mobile.equals(account.getMobile())){
@@ -148,24 +180,20 @@ public class SafetyController {
 
         return hs;
     }
+
     /**
-     * restPOST请求
-     * @param url 请求地址
-     * @param map 请求参数
-     * @param className 返回值类型
+     *  保存手机号码的方法
+     * @param mobile 手机号码
      * @return
      */
-    private RestResponse restResponseUtils(String url,Map map,Class className){
-        // 获取实名认证的状态
+    private RestResponse<Account> saveMobile(String mobile) {
         String userName = "user001";
-        //调resr接口
-        String uri = restPrefixUrl + url;
         String token = "1234";
-        if(map == null){
-            map = new HashMap();
-        }
+        String uri = restPrefixUrl +  "/rest/account/safety/save_mobile";
+        Map map = new HashMap();
+        map.put("mobile",mobile);
         map.put("userName",userName);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, className);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
     }
 
 }

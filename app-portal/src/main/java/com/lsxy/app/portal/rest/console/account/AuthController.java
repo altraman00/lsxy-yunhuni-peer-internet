@@ -52,8 +52,8 @@ public class AuthController {
         //TODO 获取实名认证的状态
         String userName = "user001";
         //调resr接口
-        String url = "/rest/account/auth/find_auth_status";
-        RestResponse<HashMap> restResponse = restResponseUtils(url,null, HashMap.class);
+
+        RestResponse<HashMap> restResponse = findAuthStatus();
         HashMap hs = restResponse.getData();
         if(hs==null){//未实名认证
             // 未实名认证
@@ -90,6 +90,18 @@ public class AuthController {
         return mav;
     }
 
+    /**
+     * 获取后台状态的rest请求方法
+     * @return
+     */
+    private RestResponse findAuthStatus(){
+        String token = "1234";
+        String userName = "user001";
+        String uri = restPrefixUrl + "/rest/account/auth/find_auth_status";
+        Map map = new HashMap();
+        map.put("userName",userName);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map, HashMap.class);
+    }
     /**
      * 上次文件方法
      * @param file
@@ -139,18 +151,14 @@ public class AuthController {
 
         String  status = IS_TRUE;//默认操作成功
         if(Integer.valueOf(type)==AUTH_ONESELF){
-            String url =  "/rest/account/auth/save_private_auth";
-            Map map = getRealnamePrivaateParams(authVo, AUTH_WAIT);
-            RestResponse<RealnamePrivate> restResponse = restResponseUtils(url, map, RealnamePrivate.class);
+            RestResponse<RealnamePrivate> restResponse = savePrivateAuth(authVo);
             RealnamePrivate realnamePrivate = restResponse.getData();
             if (realnamePrivate == null) {
                 status = IS_FALSE;
             }
 
         }else if(Integer.valueOf(type)==AUTH_COMPANY){
-            String url = "/rest/account/auth/save_corp_auth";
-            Map map = getRealnameCorpParams(authVo, AUTH_WAIT);
-            RestResponse<RealnameCorp> restResponse = restResponseUtils(url, map, RealnameCorp.class);
+            RestResponse<RealnameCorp> restResponse = saveCorpAuth(authVo);
             RealnameCorp realnameCorp = restResponse.getData();
             if (realnameCorp == null) {
                 status = IS_FALSE;
@@ -167,30 +175,35 @@ public class AuthController {
     }
 
     /**
-     * 组装个人实名认证的信息
-     * @param authVo 实名认证vo对象
-     * @param status 修改状态
+     * 保存个人实名认证rest请求
+     * @param authVo 实名认证ao
      * @return
      */
-    private Map getRealnamePrivaateParams(AuthVo authVo,int status){
+    private RestResponse savePrivateAuth(AuthVo authVo){
+        String token = "1234";
+        String userName = "user001";
+        String uri = restPrefixUrl +  "/rest/account/auth/save_private_auth";
         Map map = new HashMap();
-        map.put("status",status);//状态
+        map.put("status",AUTH_WAIT);//状态
         map.put("name",authVo.getPrivateName());//姓名
         map.put("idNumber", authVo.getIdNumber());//身份证号
         map.put("idPhoto",authVo.getIdPhoto());//身份证照片
         map.put("idType", authVo.getIdType());//证件类型
-        return map;
+        map.put("userName",userName);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnamePrivate.class);
     }
 
     /**
-     * 组装企业实名认证的信息
-     * @param authVo 实名认证vo对象
-     * @param status 修改状态
+     * 保存企业实名认证rest请求
+     * @param authVo 实名认证ao
      * @return
      */
-    private Map getRealnameCorpParams(AuthVo authVo,int status){
+    private RestResponse saveCorpAuth(AuthVo authVo){
+        String token = "1234";
+        String userName = "user001";
+        String uri = restPrefixUrl + "/rest/account/auth/save_corp_auth";
         Map map = new HashMap();
-        map.put("status",status);//状态
+        map.put("status",AUTH_WAIT);//状态
         map.put("name",authVo.getCorpName());//企业名称
         map.put("addr",authVo.getAddr());//企业地址
         map.put("fieldCode",authVo.getFieldCode());//所属行业
@@ -200,25 +213,8 @@ public class AuthController {
         map.put("type02Prop01",authVo.getType02Prop01());//[三证合一]注册号
         map.put("type02Prop02",authVo.getType02Prop02());//[三证合一]税务登记证号
         map.put("type03Prop02",authVo.getType03Prop02());//[三证分离]税务登记证照片
-        return map;
-    }
-    /**
-     * restPOST请求
-     * @param url 请求地址
-     * @param map 请求参数
-     * @param className 返回值类型
-     * @return
-     */
-    private RestResponse restResponseUtils(String url,Map map,Class className){
-        // 获取实名认证的状态
-        String userName = "user001";
-        //调resr接口
-        String uri = restPrefixUrl + url;
-        String token = "1234";
-        if(map == null){
-            map = new HashMap();
-        }
         map.put("userName",userName);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, className);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnameCorp.class);
     }
+
 }
