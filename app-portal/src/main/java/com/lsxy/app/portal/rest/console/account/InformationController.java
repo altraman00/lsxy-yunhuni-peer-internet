@@ -25,6 +25,11 @@ public class InformationController {
     private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.restful.url");
 
+    /**
+     * 基本资料首页入口
+     * @param request
+     * @return
+     */
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
@@ -45,6 +50,13 @@ public class InformationController {
         mav.setViewName("/console/account/information/index");
         return mav;
     }
+
+    /**
+     * 基本资料修改入口
+     * @param request
+     * @param informationVo 基本资料VO对象
+     * @return
+     */
     @RequestMapping(value="/edit" ,method = RequestMethod.POST)
     public ModelAndView edit(HttpServletRequest request, InformationVo informationVo ){
         ModelAndView mav = new ModelAndView();

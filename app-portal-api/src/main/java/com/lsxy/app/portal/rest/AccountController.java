@@ -9,8 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.apache.coyote.http11.Constants.a;
-
 /**
  * Created by Tandy on 2016/6/14.
  */

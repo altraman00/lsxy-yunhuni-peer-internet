@@ -7,17 +7,13 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.RealnameCorpService;
 import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
-
-import static sun.java2d.cmm.ColorTransform.In;
 
 /**
  * Created by zhangxb on 2016/6/28.

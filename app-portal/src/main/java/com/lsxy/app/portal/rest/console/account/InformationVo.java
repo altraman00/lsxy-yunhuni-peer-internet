@@ -11,13 +11,13 @@ import java.io.Serializable;
 public class InformationVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private String industry;
-    private String business;
-    private String url;
-    private String province;
-    private String city;
-    private String address;
-    private String mobile;
+    private String industry; //行业
+    private String business;//业务
+    private String url;//网站
+    private String province;//省份
+    private String city;//城市
+    private String address;//详细地址
+    private String mobile;//手机号码
 
     public InformationVo() {
 

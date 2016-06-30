@@ -1,9 +1,7 @@
 package com.lsxy.app.portal.rest.console.account;
 
-import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
-import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -20,8 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.apache.zookeeper.ZooDefs.OpCode.auth;
 
 /**
  * Created by zhangxb on 2016/6/24.
@@ -199,6 +195,7 @@ public class AuthController {
      * 组装个人实名认证的信息
      * @param authVo 实名认证vo对象
      * @param userName 用户名
+     * @param status 修改状态
      * @return
      */
     private Map getRealnamePrivaateParams(AuthVo authVo,String userName,int status){
@@ -211,6 +208,14 @@ public class AuthController {
         map.put("idType", authVo.getIdType());//证件类型
         return map;
     }
+
+    /**
+     * 组装企业实名认证的信息
+     * @param authVo 实名认证vo对象
+     * @param userName 用户名
+     * @param status 修改状态
+     * @return
+     */
     private Map getRealnameCorpParams(AuthVo authVo,String userName,int status){
         Map map = new HashMap();
         map.put("userName",userName);//用户账号

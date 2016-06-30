@@ -8,11 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.lsxy.framework.core.utils.PasswordUtil.springSecurityPasswordEncode;
-
 
 /**
  * Created by zhangxb on 2016/6/28.
+ * 实名认证
  */
 @RequestMapping("/rest/account/safety")
 @RestController
