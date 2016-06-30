@@ -1,4 +1,4 @@
-package com.lsxy.framework.core.persistence;
+package com.lsxy.framework.api.base;
 
 import java.io.Serializable;
 

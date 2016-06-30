@@ -2,7 +2,7 @@ package com.lsxy.framework.tenant.dao;
 
 
 
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Account;
 
 import java.io.Serializable;

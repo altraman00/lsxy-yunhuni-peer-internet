@@ -2,6 +2,7 @@ package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;
@@ -16,8 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 
 /**
  * Created by Tandy on 2016/6/21.
@@ -55,5 +56,20 @@ public class RestClientTest {
         System.out.println(x);
 
     }
+    @Test
+    public void accountList(){
+        String url = restPrefixUrl + "/rest/account/test002";
+        String token = "1234";
+        RestResponse<List<Account>> x = RestRequest.buildSecurityRequest(token).getList(url, Account.class);
+        System.out.println(x);
 
+    }
+    @Test
+    public void accountPage(){
+        String url = restPrefixUrl + "/rest/account/test003";
+        String token = "1234";
+        RestResponse<Page<Account>> x = RestRequest.buildSecurityRequest(token).getPage(url, Account.class);
+        System.out.println(x);
+
+    }
 }

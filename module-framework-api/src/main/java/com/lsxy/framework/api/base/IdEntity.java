@@ -1,6 +1,7 @@
-package com.lsxy.framework.core.persistence;
+package com.lsxy.framework.api.base;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
@@ -36,7 +37,9 @@ public abstract class IdEntity implements Serializable{
 	protected String id;
 	
 	private boolean deleted;
-	
+
+	//deleted属性不需要进行json序列化
+	@JsonIgnore
 	@Column(name="deleted")
 	public boolean getDeleted() {
 		return deleted;

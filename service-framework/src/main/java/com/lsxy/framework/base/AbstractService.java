@@ -1,7 +1,7 @@
 package com.lsxy.framework.base;
 
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.HqlUtil;
 import com.lsxy.framework.core.utils.Page;
@@ -67,8 +67,10 @@ public abstract class AbstractService<T> implements BaseService<T> {
     }
 
     @Override
-    public Page pageList(int pageNo, int pageSize) {
-        return null;
+    public Page<T> pageList(int pageNo, int pageSize) {
+        String hql = "from "+this.getRealClass().getName() + " obj";
+        return pageList(hql,pageNo,pageSize);
+//      return null;
     }
 
     /**
