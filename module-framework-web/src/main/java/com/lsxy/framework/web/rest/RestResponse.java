@@ -79,4 +79,18 @@ public class RestResponse<T> {
         return restResponse;
     }
 
+    /**
+     * 包装一个指定对象数据类型的响应对象
+     * @param <T>
+     * @return
+     */
+    public <T> RestResponse<T> wrapIndicateTypeRestResponse(T data) {
+        RestResponse<T> restResponse = new RestResponse<T>();
+        restResponse.setSuccess(this.isSuccess());
+        restResponse.setErrorMsg(this.getErrorMsg());
+        restResponse.setErrorCode(this.getErrorCode());
+        restResponse.setData(data);
+        return restResponse;
+    }
+
 }

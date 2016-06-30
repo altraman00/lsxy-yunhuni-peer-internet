@@ -2,8 +2,6 @@ package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.api.tenant.model.RealnamePrivate;
-import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;
@@ -58,21 +56,20 @@ public class RestClientTest {
         System.out.println(x);
 
     }
-
     @Test
-    public void bean(){
-        RealnamePrivate realnamePrivate1 = new RealnamePrivate();
-        realnamePrivate1.setIdPhoto("12346");
-        System.out.println("开始1："+realnamePrivate1.toString());
-        RealnamePrivate realnamePrivate2 = new RealnamePrivate();
-        realnamePrivate2.setIdType("1000");
-        try {
-            BeanUtils.copyProperties2(realnamePrivate1, realnamePrivate2,false);
+    public void accountList(){
+        String url = restPrefixUrl + "/rest/account/test002";
+        String token = "1234";
+        RestResponse<List<Account>> x = RestRequest.buildSecurityRequest(token).getList(url, Account.class);
+        System.out.println(x);
 
-            System.out.println("介绍1："+realnamePrivate1.toString());
-        }catch (Exception e){
-
-        }
     }
+    @Test
+    public void accountPage(){
+        String url = restPrefixUrl + "/rest/account/test003";
+        String token = "1234";
+        RestResponse<Page<Account>> x = RestRequest.buildSecurityRequest(token).getPage(url, Account.class);
+        System.out.println(x);
 
+    }
 }

@@ -38,6 +38,23 @@ public class AccountController extends AbstractRestController {
         return RestResponse.success(account);
     }
 
-
-
+    /**
+     *
+     * @return
+     */
+    @RequestMapping("/test002")
+    public RestResponse test002(){
+        Page<Account> xx = accountService.pageList(1,10);
+        List<Account> result = xx.getResult();
+        return RestResponse.success(result);
+    }
+    /**
+     *
+     * @return
+     */
+    @RequestMapping("/test003")
+    public RestResponse test003(){
+        Page<Account> xx = accountService.pageList(1,10);
+        return RestResponse.success(xx);
+    }
 }

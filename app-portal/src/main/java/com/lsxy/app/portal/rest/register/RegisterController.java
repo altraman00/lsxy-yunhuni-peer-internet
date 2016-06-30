@@ -97,7 +97,7 @@ public class RegisterController {
     @RequestMapping(value = "/mail_active",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView mailActive(String uid,String username,String code){
-        Map<String,String> model = new HashMap();
+        Map<String,String> model = new HashMap<>();
         //TODO 用户是否已激活
         boolean isActive = "12345678".equals(uid);//模拟激活
         if(isActive){
@@ -116,7 +116,7 @@ public class RegisterController {
     @RequestMapping(value = "/active",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView active(String uid,String code,String password){
-        Map<String,String> model = new HashMap();
+        Map<String,String> model = new HashMap<>();
         //TODO 判断用户激活条件是否合格
 
         //TODO 修改激活状态

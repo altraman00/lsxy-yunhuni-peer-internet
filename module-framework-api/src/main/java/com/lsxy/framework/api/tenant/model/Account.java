@@ -1,7 +1,7 @@
 package com.lsxy.framework.api.tenant.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lsxy.framework.core.persistence.IdEntity;
+import com.lsxy.framework.api.base.IdEntity;
 
 import javax.persistence.*;
 import java.util.Date;

@@ -2,6 +2,7 @@ package com.lsxy.framework.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
@@ -77,9 +78,69 @@ public class RestRequest {
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
      * @param uriparams        url自动匹配替换的参数，如url为api/{a}/{b},参数为["1","2"],则解析的url为api/1/2，使用Map参数时，遵循按key匹配
      * @return
+     * http://xxxx/{}/{}{}{}/?a={}&c={}&d={}
      */
     public <T> RestResponse<T> get(String url,Class<T> responseDataType, String... uriparams) {
         return exchange(url,HttpMethod.GET,null,responseDataType,uriparams);
+    }
+
+    /**
+     * 获取列表数据，可通过泛型指定列表数据内部对象类型
+     * @param url
+     * @param responseDataType
+     * @param uriparams
+     * @param <T>
+     * @return
+     */
+    public <T> RestResponse<List<T>> getList(String url, Class<T> responseDataType, Object... uriparams) {
+        RestResponse<List> resultResponse = get(url, List.class, uriparams);
+        List<Object> list = resultResponse.getData();
+
+        //转换为具体类型的对象列表
+        List<T> concreteList = convertListToConcretList(list,responseDataType);
+        RestResponse<List<T>> result = resultResponse.wrapIndicateTypeRestResponse(concreteList);
+        return result;
+    }
+
+    /**
+     * 获取翻页数据,可通过泛型指定翻页数据列表对象中的对象类型
+     * @param url       请求URL
+     * @param responseDataType  制定响应数据类型
+     * @param uriparams                 可指定参数,改参数将会作为url通配符的替换值 {}{}
+     * @param <T>
+     * @return
+     *          已分页对象返回相应指定对象的分页数据
+     */
+    public <T> RestResponse<Page<T>> getPage(String url, Class<T> responseDataType, Object... uriparams) {
+        RestResponse<Page> restResponse = get(url, Page.class, uriparams);
+        Page<Object> page = restResponse.getData();
+
+        //将对象列表转换为具体对象类型的列表
+        List<T> concreteList = convertListToConcretList(page.getResult(),responseDataType);
+
+        Page<T> pageResult = new Page<T>(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),concreteList);
+        RestResponse<Page<T>> resultResponse = restResponse.wrapIndicateTypeRestResponse(pageResult);
+        return resultResponse;
+    }
+
+
+    /**
+     * 转换列表对象List<Map> to List<T>
+     * @param objList
+     * @param concretDataType
+     * @param <T>
+     * @return
+     */
+    private <T> List<T> convertListToConcretList(List<?> objList,Class<T> concretDataType) {
+        List<T> concreteList = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        objList.stream().filter(obj -> obj instanceof Map).forEach(obj -> {
+            T mapperObject = mapper.convertValue(obj, concretDataType);
+            if (mapperObject != null) {
+                concreteList.add(mapperObject);
+            }
+        });
+        return concreteList;
     }
 
     /**
