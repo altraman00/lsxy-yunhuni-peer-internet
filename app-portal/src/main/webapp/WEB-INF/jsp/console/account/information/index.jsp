@@ -166,8 +166,6 @@
     }
     var msg = '${msg}';
     if(msg==''){}else{alert(msg);}
-
-
 </script>
 </body>
 </html>
