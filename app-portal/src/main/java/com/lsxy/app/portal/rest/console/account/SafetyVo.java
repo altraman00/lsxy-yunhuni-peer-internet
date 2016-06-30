@@ -113,7 +113,7 @@ public class SafetyVo implements Serializable {
     }
 
     public String getTime() {
-        return DateUtils.getTime(time,"yyyy-MM-dd HH:mm:ss");
+        return time!=null?DateUtils.getTime(time,"yyyy-MM-dd HH:mm:ss"):"";
     }
 
     public void setIsReal(String isReal) {
