@@ -14,7 +14,6 @@ import java.util.Date;
 public class RealnameCorp extends IdEntity {
     private static final long serialVersionUID = 1L;
     private Tenant tenant;//所属租户
-    private String  tenantId;// 认证租户
     private String  name;// 企业名称
     private String  addr;// 企业地址
     private String  fieldCode;// 所属行业代号,数据字典
@@ -36,7 +35,6 @@ public class RealnameCorp extends IdEntity {
     }
 
     public RealnameCorp(String tenantId,String name,String addr,String fieldCode,String authType,String type01Prop01,String type01Prop02,String type02Prop01,String type02Prop02,String type03Prop02 ){
-        this.tenantId = tenantId;
         this.name = name;
         this.addr = addr;
         this.fieldCode = fieldCode;
@@ -48,7 +46,7 @@ public class RealnameCorp extends IdEntity {
         this.type03Prop02 = type03Prop02;
     }
     @ManyToOne
-    @JoinColumn(name = "realname_corp_tenant_id")
+    @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
     }
@@ -78,14 +76,7 @@ public class RealnameCorp extends IdEntity {
         this.createTime = createTime;
     }
 
-    @Column(name = "tenant_id")
-    public String getTenantId() {
-        return tenantId;
-    }
 
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
     @Column(name = "name")
     public String getName() {
         return name;
