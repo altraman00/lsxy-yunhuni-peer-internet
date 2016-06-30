@@ -5,6 +5,7 @@ import com.lsxy.framework.core.persistence.IdEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -19,7 +20,7 @@ public class RealnamePrivate extends IdEntity {
     private String idPhoto;//身份证照片
     private String tenantId;//认证租户
     private String idType;//认证证件类型
-
+    private Date createTime;//创建时间
     public RealnamePrivate() {
     }
 
@@ -33,6 +34,15 @@ public class RealnamePrivate extends IdEntity {
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
+    }
+
+    @Column(name = "create_time")
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     @Column(name = "id_type")

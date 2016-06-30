@@ -64,7 +64,7 @@
                                             <div class="panel-body clearfix border-top-none personal-base">
                                                 <div class="row ">
                                                     <div class="col-md-1 remove-padding width-130">
-                                                        登陆账号(会员名称)：
+                                                        会员名称：
                                                     </div>
                                                     <div class="col-md-10 ">
                                                         <span>${safetyVo.username}</span>
