@@ -2,9 +2,7 @@ package com.lsxy.framework.api.tenant.model;
 
 import com.lsxy.framework.core.persistence.IdEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -15,6 +13,7 @@ import java.util.Date;
 @Table(schema="db_lsxy_base",name = "tb_base_realname_corp")
 public class RealnameCorp extends IdEntity {
     private static final long serialVersionUID = 1L;
+    private Tenant tenant;//所属租户
     private String  tenantId;// 认证租户
     private String  name;// 企业名称
     private String  addr;// 企业地址
@@ -47,6 +46,15 @@ public class RealnameCorp extends IdEntity {
         this.type02Prop01 = type02Prop01;
         this.type02Prop02 = type02Prop02;
         this.type03Prop02 = type03Prop02;
+    }
+    @ManyToOne
+    @JoinColumn(name = "realname_corp_tenant_id")
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
     }
 
     public static long getSerialVersionUID() {
