@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.callrecord.service;
 
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yuhuni.api.app.model.App;
 import com.lsxy.yuhuni.api.callrecord.model.CallRecord;

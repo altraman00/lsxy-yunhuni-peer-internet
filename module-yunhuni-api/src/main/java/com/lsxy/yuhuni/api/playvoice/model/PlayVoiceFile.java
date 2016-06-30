@@ -1,6 +1,6 @@
 package com.lsxy.yuhuni.api.playvoice.model;
 
-import com.lsxy.framework.core.persistence.IdEntity;
+import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.yuhuni.api.app.model.App;
 
 import javax.persistence.*;

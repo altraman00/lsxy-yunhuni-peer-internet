@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.session.service;
 
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.yuhuni.api.app.model.App;
 import com.lsxy.yuhuni.api.session.model.Session;
 import com.lsxy.yuhuni.api.session.service.SessionService;

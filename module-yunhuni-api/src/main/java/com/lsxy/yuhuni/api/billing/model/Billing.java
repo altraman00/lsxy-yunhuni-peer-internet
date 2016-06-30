@@ -1,7 +1,7 @@
 package com.lsxy.yuhuni.api.billing.model;
 
+import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.persistence.IdEntity;
 
 import javax.persistence.*;
 

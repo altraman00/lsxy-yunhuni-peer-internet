@@ -1,6 +1,6 @@
 package com.lsxy.yunhuni.session.dao;
 
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yuhuni.api.app.model.App;
 import com.lsxy.yuhuni.api.session.model.Session;
 

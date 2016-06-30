@@ -1,6 +1,7 @@
 package com.lsxy.yuhuni.api.apicertificate.model;
 
-import com.lsxy.framework.core.persistence.IdEntity;
+
+import com.lsxy.framework.api.base.IdEntity;
 
 import javax.persistence.*;
 import java.sql.Date;

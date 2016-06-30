@@ -1,10 +1,10 @@
 package com.lsxy.yunhuni.billing.service;
 
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.yuhuni.api.billing.model.Billing;
 import com.lsxy.yuhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.billing.dao.BillingDao;

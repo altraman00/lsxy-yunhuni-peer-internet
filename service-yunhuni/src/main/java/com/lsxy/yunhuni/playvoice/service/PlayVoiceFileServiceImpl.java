@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.playvoice.service;
 
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.yuhuni.api.playvoice.model.PlayVoiceFile;
 import com.lsxy.yuhuni.api.playvoice.service.PlayVoiceFileService;
 import com.lsxy.yunhuni.playvoice.dao.PlayVoiceFileDao;

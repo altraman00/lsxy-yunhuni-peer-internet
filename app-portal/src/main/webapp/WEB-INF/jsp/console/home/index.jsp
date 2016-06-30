@@ -97,6 +97,9 @@
                                         <span>
                                           <a  class='reset_sk_confirm' >重新生成</a>
                                         </span>
+                                        <span>
+                                            <a class="tips-error tips-key"></a>
+                                        </span>
                                         </p>
                                     </div>
                                 </div>
@@ -195,6 +198,7 @@
                             $("#secretKey").html(data.secretKey);
                         }else{
                             //errorCode errorMsg
+                            $(".tips-key").html("生成失败：" + data.errorMsg)
                         }
                     }
                 });

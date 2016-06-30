@@ -80,7 +80,7 @@ public class RestRequest {
      * @return
      * http://xxxx/{}/{}{}{}/?a={}&c={}&d={}
      */
-    public <T> RestResponse<T> get(String url,Class<T> responseDataType, String... uriparams) {
+    public <T> RestResponse<T> get(String url,Class<T> responseDataType, Object... uriparams) {
         return exchange(url,HttpMethod.GET,null,responseDataType,uriparams);
     }
 
@@ -166,7 +166,7 @@ public class RestRequest {
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
      * @return
      */
-    public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Map<String, Object> params, Class<T> responseDataType,String... uriparams){
+    public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Map<String, Object> params, Class<T> responseDataType,Object... uriparams){
         RestResponse<T> restResponse = null;
         MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
         if(params != null){

@@ -1,6 +1,6 @@
 package com.lsxy.yunhuni.recordedvoice.dao;
 
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yuhuni.api.recordedvoice.model.RecordedVoiceFile;
 
 import java.io.Serializable;
