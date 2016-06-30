@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -91,14 +92,8 @@ public class InformationController {
         String token = "1234";
         String userName = "user001";
         String uri = restPrefixUrl +   "/rest/account/information/save_information";
-        Map map = new HashMap();
-        map.put("phone",informationVo.getMobile());
-        map.put("industry",informationVo.getIndustry());
-        map.put("business",informationVo.getBusiness());
-        map.put("url",informationVo.getUrl());
-        map.put("province",informationVo.getProvince());
-        map.put("city",informationVo.getCity());
-        map.put("address",informationVo.getAddress());
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(informationVo, Map.class);
         map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, Account.class);
     }

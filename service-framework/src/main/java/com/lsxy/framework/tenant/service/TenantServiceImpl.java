@@ -42,8 +42,6 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         }
         return tenant;
     }
-        return tenantDao;
-    }
 
 
 

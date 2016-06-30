@@ -2,6 +2,7 @@ package com.lsxy.app.portal.rest;
 
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,8 @@ public class SafetyController {
      * @return
      */
     @RequestMapping("/validation_password")
-    public RestResponse validationPassword(String userName,String password){
-        Account account = accountService.findByUserName(userName);
+    public RestResponse validationPassword(String userName,String password) throws MatchMutiEntitiesException {
+        Account account = accountService.findAccountByUserName(userName);
         if(password!=null&&password.length()>0){
             password =   PasswordUtil.springSecurityPasswordEncode(password,userName);
             if(password.equalsIgnoreCase(account.getPassword())){
@@ -44,8 +45,8 @@ public class SafetyController {
      * @return
      */
     @RequestMapping("/save_mobile")
-    public RestResponse saveMobile(String userName,String mobile){
-        Account account = accountService.findByUserName(userName);
+    public RestResponse saveMobile(String userName,String mobile) throws MatchMutiEntitiesException {
+        Account account = accountService.findAccountByUserName(userName);
         account.setMobile(mobile);
         account = accountService.save(account);
         return RestResponse.success(account);
@@ -59,8 +60,8 @@ public class SafetyController {
      * @return
      */
     @RequestMapping("/save_password")
-    public RestResponse savePassword(String userName,String oldPassword,String newPassword){
-        Account account = accountService.findByUserName(userName);
+    public RestResponse savePassword(String userName,String oldPassword,String newPassword) throws MatchMutiEntitiesException {
+        Account account = accountService.findAccountByUserName(userName);
         if(oldPassword!=null&&oldPassword.length()>0){
             // 密码加密
             oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);

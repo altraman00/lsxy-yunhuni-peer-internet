@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,8 @@ public class InformationController extends AbstractRestController {
      * return
      */
     @RequestMapping("/save_information")
-    public RestResponse saveInformation(String userName,Account account){
-        Account oldAccount = accountService.findByUserName(userName);
+    public RestResponse saveInformation(String userName,Account account) throws MatchMutiEntitiesException {
+        Account oldAccount = accountService.findAccountByUserName(userName);
         try {
             BeanUtils.copyProperties2(oldAccount, account, false);
         } catch (Exception e) {

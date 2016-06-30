@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.config.SystemConfig;
@@ -183,13 +184,11 @@ public class AuthController {
         String token = "1234";
         String userName = "user001";
         String uri = restPrefixUrl +  "/rest/account/auth/save_private_auth";
-        Map map = new HashMap();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(authVo, Map.class);
+        map.put("userName",userName);
         map.put("status",AUTH_WAIT);//状态
         map.put("name",authVo.getPrivateName());//姓名
-        map.put("idNumber", authVo.getIdNumber());//身份证号
-        map.put("idPhoto",authVo.getIdPhoto());//身份证照片
-        map.put("idType", authVo.getIdType());//证件类型
-        map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnamePrivate.class);
     }
 
@@ -202,17 +201,10 @@ public class AuthController {
         String token = "1234";
         String userName = "user001";
         String uri = restPrefixUrl + "/rest/account/auth/save_corp_auth";
-        Map map = new HashMap();
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(authVo, Map.class);
         map.put("status",AUTH_WAIT);//状态
         map.put("name",authVo.getCorpName());//企业名称
-        map.put("addr",authVo.getAddr());//企业地址
-        map.put("fieldCode",authVo.getFieldCode());//所属行业
-        map.put("authType",authVo.getAuthType());//认证类型
-        map.put("type01Prop01",authVo.getType01Prop01());//[一照一码]营业执照照片
-        map.put("type01Prop02",authVo.getType01Prop02());//[一照一码]统一社会信用代码
-        map.put("type02Prop01",authVo.getType02Prop01());//[三证合一]注册号
-        map.put("type02Prop02",authVo.getType02Prop02());//[三证合一]税务登记证号
-        map.put("type03Prop02",authVo.getType03Prop02());//[三证分离]税务登记证照片
         map.put("userName",userName);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnameCorp.class);
     }

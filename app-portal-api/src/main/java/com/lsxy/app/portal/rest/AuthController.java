@@ -7,6 +7,7 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.RealnameCorpService;
 import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +40,10 @@ public class AuthController {
      * @return
      */
     @RequestMapping("/find_auth_status")
-    public RestResponse findAuthStatus(String userName){
+    public RestResponse findAuthStatus(String userName) throws MatchMutiEntitiesException {
         HashMap map = new HashMap();
         //获取租户对象
-        Tenant tenant = accountService.findByUserName(userName).getTenant();
+        Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         map.put("userName",userName);
         map.put("status",tenant.getIsRealAuth());
         if(AUTH_COMPANY_SUCESS==tenant.getIsRealAuth()){
@@ -73,9 +74,9 @@ public class AuthController {
      * @return
      */
     @RequestMapping("/save_private_auth")
-    private RestResponse svePrivateAuth(String userName, String status, RealnamePrivate realnamePrivate){
+    private RestResponse svePrivateAuth(String userName, String status, RealnamePrivate realnamePrivate) throws MatchMutiEntitiesException {
         //获取租户对象
-        Tenant tenant = accountService.findByUserName(userName).getTenant();
+        Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         tenant.setIsRealAuth(Integer.valueOf(status));
         realnamePrivate.setTenant(tenant);
         //保存到数据库
@@ -92,9 +93,9 @@ public class AuthController {
      * @return
      */
     @RequestMapping("/save_corp_auth")
-    public RestResponse saveCorpAuth( String userName,String status,RealnameCorp realnameCorp){
+    public RestResponse saveCorpAuth( String userName,String status,RealnameCorp realnameCorp) throws MatchMutiEntitiesException {
         //获取租户对象
-        Tenant tenant = accountService.findByUserName(userName).getTenant();
+        Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         tenant.setIsRealAuth(Integer.valueOf(status));
         realnameCorp.setTenant(tenant);
         //保存到数据库

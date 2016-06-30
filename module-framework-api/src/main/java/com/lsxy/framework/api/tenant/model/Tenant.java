@@ -2,6 +2,7 @@ package com.lsxy.framework.api.tenant.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
