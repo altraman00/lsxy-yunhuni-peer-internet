@@ -1,7 +1,6 @@
 package com.lsxy.framework.tenant.dao;
 
 
-import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
 
