@@ -35,7 +35,7 @@ public class InformationController {
         ModelAndView mav = new ModelAndView();
 
         //String token = (String)request.getSession(false).getAttribute(SUBMISSION_TOKEN);
-        String url = restPrefixUrl + "/rest/account/find_by_username";
+        String url = "/rest/account/find_by_username";
         RestResponse<Account> restResponse = restResponseUtils(url,null, Account.class);
         Account account = restResponse.getData();
        InformationVo informationVo = new InformationVo(account);
