@@ -30,12 +30,12 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="./number_call.html">呼入号码管理</a>
+                                                <a href="${ctx}/console/number/call/index">呼入号码管理</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="./number_band.html">测试号码绑定</a>
+                                                <a href="${ctx}/console/number/bind/index">测试号码绑定</a>
                                             </div>
                                         </li>
                                     </ul>
