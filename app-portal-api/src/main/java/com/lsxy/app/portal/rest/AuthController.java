@@ -76,11 +76,10 @@ public class AuthController {
     private RestResponse svePrivateAuth(String userName, String status, RealnamePrivate realnamePrivate){
         //获取租户对象
         Tenant tenant = accountService.findByUserName(userName).getTenant();
-        realnamePrivate.setTenantId(tenant.getId());
+        tenant.setIsRealAuth(Integer.valueOf(status));
+        realnamePrivate.setTenant(tenant);
         //保存到数据库
         realnamePrivate = realnaePrivateService.save(realnamePrivate);
-        //修改租户中实名认证状态
-        tenant.setIsRealAuth(Integer.valueOf(status));
         tenantService.save(tenant);
         return RestResponse.success(realnamePrivate);
     }
@@ -96,11 +95,11 @@ public class AuthController {
     public RestResponse saveCorpAuth( String userName,String status,RealnameCorp realnameCorp){
         //获取租户对象
         Tenant tenant = accountService.findByUserName(userName).getTenant();
-        realnameCorp.setTenantId(tenant.getId());
+        tenant.setIsRealAuth(Integer.valueOf(status));
+        realnameCorp.setTenant(tenant);
         //保存到数据库
         realnameCorp = realnameCorpService.save(realnameCorp);
         //修改租户中实名认证状态
-        tenant.setIsRealAuth(Integer.valueOf(status));
         tenantService.save(tenant);
         return RestResponse.success(realnameCorp);
     }

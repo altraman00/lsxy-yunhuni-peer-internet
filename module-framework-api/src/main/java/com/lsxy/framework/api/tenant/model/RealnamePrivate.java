@@ -13,11 +13,11 @@ import java.util.Date;
 @Table(schema="db_lsxy_base",name = "tb_base_realname_private")
 public class RealnamePrivate extends IdEntity {
     private static final long serialVersionUID = 1L;
+
     private Tenant tenant;//所属租户
     private String name;//姓名
     private String idNumber;//'身份证号
     private String idPhoto;//身份证照片
-    private String tenantId;//认证租户
     private String idType;//认证证件类型
     private Date createTime;//创建时间
     private int status;//实名认证状态
@@ -28,7 +28,6 @@ public class RealnamePrivate extends IdEntity {
         this.name = name;
         this.idNumber = idNumber;
         this.idPhoto = idPhoto;
-        this.tenantId = tenantId;
         this.idType = idType;
     }
 
@@ -37,7 +36,7 @@ public class RealnamePrivate extends IdEntity {
     }
 
     @ManyToOne
-    @JoinColumn(name = "realname_private_tenant_id")
+    @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
     }
@@ -96,23 +95,18 @@ public class RealnamePrivate extends IdEntity {
     public void setIdPhoto(String idPhoto) {
         this.idPhoto = idPhoto;
     }
-    @Column(name = "tenant_id")
-    public String getTenantId() {
-        return tenantId;
-    }
 
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
 
     @Override
     public String toString() {
         return "RealnamePrivate{" +
-                "name='" + name + '\'' +
+                "tenant=" + tenant +
+                ", name='" + name + '\'' +
                 ", idNumber='" + idNumber + '\'' +
                 ", idPhoto='" + idPhoto + '\'' +
-                ", tenantId='" + tenantId + '\'' +
                 ", idType='" + idType + '\'' +
+                ", createTime=" + createTime +
+                ", status=" + status +
                 '}';
     }
 }
