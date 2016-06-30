@@ -9,6 +9,7 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateChangeLogService;
 import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateService;
+import com.lsxy.yuhuni.api.exceptions.SkChangeCountLimitException;
 import com.lsxy.yunhuni.apicertificate.dao.ApiCertificateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,7 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
             this.save(cert);
             return secretKey;
         }else{
-            throw new RuntimeException("当天修改已达到上限");
+            throw new SkChangeCountLimitException("当天修改已达到上限");
         }
     }
 }

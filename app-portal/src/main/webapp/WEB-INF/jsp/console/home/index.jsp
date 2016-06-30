@@ -11,7 +11,7 @@
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green  aside hidden-print include" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+        <aside class="bg-Green  aside hidden-print "  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
         <!-- /.aside -->
 
         <section id="content">
@@ -93,9 +93,9 @@
                                         </span>
                                         </p>
                                         <p>
-                                            SecretKey ${homeVO.secretKey}
+                                            SecretKey: <span id="secretKey">${homeVO.secretKey}</span>
                                         <span>
-                                          <a class='create_confirm' href="${ctx}/console/home/change_sk">重新生成</a>
+                                          <a  class='reset_sk_confirm' >重新生成</a>
                                         </span>
                                         </p>
                                     </div>
@@ -178,9 +178,34 @@
 <script src="${resPrefixUrl}/js/charts/flot/jquery.flot.min.js" cache="false"></script>
 <script src="${resPrefixUrl}/js/bootbox.min.js"></script>
 <script src="${resPrefixUrl}/js/charts/flot/demo.js" cache="false"></script>
-<script src="${resPrefixUrl}/js/include.js" aysnc></script>
-<script src="${resPrefixUrl}/js/include.js"></script>
+
 <script type="text/javascript">
+
+    // restfult api 重新生成confirm
+    $('.reset_sk_confirm').on('click',function(e){
+        bootbox.confirm("确定重新生成么", function(result) {
+            if(result){
+                $.ajax({
+                    type: "get",
+                    url: ctx + "/console/home/change_sk",
+                    async: false,
+                    dataType: "json",
+                    success: function(data) {
+                        if(data.secretKey != null){
+                            $("#secretKey").html(data.secretKey);
+                        }else{
+                            //errorCode errorMsg
+                        }
+                    }
+                });
+            }
+        });
+        return false
+    })
+
+
+
+
 </script>
 </body>
 </html>

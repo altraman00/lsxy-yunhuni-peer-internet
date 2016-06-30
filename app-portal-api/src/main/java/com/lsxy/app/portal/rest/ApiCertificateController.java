@@ -1,9 +1,11 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateService;
+import com.lsxy.yuhuni.api.exceptions.SkChangeCountLimitException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,9 +36,13 @@ public class ApiCertificateController extends AbstractRestController {
      * @throws Exception
      */
     @RequestMapping("/change_sk")
-    public RestResponse changeSecretKey() throws Exception{
-        String secretKey = apiCertificateService.changeSecretKeyByUserName(getCurrentAccountUserName());
-        return RestResponse.success(secretKey);
+    public RestResponse changeSecretKey() throws MatchMutiEntitiesException {
+        try{
+            String secretKey = apiCertificateService.changeSecretKeyByUserName(getCurrentAccountUserName());
+            return RestResponse.success(secretKey);
+        }catch (SkChangeCountLimitException e){
+            return RestResponse.failed("0000",e.getMessage());
+        }
     }
 
 }

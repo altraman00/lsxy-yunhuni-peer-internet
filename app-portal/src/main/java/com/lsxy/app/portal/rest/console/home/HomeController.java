@@ -9,6 +9,7 @@ import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,12 +39,21 @@ public class HomeController extends AbstractPortalController{
 
     @RequestMapping(value = "/change_sk",method = RequestMethod.GET)
     @ResponseBody
-    public String changeSecretKey(HttpServletRequest request){
+    public Map changeSecretKey(HttpServletRequest request){
+        Map<String,Object> result = new HashMap<>();
         String token = getToken(request);
         String url = PortalConstants.REST_PREFIX_URL + "/rest/api_cert/change_sk";
         RestResponse<String> response = RestRequest.buildSecurityRequest(token).get(url,String.class);
-        String secretKey = response.getData();
-        return secretKey;
+        if(response.isSuccess()){
+            String secretKey = response.getData();
+            if(!StringUtils.isEmpty(secretKey)){
+                result.put("secretKey",secretKey);
+            }
+        }else{
+            result.put("errorCode",response.getErrorCode());
+            result.put("errorMsg",response.getErrorMsg());
+        }
+        return result;
     }
 
 }

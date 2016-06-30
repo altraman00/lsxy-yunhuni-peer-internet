@@ -37,7 +37,7 @@
 					</li>
 					<li class="border-top">
 						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="#" class="canbehover" >
-							<i class="fa fa-envelope" icon"> </i>
+							<i class="fa fa-envelope icon"> </i>
 							<span>消息中心</span>
 						</a>
 					</li>
