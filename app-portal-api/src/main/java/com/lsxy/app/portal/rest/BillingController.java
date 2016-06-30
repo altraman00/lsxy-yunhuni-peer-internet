@@ -1,9 +1,8 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.tenant.model.Account;
-import com.lsxy.yuhuni.billing.model.Billing;
-import com.lsxy.yuhuni.billing.service.BillingService;
+import com.lsxy.yuhuni.api.billing.model.Billing;
+import com.lsxy.yuhuni.api.billing.service.BillingService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

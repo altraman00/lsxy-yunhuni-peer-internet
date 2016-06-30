@@ -1,12 +1,12 @@
 package com.lsxy.yunhuni.billing.service;
 
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.framework.core.service.AbstractService;
-import com.lsxy.framework.tenant.model.Tenant;
-import com.lsxy.framework.tenant.service.TenantService;
-import com.lsxy.yuhuni.billing.model.Billing;
-import com.lsxy.yuhuni.billing.service.BillingService;
+import com.lsxy.yuhuni.api.billing.model.Billing;
+import com.lsxy.yuhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.billing.dao.BillingDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.app.dao;
 
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.yuhuni.app.model.App;
+import com.lsxy.yuhuni.api.app.model.App;
 
 import java.io.Serializable;
 

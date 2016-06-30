@@ -1,11 +1,11 @@
 package com.lsxy.yunhuni.apicertificate.service;
 
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.framework.core.service.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
-import com.lsxy.yuhuni.apicertificate.model.ApiCertificateChangeLog;
-import com.lsxy.yuhuni.apicertificate.service.ApiCertificateChangeLogService;
+import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificateChangeLog;
+import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateChangeLogService;
 import com.lsxy.yunhuni.apicertificate.dao.ApiCertificateChangeLogDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

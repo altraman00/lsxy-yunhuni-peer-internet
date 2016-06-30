@@ -1,21 +1,20 @@
 package com.lsxy.yunhuni.apicertificate.service;
 
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.framework.core.service.AbstractService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.tenant.model.Tenant;
-import com.lsxy.framework.tenant.service.TenantService;
-import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
-import com.lsxy.yuhuni.apicertificate.service.ApiCertificateChangeLogService;
-import com.lsxy.yuhuni.apicertificate.service.ApiCertificateService;
+import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateChangeLogService;
+import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.apicertificate.dao.ApiCertificateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by liups on 2016/6/29.

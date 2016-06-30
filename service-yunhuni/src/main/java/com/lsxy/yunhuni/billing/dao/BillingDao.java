@@ -2,7 +2,7 @@ package com.lsxy.yunhuni.billing.dao;
 
 
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.yuhuni.billing.model.Billing;
+import com.lsxy.yuhuni.api.billing.model.Billing;
 
 import java.io.Serializable;
 

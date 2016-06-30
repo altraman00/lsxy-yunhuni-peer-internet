@@ -2,8 +2,8 @@ package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
-import com.lsxy.yuhuni.apicertificate.service.ApiCertificateService;
+import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,11 +1,13 @@
 package com.lsxy.framework.tenant.service;
 
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.framework.core.service.AbstractService;
 import com.lsxy.framework.tenant.dao.TenantDao;
-import com.lsxy.framework.tenant.model.Account;
-import com.lsxy.framework.tenant.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ import java.io.Serializable;
  * Created by liups on 2016/6/29.
  */
 @Service
-public class TenantServiceImpl extends AbstractService<Tenant> implements TenantService{
+public class TenantServiceImpl extends AbstractService<Tenant> implements TenantService {
     @Autowired
     private AccountService accountService;
 

@@ -1,9 +1,9 @@
 package com.lsxy.app.portal;
 
 import com.lsxy.framework.FrameworkServiceConfig;
+import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
-import com.lsxy.framework.FrameworkApiConfig;
-import com.lsxy.yuhuni.YunhuniApiConfig;
+import com.lsxy.yuhuni.api.YunhuniApiConfig;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

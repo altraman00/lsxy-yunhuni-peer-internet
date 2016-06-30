@@ -1,12 +1,12 @@
 package com.lsxy.yunhuni.callrecord.service;
 
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.framework.core.service.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.yuhuni.app.model.App;
-import com.lsxy.yuhuni.callrecord.model.CallRecord;
-import com.lsxy.yuhuni.callrecord.service.CallRecordService;
-import com.lsxy.yuhuni.session.service.SessionService;
+import com.lsxy.yuhuni.api.app.model.App;
+import com.lsxy.yuhuni.api.callrecord.model.CallRecord;
+import com.lsxy.yuhuni.api.callrecord.service.CallRecordService;
+import com.lsxy.yuhuni.api.session.service.SessionService;
 import com.lsxy.yunhuni.callrecord.dao.CallRecordDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

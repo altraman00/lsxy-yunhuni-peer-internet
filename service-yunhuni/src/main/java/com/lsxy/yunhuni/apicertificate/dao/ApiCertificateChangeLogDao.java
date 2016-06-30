@@ -1,8 +1,8 @@
 package com.lsxy.yunhuni.apicertificate.dao;
 
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.yuhuni.apicertificate.model.ApiCertificate;
-import com.lsxy.yuhuni.apicertificate.model.ApiCertificateChangeLog;
+import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificateChangeLog;
 
 import java.io.Serializable;
 import java.sql.Date;

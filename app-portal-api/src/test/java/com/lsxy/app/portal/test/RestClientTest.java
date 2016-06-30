@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
-import com.lsxy.framework.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;

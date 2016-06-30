@@ -1,8 +1,8 @@
 package com.lsxy.app.portal.base;
 
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.tenant.model.Account;
-import com.lsxy.framework.tenant.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;

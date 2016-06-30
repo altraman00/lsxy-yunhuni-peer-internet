@@ -1,10 +1,10 @@
 package com.lsxy.yunhuni.session.service;
 
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
-import com.lsxy.framework.core.service.AbstractService;
-import com.lsxy.yuhuni.app.model.App;
-import com.lsxy.yuhuni.session.model.Session;
-import com.lsxy.yuhuni.session.service.SessionService;
+import com.lsxy.yuhuni.api.app.model.App;
+import com.lsxy.yuhuni.api.session.model.Session;
+import com.lsxy.yuhuni.api.session.service.SessionService;
 import com.lsxy.yunhuni.session.dao.SessionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
