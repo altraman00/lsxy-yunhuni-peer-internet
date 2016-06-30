@@ -9,11 +9,12 @@
 
 </head>
 <body>
+<section class="vbox">
 <%@include file="/inc/headerNav.jsp"%>
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green lter aside hidden-print include" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+        <aside class="bg-Green lter aside hidden-print" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
         <!-- /.aside -->
 
         <section id="content">
@@ -235,9 +236,9 @@
 <script src="${resPrefixUrl }/js/charts/flot/jquery.flot.min.js" cache="false"></script>
 <script src="${resPrefixUrl }/js/bootbox.min.js"></script>
 <script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
-<script src="${resPrefixUrl }/js/include.js"></script>
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
 <script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
+<%@include file="/inc/footer.jsp"%>
 <!--must-->
 <script>
     function sendCode(){

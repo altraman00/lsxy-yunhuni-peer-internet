@@ -31,7 +31,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         String logoutPage = "/logout";
         String checkCodeFailurePage = "/login?er=vcer";
         String loginFailurePage = "/login?er=true";
-        String loginSuccessPage = "/console/index";
+        String loginSuccessPage = "/console/home/index";
         http.authorizeRequests()
                 .antMatchers("/console/**").access("hasRole('ROLE_TENANT_USER')")
                 .and()

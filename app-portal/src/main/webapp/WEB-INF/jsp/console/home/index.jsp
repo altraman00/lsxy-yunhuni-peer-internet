@@ -7,13 +7,13 @@
     <%@include file="/inc/meta.jsp" %>
 </head>
 <body>
+<section class="vbox">
 <%@include file="/inc/headerNav.jsp"%>
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green  aside hidden-print include" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+        <aside class="bg-Green  aside hidden-print "  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
         <!-- /.aside -->
-
         <section id="content">
             <section class="hbox stretch">
                 <aside>
@@ -32,8 +32,8 @@
                                               <strong>余额</strong>
                                             </span>
                                             <span>
-                                              <small class="text-muted text-uc account-number">998</small>
-                                              <small class="account-number-decimal">.00</small>
+                                              <small class="text-muted text-uc account-number">${homeVO.balanceInt}</small>
+                                              <small class="account-number-decimal">.${homeVO.balanceDec}</small>
                                               元
                                             </span>
                                             <div class="box-footer">
@@ -49,7 +49,7 @@
                                             </span>
                                             <span>
                                               当前
-                                              <small class="text-muted text-uc account-number">10</small>
+                                              <small class="text-muted text-uc account-number">${homeVO.lineNum}</small>
                                               线
                                             </span>
                                         </div>
@@ -62,15 +62,15 @@
                                             <div class='account-left'>
                                               <span class="w-half">
                                                 <img src="${resPrefixUrl}/images/index/voice.png" alt="">
-                                                语音剩余:  <small class="account-number-small">100</small> 分钟
+                                                语音剩余:  <small class="account-number-small">${homeVO.voiceRemain}</small> 分钟
                                               </span>
                                               <span class="w-half">
                                                 <img src="${resPrefixUrl}/images/index/meeting.png" alt="">
-                                                会议剩余:  <small class="account-number-small">198</small> 分钟
+                                                会议剩余:  <small class="account-number-small">${homeVO.conferenceRemain}</small> 分钟
                                               </span>
                                               <span class="">
                                                 <img  src="${resPrefixUrl}/images/index/message.png" alt="">
-                                                短信剩余:  <small class="account-number-small">225</small> 分钟
+                                                短信剩余:  <small class="account-number-small">${homeVO.smsRemain}</small> 条
                                               </span>
                                             </div>
                                             <div class="box-footer">
@@ -87,15 +87,18 @@
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
                                         <p>
-                                            REST API: http://api.yunhuni.com/1234135312321414134/
+                                            REST API: ${homeVO.restApi}
                                         <span>
                                           <a href="#">API文档</a>
                                         </span>
                                         </p>
                                         <p>
-                                            SecretKey 1234135312321414134
+                                            SecretKey: <span id="secretKey">${homeVO.secretKey}</span>
                                         <span>
-                                          <a class='create_confirm' href="${resPrefixUrl}/baidu">重新生成</a>
+                                          <a  class='reset_sk_confirm' >重新生成</a>
+                                        </span>
+                                        <span>
+                                            <a class="tips-error tips-key"></a>
                                         </span>
                                         </p>
                                     </div>
@@ -114,50 +117,56 @@
                                     </div>
                                 </div>
                             </section>
-                            <section class="panel panel-default pos-rlt clearfix  app-list">
-                                <div class="sectionWrap">
-                                    <header class="panel-heading">
-                                        <div class="h5 border-left">应用1</div>
-                                    </header>
-                                    <div class="panel-body clearfix border-top-none">
-                                        <div class="app-status-right dropdown fl">
+                            <c:forEach var="app" items="${homeVO.appStateVOs}" >
+                                <c:if test="${app.status == 1}" >
+                                    <section class="panel panel-default pos-rlt clearfix  app-list">
+                                        <div class="sectionWrap">
+                                            <header class="panel-heading">
+                                                <div class="h5 border-left">${app.name}</div>
+                                            </header>
+                                            <div class="panel-body clearfix border-top-none">
+                                                <div class="app-status-right dropdown fl">
                                           <span class="app-icon pull-left m-r-sm">
                                             <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/></span>
                                           <span class="h5 block m-t-xs text-muted">APPID :
-                                            <span>214132513515135132512334134</span>
+                                            <span>${app.id}</span>
                                             <small class="text-success">已上线</small>
                                           </span>
-                                            <small class="text-muted m-t-xs text-uc yhn-description">这里是描述适用商户：龙米、集美汇等3个</small>
+                                                    <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                </div>
+                                                <div class="app-status-left fr">
+                                                    <ul class="app-status-list">
+                                                        <li><img src="${resPrefixUrl}/images/index/status_1.png" alt=""> 1小时内呼叫量: <span class="number">${app.callOfHour}</span> </li>
+                                                        <li><img src="${resPrefixUrl}/images/index/status_2.png" alt=""> 1天内呼叫量: <span class="number">${app.callOfDay}</span> </li>
+                                                        <li><img src="${resPrefixUrl}/images/index/status_3.png" alt=""> 当天呼叫并发: <span class="number">${app.currentCall}</span> </li>
+                                                    </ul>
+                                                    <a href="" class="fr">详情</a>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="app-status-left fr">
-                                            <ul class="app-status-list">
-                                                <li><img src="${resPrefixUrl}/images/index/status_1.png" alt=""> 1小时内呼叫量: <span class="number">100</span> </li>
-                                                <li><img src="${resPrefixUrl}/images/index/status_2.png" alt=""> 1天内呼叫量: <span class="number">100</span> </li>
-                                                <li><img src="${resPrefixUrl}/images/index/status_3.png" alt=""> 当天呼叫并发: <span class="number">100</span> </li>
-                                            </ul>
-                                            <a href="" class="fr">详情</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                            <section class="panel panel-default pos-rlt clearfix  app-list">
-                                <div class="sectionWrap">
-                                    <header class="panel-heading">
-                                        <div class="h5 border-left">应用2</div>
-                                    </header>
-                                    <div class="panel-body clearfix border-top-none">
-                                        <div class="app-status-center dropdown fl">
+                                    </section>
+                                </c:if>
+                                <c:if test="${app.status == 2}" >
+                                    <section class="panel panel-default pos-rlt clearfix  app-list">
+                                        <div class="sectionWrap">
+                                            <header class="panel-heading">
+                                                <div class="h5 border-left">${app.name}</div>
+                                            </header>
+                                            <div class="panel-body clearfix border-top-none">
+                                                <div class="app-status-center dropdown fl">
                                           <span class="app-icon pull-left m-r-sm">
                                             <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/></span>
                                           <span class="h5 block m-t-xs text-muted">APPID :
-                                            <span>214132513515135132512334134</span>
+                                            <span>${app.id}</span>
                                             <small class="text-danger">未上线</small>
                                           </span>
-                                            <small class="text-muted m-t-xs text-uc yhn-description">这里是描述适用商户：龙米、集美汇等3个</small>
+                                                    <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </section>
+                                    </section>
+                                </c:if>
+                            </c:forEach>
                         </section>
                     </section>
                 </aside>
@@ -168,13 +177,43 @@
     </section>
 </section>
 </section>
+
+
 <script src="${resPrefixUrl }/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
 <script src="${resPrefixUrl}/js/charts/flot/jquery.flot.min.js" cache="false"></script>
 <script src="${resPrefixUrl}/js/bootbox.min.js"></script>
 <script src="${resPrefixUrl}/js/charts/flot/demo.js" cache="false"></script>
-<script src="${resPrefixUrl}/js/include.js" aysnc></script>
-<script src="${resPrefixUrl}/js/include.js"></script>
+
+<%@include file="/inc/footer.jsp"%>
+
 <script type="text/javascript">
+
+    // restfult api 重新生成confirm
+    $('.reset_sk_confirm').on('click',function(e){
+        bootbox.confirm("确定重新生成么", function(result) {
+            if(result){
+                $.ajax({
+                    type: "get",
+                    url: ctx + "/console/home/change_sk",
+                    async: false,
+                    dataType: "json",
+                    success: function(data) {
+                        if(data.secretKey != null){
+                            $("#secretKey").html(data.secretKey);
+                        }else{
+                            //errorCode errorMsg
+                            $(".tips-key").html("生成失败：" + data.errorMsg)
+                        }
+                    }
+                });
+            }
+        });
+        return false
+    })
+
 </script>
+
+
+
 </body>
 </html>

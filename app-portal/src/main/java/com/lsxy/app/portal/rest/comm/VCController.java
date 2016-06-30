@@ -100,7 +100,7 @@ public class VCController {
 //    @RequestMapping("/check")
 //    public String checkCode(HttpServletRequest request){
 //        String code  = request.getParameter("code");
-//        String SystemCode = (String) request.getSession().getAttribute(PortalConstants.VC_KEY);
+//        String SystemCode = (String) request.getCallSession().getAttribute(PortalConstants.VC_KEY);
 //        if(SystemCode.equalsIgnoreCase(code))
 //            return "true";
 //        else

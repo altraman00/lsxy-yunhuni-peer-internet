@@ -47,6 +47,9 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
                 //图形验证码一次验证不过就清空
                 req.getSession().removeAttribute(PortalConstants.VC_KEY);
                 return;
+            }else{
+                //清空图形验证码
+                req.getSession().removeAttribute(PortalConstants.VC_KEY);
             }
         }
         chain.doFilter(request,response);

@@ -29,6 +29,10 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
+            <artifactId>module-yunhuni-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
             <artifactId>module-framework-core</artifactId>
         </dependency>
         <dependency>

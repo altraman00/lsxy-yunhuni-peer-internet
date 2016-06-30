@@ -54,6 +54,10 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
+            <artifactId>service-yunhuni</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
             <artifactId>module-framework-web</artifactId>
         </dependency>
         <dependency>
