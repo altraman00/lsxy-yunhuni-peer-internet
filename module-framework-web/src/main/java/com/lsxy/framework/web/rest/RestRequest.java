@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.O;
-
 /**
  * Created by Tandy on 2016/6/22.
  * YUNHUNI REST API 请求对象
@@ -101,44 +99,65 @@ public class RestRequest {
         return restResponse;
     }
 
+    /**
+     * 获取列表数据，可通过泛型指定列表数据内部对象类型
+     * @param url
+     * @param responseDataType
+     * @param uriparams
+     * @param <T>
+     * @return
+     */
     public <T> RestResponse<List<T>> getList(String url, Class<T> responseDataType, Object... uriparams) {
         RestResponse<List> resultResponse = get(url, List.class, uriparams);
         List<Object> list = resultResponse.getData();
-        List<T> xxList = new ArrayList<T>();
-        RestResponse<List<T>> resultResponse2 = resultResponse.cloneOne();
-        for (Object obj:list){
-            if(obj instanceof  Map){
-                ObjectMapper mapper = new ObjectMapper();
-                T mapperObject = mapper.convertValue(obj, responseDataType);
-                if(mapperObject != null){
-                    xxList.add(mapperObject);
-                }
-            }
-        }
-        resultResponse2.setData(xxList);
-        return resultResponse2;
+
+        //转换为具体类型的对象列表
+        List<T> concreteList = convertListToConcretList(list,responseDataType);
+        RestResponse<List<T>> result = resultResponse.wrapIndicateTypeRestResponse(concreteList);
+        return result;
     }
 
+    /**
+     * 获取翻页数据,可通过泛型指定翻页数据列表对象中的对象类型
+     * @param url       请求URL
+     * @param responseDataType  制定响应数据类型
+     * @param uriparams                 可指定参数,改参数将会作为url通配符的替换值 {}{}
+     * @param <T>
+     * @return
+     *          已分页对象返回相应指定对象的分页数据
+     */
     public <T> RestResponse<Page<T>> getPage(String url, Class<T> responseDataType, Object... uriparams) {
-        RestResponse<Page> resultResponse = get(url, Page.class, uriparams);
-        Page<Object> page = resultResponse.getData();
-        List<T> xxList = new ArrayList<T>();
-        RestResponse<Page<T>> resultResponse2 = resultResponse.cloneOne();
+        RestResponse<Page> restResponse = get(url, Page.class, uriparams);
+        Page<Object> page = restResponse.getData();
 
+        //将对象列表转换为具体对象类型的列表
+        List<T> concreteList = convertListToConcretList(page.getResult(),responseDataType);
 
-        for (Object obj:page.getResult()){
-            if(obj instanceof  Map){
-                ObjectMapper mapper = new ObjectMapper();
-                T mapperObject = mapper.convertValue(obj, responseDataType);
-                if(mapperObject != null){
-                    xxList.add(mapperObject);
-                }
-            }
-        }
-        Page<T> page2 = new Page<T>(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),xxList);
-        resultResponse2.setData(page2);
-        return resultResponse2;
+        Page<T> pageResult = new Page<T>(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),concreteList);
+        RestResponse<Page<T>> resultResponse = restResponse.wrapIndicateTypeRestResponse(pageResult);
+        return resultResponse;
     }
+
+
+    /**
+     * 转换列表对象List<Map> to List<T>
+     * @param objList
+     * @param concretDataType
+     * @param <T>
+     * @return
+     */
+    private <T> List<T> convertListToConcretList(List<?> objList,Class<T> concretDataType) {
+        List<T> concreteList = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        objList.stream().filter(obj -> obj instanceof Map).forEach(obj -> {
+            T mapperObject = mapper.convertValue(obj, concretDataType);
+            if (mapperObject != null) {
+                concreteList.add(mapperObject);
+            }
+        });
+        return concreteList;
+    }
+
     /**
      * rest api post request method
      *
