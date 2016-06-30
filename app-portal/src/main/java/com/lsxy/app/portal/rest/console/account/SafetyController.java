@@ -32,7 +32,7 @@ public class SafetyController {
     private static final String RESULT_SUCESS = "2";//处理结果-成功
     private static final String RESULT_FIAL = "-2";//处理结果-失败
     //配置rest请求地址
-    private String restPrefixUrl = SystemConfig.getProperty("portal.restful.url");
+    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 安全设置首页
      * @param request

@@ -23,7 +23,7 @@ import java.util.Map;
 @RequestMapping("/console/account/information")
 public class InformationController {
     private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.restful.url");
+    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
 
     /**
      * 基本资料首页入口

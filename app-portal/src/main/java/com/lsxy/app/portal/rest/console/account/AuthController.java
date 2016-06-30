@@ -40,7 +40,7 @@ public class AuthController {
     private static final String IS_FALSE = "-1";//表示失败
     private static final String IS_TRUE = "1";//表示成功
     private static final String IS_AUTH = "0";//表示已实名认证
-    private String restPrefixUrl = SystemConfig.getProperty("portal.restful.url");
+    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 实名认证首页
      * @param request
@@ -156,16 +156,14 @@ public class AuthController {
                 status = IS_FALSE;
             }
         }
+        ModelAndView mav = new ModelAndView();
         if(IS_TRUE.equals(status)){
-            return  new ModelAndView("redirect:/console/account/auth/index");
+            mav = new ModelAndView("redirect:/console/account/auth/index");
         }else{
-            ModelAndView mav = new ModelAndView();
             mav.addObject("msg","操作失败，请稍后重试");
             mav.setViewName("/console/account/auth/index");
-            return mav;
         }
-
-
+        return mav;
     }
 
     /**
