@@ -1,6 +1,8 @@
 package com.lsxy.app.portal.rest.security;
 
+import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.console.account.AccountController;
+import com.lsxy.framework.config.SystemConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -17,7 +19,6 @@ import java.io.IOException;
  */
 public class PortalAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
     private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
-    public static final String SSO_TOKEN = "X-Auth-Token";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -30,7 +31,7 @@ public class PortalAuthenticationSuccessHandler extends SavedRequestAwareAuthent
         if(details instanceof String){
             HttpSession session = request.getSession(false);
             if(session != null) {
-                session.setAttribute(SSO_TOKEN,details);
+                session.setAttribute(PortalConstants.SSO_TOKEN,details);
             }
         }
     }

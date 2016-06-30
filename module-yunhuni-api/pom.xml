@@ -11,5 +11,11 @@
 
     <artifactId>module-yunhuni-api</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-api</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

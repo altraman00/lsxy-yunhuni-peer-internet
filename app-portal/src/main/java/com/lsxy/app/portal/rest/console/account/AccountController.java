@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.security.PortalAuthenticationSuccessHandler;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
@@ -18,30 +19,5 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/console/account")
 public class AccountController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountController.class);
 
-    @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request){
-        if(logger.isDebugEnabled()){
-            Object attribute = request.getSession().getAttribute(PortalAuthenticationSuccessHandler.SSO_TOKEN);
-            logger.debug("调试登录tocken,{}",attribute);
-        }
-        ModelAndView mav = new ModelAndView();
-
-        mav.addObject("a","b");
-        mav.setViewName("/console/account/index");
-        return mav;
-    }
-
-    /**
-     *
-     * @return
-     */
-    @RequestMapping(path = "",method = RequestMethod.POST)
-    public RestResponse saveAccount(String xxx){
-        RestResponse.failed("errorcode","errormsg");
-
-        return RestResponse.success("");
-
-    }
 }

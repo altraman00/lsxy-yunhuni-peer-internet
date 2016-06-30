@@ -2,7 +2,6 @@ package com.lsxy.framework.api.tenant.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -31,6 +30,7 @@ public class Tenant extends IdEntity{
 	public void setIsRealAuth(int isRealAuth) {
 		this.isRealAuth = isRealAuth;
 	}
+
 	@Column(name = "tid")
 	public String getTenantUid() {
 		return tenantUid;
