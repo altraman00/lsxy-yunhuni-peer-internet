@@ -2,10 +2,6 @@
     pageEncoding="UTF-8"%>
 <%@include file="/inc/import.jsp" %>
 
- <%
- response.getWriter().println("hello world");
- %>
-
 <%
- response.sendRedirect( request.getContextPath() +"/console/home/index");
+ response.sendRedirect( request.getContextPath() +"/console/home");
 %>

@@ -9,6 +9,7 @@
 
 </head>
 <body>
+<section class="vbox">
 <%@include file="/inc/headerNav.jsp"%>
 <section class='aside-section'>
     <section class="hbox stretch">

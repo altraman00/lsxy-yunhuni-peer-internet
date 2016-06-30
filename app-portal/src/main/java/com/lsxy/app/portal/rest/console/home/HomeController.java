@@ -28,7 +28,7 @@ import java.util.Map;
 public class HomeController extends AbstractPortalController{
     private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
-    @RequestMapping(value = "/index",method = RequestMethod.GET)
+    @RequestMapping(value = "",method = RequestMethod.GET)
     public ModelAndView index(HttpServletRequest request){
         Map<String,Object> model = new HashMap<>();
         String token = getToken(request);
