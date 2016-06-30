@@ -12,9 +12,13 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app")
 public class App extends IdEntity {
+    public static int STATUS_ONLINE = 1;
+    public static int STATUS_NOT_ONLINE = 2;
+
     private Tenant tenant;
     private String name;
     private int status;
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -42,5 +46,14 @@ public class App extends IdEntity {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    @Column(name = "description")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

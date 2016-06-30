@@ -4,7 +4,7 @@ package com.lsxy.app.portal.rest.console.home.vo;
  * Created by liups on 2016/6/27.
  */
 public class AppStateVO {
-    private String appId;               //appId
+    private String id;               //appId
 
     private String name;             //应用名称
 
@@ -16,12 +16,14 @@ public class AppStateVO {
 
     private Integer currentCall;   //当前呼叫并发
 
-    public String getAppId() {
-        return appId;
+    private String description;
+
+    public String getId() {
+        return id;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -62,5 +64,13 @@ public class AppStateVO {
 
     public void setCurrentCall(Integer currentCall) {
         this.currentCall = currentCall;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

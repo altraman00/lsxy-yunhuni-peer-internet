@@ -34,7 +34,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     @Override
     public List<App> findAppByUserName(String userName) throws MatchMutiEntitiesException {
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from App obj where obj.tenant.id=?1";
+        String hql = "from App obj where obj.tenant.id=?1 order by obj.status";
         List<App> list = this.findByCustomWithParams(hql, tenant.getId());
 
         return list;

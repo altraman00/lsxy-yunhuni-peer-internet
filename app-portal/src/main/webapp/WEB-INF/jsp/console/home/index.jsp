@@ -115,7 +115,7 @@
                                 </div>
                             </section>
                             <c:forEach var="app" items="${homeVO.appStateVOs}" >
-                                <c:if test="${app.status eq 1}" >
+                                <c:if test="${app.status == 1}" >
                                     <section class="panel panel-default pos-rlt clearfix  app-list">
                                         <div class="sectionWrap">
                                             <header class="panel-heading">
@@ -129,7 +129,7 @@
                                             <span>${app.id}</span>
                                             <small class="text-success">已上线</small>
                                           </span>
-                                                    <small class="text-muted m-t-xs text-uc yhn-description">这里是描述适用商户：龙米、集美汇等3个</small>
+                                                    <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
                                                 </div>
                                                 <div class="app-status-left fr">
                                                     <ul class="app-status-list">
@@ -143,7 +143,7 @@
                                         </div>
                                     </section>
                                 </c:if>
-                                <c:if test="${app.status eq 0}" >
+                                <c:if test="${app.status == 2}" >
                                     <section class="panel panel-default pos-rlt clearfix  app-list">
                                         <div class="sectionWrap">
                                             <header class="panel-heading">
@@ -157,7 +157,7 @@
                                             <span>${app.id}</span>
                                             <small class="text-danger">未上线</small>
                                           </span>
-                                                    <small class="text-muted m-t-xs text-uc yhn-description">这里是描述适用商户：龙米、集美汇等3个</small>
+                                                    <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
                                                 </div>
                                             </div>
                                         </div>

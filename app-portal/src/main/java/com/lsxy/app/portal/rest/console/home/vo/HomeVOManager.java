@@ -14,10 +14,10 @@ import java.util.Map;
 /**
  * Created by liups on 2016/6/27.
  */
-public class HomeVOBuilder {
+public class HomeVOManager {
     public final static String CERT_REST_PREFIX = "http://api.yunhuni.com";
 
-    public static HomeVO getHomeVO(String token){
+    public static HomeVO getHomeVOByToken(String token){
         HomeVO vo = new HomeVO();
         //此处调用账务restApi
         String billingUrl = PortalConstants.REST_PREFIX_URL + "/rest/billing/get";
@@ -59,9 +59,10 @@ public class HomeVOBuilder {
         for(Map app:appList){
             AppStateVO appStateVO = new AppStateVO();
             String appId = (String) app.get("id");
-            appStateVO.setAppId(appId);
+            appStateVO.setId(appId);
             appStateVO.setName((String) app.get("name"));
             appStateVO.setStatus((Integer) app.get("status"));
+            appStateVO.setDescription((String) app.get("description"));
             RestResponse<Map> statisticsResponse = RestRequest.buildSecurityRequest(token).get(appStatisticsUrl, Map.class,appId);
             Map map = statisticsResponse.getData();
             appStateVO.setCallOfDay((Integer) map.get("dayCount"));
@@ -69,7 +70,7 @@ public class HomeVOBuilder {
             appStateVO.setCurrentCall((Integer) map.get("currentSession"));
             appStateVOs.add(appStateVO);
         }
-
+        vo.setAppStateVOs(appStateVOs);
         return vo;
     }
 

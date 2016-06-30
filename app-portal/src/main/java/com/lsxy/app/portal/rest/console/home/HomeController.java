@@ -3,10 +3,9 @@ package com.lsxy.app.portal.rest.console.home;
 import com.lsxy.app.portal.rest.base.AbstractPortalController;
 import com.lsxy.app.portal.rest.comm.PortalConstants;
 import com.lsxy.app.portal.rest.console.home.vo.HomeVO;
-import com.lsxy.app.portal.rest.console.home.vo.HomeVOBuilder;
+import com.lsxy.app.portal.rest.console.home.vo.HomeVOManager;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yuhuni.billing.model.Billing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -32,7 +31,7 @@ public class HomeController extends AbstractPortalController{
     public ModelAndView index(HttpServletRequest request){
         Map<String,Object> model = new HashMap<>();
         String token = getToken(request);
-        HomeVO homeVO = HomeVOBuilder.getHomeVO(token);
+        HomeVO homeVO = HomeVOManager.getHomeVOByToken(token);
         model.put("homeVO",homeVO);
         return new ModelAndView("console/home/index",model);
     }
