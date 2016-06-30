@@ -35,14 +35,8 @@ public class InformationController {
         ModelAndView mav = new ModelAndView();
 
         //String token = (String)request.getSession(false).getAttribute(SUBMISSION_TOKEN);
-        //从redis中取出 用户名
-        String userName = "user001";
-        //调resr接口
-        String url = restPrefixUrl + "/rest/account/findByUserName";
-        String token = "1234";
-        Map map = new HashMap();
-        map.put("userName",userName);
-        RestResponse<Account> restResponse = RestRequest.buildSecurityRequest(token).post(url,map, Account.class);
+        String url = restPrefixUrl + "/rest/account/find_by_username";
+        RestResponse<Account> restResponse = restResponseUtils(url,null, Account.class);
         Account account = restResponse.getData();
        InformationVo informationVo = new InformationVo(account);
 
@@ -61,13 +55,9 @@ public class InformationController {
     public ModelAndView edit(HttpServletRequest request, InformationVo informationVo ){
         ModelAndView mav = new ModelAndView();
         //修改数据库数据
-        //从redis中取出 用户名
-        String userName = "user001";
-        //调resr接口
-        String url = restPrefixUrl + "/rest/account/information/updateInformation";
-        String token = "1234";
-        Map map = getAccountParams(informationVo,userName);
-        RestResponse<Account> restResponse = RestRequest.buildSecurityRequest(token).post(url,map, Account.class);
+        String url =   "/rest/account/information/save_information";
+        Map map = getAccountParams(informationVo);
+        RestResponse<Account> restResponse = restResponseUtils(url,map, Account.class);
         Account account = restResponse.getData();
 
         if(account!=null) {
@@ -86,12 +76,10 @@ public class InformationController {
     /**
      * 拼装修改信息为map集合
      * @param informationVo 基本资料类
-     * @param userName 用户名
      * @return
      */
-    private Map getAccountParams(InformationVo informationVo,String userName ){
+    private Map getAccountParams(InformationVo informationVo ){
         Map map = new HashMap();
-        map.put("userName",userName);
         map.put("phone",informationVo.getMobile());
         map.put("industry",informationVo.getIndustry());
         map.put("business",informationVo.getBusiness());
@@ -101,4 +89,24 @@ public class InformationController {
         map.put("address",informationVo.getAddress());
         return map;
     }
+    /**
+     * restPOST请求
+     * @param url 请求地址
+     * @param map 请求参数
+     * @param className 返回值类型
+     * @return
+     */
+    private RestResponse restResponseUtils(String url,Map map,Class className){
+        // 获取实名认证的状态
+        String userName = "user001";
+        //调resr接口
+        String uri = restPrefixUrl + url;
+        String token = "1234";
+        if(map == null){
+            map = new HashMap();
+        }
+        map.put("userName",userName);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map, className);
+    }
+
 }

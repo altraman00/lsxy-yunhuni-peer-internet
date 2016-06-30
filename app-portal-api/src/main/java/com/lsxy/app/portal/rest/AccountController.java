@@ -32,7 +32,7 @@ public class AccountController extends AbstractRestController {
      * @param userName 用户名
      * @return
      */
-    @RequestMapping("/findByUserName")
+    @RequestMapping("/find_by_username")
     public RestResponse findByUserName(String userName){
         Account account = accountService.findByUserName(userName);
         return RestResponse.success(account);

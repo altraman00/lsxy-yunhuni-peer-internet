@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,28 +24,22 @@ public class InformationController extends AbstractRestController {
 
     /**
      * 根据用户名获取用户对象
-     * @param userName 用户标识
-     * @param phone 手机号码
-     * @param industry 行业
-     * @param business 业务
-     * @param url 网站
-     * @param province 省份
-     * @param city 城市
-     * @param address 地址
-     * @return
+     * Account 用户类
+     * return
      */
-    @RequestMapping("/updateInformation")
-    public RestResponse update(String userName,String phone,String industry,String business,String url,String province,String city,String address ){
-        Account account = accountService.findByUserName(userName);
-        account.setPhone(phone);
-        account.setIndustry(industry);
-        account.setBusiness(business);
-        account.setUrl(url);
-        account.setProvince(province);
-        account.setCity(city);
-        account.setAddress(address);
-        account  = accountService.save(account);
-        return RestResponse.success(account);
+    @RequestMapping("/save_information")
+    public RestResponse saveInformation(String userName,Account account){
+        Account oldAccount = accountService.findByUserName(userName);
+        try {
+            BeanUtils.copyProperties2(oldAccount, account, false);
+        } catch (Exception e) {
+            return RestResponse.failed("4001","转换类失败");
+        }
+        oldAccount  = accountService.save(oldAccount);
+        if(oldAccount == null){
+            return RestResponse.failed("0020","更新数据库失败");
+        }
+        return RestResponse.success(oldAccount);
     }
 
 }

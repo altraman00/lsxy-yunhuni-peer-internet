@@ -5,10 +5,13 @@ import com.lsxy.framework.api.tenant.service.RealnameCorpService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.tenant.dao.RealnameCorpDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -16,6 +19,7 @@ import java.io.Serializable;
  */
 @Service
 public class RealnameRocpServiceImpl extends AbstractService<RealnameCorp> implements RealnameCorpService {
+    private static final Logger logger = LoggerFactory.getLogger(RealnameRocpServiceImpl.class);
     @Autowired
     private RealnameCorpDao realnameCorpDao;
 
@@ -26,11 +30,21 @@ public class RealnameRocpServiceImpl extends AbstractService<RealnameCorp> imple
 
 
     @Override
-    public RealnameCorp findByTenantId(String tenantId) {
+    public List<RealnameCorp> findByTenantId(String tenantId) {
         try {
-            RealnameCorp realnameCorp =  realnameCorpDao.findByTenantId(tenantId);
-            return realnameCorp;
+            return realnameCorpDao.findByTenantId(tenantId);
         }catch(Exception e){
+            logger.error("RealnameRocpServiceImpl.findByTenantId:{}",e);
+            return null;
+        }
+    }
+
+    @Override
+    public RealnameCorp findByTenantIdAndStatus(String tenantId, int status) {
+        try {
+            return realnameCorpDao.findByTenantIdAndStatus(tenantId,status);
+        }catch(Exception e){
+            logger.error("RealnameRocpServiceImpl.findByTenantIdAndStatus:{}",e);
             return null;
         }
     }

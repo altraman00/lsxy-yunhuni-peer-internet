@@ -1,14 +1,14 @@
 package com.lsxy.framework.tenant.service;
 
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.tenant.dao.AccountDao;
-import com.lsxy.framework.api.tenant.model.Account;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.io.Serializable;
  */
 @Service
 public class AccountServiceImpl extends AbstractService<Account> implements AccountService {
-
+    private static final Logger logger = LoggerFactory.getLogger(RealnameRocpServiceImpl.class);
     @Autowired
     private AccountDao accountDao;
 
@@ -44,10 +44,10 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     @Override
     public Account findByUserName(String userName) {
         try {
-            String hql = "from Account obj where obj.userName=?1";
-            Account account = this.findUnique(hql, userName);
+            Account account = accountDao.findByUserName(userName);
             return account;
         }catch(Exception e){
+            logger.error("AccountServiceImpl.findByUserName:{}",e);
             return null;
         }
     }

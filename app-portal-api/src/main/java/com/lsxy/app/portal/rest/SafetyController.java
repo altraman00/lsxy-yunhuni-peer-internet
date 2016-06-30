@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class SafetyController {
     @Autowired
     private AccountService accountService;
-    private static final String IS_ERROR = "-2";//表示密码错误
-    private static final String IS_FALSE = "-1";//表示失败
-    private static final String IS_TRUE = "1";//表示成功
 
     /**
      * 验证手机号码是否正确
@@ -28,17 +25,16 @@ public class SafetyController {
      * @param password 待验证密码
      * @return
      */
-    @RequestMapping("/validationPsw")
-    public RestResponse validationPsw(String userName,String password){
+    @RequestMapping("/validation_password")
+    public RestResponse validationPassword(String userName,String password){
         Account account = accountService.findByUserName(userName);
-        String result = IS_FALSE;//表示密码错误
         if(password!=null&&password.length()>0){
             password =   PasswordUtil.springSecurityPasswordEncode(password,userName);
             if(password.equalsIgnoreCase(account.getPassword())){
-                result = IS_TRUE;
+                return RestResponse.success("1");
             }
         }
-        return RestResponse.success(result);
+        return RestResponse.failed("1001","密码错误");
     }
 
     /**
@@ -47,8 +43,8 @@ public class SafetyController {
      * @param mobile 新绑定手机号码
      * @return
      */
-    @RequestMapping("/updateMobile")
-    public RestResponse updateMobile(String userName,String mobile){
+    @RequestMapping("/save_mobile")
+    public RestResponse saveMobile(String userName,String mobile){
         Account account = accountService.findByUserName(userName);
         account.setMobile(mobile);
         account = accountService.save(account);
@@ -62,24 +58,25 @@ public class SafetyController {
      * @param newPassword 新密码
      * @return
      */
-    @RequestMapping("/editPssword")
-    public RestResponse editPssword(String userName,String oldPassword,String newPassword){
+    @RequestMapping("/save_password")
+    public RestResponse savePassword(String userName,String oldPassword,String newPassword){
         Account account = accountService.findByUserName(userName);
-        String result = IS_ERROR;//表示密码错误
         if(oldPassword!=null&&oldPassword.length()>0){
             // 密码加密
-            oldPassword =   PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
+            oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
             if(oldPassword.equalsIgnoreCase(account.getPassword())){
-                result = IS_TRUE;
+                account.setPassword(PasswordUtil.springSecurityPasswordEncode(newPassword,userName));
+                account = accountService.save(account);
+                if(account!=null){
+                   return RestResponse.success("1");
+                }else{
+                    return RestResponse.failed("1002","修改数据库失败");
+                }
+            }else{
+                return RestResponse.failed("1001","密码错误");
             }
+        }else{
+            return RestResponse.failed("1001","密码错误");
         }
-        if(IS_TRUE.equals(result)){
-            account.setPassword(newPassword);
-            account = accountService.save(account);
-            if(account==null){
-                result=IS_FALSE;
-            }
-        }
-        return RestResponse.success(result);
     }
 }

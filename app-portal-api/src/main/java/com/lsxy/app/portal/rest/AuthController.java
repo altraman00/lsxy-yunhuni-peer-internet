@@ -29,7 +29,7 @@ public class AuthController {
     private TenantService tenantService;
     @Autowired
     private AccountService accountService;
-    private  static final Integer  AUTH_NO= 0;//未认证
+    private  static final Integer  AUTH_NO= 100;//未认证
     private  static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
     private  static final Integer AUTH_ONESELF_SUCESS = 1;//个人认证成功
 
@@ -38,7 +38,7 @@ public class AuthController {
      * @param userName 用户名
      * @return
      */
-    @RequestMapping("/findAuthStatus")
+    @RequestMapping("/find_auth_status")
     public RestResponse findAuthStatus(String userName){
         HashMap map = new HashMap();
         //获取租户对象
@@ -46,7 +46,7 @@ public class AuthController {
         map.put("userName",userName);
         map.put("status",tenant.getIsRealAuth());
         if(AUTH_COMPANY_SUCESS==tenant.getIsRealAuth()){
-            RealnameCorp realnameCorp = realnameCorpService.findByTenantId(tenant.getId());
+            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),AUTH_COMPANY_SUCESS);
             if(realnameCorp!=null) {
                 map.put("name", realnameCorp.getName());
                 map.put("time", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
@@ -54,7 +54,7 @@ public class AuthController {
                 map.put("status",AUTH_NO);
             }
         }else if(AUTH_ONESELF_SUCESS==tenant.getIsRealAuth()){
-            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantId(tenant.getId());
+            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),AUTH_ONESELF_SUCESS);
             if(realnamePrivate!=null) {
                 map.put("name", realnamePrivate.getName());
                 map.put("time", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
@@ -69,26 +69,14 @@ public class AuthController {
      * 个人实名认证方法
      * @param userName 用户名
      * @param status 认证状态
-     * @param name 姓名
-     * @param idNumber 认证号码
-     * @param idPhoto 认证照片
-     * @param idType 认证类型
+     * @param realnamePrivate 个人实名认证
      * @return
      */
-    @RequestMapping("/privateAuth")
-    public RestResponse privateAuth(String userName,String status,String name,String idNumber,String idPhoto,String idType){
+    @RequestMapping("/save_private_auth")
+    private RestResponse svePrivateAuth(String userName, String status, RealnamePrivate realnamePrivate){
         //获取租户对象
         Tenant tenant = accountService.findByUserName(userName).getTenant();
-        //查看是否已进行过实名认证
-        RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantId(tenant.getId());
-        if(realnamePrivate==null) {
-            realnamePrivate = new RealnamePrivate(name, idNumber, idPhoto, tenant.getId(), idType);
-        }else{
-            realnamePrivate.setName(name);
-            realnamePrivate.setIdNumber(idNumber);
-            realnamePrivate.setIdPhoto(idPhoto);
-            realnamePrivate.setIdType(idType);
-        }
+        realnamePrivate.setTenantId(tenant.getId());
         //保存到数据库
         realnamePrivate = realnaePrivateService.save(realnamePrivate);
         //修改租户中实名认证状态
@@ -98,39 +86,17 @@ public class AuthController {
     }
 
     /**
-     * 企业实名认证
+     企业实名认证
      * @param userName 用户名
      * @param status 认证状态
-     * @param corpName 企业名字
-     * @param addr 企业地址
-     * @param fieldCode 企业行业
-     * @param authType 认证类型
-     * @param type01Prop01 统一社会信用代码
-     * @param type01Prop02 营业执照（照片地址）
-     * @param type02Prop01 注册号
-     * @param type02Prop02 税务登记号
-     * @param type03Prop02 税务登记（照片地址）
+     * @param realnameCorp 企业认证对象
      * @return
      */
-    @RequestMapping("/corpAuth")
-    public RestResponse corpAuth( String userName,String status,String corpName,String addr,String fieldCode,String authType,String type01Prop01,String type01Prop02,String type02Prop01,String type02Prop02,String type03Prop02){
+    @RequestMapping("/save_corp_auth")
+    public RestResponse saveCorpAuth( String userName,String status,RealnameCorp realnameCorp){
         //获取租户对象
         Tenant tenant = accountService.findByUserName(userName).getTenant();
-        //查看是否已进行过实名认证
-        RealnameCorp realnameCorp = realnameCorpService.findByTenantId(tenant.getId());
-        if(realnameCorp==null){
-            realnameCorp = new RealnameCorp(tenant.getId(), corpName, addr, fieldCode, authType, type01Prop01, type01Prop02, type02Prop01, type02Prop02, type03Prop02);
-        }else{
-            realnameCorp.setName(corpName);
-            realnameCorp.setAddr(addr);
-            realnameCorp.setFieldCode(fieldCode);
-            realnameCorp.setAuthType(authType);
-            realnameCorp.setType01Prop01(type01Prop01);
-            realnameCorp.setType01Prop02(type01Prop02);
-            realnameCorp.setType02Prop01(type02Prop01);
-            realnameCorp.setType02Prop02(type02Prop02);
-            realnameCorp.setType03Prop02(type03Prop02);
-        }
+        realnameCorp.setTenantId(tenant.getId());
         //保存到数据库
         realnameCorp = realnameCorpService.save(realnameCorp);
         //修改租户中实名认证状态

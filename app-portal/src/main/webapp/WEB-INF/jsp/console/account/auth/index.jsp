@@ -133,7 +133,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">所属行业：</lable>
                                                 <div class="col-md-4">
-                                                    <select class="form-control" name="field_code">
+                                                    <select class="form-control" name="fieldCode">
                                                         <option value="0">通讯</option>
                                                         <option value="1">身份证</option>
                                                     </select>
@@ -146,7 +146,7 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label" name="auth_type">证件类型：</lable>
+                                                <lable class="col-md-3 text-right extend_label" name="authType">证件类型：</lable>
                                                 <div class="radio-form col-md-4 ">
                                                     <input type="radio" name="san" checked value="0"> 三证合一（一照一码）
                                                     <input type="radio" name="san" value="1"> 三证合一
@@ -156,7 +156,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label">统一社会信用代码：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="type01_prop02" placeholder="" class="form-control input-form notEmpty"  />
+                                                    <input type="text" name="type01Prop02" placeholder="" class="form-control input-form notEmpty"  />
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -171,13 +171,13 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label">注册号：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="type02_prop01" placeholder="" class="form-control input-form limit15"   />
+                                                    <input type="text" name="type02Prop01" placeholder="" class="form-control input-form limit15"   />
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label">税务登记号：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="type02_prop02" placeholder="" class="form-control input-form limit15"  />
+                                                    <input type="text" name="type02Prop02" placeholder="" class="form-control input-form limit15"  />
                                                 </div>
                                             </div>
                                             <div class="form-group">

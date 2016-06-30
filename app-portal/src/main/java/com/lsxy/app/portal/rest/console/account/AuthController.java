@@ -27,8 +27,8 @@ import java.util.Map;
 @RequestMapping("/console/account/auth")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-    private  static final Integer AUTH_WAIT = 100;//个人认证等待中
-    private  static final Integer  AUTH_NO= 0;//未认证
+    private  static final Integer AUTH_WAIT = 0;//个人认证等待中
+    private  static final Integer  AUTH_NO= 100;//未认证
     private  static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
     private  static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
     private  static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
@@ -52,11 +52,8 @@ public class AuthController {
         //TODO 获取实名认证的状态
         String userName = "user001";
         //调resr接口
-        String url = restPrefixUrl + "/rest/account/auth/findAuthStatus";
-        String token = "1234";
-        Map map = new HashMap();
-        map.put("userName",userName);
-        RestResponse<HashMap> restResponse = RestRequest.buildSecurityRequest(token).post(url,map, HashMap.class);
+        String url = "/rest/account/auth/find_auth_status";
+        RestResponse<HashMap> restResponse = restResponseUtils(url,null, HashMap.class);
         HashMap hs = restResponse.getData();
         if(hs==null){//未实名认证
             // 未实名认证
@@ -65,20 +62,16 @@ public class AuthController {
             int authStatus  = Integer.valueOf((hs.get("status")+""));
             if(AUTH_NO==authStatus) {
                 mav.setViewName("/console/account/auth/index");
-            }if (AUTH_WAIT ==authStatus ) {
+            }else if (AUTH_WAIT ==authStatus ) {
                 //审核中
                 mav.setViewName("/console/account/auth/wait");
             } else if (AUTH_ONESELF_SUCESS == authStatus) {
                 // 个人实名认证
-                mav.addObject("userName",hs.get("userName"));
-                mav.addObject("name",hs.get("name"));
-                mav.addObject("time",hs.get("time"));
+                mav.addAllObjects(hs);
                 mav.setViewName("/console/account/auth/sucess");
             } else if (AUTH_COMPANY_SUCESS == authStatus) {
                 // 企业实名认证
-                mav.addObject("userName",hs.get("userName"));
-                mav.addObject("name",hs.get("name"));
-                mav.addObject("time",hs.get("time"));
+                mav.addAllObjects(hs);
                 mav.setViewName("/console/account/auth/sucess");
             } else if (AUTH_ONESELF_FAIL == authStatus) {
                 //TODO 个人实名认证失败
@@ -132,8 +125,7 @@ public class AuthController {
      */
     @RequestMapping(value="/edit" ,method = RequestMethod.POST)
     public ModelAndView edit(HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles){
-         //防止重复验证
-        Integer authStatus = (Integer) request.getSession().getAttribute("authStatus");
+
 
         //对上次文件进行处理
         if (null != multipartfiles && multipartfiles.length > 0) {
@@ -145,42 +137,27 @@ public class AuthController {
             }
         }
 
-        String userName = "user001";
-        String token = "1234";
         String  status = IS_TRUE;//默认操作成功
         if(Integer.valueOf(type)==AUTH_ONESELF){
-            if(AUTH_ONESELF_SUCESS!=authStatus) {
-                String url = restPrefixUrl + "/rest/account/auth/privateAuth";
-                Map map = getRealnamePrivaateParams(authVo, userName, AUTH_WAIT);
-                RestResponse<RealnamePrivate> restResponse = RestRequest.buildSecurityRequest(token).post(url, map, RealnamePrivate.class);
-                RealnamePrivate realnamePrivate = restResponse.getData();
-                if (realnamePrivate == null) {
-                    status = IS_FALSE;
-                }
-            }else{
-                status = IS_AUTH;
+            String url =  "/rest/account/auth/save_private_auth";
+            Map map = getRealnamePrivaateParams(authVo, AUTH_WAIT);
+            RestResponse<RealnamePrivate> restResponse = restResponseUtils(url, map, RealnamePrivate.class);
+            RealnamePrivate realnamePrivate = restResponse.getData();
+            if (realnamePrivate == null) {
+                status = IS_FALSE;
             }
+
         }else if(Integer.valueOf(type)==AUTH_COMPANY){
-            if(AUTH_COMPANY_SUCESS!=authStatus) {
-                //调resr接口
-                String url = restPrefixUrl + "/rest/account/auth/corpAuth";
-                Map map = getRealnameCorpParams(authVo, userName, AUTH_WAIT);
-                RestResponse<RealnameCorp> restResponse = RestRequest.buildSecurityRequest(token).post(url, map, RealnameCorp.class);
-                RealnameCorp realnameCorp = restResponse.getData();
-                if (realnameCorp == null) {
-                    status = IS_FALSE;
-                }
-            }else{
-                status = IS_AUTH;
+            String url = "/rest/account/auth/save_corp_auth";
+            Map map = getRealnameCorpParams(authVo, AUTH_WAIT);
+            RestResponse<RealnameCorp> restResponse = restResponseUtils(url, map, RealnameCorp.class);
+            RealnameCorp realnameCorp = restResponse.getData();
+            if (realnameCorp == null) {
+                status = IS_FALSE;
             }
         }
         if(IS_TRUE.equals(status)){
             return  new ModelAndView("redirect:/console/account/auth/index");
-        }else if(IS_AUTH.equals(status)){
-            ModelAndView mav = new ModelAndView();
-            mav.addObject("msg","已实名认证");
-            mav.setViewName("/console/account/auth/index");
-            return mav;
         }else{
             ModelAndView mav = new ModelAndView();
             mav.addObject("msg","操作失败，请稍后重试");
@@ -194,13 +171,11 @@ public class AuthController {
     /**
      * 组装个人实名认证的信息
      * @param authVo 实名认证vo对象
-     * @param userName 用户名
      * @param status 修改状态
      * @return
      */
-    private Map getRealnamePrivaateParams(AuthVo authVo,String userName,int status){
+    private Map getRealnamePrivaateParams(AuthVo authVo,int status){
         Map map = new HashMap();
-        map.put("userName",userName);//用户账号
         map.put("status",status);//状态
         map.put("name",authVo.getPrivateName());//姓名
         map.put("idNumber", authVo.getIdNumber());//身份证号
@@ -212,15 +187,13 @@ public class AuthController {
     /**
      * 组装企业实名认证的信息
      * @param authVo 实名认证vo对象
-     * @param userName 用户名
      * @param status 修改状态
      * @return
      */
-    private Map getRealnameCorpParams(AuthVo authVo,String userName,int status){
+    private Map getRealnameCorpParams(AuthVo authVo,int status){
         Map map = new HashMap();
-        map.put("userName",userName);//用户账号
         map.put("status",status);//状态
-        map.put("corpName",authVo.getCorpName());//企业名称
+        map.put("name",authVo.getCorpName());//企业名称
         map.put("addr",authVo.getAddr());//企业地址
         map.put("fieldCode",authVo.getFieldCode());//所属行业
         map.put("authType",authVo.getAuthType());//认证类型
@@ -230,5 +203,24 @@ public class AuthController {
         map.put("type02Prop02",authVo.getType02Prop02());//[三证合一]税务登记证号
         map.put("type03Prop02",authVo.getType03Prop02());//[三证分离]税务登记证照片
         return map;
+    }
+    /**
+     * restPOST请求
+     * @param url 请求地址
+     * @param map 请求参数
+     * @param className 返回值类型
+     * @return
+     */
+    private RestResponse restResponseUtils(String url,Map map,Class className){
+        // 获取实名认证的状态
+        String userName = "user001";
+        //调resr接口
+        String uri = restPrefixUrl + url;
+        String token = "1234";
+        if(map == null){
+            map = new HashMap();
+        }
+        map.put("userName",userName);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map, className);
     }
 }

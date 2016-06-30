@@ -21,6 +21,7 @@ public class RealnamePrivate extends IdEntity {
     private String tenantId;//认证租户
     private String idType;//认证证件类型
     private Date createTime;//创建时间
+    private int status;//实名认证状态
     public RealnamePrivate() {
     }
 
@@ -34,6 +35,14 @@ public class RealnamePrivate extends IdEntity {
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
+    }
+    @Column(name = "status")
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     @Column(name = "create_time")
