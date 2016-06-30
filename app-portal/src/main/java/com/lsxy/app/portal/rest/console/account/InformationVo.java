@@ -30,7 +30,7 @@ public class InformationVo implements Serializable {
         this.url = account.getUrl();
         this.city = account.getCity();
         this.address = account.getAddress();
-        this.mobile = account.getMobile();
+        this.mobile = account.getPhone();
     }
     public InformationVo(String industry, String business, String url, String province, String city, String address, String mobile) {
         this.province = province;
