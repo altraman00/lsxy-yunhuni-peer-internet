@@ -6,7 +6,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yuhuni.api.app.model.App;
 import com.lsxy.yuhuni.api.callrecord.model.CallRecord;
 import com.lsxy.yuhuni.api.callrecord.service.CallRecordService;
-import com.lsxy.yuhuni.api.session.service.SessionService;
+import com.lsxy.yuhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.callrecord.dao.CallRecordDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class CallRecordServiceImpl extends AbstractService<CallRecord> implement
     private CallRecordDao callRecordDao;
 
     @Autowired
-    private SessionService sessionService;
+    private CallSessionService callSessionService;
 
     @Override
     public BaseDaoInterface<CallRecord, Serializable> getDao() {
@@ -50,7 +50,7 @@ public class CallRecordServiceImpl extends AbstractService<CallRecord> implement
         Date lastHour = new Date(currentHour.getTime() - 3600000);
         Long hourCount = callRecordDao.countByAppAndCallEndTimeBetween(app, new java.sql.Date(lastHour.getTime()), new java.sql.Date(currentHour.getTime()));
 
-        Long currentSession = sessionService.currentSessionCount(appId);
+        Long currentSession = callSessionService.currentCallSessionCount(appId);
 
         Map result = new HashMap();
         result.put("dayCount",dayCount);

@@ -14,12 +14,23 @@ import org.springframework.security.core.userdetails.User;
 public abstract class AbstractRestController {
     @Autowired
     AccountService accountService;
+
+    /**
+     * 获取当前用户账号信息
+     * @return 当前用户账号信息
+     * @throws MatchMutiEntitiesException
+     */
     protected Account getCurrentAccount() throws MatchMutiEntitiesException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return accountService.findAccountByUserName(user.getUsername());
     }
 
+    /**
+     * 获取当前用户账号的用户名
+     * @return 当前用户账号的用户名
+     */
     protected String getCurrentAccountUserName(){
+        //从登录通过的凭证中取出用户
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user.getUsername();
     }

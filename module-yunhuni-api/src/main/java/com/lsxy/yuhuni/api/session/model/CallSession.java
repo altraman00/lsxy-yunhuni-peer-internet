@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_session")
-public class Session extends IdEntity {
+public class CallSession extends IdEntity {
     public static final int STATUS_CALLING = 1;
     public static final int STATUS_OVER = 2;
     public static final int STATUS_RINGING = 3;

@@ -84,7 +84,7 @@ public class UploadController {
         //保存文件的目录
         try {
             //实际上传文件地址，可根据需要从配置获取
-            //String savePath = request.getSession().getServletContext().getRealPath("/") + "/uploadTempDirectory/";
+            //String savePath = request.getCallSession().getServletContext().getRealPath("/") + "/uploadTempDirectory/";
             if (null != multipartfiles && multipartfiles.length > 0) {
                 //遍历并保存文件
                 for (MultipartFile file : multipartfiles) {

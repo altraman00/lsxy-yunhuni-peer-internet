@@ -1,7 +1,7 @@
 package com.lsxy.yuhuni.api.recordedvoice.model;
 
 import com.lsxy.framework.api.base.IdEntity;
-import com.lsxy.yuhuni.api.session.model.Session;
+import com.lsxy.yuhuni.api.session.model.CallSession;
 import com.lsxy.yuhuni.api.app.model.App;
 
 import javax.persistence.*;
@@ -15,7 +15,7 @@ public class RecordedVoiceFile extends IdEntity {
     private String url;     //文件URL
     private App app;        //所属APP
     private double size;    //文件大小
-    private Session session; //所属会话
+    private CallSession callSession; //所属会话
 
     @Column(name = "url")
     public String getUrl() {
@@ -47,11 +47,11 @@ public class RecordedVoiceFile extends IdEntity {
 
     @OneToOne
     @JoinColumn(name = "session_id")
-    public Session getSession() {
-        return session;
+    public CallSession getCallSession() {
+        return callSession;
     }
 
-    public void setSession(Session session) {
-        this.session = session;
+    public void setCallSession(CallSession callSession) {
+        this.callSession = callSession;
     }
 }
