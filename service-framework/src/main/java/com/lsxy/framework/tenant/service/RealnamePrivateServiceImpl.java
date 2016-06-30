@@ -1,9 +1,9 @@
 package com.lsxy.framework.tenant.service;
 
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.persistence.BaseDaoInterface;
 import com.lsxy.framework.tenant.dao.RealnamePrivateDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

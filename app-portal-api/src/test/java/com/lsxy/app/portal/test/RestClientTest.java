@@ -2,6 +2,7 @@ package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
