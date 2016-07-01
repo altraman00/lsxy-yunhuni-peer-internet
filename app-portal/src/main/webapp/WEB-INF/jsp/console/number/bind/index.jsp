@@ -128,6 +128,7 @@
 
                                         </form>
                                     </div>
+                                </div>
                             </section>
                         </section>
                     </aside>
@@ -184,11 +185,7 @@
 </script>
 
 
-<script src="${resPrefixUrl }/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
-<script src="${resPrefixUrl }/js/charts/flot/jquery.flot.min.js" cache="false"></script>
-<script src="${resPrefixUrl }/js/bootbox.min.js"></script>
-<script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
-<script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
+<%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/number/band.js'></script>
 </body>
 </html>
