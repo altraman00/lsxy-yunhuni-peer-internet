@@ -36,25 +36,7 @@ public class RestToken extends UsernamePasswordAuthenticationToken {
     public Date getTimestamp() {
         return timestamp;
     }
-    public final class RestCredentials {
 
-        private String requestData;
-        private String signature;
-
-        public RestCredentials(String requestData, String signature) {
-            this.requestData = requestData;
-            this.signature = signature;
-        }
-
-        public String getRequestData() {
-            return requestData;
-        }
-
-        public String getSignature() {
-            return signature;
-        }
-
-    }
 }
 
 

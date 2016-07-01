@@ -26,6 +26,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
 
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -39,7 +41,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         ;
-        http.addFilterBefore(new SignatureAuthFilter(), BasicAuthenticationFilter.class);
+        http.addFilterBefore(new SignatureAuthFilter(authenticationManager()), BasicAuthenticationFilter.class);
 
 //        http.addFilter(headerAuthenticationFilter());
     }
@@ -59,6 +61,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication().withUser("user001").password("123").roles("TENANT_USER");
+        RestAuthenticationProvider xx = new RestAuthenticationProvider();
+        auth.authenticationProvider(xx);
     }
 
 
