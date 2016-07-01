@@ -64,7 +64,7 @@
                                         <ul>
                                             <li>认证途径：云呼你平台认证</li>
                                             <li>认证账号：${userName}</li>
-                                            <li>真实姓名：${name}</li>
+                                            <li><c:if test="${status == 1}"> 真实姓名：</c:if><c:if test="${status == 2}"> 企业名称：</c:if>${name}</li>
                                             <li>认证时间：${time}</li>
                                         </ul>
                                     </div>

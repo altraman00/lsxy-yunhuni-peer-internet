@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.O;
-
 /**
  * Created by Tandy on 2016/6/22.
  * YUNHUNI REST API 请求对象
