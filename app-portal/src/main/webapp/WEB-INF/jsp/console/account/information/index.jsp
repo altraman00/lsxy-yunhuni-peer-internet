@@ -14,7 +14,7 @@
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green lter aside hidden-print include" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+        <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
         <!-- /.aside -->
 
         <section id="content">
@@ -136,6 +136,7 @@
                                         </div>
                                     </form:form>
                                 </div>
+                            </div>
                         </section>
                     </section>
                 </aside>
@@ -144,16 +145,10 @@
     </section>
 </section>
 </section>
+
+
+<%@include file="/inc/footer.jsp"%>
 <script src="${resPrefixUrl }/js/province.js"></script>
-
-
-
-<script src="${resPrefixUrl }/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
-<script src="${resPrefixUrl }/js/charts/flot/jquery.flot.min.js" cache="false"></script>
-<script src="${resPrefixUrl }/js/bootbox.min.js"></script>
-<script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
-<script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
-<script src="${resPrefixUrl }/js/include.js"></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/personal/auth.js'></script>
 <script>
     function initPCAS()

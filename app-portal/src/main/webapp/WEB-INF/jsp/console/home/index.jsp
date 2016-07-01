@@ -178,12 +178,6 @@
 </section>
 </section>
 
-
-<script src="${resPrefixUrl }/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
-<script src="${resPrefixUrl}/js/charts/flot/jquery.flot.min.js" cache="false"></script>
-<script src="${resPrefixUrl}/js/bootbox.min.js"></script>
-<script src="${resPrefixUrl}/js/charts/flot/demo.js" cache="false"></script>
-
 <%@include file="/inc/footer.jsp"%>
 
 <script type="text/javascript">
