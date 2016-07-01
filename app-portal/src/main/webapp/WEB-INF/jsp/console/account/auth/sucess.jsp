@@ -62,11 +62,10 @@
                                     <div class="caption fr">
                                         <h5>实名认证完成!</h5>
                                         <ul>
-                                            <li>认证途径：支付宝快捷认证</li>
-                                            <li>认证账号：llv@qq.com</li>
-                                            <li>真实姓名：*平</li>
-                                            <li>是否经过银行卡认证：否</li>
-                                            <li>认证时间：2016-05-34 15:32:23</li>
+                                            <li>认证途径：云呼你平台认证</li>
+                                            <li>认证账号：${userName}</li>
+                                            <li>真实姓名：${name}</li>
+                                            <li>认证时间：${time}</li>
                                         </ul>
                                     </div>
                                 </div>

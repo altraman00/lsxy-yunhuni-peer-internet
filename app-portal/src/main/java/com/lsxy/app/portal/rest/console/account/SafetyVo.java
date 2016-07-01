@@ -1,9 +1,14 @@
 package com.lsxy.app.portal.rest.console.account;
 
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.DateUtils;
 
 import java.io.Serializable;
 import java.util.Date;
+
+import static javafx.scene.input.KeyCode.T;
+import static jdk.nashorn.internal.objects.NativeString.substring;
 
 /**
  * Created by zhangxb on 2016/6/27.
@@ -21,8 +26,34 @@ public class SafetyVo implements Serializable {
     private String isEmail;//是否绑定邮箱
     private String isPrivate;//是否设置密保
     private String isPsw;//是否设置密码
+    private static final String IS_TRUE = "1";//已设置
+    private static final String IS_FALSE = "-1";//未设置
 
+    private String isTrue(String temp){
+        if(temp==null||temp.length()==0){
+            return IS_FALSE;
+        }else{
+            return  IS_TRUE;
+        }
+    }
     public SafetyVo() {
+    }
+
+    public  SafetyVo(Account account){
+        this.isPrivate = IS_FALSE;
+        this.username = account.getUserName();
+        Tenant tenant =account.getTenant();
+        if(tenant!=null) {
+            this.isReal =tenant.getIsRealAuth()==1 ||tenant.getIsRealAuth()==2? IS_TRUE : IS_FALSE;
+        }else{
+            this.isReal=IS_FALSE;
+        }
+        this.userId = account.getId();
+        this.time = account.getCreateTime();
+        this.isMobile = isTrue(account.getMobile());
+        this.mobile = this.isMobile==IS_TRUE?account.getMobile().substring(0,3)+"****"+account.getMobile().substring(7,11):"";
+        this.isEmail = isTrue(account.getEmail());
+        this.isPsw = IS_TRUE;
     }
 
     public SafetyVo(String isPrivate, String username, String isReal, String userId, Date time, String mobile, String isMobile, String isEmail, String isPsw) {
@@ -62,7 +93,7 @@ public class SafetyVo implements Serializable {
     }
 
     public String getMobile() {
-        return mobile.substring(0,3)+"****"+mobile.substring(7,11);
+        return mobile;
     }
 
     public static long getSerialVersionUID() {
@@ -82,7 +113,7 @@ public class SafetyVo implements Serializable {
     }
 
     public String getTime() {
-        return DateUtils.getTime("yyyy-MM-dd HH:mm:ss");
+        return time!=null?DateUtils.getTime(time,"yyyy-MM-dd HH:mm:ss"):"";
     }
 
     public void setIsReal(String isReal) {

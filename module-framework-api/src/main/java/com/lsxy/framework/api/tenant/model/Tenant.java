@@ -16,21 +16,20 @@ import javax.persistence.Table;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_tenant")
 public class Tenant extends IdEntity{
-
+	private static final long serialVersionUID = 1L;
 	//是否实名
-	private boolean isRealAuth;
+	private int isRealAuth;
 
 	//租户识别码
 	private String tenantUid;
 
-
 	@Column(name = "is_real_auth")
-	public boolean isRealAuth() {
+	public int getIsRealAuth() {
 		return isRealAuth;
 	}
 
-	public void setRealAuth(boolean realAuth) {
-		isRealAuth = realAuth;
+	public void setIsRealAuth(int isRealAuth) {
+		this.isRealAuth = isRealAuth;
 	}
 
 	@Column(name = "tid")
@@ -41,5 +40,4 @@ public class Tenant extends IdEntity{
 	public void setTenantUid(String tenantUid) {
 		this.tenantUid = tenantUid;
 	}
-
 }

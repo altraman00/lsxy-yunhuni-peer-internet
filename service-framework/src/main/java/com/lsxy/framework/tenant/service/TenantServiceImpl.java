@@ -1,6 +1,9 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.AccountService;
@@ -14,7 +17,8 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 
 /**
- * Created by liups on 2016/6/29.
+ * Created by zhangxb on 2016/6/29.
+ * 租户实现类
  */
 @Service
 public class TenantServiceImpl extends AbstractService<Tenant> implements TenantService {
@@ -38,4 +42,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         }
         return tenant;
     }
+
+
+
+
 }
