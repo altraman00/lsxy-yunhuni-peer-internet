@@ -27,7 +27,7 @@
 						<a href="#" class="side-menu-link">
 							<i class="fa fa-caret-down icon"> </i><span>开发者中心</span> </a>
 						<ul class="nav lt list">
-							<li>
+							<li class="nav-router " data-router="">
 								<a data-toggle="tooltip" data-placement='right' title='应用管理' href="fee.html"> <i class="fa fa-desktop icon"></i> <span>应用管理</span> </a>
 							</li>
 							<li>
@@ -37,7 +37,7 @@
 					</li>
 					<li class="border-top">
 						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="#" class="canbehover" >
-							<i class="fa fa-envelope" icon"> </i>
+							<i class="fa fa-envelope icon"> </i>
 							<span>消息中心</span>
 						</a>
 					</li>

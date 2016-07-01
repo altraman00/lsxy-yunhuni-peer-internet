@@ -68,6 +68,21 @@ public class RedisCacheService {
 	        });
 	    }
 
+	/**
+	 * @param key
+	 * @param liveTime
+	 */
+	public void expire(final byte[] key,final long liveTime) {
+		redisTemplate.execute(new RedisCallback() {
+			public Long doInRedis(RedisConnection connection) throws DataAccessException {
+				if (liveTime > 0) {
+					connection.expire(key, liveTime);
+				}
+				return 1L;
+			}
+		});
+	}
+
 	    /**
 	     * @param key
 	     * @param value
@@ -76,6 +91,14 @@ public class RedisCacheService {
 	    public void set(String key, String value, long liveTime) {
 	        this.set(key.getBytes(), value.getBytes(), liveTime);
 	    }
+
+        /**
+         * @param key
+         * @param liveTime  过期时间单位为秒
+         */
+        public void expire(String key, long liveTime) {
+            this.expire(key.getBytes(), liveTime);
+        }
 
 	    /**
 	     * @param key

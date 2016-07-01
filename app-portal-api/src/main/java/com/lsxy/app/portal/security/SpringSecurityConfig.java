@@ -26,6 +26,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private PreUserDetailsService preUserDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -54,7 +56,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private AuthenticationProvider preAuthenticationProvider() {
         PreAuthenticatedAuthenticationProvider provider = new PreAuthenticatedAuthenticationProvider();
-        provider.setPreAuthenticatedUserDetailsService(new TokenAuthenticationUserDetailsService());
+        provider.setPreAuthenticatedUserDetailsService(preUserDetailsService);
         return provider;
     }
 
