@@ -30,8 +30,8 @@
 							<li class="nav-router " data-router="">
 								<a data-toggle="tooltip" data-placement='right' title='应用管理' href="fee.html"> <i class="fa fa-desktop icon"></i> <span>应用管理</span> </a>
 							</li>
-							<li class="nav-router " data-router="">
-								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="message.html"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
+							<li class="nav-router " data-router="telenum">
+								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="${ctx}/console/telenum/callnum/index"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
 							</li>
 						</ul>
 					</li>
