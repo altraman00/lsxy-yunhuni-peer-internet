@@ -36,6 +36,8 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-api</artifactId>
+            <exclusions>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
