@@ -31,12 +31,12 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/number/call/index">呼入号码管理</a>
+                                                <a href="${ctx}/console/telenum/callnum/index">呼入号码管理</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/number/bind/index">测试号码绑定</a>
+                                                <a href="${ctx}/console/telenum/bind/index">测试号码绑定</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -74,55 +74,58 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td scope="row">1</td>
-                                        <td>13971068693</td>
-                                        <td>正常</td>
-                                        <td><a href="#">demo001</a></td>
-                                        <td>2016-06-40</td>
-                                    </tr>
-                                    <tr>
-                                        <td scope="row">2</td>
-                                        <td>13971068693</td>
-                                        <td>正常</td>
-                                        <td><a href="#">demo001</a></td>
-                                        <td>2016-06-40</td>
-                                    </tr>
-                                    <tr>
-                                        <td scope="row">3</td>
-                                        <td>13971068693</td>
-                                        <td>正常</td>
-                                        <td><a href="#">demo001</a></td>
-                                        <td>2016-06-40</td>
-                                    </tr>
-                                    <tr>
-                                        <td scope="row">4</td>
-                                        <td>13971068693</td>
-                                        <td>正常</td>
-                                        <td><a href="#">demo001</a></td>
-                                        <td>2016-06-40</td>
-                                    </tr>
+                                    <c:forEach items="${pageList.result}" var="result" varStatus="s">
+                                        <tr>
+                                            <td scope="row">${s.index+1}</td>
+                                            <td>${result.resourceTelenum.telNumber}</td>
+                                            <td>${result.rentStatus}</td>
+                                            <td><a href="#">${result.app.name}</a></td>
+                                            <td><div name="rentExpireTime">${result.rentExpire}</div></td>
+                                        </tr>
+                                    </c:forEach>
                                     </tbody>
                                 </table>
                             </section>
                             <section class="panel panel-default yunhuni-personal">
                                 <nav class='pageWrap'>
                                     <ul class="pagination">
-                                        <li>
-                                            <a href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li class="active"><a href="#">1</a></li>
-                                        <li><a href="#">2</a></li>
-                                        <li><a href="#">3</a></li>
-                                        <li><a href="#">4</a></li>
-                                        <li><a href="#">5</a></li>
-                                        <li>
-                                            <a href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
+                                        <!--设置显示的页数-->
+                                        <c:set var="startPageNo" value="1"></c:set>
+                                        <c:set var="endPageNo" value="5"></c:set>
+                                        <c:if test="${ pageList.currentPageNo + 2 >5}">
+                                            <c:set var="startPageNo" value="${ pageList.currentPageNo-2}"></c:set>
+                                            <c:set var="endPageNo" value="${ pageList.currentPageNo+2}"></c:set>
+                                        </c:if>
+                                        <c:if test="${pageList.totalPageCount <= endPageNo}">
+                                            <c:set  var="endPageNo" value="${pageList.totalPageCount}"></c:set>
+                                        </c:if>
+
+
+                                        <c:if test="${startPageNo > 1}">
+                                            <li>
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${startPageNo-1}" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                        </c:if>
+
+                                        <c:forEach end="${endPageNo}" begin="${startPageNo}" varStatus="s" >
+                                            <li
+                                                <c:if test="${pageList.currentPageNo == s.index}">
+                                                    class="active"
+                                                </c:if>
+                                            >
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${s.index}">${s.index}</a>
+                                            </li>
+                                        </c:forEach>
+
+                                        <c:if test="${pageList.totalPageCount>endPageNo}">
+                                            <li>
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo${endPageNo+1}" aria-label="Next">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                </a>
+                                            </li>
+                                        </c:if>
                                     </ul>
                                 </nav>
                             </section>
@@ -138,10 +141,25 @@
 
 
 
-
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
+ <script type="text/javascript" >
+     /*处理日期方法*/
+     function getLocalTime(nS) {
+         var date = new Date(parseInt(nS) ).toLocaleString();
+         var dates = date.split(" ");
+         var ymd = dates[0].split("/");
+         return ymd[0]+"年"+ymd[1]+"月"+ymd[2]+"日";
+     }
+     /*翻译日期*/
+     $(function(){
+         var times =  $('div[name="rentExpireTime"]');
+         for(var i = 0;i<times.length; i++){
+             times[i].innerHTML = getLocalTime(times[i].innerHTML);
+         }
+     })
+ </script>
 </body>
 </html>
