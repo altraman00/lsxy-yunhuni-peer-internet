@@ -21,6 +21,7 @@
             <version>2.2</version>
               <configuration>
                   <port>18080</port>
+                  <path>/</path>
               </configuration>
           </plugin>
         </plugins>
