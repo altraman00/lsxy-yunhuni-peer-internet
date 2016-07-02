@@ -1,7 +1,7 @@
-package com.lsxy.framework.recharge.dao;
+package com.lsxy.yunhuni.recharge.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.recharge.model.Recharge;
+import com.lsxy.yuhuni.api.recharge.model.Recharge;
 
 import java.io.Serializable;
 

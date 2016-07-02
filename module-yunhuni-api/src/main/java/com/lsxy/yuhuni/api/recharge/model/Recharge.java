@@ -1,8 +1,8 @@
-package com.lsxy.framework.api.recharge.model;
+package com.lsxy.yuhuni.api.recharge.model;
 
 import com.lsxy.framework.api.base.IdEntity;
-import com.lsxy.framework.api.recharge.enums.RechargeStatus;
-import com.lsxy.framework.api.recharge.enums.RechargeType;
+import com.lsxy.yuhuni.api.recharge.enums.RechargeStatus;
+import com.lsxy.yuhuni.api.recharge.enums.RechargeType;
 import com.lsxy.framework.api.tenant.model.Tenant;
 
 import javax.persistence.*;

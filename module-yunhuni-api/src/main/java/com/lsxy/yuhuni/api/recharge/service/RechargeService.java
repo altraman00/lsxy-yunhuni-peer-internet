@@ -1,8 +1,8 @@
-package com.lsxy.framework.api.recharge.service;
+package com.lsxy.yuhuni.api.recharge.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.framework.api.recharge.model.Recharge;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.yuhuni.api.recharge.model.Recharge;
 
 /**
  * 充值相关接口
@@ -24,4 +24,13 @@ public interface RechargeService extends BaseService<Recharge> {
      * @return
      */
     Recharge getRechargeByOrderId(String orderId);
+
+    /**
+     * 充值成功后的处理
+     * 如果没有做过处理，根据订单号在系统中查到该笔订单的详细，并执行业务程序
+     * 如果有做过处理，不执行商户的业务程序
+     * @param orderId 充值记录的orderId
+     * @return
+     */
+    Recharge paySuccess(String orderId) throws MatchMutiEntitiesException;
 }

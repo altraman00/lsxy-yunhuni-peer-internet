@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.recharge.enums;
+package com.lsxy.yuhuni.api.recharge.enums;
 
 /**
  * 充值支付状态

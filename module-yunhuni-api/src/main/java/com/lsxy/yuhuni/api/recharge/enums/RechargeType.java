@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.recharge.enums;
+package com.lsxy.yuhuni.api.recharge.enums;
 
 /**
  * 充值类型，一定要是规定好的类型：支付宝，银联

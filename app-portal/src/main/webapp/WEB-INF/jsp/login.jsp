@@ -55,7 +55,7 @@
 
 			<div class="row margin-block"  >
 				<div class="col-sm-12 text-center" >
-					<a href="${ctx}/reg/index" class="register">还没注册账号，注册新账号</a>+
+					<a href="${ctx}/reg/index" class="register">还没注册账号，注册新账号</a>
 				</div>
 			</div>
 			<div class="row margin-block" >

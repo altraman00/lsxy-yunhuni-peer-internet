@@ -1,9 +1,13 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.recharge.model.Recharge;
-import com.lsxy.framework.api.recharge.service.RechargeService;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.yuhuni.api.billing.service.BillingService;
+import com.lsxy.yuhuni.api.recharge.model.Recharge;
+import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
+import com.lsxy.yuhuni.api.recharge.service.RechargeService;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yuhuni.api.recharge.service.ThirdPayRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class RechargeController extends AbstractRestController {
     @Autowired
     RechargeService rechargeService;
+
+    @Autowired
+    ThirdPayRecordService thirdPayRecordService;
+
 
     /**
      * 创建充值订单
@@ -61,4 +69,28 @@ public class RechargeController extends AbstractRestController {
         return result;
     }
 
+    /**
+     * 支付成功后的处理
+     * @param orderId 充值orderId
+     * @return
+     */
+    @RequestMapping("/pay_success")
+    public RestResponse paySuccess(String orderId) throws Exception {
+        Recharge recharge =  rechargeService.paySuccess(orderId);
+        return RestResponse.success(recharge);
+    }
+
+    /**
+     * 支付付款记录
+     * @param payRecord 充值orderId
+     * @return
+     */
+    @RequestMapping("/pay_record")
+    public RestResponse payRecord(ThirdPayRecord payRecord,String rechargeId) throws Exception {
+        Recharge recharge = new Recharge();
+        recharge.setId(rechargeId);
+        payRecord.setRecharge(recharge);
+        thirdPayRecordService.save(payRecord);
+        return RestResponse.success(null);
+    }
 }
