@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import static javafx.scene.input.KeyCode.Y;
+
 /**
  * 测试号码绑定
  * Created by zhangxb on 2016/7/2.
@@ -49,8 +51,7 @@ public class TestMobileBindController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         List<TestMobileBind> testMobileBindList = testMobileBindService.findByNumber(userName,number);
         for(int i=0;i<testMobileBindList.size();i++) {
-            //javax.persistence.TransactionRequiredException: No EntityManager with actual transaction available for current thread - cannot reliably process 'flush' call
-            testMobileBindService.delete(testMobileBindList.get(0));
+            testMobileBindService.delete(testMobileBindList.get(i));
         }
         return RestResponse.success(testMobileBindList.size());
     }
