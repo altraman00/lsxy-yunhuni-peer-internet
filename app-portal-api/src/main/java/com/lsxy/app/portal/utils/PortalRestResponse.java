@@ -3,8 +3,6 @@ package com.lsxy.app.portal.utils;
 import com.lsxy.app.portal.exceptions.APIErrors;
 import com.lsxy.framework.web.rest.RestResponse;
 
-import static javafx.scene.input.KeyCode.T;
-
 /**
  * Created by Tandy on 2016/6/25.
  */
