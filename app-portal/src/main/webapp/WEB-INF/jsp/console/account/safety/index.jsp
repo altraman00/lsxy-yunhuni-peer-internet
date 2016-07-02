@@ -294,6 +294,7 @@
             showmsg('请输入四位数的验证码','moadltips2'); return false;
         }
         var sType = {
+            '0':'验证码错误',
             '1':'验证通过',
             '2':'验证达到最大次数',
             '3':'验证码过期',
@@ -319,7 +320,6 @@
                         data : {'mobile':mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
-
                             if(data.sucess==2) {
                                 alert(sType[result]+', 绑定手机');
                                 window.location.href="${ctx}/console/account/safety/index";
@@ -328,7 +328,7 @@
                             }
                         },
                         fail:function(){
-                            alert('手机号码失败，请重试');
+                            alert('网络异常，请稍后重试');
                         }
                     });
                 }else{
