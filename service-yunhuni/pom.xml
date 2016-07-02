@@ -10,6 +10,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>service-yunhuni</artifactId>
-
+    <dependencies>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-yunhuni-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>service-framework</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -9,6 +9,7 @@
 
 </head>
 <body>
+<section class="vbox">
 <%@include file="/inc/headerNav.jsp"%>
 <section class='aside-section'>
     <section class="hbox stretch">
@@ -72,13 +73,13 @@
                                           id="personalAuthForm">
                                         <div class="form-group">
                                             <div class="col-md-4 remove-padding">
-                                                <input type="password" name="" placeholder="原密码"
+                                                <input type="password" name="oldPassword" placeholder="原密码"
                                                        class="form-control input-form password" />
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="col-md-4 remove-padding ">
-                                                <input type="password" name="" placeholder="新密码"
+                                                <input type="password" name="newPassword" placeholder="新密码"
                                                        class="form-control input-form newpassword" />
                                             </div>
                                         </div>

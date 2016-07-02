@@ -11,12 +11,12 @@
 				<ul class="list">
 					<li class=""> <a href="#" class="side-menu-link" > <i class="fa fa-caret-down icon"> </i><span>用户中心</span> </a>
 						<ul class="nav lt list">
-							<li>
-								<a data-toggle="tooltip" data-placement='right' class="active" title='账号管理' href="${ctx}/console/account/safety/index">
+							<li class="nav-router " data-router="account">
+								<a data-toggle="tooltip" data-placement='right' title='账号管理' href="${ctx}/console/account/safety/index">
 									<i class="fa fa-user icon"></i> <span>账号管理</span>
 								</a>
 							</li>
-							<li>
+							<li  class=".nav-router " data-router="cost">
 								<a data-toggle="tooltip" data-placement='right' title='费用管理' href="no_service.html">
 									<i class="fa fa-database icon" aria-hidden="true"> </i>
 									<span>费用管理</span> </a>
@@ -27,17 +27,17 @@
 						<a href="#" class="side-menu-link">
 							<i class="fa fa-caret-down icon"> </i><span>开发者中心</span> </a>
 						<ul class="nav lt list">
-							<li>
+							<li class="nav-router " data-router="">
 								<a data-toggle="tooltip" data-placement='right' title='应用管理' href="fee.html"> <i class="fa fa-desktop icon"></i> <span>应用管理</span> </a>
 							</li>
-							<li>
+							<li class="nav-router " data-router="">
 								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="message.html"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
 							</li>
 						</ul>
 					</li>
 					<li class="border-top">
 						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="#" class="canbehover" >
-							<i class="fa fa-envelope" icon"> </i>
+							<i class="fa fa-envelope icon"> </i>
 							<span>消息中心</span>
 						</a>
 					</li>

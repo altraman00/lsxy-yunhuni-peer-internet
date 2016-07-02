@@ -1,5 +1,6 @@
 package com.lsxy.framework.tenant.service;
 
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
@@ -38,4 +39,11 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         }
         return account;
     }
+
+    @Override
+    public Account findAccountByUserName(String userName) throws MatchMutiEntitiesException {
+        return accountDao.findByUserName(userName);
+    }
+
+
 }

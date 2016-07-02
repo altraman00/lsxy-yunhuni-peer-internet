@@ -9,11 +9,12 @@
 
 </head>
 <body>
+<section class="vbox">
 <%@include file="/inc/headerNav.jsp"%>
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green lter aside hidden-print include" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+        <aside class="bg-Green lter aside hidden-print" data-include="aside" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
         <!-- /.aside -->
 
         <section id="content">
@@ -64,7 +65,7 @@
                                             <div class="panel-body clearfix border-top-none personal-base">
                                                 <div class="row ">
                                                     <div class="col-md-1 remove-padding width-130">
-                                                        登陆账号(会员名称)：
+                                                        会员名称：
                                                     </div>
                                                     <div class="col-md-10 ">
                                                         <span>${safetyVo.username}</span>
@@ -235,9 +236,9 @@
 <script src="${resPrefixUrl }/js/charts/flot/jquery.flot.min.js" cache="false"></script>
 <script src="${resPrefixUrl }/js/bootbox.min.js"></script>
 <script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
-<script src="${resPrefixUrl }/js/include.js"></script>
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
 <script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
+<%@include file="/inc/footer.jsp"%>
 <!--must-->
 <script>
     function sendCode(){
@@ -318,7 +319,7 @@
                         data : {'mobile':mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
-                            //alert(data.msg);
+
                             if(data.sucess==2) {
                                 alert(sType[result]+', 绑定手机');
                                 window.location.href="${ctx}/console/account/safety/index";
