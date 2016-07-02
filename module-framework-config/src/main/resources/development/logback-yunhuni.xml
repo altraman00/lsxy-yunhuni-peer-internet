@@ -33,12 +33,12 @@
         </triggeringPolicy>
     </appender>
 
-    <logger name="com.lsxy" level="INFO" additivity="false" />
+    <logger name="com.lsxy" level="DEBUG" additivity="false" />
     <logger name="org.springframework.*" level="INFO" additivity="false" />
 
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="ROLLINGFILE" />
+        <appender-ref ref="FILE" />
     </root>
 </included>
