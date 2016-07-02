@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ./app-portal-stop.sh
 echo "app-portal stoped"
 git pull
