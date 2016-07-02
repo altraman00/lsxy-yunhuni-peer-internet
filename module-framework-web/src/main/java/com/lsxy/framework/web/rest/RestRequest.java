@@ -58,7 +58,7 @@ public class RestRequest {
         this.securityToken = securityToken;
     }
 
-    private RestRequest(RestRequestConnectionConfig config) {
+    protected RestRequest(RestRequestConnectionConfig config) {
 
         this.restTemplate = new RestTemplate(config.getHttpFactory());
         // 添加转换器

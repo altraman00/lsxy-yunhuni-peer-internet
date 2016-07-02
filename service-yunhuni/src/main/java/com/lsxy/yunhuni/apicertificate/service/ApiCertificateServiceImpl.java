@@ -74,4 +74,14 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
             throw new SkChangeCountLimitException("当天修改已达到上限");
         }
     }
+
+    @Override
+    public String findApiCertificateSecretKeyByCertId(String certId) {
+        ApiCertificate ac = this.apiCertificateDao.findByCertId(certId);
+        String secretKey = null;
+        if(ac != null) {
+            secretKey = ac.getSecretKey();
+        }
+        return secretKey;
+    }
 }

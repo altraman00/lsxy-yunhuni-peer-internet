@@ -30,15 +30,12 @@ public class CallControllerTest {
         RestResponse<String> response = RestRequest.buildRequest().get(url,String.class);
         Assert.notNull(response);
         Assert.isTrue(response.getData().equals("12345678"));
+
+
     }
 
-    @Test
-    public void testGetCall(){
-        String url = restPrefixUrl + "/v1/account/12345678/call/88888888";
-        RestResponse<String> response = RestRequest.buildRequest().get(url,String.class);
-        Assert.notNull(response);
-        Assert.isTrue(response.getData().equals("88888888"));
-    }
+
+
 
 
 }

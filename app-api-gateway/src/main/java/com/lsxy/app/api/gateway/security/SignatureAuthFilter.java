@@ -64,6 +64,7 @@ public class SignatureAuthFilter extends GenericFilterBean{
         }
         // Get authorization header
         String credentials = request.getHeader("Authorization");
+        String timestamp = request.getHeader("Timestamp");
         // If there's not credentials return...
         if (credentials == null || credentials.indexOf(":")  < 0) {
             if(logger.isDebugEnabled()) {
@@ -82,9 +83,6 @@ public class SignatureAuthFilter extends GenericFilterBean{
         String contentMd5 = hasContent ? md5.encodePassword(request.getPayload(), null) : "";
         String contentType = hasContent ? request.getContentType() : "";
 
-        // get timestamp
-        String timestamp = request.getHeader("Date");
-
         // calculate content to sign
         StringBuilder toSign = new StringBuilder();
         toSign.append(request.getMethod()).append("\n")
@@ -98,7 +96,7 @@ public class SignatureAuthFilter extends GenericFilterBean{
         // calculate UTC time from timestamp (usually Date header is GMT but still...)
         Date date = null;
         try {
-            date = DateUtils.parseDate(timestamp);
+            date = DateUtils.parseDate(timestamp,"yyyyMMddHHmmss");
         } catch (ParseException | IllegalArgumentException ex) {
             ex.printStackTrace();
         }
