@@ -3,4 +3,6 @@
     <contextName>yunhuni-app-portal-api</contextName>
     <property name="APP_NAME" value="app-portal-api" />
     <include resource="logback-yunhuni.xml"/>
+
+
 </configuration>
