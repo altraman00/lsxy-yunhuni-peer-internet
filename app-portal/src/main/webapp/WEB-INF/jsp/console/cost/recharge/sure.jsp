@@ -15,7 +15,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print" id="nav"></aside>
+            <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
             <!-- /.aside -->
 
             <section id="content">
@@ -96,12 +96,15 @@
                                             <div class="cost-box" >
                                                 <p class="surecolor"><strong>充值订单确认</strong></p>
                                                 <p><span>充值金额：</span>
-                                                    <span class="cost-money">1000.<span class="floatmoney">00</span> <span class="unit">元</span></span> </p>
-                                                <p>订单号：2o347003984509803948507987897945</p>
-                                                <p>充值方式：支付宝</p>
-                                                <p>订单状态：未完成支付</p>
+                                                    <span class="cost-money">${balanceInt}<span class="floatmoney">.${balanceDec}</span> <span class="unit">元</span></span> </p>
+                                                <p>订单号：${recharge.orderId}</p>
+                                                <p>充值方式：${recharge.type}</p>
+                                                <p>订单状态：${recharge.status}</p>
                                                 <br/>
-                                                <button type="submit" class="btn btn-primary  btn-form ">付款</button>
+                                                <form:form action="${ctx}/console/cost/recharge/to_alipay" method="post" target="_blank">
+                                                    <input type="hidden" name="orderId" value="${recharge.orderId}" />
+                                                    <button id="paysubmit" type="submit" class="btn btn-primary  btn-form ">付款</button>
+                                                </form:form>
                                             </div>
                                         </div>
                                     </div>
@@ -116,7 +119,33 @@
     </section>
 </section>
 <%@include file="/inc/footer.jsp"%>
-<script src="${resPrefixUrl }/js/cost/recharge.js"></script><!--must-->
 </body>
+<script>
+    $(document).ready(function () {
+        $('#paysubmit').click(function(){
+            bootbox.dialog({
+                message: "将在新窗口为您打开付款界面，请按提示进行操作。",
+                title: "付款提示",
+                buttons: {
+                    danger: {
+                        label: "我已付款!",
+                        className: "btn-primary",
+                        callback: function() {
+                            window.location.href = '';
+                        }
+                    },
+                    success: {
+                        label: "查看订单",
+                        className: "btn-success",
+                        callback: function() {
+                            window.location.href = '';
+                        }
+                    },
+                }
+            });
+        })
+    });
+
+</script>
 </html>
 

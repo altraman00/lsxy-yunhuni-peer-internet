@@ -8,8 +8,16 @@ import java.io.Serializable;
 import java.sql.Date;
 
 /**
+ * 呼叫记录查询类
  * Created by liups on 2016/6/29.
  */
 public interface CallRecordDao extends BaseDaoInterface<CallRecord, Serializable> {
+    /**
+     * 统计一个应用一定时间内的呼叫记录
+     * @param app 应用
+     * @param start 开始时间
+     * @param end 结束时间
+     * @return 次数
+     */
     Long countByAppAndCallEndTimeBetween(App app, Date start, Date end);
 }

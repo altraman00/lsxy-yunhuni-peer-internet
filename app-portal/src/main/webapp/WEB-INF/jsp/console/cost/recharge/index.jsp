@@ -102,7 +102,7 @@
                                                 </div>
                                                 <div class="row ">
                                                     <div class="col-md-12 remove-padding ">
-                                                        <div class="cost-money">998.<span class="font24">00</span><span class="unit">元</span></div>
+                                                        <div class="cost-money">${balanceInt}.<span class="font24">${balanceDec}</span><span class="unit">元</span></div>
                                                     </div>
                                                 </div>
 
@@ -123,18 +123,18 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right line30">充值方式：</lable>
                                                 <div class="col-md-2 input-box">
-                                                    <input type="radio" name="modepay" class="radiovalid" value="zhifubao" />
+                                                    <input type="radio" name="type" class="radiovalid" value="ZHIFUBAO" />
                                                     <img src="${resPrefixUrl }/images/zhifubao.png"/>
                                                 </div>
                                                 <div class="col-md-2 input-box">
-                                                    <input type="radio" name="modepay" class="radiovalid" value="yinlian"/>
+                                                    <input type="radio" name="type" class="radiovalid" value="YINLIAN"/>
                                                     <img src="${resPrefixUrl }/images/yinlian.png"/>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right line30">充值金额：</lable>
                                                 <div class="col-md-2">
-                                                    <input type="text" name="" placeholder=""
+                                                    <input type="text" name="amount" placeholder=""
                                                            class="form-control input-form costprice " />
                                                 </div>
                                                 <div class="col-md-1">
