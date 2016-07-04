@@ -54,7 +54,7 @@ public class TestMobileBindController extends AbstractPortalController{
      */
     private RestResponse findAll(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_mobile_bind/find_all";
+        String uri = restPrefixUrl +   "/rest/test_mobile_bind/list";
         Map map = new HashMap();
         return  RestRequest.buildSecurityRequest(token).post(uri,map, List.class);
     }
@@ -131,7 +131,7 @@ public class TestMobileBindController extends AbstractPortalController{
      */
     private RestResponse deleteNumber(HttpServletRequest request,String number){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_mobile_bind/delete";
+        String uri = restPrefixUrl +   "/rest/test_mobile_bind/disbind";
         Map map = new HashMap();
         map.put("number",number);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, String.class);

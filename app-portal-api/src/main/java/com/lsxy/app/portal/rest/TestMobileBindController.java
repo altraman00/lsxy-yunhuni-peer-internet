@@ -32,7 +32,7 @@ public class TestMobileBindController extends AbstractRestController {
      * @return
      * @throws MatchMutiEntitiesException
      */
-    @RequestMapping("/find_all")
+    @RequestMapping("/list")
     public RestResponse findAll() throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         List<TestMobileBind> list = testMobileBindService.findAll(userName);
@@ -46,7 +46,7 @@ public class TestMobileBindController extends AbstractRestController {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    @RequestMapping("/delete")
+    @RequestMapping("/disbind")
     public RestResponse delete(String number) throws InvocationTargetException, IllegalAccessException, MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         List<TestMobileBind> testMobileBindList = testMobileBindService.findByNumber(userName,number);

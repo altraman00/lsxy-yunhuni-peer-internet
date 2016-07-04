@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 呼入号码管理
  * Created by zhangxb on 2016/7/1.
  */
-@RequestMapping("/rest/resources_ret/")
+@RequestMapping("/rest/res_rent/")
 @RestController
 public class ResourcesRentController extends AbstractRestController{
 
@@ -28,7 +28,7 @@ public class ResourcesRentController extends AbstractRestController{
      * @return
      * @throws MatchMutiEntitiesException
      */
-    @RequestMapping("/page_list")
+    @RequestMapping("/list")
     public RestResponse pageList(String pageNo, String pageSize) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         //获取该租户下的所有号码信息

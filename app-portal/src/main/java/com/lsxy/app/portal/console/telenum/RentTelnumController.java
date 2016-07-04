@@ -53,7 +53,7 @@ public class RentTelnumController extends AbstractPortalController {
      */
     private RestResponse pageList(HttpServletRequest request,String  pageNo, String pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/resources_ret/page_list";
+        String uri = restPrefixUrl +   "/rest/res_ret/list";
         Map map = new HashMap();
         int tempPageNo = validateNum(1,pageNo);
         int tempPageSize = validateNum(20,pageSize);//每页显示 Page.DEFAULT_PAGE_SIZE 20
