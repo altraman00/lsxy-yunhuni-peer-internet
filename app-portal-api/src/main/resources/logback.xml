@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="true">
+<configuration debug="false">
     <contextName>yunhuni-app-portal-api</contextName>
     <property name="APP_NAME" value="app-portal-api" />
     <include resource="logback-yunhuni.xml"/>
