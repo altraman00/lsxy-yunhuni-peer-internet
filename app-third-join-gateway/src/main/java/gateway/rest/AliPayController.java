@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Created by liups on 2016/7/4.
  */
-@Controller
+@RestController
 @RequestMapping("/third/alipay")
 public class AliPayController extends AbstractAPIController{
     private static final Logger logger = LoggerFactory.getLogger(AliPayController.class);
@@ -34,16 +34,18 @@ public class AliPayController extends AbstractAPIController{
     ThirdPayRecordService thirdPayRecordService;
 
     @RequestMapping("/notify")
-    public void aliPayNotify(HttpServletRequest request,String trade_status) throws Exception {
-        handleAliPayResult(request,trade_status);
+    public String aliPayNotify(HttpServletRequest request,String trade_status) throws Exception {
+        return handleAliPayResult(request, trade_status);
     }
 
     /**
      * 对支付宝返回的支付结果进行处理
      * @param request
      * @param tradeStatus 返回的支付状态
+     * @return 如果校验通过，返回success给支付宝(一定要是success)
      */
-    private void handleAliPayResult(HttpServletRequest request, String tradeStatus) throws MatchMutiEntitiesException {
+    private String handleAliPayResult(HttpServletRequest request, String tradeStatus) throws MatchMutiEntitiesException {
+        String result = null;
         Map<String,String> params = new HashMap<>();
         Map requestParams = request.getParameterMap();
         //将返回的数据进行处理
@@ -80,12 +82,13 @@ public class AliPayController extends AbstractAPIController{
                 try {
                     //将付款记录存到数据库
                     thirdPayRecordService.save(payRecord);
+                    result =  "success";
                 } catch (DataIntegrityViolationException e) {
                     logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
                 }
-
             }
         }
+        return result;
     }
 
 
