@@ -64,7 +64,6 @@ public class AliPayController extends AbstractAPIController{
         if(verify_result){
             //验证成功
             if(tradeStatus.equals("TRADE_FINISHED") || tradeStatus.equals("TRADE_SUCCESS")){
-                //将付款记录存到数据库
                 ThirdPayRecord payRecord = new ThirdPayRecord();
                 payRecord.setPayType(RechargeType.ZHIFUBAO.getName());
                 payRecord.setOrderId(params.get("out_trade_no"));
@@ -75,10 +74,11 @@ public class AliPayController extends AbstractAPIController{
                 payRecord.setBuyerId(params.get("buyer_id"));
                 payRecord.setSellerName(params.get("seller_email"));
                 payRecord.setBuyerName(params.get("buyer_email"));
-                //调用RestApi对该订单进行处理
+                //对该付款记录进行处理
                 Recharge recharge = rechargeService.paySuccess(payRecord.getOrderId());
                 payRecord.setRecharge(recharge);
                 try {
+                    //将付款记录存到数据库
                     thirdPayRecordService.save(payRecord);
                 } catch (DataIntegrityViolationException e) {
                     logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
