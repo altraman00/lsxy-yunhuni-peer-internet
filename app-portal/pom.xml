@@ -21,6 +21,7 @@
             <version>2.2</version>
               <configuration>
                   <port>18080</port>
+                  <path>/</path>
               </configuration>
           </plugin>
         </plugins>
@@ -36,6 +37,8 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-api</artifactId>
+            <exclusions>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
