@@ -177,6 +177,10 @@ public class RestRequest {
             headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
         }
         HttpEntity entity = new HttpEntity(requestEntity,headers);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("Rest请求：{} \r\n 请求参数：{}\r\n请求头：{}",url,params,entity.getHeaders());
+        }
         HttpEntity<RestResponse> response = this.restTemplate.exchange(url, httpMethod, entity, RestResponse.class,uriparams);
         if (response != null) {
             restResponse = response.getBody();
@@ -185,6 +189,9 @@ public class RestRequest {
                 T obj = mapper.convertValue(restResponse.getData(), responseDataType);
                 restResponse.setData(obj);
             }
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("获取到请求对象："+restResponse);
         }
         return restResponse;
     }
