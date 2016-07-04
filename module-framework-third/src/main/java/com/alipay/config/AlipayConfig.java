@@ -25,7 +25,7 @@ public class AlipayConfig {
     public static String key = "ne5iqt3tgipeta6y2fnupbzbinfbzzw2";
 
 	// 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
-	public static String notify_url = "http://52.77.167.139:8080/third/alipay/notify";
+	public static String notify_url = "http://portal.dev.yunhuni.com/third/alipay/notify";
 
 	// 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
 	public static String return_url = "http://localhost/console/cost/recharge/pay_return";
