@@ -41,8 +41,8 @@
 							<span>消息中心</span>
 						</a>
 					</li>
-					<li class="border-top nav-router" data-router="customer">
-						<a data-toggle="tooltip" data-placement='right' title='客服中心' href="${ctx}/console/customer/index" class="canbehover" >
+					<li class="border-top ">
+						<a data-toggle="tooltip" data-placement='right' title='客服中心' href="${ctx}/console/customer/index" class="canbehover nav-router" data-router="customer">
 							<i class="fa fa-comment-o icon"> </i>
 							<span>客服中心</span> </a>
 					</li>
