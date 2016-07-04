@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,8 @@ import java.util.Map;
  * RestResponse<UserRestToken> response = RestRequest.newInstance().post(url,formParams,UserRestToken.class);
  */
 public class RestRequest {
+    //请求标识
+    private String id;
 
     private static final Logger logger = LoggerFactory.getLogger(RestRequest.class);
     //单实例请求对象
@@ -59,7 +62,7 @@ public class RestRequest {
     }
 
     protected RestRequest(RestRequestConnectionConfig config) {
-
+        this.id = UUIDGenerator.uuid();
         this.restTemplate = new RestTemplate(config.getHttpFactory());
         // 添加转换器
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
@@ -179,7 +182,9 @@ public class RestRequest {
         HttpEntity entity = new HttpEntity(requestEntity,headers);
 
         if(logger.isDebugEnabled()){
-            logger.debug("Rest请求：{} \r\n 请求参数：{}\r\n请求头：{}",url,params,entity.getHeaders());
+            logger.debug("[{}]REST请求：{} ",this.id,url);
+            logger.debug("[{}]REST请求参数：{}",this.id,params);
+            logger.debug("[{}]REST请求头：{}",this.id,entity.getHeaders());
         }
         HttpEntity<RestResponse> response = this.restTemplate.exchange(url, httpMethod, entity, RestResponse.class,uriparams);
         if (response != null) {
@@ -191,7 +196,7 @@ public class RestRequest {
             }
         }
         if(logger.isDebugEnabled()){
-            logger.debug("获取到请求对象："+restResponse);
+            logger.debug("[{}]REST响应{}",this.id,restResponse);
         }
         return restResponse;
     }
