@@ -5,7 +5,7 @@
 <script src="${resPrefixUrl }/js/bootbox.min.js"></script>
 <script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
-
+<script src="${resPrefixUrl }/js/yunhuni.js" ></script>
 <script>
 	$(function(){
 		var node = "";

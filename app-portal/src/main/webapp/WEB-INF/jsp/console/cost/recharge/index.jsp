@@ -1,14 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@include file="/inc/import.jsp" %>
+
 <!DOCTYPE html>
 <html>
-
-<!-- header -->
 <head>
     <%@include file="/inc/meta.jsp" %>
-
 </head>
-
 <body>
 <section class="vbox">
 <%@include file="/inc/headerNav.jsp"%>
@@ -17,7 +14,6 @@
         <!-- .aside -->
         <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
         <!-- /.aside -->
-
         <section id="content">
             <section class="hbox stretch">
                 <!-- 如果没有三级导航 这段代码注释-->

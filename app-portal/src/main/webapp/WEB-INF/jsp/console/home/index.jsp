@@ -12,7 +12,7 @@
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
-        <aside class="bg-Green  aside hidden-print "  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+        <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
         <!-- /.aside -->
         <section id="content">
             <section class="hbox stretch">
