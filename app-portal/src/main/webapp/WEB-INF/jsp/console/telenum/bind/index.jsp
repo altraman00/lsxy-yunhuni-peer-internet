@@ -196,7 +196,7 @@
                     var number = $('#modalmobile').html();
                     var type = "save";
                     if(pro){
-                        type = "delete";
+                        type = "disbind";
                     }
                     $.ajax({
                         url : "${ctx}/console/telenum/bind/"+type,

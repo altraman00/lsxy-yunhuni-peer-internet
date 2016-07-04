@@ -40,7 +40,7 @@ public class TestMobileBindController extends AbstractPortalController{
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        RestResponse<List<TestMobileBind>> restResponse = findAll(request);
+        RestResponse<List<TestMobileBind>> restResponse = list(request);
         List<TestMobileBind> testMobileBindList = restResponse.getData();
         mav.addObject("testMobileBindList",testMobileBindList);
         mav.setViewName("/console/telenum/bind/index");
@@ -52,7 +52,7 @@ public class TestMobileBindController extends AbstractPortalController{
      * @param request
      * @return
      */
-    private RestResponse findAll(HttpServletRequest request){
+    private RestResponse list(HttpServletRequest request){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/test_mobile_bind/list";
         Map map = new HashMap();
@@ -112,11 +112,11 @@ public class TestMobileBindController extends AbstractPortalController{
      * @param number
      * @return
      */
-    @RequestMapping("/delete")
+    @RequestMapping("/disbind")
     @ResponseBody
     public Map delete(HttpServletRequest request,String number){
         Map hs = new HashMap();
-        RestResponse<String> restResponse = deleteNumber(request,number);
+        RestResponse<String> restResponse = disbindNumber(request,number);
         String deleteNumber = restResponse.getData();
         hs.put("sucess", RESULT_SUCESS);
         hs.put("msg", "手机号码解除成功！");
@@ -129,7 +129,7 @@ public class TestMobileBindController extends AbstractPortalController{
      * @param number 测试绑定手机
      * @return
      */
-    private RestResponse deleteNumber(HttpServletRequest request,String number){
+    private RestResponse disbindNumber(HttpServletRequest request,String number){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/test_mobile_bind/disbind";
         Map map = new HashMap();
