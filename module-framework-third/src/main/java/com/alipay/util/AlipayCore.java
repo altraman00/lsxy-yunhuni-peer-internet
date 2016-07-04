@@ -74,44 +74,22 @@ public class AlipayCore {
         return prestr;
     }
 
-    /** 
-     * 写日志，方便测试（看网站需求，也可以改成把记录存入数据库）
-     * @param sWord 要写入日志里的文本内容
-     */
-    public static void logResult(String sWord) {
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(AlipayConfig.log_path + "alipay_log_" + System.currentTimeMillis()+".txt");
-            writer.write(sWord);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    /** 
-     * 生成文件摘要
-     * @param strFilePath 文件路径
-     * @param file_digest_type 摘要算法
-     * @return 文件摘要结果
-     */
-    public static String getAbstract(String strFilePath, String file_digest_type) throws IOException {
-        PartSource file = new FilePartSource(new File(strFilePath));
-    	if(file_digest_type.equals("MD5")){
-    		return DigestUtils.md5Hex(file.createInputStream());
-    	}
-    	else if(file_digest_type.equals("SHA")) {
-    		return DigestUtils.sha256Hex(file.createInputStream());
-    	}
-    	else {
-    		return "";
-    	}
-    }
+//    /**
+//     * 生成文件摘要
+//     * @param strFilePath 文件路径
+//     * @param file_digest_type 摘要算法
+//     * @return 文件摘要结果
+//     */
+//    public static String getAbstract(String strFilePath, String file_digest_type) throws IOException {
+//        PartSource file = new FilePartSource(new File(strFilePath));
+//    	if(file_digest_type.equals("MD5")){
+//    		return DigestUtils.md5Hex(file.createInputStream());
+//    	}
+//    	else if(file_digest_type.equals("SHA")) {
+//    		return DigestUtils.sha256Hex(file.createInputStream());
+//    	}
+//    	else {
+//    		return "";
+//    	}
+//    }
 }
