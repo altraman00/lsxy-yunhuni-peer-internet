@@ -25,7 +25,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         }
 
         http.authorizeRequests()
-                .antMatchers("/**").access("hasRole('ROLE_TENANT_USER')")
+                .antMatchers("/*").permitAll()
+                .antMatchers("/rest/**").access("hasRole('ROLE_TENANT_USER')")
                 .and().httpBasic()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
@@ -48,7 +49,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("user001").password("123").roles("TENANT_USER");
+        auth.inMemoryAuthentication().withUser("user001").password("password").roles("TENANT_USER");
     }
 
 

@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Import;
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class})
 public class MainClass {
 
-
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MainClass.class, args);
     }

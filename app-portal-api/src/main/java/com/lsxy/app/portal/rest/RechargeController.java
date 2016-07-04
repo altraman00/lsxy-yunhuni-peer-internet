@@ -8,7 +8,11 @@ import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
 import com.lsxy.yuhuni.api.recharge.service.RechargeService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.recharge.service.ThirdPayRecordService;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rest/recharge")
 @RestController
 public class RechargeController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(RechargeController.class);
+
     @Autowired
     RechargeService rechargeService;
 
@@ -71,26 +77,19 @@ public class RechargeController extends AbstractRestController {
 
     /**
      * 支付成功后的处理
-     * @param orderId 充值orderId
+     * @param payRecord 付款记录
      * @return
      */
     @RequestMapping("/pay_success")
-    public RestResponse paySuccess(String orderId) throws Exception {
-        Recharge recharge =  rechargeService.paySuccess(orderId);
+    public RestResponse paySuccess(ThirdPayRecord payRecord) throws Exception {
+        Recharge recharge =  rechargeService.paySuccess(payRecord.getOrderId());
+        try {
+            payRecord.setRecharge(recharge);
+            thirdPayRecordService.save(payRecord);
+        } catch (DataIntegrityViolationException e) {
+            logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
+        }
         return RestResponse.success(recharge);
     }
 
-    /**
-     * 支付付款记录
-     * @param payRecord 充值orderId
-     * @return
-     */
-    @RequestMapping("/pay_record")
-    public RestResponse payRecord(ThirdPayRecord payRecord,String rechargeId) throws Exception {
-        Recharge recharge = new Recharge();
-        recharge.setId(rechargeId);
-        payRecord.setRecharge(recharge);
-        thirdPayRecordService.save(payRecord);
-        return RestResponse.success(null);
-    }
 }

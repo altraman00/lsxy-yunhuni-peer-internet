@@ -92,18 +92,17 @@ public class RechargeController extends AbstractPortalController {
 
 
     /**
-     * 支付宝支付完后的跳转页面
+     * 支付宝支付完后的跳转页面(由支付宝跳转回我们的网站)
      * 获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表
      * @param request HttpServletRequest
-     * @param out_trade_no 商户订单号
      * @param trade_status 交易状态
      * @return
      */
-    @RequestMapping(value = "/pay_return",method = RequestMethod.GET)
-    public ModelAndView payReturn(HttpServletRequest request,String out_trade_no,String trade_status){
+    @RequestMapping(value = "/pay_return")
+    public ModelAndView payReturn(HttpServletRequest request,String trade_status){
         Map model = new HashMap();
         //处理支付宝返回的数据
-        handleAliPayResult(request, out_trade_no, trade_status);
+        handleAliPayResult(request, trade_status);
         //-------------------
         String token = getSecurityToken(request);
         Billing billing = getBilling(token);
@@ -180,10 +179,9 @@ public class RechargeController extends AbstractPortalController {
     /**
      * 对支付宝返回的支付结果进行处理
      * @param request
-     * @param orderId 充值orderId
      * @param tradeStatus 返回的支付状态
      */
-    private void handleAliPayResult(HttpServletRequest request, String orderId, String tradeStatus) {
+    private void handleAliPayResult(HttpServletRequest request, String tradeStatus) {
         String token = getSecurityToken(request);
         Map<String,String> params = new HashMap<>();
         Map requestParams = request.getParameterMap();
@@ -205,11 +203,8 @@ public class RechargeController extends AbstractPortalController {
         if(verify_result){
             //验证成功
             if(tradeStatus.equals("TRADE_FINISHED") || tradeStatus.equals("TRADE_SUCCESS")){
-                //调用RestApi对该订单进行处理
-                String successUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/pay_success?orderId={1}";
-                RestResponse<Recharge> successResponse = RestRequest.buildSecurityRequest(token).get(successUrl, Recharge.class, orderId);
-                Recharge recharge = successResponse.getData();
-                //将付款记录存到数据库
+                //调用RestApi对该订单进行处理，并将付款记录存到数据库
+                String successUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/pay_success";
                 ThirdPayRecord payRecord = new ThirdPayRecord();
                 payRecord.setPayType(RechargeType.ZHIFUBAO.getName());
                 payRecord.setOrderId(params.get("out_trade_no"));
@@ -222,9 +217,7 @@ public class RechargeController extends AbstractPortalController {
                 payRecord.setBuyerName(params.get("buyer_email"));
                 ObjectMapper mapper = new ObjectMapper();
                 Map<String, Object> map = mapper.convertValue(payRecord, Map.class);
-                map.put("rechargeId",recharge.getId());
-                String recordUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/pay_record";
-                RestRequest.buildSecurityRequest(token).post(recordUrl, map,Recharge.class, orderId);
+                RestRequest.buildSecurityRequest(token).post(successUrl, map,Recharge.class);
             }
         }
     }
