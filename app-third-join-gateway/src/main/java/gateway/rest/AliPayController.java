@@ -45,6 +45,7 @@ public class AliPayController extends AbstractAPIController{
      * @return 如果校验通过，返回success给支付宝(一定要是success)
      */
     private String handleAliPayResult(HttpServletRequest request, String tradeStatus) throws MatchMutiEntitiesException {
+
         String result = null;
         Map<String,String> params = new HashMap<>();
         Map requestParams = request.getParameterMap();
@@ -60,6 +61,9 @@ public class AliPayController extends AbstractAPIController{
             //乱码解决，这段代码在出现乱码时使用。如果mysign和sign不相等也可以使用这段代码转化
             //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
             params.put(name, valueStr);
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("支付宝异步调用执行,交易号：{}",params.get("trade_no"));
         }
         //计算得出通知验证结果
         boolean verify_result = AlipayNotify.verify(params);
