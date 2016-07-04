@@ -65,17 +65,19 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     @Override
     public Recharge paySuccess(String orderId) throws MatchMutiEntitiesException {
         Recharge recharge = rechargeDao.findByOrderId(orderId);
-        String status = recharge.getStatus();
-        //如果充值记录是未支付状态，则将支付状态改成已支付，并将钱加到账务表里
-        if(RechargeStatus.NOTPAID.getName().equals(status)){
-            //状态变成已支付
-            recharge.setStatus(RechargeStatus.PAID.getName());
-            Tenant tenant = recharge.getTenant();
-            //更新账务表的余额
-            Billing billing = billingService.findBillingByTenantId(tenant.getId());
-            billing.setBalance(billing.getBalance() + recharge.getAmount());
-            rechargeDao.save(recharge);
-            billingService.save(billing);
+        if(recharge != null){
+            String status = recharge.getStatus();
+            //如果充值记录是未支付状态，则将支付状态改成已支付，并将钱加到账务表里
+            if(RechargeStatus.NOTPAID.name().equals(status)){
+                //状态变成已支付
+                recharge.setStatus(RechargeStatus.PAID.name());
+                Tenant tenant = recharge.getTenant();
+                //更新账务表的余额
+                Billing billing = billingService.findBillingByTenantId(tenant.getId());
+                billing.setBalance(billing.getBalance() + recharge.getAmount());
+                rechargeDao.save(recharge);
+                billingService.save(billing);
+            }
         }
         return  recharge;
     }
