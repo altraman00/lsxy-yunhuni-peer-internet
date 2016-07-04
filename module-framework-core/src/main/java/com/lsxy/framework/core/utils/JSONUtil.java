@@ -1,5 +1,6 @@
 package com.lsxy.framework.core.utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.ezmorph.object.DateMorpher;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -252,4 +254,22 @@ public class JSONUtil {
 			}
 		}
 	}
+
+
+    /**
+     * 使用jackson转换对象到json串
+     * @param obj
+     * @return
+     */
+    public static String objectToJson(Object obj) {
+        ObjectMapper mapper = new ObjectMapper();
+        // Convert object to JSON string
+        String jsonStr = "";
+        try {
+            jsonStr =  mapper.writeValueAsString(obj);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonStr;
+    }
 }

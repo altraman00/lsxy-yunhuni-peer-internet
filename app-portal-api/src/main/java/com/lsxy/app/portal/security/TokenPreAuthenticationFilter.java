@@ -1,6 +1,9 @@
 package com.lsxy.app.portal.security;
 
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.web.utils.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
@@ -21,6 +24,7 @@ public class TokenPreAuthenticationFilter extends AbstractPreAuthenticatedProces
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
+        WebUtils.logRequestParams(request);
         return request.getHeader(SSO_TOKEN);
     }
 
