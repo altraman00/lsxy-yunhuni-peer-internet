@@ -5,8 +5,6 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 
 import javax.persistence.*;
 
-import static javafx.scene.input.KeyCode.O;
-
 /**
  * 全局号码资源
  * Created by zhangxb on 2016/7/1.
