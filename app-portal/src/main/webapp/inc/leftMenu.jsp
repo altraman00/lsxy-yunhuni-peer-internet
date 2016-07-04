@@ -35,8 +35,8 @@
 							</li>
 						</ul>
 					</li>
-					<li class="border-top">
-						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="#" class="canbehover" >
+					<li class="border-top" data-router="customer">
+						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="${ctx}/console/customer/index" class="canbehover" >
 							<i class="fa fa-envelope icon"> </i>
 							<span>消息中心</span>
 						</a>
