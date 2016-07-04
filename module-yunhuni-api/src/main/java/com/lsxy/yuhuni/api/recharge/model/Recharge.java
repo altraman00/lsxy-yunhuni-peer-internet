@@ -27,8 +27,8 @@ public class Recharge  extends IdEntity {
     public Recharge(Tenant tenant, Double amount, RechargeType type, RechargeStatus status, String orderId) {
         this.tenant = tenant;
         this.amount = amount;
-        this.type = type.getName();
-        this.status = status.getName();
+        this.type = type.name();
+        this.status = status.name();
         this.orderId = orderId;
     }
 

@@ -1,4 +1,4 @@
-package gateway.security;
+package com.lsxy.third.gateway.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

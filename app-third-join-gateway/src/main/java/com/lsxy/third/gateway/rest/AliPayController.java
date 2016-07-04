@@ -1,4 +1,4 @@
-package gateway.rest;
+package com.lsxy.third.gateway.rest;
 
 import com.alipay.util.AlipayNotify;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
@@ -7,7 +7,7 @@ import com.lsxy.yuhuni.api.recharge.model.Recharge;
 import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
 import com.lsxy.yuhuni.api.recharge.service.RechargeService;
 import com.lsxy.yuhuni.api.recharge.service.ThirdPayRecordService;
-import gateway.base.AbstractAPIController;
+import com.lsxy.third.gateway.base.AbstractAPIController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +45,7 @@ public class AliPayController extends AbstractAPIController{
      * @return 如果校验通过，返回success给支付宝(一定要是success)
      */
     private String handleAliPayResult(HttpServletRequest request, String tradeStatus) throws MatchMutiEntitiesException {
+
         String result = null;
         Map<String,String> params = new HashMap<>();
         Map requestParams = request.getParameterMap();
@@ -61,13 +62,16 @@ public class AliPayController extends AbstractAPIController{
             //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
             params.put(name, valueStr);
         }
+        if(logger.isDebugEnabled()){
+            logger.debug("支付宝异步调用执行,交易号：{}",params.get("trade_no"));
+        }
         //计算得出通知验证结果
         boolean verify_result = AlipayNotify.verify(params);
         if(verify_result){
             //验证成功
             if(tradeStatus.equals("TRADE_FINISHED") || tradeStatus.equals("TRADE_SUCCESS")){
                 ThirdPayRecord payRecord = new ThirdPayRecord();
-                payRecord.setPayType(RechargeType.ZHIFUBAO.getName());
+                payRecord.setPayType(RechargeType.ZHIFUBAO.name());
                 payRecord.setOrderId(params.get("out_trade_no"));
                 payRecord.setTradeNo(params.get("trade_no"));
                 payRecord.setTradeStatus(params.get("trade_status"));
@@ -78,13 +82,15 @@ public class AliPayController extends AbstractAPIController{
                 payRecord.setBuyerName(params.get("buyer_email"));
                 //对该付款记录进行处理
                 Recharge recharge = rechargeService.paySuccess(payRecord.getOrderId());
-                payRecord.setRecharge(recharge);
-                try {
-                    //将付款记录存到数据库
-                    thirdPayRecordService.save(payRecord);
-                    result =  "success";
-                } catch (DataIntegrityViolationException e) {
-                    logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
+                if(recharge != null){
+                    payRecord.setRecharge(recharge);
+                    try {
+                        //将付款记录存到数据库
+                        thirdPayRecordService.save(payRecord);
+                        result =  "success";
+                    } catch (DataIntegrityViolationException e) {
+                        logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
+                    }
                 }
             }
         }

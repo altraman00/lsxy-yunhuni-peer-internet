@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
+import com.lsxy.yuhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yuhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yuhuni.api.recharge.model.Recharge;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -64,6 +65,8 @@ public class RechargeController extends AbstractPortalController {
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
         Recharge recharge = createRecharge(token,type,amount);
+        recharge.setStatus(RechargeStatus.valueOf(recharge.getStatus()).getName());
+        recharge.setType(RechargeType.valueOf(recharge.getType()).getName());
         model.put("recharge",recharge);
         //金额格式化成整数和小数部分
         amountFormat(model,recharge.getAmount());
@@ -206,7 +209,7 @@ public class RechargeController extends AbstractPortalController {
                 //调用RestApi对该订单进行处理，并将付款记录存到数据库
                 String successUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/pay_success";
                 ThirdPayRecord payRecord = new ThirdPayRecord();
-                payRecord.setPayType(RechargeType.ZHIFUBAO.getName());
+                payRecord.setPayType(RechargeType.ZHIFUBAO.name());
                 payRecord.setOrderId(params.get("out_trade_no"));
                 payRecord.setTradeNo(params.get("trade_no"));
                 payRecord.setTradeStatus(params.get("trade_status"));
