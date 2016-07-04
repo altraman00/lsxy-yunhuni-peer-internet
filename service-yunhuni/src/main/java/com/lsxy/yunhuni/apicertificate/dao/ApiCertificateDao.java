@@ -11,4 +11,10 @@ import java.io.Serializable;
  */
 public interface ApiCertificateDao extends BaseDaoInterface<ApiCertificate, Serializable> {
 
+    /**
+     * 根据certId获取对应的鉴权账号
+     * @param certId
+     * @return
+     */
+    public ApiCertificate findByCertId(String certId);
 }

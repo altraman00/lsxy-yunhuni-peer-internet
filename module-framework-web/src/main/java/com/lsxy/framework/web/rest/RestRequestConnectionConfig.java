@@ -16,7 +16,7 @@ public class RestRequestConnectionConfig {
     private PoolingHttpClientConnectionManager cm;
     private HttpComponentsClientHttpRequestFactory httpFactory;
 
-    private RestRequestConnectionConfig(){
+    protected RestRequestConnectionConfig(){
         //初始化连接池
         cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(Integer.parseInt(SystemConfig.getProperty("global.rest.api.client.pool.size","1000")));  //设置整个连接池最大连接数

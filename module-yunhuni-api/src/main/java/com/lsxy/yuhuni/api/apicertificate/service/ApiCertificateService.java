@@ -31,4 +31,13 @@ public interface ApiCertificateService extends BaseService<ApiCertificate> {
      * @return 新生成的secretKey
      */
     String changeSecretKeyByUserName(String userName) throws MatchMutiEntitiesException;
+
+
+    /**
+     *
+     * 根据api 凭证标识获取对应的加密key
+     * @param certId
+     * @return
+     */
+    String findApiCertificateSecretKeyByCertId(String certId);
 }
