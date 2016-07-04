@@ -1,4 +1,4 @@
-package gateway.rest;
+package com.lsxy.third.gateway.rest;
 
 import com.alipay.util.AlipayNotify;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
@@ -7,7 +7,7 @@ import com.lsxy.yuhuni.api.recharge.model.Recharge;
 import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
 import com.lsxy.yuhuni.api.recharge.service.RechargeService;
 import com.lsxy.yuhuni.api.recharge.service.ThirdPayRecordService;
-import gateway.base.AbstractAPIController;
+import com.lsxy.third.gateway.base.AbstractAPIController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
