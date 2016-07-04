@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
  * Created by Tandy on 2016/6/7.
@@ -24,6 +25,10 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
+
+
+    @Autowired
+    private RestAuthenticationProvider restAuthenticationProvider;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -38,6 +43,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         ;
+        http.addFilterBefore(new SignatureAuthFilter(authenticationManager()), BasicAuthenticationFilter.class);
 
 //        http.addFilter(headerAuthenticationFilter());
     }
@@ -57,8 +63,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication().withUser("user001").password("123").roles("TENANT_USER");
+        auth.authenticationProvider(restAuthenticationProvider);
     }
-
 
 }
 

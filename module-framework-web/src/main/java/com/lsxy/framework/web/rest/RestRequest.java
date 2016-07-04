@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javafx.scene.input.KeyCode.O;
-
 /**
  * Created by Tandy on 2016/6/22.
  * YUNHUNI REST API 请求对象
@@ -39,6 +38,8 @@ import static javafx.scene.input.KeyCode.O;
  * RestResponse<UserRestToken> response = RestRequest.newInstance().post(url,formParams,UserRestToken.class);
  */
 public class RestRequest {
+    //请求标识
+    private String id;
 
     private static final Logger logger = LoggerFactory.getLogger(RestRequest.class);
     //单实例请求对象
@@ -60,8 +61,8 @@ public class RestRequest {
         this.securityToken = securityToken;
     }
 
-    private RestRequest(RestRequestConnectionConfig config) {
-
+    protected RestRequest(RestRequestConnectionConfig config) {
+        this.id = UUIDGenerator.uuid();
         this.restTemplate = new RestTemplate(config.getHttpFactory());
         // 添加转换器
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
@@ -179,6 +180,12 @@ public class RestRequest {
             headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
         }
         HttpEntity entity = new HttpEntity(requestEntity,headers);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("[{}]REST请求：{} ",this.id,url);
+            logger.debug("[{}]REST请求参数：{}",this.id,params);
+            logger.debug("[{}]REST请求头：{}",this.id,entity.getHeaders());
+        }
         HttpEntity<RestResponse> response = this.restTemplate.exchange(url, httpMethod, entity, RestResponse.class,uriparams);
         if (response != null) {
             restResponse = response.getBody();
@@ -187,6 +194,9 @@ public class RestRequest {
                 T obj = mapper.convertValue(restResponse.getData(), responseDataType);
                 restResponse.setData(obj);
             }
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("[{}]REST响应{}",this.id,restResponse);
         }
         return restResponse;
     }

@@ -7,9 +7,6 @@ import com.lsxy.framework.core.utils.DateUtils;
 import java.io.Serializable;
 import java.util.Date;
 
-import static javafx.scene.input.KeyCode.T;
-import static jdk.nashorn.internal.objects.NativeString.substring;
-
 /**
  * Created by zhangxb on 2016/6/27.
  * 安全设置VO对象

@@ -1,5 +1,10 @@
 package com.lsxy.framework.web.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lsxy.framework.core.utils.JSONUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by Tandy on 2016/6/6.
  * 提供统一的REST相应对象封装
@@ -7,6 +12,8 @@ package com.lsxy.framework.web.rest;
  *
  */
 public class RestResponse<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestResponse.class);
     //是否请求成功
     private boolean success;
 
@@ -62,6 +69,10 @@ public class RestResponse<T> {
         RestResponse restResponse = new RestResponse();
         restResponse.setSuccess(true);
         restResponse.setData(data);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("输出响应："+restResponse);
+        }
         return restResponse;
     }
 
@@ -93,4 +104,8 @@ public class RestResponse<T> {
         return restResponse;
     }
 
+    @Override
+    public String toString() {
+        return JSONUtil.objectToJson(this);
+    }
 }
