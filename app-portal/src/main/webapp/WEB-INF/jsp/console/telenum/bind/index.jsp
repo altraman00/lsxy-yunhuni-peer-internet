@@ -69,7 +69,7 @@
 
                                             <c:forEach items="${testMobileBindList}"  var="testMobileBind" varStatus="s" >
                                                 <div class="form-group">
-                                                    <lable class="col-md-3 text-right">号码1：</lable>
+                                                    <lable class="col-md-3 text-right">号码${s.index+1}：</lable>
                                                     <div class="col-md-4">
                                                         <input type="text" name="" placeholder="" value="${testMobileBind.number}" class="form-control input-form limit20" id="voild-${s.index+1}" disabled/>
                                                     </div>
@@ -207,7 +207,7 @@
                         success : function(data){
 
                             if(data.sucess==2) {
-                                alert(sType[result]+', 绑定手机');
+                                alert(sType[result]+', '+data.msg);
                                 if(pro){
                                     //解除绑定
                                     $('#voild-'+id).val('');

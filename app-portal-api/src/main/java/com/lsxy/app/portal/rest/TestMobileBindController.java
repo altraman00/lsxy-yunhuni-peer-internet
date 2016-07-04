@@ -67,6 +67,10 @@ public class TestMobileBindController extends AbstractRestController {
         if(testMobileBindList.size()>0){
             return RestResponse.failed("0020","号码已被绑定");
         }
+        List<TestMobileBind> list = testMobileBindService.findAll(userName);
+        if(list.size()>5){
+            return RestResponse.failed("0030","绑定号码已超过5个");
+        }
         Tenant tenant = tenantService.findTenantByUserName(userName);
         TestMobileBind testMobileBind = new TestMobileBind();
         testMobileBind.setTenant(tenant);
