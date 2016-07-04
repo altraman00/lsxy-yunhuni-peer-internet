@@ -35,7 +35,7 @@ public class RentTelnumController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index" )
-    public ModelAndView index(HttpServletRequest request,String pageNo, String pageSize){
+    public ModelAndView index(HttpServletRequest request,Integer pageNo, Integer pageSize){
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,pageSize);
         Page pageList= restResponse.getData();
@@ -51,30 +51,12 @@ public class RentTelnumController extends AbstractPortalController {
      * @param pageSize 每页多少条数据
      * @return
      */
-    private RestResponse pageList(HttpServletRequest request,String  pageNo, String pageSize){
+    private RestResponse pageList(HttpServletRequest request,Integer  pageNo, Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/resources_ret/page_list";
+        String uri = restPrefixUrl +   "/rest/res_rent/list";
         Map map = new HashMap();
-        int tempPageNo = validateNum(1,pageNo);
-        int tempPageSize = validateNum(20,pageSize);//每页显示 Page.DEFAULT_PAGE_SIZE 20
-        map.put("pageNo",tempPageNo);
-        map.put("pageSize",tempPageSize);
+        map.put("pageNo",pageNo);
+        map.put("pageSize",pageSize);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, Page.class);
-    }
-
-    /**
-     * 处理分页数据
-     * @param tempNum 初始值
-     * @param temp 处理的参数
-     * @return
-     */
-    private int validateNum(int tempNum, String temp){
-        if(temp!=null){
-            tempNum = Integer.valueOf(temp);
-            if(tempNum<=0){
-                tempNum=1;
-            }
-        }
-        return tempNum;
     }
 }
