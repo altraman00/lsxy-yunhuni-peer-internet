@@ -2,7 +2,7 @@ package test;
 
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
-import gateway.MainClass;
+import com.lsxy.third.gateway.MainClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
