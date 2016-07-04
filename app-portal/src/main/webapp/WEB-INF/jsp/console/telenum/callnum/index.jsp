@@ -31,7 +31,7 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/telenum/callnum/index">呼入号码管理</a>
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=1&pageSize=20">呼入号码管理</a>
                                             </div>
                                         </li>
                                         <li>
@@ -103,7 +103,7 @@
 
                                         <c:if test="${startPageNo > 1}">
                                             <li>
-                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${startPageNo-1}" aria-label="Previous">
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${startPageNo-1}&pageSize=20" aria-label="Previous">
                                                     <span aria-hidden="true">&laquo;</span>
                                                 </a>
                                             </li>
@@ -115,13 +115,13 @@
                                                     class="active"
                                                 </c:if>
                                             >
-                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${s.index}">${s.index}</a>
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${s.index}&pageSize=20">${s.index}</a>
                                             </li>
                                         </c:forEach>
 
                                         <c:if test="${pageList.totalPageCount>endPageNo}">
                                             <li>
-                                                <a href="${ctx}/console/telenum/callnum/index?pageNo${endPageNo+1}" aria-label="Next">
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${endPageNo+1}&pageSize=20" aria-label="Next">
                                                     <span aria-hidden="true">&raquo;</span>
                                                 </a>
                                             </li>
