@@ -114,7 +114,7 @@ public class TestMobileBindController extends AbstractPortalController{
      */
     @RequestMapping("/disbind")
     @ResponseBody
-    public Map delete(HttpServletRequest request,String number){
+    public Map disbind(HttpServletRequest request,String number){
         Map hs = new HashMap();
         RestResponse<String> restResponse = disbindNumber(request,number);
         String deleteNumber = restResponse.getData();
