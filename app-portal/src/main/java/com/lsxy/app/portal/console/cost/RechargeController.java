@@ -206,7 +206,7 @@ public class RechargeController extends AbstractPortalController {
                 //调用RestApi对该订单进行处理，并将付款记录存到数据库
                 String successUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/pay_success";
                 ThirdPayRecord payRecord = new ThirdPayRecord();
-                payRecord.setPayType(RechargeType.ZHIFUBAO.getName());
+                payRecord.setPayType(RechargeType.ZHIFUBAO.name());
                 payRecord.setOrderId(params.get("out_trade_no"));
                 payRecord.setTradeNo(params.get("trade_no"));
                 payRecord.setTradeStatus(params.get("trade_status"));
