@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
-cd app-portal
-nohup mvn tomcat7:run 1>> /dev/null 2>> /dev/null &
-cd ..
+./portal-stop.sh
+cd ../app-portal
+nohup mvn clean tomcat7:run 1>> /opt/yunhuni/logs/app-portal.out 2>> /opt/yunhuni/logs/app-portal.out &
+cd ../bin
+tail -f /opt/yunhuni/logs/app-portal.out

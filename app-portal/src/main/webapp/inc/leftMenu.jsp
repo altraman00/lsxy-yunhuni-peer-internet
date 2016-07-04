@@ -13,7 +13,7 @@
 						<ul class="nav lt list">
 							<li class="nav-router " data-router="account">
 								<a data-toggle="tooltip" data-placement='right' title='账号管理' href="${ctx}/console/account/safety/index">
-									<i class="fa fa-user icon"></i> <span>账号管理</span>
+									<i class="fa fa-user icon "></i> <span>账号管理</span>
 								</a>
 							</li>
 							<li  class=".nav-router " data-router="cost">
@@ -35,14 +35,14 @@
 							</li>
 						</ul>
 					</li>
-					<li class="border-top">
+					<li class="border-top" >
 						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="#" class="canbehover" >
 							<i class="fa fa-envelope icon"> </i>
 							<span>消息中心</span>
 						</a>
 					</li>
-					<li class="border-top" >
-						<a data-toggle="tooltip" data-placement='right' title='客服中心' href="#" class="canbehover" >
+					<li class="border-top ">
+						<a data-toggle="tooltip" data-placement='right' title='客服中心' href="${ctx}/console/customer/index" class="canbehover nav-router" data-router="customer">
 							<i class="fa fa-comment-o icon"> </i>
 							<span>客服中心</span> </a>
 					</li>
