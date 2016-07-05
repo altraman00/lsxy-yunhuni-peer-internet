@@ -38,37 +38,13 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td> 注册用户：【15648569451】，您的企业认证审核已通过，已获得开发者权限，试着上线应用吧！</td>
-                                        <td><a href="">删除</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-02</td>
-                                        <td> 注册用户：【15648569451】，您的放音文件审核已通过，快去查看吧！</td>
-                                        <td><a href="">删除</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-03</td>
-                                        <td> 注册用户：【15648569451】，您的企业认证审核已通过，已获得开发者权限，试着上线应用吧！</td>
-                                        <td><a href="">删除</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td>  注册用户：【15648569451】，您的开具发票申请已受理完成，发票已由专门的快递送出，请耐心等候！</td>
-                                        <td><a href="">删除</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td> 注册用户：【15648569451】，您的账号余额已不足10元，可能将要面临收费功能不可用的情况，请及时充值吧！</td>
-                                        <td><a href="">删除</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td> 注册用户：【15648569451】，您的反馈意见已飞速到达我们的产品研发部门，感谢您提供的宝贵意见！</td>
-                                        <td><a href="">删除</a></td>
-                                    </tr>
+                                    <c:forEach items="${pageList.result}" var="result" varStatus="s">
+                                        <tr>
+                                            <td>${result.createTime}</td>
+                                            <td>${result.message.content}</td>
+                                            <td><a href="">删除</a></td>
+                                        </tr>
+                                    </c:forEach>
                                     </tbody>
                                 </table>
                             </section>
@@ -93,7 +69,6 @@
                                     </ul>
                                 </nav>
                             </section>
-
                         </section>
                     </section>
                 </aside>
