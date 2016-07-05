@@ -11,7 +11,7 @@ IS_SPRINGBOOT=false
 #是否需要强制安装
 FORCE_INSTALL=false
 
-while getopts "A:P:ST" opt; do
+while getopts "A:P:STI" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
@@ -47,7 +47,7 @@ fi
 pull_ret=`git pull`
 if [ "$pull_ret"x = "Already up-to-date."x ]; then
     #是否需要强制安装模块
-    if [ $FORCE_INSTALL ]; then
+    if [ $FORCE_INSTALL = true ]; then
         echo "安装模块代码"
         cd $YUNHUNI_HOME
         mvn clean compile install -U $ENV_PROFILE -DskipTests=true
@@ -68,11 +68,11 @@ ps -ef | grep "app-portal.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs
 
 cd $YUNHUNI_HOME/$APP_NAME
 echo "判断是否是TOMCAT:$IS_TOMCAT"
-if [ $IS_TOMCAT ]; then
+if [ $IS_TOMCAT = true ]; then
   echo "starting  tomcat ..."
   nohup mvn -U $ENV_PROFILE clean tomcat7:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
   #mvn -U $ENV_PROFILE clean tomcat7:run
-elif [ $IS_SPRINGBOOT ]; then
+elif [ $IS_SPRINGBOOT = true ]; then
   echo "starting springboot application...."
 fi
 echo "OK";
