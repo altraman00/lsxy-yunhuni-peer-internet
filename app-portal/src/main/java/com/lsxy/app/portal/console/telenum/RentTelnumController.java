@@ -54,10 +54,7 @@ public class RentTelnumController extends AbstractPortalController {
      */
     private RestResponse pageList(HttpServletRequest request,Integer  pageNo, Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/list";
-        Map map = new HashMap();
-        map.put("pageNo",pageNo);
-        map.put("pageSize",pageSize);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, Page.class);
+        String uri = restPrefixUrl +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
+        return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,pageNo,pageSize);
     }
 }

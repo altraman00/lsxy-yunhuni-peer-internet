@@ -80,7 +80,7 @@
                                             <td>${result.resourceTelenum.telNumber}</td>
                                             <td>${result.rentStatus}</td>
                                             <td><a href="#">${result.app.name}</a></td>
-                                            <td name="ymdTime">${result.rentExpire}</td>
+                                            <td><fmt:formatDate value="${result.rentExpire}" pattern="yyyy年MM月dd"/></td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
@@ -102,17 +102,5 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
- <script type="text/javascript" >
-     /*翻译日期*/
-     $(function(){
-         var times =  $('td[name="ymdTime"]');
-         for(var i = 0;i<times.length; i++){
-             var date = new Date(parseInt(times[i].innerHTML) ).toLocaleString();
-             var dates = date.split(" ");
-             var ymd = dates[0].split("/");
-             times[i].innerHTML = ymd[0]+"年"+ymd[1]+"月"+ymd[2]+"日";
-         }
-     })
- </script>
 </body>
 </html>

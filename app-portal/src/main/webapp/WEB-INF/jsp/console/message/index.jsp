@@ -42,9 +42,9 @@
                                     <tbody>
                                     <c:forEach items="${pageList.result}" var="result" varStatus="s">
                                         <tr>
-                                            <td name="ymdTime">${result.createTime}</td>
+                                            <td><fmt:formatDate value="${result.createTime}" pattern="yyyy年MM月dd"/></td>
                                             <td>${result.message.content}</td>
-                                            <td><a href="${ctx}/console/">删除</a></td>
+                                            <td><a href="${ctx}/console/message/account_message/delete?id=${result.id}">删除</a></td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
@@ -64,18 +64,6 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/history.js'> </script>
 <%@include file="/inc/footer.jsp"%>
-<script type="text/javascript" >
-    /*翻译日期*/
-    $(function(){
-        var times =  $('td[name="ymdTime"]');
-        for(var i = 0;i<times.length; i++){
-            var date = new Date(parseInt(times[i].innerHTML) ).toLocaleString();
-            var dates = date.split(" ");
-            var ymd = dates[0].split("/");
-            times[i].innerHTML = ymd[0]+"年"+ymd[1]+"月"+ymd[2]+"日";
-        }
-    })
- </script>
 </body>
 </html>
 

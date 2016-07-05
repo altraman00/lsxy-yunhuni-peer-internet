@@ -9,10 +9,14 @@ import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,14 +56,34 @@ public class AccountMessageController extends AbstractPortalController {
      */
     private RestResponse list(HttpServletRequest request, Integer  pageNo, Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/message/account_message/list";
-        Map map = new HashMap();
-        map.put("pageNo",pageNo);
-        map.put("pageSize",pageSize);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, Page.class);
+        String uri = restPrefixUrl +   "/rest/message/account_message/list?pageNo={1}&pageSize={2}";
+        return  RestRequest.buildSecurityRequest(token).getPage(uri, AccountMessage.class,pageNo,pageSize);
     }
-    public ModelAndView delete(HttpServletRequest request,String id){
-        ModelAndView mav = new ModelAndView();
-        return mav;
+    /**
+     * 删除用户消息
+     * @param request
+     * @param id 用户消息id
+     * @return
+     */
+    @RequestMapping("/delete")
+    public ModelAndView delete(HttpServletRequest request,String id,Integer pageNo){
+        deleteAccountMessage(request,id);
+        RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+        redirectAttributes.addAttribute("pageNo",pageNo);
+        return new ModelAndView("redirect:/console/message/account_message/index");
+    }
+
+    /**
+     * 更新后台用户消息状态为已删除
+     * @param request
+     * @param id 用户消息删除
+     * @return
+     */
+    private RestResponse deleteAccountMessage(HttpServletRequest request,String id){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/message/account_message/delete";
+        Map map = new HashMap();
+        map.put("id",id);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map, AccountMessage.class);
     }
 }
