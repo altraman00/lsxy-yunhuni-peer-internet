@@ -58,4 +58,8 @@ public class AccountMessageController extends AbstractPortalController {
         map.put("pageSize",pageSize);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, Page.class);
     }
+    public ModelAndView delete(HttpServletRequest request,String id){
+        ModelAndView mav = new ModelAndView();
+        return mav;
+    }
 }

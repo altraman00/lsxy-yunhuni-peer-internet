@@ -86,14 +86,7 @@
                                     </tbody>
                                 </table>
                             </section>
-                            <section class="panel panel-default yunhuni-personal">
-                                <nav class='pageWrap'>
-                                    <ul class="pagination">
-                                        <%@include file="/inc/paging.jsp"%>
-                                    </ul>
-                                </nav>
-                            </section>
-
+                            <%@include file="/inc/paging.jsp"%>
                         </section>
                     </section>
                 </aside>

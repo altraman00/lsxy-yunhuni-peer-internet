@@ -44,19 +44,13 @@
                                         <tr>
                                             <td name="ymdTime">${result.createTime}</td>
                                             <td>${result.message.content}</td>
-                                            <td><a href="">删除</a></td>
+                                            <td><a href="${ctx}/console/">删除</a></td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
                                 </table>
                             </section>
-                            <section class="panel panel-default yunhuni-personal">
-                                <nav class='pageWrap'>
-                                    <ul class="pagination">
-                                        <%@include file="/inc/paging.jsp"%>
-                                    </ul>
-                                </nav>
-                            </section>
+                            <%@include file="/inc/paging.jsp"%>
                         </section>
                     </section>
                 </aside>
