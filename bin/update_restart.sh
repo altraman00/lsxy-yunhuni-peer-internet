@@ -8,6 +8,8 @@ ENV_PROFILE="-Pdevelopment"
 #tomcat还是springboot
 IS_TOMCAT=false
 IS_SPRINGBOOT=false
+#是否需要强制安装
+FORCE_INSTALL=false
 
 while getopts "A:P:ST" opt; do
   case $opt in
@@ -22,6 +24,9 @@ while getopts "A:P:ST" opt; do
       ;;
     S)
       IS_SPRINGBOOT=true;
+      ;;
+    I)
+      FORCE_INSTALL=true;
       ;;
     \?)
       echo "Invalid option: -$OPTARG"   
@@ -40,9 +45,15 @@ fi
 
 #更新代码和安装模块组件
 pull_ret=`git pull`
-
 if [ "$pull_ret"x = "Already up-to-date."x ]; then
-    echo "已经是最新代码了 不用INSTALL了";
+    #是否需要强制安装模块
+    if [ FORCE_INSTALL ]; then
+        echo "安装模块代码"
+        cd $YUNHUNI_HOME
+        mvn clean compile install -U $ENV_PROFILE -DskipTests=true
+    else
+        echo "已经是最新代码了 不用INSTALL了";
+    fi
 else
     echo "安装模块代码"
     cd $YUNHUNI_HOME
