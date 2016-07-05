@@ -5,7 +5,6 @@ import com.lsxy.framework.core.utils.Page;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public interface BaseService<T>{
