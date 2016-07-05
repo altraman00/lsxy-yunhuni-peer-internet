@@ -9,14 +9,10 @@ import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +36,7 @@ public class AccountMessageController extends AbstractPortalController {
     public ModelAndView index(HttpServletRequest request,Integer pageNo){
         ModelAndView mav = new ModelAndView();
         if(pageNo==null){pageNo=1;}
-        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,20);
+        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,3);
         Page<AccountMessage> pageList = restResponse.getData();
         mav.addObject("pageUrl","/console/message/account_message/index");
         mav.addObject("pageList",pageList);
@@ -68,9 +64,9 @@ public class AccountMessageController extends AbstractPortalController {
     @RequestMapping("/delete")
     public ModelAndView delete(HttpServletRequest request,String id,Integer pageNo){
         deleteAccountMessage(request,id);
-        RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
-        redirectAttributes.addAttribute("pageNo",pageNo);
-        return new ModelAndView("redirect:/console/message/account_message/index");
+        ModelAndView mav = index(request,pageNo);
+        mav.addObject("msg","删除成功");
+        return mav;
     }
 
     /**
