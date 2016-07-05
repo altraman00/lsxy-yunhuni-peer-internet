@@ -39,25 +39,34 @@ then
 fi
 
 #更新代码和安装模块组件
-git pull
-cd $YUNHUNI_HOME
-mvn clean compile install -U $ENV_PROFILE -DskipTests=true
+pull_ret=`git pull`
+
+if [ "$pull_ret"x = "Already up-to-date."x ]; then
+    echo "已经是最新代码了 不用INSTALL了";
+else
+    echo "安装模块代码"
+    cd $YUNHUNI_HOME
+    mvn clean compile install -U $ENV_PROFILE -DskipTests=true
+fi
+
 
 #先停止制定的APP服务
-ps -ef | grep "app-portal.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9 
+echo "停止现有服务...."
+ps -ef | grep "app-portal.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 #启动服务脚本
 
 cd $YUNHUNI_HOME/$APP_NAME
 echo "判断是否是TOMCAT:$IS_TOMCAT"
 if [ $IS_TOMCAT ]; then
   echo "starting  tomcat ..."
-  nohup mvn -U $ENV_PROFILE clean tomcat7:run 1>> /opt/yunhuni/logs/app-portal.out 2>> /opt/yunhuni/logs/app-portal.out &
+  nohup mvn -U $ENV_PROFILE clean tomcat7:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
   #mvn -U $ENV_PROFILE clean tomcat7:run
 elif [ $IS_SPRINGBOOT ]; then
-  echo "starting springboot application...."  
+  echo "starting springboot application...."
 fi
 echo "OK";
 exit 1;
+
 cd ../bin
 
 if [ $# -gt 0 ]
