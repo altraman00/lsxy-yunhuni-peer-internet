@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * 用户消息
  * Created by zhangxb on 2016/7/5.
@@ -23,7 +25,7 @@ public class AccountMessageController extends AbstractRestController {
     AccountMessageService accountMessageService;
 
     /**
-     * 查询用户的消息
+     * 查询用户消息
      * @param pageNo 第几页
      * @param pageSize 每页多少条记录
      * @return
@@ -34,5 +36,19 @@ public class AccountMessageController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         Page<AccountMessage> list = accountMessageService.pageListByAccountId(userName,pageNo,pageSize);
         return RestResponse.success(list);
+    }
+
+    /**
+     * 根据用户消息id删除用户消息记录
+     * @param id 用户消息id
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    @RequestMapping("delete")
+    public RestResponse delete(String id) throws InvocationTargetException, IllegalAccessException {
+        AccountMessage accountMessage = accountMessageService.findById(id);
+        accountMessageService.delete(accountMessage);
+        return RestResponse.success(accountMessage);
     }
 }

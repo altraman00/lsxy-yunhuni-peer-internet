@@ -4,9 +4,8 @@
             <!--设置显示的页数-->
             <c:set var="startPageNo" value="1"></c:set>
             <c:set var="endPageNo" value="5"></c:set>
-            <c:set var="currentPageNo" value="${ pageList.currentPageNo-1}"></c:set>
-            <c:if test="${pageList.totalPageCount >5 && currentPageNo + 2 >5}">
-                <c:set var="endPageNo" value="${ currentPageNo+2}"></c:set>
+            <c:if test="${pageList.totalPageCount >5 && pageList.currentPageNo + 2 >5}">
+                <c:set var="endPageNo" value="${ pageList.currentPageNo+2}"></c:set>
                 <c:if test="${endPageNo>pageList.totalPageCount}">
                     <c:set var="endPageNo" value="${pageList.totalPageCount}"></c:set>
                 </c:if>
@@ -23,10 +22,10 @@
                 </li>
             </c:if>
             <c:forEach end="${endPageNo}" begin="${startPageNo}" varStatus="s" >
-                <c:if test="${currentPageNo == s.index}">
+                <c:if test="${pageList.currentPageNo == s.index}">
                     <li class="active"> <a href="${ctx}${pageUrl}?pageNo=${s.index}">${s.index}</a> </li>
                 </c:if>
-                <c:if test="${currentPageNo != s.index}">
+                <c:if test="${pageList.currentPageNo != s.index}">
                     <li> <a href="${ctx}${pageUrl}?pageNo=${s.index}">${s.index}</a> </li>
                 </c:if>
             </c:forEach>
