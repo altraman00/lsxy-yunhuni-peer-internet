@@ -10,8 +10,10 @@ IS_TOMCAT=false
 IS_SPRINGBOOT=false
 #是否需要强制安装
 FORCE_INSTALL=false
+#是否需要在最后TAIL LOG
+TAIL_LOG=false
 
-while getopts "A:P:STI" opt; do
+while getopts "A:P:STIL" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
@@ -27,6 +29,9 @@ while getopts "A:P:STI" opt; do
       ;;
     I)
       FORCE_INSTALL=true;
+      ;;
+    L)
+      TAIL_LOG=true;
       ;;
     \?)
       echo "Invalid option: -$OPTARG"   
@@ -74,17 +79,10 @@ if [ $IS_TOMCAT = true ]; then
   #mvn -U $ENV_PROFILE clean tomcat7:run
 elif [ $IS_SPRINGBOOT = true ]; then
   echo "starting springboot application...."
+  nohup mvn -U $ENV_PROFILE spring-boot:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
 fi
 echo "OK";
-exit 1;
 
-cd ../bin
-
-if [ $# -gt 0 ]
-    then
-        if [ $1 == "tail" ]
-        then
-         tail -f /opt/yunhuni/logs/app-portal.out
-    fi
+if [ $TAIL_LOG = true ]; then
+    tail -f /opt/yunhuni/logs/$APP_NAME.out
 fi
-
