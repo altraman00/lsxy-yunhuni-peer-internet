@@ -2,8 +2,6 @@ package com.lsxy.app.portal.console.home;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.app.portal.console.home.vo.AppStateVO;
-import com.lsxy.app.portal.console.home.vo.HomeVO;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -147,7 +145,7 @@ public class HomeController extends AbstractPortalController {
      */
     private Map getStatistics(String token, App app) {
         //获取当前App的统计数据
-        String appStatisticsUrl = PortalConstants.REST_PREFIX_URL + "/rest/callrecord/current_record_statistics?appId={}";
+        String appStatisticsUrl = PortalConstants.REST_PREFIX_URL + "/rest/callrecord/current_record_statistics?appId={1}";
         RestResponse<Map> statisticsResponse = RestRequest.buildSecurityRequest(token).get(appStatisticsUrl, Map.class,app.getId());
         return statisticsResponse.getData();
     }
