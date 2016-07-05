@@ -91,16 +91,16 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         Tenant tenant = tenantService.findTenantByUserName(userName);
         if(tenant != null){
             if(startTime != null && endTime != null){
-                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime between ?2 and ?3";
+                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime between ?2 and ?3 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),startTime,endTime);
             }else if(startTime != null && endTime == null){
-                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime >= ?2";
+                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime >= ?2 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),startTime);
             }else if(startTime == null && endTime != null){
-                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime <= ?2";
+                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime <= ?2 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime);
             }else{
-                String hql = "from Recharge obj where obj.tenant.id=?1";
+                String hql = "from Recharge obj where obj.tenant.id=?1 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
             }
         }

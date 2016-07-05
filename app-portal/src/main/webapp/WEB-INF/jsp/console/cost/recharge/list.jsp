@@ -122,7 +122,7 @@
                                             <tr>
                                                 <td scope="row">${s.index+1}</td>
                                                 <td>${result.orderId}</td>
-                                                <td><fmt:formatNumber value="${ result.amount}" pattern="#.##" /> </td>
+                                                <td><fmt:formatNumber value="${ result.amount}" pattern="#0.00" /> </td>
                                                 <td>
                                                     ${result.typeName}
                                                 </td>
