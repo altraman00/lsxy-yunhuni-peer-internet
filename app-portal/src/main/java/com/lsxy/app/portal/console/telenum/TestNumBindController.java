@@ -6,7 +6,7 @@ import com.lsxy.app.portal.console.account.InformationController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yuhuni.api.resourceTelenum.model.TestMobileBind;
+import com.lsxy.yuhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -24,8 +24,8 @@ import java.util.Map;
  * 测试号码绑定处理类
  */
 @Controller
-@RequestMapping("/console/telenum/bind")
-public class TestMobileBindController extends AbstractPortalController{
+@RequestMapping("/console/telenum/test_num_bind")
+public class TestNumBindController extends AbstractPortalController{
     private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     private static final String RESULT_SUCESS = "2";//处理结果-成功
@@ -40,8 +40,8 @@ public class TestMobileBindController extends AbstractPortalController{
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        RestResponse<List<TestMobileBind>> restResponse = list(request);
-        List<TestMobileBind> testMobileBindList = restResponse.getData();
+        RestResponse<List<TestNumBind>> restResponse = list(request);
+        List<TestNumBind> testMobileBindList = restResponse.getData();
         mav.addObject("testMobileBindList",testMobileBindList);
         mav.setViewName("/console/telenum/bind/index");
         return mav;
@@ -54,7 +54,7 @@ public class TestMobileBindController extends AbstractPortalController{
      */
     private RestResponse list(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_mobile_bind/list";
+        String uri = restPrefixUrl +   "/rest/test_num_bind/list";
         Map map = new HashMap();
         return  RestRequest.buildSecurityRequest(token).post(uri,map, List.class);
     }
@@ -69,8 +69,8 @@ public class TestMobileBindController extends AbstractPortalController{
     @ResponseBody
     public Map save(HttpServletRequest request,String number){
         Map hs = new HashMap();
-        RestResponse<TestMobileBind> restResponse = saveNumber(request,number);
-        TestMobileBind testMobileBind = restResponse.getData();
+        RestResponse<TestNumBind> restResponse = saveNumber(request,number);
+        TestNumBind testMobileBind = restResponse.getData();
         if("0020".equals(restResponse.getErrorCode())){
             hs.put("sucess", RESULT_FIAL);
             hs.put("msg",restResponse.getErrorMsg());
@@ -100,10 +100,10 @@ public class TestMobileBindController extends AbstractPortalController{
      */
     private RestResponse saveNumber(HttpServletRequest request,String number){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_mobile_bind/save";
+        String uri = restPrefixUrl +   "/rest/test_num_bind/save";
         Map map = new HashMap();
         map.put("number",number);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, TestMobileBind.class);
+        return  RestRequest.buildSecurityRequest(token).post(uri,map, TestNumBind.class);
     }
 
     /**
@@ -131,7 +131,7 @@ public class TestMobileBindController extends AbstractPortalController{
      */
     private RestResponse disbindNumber(HttpServletRequest request,String number){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_mobile_bind/disbind";
+        String uri = restPrefixUrl +   "/rest/test_num_bind/disbind";
         Map map = new HashMap();
         map.put("number",number);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, String.class);

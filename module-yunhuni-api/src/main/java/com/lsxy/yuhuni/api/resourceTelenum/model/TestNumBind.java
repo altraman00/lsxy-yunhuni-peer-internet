@@ -10,8 +10,8 @@ import javax.persistence.*;
  * Created by zhangxb on 2016/7/2.
  */
 @Entity
-@Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_test_mobile_bind")
-public class TestMobileBind extends IdEntity {
+@Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_test_num_bind")
+public class TestNumBind extends IdEntity {
     private String number;//测试号码
     Tenant tenant;//所属租户
 
