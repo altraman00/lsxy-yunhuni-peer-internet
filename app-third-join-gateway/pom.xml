@@ -15,26 +15,6 @@
         <start-class>com.lsxy.app.api.com.lsxy.third.gateway.MainClass</start-class>
         <java.version>1.8</java.version>
     </properties>
-    <dependencyManagement>
-        <dependencies>
-            <!-- Override Spring Data release train provided by Spring Boot -->
-            <dependency>
-                <groupId>org.springframework.data</groupId>
-                <artifactId>spring-data-releasetrain</artifactId>
-                <version>Fowler-SR2</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <!-- Import dependency management from Spring Boot -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>1.3.5.RELEASE</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
