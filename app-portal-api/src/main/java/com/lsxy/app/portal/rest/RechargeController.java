@@ -1,17 +1,23 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.recharge.model.Recharge;
 import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
 import com.lsxy.yuhuni.api.recharge.service.RechargeService;
 import com.lsxy.yuhuni.api.recharge.service.ThirdPayRecordService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * 充值RestApi接口
@@ -79,7 +85,7 @@ public class RechargeController extends AbstractRestController {
      */
     @RequestMapping("/pay_success")
     public RestResponse paySuccess(ThirdPayRecord payRecord) throws Exception {
-        Recharge recharge =  rechargeService.paySuccess(payRecord.getOrderId());
+        Recharge recharge =  rechargeService.paySuccess(payRecord.getOrderId(), payRecord.getTotalFee());
         if(recharge != null){
             try {
                 payRecord.setRecharge(recharge);
@@ -89,6 +95,35 @@ public class RechargeController extends AbstractRestController {
             }
         }
         return RestResponse.success(recharge);
+    }
+
+    /**
+     * 充值记录
+     * @param pageNo 当前页
+     * @param pageSize 每页总数
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/list")
+    public RestResponse list(Integer  pageNo, Integer pageSize,String startTime,String endTime) throws Exception {
+        Date startDate = null;
+        Date endDate = null;
+        if(StringUtils.isNotBlank(startTime)){
+            startDate = DateUtils.parseDate(startTime, "yyyy-MM");
+        }
+        if(StringUtils.isNotBlank(endTime)){
+            endDate = DateUtils.parseDate(endTime, "yyyy-MM");
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(endDate);
+            //当前月＋1，即下个月
+            cal.add(Calendar.MONTH,1);
+            endDate = cal.getTime();
+        }
+        String userName = getCurrentAccountUserName();
+        Page<Recharge> page = rechargeService.pageListByUserNameAndTime(userName,pageNo,pageSize,startDate,endDate);
+        return RestResponse.success(page);
     }
 
 }

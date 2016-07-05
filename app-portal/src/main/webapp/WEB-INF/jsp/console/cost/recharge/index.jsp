@@ -38,7 +38,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="./cost_order.html">充值订单</a>
+                                                <a href="${ctx}/console/cost/recharge/list">充值订单</a>
                                             </div>
                                         </li>
                                         <li>
@@ -112,7 +112,7 @@
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <div class="sectionWrap">
                                     <div class="cost-rechage cost-box">
-                                        <form:form action="${ctx }/console/cost/recharge/sure" id="costDefulat" method="post" >
+                                        <form:form action="${ctx }/console/cost/recharge/create" id="costDefulat" method="post" >
                                             <!-- 防止表单重复提交要加这个隐藏变量 -->
                                             <input type="hidden" name="submission_token" value="${submission_token}" />
 

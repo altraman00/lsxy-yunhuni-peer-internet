@@ -205,6 +205,10 @@ public abstract class AbstractService<T> implements BaseService<T> {
         long totalCount = (Long) obj;
 
         query = this.em.createQuery(jpql);
+        for (int i = 0; i < params.length; i++) {
+            Object object = params[i];
+            query.setParameter(i+1, object);
+        }
         query.setMaxResults(pageSize);
         query.setFirstResult(pageNo*pageSize);
         List list = query.getResultList();
