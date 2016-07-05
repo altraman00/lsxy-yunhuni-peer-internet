@@ -29,10 +29,10 @@ public class ResourcesRentController extends AbstractRestController{
      * @throws MatchMutiEntitiesException
      */
     @RequestMapping("/list")
-    public RestResponse pageList(String pageNo, String pageSize) throws MatchMutiEntitiesException {
+    public RestResponse pageList(Integer pageNo, Integer pageSize) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         //获取该租户下的所有号码信息
-        Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(userName,Integer.valueOf(pageNo),Integer.valueOf(pageSize));
+        Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(userName,pageNo,pageSize);
         return RestResponse.success(page);
     }
 
