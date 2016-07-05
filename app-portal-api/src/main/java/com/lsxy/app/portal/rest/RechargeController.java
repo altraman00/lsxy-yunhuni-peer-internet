@@ -79,7 +79,7 @@ public class RechargeController extends AbstractRestController {
      */
     @RequestMapping("/pay_success")
     public RestResponse paySuccess(ThirdPayRecord payRecord) throws Exception {
-        Recharge recharge =  rechargeService.paySuccess(payRecord.getOrderId());
+        Recharge recharge =  rechargeService.paySuccess(payRecord.getOrderId(), payRecord.getTotalFee());
         if(recharge != null){
             try {
                 payRecord.setRecharge(recharge);

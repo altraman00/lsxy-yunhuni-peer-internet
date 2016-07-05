@@ -218,9 +218,11 @@ public class RechargeController extends AbstractPortalController {
                 payRecord.setBuyerId(params.get("buyer_id"));
                 payRecord.setSellerName(params.get("seller_email"));
                 payRecord.setBuyerName(params.get("buyer_email"));
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, Object> map = mapper.convertValue(payRecord, Map.class);
-                RestRequest.buildSecurityRequest(token).post(successUrl, map,Recharge.class);
+                if(AlipayConfig.seller_id.equals(payRecord.getSellerId())){
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, Object> map = mapper.convertValue(payRecord, Map.class);
+                    RestRequest.buildSecurityRequest(token).post(successUrl, map,Recharge.class);
+                }
             }
         }
     }

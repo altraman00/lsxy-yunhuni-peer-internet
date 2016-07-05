@@ -30,7 +30,8 @@ public interface RechargeService extends BaseService<Recharge> {
      * 如果没有做过处理，根据订单号在系统中查到该笔订单的详细，并执行业务程序
      * 如果有做过处理，不执行商户的业务程序
      * @param orderId 充值记录的orderId
+     * @param totalFee
      * @return
      */
-    Recharge paySuccess(String orderId) throws MatchMutiEntitiesException;
+    Recharge paySuccess(String orderId, Double totalFee) throws MatchMutiEntitiesException;
 }
