@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -19,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 @SuppressWarnings({"unchecked","rawtypes"})
+@Transactional
 public abstract class AbstractService<T> implements BaseService<T> {
 
     private Logger logger = LoggerFactory.getLogger(com.google.common.util.concurrent.AbstractService.class);
