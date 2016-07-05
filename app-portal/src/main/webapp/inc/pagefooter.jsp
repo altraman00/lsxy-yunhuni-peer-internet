@@ -15,6 +15,9 @@
             <c:if test="${pageObj.totalPageCount <= endPageNo}">
                 <c:set  var="endPageNo" value="${pageObj.totalPageCount}"></c:set>
             </c:if>
+            <c:if test="${endPageNo - 4 > 0}">
+                <c:set  var="startPageNo" value="${endPageNo - 4}"></c:set>
+            </c:if>
 
             <c:if test="${startPageNo > 1}">
                 <li>

@@ -3,7 +3,6 @@ package com.lsxy.app.portal.rest;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.recharge.model.Recharge;
 import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
@@ -17,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -110,13 +110,19 @@ public class RechargeController extends AbstractRestController {
     public RestResponse list(Integer  pageNo, Integer pageSize,String startTime,String endTime) throws Exception {
         Date startDate = null;
         Date endDate = null;
-        if(StringUtils.isNotBlank(startTime)&&StringUtils.isNotBlank(endTime)){
+        if(StringUtils.isNotBlank(startTime)){
             startDate = DateUtils.parseDate(startTime, "yyyy-MM");
+        }
+        if(StringUtils.isNotBlank(endTime)){
             endDate = DateUtils.parseDate(endTime, "yyyy-MM");
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(endDate);
+            //当前月＋1，即下个月
+            cal.add(Calendar.MONTH,1);
+            endDate = cal.getTime();
         }
         String userName = getCurrentAccountUserName();
-        Page<Recharge> page = rechargeService.pageListByUserNameAndTime(userName,pageNo,pageSize,
-                startDate,endDate);
+        Page<Recharge> page = rechargeService.pageListByUserNameAndTime(userName,pageNo,pageSize,startDate,endDate);
         return RestResponse.success(page);
     }
 

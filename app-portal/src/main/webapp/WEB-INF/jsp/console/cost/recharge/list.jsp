@@ -91,17 +91,18 @@
                                         <div class="col-md-12 padder-v fix-padding">
                                             <div class='wrapperBox cost_month cost_month_select'>
                                                 <div class="panel-body clearfix border-top-none personal-base">
-                                                    <div class="row">
-                                                        从
-                                                        <input type="text" class="datepicker currentMonth form-control" value='' data-date-end-date="0m" />
-                                                        到
-                                                        <input type="text" class="datepicker lastMonth form-control" value='' data-date-end-date="0m" />
-                                                        <button class="btn btn-primary query">查询</button>
-                                                    </div>
+                                                    <form action="${ctx}/console/cost/recharge/list" method="get">
+                                                        <div class="row">
+                                                            从
+                                                            <input type="text" class="datepicker currentMonth form-control" name="startTime" value='${startTime}' data-date-end-date="0m" />
+                                                            到
+                                                            <input type="text" class="datepicker lastMonth form-control" name="endTime" value='${endTime}' data-date-end-date="0m" />
+                                                            <button class="btn btn-primary query">查询</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </section>
                                 <section class="panel panel-default pos-rlt clearfix ">
@@ -142,6 +143,7 @@
                                     </table>
                                 </section>
                                 <c:set var="pageUrl" value="${ctx}/console/cost/recharge/list"></c:set>
+                                <c:set var="extraParam" value="&startTime=${startTime}&endTime=${endTime}"></c:set>
                                 <%@include file="/inc/pagefooter.jsp" %>
                             </section>
                         </section>

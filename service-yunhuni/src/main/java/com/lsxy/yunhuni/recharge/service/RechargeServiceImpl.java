@@ -90,12 +90,18 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         Page<Recharge> page = null;
         Tenant tenant = tenantService.findTenantByUserName(userName);
         if(tenant != null){
-            if(startTime == null || endTime == null){
-                String hql = "from Recharge obj where obj.tenant.id=?1";
-                page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
-            }else{
+            if(startTime != null && endTime != null){
                 String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime between ?2 and ?3";
                 page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),startTime,endTime);
+            }else if(startTime != null && endTime == null){
+                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime >= ?2";
+                page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),startTime);
+            }else if(startTime == null && endTime != null){
+                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime <= ?2";
+                page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime);
+            }else{
+                String hql = "from Recharge obj where obj.tenant.id=?1";
+                page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
             }
         }
         return page;

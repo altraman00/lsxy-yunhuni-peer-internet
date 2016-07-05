@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.yuhuni.api.recharge.model.Recharge;
 
 import java.util.Date;
@@ -18,8 +17,8 @@ public class RechargeVO extends Recharge{
     private String orderId;               //订单ID
     private Date createTime;
 
-    private String typeName;
-    private String statusName;
+    private String typeName;                //页面显示的type的中文
+    private String statusName;              //页面显示的status的中文
 
     public RechargeVO(){
 
