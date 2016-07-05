@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.console.home.vo;
+package com.lsxy.app.portal.console.home;
 
 /**
  * Created by liups on 2016/6/27.

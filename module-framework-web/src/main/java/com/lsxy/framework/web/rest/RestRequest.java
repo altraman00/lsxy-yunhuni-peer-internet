@@ -81,7 +81,7 @@ public class RestRequest {
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
      * @param uriparams        url自动匹配替换的参数，如url为api/{a}/{b},参数为["1","2"],则解析的url为api/1/2，使用Map参数时，遵循按key匹配
      * @return
-     * http://xxxx/{}/{}{}{}/?a={}&c={}&d={}
+     * http://xxxx/{1}/{2}{3}{4}/?a={5}&c={6}&d={7} 注：{}里面一定要带一个字符，不然值设不进去
      */
     public <T> RestResponse<T> get(String url,Class<T> responseDataType, Object... uriparams) {
         return exchange(url,HttpMethod.GET,null,responseDataType,uriparams);
