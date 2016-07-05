@@ -24,7 +24,7 @@ import java.util.Map;
  * 测试号码绑定处理类
  */
 @Controller
-@RequestMapping("/console/telenum/test_num_bind")
+@RequestMapping("/console/telenum/bin")
 public class TestNumBindController extends AbstractPortalController{
     private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
