@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.recharge.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yuhuni.api.billing.model.Billing;
 import com.lsxy.yuhuni.api.billing.service.BillingService;
 import com.lsxy.yuhuni.api.recharge.enums.RechargeStatus;
@@ -12,12 +13,14 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.yuhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.recharge.dao.RechargeDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Created by liups on 2016/7/1.
@@ -65,7 +68,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     @Override
     public Recharge paySuccess(String orderId, Double totalFee) throws MatchMutiEntitiesException {
         Recharge recharge = rechargeDao.findByOrderId(orderId);
-        if(recharge != null && recharge.getAmount() == totalFee){
+        if(recharge != null && recharge.getAmount().equals(totalFee)){
             String status = recharge.getStatus();
             //如果充值记录是未支付状态，则将支付状态改成已支付，并将钱加到账务表里
             if(RechargeStatus.NOTPAID.name().equals(status)){
@@ -80,5 +83,21 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             }
         }
         return  recharge;
+    }
+
+    @Override
+    public Page<Recharge> pageListByUserNameAndTime(String userName, Integer pageNo, Integer pageSize, Date startTime, Date endTime) throws MatchMutiEntitiesException {
+        Page<Recharge> page = null;
+        Tenant tenant = tenantService.findTenantByUserName(userName);
+        if(tenant != null){
+            if(startTime == null || endTime == null){
+                String hql = "from Recharge obj where obj.tenant.id=?1";
+                page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
+            }else{
+                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime between ?2 and ?3";
+                page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),startTime,endTime);
+            }
+        }
+        return page;
     }
 }

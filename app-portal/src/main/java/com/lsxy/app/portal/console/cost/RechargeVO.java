@@ -1,21 +1,16 @@
-package com.lsxy.yuhuni.api.recharge.model;
+package com.lsxy.app.portal.console.cost;
 
-import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.yuhuni.api.recharge.enums.RechargeStatus;
-import com.lsxy.yuhuni.api.recharge.enums.RechargeType;
+import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.yuhuni.api.recharge.model.Recharge;
 
-import javax.persistence.*;
 import java.util.Date;
 
 /**
- * 充值记录表
- * Created by liups on 2016/7/1.
+ * 充值页面展示VO
+ * Created by liups on 2016/7/5.
  */
-@Entity
-@Table(schema = "db_lsxy_base", name = "tb_base_recharge")
-public class Recharge  extends IdEntity {
-
+public class RechargeVO extends Recharge{
     private Tenant tenant;                //所属租户
     private Double amount;                //充值金额
     private String type;                  //充值方式
@@ -23,69 +18,86 @@ public class Recharge  extends IdEntity {
     private String orderId;               //订单ID
     private Date createTime;
 
-    public Recharge() {
+    private String typeName;
+    private String statusName;
+
+    public RechargeVO(){
+
     }
 
-    public Recharge(Tenant tenant, Double amount, RechargeType type, RechargeStatus status, String orderId) {
-        this.tenant = tenant;
-        this.amount = amount;
-        this.type = type.name();
-        this.status = status.name();
-        this.orderId = orderId;
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
+    @Override
     public Tenant getTenant() {
         return tenant;
     }
 
+    @Override
     public void setTenant(Tenant tenant) {
         this.tenant = tenant;
     }
 
-    @Column(name = "amount")
+    @Override
     public Double getAmount() {
         return amount;
     }
 
+    @Override
     public void setAmount(Double amount) {
         this.amount = amount;
     }
 
-    @Column(name = "type")
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
-    @Column(name = "status")
+    @Override
     public String getStatus() {
         return status;
     }
 
+    @Override
     public void setStatus(String status) {
         this.status = status;
     }
 
-    @Column(name = "order_id")
+    @Override
     public String getOrderId() {
         return orderId;
     }
 
+    @Override
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
-    @Column(name = "create_time")
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
 
+    @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
     }
 }

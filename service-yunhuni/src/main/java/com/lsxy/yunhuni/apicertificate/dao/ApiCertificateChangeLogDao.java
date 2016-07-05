@@ -5,7 +5,7 @@ import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificateChangeLog;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * 鉴权账号（凭证）变更记录查询dao

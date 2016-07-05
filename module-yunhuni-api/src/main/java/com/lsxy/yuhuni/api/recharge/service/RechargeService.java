@@ -2,7 +2,11 @@ package com.lsxy.yuhuni.api.recharge.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yuhuni.api.recharge.model.Recharge;
+
+import java.util.Date;
+
 
 /**
  * 充值相关接口
@@ -34,4 +38,15 @@ public interface RechargeService extends BaseService<Recharge> {
      * @return
      */
     Recharge paySuccess(String orderId, Double totalFee) throws MatchMutiEntitiesException;
+
+    /**
+     * 充值记录
+     * @param userName 用户名
+     * @param pageNo 当前页数
+     * @param pageSize 每页总数
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    Page<Recharge> pageListByUserNameAndTime(String userName, Integer pageNo, Integer pageSize, Date startTime, Date endTime) throws MatchMutiEntitiesException;
 }

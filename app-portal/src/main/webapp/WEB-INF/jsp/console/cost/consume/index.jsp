@@ -41,7 +41,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="./cost_order.html">充值订单</a>
+                                                <a href="${ctx}/console/cost/recharge/list">充值订单</a>
                                             </div>
                                         </li>
                                         <li>

@@ -1,23 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@include file="/inc/import.jsp" %>
+
 <!DOCTYPE html>
 <html>
-
-<!-- header -->
 <head>
     <%@include file="/inc/meta.jsp" %>
-
 </head>
-
 <body>
 <section class="vbox">
-<%@include file="/inc/headerNav.jsp"%>
+    <%@include file="/inc/headerNav.jsp"%>
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
             <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
             <!-- /.aside -->
-
             <section id="content">
                 <section class="hbox stretch">
                     <!-- 如果没有三级导航 这段代码注释-->
@@ -36,7 +32,7 @@
                                                 </div>
                                             </li>
                                             <li>
-                                                <div class="aside-li-a ">
+                                                <div class="aside-li-a">
                                                     <a href="${ctx}/console/cost/recharge">充值</a>
                                                 </div>
                                             </li>
@@ -78,8 +74,8 @@
                                 </section>
                             </section>
                         </section>
-
                     </aside>
+
                     <aside>
                         <section class="vbox xbox">
                             <!-- 如果没有三级导航 这段代码注释-->
@@ -87,31 +83,70 @@
                                     class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                             </div>
                             <div class="wrapper header">
-                                <span class="border-left">&nbsp;充值</span></div>
-
+                                <span class="border-left">&nbsp;充值订单记录</span>
+                            </div>
                             <section class="scrollable wrapper w-f">
-                                <section class="panel panel-default pos-rlt clearfix ">
-                                    <div class="sectionWrap">
-                                        <div class="row">
-                                            <div class="cost-box" >
-                                                <p class="surecolor"><strong>充值订单确认</strong></p>
-                                                <p><span>充值金额：</span>
-                                                    <span class="cost-money">${balanceInt}<span class="floatmoney">.${balanceDec}</span> <span class="unit">元</span></span> </p>
-                                                <p>订单号：${recharge.orderId}</p>
-                                                <p>充值方式：${recharge.typeName}</p>
-                                                <p>订单状态：${recharge.statusName}</p>
-                                                <br/>
-                                                <form:form action="${ctx}/console/cost/recharge/to_alipay" method="post" target="_blank">
-                                                    <input type="hidden" name="orderId" value="${recharge.orderId}" />
-                                                    <button id="paysubmit" type="submit" class="btn btn-primary  btn-form ">付款</button>
-                                                </form:form>
+                                <section class="panel panel-default yunhuni-personal">
+                                    <div class="row m-l-none m-r-none bg-light lter">
+                                        <div class="col-md-12 padder-v fix-padding">
+                                            <div class='wrapperBox cost_month cost_month_select'>
+                                                <div class="panel-body clearfix border-top-none personal-base">
+                                                    <div class="row">
+                                                        从
+                                                        <input type="text" class="datepicker currentMonth form-control" value='' data-date-end-date="0m" />
+                                                        到
+                                                        <input type="text" class="datepicker lastMonth form-control" value='' data-date-end-date="0m" />
+                                                        <button class="btn btn-primary query">查询</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </section>
+                                <section class="panel panel-default pos-rlt clearfix ">
+                                    <table class="table table-striped cost-table-history tablelist">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>订单号</th>
+                                            <th>金额</th>
+                                            <th>充值方式</th>
+                                            <th>订单创建时间</th>
+                                            <th>支付状态</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <c:forEach items="${pageObj.result}" var="result" varStatus="s">
+                                            <tr>
+                                                <td scope="row">${s.index+1}</td>
+                                                <td>${result.orderId}</td>
+                                                <td><fmt:formatNumber value="${ result.amount}" pattern="#.##" /> </td>
+                                                <td>
+                                                    ${result.typeName}
+                                                </td>
+                                                <td>
+                                                    <fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                                                </td>
+                                                <td>
+                                                    <c:if test="${'NOTPAID' eq result.status}">
+                                                        <a href="${ctx}/console/cost/recharge/get?orderId=${result.orderId}" class="nosuccess text-underline" >${result.statusName}</a>
+                                                    </c:if>
+                                                    <c:if test="${'PAID' eq result.status}">
+                                                        <a class="success">${result.statusName}</a>
+                                                    </c:if>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </section>
+                                <c:set var="pageUrl" value="${ctx}/console/cost/recharge/list"></c:set>
+                                <%@include file="/inc/pagefooter.jsp" %>
                             </section>
                         </section>
                     </aside>
+
                 </section>
                 <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
             </section>
@@ -119,33 +154,9 @@
     </section>
 </section>
 <%@include file="/inc/footer.jsp"%>
+<script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
+<script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
+<script type="text/javascript" src="${resPrefixUrl }/js/cost/order.js"></script><!--must-->
 </body>
-<script>
-    $(document).ready(function () {
-        $('#paysubmit').click(function(){
-            bootbox.dialog({
-                message: "将在新窗口为您打开付款界面，请按提示进行操作。",
-                title: "付款提示",
-                buttons: {
-                    danger: {
-                        label: "我已付款!",
-                        className: "btn-primary",
-                        callback: function() {
-                            window.location.href = ctx + '/console/cost/recharge/list';
-                        }
-                    },
-                    success: {
-                        label: "查看订单",
-                        className: "btn-success",
-                        callback: function() {
-                            window.location.href = ctx + '/console/cost/recharge/list';
-                        }
-                    },
-                }
-            });
-        })
-    });
-
-</script>
 </html>
 
