@@ -70,7 +70,9 @@ fi
 
 #先停止制定的APP服务
 echo "停止现有服务...."
-ps -ef | grep "app-portal.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
+ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
+ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
+
 #启动服务脚本
 
 cd $YUNHUNI_HOME/$APP_NAME
