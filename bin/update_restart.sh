@@ -47,7 +47,7 @@ fi
 pull_ret=`git pull`
 if [ "$pull_ret"x = "Already up-to-date."x ]; then
     #是否需要强制安装模块
-    if [ FORCE_INSTALL ]; then
+    if [ $FORCE_INSTALL ]; then
         echo "安装模块代码"
         cd $YUNHUNI_HOME
         mvn clean compile install -U $ENV_PROFILE -DskipTests=true
