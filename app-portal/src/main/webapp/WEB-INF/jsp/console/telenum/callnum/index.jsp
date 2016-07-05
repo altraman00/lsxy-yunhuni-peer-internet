@@ -80,7 +80,7 @@
                                             <td>${result.resourceTelenum.telNumber}</td>
                                             <td>${result.rentStatus}</td>
                                             <td><a href="#">${result.app.name}</a></td>
-                                            <td><div name="rentExpireTime">${result.rentExpire}</div></td>
+                                            <td name="ymdTime">${result.rentExpire}</td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
@@ -89,43 +89,7 @@
                             <section class="panel panel-default yunhuni-personal">
                                 <nav class='pageWrap'>
                                     <ul class="pagination">
-                                        <!--设置显示的页数-->
-                                        <c:set var="startPageNo" value="1"></c:set>
-                                        <c:set var="endPageNo" value="5"></c:set>
-                                        <c:if test="${ pageList.currentPageNo + 2 >5}">
-                                            <c:set var="startPageNo" value="${ pageList.currentPageNo-2}"></c:set>
-                                            <c:set var="endPageNo" value="${ pageList.currentPageNo+2}"></c:set>
-                                        </c:if>
-                                        <c:if test="${pageList.totalPageCount <= endPageNo}">
-                                            <c:set  var="endPageNo" value="${pageList.totalPageCount}"></c:set>
-                                        </c:if>
-
-
-                                        <c:if test="${startPageNo > 1}">
-                                            <li>
-                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${startPageNo-1}&pageSize=20" aria-label="Previous">
-                                                    <span aria-hidden="true">&laquo;</span>
-                                                </a>
-                                            </li>
-                                        </c:if>
-
-                                        <c:forEach end="${endPageNo}" begin="${startPageNo}" varStatus="s" >
-                                            <li
-                                                <c:if test="${pageList.currentPageNo == s.index}">
-                                                    class="active"
-                                                </c:if>
-                                            >
-                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${s.index}&pageSize=20">${s.index}</a>
-                                            </li>
-                                        </c:forEach>
-
-                                        <c:if test="${pageList.totalPageCount>endPageNo}">
-                                            <li>
-                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=${endPageNo+1}&pageSize=20" aria-label="Next">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                </a>
-                                            </li>
-                                        </c:if>
+                                        <%@include file="/inc/paging.jsp"%>
                                     </ul>
                                 </nav>
                             </section>
@@ -146,18 +110,14 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
  <script type="text/javascript" >
-     /*处理日期方法*/
-     function getLocalTime(nS) {
-         var date = new Date(parseInt(nS) ).toLocaleString();
-         var dates = date.split(" ");
-         var ymd = dates[0].split("/");
-         return ymd[0]+"年"+ymd[1]+"月"+ymd[2]+"日";
-     }
      /*翻译日期*/
      $(function(){
-         var times =  $('div[name="rentExpireTime"]');
+         var times =  $('td[name="ymdTime"]');
          for(var i = 0;i<times.length; i++){
-             times[i].innerHTML = getLocalTime(times[i].innerHTML);
+             var date = new Date(parseInt(times[i].innerHTML) ).toLocaleString();
+             var dates = date.split(" ");
+             var ymd = dates[0].split("/");
+             times[i].innerHTML = ymd[0]+"年"+ymd[1]+"月"+ymd[2]+"日";
          }
      })
  </script>

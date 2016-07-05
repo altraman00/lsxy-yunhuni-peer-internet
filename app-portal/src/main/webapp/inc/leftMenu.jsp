@@ -31,12 +31,12 @@
 								<a data-toggle="tooltip" data-placement='right' title='应用管理' href="fee.html"> <i class="fa fa-desktop icon"></i> <span>应用管理</span> </a>
 							</li>
 							<li class="nav-router " data-router="telenum">
-								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="${ctx}/console/telenum/callnum/index?pageNo=1&pageSize=20"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
+								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="${ctx}/console/telenum/callnum/index"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
 							</li>
 						</ul>
 					</li>
 					<li class="border-top">
-						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="${ctx}/console/message/account_message/index?pageNo=1&pageSize=20" class="canbehover nav-router"  data-router="message" >
+						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="${ctx}/console/message/account_message/index" class="canbehover nav-router"  data-router="message" >
 							<i class="fa fa-envelope icon"> </i>
 							<span>消息中心</span>
 						</a>

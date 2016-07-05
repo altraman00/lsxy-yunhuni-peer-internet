@@ -30,14 +30,15 @@ public class AccountMessageController extends AbstractPortalController {
      * 用户消息首页
      * @param request
      * @param pageNo 第几页
-     * @param pageSize 记录数
      * @return
      */
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request,Integer pageNo,Integer pageSize){
+    public ModelAndView index(HttpServletRequest request,Integer pageNo){
         ModelAndView mav = new ModelAndView();
-        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,pageSize);
+        if(pageNo==null){pageNo=1;}
+        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,20);
         Page<AccountMessage> pageList = restResponse.getData();
+        mav.addObject("pageUrl","/console/message/account_message/index");
         mav.addObject("pageList",pageList);
         mav.setViewName("/console/message/index");
         return mav;

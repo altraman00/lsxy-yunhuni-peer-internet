@@ -1,10 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@include file="/inc/import.jsp" %>
-
 <!DOCTYPE html>
 <html>
+
+<!-- header -->
 <head>
     <%@include file="/inc/meta.jsp" %>
+
 </head>
 <body>
 <section class="vbox">
@@ -12,7 +14,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green  aside hidden-print "  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
             <!-- /.aside -->
 
         <section id="content">
@@ -40,7 +42,7 @@
                                     <tbody>
                                     <c:forEach items="${pageList.result}" var="result" varStatus="s">
                                         <tr>
-                                            <td>${result.createTime}</td>
+                                            <td name="ymdTime">${result.createTime}</td>
                                             <td>${result.message.content}</td>
                                             <td><a href="">删除</a></td>
                                         </tr>
@@ -51,21 +53,7 @@
                             <section class="panel panel-default yunhuni-personal">
                                 <nav class='pageWrap'>
                                     <ul class="pagination">
-                                        <li>
-                                            <a href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li class="active"><a href="#">1</a></li>
-                                        <li><a href="#">2</a></li>
-                                        <li><a href="#">3</a></li>
-                                        <li><a href="#">4</a></li>
-                                        <li><a href="#">5</a></li>
-                                        <li>
-                                            <a href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
+                                        <%@include file="/inc/paging.jsp"%>
                                     </ul>
                                 </nav>
                             </section>
@@ -78,22 +66,22 @@
     </section>
 </section>
 
-
-
-
-
-<script src="${resPrefixUrl }/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
-<script src="${resPrefixUrl }/js/charts/flot/jquery.flot.min.js" cache="false"></script>
-<script src="${resPrefixUrl }/js/bootbox.min.js"></script>
-<script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
-
-
-
-<script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/history.js'> </script>
- <%@include file="/inc/footer.jsp"%>
+<%@include file="/inc/footer.jsp"%>
+<script type="text/javascript" >
+    /*翻译日期*/
+    $(function(){
+        var times =  $('td[name="ymdTime"]');
+        for(var i = 0;i<times.length; i++){
+            var date = new Date(parseInt(times[i].innerHTML) ).toLocaleString();
+            var dates = date.split(" ");
+            var ymd = dates[0].split("/");
+            times[i].innerHTML = ymd[0]+"年"+ymd[1]+"月"+ymd[2]+"日";
+        }
+    })
+ </script>
 </body>
 </html>
 

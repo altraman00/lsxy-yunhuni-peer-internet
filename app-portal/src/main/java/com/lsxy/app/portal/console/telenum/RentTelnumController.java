@@ -31,14 +31,15 @@ public class RentTelnumController extends AbstractPortalController {
      * 呼入号码管理首页
      * @param request
      * @param pageNo 请求的页面
-     * @param pageSize 每页多少条数据
      * @return
      */
     @RequestMapping("/index" )
-    public ModelAndView index(HttpServletRequest request,Integer pageNo, Integer pageSize){
+    public ModelAndView index(HttpServletRequest request,Integer pageNo){
         ModelAndView mav = new ModelAndView();
-        RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,pageSize);
+        if(pageNo==null){pageNo=1;}
+        RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,20);
         Page pageList= restResponse.getData();
+        mav.addObject("pageUrl","/console/telenum/callnum/index");
         mav.addObject("pageList",pageList);
         mav.setViewName("/console/telenum/callnum/index");
         return mav;

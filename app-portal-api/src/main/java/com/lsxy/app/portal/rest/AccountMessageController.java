@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 用户消息
  * Created by zhangxb on 2016/7/5.
  */
 @RequestMapping("/rest/message/account_message")
