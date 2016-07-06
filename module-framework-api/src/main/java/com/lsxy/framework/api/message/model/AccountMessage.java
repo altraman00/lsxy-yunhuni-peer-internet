@@ -6,8 +6,6 @@ import com.lsxy.framework.api.tenant.model.Account;
 import javax.persistence.*;
 import java.util.Date;
 
-import static org.apache.zookeeper.ZooDefs.OpCode.create;
-
 /**
  * 用户消息
  * Created by zhangxb on 2016/7/4.

@@ -18,5 +18,5 @@ public interface AccountMessageService extends BaseService<AccountMessage>{
      * @return
      * @throws MatchMutiEntitiesException
      */
-    public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize) throws MatchMutiEntitiesException;
+    public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize)throws MatchMutiEntitiesException ;
 }

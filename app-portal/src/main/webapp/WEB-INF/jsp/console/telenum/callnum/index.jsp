@@ -80,7 +80,7 @@
                                             <td>${result.resourceTelenum.telNumber}</td>
                                             <td>${result.rentStatus}</td>
                                             <td><a href="#">${result.app.name}</a></td>
-                                            <td><fmt:formatDate value="${result.rentExpire}" pattern="yyyy年MM月dd"/></td>
+                                            <td><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>

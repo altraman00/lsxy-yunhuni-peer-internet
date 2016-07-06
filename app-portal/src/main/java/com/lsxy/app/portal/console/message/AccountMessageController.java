@@ -36,7 +36,7 @@ public class AccountMessageController extends AbstractPortalController {
     public ModelAndView index(HttpServletRequest request,Integer pageNo){
         ModelAndView mav = new ModelAndView();
         if(pageNo==null){pageNo=1;}
-        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,3);
+        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,20);
         Page<AccountMessage> pageList = restResponse.getData();
         mav.addObject("pageUrl","/console/message/account_message/index");
         mav.addObject("pageList",pageList);

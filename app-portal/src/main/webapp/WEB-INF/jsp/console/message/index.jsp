@@ -42,7 +42,7 @@
                                     <tbody>
                                     <c:forEach items="${pageList.result}" var="result" varStatus="s">
                                         <tr>
-                                            <td><fmt:formatDate value="${result.createTime}" pattern="yyyy年MM月dd"/></td>
+                                            <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd"/></td>
                                             <td>${result.message.content}</td>
                                             <td><a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageList.currentPageNo}">删除</a></td>
                                         </tr>

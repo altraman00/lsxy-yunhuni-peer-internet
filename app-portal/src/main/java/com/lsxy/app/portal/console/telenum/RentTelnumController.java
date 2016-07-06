@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 呼入号码管理
@@ -36,7 +34,6 @@ public class RentTelnumController extends AbstractPortalController {
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request,Integer pageNo){
         ModelAndView mav = new ModelAndView();
-        if(pageNo==null){pageNo=1;}
         RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,20);
         Page pageList= restResponse.getData();
         mav.addObject("pageUrl","/console/telenum/callnum/index");
@@ -54,6 +51,7 @@ public class RentTelnumController extends AbstractPortalController {
      */
     private RestResponse pageList(HttpServletRequest request,Integer  pageNo, Integer pageSize){
         String token = getSecurityToken(request);
+        if(pageNo==null){pageNo=1;}
         String uri = restPrefixUrl +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
         return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,pageNo,pageSize);
     }

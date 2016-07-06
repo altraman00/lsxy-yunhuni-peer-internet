@@ -45,7 +45,7 @@ public class AccountMessageController extends AbstractRestController {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    @RequestMapping("delete")
+    @RequestMapping("/delete")
     public RestResponse delete(String id) throws InvocationTargetException, IllegalAccessException {
         AccountMessage accountMessage = accountMessageService.findById(id);
         accountMessageService.delete(accountMessage);
