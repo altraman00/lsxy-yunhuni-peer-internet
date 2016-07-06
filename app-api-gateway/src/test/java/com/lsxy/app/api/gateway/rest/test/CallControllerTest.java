@@ -27,7 +27,7 @@ public class CallControllerTest {
     @Test
     public void testDoCall(){
         String url = restPrefixUrl + "/v1/account/12345678/call";
-        RestResponse<String> response = RestRequest.buildRequest().get(url,String.class);
+        RestResponse<String> response = APIGWRestRequest.buildSecurityRequest(url).get(url,String.class);
         Assert.notNull(response);
         Assert.isTrue(response.getData().equals("12345678"));
 

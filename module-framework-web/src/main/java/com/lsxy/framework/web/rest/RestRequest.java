@@ -175,10 +175,8 @@ public class RestRequest {
         if(params != null){
             params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
         }
-        HttpHeaders headers = new HttpHeaders();
-        if (StringUtil.isNotEmpty(this.securityToken)) {
-            headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
-        }
+        //构建请求头信息
+        HttpHeaders headers = buildHttpHeaders();
         HttpEntity entity = new HttpEntity(requestEntity,headers);
 
         if(logger.isDebugEnabled()){
@@ -199,6 +197,18 @@ public class RestRequest {
             logger.debug("[{}]REST响应{}",this.id,restResponse);
         }
         return restResponse;
+    }
+
+    /**
+     * 构建http header头信息
+     * @return
+     */
+    protected HttpHeaders buildHttpHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        if (StringUtil.isNotEmpty(this.securityToken)) {
+            headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
+        }
+        return headers;
     }
 
 

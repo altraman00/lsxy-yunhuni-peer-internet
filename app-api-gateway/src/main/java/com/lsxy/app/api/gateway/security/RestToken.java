@@ -1,6 +1,7 @@
 package com.lsxy.app.api.gateway.security;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.Date;
@@ -18,7 +19,7 @@ public class RestToken extends UsernamePasswordAuthenticationToken {
     }
 
     // this constructor creates an authenticated token (see super-class)
-    public RestToken(String principal, RestCredentials credentials, Date timestamp, Collection authorities) {
+    public RestToken(String principal, RestCredentials credentials, Date timestamp, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities);
         this.timestamp = timestamp;
     }

@@ -43,7 +43,7 @@ public class Page<T> implements Serializable {
 	 */
 	@SuppressWarnings("rawtypes")
 	public Page() {
-		this(0, 0, DEFAULT_PAGE_SIZE, new ArrayList());
+		this(0, 0, DEFAULT_PAGE_SIZE, new ArrayList<T>());
 	}
 
 	/**
