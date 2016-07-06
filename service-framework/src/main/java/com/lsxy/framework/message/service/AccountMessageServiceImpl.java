@@ -6,9 +6,10 @@ import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.message.dao.AccountMessageDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.io.Serializable;
  */
 @Service
 public class AccountMessageServiceImpl extends AbstractService<AccountMessage> implements AccountMessageService{
+    private static final Logger logger = LoggerFactory.getLogger(AccountMessageServiceImpl.class);
     @Autowired
     AccountMessageDao accountMessageDao;
     @Autowired
@@ -30,8 +32,8 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     }
 
     @Override
-    public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize) throws MatchMutiEntitiesException {
-        Account account = accountService.findAccountByUserName(userName);
+    public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize) {
+        Account  account = accountService.findAccountByUserName(userName);
         String hql = "from AccountMessage obj where obj.account.id="+account.getId()+" and obj.status <>-1 order by status asc,create_time desc";
         Page<AccountMessage> page =  this.pageList(hql,pageNo,pageSize);
         return page;

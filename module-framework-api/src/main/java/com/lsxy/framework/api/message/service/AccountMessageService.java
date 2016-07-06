@@ -2,7 +2,6 @@ package com.lsxy.framework.api.message.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.message.model.AccountMessage;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 
 /**
@@ -16,7 +15,6 @@ public interface AccountMessageService extends BaseService<AccountMessage>{
      * @param pageNo 第几页
      * @param pageSize 多少页
      * @return
-     * @throws MatchMutiEntitiesException
      */
-    public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize)throws MatchMutiEntitiesException ;
+    public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize);
 }
