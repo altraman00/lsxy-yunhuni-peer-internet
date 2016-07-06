@@ -11,6 +11,9 @@ import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import static com.lsxy.framework.web.rest.RestRequest.buildRequest;
 
 /**
@@ -26,13 +29,15 @@ public class CallControllerTest {
 
     @Test
     public void testDoCall(){
-        String url = restPrefixUrl + "/v1/account/12345678/call";
-        RestResponse<String> response = APIGWRestRequest.buildSecurityRequest(url).get(url,String.class);
+        String url = restPrefixUrl + "v1/account/12345678/call";
+        String certid = "1";
+        RestResponse<String> response = APIGWRestRequest.buildSecurityRequest(certid).get(url,String.class);
         Assert.notNull(response);
         Assert.isTrue(response.getData().equals("12345678"));
 
 
     }
+
 
 
 

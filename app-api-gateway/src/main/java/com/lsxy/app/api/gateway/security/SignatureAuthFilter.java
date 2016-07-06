@@ -90,6 +90,7 @@ public class SignatureAuthFilter extends GenericFilterBean{
                 .append(contentType).append("\n")
                 .append(timestamp).append("\n")
                 .append(request.getRequestURI());
+
 // a rest credential is composed by request data to sign and the signature
         RestCredentials restCredential = new RestCredentials(toSign.toString(), auth[1]);
 

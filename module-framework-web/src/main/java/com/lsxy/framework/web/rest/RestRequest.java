@@ -161,29 +161,50 @@ public class RestRequest {
     }
 
     /**
+     * rest api post request method
+     *
+     * @param url              目标地址
+     * @param params           请求post 参数
+     * @param responseDataType 返回对象类型
+     * @param <T>              返回对象类型
+     * @return
+     */
+
+    public <T> RestResponse<T> post(String url, String payload, Class<T> responseDataType, String... uriparams) {
+        return exchange(url,HttpMethod.POST,payload,responseDataType,uriparams);
+    }
+    /**
      * 公用的代码抽取
      * @param url              请求的目标url 地址
      * @param httpMethod       请求的方式
-     * @param params           请求参数
+     * @param payload           请求参数  可以是Map或者是String 用于处理post body
      * @param responseDataType 请求返回对象restresponse中data属性的数据类型
      * @param <T>              用户指定rest response返回对象中data属性的数据对象类
      * @return
      */
-    public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Map<String, Object> params, Class<T> responseDataType,Object... uriparams){
+    public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Object payload, Class<T> responseDataType,Object... uriparams){
         RestResponse<T> restResponse = null;
         MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
-        if(params != null){
-            params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
-        }
+        HttpEntity entity = null;
         //构建请求头信息
-        HttpHeaders headers = buildHttpHeaders();
-        HttpEntity entity = new HttpEntity(requestEntity,headers);
+        HttpHeaders headers = buildHttpHeaders(url,httpMethod,payload,uriparams);
+
+        if(payload instanceof  Map){
+            Map<String,Object> params = (Map<String, Object>) payload;
+            if(params != null){
+                params.keySet().stream().forEach(key -> requestEntity.add(key, MapUtils.getString(params, key, "")));
+            }
+            entity = new HttpEntity(requestEntity,headers);
+        }else{
+            entity = new HttpEntity(payload,headers);
+        }
 
         if(logger.isDebugEnabled()){
             logger.debug("[{}]REST请求：{} ",this.id,url);
-            logger.debug("[{}]REST请求参数：{}",this.id,params);
+            logger.debug("[{}]REST请求参数：{}",this.id,payload);
             logger.debug("[{}]REST请求头：{}",this.id,entity.getHeaders());
         }
+
         HttpEntity<RestResponse> response = this.restTemplate.exchange(url, httpMethod, entity, RestResponse.class,uriparams);
         if (response != null) {
             restResponse = response.getBody();
@@ -202,8 +223,12 @@ public class RestRequest {
     /**
      * 构建http header头信息
      * @return
+     * @param url
+     * @param httpMethod
+     * @param params
+     * @param uriparams
      */
-    protected HttpHeaders buildHttpHeaders() {
+    protected HttpHeaders buildHttpHeaders(String url, HttpMethod httpMethod,Object  params, Object[] uriparams) {
         HttpHeaders headers = new HttpHeaders();
         if (StringUtil.isNotEmpty(this.securityToken)) {
             headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
