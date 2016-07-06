@@ -29,9 +29,10 @@
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-2 col-md-offset-9 padder-v fix-padding">
                                         <select   class="form-control myselectapp">
-                                            <option value="1">全部应用</option>
-                                            <option value="2">应用2</option>
-                                            <option value="3">应用3</option>
+                                            <option value="0">全部应用</option>
+                                            <c:forEach items="${appList}" var="app">
+                                                <option value="${app.id}">${app.name}</option>
+                                            </c:forEach>
                                         </select>
                                     </div>
                                 </div>
@@ -54,7 +55,7 @@
                                 <!--日统计-->
                                 <div class="row monthform" >
                                     <div class="col-md-12">
-                                        <input type="text" class="datepicker currentMonth form-control date_block monthstart" value="2016-07" />
+                                        <input type="text" class="datepicker currentMonth form-control date_block monthstart" value="${initTime}" />
                                         <span class="monthcontrast"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" /></span>
                                         <button class="btn btn-primary finddatebtn" data-id="month" >查询</button>
                                         <button class="btn btn-default compassbtn monthcbtn" data-id="month">对比</button>
@@ -248,12 +249,22 @@
      */
     function initchart(){
         var type = $('input[name="stime"]:checked').val();
-        var app = $('.myselectapp').val();
-        var starttime = initialStartTime(type);
-        var endtime = initialEndTime(type);
-        //console.log(starttime+','+endtime+','+type+','+app);
-        var param  = {starttime:starttime,endtime:endtime,type:type,app:app};
-        console.log(param);
+        var appId = $('.myselectapp').val();
+        var startTime = initialStartTime(type);
+        var endTime = initialEndTime(type);
+        $.ajax({
+            url : "${ctx}/console/statistics/consume/list",
+            type : 'post',
+            async: false,//使用同步的方式,true为异步方式
+            data : {'type':type,'appId':appId,'startTime':startTime,'endTime':endTime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(data){
+                alert(data);
+            },
+            fail:function(){
+                alert('密码验证失败，请重试')
+            }
+        });
         //异步查询 返回json 数据
         if(type=='year'){
             //注意 tdata 等于 seriesjson[name]

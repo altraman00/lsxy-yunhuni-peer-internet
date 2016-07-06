@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by zhangxb on 2016/7/6.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_consume_days")
+@Table(schema="db_lsxy_base",name = "tb_base_consume_day")
 public class ConsumeDay extends IdEntity{
     private Date dt;//统计时间
     private int day;//统计日 区间1-31

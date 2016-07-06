@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by zhangxb on 2016/7/6.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_consume_hours")
+@Table(schema="db_lsxy_base",name = "tb_base_consume_hour")
 public class ConsumeHour extends IdEntity{
     private Date dt;//统计时间
     private int hour;//统计小时 区间0-23

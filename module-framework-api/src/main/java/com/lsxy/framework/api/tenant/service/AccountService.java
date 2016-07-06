@@ -20,7 +20,7 @@ public interface AccountService extends BaseService<Account> {
      * @return 账号信息
      * @throws MatchMutiEntitiesException
      */
-    Account findAccountByUserName(String userName) throws MatchMutiEntitiesException;
+    Account findAccountByUserName(String userName);
 
 
 }
