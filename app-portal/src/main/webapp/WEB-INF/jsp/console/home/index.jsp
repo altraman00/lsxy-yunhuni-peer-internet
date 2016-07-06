@@ -104,69 +104,73 @@
                                     </div>
                                 </div>
                             </section>
-                            <section class="panel panel-default pos-rlt clearfix ">
-                                <div class="sectionWrap">
-                                    <div class="panel-body clearfix">
-                                        <div class="none-app">
-                                            <img src="${resPrefixUrl}/images/index/chicken.png" alt="">
-                                        <span>
-                                          还没创建应用，创建应用HAPPY一下吧<br/></br>
-                                            <a href="">创建应用</a>
-                                        </span>
+                            <c:if test="${homeVO.appStateVOs == null || fn:length(homeVO.appStateVOs) == 0}">
+                                <section class="panel panel-default pos-rlt clearfix ">
+                                    <div class="sectionWrap">
+                                        <div class="panel-body clearfix">
+                                            <div class="none-app">
+                                                <img src="${resPrefixUrl}/images/index/chicken.png" alt="">
+                                            <span>
+                                              还没创建应用，创建应用HAPPY一下吧<br/></br>
+                                                <a href="">创建应用</a>
+                                            </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </section>
-                            <c:forEach var="app" items="${homeVO.appStateVOs}" >
-                                <c:if test="${app.status == 1}" >
-                                    <section class="panel panel-default pos-rlt clearfix  app-list">
-                                        <div class="sectionWrap">
-                                            <header class="panel-heading">
-                                                <div class="h5 border-left">${app.name}</div>
-                                            </header>
-                                            <div class="panel-body clearfix border-top-none">
-                                                <div class="app-status-right dropdown fl">
+                                </section>
+                            </c:if>
+                            <c:if test="${homeVO.appStateVOs != null && fn:length(homeVO.appStateVOs) > 0}">
+                                <c:forEach var="app" items="${homeVO.appStateVOs}" >
+                                    <c:if test="${app.status == 1}" >
+                                        <section class="panel panel-default pos-rlt clearfix  app-list">
+                                            <div class="sectionWrap">
+                                                <header class="panel-heading">
+                                                    <div class="h5 border-left">${app.name}</div>
+                                                </header>
+                                                <div class="panel-body clearfix border-top-none">
+                                                    <div class="app-status-right dropdown fl">
                                           <span class="app-icon pull-left m-r-sm">
                                             <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/></span>
                                           <span class="h5 block m-t-xs text-muted">APPID :
                                             <span>${app.id}</span>
                                             <small class="text-success">已上线</small>
                                           </span>
-                                                    <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
-                                                </div>
-                                                <div class="app-status-left fr">
-                                                    <ul class="app-status-list">
-                                                        <li><img src="${resPrefixUrl}/images/index/status_1.png" alt=""> 1小时内呼叫量: <span class="number">${app.callOfHour}</span> </li>
-                                                        <li><img src="${resPrefixUrl}/images/index/status_2.png" alt=""> 1天内呼叫量: <span class="number">${app.callOfDay}</span> </li>
-                                                        <li><img src="${resPrefixUrl}/images/index/status_3.png" alt=""> 当天呼叫并发: <span class="number">${app.currentCall}</span> </li>
-                                                    </ul>
-                                                    <a href="" class="fr">详情</a>
+                                                        <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                    </div>
+                                                    <div class="app-status-left fr">
+                                                        <ul class="app-status-list">
+                                                            <li><img src="${resPrefixUrl}/images/index/status_1.png" alt=""> 1小时内呼叫量: <span class="number">${app.callOfHour}</span> </li>
+                                                            <li><img src="${resPrefixUrl}/images/index/status_2.png" alt=""> 1天内呼叫量: <span class="number">${app.callOfDay}</span> </li>
+                                                            <li><img src="${resPrefixUrl}/images/index/status_3.png" alt=""> 当前呼叫并发: <span class="number">${app.currentCall}</span> </li>
+                                                        </ul>
+                                                        <a href="" class="fr">详情</a>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </section>
-                                </c:if>
-                                <c:if test="${app.status == 2}" >
-                                    <section class="panel panel-default pos-rlt clearfix  app-list">
-                                        <div class="sectionWrap">
-                                            <header class="panel-heading">
-                                                <div class="h5 border-left">${app.name}</div>
-                                            </header>
-                                            <div class="panel-body clearfix border-top-none">
-                                                <div class="app-status-center dropdown fl">
+                                        </section>
+                                    </c:if>
+                                    <c:if test="${app.status == 2}" >
+                                        <section class="panel panel-default pos-rlt clearfix  app-list">
+                                            <div class="sectionWrap">
+                                                <header class="panel-heading">
+                                                    <div class="h5 border-left">${app.name}</div>
+                                                </header>
+                                                <div class="panel-body clearfix border-top-none">
+                                                    <div class="app-status-center dropdown fl">
                                           <span class="app-icon pull-left m-r-sm">
                                             <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/></span>
                                           <span class="h5 block m-t-xs text-muted">APPID :
                                             <span>${app.id}</span>
                                             <small class="text-danger">未上线</small>
                                           </span>
-                                                    <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                        <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </section>
-                                </c:if>
-                            </c:forEach>
+                                        </section>
+                                    </c:if>
+                                </c:forEach>
+                            </c:if>
                         </section>
                     </section>
                 </aside>

@@ -4,7 +4,7 @@ package com.lsxy.yuhuni.api.apicertificate.model;
 import com.lsxy.framework.api.base.IdEntity;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * 鉴权账号（凭证）变更记录
@@ -27,7 +27,7 @@ public class ApiCertificateChangeLog extends IdEntity {
         this.apiCertificate = apiCertificate;
         this.secretKey = secretKey;
         this.changeType = changeType;
-        this.changeDate = new Date(System.currentTimeMillis());
+        this.changeDate = new Date();
     }
 
     @ManyToOne

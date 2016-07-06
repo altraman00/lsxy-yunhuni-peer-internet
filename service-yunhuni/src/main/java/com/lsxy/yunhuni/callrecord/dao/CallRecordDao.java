@@ -5,7 +5,7 @@ import com.lsxy.yuhuni.api.app.model.App;
 import com.lsxy.yuhuni.api.callrecord.model.CallRecord;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * 呼叫记录查询类

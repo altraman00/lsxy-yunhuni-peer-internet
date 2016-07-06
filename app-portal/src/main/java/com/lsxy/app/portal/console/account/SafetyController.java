@@ -161,7 +161,6 @@ public class SafetyController extends AbstractPortalController {
             status = IS_TRUE;
         }
         if(IS_TRUE.equals(status)) {
-
             SafetyVo safetyVo = new SafetyVo(account);
             request.getSession().setAttribute("safetyVo",safetyVo);
             //将手机验证码删除

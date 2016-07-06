@@ -42,13 +42,13 @@ public class CallRecordServiceImpl extends AbstractService<CallRecord> implement
         String date = DateUtils.getDate("yyyy-MM-dd");
         Date today = DateUtils.parseDate(date);
         Date nextDate = DateUtils.nextDate(today);
-        Long dayCount = callRecordDao.countByAppAndCallEndTimeBetween(app, new java.sql.Date(today.getTime()), new java.sql.Date(nextDate.getTime()));
+        Long dayCount = callRecordDao.countByAppAndCallEndTimeBetween(app, today, nextDate);
 
         //前一小时
         String hour = DateUtils.getDate("yyyy-MM-dd HH");
         Date currentHour = DateUtils.parseDate(hour,"yyyy-MM-dd HH");
         Date lastHour = new Date(currentHour.getTime() - 3600000);
-        Long hourCount = callRecordDao.countByAppAndCallEndTimeBetween(app, new java.sql.Date(lastHour.getTime()), new java.sql.Date(currentHour.getTime()));
+        Long hourCount = callRecordDao.countByAppAndCallEndTimeBetween(app, lastHour, currentHour);
 
         Long currentSession = callSessionService.currentCallSessionCount(appId);
 
