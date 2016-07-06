@@ -5,7 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yuhuni.api.app.model.App;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * Created by liups on 2016/6/29.

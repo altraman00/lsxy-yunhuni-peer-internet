@@ -29,6 +29,7 @@ public class CallSessionServiceImpl extends AbstractService<CallSession> impleme
     public Long currentCallSessionCount(String appId) {
         App app = new App();
         app.setId(appId);
+
         return callSessionDao.countByStatusAndApp(CallSession.STATUS_CALLING,app);
     }
 }

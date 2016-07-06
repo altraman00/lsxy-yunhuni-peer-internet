@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
+import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yuhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yuhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yuhuni.api.recharge.model.Recharge;
@@ -19,12 +21,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static com.alipay.util.AlipaySubmit.ALIPAY_GATEWAY_NEW;
+import static org.apache.zookeeper.ZooDefs.OpCode.create;
 
 /**
  * 充值控制器
@@ -57,17 +59,19 @@ public class RechargeController extends AbstractPortalController {
     /**
      * 生成订单，并返回确认付款页面
      * @param request
+     * @param type 支付类型
+     * @param amount 支付金额
      * @return
      */
-    @RequestMapping(value = "/sure",method = RequestMethod.POST)
+    @RequestMapping(value = "/create",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView sure(HttpServletRequest request,String type,Double amount) throws Exception {
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
         Recharge recharge = createRecharge(token,type,amount);
-        recharge.setStatus(RechargeStatus.valueOf(recharge.getStatus()).getName());
-        recharge.setType(RechargeType.valueOf(recharge.getType()).getName());
-        model.put("recharge",recharge);
+        //构建VO
+        RechargeVO rechargeVO = createRechargeVO(recharge);
+        model.put("recharge",rechargeVO);
         //金额格式化成整数和小数部分
         amountFormat(model,recharge.getAmount());
         return new ModelAndView("console/cost/recharge/sure",model);
@@ -106,16 +110,69 @@ public class RechargeController extends AbstractPortalController {
         Map model = new HashMap();
         //处理支付宝返回的数据
         handleAliPayResult(request, trade_status);
-        //-------------------
-        String token = getSecurityToken(request);
-        Billing billing = getBilling(token);
-        if(billing != null){
-            //金额格式化成整数和小数部分
-            amountFormat(model, billing.getBalance());
-        }
-        //-------------------
-        return new ModelAndView("console/cost/recharge/index",model);
+        //重定向到列表
+        return new ModelAndView("redirect:/console/cost/recharge/list",model);
     }
+
+    /**
+     * 返回列表
+     * @param request
+     * @param pageNo 当前页
+     * @param pageSize 每页总数
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    @RequestMapping(value = "/list")
+    public ModelAndView list(HttpServletRequest request,Integer  pageNo, Integer pageSize,String startTime,String endTime) throws Exception {
+        if(pageNo == null){
+            pageNo = 1;
+        }
+        if(pageSize == null){
+            pageSize = 20;
+        }
+        Map<String,Object> model = new HashMap<>();
+        String token = getSecurityToken(request);
+        Page page = getRechargePage(pageNo, pageSize, startTime, endTime, token);
+        List result = page.getResult();
+        for(int i = 0;i < result.size();i++){
+            Recharge recharge = (Recharge) result.get(i);
+            result.set(i,createRechargeVO(recharge));
+        }
+        model.put("pageObj",page);
+        model.put("startTime",startTime);
+        model.put("endTime",endTime);
+        return new ModelAndView("console/cost/recharge/list",model);
+    }
+
+    /**
+     * 返回订单，未支付则到支付页面，已支付则显示详情
+     * @param request
+     * @param orderId 充值记录的orderId
+     * @return
+     */
+    @RequestMapping(value = "/get",method = RequestMethod.GET)
+    public ModelAndView sure(HttpServletRequest request,String orderId) throws Exception {
+        String viewName = "console/cost/recharge/list";
+        Map<String,Object> model = new HashMap<>();
+        String token = getSecurityToken(request);
+        //根据orderId获取充值记录
+        Recharge recharge = getRecharge(token,orderId);
+        if(RechargeStatus.NOTPAID.name().equals(recharge.getStatus())){
+            //未支付，则去往支付页面
+            viewName = "console/cost/recharge/sure";
+        }else if(RechargeStatus.PAID.name().equals(recharge.getStatus())){
+            //已支付，则显示订单
+            viewName = "console/cost/recharge/list";
+        }
+        //构建VO
+        RechargeVO rechargeVO = createRechargeVO(recharge);
+        model.put("recharge",rechargeVO);
+        //金额格式化成整数和小数部分
+        amountFormat(model,recharge.getAmount());
+        return new ModelAndView(viewName,model);
+    }
+
 
 
 
@@ -124,6 +181,8 @@ public class RechargeController extends AbstractPortalController {
      * RestApi调用
      * 生成订单
      * @param token
+     * @param type 充值类型
+     * @param amount 金额
      * @return
      */
     private Recharge createRecharge(String token, String type, Double amount) {
@@ -144,7 +203,7 @@ public class RechargeController extends AbstractPortalController {
      * @return
      */
     private Recharge getRecharge(String token, String orderId) {
-        //此处调用生成订单restApi
+        //此处调用获取订单restApi
         String getUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/get?orderId={1}";
         RestResponse<Recharge> orderResponse = RestRequest.buildSecurityRequest(token).get(getUrl, Recharge.class,orderId);
         return orderResponse.getData();
@@ -173,7 +232,7 @@ public class RechargeController extends AbstractPortalController {
             //余额整数部分
             model.put("balanceInt",amount.intValue());
             //余额小数部分
-            DecimalFormat df   = new DecimalFormat("######0.00");
+            DecimalFormat df   = new DecimalFormat("#0.00");
             String format = df.format(amount);
             model.put("balanceDec",format.substring(format.indexOf('.') + 1, format.length()));
         }
@@ -218,11 +277,41 @@ public class RechargeController extends AbstractPortalController {
                 payRecord.setBuyerId(params.get("buyer_id"));
                 payRecord.setSellerName(params.get("seller_email"));
                 payRecord.setBuyerName(params.get("buyer_email"));
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, Object> map = mapper.convertValue(payRecord, Map.class);
-                RestRequest.buildSecurityRequest(token).post(successUrl, map,Recharge.class);
+                if(AlipayConfig.seller_id.equals(payRecord.getSellerId())){
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, Object> map = mapper.convertValue(payRecord, Map.class);
+                    RestRequest.buildSecurityRequest(token).post(successUrl, map,Recharge.class);
+                }
             }
         }
     }
 
+    /**
+     * RestApi调用
+     * @param pageNo 当前页数
+     * @param pageSize 每页总数
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param token
+     * @return
+     */
+    private Page getRechargePage(Integer pageNo, Integer pageSize, String startTime, String endTime, String token) {
+        String orderUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/list?pageNo={1}&pageSize={2}&startTime={3}&endTime={4}";
+        RestResponse<Page<Recharge>> response = RestRequest.buildSecurityRequest(token).getPage(orderUrl, Recharge.class, pageNo, pageSize, startTime, endTime);
+        return (Page) response.getData();
+    }
+
+    /**
+     * 构建充值VO
+     * @param recharge 要转换的充值实体类
+     * @return
+     * @throws Exception
+     */
+    private RechargeVO createRechargeVO(Recharge recharge) throws Exception {
+        RechargeVO vo = new RechargeVO();
+        BeanUtils.copyProperties2(vo,recharge,true);
+        vo.setStatusName(RechargeStatus.valueOf(vo.getStatus()).getName());
+        vo.setTypeName(RechargeType.valueOf(vo.getType()).getName());
+        return vo;
+    }
 }

@@ -37,8 +37,6 @@ public class ApiCertificateChangeLogServiceImpl extends AbstractService<ApiCerti
         String date = DateUtils.getDate("yyyy-MM-dd");
         Date today = DateUtils.parseDate(date);
         Date nextDate = DateUtils.nextDate(today);
-        return apiCertificateChangeLogDao.countByApiCertificateAndChangeDateBetween(cert,
-                new java.sql.Date(today.getTime()),
-                new java.sql.Date(nextDate.getTime()));
+        return apiCertificateChangeLogDao.countByApiCertificateAndChangeDateBetween(cert,today,nextDate);
     }
 }
