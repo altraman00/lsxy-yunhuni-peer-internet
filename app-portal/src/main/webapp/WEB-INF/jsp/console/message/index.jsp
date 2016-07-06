@@ -40,7 +40,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <c:forEach items="${pageList.result}" var="result" varStatus="s">
+                                    <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd"/></td>
                                             <td>${result.message.content}</td>
@@ -50,7 +50,9 @@
                                     </tbody>
                                 </table>
                             </section>
-                            <%@include file="/inc/paging.jsp"%>
+                            <c:set var="pageSize" value="1"></c:set>
+                            <c:set var="pageUrl" value="${ctx}/console/message/account_message/index"></c:set>
+                            <%@include file="/inc/pagefooter.jsp" %>
                         </section>
                     </section>
                 </aside>

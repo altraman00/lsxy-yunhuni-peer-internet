@@ -33,13 +33,11 @@ public class AccountMessageController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request,Integer pageNo){
+    public ModelAndView index(HttpServletRequest request,Integer pageNo, Integer pageSize){
         ModelAndView mav = new ModelAndView();
-        if(pageNo==null){pageNo=1;}
-        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,20);
-        Page<AccountMessage> pageList = restResponse.getData();
-        mav.addObject("pageUrl","/console/message/account_message/index");
-        mav.addObject("pageList",pageList);
+        RestResponse<Page<AccountMessage>> restResponse = list(request,pageNo,pageSize);
+        Page<AccountMessage> pageObj = restResponse.getData();
+        mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/message/index");
         return mav;
     }
@@ -53,6 +51,8 @@ public class AccountMessageController extends AbstractPortalController {
     private RestResponse list(HttpServletRequest request, Integer  pageNo, Integer pageSize){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/message/account_message/list?pageNo={1}&pageSize={2}";
+        if(pageNo==null){pageNo=1;}
+        if(pageSize==null){pageSize=20;}
         return  RestRequest.buildSecurityRequest(token).getPage(uri, AccountMessage.class,pageNo,pageSize);
     }
     /**
@@ -62,9 +62,9 @@ public class AccountMessageController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/delete")
-    public ModelAndView delete(HttpServletRequest request,String id,Integer pageNo){
+    public ModelAndView delete(HttpServletRequest request,String id,Integer pageNo,Integer pageSize){
         deleteAccountMessage(request,id);
-        ModelAndView mav = index(request,pageNo);
+        ModelAndView mav = index(request,pageNo,pageSize);
         mav.addObject("msg","删除成功");
         return mav;
     }

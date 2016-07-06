@@ -32,12 +32,11 @@ public class RentTelnumController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index" )
-    public ModelAndView index(HttpServletRequest request,Integer pageNo){
+    public ModelAndView index(HttpServletRequest request,Integer pageNo,Integer pageSize){
         ModelAndView mav = new ModelAndView();
-        RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,20);
-        Page pageList= restResponse.getData();
-        mav.addObject("pageUrl","/console/telenum/callnum/index");
-        mav.addObject("pageList",pageList);
+        RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,pageSize);
+        Page<ResourcesRent> pageObj= restResponse.getData();
+        mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/telenum/callnum/index");
         return mav;
     }
@@ -49,10 +48,11 @@ public class RentTelnumController extends AbstractPortalController {
      * @param pageSize 每页多少条数据
      * @return
      */
-    private RestResponse pageList(HttpServletRequest request,Integer  pageNo, Integer pageSize){
+    private RestResponse pageList(HttpServletRequest request,Integer  pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        if(pageNo==null){pageNo=1;}
         String uri = restPrefixUrl +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
+        if(pageNo==null){pageNo=1;}
+        if(pageSize==null){pageSize=20;}
         return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,pageNo,pageSize);
     }
 }

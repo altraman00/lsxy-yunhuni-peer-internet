@@ -74,7 +74,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <c:forEach items="${pageList.result}" var="result" varStatus="s">
+                                    <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.resourceTelenum.telNumber}</td>
@@ -86,7 +86,8 @@
                                     </tbody>
                                 </table>
                             </section>
-                            <%@include file="/inc/paging.jsp"%>
+                            <c:set var="pageUrl" value="${ctx}/console/telenum/callnum/index"></c:set>
+                            <%@include file="/inc/pagefooter.jsp" %>
                         </section>
                     </section>
                 </aside>
