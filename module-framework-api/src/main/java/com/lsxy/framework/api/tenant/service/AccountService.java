@@ -18,7 +18,6 @@ public interface AccountService extends BaseService<Account> {
      * 根据登陆用户名查询账号信息
      * @param userName 用户名
      * @return 账号信息
-     * @throws MatchMutiEntitiesException
      */
     Account findAccountByUserName(String userName);
 
