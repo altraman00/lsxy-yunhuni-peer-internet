@@ -1,13 +1,17 @@
 package com.lsxy.app.portal.console.statistics;
 
+import com.lsxy.framework.core.utils.DateUtils;
+
+import java.util.Date;
+
 /**
  * Created by zhangxb on 2016/7/6.
  */
 public class ConsumeStatisticsVo {
-    private String type;//类型 month year
-    private String startTime;//时间
-    private String endTime;//比较时间
-    private String appId;//应用编号
+    private String type = "month";//类型 month year
+    private String startTime = DateUtils.formatDate(new Date(),"yyyy-MM");//时间
+    private String endTime = "";//比较时间
+    private String appId = "0";//应用编号
 
     public ConsumeStatisticsVo() {
     }
@@ -18,7 +22,6 @@ public class ConsumeStatisticsVo {
         this.endTime = endTime;
         this.appId = appId;
     }
-
     public String getType() {
         return type;
     }

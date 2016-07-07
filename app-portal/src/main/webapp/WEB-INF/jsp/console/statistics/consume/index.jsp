@@ -95,48 +95,17 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td>123.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td>123.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td>123.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2016-01-01</td>
-                                        <td>123.00</td>
-                                    </tr>
+                                    <c:forEach items="${pageObj.result}" var="result">
+                                        <tr>
+                                            <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
+                                            <td><fmt:formatNumber value="${result.sumAmount}" pattern="0.00"></fmt:formatNumber> </td>
+                                        </tr>
+                                    </c:forEach>
                                     </tbody>
                                 </table>
                             </section>
-
-                            <section class="panel panel-default yunhuni-personal">
-                                <nav class='pageWrap'>
-                                    <ul class="pagination">
-                                        <li>
-                                            <a href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li class="active"><a href="#">1</a></li>
-                                        <li><a href="#">2</a></li>
-                                        <li><a href="#">3</a></li>
-                                        <li><a href="#">4</a></li>
-                                        <li><a href="#">5</a></li>
-                                        <li>
-                                            <a href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </section>
-
+                            <c:set var="pageUrl" value="${ctx}/console/statistics/consume/index"></c:set>
+                            <%@include file="/inc/pagefooter.jsp" %>
                         </section>
                     </section>
                 </aside>
@@ -259,7 +228,7 @@
             data : {'type':type,'appId':appId,'startTime':startTime,'endTime':endTime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
             dataType: "json",
             success : function(data){
-                alert(data);
+               // alert(data);
             },
             fail:function(){
                 alert('密码验证失败，请重试')

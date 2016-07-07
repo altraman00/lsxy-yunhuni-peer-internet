@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,15 +36,13 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
+    public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
         ModelAndView mav = new ModelAndView();
-        mav.addObject("appList",getAppList(request).getData());
-        if(consumeStatisticsVo==null){
-            consumeStatisticsVo = new ConsumeStatisticsVo("month",DateUtils.formatDate(new Date(),"yyyy-MM"),"","0");
-        }
+        ConsumeStatisticsVo consumeStatisticsVo = (ConsumeStatisticsVo)request.getSession().getAttribute("consumeStatisticsVo");
+        if(consumeStatisticsVo==null){consumeStatisticsVo = new ConsumeStatisticsVo();}
         mav.addObject("appList",getAppList(request).getData());
         mav.addObject("consumeStatisticsVo",consumeStatisticsVo);//时间
-        mav.addObject("pageObj",getPageList(request,consumeStatisticsVo,pageNo,pageSize));
+        mav.addObject("pageObj",getPageList(request,consumeStatisticsVo,pageNo,pageSize).getData());
         mav.setViewName("/console/statistics/consume/index");
         return mav;
     }
@@ -60,10 +59,11 @@ public class ConsumeStatisticsController extends AbstractPortalController {
     }
     @RequestMapping("/list")
     @ResponseBody
-    public List list(HttpServletRequest request, String appId, String startTime, String endTime, String type){
-        RestResponse<List<ConsumeDay>> restResponse =  getList(request,appId,startTime);
-        List<ConsumeDay> list =  restResponse.getData();
-        return list;
+    public List list(HttpServletRequest request, ConsumeStatisticsVo consumeStatisticsVo){
+        request.getSession().setAttribute("consumeStatisticsVo",consumeStatisticsVo);
+        //RestResponse<List<ConsumeDay>> restResponse =  getList(request,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime());
+        //List<ConsumeDay> list =  restResponse.getData();
+        return null;
     }
     private RestResponse getList(HttpServletRequest request,String appId,String startTime){
         String token = getSecurityToken(request);
@@ -72,8 +72,6 @@ public class ConsumeStatisticsController extends AbstractPortalController {
     }
     private RestResponse getPageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        if(pageNo==null){pageNo=1;}
-        if(pageSize==null){pageSize=20;}
         if(consumeStatisticsVo.getEndTime().length()==0){consumeStatisticsVo.setEndTime(consumeStatisticsVo.getStartTime());}
         String uri = restPrefixUrl +   "/rest/consume_day/page?appId={1}&startTime={2}&endTime={3}&pageNo={4}&pageSize={5}";
         return RestRequest.buildSecurityRequest(token).getPage(uri, ConsumeDay.class,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
