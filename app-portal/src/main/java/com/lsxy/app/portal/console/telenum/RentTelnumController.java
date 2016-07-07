@@ -11,11 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 呼入号码管理
@@ -31,15 +30,14 @@ public class RentTelnumController extends AbstractPortalController {
      * 呼入号码管理首页
      * @param request
      * @param pageNo 请求的页面
-     * @param pageSize 每页多少条数据
      * @return
      */
     @RequestMapping("/index" )
-    public ModelAndView index(HttpServletRequest request,Integer pageNo, Integer pageSize){
+    public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize){
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,pageSize);
-        Page pageList= restResponse.getData();
-        mav.addObject("pageList",pageList);
+        Page<ResourcesRent> pageObj= restResponse.getData();
+        mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/telenum/callnum/index");
         return mav;
     }
@@ -51,12 +49,9 @@ public class RentTelnumController extends AbstractPortalController {
      * @param pageSize 每页多少条数据
      * @return
      */
-    private RestResponse pageList(HttpServletRequest request,Integer  pageNo, Integer pageSize){
+    private RestResponse pageList(HttpServletRequest request,Integer  pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/list";
-        Map map = new HashMap();
-        map.put("pageNo",pageNo);
-        map.put("pageSize",pageSize);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, Page.class);
+        String uri = restPrefixUrl +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
+        return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,pageNo,pageSize);
     }
 }
