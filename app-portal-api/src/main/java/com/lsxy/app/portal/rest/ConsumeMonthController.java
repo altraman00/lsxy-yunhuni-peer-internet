@@ -1,8 +1,8 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.consume.model.ConsumeDay;
-import com.lsxy.framework.api.consume.service.ConsumeDayService;
+import com.lsxy.framework.api.consume.model.ConsumeMonth;
+import com.lsxy.framework.api.consume.service.ConsumeMonthService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * 消费日统计
+ * 消费月统计
  * Created by zhangxb on 2016/7/6.
  */
-@RequestMapping("/rest/consume_day")
+@RequestMapping("/rest/consume_month")
 @RestController
-public class ConsumeDayController extends AbstractRestController {
+public class ConsumeMonthController extends AbstractRestController {
     @Autowired
-    ConsumeDayService consumeDayService;
-
+    ConsumeMonthService consumeMonthService;
     /**
      * 根据时间和应用获取列表数据
      * @param appId 应用id
@@ -30,7 +29,7 @@ public class ConsumeDayController extends AbstractRestController {
     @RequestMapping("/list")
     public RestResponse list(String appId,String startTime){
         String userName = getCurrentAccountUserName();
-        List<ConsumeDay> list =  consumeDayService.list(userName,appId,startTime);
+        List<ConsumeMonth> list =  consumeMonthService.list(userName,appId,startTime);
         return RestResponse.success(list);
     }
 
@@ -47,7 +46,7 @@ public class ConsumeDayController extends AbstractRestController {
     public RestResponse pageList(String appId,String startTime,String endTime ,Integer pageNo ,Integer pageSize){
         String userName = getCurrentAccountUserName();
         if(endTime.length()==0){endTime=startTime;}
-        Page<ConsumeDay> page =  consumeDayService.pageList(userName,appId,startTime,endTime,pageNo,pageSize);
+        Page<ConsumeMonth> page =  consumeMonthService.pageList(userName,appId,startTime,endTime,pageNo,pageSize);
         return RestResponse.success(page);
     }
 }

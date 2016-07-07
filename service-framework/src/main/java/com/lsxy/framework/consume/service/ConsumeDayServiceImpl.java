@@ -8,16 +8,12 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.consume.dao.ConsumeDayDao;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import scala.App;
 
 import java.io.Serializable;
 import java.util.List;
-
-import static javafx.scene.input.KeyCode.T;
 
 /**
  * 消费日统计serviceimpl
@@ -39,7 +35,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         Tenant tenant = tenantService.findTenantByUserName(userName);
         String hql = "";
         if("0".equals(appId)){//表示查询全部
-            hql = "from ConsumeDay obj where obj.tenantId="+tenant.getId()+" and DATE_FORMAT(obj.dt,'%Y-%m')<='"+endTime+" ' and DATE_FORMAT(obj.dt,'%Y-%m')>='"+startTime+"' ORDER BY obj.dt,obj.day";
+            hql = "from ConsumeDay obj where obj.tenantId="+tenant.getId()+" and DATE_FORMAT(obj.dt,'%Y-%m')<='"+endTime+"' and DATE_FORMAT(obj.dt,'%Y-%m')>='"+startTime+"' ORDER BY obj.dt,obj.day";
         }else{
             hql = "from ConsumeDay obj where obj.tenantId="+tenant.getId()+" and obj.appId="+appId+" and DATE_FORMAT(obj.dt,'%Y-%m')<='"+endTime+"'  and DATE_FORMAT(obj.dt,'%Y-%m')>='"+startTime+"' ORDER BY obj.dt,obj.day";
         }
@@ -52,7 +48,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         Tenant tenant = tenantService.findTenantByUserName(userName);
         List<ConsumeDay> list = null;
         if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeDay obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y-%m')=?3 ORDER BY obj.day";
+            String hql = "from ConsumeDay obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y-%m')=?2 ORDER BY obj.day";
             list = this.findByCustomWithParams(hql, tenant.getId(),startTime);
         }else{
             String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and DATE_FORMAT(obj.dt,'%Y-%m')=?3 ORDER BY obj.day";

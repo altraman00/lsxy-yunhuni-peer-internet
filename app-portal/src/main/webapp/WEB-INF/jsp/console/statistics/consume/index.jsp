@@ -24,11 +24,12 @@
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;消费统计</span>
                         </div>
+                        <form:form role="form" action="${ctx}/console/statistics/consume/index" method="post"   id="mainForm">
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-2 col-md-offset-9 padder-v fix-padding">
-                                        <select   class="form-control myselectapp">
+                                        <select   class="form-control myselectapp" name="appId">
                                             <option value="0" >全部应用</option>
                                             <c:forEach items="${appList}" var="app">
                                                 <option value="${app.id}" <c:if test="${app.id==consumeStatisticsVo.appId}">selected="selected"</c:if> >${app.name}</option>
@@ -43,8 +44,8 @@
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <input type="radio" name="stime" value="month" class="selectdata"  <c:if test="${consumeStatisticsVo.type=='month'}">checked</c:if> />日统计
-                                        <input type="radio" name="stime" value="year" class="selectdata"   <c:if test="${consumeStatisticsVo.type=='year'}">checked</c:if> />月统计
+                                        <input type="radio" name="type" value="month" class="selectdata"  <c:if test="${consumeStatisticsVo.type=='month'}">checked</c:if> />日统计
+                                        <input type="radio" name="type" value="year" class="selectdata"   <c:if test="${consumeStatisticsVo.type=='year'}">checked</c:if> />月统计
                                     </div>
                                 </div>
                                 <div class="row">
@@ -55,21 +56,20 @@
                                 <!--日统计-->
                                 <div class="row monthform" >
                                     <div class="col-md-12">
-                                        <input type="text" class="datepicker currentMonth form-control date_block monthstart" value="${consumeStatisticsVo.startTime}" />
-                                        <span class="monthcontrast"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" value="${consumeStatisticsVo.endTime}"/></span>
-                                        <button class="btn btn-primary finddatebtn" data-id="month" >查询</button>
-                                        <button class="btn btn-default compassbtn monthcbtn" data-id="month">对比</button>
+                                        <input type="text" class="datepicker currentMonth form-control date_block monthstart" name="startTime" value="${consumeStatisticsVo.startTime}" />
+                                        <span class="<c:if test="${consumeStatisticsVo.endTime==''}">monthcontrast</c:if>"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" name="endTime" value="${consumeStatisticsVo.endTime}"/></span>
+                                        <button class="btn btn-primary finddatebtn" type="button"  data-id="month" >查询</button>
+                                        <button class="btn btn-default compassbtn monthcbtn" type="button"   data-id="month"><c:if test="${consumeStatisticsVo.endTime!=''}">取消</c:if>对比</button>
                                         <span class="tips-error monthtips"></span>
                                     </div>
                                 </div>
-
                                 <!--月统计-->
                                 <div class="row yearform" >
                                     <div class="col-md-12">
-                                        <input type="text" class="datepicker  form-control currentYear date_block yearstart" value="2016"  />
-                                        <span class="yearcontrast"><span>对比</span><input type="text" class="datepicker currentYear form-control date_block yearend" /></span>
-                                        <button class="btn btn-default finddatebtn " data-id="year" >查询</button>
-                                        <button class="btn btn-default compassbtn yearcbtn" data-id="year">对比</button>
+                                        <input type="text" class="datepicker  form-control currentYear date_block yearstart" name="startTimeYear" value="${consumeStatisticsVo.startTimeYear}"  />
+                                        <span class="<c:if test="${consumeStatisticsVo.endTimeYear==''}">yearcontrast</c:if>"><span>对比</span><input type="text" class="datepicker currentYear form-control date_block yearend" name="endTimeYear" value="${consumeStatisticsVo.endTimeYear}" /></span>
+                                        <button class="btn btn-default finddatebtn " type="button"  data-id="year" >查询</button>
+                                        <button class="btn btn-default compassbtn yearcbtn" type="button" data-id="year"><c:if test="${consumeStatisticsVo.endTimeYear!=''}">取消</c:if>对比</button>
                                         <span class="tips-error yeartips"></span>
                                     </div>
                                 </div>
@@ -80,9 +80,6 @@
                                     </div>
                                 </div>
                             </section>
-
-
-
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <div class="form-group">
                                     <span class="hr text-label"><strong>详情数据</strong></span>
@@ -107,6 +104,7 @@
                             <c:set var="pageUrl" value="${ctx}/console/statistics/consume/index"></c:set>
                             <%@include file="/inc/pagefooter.jsp" %>
                         </section>
+                        </form:form>
                     </section>
                 </aside>
             </section>
@@ -126,7 +124,7 @@
 
 
 <script>
-    $('input[name="stime"]').click(function(){
+    $('input[name="type"]').click(function(){
         //参数
         var v = $(this).val();
         if(v=='year'){
@@ -136,7 +134,7 @@
             $('.monthform').show();
             $('.yearform').hide();s
         }
-        initchart();
+        initForm();
     });
 
     //查询
@@ -155,7 +153,7 @@
                 tips(tipsclass,'请填写对比时间'); return;
             }
         }
-        initchart();
+        initForm();
     });
 
     function tips(tipsclass,tips){
@@ -179,7 +177,7 @@
 
     //应用
     $('.myselectapp').change(function(){
-        initchart();
+        initForm();
     });
 
 
@@ -209,7 +207,10 @@
         return endtime;
     }
 
-
+    function initForm(){
+        var form = document.getElementById("mainForm");
+        form.submit();
+    }
 
     //触发函数
     /**
@@ -217,37 +218,49 @@
      * endtime 对比时间
      */
     function initchart(){
-        var type = $('input[name="stime"]:checked').val();
+        var type = $('input[name="type"]:checked').val();
         var appId = $('.myselectapp').val();
         var startTime = initialStartTime(type);
         var endTime = initialEndTime(type);
+        var tdata = new Array();
+        var seriesjson  ="";
+        var resultData="";
         $.ajax({
             url : "${ctx}/console/statistics/consume/list",
             type : 'post',
             async: false,//使用同步的方式,true为异步方式
-            data : {'type':type,'appId':appId,'startTime':startTime,'endTime':endTime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            data : {'type':type,'appId':appId,'startTime':startTime,'endTime':endTime, '${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
             dataType: "json",
             success : function(data){
-               // alert(data);
+                resultData = data;
             },
             fail:function(){
                 alert('密码验证失败，请重试')
             }
         });
+        for(var i=0;i<resultData.length;i++){
+            tdata[i]=resultData[i].name;
+        }
+        seriesjson=JSON.stringify(resultData);
+        //alert(seriesjson);
         //异步查询 返回json 数据
         if(type=='year'){
+            $('.yearform').show();
+            $('.monthform').hide();
             //注意 tdata 等于 seriesjson[name]
-            var tdata = new Array('2016年','2017年');
-            var seriesjson  ="[{name:'2016年',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90]},{name:'2017年',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
-            var seriesjson = eval('('+seriesjson+')');
+            //var tdata = new Array('2016年','2017年');
+            //var seriesjson  ="[{name:'2016年',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90]},{name:'2017年',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
+            //var seriesjson = eval('('+seriesjson+')');
         }else{
+            $('.monthform').show();
+            $('.yearform').hide();
             //注意 tdata 等于 seriesjson[name]
-            var tdata = new Array('5月','6月');
-            var seriesjson  ="[{name:'5月',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101,4000]},{name:'6月',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
-            var seriesjson = eval('('+seriesjson+')');
-
+            //var tdata = new Array('5月','6月');
+            //var seriesjson  ="[{name:'5月',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101,4000]},{name:'6月',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
+            //var seriesjson = eval('('+seriesjson+')');
+            //alert(seriesjson);
         }
-
+        seriesjson = eval('('+seriesjson+')');
         charts(tdata,seriesjson,type);
     }
 
@@ -302,10 +315,6 @@
 
         myChart.setOption(option);
     }
-
-
-
-
 </script>
 <!--must-->
 <script type="text/javascript" src='${resPrefixUrl }/js/statistics/consume.js'> </script>
