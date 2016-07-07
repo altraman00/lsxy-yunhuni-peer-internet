@@ -65,7 +65,11 @@ public class Page<T> implements Serializable {
 		else
 			this.totalPageCount = totalCount / pageSize + 1;
 
-		this.currentPageNo =   start / pageSize + 1;
+		if(pageSize==1){
+			this.currentPageNo =   start / pageSize;
+		}else{
+			this.currentPageNo =   start / pageSize + 1;
+		}
 
 		this.hasNextPage = this.getCurrentPageNo() <= this.getTotalPageCount() - 1;
 		this.hasPreviousPage = this.getCurrentPageNo() > 1;
