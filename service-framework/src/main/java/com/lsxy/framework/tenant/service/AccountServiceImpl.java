@@ -26,6 +26,9 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     @Autowired
     private AccountDao accountDao;
 
+    @Autowired
+    private TenantService tenantService;
+
     @Override
     public BaseDaoInterface<Account, Serializable> getDao() {
         return accountDao;

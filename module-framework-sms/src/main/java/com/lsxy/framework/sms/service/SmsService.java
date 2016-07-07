@@ -1,5 +1,10 @@
 package com.lsxy.framework.sms.service;
 
+import com.lsxy.framework.sms.exceptions.CheckCodeExpireException;
+import com.lsxy.framework.sms.exceptions.CheckOutMaxTimesException;
+import com.lsxy.framework.sms.exceptions.InvalidValidateCodeException;
+import com.lsxy.framework.sms.exceptions.TooManyGenTimesException;
+
 import java.util.Map;
 
 /**
@@ -7,6 +12,7 @@ import java.util.Map;
  * 短信网关服务
  */
 public interface SmsService {
+    String CODE_PREFIX = "MC_";
 
     /**
      * 发送模板短信
@@ -17,8 +23,9 @@ public interface SmsService {
      */
     public boolean sendsms(String to,String template,Map<String,Object> params);
 
+    public String genVC(String to) throws TooManyGenTimesException;
 
-
+    public boolean checkVC(String to,String vc) throws InvalidValidateCodeException,CheckOutMaxTimesException,CheckCodeExpireException;
 
 
 }

@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;

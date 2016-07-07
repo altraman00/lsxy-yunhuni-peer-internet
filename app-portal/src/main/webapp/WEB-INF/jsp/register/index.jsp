@@ -117,23 +117,13 @@
             tipsmsg("请填入验证码","mobileCodeTips");
             return;
         }
-        $.get(ctx + "/mc/check", {"mc":mobileCode},
+        var mobile = $("#form-mobile").val();
+        $.get(ctx + "/mc/check", {"mc":mobileCode,"mobile":mobile},
             function(data){
-                switch (data){
-                    case 0:
-                        tipsmsg("验证码错误，请重新输入","mobileCodeTips");
-                        break;
-                    case 1:
-                        document.getElementById('defaultForm').submit();
-                        break;
-                    case 2:
-                        tipsmsg("此验证码达到最大验证次数，请重新获取","mobileCodeTips");
-                        break;
-                    case 3:
-                        tipsmsg("验证码过期，请重新获取","mobileCodeTips");
-                        break;
-                    default:
-                        tipsmsg("系统繁忙，请稍候！","mobileCodeTips");
+                if(data == 1){
+                    document.getElementById('defaultForm').submit();
+                }else{
+                    tipsmsg(data,"mobileCodeTips");
                 }
         });
 
