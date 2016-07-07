@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.security;
 
 import com.lsxy.app.api.gateway.security.auth.RestAuthenticationProvider;
 import com.lsxy.app.api.gateway.security.auth.SignatureAuthFilter;
+import com.lsxy.app.api.gateway.security.ip.BlackIpListFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SignatureAuthFilter signatureAuthFilter;
 
+    @Autowired
+    private BlackIpListFilter blackIpListFilter;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -45,15 +49,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         ;
-        http.addFilterBefore(signatureAuthFilter, BasicAuthenticationFilter.class);
 
-//        http.addFilter(headerAuthenticationFilter());
+        http.addFilterBefore(signatureAuthFilter, BasicAuthenticationFilter.class);
+        http.addFilterBefore(blackIpListFilter,SignatureAuthFilter.class);
+
     }
-//
-//    @Bean
-//    public TokenPreAuthenticationFilter headerAuthenticationFilter() throws Exception {
-//        return new TokenPreAuthenticationFilter(authenticationManager());
-//    }
+
 
 
     @Bean
