@@ -57,7 +57,7 @@
                                 <div class="row monthform" >
                                     <div class="col-md-12">
                                         <input type="text" class="datepicker currentMonth form-control date_block monthstart" name="startTime" value="${consumeStatisticsVo.startTime}" />
-                                        <span class="<c:if test="${consumeStatisticsVo.endTime==''}">monthcontrast</c:if>"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" name="endTime" value="${consumeStatisticsVo.endTime}"/></span>
+                                        <span class="monthcontrast"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" name="endTime" value="${consumeStatisticsVo.endTime}"/></span>
                                         <button class="btn btn-primary finddatebtn" type="button"  data-id="month" >查询</button>
                                         <button class="btn btn-default compassbtn monthcbtn" type="button"   data-id="month"><c:if test="${consumeStatisticsVo.endTime!=''}">取消</c:if>对比</button>
                                         <span class="tips-error monthtips"></span>
@@ -67,8 +67,8 @@
                                 <div class="row yearform" >
                                     <div class="col-md-12">
                                         <input type="text" class="datepicker  form-control currentYear date_block yearstart" name="startTimeYear" value="${consumeStatisticsVo.startTimeYear}"  />
-                                        <span class="<c:if test="${consumeStatisticsVo.endTimeYear==''}">yearcontrast</c:if>"><span>对比</span><input type="text" class="datepicker currentYear form-control date_block yearend" name="endTimeYear" value="${consumeStatisticsVo.endTimeYear}" /></span>
-                                        <button class="btn btn-default finddatebtn " type="button"  data-id="year" >查询</button>
+                                        <span class="yearcontrast"><span>对比</span><input type="text" class="datepicker currentYear form-control date_block yearend" name="endTimeYear" value="${consumeStatisticsVo.endTimeYear}" /></span>
+                                        <button class="btn btn-primary finddatebtn " type="button"  data-id="year" >查询</button>
                                         <button class="btn btn-default compassbtn yearcbtn" type="button" data-id="year"><c:if test="${consumeStatisticsVo.endTimeYear!=''}">取消</c:if>对比</button>
                                         <span class="tips-error yeartips"></span>
                                     </div>
@@ -175,6 +175,12 @@
         }else{
             $('.'+id+'contrast').hide();
             $(this).html('对比');
+            if(id=='year'){
+               $('input[name="endTimeYear"]').val("");
+            }else{
+                $('input[name="endTime"]').val("");
+            }
+            initForm();
         }
     });
 
@@ -250,6 +256,9 @@
         if(type=='year'){
             $('.yearform').show();
             $('.monthform').hide();
+            if('${consumeStatisticsVo.endTimeYear}'!=''){
+                $('.'+type+'contrast').show();
+            }
             //注意 tdata 等于 seriesjson[name]
             //var tdata = new Array('2016年','2017年');
             //var seriesjson  ="[{name:'2016年',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90]},{name:'2017年',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
@@ -257,6 +266,9 @@
         }else{
             $('.monthform').show();
             $('.yearform').hide();
+            if('${consumeStatisticsVo.endTime}'!=''){
+                $('.'+type+'contrast').show();
+            }
             //注意 tdata 等于 seriesjson[name]
             //var tdata = new Array('5月','6月');
             //var seriesjson  ="[{name:'5月',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101,4000]},{name:'6月',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
