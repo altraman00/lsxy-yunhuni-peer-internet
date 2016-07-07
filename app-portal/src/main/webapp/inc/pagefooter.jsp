@@ -1,7 +1,3 @@
-
-<c:if test="${pageSize == null}">
-    <c:set var="pageSize" value="20"></c:set>
-</c:if>
 <section class="panel panel-default yunhuni-personal">
     <nav class='pageWrap'>
         <ul class="pagination">
@@ -21,7 +17,7 @@
 
             <c:if test="${startPageNo > 1}">
                 <li>
-                    <a href="${pageUrl}?pageNo=${startPageNo-1}&pageSize=${pageSize}${extraParam}" aria-label="Previous">
+                    <a href="${pageUrl}?pageNo=${startPageNo-1}&pageSize=${pageObj.pageSize}${extraParam}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
@@ -33,13 +29,13 @@
                             class="active"
                         </c:if>
                 >
-                    <a href="${pageUrl}?pageNo=${s.index}&pageSize=${pageSize}${extraParam}">${s.index}</a>
+                    <a href="${pageUrl}?pageNo=${s.index}&pageSize=${pageObj.pageSize}${extraParam}">${s.index}</a>
                 </li>
             </c:forEach>
 
             <c:if test="${pageObj.totalPageCount>endPageNo}">
                 <li>
-                    <a href="${pageUrl}?pageNo=${endPageNo+1}&pageSize=${pageSize}${extraParam}" aria-label="Next">
+                    <a href="${pageUrl}?pageNo=${endPageNo+1}&pageSize=${pageObj.pageSize}${extraParam}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>

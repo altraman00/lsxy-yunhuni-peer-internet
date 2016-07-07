@@ -8,6 +8,7 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.tenant.dao.AccountDao;
 import org.apache.commons.lang.StringUtils;
@@ -24,8 +25,6 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Autowired
     private AccountDao accountDao;
-    @Autowired
-    private TenantService tenantService;
 
     @Override
     public BaseDaoInterface<Account, Serializable> getDao() {
@@ -53,7 +52,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
     @Override
-    public Account findAccountByUserName(String userName) throws MatchMutiEntitiesException {
+    public Account findAccountByUserName(String userName) {
         return accountDao.findByUserNameAndStatus(userName,Account.STATUS_NORMAL);
     }
 
