@@ -56,8 +56,33 @@ public interface AccountService extends BaseService<Account> {
      * 用户注册-激活用户
      * @param accountId 激活账号ID
      * @param password 密码
-     * @return
+     * @return RegisterException 若激活失败，则抛出此异常
      */
     Account activeAccount(String accountId,String password) throws RegisterException;
 
+    /**
+     * 忘记密码-检查邮箱是否存在
+     * @param email 邮箱
+     */
+    boolean checkEmail(String email);
+
+    /**
+     * 忘记密码-检查手机是否存在
+     * @param mobile 邮箱
+     */
+    boolean checkMobile(String mobile);
+
+    /**
+     * 根据邮箱修改密码
+     * @param email 邮箱
+     * @param password 密码
+     */
+    void resetPwdByEmail(String email, String password);
+
+    /**
+     * 根据手机箱修改密码
+     * @param mobile 手机
+     * @param password 密码
+     */
+    void resetPwdByMobile(String mobile, String password);
 }

@@ -1,10 +1,10 @@
 package com.lsxy.app.portal.loginandregister;
 
-import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.app.portal.comm.MobileCodeChecker;
+import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
+import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -119,14 +119,14 @@ public class RegisterController {
                 returnView = "register/active";
             }else if(Account.STATUS_NORMAL == accountStatus){
                 //已经激活
-                model.put("info","该账户已经激活");
+                model.put("info","账户已经激活");
                 returnView = "register/active_result";
             }else{
-                model.put("erInfo","账号异常");
+                model.put("erInfo","账号已过期");
                 returnView = "register/active_fail";
             }
         }else{
-            model.put("erInfo","参数异常");
+            model.put("erInfo","参数异常或邮件已过期");
             returnView = "register/active_fail";
         }
         return new ModelAndView(returnView,model);
@@ -141,14 +141,16 @@ public class RegisterController {
         String cUid = cacheManager.get(code);
         if(StringUtils.isNotBlank(uid)&&uid.equals(cUid)){
             try {
-                model.put("info","激活成功");
+                //激活账号
+                activeAccount(uid,password);
+                model.put("info","账户已经激活");
                 returnUrl = "register/active_result";
             } catch (RegisterException e) {
                 model.put("erInfo",e.getMessage());
                 returnUrl = "register/active_fail";
             }
         }else{
-            model.put("erInfo","激活失败：无效的参数");
+            model.put("erInfo","激活失败：参数异常或激活时间已过期");
             returnUrl = "register/active_fail";
         }
         return new ModelAndView(returnUrl,model);
@@ -163,7 +165,7 @@ public class RegisterController {
      */
     private void regInfoCheck(String userName,String mobile,String email){
         //此处调用户注册信息检验RestApi
-        String regInfoCheckUrl = PortalConstants.REST_PREFIX_URL + "/reg/check_info?userName={1}&mobile={2}&email={3}";
+        String regInfoCheckUrl = PortalConstants.REST_PREFIX_URL + "/reg/reg_info_check?userName={1}&mobile={2}&email={3}";
         RestResponse<Integer> response = RestRequest.buildRequest().get(regInfoCheckUrl,Integer.class,userName,mobile,email);
         //如果不成功，则抛出注册异常
         if(!response.isSuccess()){
@@ -176,15 +178,13 @@ public class RegisterController {
      * @param accountId 账号ID
      * @param password 密码
      */
-    private Boolean activeAccount(String accountId,String password){
+    private void activeAccount(String accountId,String password){
         //此处调用户激活信息检验RestApi
         String regInfoCheckUrl = PortalConstants.REST_PREFIX_URL + "/reg/active?accountId={1}&password={3}";
-        RestResponse<Boolean> response = RestRequest.buildRequest().get(regInfoCheckUrl,Boolean.class,accountId,password);
+        RestResponse<Account> response = RestRequest.buildRequest().get(regInfoCheckUrl,Account.class,accountId,password);
         //如果不成功，则抛出注册异常
         if(!response.isSuccess()){
             throw new RegisterException(response.getErrorMsg());
-        }else{
-            return true;
         }
     }
 

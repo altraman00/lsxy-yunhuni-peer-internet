@@ -35,8 +35,8 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException {
-        String hql = "from Account obj where obj.userName=?1 or obj.email=?2 or obj.mobile=?3";
-        Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName);
+        String hql = "from Account obj where obj.userName=?1 or obj.email=?2 or obj.mobile=?3 and obj.status=?4";
+        Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName,Account.STATUS_NORMAL);
         if(account != null) {
             if(!account.getPassword().equals(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()))){
                  account = null;
@@ -47,14 +47,14 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public Account findAccountByLoginName(String userLoginName) throws MatchMutiEntitiesException {
-        String hql = "from Account obj where obj.userName=?1 or obj.email=?2 or obj.mobile=?3";
-        Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName);
+        String hql = "from Account obj where obj.userName=?1 or obj.email=?2 or obj.mobile=?3 and obj.status=?4";
+        Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName,Account.STATUS_NORMAL);
         return account;
     }
 
     @Override
     public Account findAccountByUserName(String userName) throws MatchMutiEntitiesException {
-        return accountDao.findByUserName(userName);
+        return accountDao.findByUserNameAndStatus(userName,Account.STATUS_NORMAL);
     }
 
     @Override
@@ -104,6 +104,8 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
                 //TODO 帐务数据创建
 
+                //TODO 默认将用户手机号作为当前租户的测试号码
+
             }else{
                 throw new RegisterException("注册信息不可用，已存在重复的注册信息！");
             }
@@ -117,8 +119,34 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         return account;
     }
 
+    @Override
+    public boolean checkEmail(String email) {
+        Long count = accountDao.countByEmailAndStatus(email, Account.STATUS_NORMAL);
+        return count > 0;
+    }
+
+    @Override
+    public boolean checkMobile(String mobile) {
+        Long count = accountDao.countByMobileAndStatus(mobile, Account.STATUS_NORMAL);
+        return count > 0;
+    }
+
+    @Override
+    public void resetPwdByEmail(String email, String password) {
+        Account account = accountDao.findByEmailAndStatus(email, Account.STATUS_NORMAL);
+        account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
+        this.save(account);
+    }
+
+    @Override
+    public void resetPwdByMobile(String mobile, String password) {
+        Account account = accountDao.findByMobileAndStatus(mobile,Account.STATUS_NORMAL);
+        account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
+        this.save(account);
+    }
+
     /**
-     * 检查激活信息是否可用，各个信息在数据库中是否有重复
+     * 检查激活信息是否可用，各个信息在数据库中是否有重复，执行激活前调用
      * @param userName 用户名
      * @param mobile 手机号
      * @param email 邮箱

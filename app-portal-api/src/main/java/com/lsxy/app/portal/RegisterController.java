@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.lsxy.framework.web.rest.RestResponse.failed;
-import static org.apache.coyote.http11.Constants.a;
 
 /**
  * 注册入口
@@ -34,7 +33,7 @@ public class RegisterController {
      * @param email 邮箱
      * @return
      */
-    @RequestMapping("/check_info")
+    @RequestMapping("/reg_info_check")
     public RestResponse regInfoCheck(String userName,String mobile,String email){
         RestResponse response;
         int result = accountService.checkRegInfo(userName,mobile,email);
@@ -60,13 +59,14 @@ public class RegisterController {
     /**
      * 用户激活
      * @param accountId 账号ID
-     * @return
+     * @return 激活成功则返回true
      */
     @RequestMapping("/active")
     public RestResponse activeInfoCheck(String accountId,String password){
         RestResponse response;
         try {
             Account account = accountService.activeAccount(accountId, password);
+            //TODO MQ事件，发邮件通知账号已经激活
             response = RestResponse.success(account);
         } catch (RegisterException e) {
             response = RestResponse.failed("0001",e.getMessage());

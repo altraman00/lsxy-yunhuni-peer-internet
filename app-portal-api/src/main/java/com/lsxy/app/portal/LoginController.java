@@ -2,9 +2,9 @@ package com.lsxy.app.portal;
 
 import com.lsxy.app.portal.exceptions.APIErrors;
 import com.lsxy.app.portal.utils.PortalRestResponse;
-import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class LoginController {
             Account account = accountService.findPersonByLoginNameAndPassword(username, password);
             if (account != null) {
 
-                //TODO 将token放入redis 与account形成映射关系
+                //将token放入redis 与account形成映射关系
                 UserRestToken token = UserRestToken.newToken();
                 cacheManager.set(token.getToken(),account.getUserName(),30*60);
                 return PortalRestResponse.success(token);
@@ -58,5 +58,8 @@ public class LoginController {
 
         }
     }
+
+
+
 
 }
