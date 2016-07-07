@@ -19,7 +19,7 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param endTime 结束时间
      * @return
      */
-    public Page<ConsumeDay> pageList(String userName, String appId, String startTime, String endTime);
+    public Page<ConsumeDay> pageList(String userName, String appId, String startTime, String endTime,Integer pageNo,Integer pageSize);
 
     /**
      * 获取用户某时间的列表数据

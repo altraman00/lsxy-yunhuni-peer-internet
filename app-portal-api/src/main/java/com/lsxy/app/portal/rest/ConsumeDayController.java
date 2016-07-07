@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.api.consume.service.ConsumeDayService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +24,11 @@ public class ConsumeDayController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         List<ConsumeDay> list =  consumeDayService.list(userName,appId,startTime);
         return RestResponse.success(list);
+    }
+    @RequestMapping("/page")
+    public RestResponse pageList(String appId,String startTime,String endTime ,Integer pageNo ,Integer pageSize){
+        String userName = getCurrentAccountUserName();
+        Page<ConsumeDay> page =  consumeDayService.pageList(userName,appId,startTime,endTime,pageNo,pageSize);
+        return RestResponse.success(page);
     }
 }

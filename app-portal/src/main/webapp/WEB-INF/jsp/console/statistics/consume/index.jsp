@@ -29,9 +29,9 @@
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-2 col-md-offset-9 padder-v fix-padding">
                                         <select   class="form-control myselectapp">
-                                            <option value="0">全部应用</option>
+                                            <option value="0" >全部应用</option>
                                             <c:forEach items="${appList}" var="app">
-                                                <option value="${app.id}">${app.name}</option>
+                                                <option value="${app.id}" <c:if test="${app.id==consumeStatisticsVo.appId}">selected="selected"</c:if> >${app.name}</option>
                                             </c:forEach>
                                         </select>
                                     </div>
@@ -43,8 +43,8 @@
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <input type="radio" name="stime" value="month" class="selectdata" checked/>日统计
-                                        <input type="radio" name="stime" value="year" class="selectdata" />月统计
+                                        <input type="radio" name="stime" value="month" class="selectdata"  <c:if test="${consumeStatisticsVo.type=='month'}">checked</c:if> />日统计
+                                        <input type="radio" name="stime" value="year" class="selectdata"   <c:if test="${consumeStatisticsVo.type=='year'}">checked</c:if> />月统计
                                     </div>
                                 </div>
                                 <div class="row">
@@ -55,8 +55,8 @@
                                 <!--日统计-->
                                 <div class="row monthform" >
                                     <div class="col-md-12">
-                                        <input type="text" class="datepicker currentMonth form-control date_block monthstart" value="${initTime}" />
-                                        <span class="monthcontrast"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" /></span>
+                                        <input type="text" class="datepicker currentMonth form-control date_block monthstart" value="${consumeStatisticsVo.startTime}" />
+                                        <span class="monthcontrast"><span>对比</span><input type="text" class="datepicker currentMonth form-control date_block monthend" value="${consumeStatisticsVo.endTime}"/></span>
                                         <button class="btn btn-primary finddatebtn" data-id="month" >查询</button>
                                         <button class="btn btn-default compassbtn monthcbtn" data-id="month">对比</button>
                                         <span class="tips-error monthtips"></span>

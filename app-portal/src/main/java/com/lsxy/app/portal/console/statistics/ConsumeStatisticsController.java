@@ -5,6 +5,7 @@ import com.lsxy.app.portal.console.customer.FeedbackController;
 import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.app.model.App;
@@ -34,10 +35,15 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request){
+    public ModelAndView index(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
         ModelAndView mav = new ModelAndView();
-        mav.addObject("ConsumeStatisticsVo",getAppList(request).getData());
-        mav.addObject("initTime",DateUtils.formatDate(new Date(),"yyyy-MM"));//时间
+        mav.addObject("appList",getAppList(request).getData());
+        if(consumeStatisticsVo==null){
+            consumeStatisticsVo = new ConsumeStatisticsVo("month",DateUtils.formatDate(new Date(),"yyyy-MM"),"","0");
+        }
+        mav.addObject("appList",getAppList(request).getData());
+        mav.addObject("consumeStatisticsVo",consumeStatisticsVo);//时间
+        mav.addObject("pageObj",getPageList(request,consumeStatisticsVo,pageNo,pageSize));
         mav.setViewName("/console/statistics/consume/index");
         return mav;
     }
@@ -54,7 +60,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
     }
     @RequestMapping("/list")
     @ResponseBody
-    public List index(HttpServletRequest request,String appId,String startTime,String endTime,String type){
+    public List list(HttpServletRequest request, String appId, String startTime, String endTime, String type){
         RestResponse<List<ConsumeDay>> restResponse =  getList(request,appId,startTime);
         List<ConsumeDay> list =  restResponse.getData();
         return list;
@@ -63,5 +69,13 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/consume_day/list?appId={1}&startTime={2}";
         return RestRequest.buildSecurityRequest(token).getList(uri, ConsumeDay.class,appId,startTime);
+    }
+    private RestResponse getPageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
+        String token = getSecurityToken(request);
+        if(pageNo==null){pageNo=1;}
+        if(pageSize==null){pageSize=20;}
+        if(consumeStatisticsVo.getEndTime().length()==0){consumeStatisticsVo.setEndTime(consumeStatisticsVo.getStartTime());}
+        String uri = restPrefixUrl +   "/rest/consume_day/page?appId={1}&startTime={2}&endTime={3}&pageNo={4}&pageSize={5}";
+        return RestRequest.buildSecurityRequest(token).getPage(uri, ConsumeDay.class,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
     }
 }
