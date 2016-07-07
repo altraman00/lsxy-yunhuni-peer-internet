@@ -33,13 +33,14 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     @Override
     public Page<ConsumeDay> pageList(String userName, String appId, String startTime, String endTime,Integer pageNo,Integer pageSize) {
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "";
+        Page<ConsumeDay> page = null;
         if("0".equals(appId)){//表示查询全部
-            hql = "from ConsumeDay obj where obj.tenantId="+tenant.getId()+" and DATE_FORMAT(obj.dt,'%Y-%m')<='"+endTime+"' and DATE_FORMAT(obj.dt,'%Y-%m')>='"+startTime+"' ORDER BY obj.dt,obj.day";
+            String hql = "from ConsumeDay obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y-%m')=?2 or DATE_FORMAT(obj.dt,'%Y-%m')=?3 ORDER BY obj.dt,obj.day";
+            page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
         }else{
-            hql = "from ConsumeDay obj where obj.tenantId="+tenant.getId()+" and obj.appId="+appId+" and DATE_FORMAT(obj.dt,'%Y-%m')<='"+endTime+"'  and DATE_FORMAT(obj.dt,'%Y-%m')>='"+startTime+"' ORDER BY obj.dt,obj.day";
+            String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and DATE_FORMAT(obj.dt,'%Y-%m')=?3  or DATE_FORMAT(obj.dt,'%Y-%m')=?4 ORDER BY obj.dt,obj.day";
+            page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),appId,endTime,startTime);
         }
-        Page<ConsumeDay> page =  this.pageList(hql,pageNo,pageSize);
         return page;
     }
 
