@@ -1,4 +1,4 @@
-package com.lsxy.app.api.gateway.security;
+package com.lsxy.app.api.gateway.security.auth;
 
 /**
  * Created by Tandy on 2016/7/1.

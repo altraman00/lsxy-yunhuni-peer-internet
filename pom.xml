@@ -23,7 +23,6 @@
         <module>app-oc</module>
         <module>app-backend</module>
         <module>app-api-gateway</module>
-        <module>resources</module>
         <module>service-framework</module>
         <module>service-yunhuni</module>
         <module>module-framework-api</module>
@@ -60,6 +59,11 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-third</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-sms</artifactId>
                 <version>1.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>

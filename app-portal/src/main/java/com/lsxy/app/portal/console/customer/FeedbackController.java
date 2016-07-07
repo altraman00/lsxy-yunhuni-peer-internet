@@ -62,7 +62,7 @@ public class FeedbackController  extends AbstractPortalController {
     private RestResponse save(HttpServletRequest request,String content,String status){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/customer/feedback/save";
-        Map map = new HashMap();
+        Map<String,Object> map = new HashMap<>();
         map.put("content",content);
         map.put("status",status);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, Feedback.class);
