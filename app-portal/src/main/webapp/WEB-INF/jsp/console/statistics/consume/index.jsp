@@ -127,14 +127,16 @@
 <script>
     $('input[name="type"]').click(function(){
         //参数
-        var v = $(this).val();
-        if(v=='year'){
-            $('.yearform').show();
-            $('.monthform').hide();
-        }else{
-            $('.monthform').show();
-            $('.yearform').hide();s
-        }
+//        var v = $(this).val();
+//        if(v=='year'){
+//            $('.yearform').show();
+//            $('.monthform').hide();
+//
+//        }else{
+//            alert(1);
+//            $('.monthform').show();
+//            $('.yearform').hide();s
+//        }
         initForm();
     });
 
