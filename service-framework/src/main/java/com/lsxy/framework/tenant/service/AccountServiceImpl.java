@@ -1,6 +1,7 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.AccountService;
@@ -9,6 +10,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.tenant.dao.AccountDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -86,26 +88,33 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
     @Override
-    public Account activeAccount(String accountId, String password) {
+    public Account activeAccount(String accountId, String password) throws RegisterException{
         Account account = this.findById(accountId);
         //账号是否是未激活状态
-        if(account != null && Account.STATUS_NOT_ACTIVE == account.getStatus()){
+        if(account != null && Account.STATUS_NOT_ACTIVE == account.getStatus()&& StringUtils.isNotBlank(password)){
             //校验激活信息是否重复
             boolean flag = this.checkActiveInfo(account.getUserName(),account.getMobile(),account.getEmail());
             if(flag){
-                //修改激活状态
+                //修改激活状态,设置密码
                 account.setStatus(Account.STATUS_NORMAL);
+                account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
                 this.save(account);
-                //创建主鉴权账号
                 Tenant tenant = account.getTenant();
+                //TODO 创建主鉴权账号
 
                 //TODO 帐务数据创建
 
             }else{
+                throw new RegisterException("注册信息不可用，已存在重复的注册信息！");
             }
         }else if( Account.STATUS_NORMAL == account.getStatus()){
+            throw new RegisterException("账号已激活，请勿重复操作");
+        }else if(Account.STATUS_EXPIRE == account.getStatus()){
+            throw new RegisterException("账号已过期");
+        }else{
+            throw new RegisterException("账号激活失败");
         }
-        return null;
+        return account;
     }
 
     /**
@@ -115,7 +124,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
      * @param email 邮箱
      * @return
      */
-    public boolean checkActiveInfo(String userName, String mobile, String email){
+    private boolean checkActiveInfo(String userName, String mobile, String email){
         Long userNameCount = accountDao.countByUserNameAndStatus(userName,Account.STATUS_NORMAL);
         if(userNameCount > 0){
             return false;

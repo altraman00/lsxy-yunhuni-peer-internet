@@ -1,5 +1,6 @@
 package com.lsxy.app.portal;
 
+import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.lsxy.framework.web.rest.RestResponse.failed;
 import static org.apache.coyote.http11.Constants.a;
 
 /**
@@ -41,16 +43,16 @@ public class RegisterController {
                 response = RestResponse.success(AccountService.REG_CHECK_PASS);
                 break;
             case AccountService.REG_CHECK_USERNAME_EXIST:
-                response = RestResponse.failed("0000","用户名已被注册");
+                response = failed("0000","用户名已被注册");
                 break;
             case AccountService.REG_CHECK_MOBILE_EXIST:
-                response = RestResponse.failed("0000","手机号已被注册");
+                response = failed("0000","手机号已被注册");
                 break;
             case AccountService.REG_CHECK_EMAIL_EXIST:
-                response = RestResponse.failed("0000","邮箱已被注册");
+                response = failed("0000","邮箱已被注册");
                 break;
             default:
-                response = RestResponse.failed("0000","信息检验失败");
+                response = failed("0000","信息检验失败");
         }
         return response;
     }
@@ -62,8 +64,13 @@ public class RegisterController {
      */
     @RequestMapping("/active")
     public RestResponse activeInfoCheck(String accountId,String password){
-        RestResponse response = null;
-
+        RestResponse response;
+        try {
+            Account account = accountService.activeAccount(accountId, password);
+            response = RestResponse.success(account);
+        } catch (RegisterException e) {
+            response = RestResponse.failed("0001",e.getMessage());
+        }
         return response;
     }
 
@@ -86,10 +93,10 @@ public class RegisterController {
                 //TODO MQ事件，发送激活邮件
                 cacheManager.set(UUIDGenerator.uuid(),account.getId());
             }else{
-                response = RestResponse.failed("0000","注册用户失败，系统出错！");
+                response = failed("0000","注册用户失败，系统出错！");
             }
         }else{
-            response = RestResponse.failed("0000","注册用户失败,注册信息已存在");
+            response = failed("0000","注册用户失败,注册信息已存在");
         }
         return response;
     }
@@ -106,7 +113,7 @@ public class RegisterController {
         if(account != null){
             response = RestResponse.success(account.getStatus());
         }else{
-            response = RestResponse.failed("0000","账号不存在");
+            response = failed("0000","账号不存在");
         }
         return  response;
     }

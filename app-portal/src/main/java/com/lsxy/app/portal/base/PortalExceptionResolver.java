@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.comm;
+package com.lsxy.app.portal.base;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;

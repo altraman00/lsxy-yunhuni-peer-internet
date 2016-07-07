@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.tenant.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 
@@ -57,5 +58,6 @@ public interface AccountService extends BaseService<Account> {
      * @param password 密码
      * @return
      */
-    Account activeAccount(String accountId,String password);
+    Account activeAccount(String accountId,String password) throws RegisterException;
+
 }

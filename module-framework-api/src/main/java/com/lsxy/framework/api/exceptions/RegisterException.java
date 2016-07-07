@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.exceptions;
+package com.lsxy.framework.api.exceptions;
 
 /**
  * 注册异常

@@ -3,7 +3,7 @@ package com.lsxy.app.portal.loginandregister;
 import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.app.portal.comm.MobileCodeChecker;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.app.portal.exceptions.RegisterException;
+import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
@@ -140,11 +140,11 @@ public class RegisterController {
         //判断用户激活条件是否合格
         String cUid = cacheManager.get(code);
         if(StringUtils.isNotBlank(uid)&&uid.equals(cUid)){
-            if(activeAccount(uid,password)){
+            try {
                 model.put("info","激活成功");
                 returnUrl = "register/active_result";
-            }else{
-                model.put("erInfo","激活失败：账号异常");
+            } catch (RegisterException e) {
+                model.put("erInfo",e.getMessage());
                 returnUrl = "register/active_fail";
             }
         }else{
