@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.forgetpassword;
+package com.lsxy.app.portal.loginandregister;
 
 import com.lsxy.app.portal.comm.MobileCodeChecker;
 import com.lsxy.app.portal.comm.MobileCodeUtils;

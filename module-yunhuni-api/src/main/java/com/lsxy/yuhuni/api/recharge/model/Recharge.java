@@ -18,8 +18,8 @@ public class Recharge  extends IdEntity {
 
     private Tenant tenant;                //所属租户
     private Double amount;                //充值金额
-    private String type;                  //充值方式
-    private String status;                //充值状态
+    private String type;                  //充值方式 参考RechargeType
+    private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
     private Date createTime;
 

@@ -47,9 +47,4 @@ public class SpringMvcConfig extends WebMvcConfigurerAdapter{
         registry.viewResolver(viewResolver);
     }
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login");
-    }
-
 }

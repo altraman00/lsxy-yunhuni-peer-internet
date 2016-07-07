@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-    <title>注册成功</title>
+    <title>激活失败</title>
     <%@include file="/inc/meta.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
@@ -25,8 +25,8 @@
     <div class="row box">
         <div class="col-md-12 text-center">
             <img src="${resPrefixUrl }/images/register/icon_12.png"/>
-            <p class="p">账号注册成功，请72小时内前往邮箱收取邮件激活账号 ${email}</p>
-            <p><a href="#">去邮箱收取邮件</a></p>
+            <p class="p">激活失败：${erInfo}</p>
+            <p><a href="${ctx}/reg/index">点击重新注册</a></p>
         </div>
     </div>
 </div>

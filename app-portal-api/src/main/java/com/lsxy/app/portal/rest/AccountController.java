@@ -24,14 +24,6 @@ public class AccountController extends AbstractRestController {
     @Autowired
     private AccountService accountService;
 
-    @RequestMapping("/")
-    public RestResponse restMyAccountInfo(){
-
-        Account account = new Account();
-        account.setId("1234123412341234");
-        return RestResponse.success(account);
-    }
-
     /**
      * 根据用户名获取用户对象
      * @return
@@ -42,23 +34,4 @@ public class AccountController extends AbstractRestController {
         return RestResponse.success(account);
     }
 
-    /**
-     *
-     * @return
-     */
-    @RequestMapping("/test002")
-    public RestResponse test002(){
-        Page<Account> xx = accountService.pageList(1,10);
-        List<Account> result = xx.getResult();
-        return RestResponse.success(result);
-    }
-    /**
-     *
-     * @return
-     */
-    @RequestMapping("/test003")
-    public RestResponse test003(){
-        Page<Account> xx = accountService.pageList(1,10);
-        return RestResponse.success(xx);
-    }
 }

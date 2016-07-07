@@ -19,4 +19,9 @@ public interface TenantService extends BaseService<Tenant> {
      */
     Tenant findTenantByUserName(String userName) throws MatchMutiEntitiesException;
 
+    /**
+     * 创建租户
+     * @return
+     */
+    Tenant createTenant();
 }
