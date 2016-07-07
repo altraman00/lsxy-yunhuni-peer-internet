@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ public class RentTelnumController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index" )
-    public ModelAndView index(HttpServletRequest request,Integer pageNo,Integer pageSize){
+    public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize){
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,pageSize);
         Page<ResourcesRent> pageObj= restResponse.getData();
@@ -51,8 +52,6 @@ public class RentTelnumController extends AbstractPortalController {
     private RestResponse pageList(HttpServletRequest request,Integer  pageNo,Integer pageSize){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
-        if(pageNo==null){pageNo=1;}
-        if(pageSize==null){pageSize=20;}
         return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,pageNo,pageSize);
     }
 }
