@@ -1,14 +1,17 @@
-package com.lsxy.app.api.gateway.security;
+package com.lsxy.app.api.gateway.security.auth;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -27,6 +30,7 @@ import java.util.TreeSet;
  * Created by Tandy on 2016/6/30.
  * 签名认证过滤器
  */
+@Component
 public class SignatureAuthFilter extends GenericFilterBean{
     private static final Logger logger = LoggerFactory.getLogger(SignatureAuthFilter.class);
     // Enable Multi-Read for PUT and POST requests
@@ -36,22 +40,13 @@ public class SignatureAuthFilter extends GenericFilterBean{
     };
 
 
+    @Autowired
     private AuthenticationManager authenticationManager;
-    private AuthenticationEntryPoint authenticationEntryPoint;
-    private Md5PasswordEncoder md5;
+
+    @Autowired
+    private RestAuthenticationEntryPoint authenticationEntryPoint;
 
 
-    public SignatureAuthFilter(AuthenticationManager authenticationManager) {
-        this(authenticationManager, new RestAuthenticationEntryPoint());
-        ((RestAuthenticationEntryPoint)this.authenticationEntryPoint).setRealmName("Secure realm");
-    }
-
-
-    public SignatureAuthFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
-        this.authenticationManager = authenticationManager;
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.md5 = new Md5PasswordEncoder();
-    }
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
@@ -78,12 +73,13 @@ public class SignatureAuthFilter extends GenericFilterBean{
         String auth[] = credentials.split(":");
 
 
-        // get md5 content and content-type if the request is POST or PUT method
+        // 是否有post 或者 put  body
         boolean hasContent = METHOD_HAS_CONTENT.contains(request.getMethod());
-        String contentMd5 = hasContent ? md5.encodePassword(request.getPayload(), null) : "";
+
+        String contentMd5 = hasContent ? (new Md5PasswordEncoder()).encodePassword(request.getPayload(), null) : "";
         String contentType = hasContent ? request.getContentType() : "";
 
-        // calculate content to sign
+        // 组织签名数据
         StringBuilder toSign = new StringBuilder();
         toSign.append(request.getMethod()).append("\n")
                 .append(contentMd5).append("\n")
@@ -91,34 +87,26 @@ public class SignatureAuthFilter extends GenericFilterBean{
                 .append(timestamp).append("\n")
                 .append(request.getRequestURI());
 
-// a rest credential is composed by request data to sign and the signature
         RestCredentials restCredential = new RestCredentials(toSign.toString(), auth[1]);
-
-        // calculate UTC time from timestamp (usually Date header is GMT but still...)
-        Date date = null;
         try {
-            date = DateUtils.parseDate(timestamp,"yyyyMMddHHmmss");
-        } catch (ParseException | IllegalArgumentException ex) {
-            ex.printStackTrace();
-        }
+            Date date = DateUtils.parseDate(timestamp,"yyyyMMddHHmmss");
 
 
-        // Create an authentication token
-        Authentication authentication = new RestToken(auth[0], restCredential, date);
-        try {
-            // Request the authentication manager to authenticate the token (throws exception)
+            // Create an authentication token
+            Authentication authentication = new RestToken(auth[0], restCredential, date);
+
             Authentication successfulAuthentication = authenticationManager.authenticate(authentication);
 
-            // Pass the successful token to the SecurityHolder where it can be
-            // retrieved by this thread at any stage.
+            //认证成功，设置认证token
             SecurityContextHolder.getContext().setAuthentication(successfulAuthentication);
             // Continue with the Filters
             chain.doFilter(request, response);
         } catch (AuthenticationException authenticationException) {
-            // If it fails clear this threads context and kick off the
-            // authentication entry point process.
             SecurityContextHolder.clearContext();
             authenticationEntryPoint.commence(request, response, authenticationException);
+        } catch (ParseException e) {
+            SecurityContextHolder.clearContext();
+            authenticationEntryPoint.commence(request, response, new BadCredentialsException("时间戳参数不正确"));
         }
     }
 }

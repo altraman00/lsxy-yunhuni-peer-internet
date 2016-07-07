@@ -1,4 +1,4 @@
-package com.lsxy.app.api.gateway.security;
+package com.lsxy.app.api.gateway.security.auth;
 
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateService;

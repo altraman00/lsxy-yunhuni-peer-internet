@@ -1,7 +1,8 @@
-package com.lsxy.app.api.gateway.security;
+package com.lsxy.app.api.gateway.security.auth;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +13,12 @@ import java.io.PrintWriter;
 /**
  * Created by Tandy on 2016/7/1.
  */
+@Component
 public class RestAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
+
+    public  RestAuthenticationEntryPoint(){
+        this.setRealmName("Secure realm");
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {

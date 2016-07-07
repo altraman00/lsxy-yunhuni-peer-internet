@@ -29,11 +29,17 @@ public class CallControllerTest {
 
     @Test
     public void testDoCall(){
-        String url = restPrefixUrl + "v1/account/12345678/call";
+        String url = restPrefixUrl + "v1/account/12345678/calltest";
         String certid = "1";
+
         RestResponse<String> response = APIGWRestRequest.buildSecurityRequest(certid).get(url,String.class);
         Assert.notNull(response);
         Assert.isTrue(response.getData().equals("12345678"));
+
+
+        RestResponse<String> response2 = APIGWRestRequest.buildSecurityRequest(certid).post(url,"<xml><result>1</result></xml>",String.class);
+        Assert.notNull(response2);
+        Assert.isTrue(response2.getData().equals("12345678"));
 
 
     }

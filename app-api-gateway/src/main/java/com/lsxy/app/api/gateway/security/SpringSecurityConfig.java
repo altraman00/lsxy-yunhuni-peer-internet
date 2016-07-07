@@ -1,22 +1,21 @@
 package com.lsxy.app.api.gateway.security;
 
+import com.lsxy.app.api.gateway.security.auth.RestAuthenticationProvider;
+import com.lsxy.app.api.gateway.security.auth.SignatureAuthFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authentication.dao.ReflectionSaltSource;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import static org.apache.zookeeper.ZooDefs.OpCode.auth;
 
 /**
  * Created by Tandy on 2016/6/7.
@@ -29,6 +28,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private RestAuthenticationProvider restAuthenticationProvider;
+
+    @Autowired
+    private SignatureAuthFilter signatureAuthFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,7 +45,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         ;
-        http.addFilterBefore(new SignatureAuthFilter(authenticationManager()), BasicAuthenticationFilter.class);
+        http.addFilterBefore(signatureAuthFilter, BasicAuthenticationFilter.class);
 
 //        http.addFilter(headerAuthenticationFilter());
     }
@@ -53,6 +55,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //        return new TokenPreAuthenticationFilter(authenticationManager());
 //    }
 
+
+    @Bean
+    public AuthenticationManager getAuthenticationManager() throws Exception {
+        return this.authenticationManager();
+    }
 
 
     /**

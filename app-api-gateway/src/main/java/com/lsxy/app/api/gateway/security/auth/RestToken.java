@@ -1,4 +1,4 @@
-package com.lsxy.app.api.gateway.security;
+package com.lsxy.app.api.gateway.security.auth;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
