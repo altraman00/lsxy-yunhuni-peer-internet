@@ -101,6 +101,7 @@
                                     </tbody>
                                 </table>
                             </section>
+                            <c:set var="extraParam" value="&startTimeYear=${consumeStatisticsVo.startTimeYear}&endTimeYear=${consumeStatisticsVo.endTimeYear}&startTime=${consumeStatisticsVo.startTime}&endTime=${consumeStatisticsVo.endTime}&type=${consumeStatisticsVo.type}&appId=${consumeStatisticsVo.appId}"></c:set>
                             <c:set var="pageUrl" value="${ctx}/console/statistics/consume/index"></c:set>
                             <%@include file="/inc/pagefooter.jsp" %>
                         </section>

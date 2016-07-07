@@ -22,15 +22,16 @@
                     </a>
                 </li>
             </c:if>
-
             <c:forEach end="${endPageNo}" begin="${startPageNo}" varStatus="s" >
-                <li
-                        <c:if test="${pageObj.currentPageNo == s.index}">
-                            class="active"
-                        </c:if>
-                >
-                    <a href="${pageUrl}?pageNo=${s.index}&pageSize=${pageObj.pageSize}${extraParam}">${s.index}</a>
-                </li>
+                <c:if test="${endPageNo!=1}">
+                    <li
+                            <c:if test="${pageObj.currentPageNo == s.index}">
+                                class="active"
+                            </c:if>
+                    >
+                        <a href="${pageUrl}?pageNo=${s.index}&pageSize=${pageObj.pageSize}${extraParam}">${s.index}</a>
+                    </li>
+                </c:if>
             </c:forEach>
 
             <c:if test="${pageObj.totalPageCount>endPageNo}">
