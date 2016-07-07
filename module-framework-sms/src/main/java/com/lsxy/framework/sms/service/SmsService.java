@@ -8,6 +8,17 @@ import java.util.Map;
  */
 public interface SmsService {
 
+    /**
+     * 发送模板短信
+     * @param to
+     * @param template 模板标识
+     * @param params
+     * @return
+     */
     public boolean sendsms(String to,String template,Map<String,Object> params);
+
+
+
+
 
 }
