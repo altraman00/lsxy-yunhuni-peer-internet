@@ -33,10 +33,10 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         Tenant tenant = tenantService.findTenantByUserName(userName);
         Page<ConsumeMonth> page = null;
         if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y')=?2 or DATE_FORMAT(obj.dt,'%Y')=?3 ORDER BY obj.dt,obj.month";
+            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and ( DATE_FORMAT(obj.dt,'%Y')=?2 or DATE_FORMAT(obj.dt,'%Y')=?3 ) ORDER BY obj.dt,obj.month";
             page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
         }else{
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and obj.appId=?2 and DATE_FORMAT(obj.dt,'%Y')=?3  or DATE_FORMAT(obj.dt,'%Y')=?4 ORDER BY obj.dt,obj.month";
+            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and obj.appId=?2 and ( DATE_FORMAT(obj.dt,'%Y')=?3  or DATE_FORMAT(obj.dt,'%Y')=?4 )ORDER BY obj.dt,obj.month";
             page = this.pageList(hql,pageNo,pageSize,tenant.getId(),appId,endTime,startTime);
         }
         return page;

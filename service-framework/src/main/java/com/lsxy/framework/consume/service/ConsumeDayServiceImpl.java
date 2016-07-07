@@ -35,10 +35,10 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         Tenant tenant = tenantService.findTenantByUserName(userName);
         Page<ConsumeDay> page = null;
         if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeDay obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y-%m')=?2 or DATE_FORMAT(obj.dt,'%Y-%m')=?3 ORDER BY obj.dt,obj.day";
+            String hql = "from ConsumeDay obj where obj.tenantId=?1 and ( DATE_FORMAT(obj.dt,'%Y-%m')=?2 or DATE_FORMAT(obj.dt,'%Y-%m')=?3 ) ORDER BY obj.dt,obj.day";
             page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
         }else{
-            String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and DATE_FORMAT(obj.dt,'%Y-%m')=?3  or DATE_FORMAT(obj.dt,'%Y-%m')=?4 ORDER BY obj.dt,obj.day";
+            String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and ( DATE_FORMAT(obj.dt,'%Y-%m')=?3  or DATE_FORMAT(obj.dt,'%Y-%m')=?4 ) ORDER BY obj.dt,obj.day";
             page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),appId,endTime,startTime);
         }
         return page;
