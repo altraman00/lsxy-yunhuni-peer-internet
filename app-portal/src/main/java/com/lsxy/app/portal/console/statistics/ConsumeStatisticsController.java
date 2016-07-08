@@ -6,6 +6,7 @@ import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.api.consume.model.ConsumeMonth;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.app.model.App;
@@ -38,15 +39,10 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public ModelAndView index(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo){
         ModelAndView mav = new ModelAndView();
         mav.addObject("appList",getAppList(request).getData());
         mav.addObject("consumeStatisticsVo",consumeStatisticsVo);//时间
-        if(ConsumeStatisticsVo.TYPE_MONTH.equals(consumeStatisticsVo.getType())){//日统计，按月查
-            mav.addObject("pageObj",getConsumeDayPageList( request, consumeStatisticsVo, pageNo, pageSize).getData());
-        }else{//月统计，按年查
-            mav.addObject("pageObj",getConsumeMonthPageList( request, consumeStatisticsVo, pageNo, pageSize).getData());
-        }
         mav.setViewName("/console/statistics/consume/index");
         return mav;
     }
@@ -61,18 +57,40 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         String uri = restPrefixUrl +   "/rest/app/list";
         return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
     }
+
+    /**
+     * 异步分页信息
+     * @param request
+     * @param consumeStatisticsVo
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping("/page_list")
+    @ResponseBody
+    public List pageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+        List list = ((Page)getPageList( request, consumeStatisticsVo, pageNo, pageSize).getData()).getResult();
+        return list;
+    }
+
+    /**
+     * 异步获取图表显示信息
+     * @param request
+     * @param consumeStatisticsVo
+     * @return
+     */
     @RequestMapping("/list")
     @ResponseBody
     public List list(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo){
         List list = new ArrayList();
-        if(ConsumeStatisticsVo.TYPE_MONTH.equals(consumeStatisticsVo.getType())){//日统计比较
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(consumeStatisticsVo.getType())){//日统计比较
             Map map1 = getConsumeDayList(request,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime());
             list.add(map1);
             if(consumeStatisticsVo.getEndTime().length()>0){//有对比时间
                 Map map2 = getConsumeDayList(request,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getEndTime());
                 list.add(map2);
             }
-        }else{
+        }else{//月统计
             Map map1 = getConsumeMonthList(request,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime());
             list.add(map1);
             if(consumeStatisticsVo.getEndTime().length()>0){//有对比时间
@@ -102,7 +120,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         return map;
     }
     /**
-     * 获取消费日统计的图表显示信息
+     * 获取消费月统计的图表显示信息
      * @param request
      * @param appId 应用id
      * @param startTime 开始时间
@@ -119,7 +137,6 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         map.put("data",getArrays(list));
         return map;
     }
-
     /**
      * 获取列表数据
      * @param list 待处理的list
@@ -139,29 +156,20 @@ public class ConsumeStatisticsController extends AbstractPortalController {
     }
 
     /**
-     * 获取消费日统计的分页信息
+     * 获取消费统计的分页信息
      * @param request
      * @param consumeStatisticsVo 消费统计VO对象
      * @param pageNo 第几页
      * @param pageSize 一页多少数据
      * @return
      */
-    private RestResponse getConsumeDayPageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
+    private RestResponse getPageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/consume_day/page?appId={1}&startTime={2}&endTime={3}&pageNo={4}&pageSize={5}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri, ConsumeDay.class,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
-    }
-    /**
-     * 获取消费月统计的分页信息
-     * @param request
-     * @param consumeStatisticsVo 消费统计VO对象
-     * @param pageNo 第几页
-     * @param pageSize 一页多少数据
-     * @return
-     */
-    private RestResponse getConsumeMonthPageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
-        String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/consume_month/page?appId={1}&startTime={2}&endTime={3}&pageNo={4}&pageSize={5}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri, ConsumeMonth.class,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTimeYear(),consumeStatisticsVo.getEndTimeYear(),pageNo,pageSize);
+        String uri = restPrefixUrl + "/rest/consume_"+consumeStatisticsVo.getType()+"/page?appId={1}&startTime={2}&endTime={3}&pageNo={4}&pageSize={5}";
+        Class clazz = ConsumeMonth.class;
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(consumeStatisticsVo.getType())){
+            clazz = ConsumeDay.class;
+        }
+        return RestRequest.buildSecurityRequest(token).getPage(uri,clazz ,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
     }
 }
