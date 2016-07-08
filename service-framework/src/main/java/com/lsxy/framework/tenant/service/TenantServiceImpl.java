@@ -34,7 +34,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     }
 
     @Override
-    public Tenant findTenantByUserName(String userName) throws MatchMutiEntitiesException {
+    public Tenant findTenantByUserName(String userName)  {
         Tenant tenant = null;
         Account account = accountService.findAccountByUserName(userName);
         if(account != null){

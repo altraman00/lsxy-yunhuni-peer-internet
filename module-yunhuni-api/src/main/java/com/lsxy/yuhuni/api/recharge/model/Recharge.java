@@ -1,11 +1,12 @@
 package com.lsxy.yuhuni.api.recharge.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yuhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yuhuni.api.recharge.enums.RechargeType;
-import com.lsxy.framework.api.tenant.model.Tenant;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * 充值记录表
@@ -20,6 +21,7 @@ public class Recharge  extends IdEntity {
     private String type;                  //充值方式
     private String status;                //充值状态
     private String orderId;               //订单ID
+    private Date createTime;
 
     public Recharge() {
     }
@@ -76,5 +78,14 @@ public class Recharge  extends IdEntity {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    @Column(name = "create_time")
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

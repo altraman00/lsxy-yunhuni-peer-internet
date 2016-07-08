@@ -42,7 +42,7 @@
                                             </li>
                                             <li>
                                                 <div class="aside-li-a active">
-                                                    <a href="./cost_order.html">充值订单</a>
+                                                    <a href="${ctx}/console/cost/recharge/list">充值订单</a>
                                                 </div>
                                             </li>
                                             <li>
@@ -98,8 +98,8 @@
                                                 <p><span>充值金额：</span>
                                                     <span class="cost-money">${balanceInt}<span class="floatmoney">.${balanceDec}</span> <span class="unit">元</span></span> </p>
                                                 <p>订单号：${recharge.orderId}</p>
-                                                <p>充值方式：${recharge.type}</p>
-                                                <p>订单状态：${recharge.status}</p>
+                                                <p>充值方式：${recharge.typeName}</p>
+                                                <p>订单状态：${recharge.statusName}</p>
                                                 <br/>
                                                 <form:form action="${ctx}/console/cost/recharge/to_alipay" method="post" target="_blank">
                                                     <input type="hidden" name="orderId" value="${recharge.orderId}" />
@@ -131,14 +131,14 @@
                         label: "我已付款!",
                         className: "btn-primary",
                         callback: function() {
-                            window.location.href = '';
+                            window.location.href = ctx + '/console/cost/recharge/list';
                         }
                     },
                     success: {
                         label: "查看订单",
                         className: "btn-success",
                         callback: function() {
-                            window.location.href = '';
+                            window.location.href = ctx + '/console/cost/recharge/list';
                         }
                     },
                 }

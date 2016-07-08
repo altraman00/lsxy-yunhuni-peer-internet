@@ -108,19 +108,21 @@ public class HomeController extends AbstractPortalController {
         List<App> appList = getApps(token);
 
         List<AppStateVO> appStateVOs = new ArrayList<>();
-        for(App app:appList){
-            AppStateVO appStateVO = new AppStateVO();
-            try {
-                BeanUtils.copyProperties2(appStateVO,app,false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            Map map = getStatistics(token, app);
+        if(appList != null){
+            for(App app:appList){
+                AppStateVO appStateVO = new AppStateVO();
+                try {
+                    BeanUtils.copyProperties2(appStateVO,app,false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Map map = getStatistics(token, app);
 
-            appStateVO.setCallOfDay((Integer) map.get("dayCount"));
-            appStateVO.setCallOfHour((Integer) map.get("hourCount"));
-            appStateVO.setCurrentCall((Integer) map.get("currentSession"));
-            appStateVOs.add(appStateVO);
+                appStateVO.setCallOfDay((Integer) map.get("dayCount"));
+                appStateVO.setCallOfHour((Integer) map.get("hourCount"));
+                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
+                appStateVOs.add(appStateVO);
+            }
         }
         vo.setAppStateVOs(appStateVOs);
         return vo;

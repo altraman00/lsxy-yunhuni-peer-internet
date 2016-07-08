@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -19,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 @SuppressWarnings({"unchecked","rawtypes"})
+@Transactional
 public abstract class AbstractService<T> implements BaseService<T> {
 
     private Logger logger = LoggerFactory.getLogger(com.google.common.util.concurrent.AbstractService.class);
@@ -193,7 +195,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
         if(excludeDeleted)
             jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
         pageNo--;
-        String countJpql = " select count (*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
+        String countJpql = " select count(*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
         Query query = this.em.createQuery(countJpql);
         for (int i = 0; i < params.length; i++) {
             Object object = params[i];
@@ -203,6 +205,10 @@ public abstract class AbstractService<T> implements BaseService<T> {
         long totalCount = (Long) obj;
 
         query = this.em.createQuery(jpql);
+        for (int i = 0; i < params.length; i++) {
+            Object object = params[i];
+            query.setParameter(i+1, object);
+        }
         query.setMaxResults(pageSize);
         query.setFirstResult(pageNo*pageSize);
         List list = query.getResultList();

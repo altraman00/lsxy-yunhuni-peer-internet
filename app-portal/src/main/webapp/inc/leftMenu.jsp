@@ -30,13 +30,13 @@
 							<li class="nav-router " data-router="">
 								<a data-toggle="tooltip" data-placement='right' title='应用管理' href="fee.html"> <i class="fa fa-desktop icon"></i> <span>应用管理</span> </a>
 							</li>
-							<li class="nav-router " data-router="">
-								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="message.html"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
+							<li class="nav-router " data-router="telenum">
+								<a data-toggle="tooltip" data-placement='right' title='号码管理' href="${ctx}/console/telenum/callnum/index"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>号码管理</span> </a>
 							</li>
 						</ul>
 					</li>
-					<li class="border-top" >
-						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="#" class="canbehover" >
+					<li class="border-top">
+						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="${ctx}/console/message/account_message/index" class="canbehover nav-router"  data-router="message" >
 							<i class="fa fa-envelope icon"> </i>
 							<span>消息中心</span>
 						</a>
@@ -46,10 +46,20 @@
 							<i class="fa fa-comment-o icon"> </i>
 							<span>客服中心</span> </a>
 					</li>
-					<li class="border-top" >
-						<a data-toggle="tooltip" data-placement='right' title='统计查询' href="#" class="canbehover" >
-							<i class="fa fa-clock-o icon"> </i>
-							<span>统计查询</span> </a>
+					<li class="border-top">
+						<a href="#" class="side-menu-link">
+							<i class="fa fa-caret-down icon"> </i><span>统计查询</span> </a>
+						<ul class="nav lt list">
+							<li>
+								<a data-toggle="tooltip" data-placement='right' title='消费统计' href="${ctx}/console/statistics/consume/index" class="nav-router" data-router="statistics"> <i class="fa fa-calendar icon"></i> <span>消费统计</span> </a>
+							</li>
+							<li>
+								<a data-toggle="tooltip" data-placement='right' title='会话统计' href="statistics_conversation.html"><i class="fa fa-clock-o icon" aria-hidden="true"> </i> <span>会话统计</span> </a>
+							</li>
+							<li>
+								<a data-toggle="tooltip" data-placement='right' title='详单查询' href="statistics_find.html"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>详单查询</span> </a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</nav>

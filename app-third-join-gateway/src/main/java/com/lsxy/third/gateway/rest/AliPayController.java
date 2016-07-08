@@ -1,5 +1,6 @@
 package com.lsxy.third.gateway.rest;
 
+import com.alipay.config.AlipayConfig;
 import com.alipay.util.AlipayNotify;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.yuhuni.api.recharge.enums.RechargeType;
@@ -81,15 +82,17 @@ public class AliPayController extends AbstractAPIController{
                 payRecord.setSellerName(params.get("seller_email"));
                 payRecord.setBuyerName(params.get("buyer_email"));
                 //对该付款记录进行处理
-                Recharge recharge = rechargeService.paySuccess(payRecord.getOrderId());
-                if(recharge != null){
-                    payRecord.setRecharge(recharge);
-                    try {
-                        //将付款记录存到数据库
-                        thirdPayRecordService.save(payRecord);
-                        result =  "success";
-                    } catch (DataIntegrityViolationException e) {
-                        logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
+                if(AlipayConfig.seller_id.equals(payRecord.getSellerId())){
+                    Recharge recharge = rechargeService.paySuccess(payRecord.getOrderId(),payRecord.getTotalFee());
+                    if(recharge != null){
+                        payRecord.setRecharge(recharge);
+                        try {
+                            //将付款记录存到数据库
+                            thirdPayRecordService.save(payRecord);
+                            result =  "success";
+                        } catch (DataIntegrityViolationException e) {
+                            logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
+                        }
                     }
                 }
             }
