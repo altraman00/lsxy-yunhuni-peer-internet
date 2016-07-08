@@ -56,6 +56,9 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         Tenant tenant = new Tenant();
         tenant.setIsRealAuth(Tenant.AUTH_NO); //设为未实名认证状态
         tenant.setTenantUid(DateUtils.getTime("yyyyMMdd")+ incTid);
+        if(incTid >= 9999){
+            cacheManager.del(INCREASE_TID);
+        }
         return this.save(tenant);
     }
 

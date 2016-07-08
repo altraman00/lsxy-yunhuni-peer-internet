@@ -6,6 +6,8 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +21,7 @@ import static com.lsxy.framework.web.rest.RestResponse.failed;
 @RestController
 @RequestMapping("/reg")
 public class RegisterController {
-
+    private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     @Autowired
     private RedisCacheService cacheManager;
 
@@ -91,7 +93,11 @@ public class RegisterController {
             if(account != null){
                 response = RestResponse.success(account);
                 //TODO MQ事件，发送激活邮件
-                cacheManager.set(UUIDGenerator.uuid(),account.getId(),72 * 60 * 60);
+                String uuid = UUIDGenerator.uuid();
+                if(logger.isDebugEnabled()){
+                    logger.debug("发邮件，key：{},accountId:{}，userName:{}",uuid,account.getId(),account.getUserName());
+                }
+                cacheManager.set(uuid,account.getId(),72 * 60 * 60);
             }else{
                 response = failed("0000","注册用户失败，系统出错！");
             }

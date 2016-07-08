@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
     <title>重置密码</title>

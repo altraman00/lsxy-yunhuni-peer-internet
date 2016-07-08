@@ -4,7 +4,7 @@
 <html lang="en" class="no-js">
 <head>
     <title>注册</title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
 </head>
@@ -120,10 +120,10 @@
         var mobile = $("#form-mobile").val();
         $.get(ctx + "/mc/check", {"mc":mobileCode,"mobile":mobile},
             function(data){
-                if(data == 1){
+                if(data.flag){
                     document.getElementById('defaultForm').submit();
                 }else{
-                    tipsmsg(data,"mobileCodeTips");
+                    tipsmsg(data.err,"mobileCodeTips");
                 }
         });
 

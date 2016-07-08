@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/6/22.
@@ -28,21 +30,29 @@ public class MCController {
     }
 
     /**
-     * 验证手机验证码 成功返回1 ，失败则返回原因
+     * 验证手机验证码
      */
     @RequestMapping(value = "/check",method = RequestMethod.GET)
     @ResponseBody
-    public String checkMobileCode(HttpServletRequest request, String mobile,String mc){
+    public Map<String,Object> checkMobileCode(HttpServletRequest request, String mobile, String mc){
+        Map<String,Object> result = new HashMap<>();
         //检查手机验证码
         if(StringUtils.isNotBlank(mc) && StringUtils.isNotBlank(mobile)){
             String s = checkMobileCode(mobile, mc);
             if("1".equals(s)){
                 MobileCodeChecker checker = new MobileCodeChecker(mobile,true);
                 MobileCodeUtils.setMobileCodeChecker(request,checker);
+                result.put("flag",true);
+                result.put("msg","验证通过");
+            }else{
+                result.put("flag",false);
+                result.put("err",s);
             }
-            return s;
+            return result;
         }else{
-            return "手机号或验证码为空";
+            result.put("flag",false);
+            result.put("err","手机号或验证码为空");
+            return result;
         }
     }
 

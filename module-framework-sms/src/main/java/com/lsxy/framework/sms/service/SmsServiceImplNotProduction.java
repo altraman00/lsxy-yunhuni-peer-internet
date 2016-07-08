@@ -1,5 +1,6 @@
 package com.lsxy.framework.sms.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil2;
@@ -77,6 +78,7 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
         if(StringUtils.isNotBlank(to) && StringUtils.isNotBlank(vc)){
             String json = redisCacheService.get(CODE_PREFIX + to);
             if(StringUtils.isNotBlank(json)){
+                //{"mobile":"13750001373","checkCode":"9283","checkNum":0,"createTime":1467953645699}
                 MobileCode mobileCode = JSONUtil2.fromJson(json, MobileCode.class);
                 //同一个手机验证码只能检查有限次数
                 int checkNum = mobileCode.getCheckNum();

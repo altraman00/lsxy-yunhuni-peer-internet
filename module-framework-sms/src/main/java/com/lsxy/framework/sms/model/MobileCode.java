@@ -1,7 +1,5 @@
 package com.lsxy.framework.sms.model;
 
-import org.springframework.util.StringUtils;
-
 /**
  * Created by liups on 2016/6/23.
  */
@@ -14,8 +12,27 @@ public class MobileCode {
     private int checkNum = 0;
     private long createTime = System.currentTimeMillis();
 
+    public MobileCode() {
+    }
+
     public MobileCode(String mobile, String checkCode) {
         this.mobile = mobile;
+        this.checkCode = checkCode;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getCheckCode() {
+        return checkCode;
+    }
+
+    public void setCheckCode(String checkCode) {
         this.checkCode = checkCode;
     }
 
@@ -27,20 +44,11 @@ public class MobileCode {
         this.checkNum = checkNum;
     }
 
-    public String getCheckCode() {
-        return checkCode;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public long getCreateTime(){
+    public long getCreateTime() {
         return createTime;
     }
 
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
 }
