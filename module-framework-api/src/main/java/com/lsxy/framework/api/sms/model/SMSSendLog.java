@@ -22,6 +22,10 @@ public class SMSSendLog  extends IdEntity {
 
     private String sendTo;
 
+
+    public SMSSendLog(){
+
+    }
     public SMSSendLog(String to, String content, String clientName) {
         this.sendTo = to;
         this.msgContent = content;
