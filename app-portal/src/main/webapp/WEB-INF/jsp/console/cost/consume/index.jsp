@@ -102,7 +102,8 @@
                                                     <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" />
                                                     到
                                                     <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" />
-                                                    <button class="btn btn-primary query">查询</button>
+                                                    <button class="btn btn-primary query" type="button"  id="findform" >查询</button>
+                                                    <span class="tips-error" ></span>
                                                 </div>
                                             </div>
                                         </div>
