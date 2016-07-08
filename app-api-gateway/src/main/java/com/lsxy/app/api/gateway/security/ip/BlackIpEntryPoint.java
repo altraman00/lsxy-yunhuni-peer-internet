@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 /**
  * Created by Tandy on 2016/7/1.
  */
-@Component
 public class BlackIpEntryPoint extends Http403ForbiddenEntryPoint {
 
 

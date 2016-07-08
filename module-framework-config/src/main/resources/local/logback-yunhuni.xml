@@ -41,7 +41,7 @@
         </triggeringPolicy>
     </appender>
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
-    <logger name="org.springframework" level="INFO" additivity="true" />
+    <logger name="org.springframework.security" level="DEBUG" additivity="true" />
     <logger name="org.hibernate" level="INFO" additivity="true" />
 
 
