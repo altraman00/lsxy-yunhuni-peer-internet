@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.app.model.App;
+import javassist.bytecode.stackmap.TypeData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -66,7 +67,7 @@ public class SessionStatisticsController extends AbstractPortalController {
     public List list(HttpServletRequest request,String type,String startTime,String appId){
         List list = new ArrayList();
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){//日统计比较
-
+            
         }else{//月统计
 
         }
@@ -98,7 +99,6 @@ public class SessionStatisticsController extends AbstractPortalController {
         double[] list1 = new double[list.size()];
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
-            
             if(obj instanceof ConsumeMonth){
                 if(SESSION==type){
                     list1[i]=((ConsumeMonth)obj).getSumSessionCount();
@@ -106,7 +106,11 @@ public class SessionStatisticsController extends AbstractPortalController {
                     list1[i]=((ConsumeMonth)obj).getSumAmount();
                 }
             }else if(obj instanceof ConsumeDay){
-                list1[i]=((ConsumeDay)obj).getSumSessionCount();
+                if(SESSION==type){
+                    list1[i]=((ConsumeDay)obj).getSumSessionCount();
+                }else if(CONSUME==type){
+                    list1[i]=((ConsumeDay)obj).getSumAmount();
+                }
             }
         }
         return list1;
