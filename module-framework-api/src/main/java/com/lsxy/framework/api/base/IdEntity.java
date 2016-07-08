@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -35,8 +36,18 @@ public abstract class IdEntity implements Serializable{
 //	private static final long serialVersionUID = 1L;
 
 	protected String id;
-	
-	private boolean deleted;
+
+	protected boolean deleted = false; //是否删除
+
+	protected Date createTime = new Date(); //创建时间
+
+	protected Date lastTime = new Date();  //最后修改时间
+
+	protected Date deleteTime; //删除时间
+
+	protected Long sortNo = new Date().getTime(); //排序号
+
+	protected int version = 0; //版本号
 
 	//deleted属性不需要进行json序列化
 	@JsonIgnore
@@ -60,5 +71,50 @@ public abstract class IdEntity implements Serializable{
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@Column(name="create_time")
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	@Column(name="last_time")
+	public Date getLastTime() {
+		return lastTime;
+	}
+
+	public void setLastTime(Date lastTime) {
+		this.lastTime = lastTime;
+	}
+
+	@Column(name="delete_time")
+	public Date getDeleteTime() {
+		return deleteTime;
+	}
+
+	public void setDeleteTime(Date deleteTime) {
+		this.deleteTime = deleteTime;
+	}
+
+	@Column(name="sortno")
+	public Long getSortNo() {
+		return sortNo;
+	}
+
+	public void setSortNo(Long sortNo) {
+		this.sortNo = sortNo;
+	}
+
+	@Column(name="version")
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
 	}
 }

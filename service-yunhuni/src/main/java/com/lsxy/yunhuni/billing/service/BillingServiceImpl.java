@@ -28,8 +28,6 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
     public BaseDaoInterface<Billing, Serializable> getDao() {
         return billingDao;
     }
-
-
     @Override
     public Billing findBillingByUserName(String username) throws MatchMutiEntitiesException {
         Billing billing = null;

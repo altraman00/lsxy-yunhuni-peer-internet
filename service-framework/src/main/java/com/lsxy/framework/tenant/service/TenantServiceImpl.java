@@ -52,6 +52,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     @Override
     public Tenant createTenant() {
+        //TODO redis上锁，确保不会发生超过9999的数字
         long incTid = cacheManager.incr(INCREASE_TID);
         Tenant tenant = new Tenant();
         tenant.setIsRealAuth(Tenant.AUTH_NO); //设为未实名认证状态

@@ -33,7 +33,6 @@ public class RegisterController {
     @Autowired
     private RedisCacheService cacheManager;
 
-
     @RequestMapping(value = "/index",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView registerPage(){
@@ -126,8 +125,15 @@ public class RegisterController {
                 returnView = "register/active_fail";
             }
         }else{
-            model.put("erInfo","参数异常或邮件已过期");
-            returnView = "register/active_fail";
+            //
+            Integer accountStatus = getAccountStatus(uid);
+            if(accountStatus == 2){
+                model.put("info","账户已经激活");
+                returnView = "register/active_result";
+            }else{
+                model.put("erInfo","参数异常或邮件已过期");
+                returnView = "register/active_fail";
+            }
         }
         return new ModelAndView(returnView,model);
     }
@@ -145,6 +151,8 @@ public class RegisterController {
                 activeAccount(uid,password);
                 model.put("info","账户已经激活");
                 returnUrl = "register/active_result";
+                //激活后删除redis里的邮件标识
+                cacheManager.del(code);
             } catch (RegisterException e) {
                 model.put("erInfo",e.getMessage());
                 returnUrl = "register/active_fail";

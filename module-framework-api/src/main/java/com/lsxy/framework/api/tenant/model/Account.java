@@ -46,15 +46,6 @@ public class Account extends IdEntity {
 	private String province;//省份
 
 	private String city;//城市
-	private Date createTime;//创建时间
-	@Column(name = "create_time")
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
 
 	@Column(name = "username")
 	public String getUserName() {

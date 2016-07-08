@@ -37,7 +37,7 @@
             <ul class="dropdown-menu animated fadeInRight">
                 <span class="arrow top"></span>
                 <li> <a href="#">设置</a> </li>
-                <li> <a href="${ctx}/logout" data-toggle="ajaxModal" >退出</a> </li>
+                <li> <a href="javascript:void(0)" data-toggle="ajaxModal" onclick="window.location.href='${ctx}/logout'">退出</a> </li>
             </ul>
         </li>
     </ul>

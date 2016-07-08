@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by Tandy on 2016/6/24.
@@ -62,22 +63,31 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public int checkRegInfo(String userName, String mobile, String email){
-        String hql = "from Account obj where (obj.userName=?1 and obj.status=?2) or (obj.userName=?3 and obj.status=?4 and obj.createTime<?5)";
-        Long userNameCount = accountDao.countByUserNameAndStatus(userName,Account.STATUS_NORMAL);
+        /*
+            检查注册重复信息时，各项信息不能和已经激活的用户相同，同一信息若没激活，在注册的72小内也不能重复注册
+         */
+        Date limitTime = new Date(System.currentTimeMillis() - 72 * 60 * 60 * 1000);
+
+        //验证用户名是否能注册
+        String userNameHql = "from Account obj where (obj.userName=?1 and obj.status=?2) or (obj.userName=?3 and obj.status=?4 and obj.createTime > ?5)";
+        long userNameCount = countByCustom(userNameHql, userName, Account.STATUS_NORMAL, userName, Account.STATUS_NOT_ACTIVE, limitTime);
         if(userNameCount > 0){
             return AccountService.REG_CHECK_USERNAME_EXIST;
         }
-        Long mobileCount = accountDao.countByMobileAndStatus(mobile,Account.STATUS_NORMAL);
+        //验证手机号是否能注册
+        String mobileHql = "from Account obj where (obj.mobile=?1 and obj.status=?2) or (obj.mobile=?3 and obj.status=?4 and obj.createTime > ?5)";
+        long mobileCount = countByCustom(mobileHql, mobile, Account.STATUS_NORMAL, mobile, Account.STATUS_NOT_ACTIVE, limitTime);
         if(mobileCount > 0){
             return AccountService.REG_CHECK_MOBILE_EXIST;
         }
-        Long emailCount = accountDao.countByEmailAndStatus(email,Account.STATUS_NORMAL);
+        //验证邮箱是否能注册
+        String emailHql = "from Account obj where (obj.email=?1 and obj.status=?2) or (obj.email=?3 and obj.status=?4 and obj.createTime > ?5)";
+        long emailCount = countByCustom(emailHql, email, Account.STATUS_NORMAL, email, Account.STATUS_NOT_ACTIVE, limitTime);
         if(emailCount > 0){
-            return AccountService.REG_CHECK_MOBILE_EXIST;
+            return AccountService.REG_CHECK_EMAIL_EXIST;
         }
         return AccountService.REG_CHECK_PASS;
     }
-
 
     @Override
     public Account createAccount(String userName, String mobile, String email) {
@@ -150,7 +160,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
     /**
-     * 检查激活信息是否可用，各个信息在数据库中是否有重复，执行激活前调用
+     * 检查激活信息是否可用，各个信息在数据库中是否有重复（已激活的账号），执行激活前调用
      * @param userName 用户名
      * @param mobile 手机号
      * @param email 邮箱

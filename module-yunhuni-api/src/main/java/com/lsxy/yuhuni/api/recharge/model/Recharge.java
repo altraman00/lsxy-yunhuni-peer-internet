@@ -21,7 +21,6 @@ public class Recharge  extends IdEntity {
     private String type;                  //充值方式 参考RechargeType
     private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
-    private Date createTime;
 
     public Recharge() {
     }
@@ -80,12 +79,4 @@ public class Recharge  extends IdEntity {
         this.orderId = orderId;
     }
 
-    @Column(name = "create_time")
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 }

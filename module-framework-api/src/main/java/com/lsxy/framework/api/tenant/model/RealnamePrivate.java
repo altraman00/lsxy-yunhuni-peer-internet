@@ -19,7 +19,6 @@ public class RealnamePrivate extends IdEntity {
     private String idNumber;//'身份证号
     private String idPhoto;//身份证照片
     private String idType;//认证证件类型
-    private Date createTime;//创建时间
     private int status;//实名认证状态
     public RealnamePrivate() {
     }
@@ -51,15 +50,6 @@ public class RealnamePrivate extends IdEntity {
 
     public void setStatus(int status) {
         this.status = status;
-    }
-
-    @Column(name = "create_time")
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
     }
 
     @Column(name = "id_type")
