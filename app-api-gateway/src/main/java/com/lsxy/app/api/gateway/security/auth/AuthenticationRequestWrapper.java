@@ -1,4 +1,4 @@
-package com.lsxy.app.api.gateway.security;
+package com.lsxy.app.api.gateway.security.auth;
 
 
 import javax.security.sasl.AuthenticationException;
