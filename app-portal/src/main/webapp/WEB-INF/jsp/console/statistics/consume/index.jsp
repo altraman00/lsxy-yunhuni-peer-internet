@@ -162,7 +162,7 @@
             $('.monthform').hide();
         }else{
             $('.monthform').show();
-            $('.yearform').hide();s
+            $('.yearform').hide();
         }
         initchart();
     });
