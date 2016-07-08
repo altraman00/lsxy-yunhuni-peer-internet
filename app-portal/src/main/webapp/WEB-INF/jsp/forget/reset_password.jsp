@@ -35,6 +35,7 @@
                     <input type="hidden" name="submission_token" value="${submission_token}" />
 
                     <input type="hidden" name="resetType" value="${resetType}" />
+                    <input type="hidden" name="emailKey" value="${emailKey}">
                     <div class="form-group">
                         <lable class="col-lg-2 text-right">新的密码</lable>
                         <div class="col-lg-9">

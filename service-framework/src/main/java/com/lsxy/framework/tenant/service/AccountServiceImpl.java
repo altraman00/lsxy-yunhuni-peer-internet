@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.io.Serializable;
 
 /**
@@ -37,7 +38,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException {
-        String hql = "from Account obj where obj.userName=?1 or obj.email=?2 or obj.mobile=?3 and obj.status=?4";
+        String hql = "from Account obj where (obj.userName=?1 or obj.email=?2 or obj.mobile=?3) and obj.status=?4";
         Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName,Account.STATUS_NORMAL);
         if(account != null) {
             if(!account.getPassword().equals(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()))){
@@ -49,7 +50,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public Account findAccountByLoginName(String userLoginName) throws MatchMutiEntitiesException {
-        String hql = "from Account obj where obj.userName=?1 or obj.email=?2 or obj.mobile=?3 and obj.status=?4";
+        String hql = "from Account obj where (obj.userName=?1 or obj.email=?2 or obj.mobile=?3) and obj.status=?4";
         Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName,Account.STATUS_NORMAL);
         return account;
     }
@@ -61,6 +62,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public int checkRegInfo(String userName, String mobile, String email){
+        String hql = "from Account obj where (obj.userName=?1 and obj.status=?2) or (obj.userName=?3 and obj.status=?4 and obj.createTime<?5)";
         Long userNameCount = accountDao.countByUserNameAndStatus(userName,Account.STATUS_NORMAL);
         if(userNameCount > 0){
             return AccountService.REG_CHECK_USERNAME_EXIST;

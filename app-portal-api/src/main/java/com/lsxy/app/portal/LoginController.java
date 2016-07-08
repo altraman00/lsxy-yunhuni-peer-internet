@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 登陆入口
  */
 @RestController
+@RequestMapping("/login")
 public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -35,7 +36,7 @@ public class LoginController {
      * 登录接口
      * @return
      */
-    @RequestMapping(path="/login",method = RequestMethod.POST)
+    @RequestMapping(path="",method = RequestMethod.POST)
     public RestResponse login(@RequestParam String username,@RequestParam String password){
 
         try {

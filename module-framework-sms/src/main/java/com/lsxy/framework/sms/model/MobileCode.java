@@ -12,20 +12,11 @@ public class MobileCode {
     private String mobile;
     private String checkCode;
     private int checkNum = 0;
-    private boolean isPass = false;
     private long createTime = System.currentTimeMillis();
 
     public MobileCode(String mobile, String checkCode) {
         this.mobile = mobile;
         this.checkCode = checkCode;
-    }
-
-    public boolean isPass() {
-        return isPass;
-    }
-
-    public void setPass(boolean pass) {
-        isPass = pass;
     }
 
     public int getCheckNum() {

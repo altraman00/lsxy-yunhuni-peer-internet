@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 public class PortalExceptionResolver implements HandlerExceptionResolver {
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        ex.printStackTrace();
         ModelAndView modelAndView = new ModelAndView("error_page");
         return modelAndView;
     }

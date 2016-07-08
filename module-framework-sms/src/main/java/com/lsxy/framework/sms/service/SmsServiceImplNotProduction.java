@@ -2,10 +2,9 @@ package com.lsxy.framework.sms.service;
 
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.sms.clients.SMSClientFactory;
-import com.lsxy.framework.sms.exceptions.CheckCodeExpireException;
+import com.lsxy.framework.sms.exceptions.CheckCodeNotFoundException;
 import com.lsxy.framework.sms.exceptions.CheckOutMaxTimesException;
 import com.lsxy.framework.sms.exceptions.InvalidValidateCodeException;
 import com.lsxy.framework.sms.exceptions.TooManyGenTimesException;
@@ -69,12 +68,12 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
         String random = random(4);
         MobileCode mobileCode = new MobileCode(to,random);
         String setJson = JSONUtil2.objectToJson(mobileCode);
-        redisCacheService.set(CODE_PREFIX + to,setJson);
+        redisCacheService.set(CODE_PREFIX + to,setJson , 30 * 60);
         return random;
     }
 
     @Override
-    public boolean checkVC(String to, String vc) throws InvalidValidateCodeException, CheckOutMaxTimesException, CheckCodeExpireException {
+    public boolean checkVC(String to, String vc) throws InvalidValidateCodeException, CheckOutMaxTimesException, CheckCodeNotFoundException {
         if(StringUtils.isNotBlank(to) && StringUtils.isNotBlank(vc)){
             String json = redisCacheService.get(CODE_PREFIX + to);
             if(StringUtils.isNotBlank(json)){
@@ -87,7 +86,6 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
                 }else{
                     mobileCode.setCheckNum(checkNum +1);
                     boolean flag = vc.equals(mobileCode.getCheckCode());
-                    mobileCode.setPass(flag);
                     if(flag){
                         return true;
                     }else{
@@ -95,7 +93,7 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
                     }
                 }
             }else{
-                throw new CheckCodeExpireException("验证码不存在或已过期");
+                throw new CheckCodeNotFoundException("验证码不存在或已过期");
             }
         }else{
             throw new InvalidValidateCodeException("手机号或验证码为空");

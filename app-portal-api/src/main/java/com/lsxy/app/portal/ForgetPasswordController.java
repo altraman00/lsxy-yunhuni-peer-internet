@@ -8,11 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 忘记密码
  * Created by liups on 2016/7/7.
  */
+@RestController
 @RequestMapping("/forget")
 public class ForgetPasswordController {
     private static final Logger logger = LoggerFactory.getLogger(ForgetPasswordController.class);
@@ -54,7 +56,7 @@ public class ForgetPasswordController {
     public RestResponse sendEmail(String email){
         //发送邮件（参数是一个UUID），并将其存到数据库（redis?）
         String uuid = UUIDGenerator.uuid();
-        cacheManager.set(uuid,email);
+        cacheManager.set(uuid,email,72 * 60 * 60);
         if(logger.isDebugEnabled()){
             logger.debug("邮件重置密码：code:{},email:{}",uuid,email);
         }

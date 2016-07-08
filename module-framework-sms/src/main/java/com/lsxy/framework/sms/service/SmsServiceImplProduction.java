@@ -2,7 +2,7 @@ package com.lsxy.framework.sms.service;
 
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.sms.clients.SMSClientFactory;
-import com.lsxy.framework.sms.exceptions.CheckCodeExpireException;
+import com.lsxy.framework.sms.exceptions.CheckCodeNotFoundException;
 import com.lsxy.framework.sms.exceptions.CheckOutMaxTimesException;
 import com.lsxy.framework.sms.exceptions.InvalidValidateCodeException;
 import com.lsxy.framework.sms.exceptions.TooManyGenTimesException;
@@ -58,7 +58,7 @@ public class SmsServiceImplProduction  extends AbstractSmsServiceImpl {
     }
 
     @Override
-    public boolean checkVC(String to, String vc) throws InvalidValidateCodeException, CheckOutMaxTimesException, CheckCodeExpireException {
+    public boolean checkVC(String to, String vc) throws InvalidValidateCodeException, CheckOutMaxTimesException, CheckCodeNotFoundException {
         return false;
     }
 

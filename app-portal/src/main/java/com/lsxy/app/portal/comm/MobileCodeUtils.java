@@ -31,7 +31,7 @@ public class MobileCodeUtils {
     }
 
     /**
-     * restApi 删除手机验证码
+     * restApi调用 删除缓存的手机验证码
      * @param mobile
      */
     private static void removeMobileCode(String mobile){

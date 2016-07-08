@@ -8,6 +8,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.alipay.config.AlipayConfig.key;
+
 /**
  * Created by liups on 2016/6/24.
  * 忘记密码
@@ -28,6 +31,7 @@ import java.util.Map;
 public class ForgetPasswordController {
 
     private static String ALLOW_RESET_PASSWORD = "allowResetPassword";
+    private static String RESET_EMAIL_KEY = "resetEmailKey";
     private static String RESET_EMAIL = "resetEmail";
     private static String RESET_MOBILE = "resetMobile";
     private static String RESET_TYPE = "resetType";
@@ -83,6 +87,7 @@ public class ForgetPasswordController {
         if(StringUtils.isNotBlank(email)){
             request.getSession().setAttribute(ALLOW_RESET_PASSWORD,true);
             request.getSession().setAttribute(RESET_EMAIL,email);
+            request.getSession().setAttribute(RESET_EMAIL_KEY,key);
             model.put(RESET_TYPE,"email");
             return new ModelAndView("forget/reset_password",model);
         }else{
@@ -120,14 +125,18 @@ public class ForgetPasswordController {
         Map<String,String> model = new HashMap<>();
         String erInfoKey = "erInfo";
         boolean isReset = false;
-        boolean isAllow = (boolean) request.getSession().getAttribute(ALLOW_RESET_PASSWORD);
-        if(isAllow){
+        Object isAllow = request.getSession().getAttribute(ALLOW_RESET_PASSWORD);
+        if(isAllow != null && (boolean)isAllow){
             if("email".equals(resetType)){
                 String email = (String) request.getSession().getAttribute(RESET_EMAIL);
                 if(StringUtils.isNotBlank(email)){
                     //调用根据邮箱重设密码微服务
                     resetPwdByEmail(email,password);
                     isReset = true;
+                    Object emailKey = request.getSession().getAttribute(RESET_EMAIL_KEY);
+                    if(emailKey != null && emailKey instanceof String){
+                        cacheManager.del((String)emailKey);
+                    }
                 }else{
                     model.put(erInfoKey,"凭证已过期");
                 }
@@ -151,6 +160,7 @@ public class ForgetPasswordController {
             request.getSession().removeAttribute(ALLOW_RESET_PASSWORD);
             request.getSession().removeAttribute(RESET_MOBILE);
             request.getSession().removeAttribute(RESET_EMAIL);
+            request.getSession().removeAttribute(RESET_EMAIL_KEY);
             return new ModelAndView("forget/reset_success",model);
         }else{
             return new ModelAndView("forget/reset_fail",model);

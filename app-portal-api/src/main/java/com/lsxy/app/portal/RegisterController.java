@@ -91,7 +91,7 @@ public class RegisterController {
             if(account != null){
                 response = RestResponse.success(account);
                 //TODO MQ事件，发送激活邮件
-                cacheManager.set(UUIDGenerator.uuid(),account.getId());
+                cacheManager.set(UUIDGenerator.uuid(),account.getId(),72 * 60 * 60);
             }else{
                 response = failed("0000","注册用户失败，系统出错！");
             }

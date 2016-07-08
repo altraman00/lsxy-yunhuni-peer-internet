@@ -1,7 +1,7 @@
 package com.lsxy.app.portal;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.sms.exceptions.CheckCodeExpireException;
+import com.lsxy.framework.sms.exceptions.CheckCodeNotFoundException;
 import com.lsxy.framework.sms.exceptions.CheckOutMaxTimesException;
 import com.lsxy.framework.sms.exceptions.InvalidValidateCodeException;
 import com.lsxy.framework.sms.exceptions.TooManyGenTimesException;
@@ -10,7 +10,9 @@ import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -18,6 +20,7 @@ import java.util.Map;
  * 验证码
  * Created by liups on 2016/7/7.
  */
+@RestController
 @RequestMapping("/code")
 public class CheckCodeController {
     @Autowired
@@ -63,9 +66,15 @@ public class CheckCodeController {
             }else{
                 response = RestResponse.failed("0000","校验出错");
             }
-        } catch (InvalidValidateCodeException | CheckOutMaxTimesException | CheckCodeExpireException e) {
+        } catch (InvalidValidateCodeException e) {
             e.printStackTrace();
-            response = RestResponse.failed("0000",e.getMessage());
+            response = RestResponse.failed("0000","验证码错误");
+        } catch (CheckOutMaxTimesException e) {
+            e.printStackTrace();
+            response = RestResponse.failed("0000","验证超过最大次数");
+        } catch (CheckCodeNotFoundException e) {
+            e.printStackTrace();
+            response = RestResponse.failed("0000","验证码不存在或已过期");
         }
         return response;
     }
