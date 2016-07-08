@@ -31,7 +31,7 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/cost/consume">消费记录</a>
+                                                <a href="${ctx}/console/cost/consume/index">消费记录</a>
                                             </div>
                                         </li>
                                         <li>
@@ -146,28 +146,9 @@
                                     </tbody>
                                 </table>
                             </section>
-                            <section class="panel panel-default yunhuni-personal">
-                                <nav class='pageWrap'>
-                                    <ul class="pagination">
-                                        <li>
-                                            <a href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li class="active"><a href="#">1</a></li>
-                                        <li><a href="#">2</a></li>
-                                        <li><a href="#">3</a></li>
-                                        <li><a href="#">4</a></li>
-                                        <li><a href="#">5</a></li>
-                                        <li>
-                                            <a href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </section>
-
+                            <c:set var="pageUrl" value="${ctx}/console/cost/recharge/list"></c:set>
+                            <c:set var="extraParam" value="&startTime=${startTime}&endTime=${endTime}"></c:set>
+                            <%@include file="/inc/pagefooter.jsp" %>
                         </section>
                     </section>
                 </aside>
