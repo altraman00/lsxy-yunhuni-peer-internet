@@ -31,7 +31,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     @Override
     public Page<Consume> pageList(String userName,Integer pageNo, Integer pageSize,String startTime,String endTime) {
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from Consume obj where obj.tenantId=?1 and ( DATE_FORMAT(obj.dt,'%Y-%m')<=?2 and DATE_FORMAT(obj.dt,'%Y-%m')>=?3 )  ORDER BY obj.dt";
+        String hql = "from Consume obj where obj.tenant.id=?1 and ( DATE_FORMAT(obj.dt,'%Y-%m')<=?2 and DATE_FORMAT(obj.dt,'%Y-%m')>=?3 )  ORDER BY obj.dt";
         Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
         return page;
     }

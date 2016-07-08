@@ -1,10 +1,9 @@
 package com.lsxy.framework.api.consume.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import com.lsxy.framework.api.tenant.model.Tenant;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -19,7 +18,7 @@ public class Consume extends IdEntity {
     private double amount;//消费金额
     private String remark;//备注
     private String appId;//所属应用编号（仅用查询，如需关联应用等合并结构后改）
-    private String tenantId;//所属租户编号（仅用查询）
+    private Tenant tenant;//所属租户
     @Column(name = "remark")
     public String getRemark() {
         return remark;
@@ -61,12 +60,13 @@ public class Consume extends IdEntity {
     public void setAppId(String appId) {
         this.appId = appId;
     }
-    @Column(name = "tenant_id")
-    public String getTenantId() {
-        return tenantId;
+    @ManyToOne
+    @JoinColumn(name = "tenant_id")
+    public Tenant getTenant() {
+        return tenant;
     }
 
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
     }
 }
