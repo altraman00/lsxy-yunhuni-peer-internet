@@ -6,7 +6,6 @@ import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.api.consume.model.ConsumeMonth;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.app.model.App;
@@ -19,10 +18,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
-
-import static javafx.scene.input.KeyCode.O;
-import static org.apache.zookeeper.KeeperException.Code.get;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 消费统计
