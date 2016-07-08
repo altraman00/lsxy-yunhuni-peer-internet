@@ -22,12 +22,14 @@ public class ConsumeController extends AbstractRestController {
      * 获取分页数据
      * @param pageNo 第几页
      * @param pageSize 每页记录数
+     * @param startTime 开始时间
+     * @param endTime 结束时间
      * @return
      */
     @RequestMapping("/page")
-    public RestResponse pageList(Integer pageNo , Integer pageSize){
+    public RestResponse pageList(Integer pageNo , Integer pageSize,String startTime,String endTime){
         String userName = getCurrentAccountUserName();
-        Page<Consume> page =  consumeService.pageList(userName,pageNo,pageSize);
+        Page<Consume> page =  consumeService.pageList(userName,pageNo,pageSize,startTime,endTime);
         return RestResponse.success(page);
     }
 }

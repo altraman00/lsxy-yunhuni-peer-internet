@@ -17,7 +17,7 @@
 								</a>
 							</li>
 							<li  class="nav-router " data-router="cost">
-								<a data-toggle="tooltip" data-placement='right' title='费用管理' href="${ctx}/console/cost/consume/index">
+								<a data-toggle="tooltip" data-placement='right' title='费用管理' href="${ctx}/console/cost/consume">
 									<i class="fa fa-database icon" aria-hidden="true"> </i>
 									<span>费用管理</span> </a>
 							</li>

@@ -17,8 +17,18 @@ public class Consume extends IdEntity {
     private Date dt;//消费时间
     private String type;//消费类型 目前直接存名字
     private double amount;//消费金额
+    private String remark;//备注
     private String appId;//所属应用编号（仅用查询，如需关联应用等合并结构后改）
     private String tenantId;//所属租户编号（仅用查询）
+    @Column(name = "remark")
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
     @Column(name = "dt")
     public Date getDt() {
         return dt;
