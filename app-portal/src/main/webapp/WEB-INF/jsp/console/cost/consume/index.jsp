@@ -88,7 +88,7 @@
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;消费记录</span>
                         </div>
-                        <form:form role="form" action="${ctx}/console/cost/consume/index" method="post">
+                        <form:form role="form" action="${ctx}/console/cost/consume" method="post">
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
