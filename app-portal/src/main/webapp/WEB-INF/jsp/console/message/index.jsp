@@ -44,7 +44,7 @@
                                         <tr>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd"/></td>
                                             <td>${result.message.content}</td>
-                                            <td><a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageList.currentPageNo}">删除</a></td>
+                                            <td><a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageObj.currentPageNo}">删除</a></td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
