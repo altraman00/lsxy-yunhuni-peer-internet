@@ -4,7 +4,9 @@ import com.lsxy.app.api.gateway.security.auth.AuthenticationRequestWrapper;
 import com.lsxy.app.api.gateway.security.auth.RestAuthenticationEntryPoint;
 import com.lsxy.app.api.gateway.security.auth.RestCredentials;
 import com.lsxy.app.api.gateway.security.auth.RestToken;
+import com.lsxy.app.api.gateway.util.SpringContextHolder;
 import com.lsxy.framework.api.config.service.ApiGwBlankIPService;
+import com.lsxy.framework.core.web.SpringContextUtil;
 import com.lsxy.framework.web.utils.IP;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -38,19 +40,13 @@ import static com.lsxy.framework.web.utils.WebUtils.getRemoteAddress;
 /**
  * Created by Tandy on 2016/7/4
  * 黑名单
+ * 对象不能定义为bean组件，否则会被自动识别为servlet filter ，
+ * 会导致spring security filter触发一次 servlet filter触发一次
  */
 
-@Component
+//@Component  不能打开该注释，否则会出问题
 public class BlackIpListFilter extends GenericFilterBean{
     private static final Logger logger = LoggerFactory.getLogger(BlackIpListFilter.class);
-
-    @Autowired
-    private BlackIpEntryPoint authenticationEntryPoint;
-
-    @Autowired
-    private ApiGwBlankIPService apiGwBlankIPService;
-
-
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -59,7 +55,7 @@ public class BlackIpListFilter extends GenericFilterBean{
         if(logger.isDebugEnabled()){
             logger.debug("进入IP黑名单校验过滤器");
         }
-        boolean result = apiGwBlankIPService.isBlankIP(ip);
+        boolean result = getApiGwBlankIPService().isBlankIP(ip);
         if(logger.isDebugEnabled()){
             logger.debug("校验IP黑名单：{}  已被黑名单？ {}",ip,result);
         }
@@ -67,7 +63,11 @@ public class BlackIpListFilter extends GenericFilterBean{
             chain.doFilter(request,response);
         }else{
             IPAuthenticationException ex = new IPAuthenticationException("IP地址已被列入黑名单:"+ip);
-            authenticationEntryPoint.commence((HttpServletRequest)request,(HttpServletResponse) response,ex);
+            new BlackIpEntryPoint().commence((HttpServletRequest)request,(HttpServletResponse) response,ex);
         }
+    }
+
+    private ApiGwBlankIPService getApiGwBlankIPService() {
+        return SpringContextHolder.getApplicationContext().getBean(ApiGwBlankIPService.class);
     }
 }
