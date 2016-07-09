@@ -24,6 +24,9 @@ public class SmsServiceImplProduction  extends AbstractSmsServiceImpl {
 
 
     @Autowired
+    private AsyncSmsSaveTask asyncSmsSaveTask;
+
+    @Autowired
     private SMSClientFactory smsClientFactory;
 
     @Override
@@ -43,7 +46,8 @@ public class SmsServiceImplProduction  extends AbstractSmsServiceImpl {
             //如果短信发送成功就异步存到数据库
             String clientName = smsClientFactory.getSMSClient().getClientName();
             SMSSendLog log = new SMSSendLog(to,content,clientName);
-            saveToDB(log);
+
+            asyncSmsSaveTask.saveToDB(log);
         }
         return result;
     }

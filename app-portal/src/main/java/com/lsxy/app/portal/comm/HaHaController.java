@@ -1,8 +1,9 @@
 package com.lsxy.app.portal.comm;
 
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
-import com.lsxy.framework.mail.MailUtils;
+import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +19,10 @@ import java.util.Map;
 @Controller
 
 public class HaHaController {
+
+    @Autowired
+    private MailService mailService;
+
     @RequestMapping("/haha")
     public ModelAndView goHaHa(){
         ModelAndView mav = new ModelAndView("/haha");
@@ -41,7 +46,7 @@ public class HaHaController {
             }
         };
         String mailto = "51562066@qq.com";
-        MailUtils.send(title,mailto,"这是邮件内容，测试使用的");
+        mailService.send(title,mailto,"这是邮件内容，测试使用的");
         return RestResponse.success("mail to");
     }
 }

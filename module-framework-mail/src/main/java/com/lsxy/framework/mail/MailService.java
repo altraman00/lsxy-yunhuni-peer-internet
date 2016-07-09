@@ -25,13 +25,15 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.lsxy.framework.config.SystemConfig;
+import org.springframework.stereotype.Component;
 
 /**
  * Mail实体类(包含发件功能)
  */
-public class MailUtils {
+@Component
+public class MailService {
 
-	protected static Log logger = LogFactory.getLog(MailUtils.class);
+	protected static Log logger = LogFactory.getLog(MailService.class);
 
 	/**
 	 * 把主题转换为中文
@@ -39,7 +41,7 @@ public class MailUtils {
 	 * @param strText
 	 * @return
 	 */
-	private static String transferChinese(String strText) {
+	private String transferChinese(String strText) {
 
 		try {
 			strText = MimeUtility.encodeText(strText, "UTF-8", "B");	
@@ -55,7 +57,7 @@ public class MailUtils {
 	 * 发送邮件
 	 * @return 成功返回true，失败返回false
 	 */
-	public  static boolean send(String title, String mailto,String content) throws MailConfigNotEnabledException  {
+	public  boolean send(String title, String mailto,String content) throws MailConfigNotEnabledException  {
 		if (SystemConfig.getProperty("global.mail.enabled", "true").equals("false")) {
 			throw new MailConfigNotEnabledException();
 		}
@@ -132,7 +134,7 @@ public class MailUtils {
 	 * @return
 	 * @throws MailContentNullException 
 	 */
-	public static boolean send(String title,String mailto,String template, Map<String,String> params)
+	public boolean send(String title,String mailto,String template, Map<String,String> params)
 			throws MailConfigNotEnabledException, MailContentNullException{
 		//根据模板构建邮件内容
 		String content = buildMailContentInTemplate(template, params);
@@ -145,7 +147,7 @@ public class MailUtils {
 	 * @param params
      * @return
      */
-	private static String buildMailContentInTemplate(String template, Map<String, String> params) {
+	private String buildMailContentInTemplate(String template, Map<String, String> params) {
 		Properties properties = new Properties();
 		properties.setProperty("resource.loader", "class");
 		properties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
@@ -159,17 +161,17 @@ public class MailUtils {
 		return writer.toString();
 	}
 
-    public static void main(String[] args) throws MailConfigNotEnabledException, MailContentNullException {
-        String title = "哈哈哈哈哈哈哈";
-        String url = "http://www.baidu.com";
-        Map<String, String> params = new HashMap<String, String>() {
-            {
-                put("link", url);
-            }
-        };
-        String mailto = "51562066@qq.com";
-//        MailUtils.send(title,mailto,"这是邮件内容，测试使用的");
-        String template = "01-portal-notify-account-activate.vm";
-        MailUtils.send(title,mailto,template,params);
-    }
+//    public static void main(String[] args) throws MailConfigNotEnabledException, MailContentNullException {
+//        String title = "哈哈哈哈哈哈哈";
+//        String url = "http://www.baidu.com";
+//        Map<String, String> params = new HashMap<String, String>() {
+//            {
+//                put("link", url);
+//            }
+//        };
+//        String mailto = "51562066@qq.com";
+////        MailService.send(title,mailto,"这是邮件内容，测试使用的");
+//        String template = "01-portal-notify-account-activate.vm";
+//        MailService.send(title,mailto,template,params);
+//    }
 }
