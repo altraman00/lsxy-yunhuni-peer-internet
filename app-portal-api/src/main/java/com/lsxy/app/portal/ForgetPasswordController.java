@@ -86,7 +86,7 @@ public class ForgetPasswordController {
      * @param password 新的密码
      * @return
      */
-    @RequestMapping("reset_pwd_email")
+    @RequestMapping("/reset_pwd_email")
     public RestResponse resetPwdByEmail(String email,String password){
         accountService.resetPwdByEmail(email,password);
         return RestResponse.success(null);
@@ -98,7 +98,7 @@ public class ForgetPasswordController {
      * @param password 新的密码
      * @return
      */
-    @RequestMapping("reset_pwd_mobile")
+    @RequestMapping("/reset_pwd_mobile")
     public RestResponse resetPwdByMobile(String mobile,String password){
         accountService.resetPwdByMobile(mobile,password);
         return RestResponse.success(null);
