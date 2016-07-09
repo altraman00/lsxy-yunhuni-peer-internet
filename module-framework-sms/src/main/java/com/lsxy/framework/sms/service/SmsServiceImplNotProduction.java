@@ -39,6 +39,9 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
     @Autowired
     private SMSClientFactory smsClientFactory;
 
+    @Autowired
+    private AsyncSmsSaveTask asyncSmsSaveTask;
+
     @Override
     public boolean sendsms(String to, String template, Map<String, Object> params) {
         String content = buildSmsContent(template,params);
@@ -51,7 +54,7 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
         //如果短信发送成功就异步存到数据库
         String clientName = smsClientFactory.getSMSClient().getClientName();
         SMSSendLog log = new SMSSendLog(to,content,clientName);
-        saveToDB(log);
+        asyncSmsSaveTask.saveToDB(log);
         return true;
     }
 

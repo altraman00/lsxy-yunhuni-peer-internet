@@ -16,8 +16,7 @@ import java.util.Properties;
  */
 public abstract class AbstractSmsServiceImpl implements  SmsService{
 
-    @Autowired
-    private SMSSendLogService smsSendLogService;
+
 
     /**
      * 根据制定模板构建短信内容
@@ -39,13 +38,6 @@ public abstract class AbstractSmsServiceImpl implements  SmsService{
         return writer.toString();
     }
 
-    /**
-     * 异步入库
-     * @param smsSendLog
-     */
-    @Async
-    protected void saveToDB(SMSSendLog smsSendLog){
-        smsSendLogService.save(smsSendLog);
-    }
+
 
 }

@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 /**
  * Created by Tandy on 2016/6/7.
  */
-@ComponentScan("com.lsxy.app.portal")
+@ComponentScan({"com.lsxy.app.portal","com.lsxy.framework.mail"})
 @EnableWebMvc
 @Configuration
 @Import({SpringSecurityConfig.class, FrameworkCacheConfigNotSpringBoot.class})

@@ -81,7 +81,6 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-mail</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
         </dependency>
 
 
