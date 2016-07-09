@@ -61,7 +61,7 @@ public class AccountMessageController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/delete")
-    public ModelAndView delete(HttpServletRequest request,String id,Integer pageNo,Integer pageSize){
+    public ModelAndView delete(HttpServletRequest request,String id,@RequestParam(defaultValue = "1")Integer pageNo,@RequestParam(defaultValue = "20")Integer pageSize){
         deleteAccountMessage(request,id);
         ModelAndView mav = index(request,pageNo,pageSize);
         mav.addObject("msg","删除成功");
