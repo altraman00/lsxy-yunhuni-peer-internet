@@ -37,6 +37,17 @@ public class AccountMessageController extends AbstractRestController {
     }
 
     /**
+     * 根据状态查询数量
+     * @param status
+     * @return
+     */
+    @RequestMapping("/count")
+    public RestResponse count(Integer status){
+        String userName = getCurrentAccountUserName();
+        Long num = accountMessageService.count(userName,status);
+        return RestResponse.success(num);
+    }
+    /**
      * 根据用户消息id删除用户消息记录
      * @param id 用户消息id
      * @return
