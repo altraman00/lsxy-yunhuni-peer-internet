@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.apicertificate.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yuhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 
 import java.io.Serializable;
 

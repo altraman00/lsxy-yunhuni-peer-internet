@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.recharge.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
+import com.lsxy.yunhuni.api.recharge.model.ThirdPayRecord;
 
 import java.io.Serializable;
 

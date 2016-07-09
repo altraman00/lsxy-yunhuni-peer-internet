@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.resourceTelenum.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yuhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 
 import java.io.Serializable;
 

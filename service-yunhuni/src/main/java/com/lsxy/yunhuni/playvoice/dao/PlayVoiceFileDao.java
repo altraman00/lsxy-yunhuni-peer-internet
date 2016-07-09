@@ -1,7 +1,7 @@
 package com.lsxy.yunhuni.playvoice.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yuhuni.api.playvoice.model.PlayVoiceFile;
+import com.lsxy.yunhuni.api.playvoice.model.PlayVoiceFile;
 
 import java.io.Serializable;
 

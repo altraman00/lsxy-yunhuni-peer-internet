@@ -6,10 +6,7 @@ import com.lsxy.framework.api.sms.service.SMSSendLogService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.sms.dao.SMSSendLogDao;
-import com.lsxy.framework.tenant.dao.AccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

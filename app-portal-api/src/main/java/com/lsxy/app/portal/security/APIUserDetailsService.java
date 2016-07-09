@@ -1,10 +1,8 @@
 package com.lsxy.app.portal.security;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.core.utils.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -1,8 +1,8 @@
 package com.lsxy.yunhuni.session.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yuhuni.api.app.model.App;
-import com.lsxy.yuhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.session.model.CallSession;
 
 import java.io.Serializable;
 

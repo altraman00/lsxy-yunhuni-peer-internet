@@ -13,3 +13,6 @@ import java.io.Serializable;
  */
 public interface ApiInvokeLogDao extends BaseDaoInterface<ApiInvokeLog, Serializable> {
 }
+
+
+

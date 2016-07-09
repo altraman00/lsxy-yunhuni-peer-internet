@@ -2,8 +2,8 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.yuhuni.api.resourceTelenum.model.ResourceTelenum;
-import com.lsxy.yuhuni.api.resourceTelenum.service.ResourceTelenumService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

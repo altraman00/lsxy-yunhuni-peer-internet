@@ -1,6 +1,5 @@
 package com.lsxy.framework.sms.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil2;

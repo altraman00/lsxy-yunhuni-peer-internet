@@ -2,8 +2,8 @@ package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yuhuni.api.app.model.App;
-import com.lsxy.yuhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

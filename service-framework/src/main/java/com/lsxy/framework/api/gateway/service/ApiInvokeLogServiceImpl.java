@@ -6,7 +6,6 @@ import com.lsxy.framework.api.gateway.model.ApiInvokeLog;
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.api.sms.service.SMSSendLogService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.sms.dao.SMSSendLogDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

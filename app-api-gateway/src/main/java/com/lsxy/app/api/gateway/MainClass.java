@@ -3,13 +3,11 @@ package com.lsxy.app.api.gateway;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
-import com.lsxy.yuhuni.api.YunhuniApiConfig;
+import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
 

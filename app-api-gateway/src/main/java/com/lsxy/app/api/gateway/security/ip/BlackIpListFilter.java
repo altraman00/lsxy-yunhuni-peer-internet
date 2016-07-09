@@ -1,26 +1,10 @@
 package com.lsxy.app.api.gateway.security.ip;
 
-import com.lsxy.app.api.gateway.security.auth.AuthenticationRequestWrapper;
-import com.lsxy.app.api.gateway.security.auth.RestAuthenticationEntryPoint;
-import com.lsxy.app.api.gateway.security.auth.RestCredentials;
-import com.lsxy.app.api.gateway.security.auth.RestToken;
 import com.lsxy.app.api.gateway.util.SpringContextHolder;
 import com.lsxy.framework.api.config.service.ApiGwBlankIPService;
-import com.lsxy.framework.core.web.SpringContextUtil;
-import com.lsxy.framework.web.utils.IP;
 import com.lsxy.framework.web.utils.WebUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.IpAddressMatcher;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -34,8 +18,6 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
-
-import static com.lsxy.framework.web.utils.WebUtils.getRemoteAddress;
 
 /**
  * Created by Tandy on 2016/7/4

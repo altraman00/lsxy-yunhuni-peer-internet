@@ -2,8 +2,8 @@ package com.lsxy.yunhuni.recharge.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.yuhuni.api.recharge.model.ThirdPayRecord;
-import com.lsxy.yuhuni.api.recharge.service.ThirdPayRecordService;
+import com.lsxy.yunhuni.api.recharge.model.ThirdPayRecord;
+import com.lsxy.yunhuni.api.recharge.service.ThirdPayRecordService;
 import com.lsxy.yunhuni.recharge.dao.ThirdPayRecordDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
