@@ -16,15 +16,6 @@ public class AccountMessage extends IdEntity{
     private Message message;//对于消息
     private Account account;//所属用户
     private int status;//消息状态 '0未处理;1已读;-1已删除'
-    private Date createTime;//创建时间
-    @Column(name = "create_time")
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 
     @ManyToOne
     @JoinColumn(name = "message_id")

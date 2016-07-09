@@ -18,4 +18,9 @@ public interface TenantService extends BaseService<Tenant> {
      */
     Tenant findTenantByUserName(String userName);
 
+    /**
+     * 创建租户
+     * @return
+     */
+    Tenant createTenant();
 }

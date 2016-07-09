@@ -2,9 +2,9 @@ package com.lsxy.app.portal;
 
 import com.lsxy.app.portal.exceptions.APIErrors;
 import com.lsxy.app.portal.utils.PortalRestResponse;
-import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;
 import org.slf4j.Logger;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 登陆入口
  */
 @RestController
+@RequestMapping("/login")
 public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -35,14 +36,14 @@ public class LoginController {
      * 登录接口
      * @return
      */
-    @RequestMapping(path="/login",method = RequestMethod.POST)
+    @RequestMapping(path="",method = RequestMethod.POST)
     public RestResponse login(@RequestParam String username,@RequestParam String password){
 
         try {
             Account account = accountService.findPersonByLoginNameAndPassword(username, password);
             if (account != null) {
 
-                //TODO 将token放入redis 与account形成映射关系
+                //将token放入redis 与account形成映射关系
                 UserRestToken token = UserRestToken.newToken();
                 cacheManager.set(token.getToken(),account.getUserName(),30*60);
                 return PortalRestResponse.success(token);
@@ -58,5 +59,8 @@ public class LoginController {
 
         }
     }
+
+
+
 
 }

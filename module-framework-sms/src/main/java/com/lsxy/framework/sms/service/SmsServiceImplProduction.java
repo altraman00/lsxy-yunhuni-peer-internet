@@ -2,6 +2,10 @@ package com.lsxy.framework.sms.service;
 
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.sms.clients.SMSClientFactory;
+import com.lsxy.framework.sms.exceptions.CheckCodeNotFoundException;
+import com.lsxy.framework.sms.exceptions.CheckOutMaxTimesException;
+import com.lsxy.framework.sms.exceptions.InvalidValidateCodeException;
+import com.lsxy.framework.sms.exceptions.TooManyGenTimesException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +52,15 @@ public class SmsServiceImplProduction  extends AbstractSmsServiceImpl {
         return result;
     }
 
+    @Override
+    public String genVC(String to) throws TooManyGenTimesException {
+        return null;
+    }
+
+    @Override
+    public boolean checkVC(String to, String vc) throws InvalidValidateCodeException, CheckOutMaxTimesException, CheckCodeNotFoundException {
+        return false;
+    }
 
 
 }

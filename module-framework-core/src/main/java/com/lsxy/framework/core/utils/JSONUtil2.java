@@ -26,7 +26,6 @@ public class JSONUtil2 {
 	 * 将一个对象json化
 	 * 
 	 * @param obj
-	 * @param fields
 	 * @return
 	 */
 	public static String objectToJson(Object obj) {

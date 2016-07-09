@@ -43,6 +43,7 @@
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="org.springframework.security" level="DEBUG" additivity="true" />
     <logger name="org.hibernate" level="INFO" additivity="true" />
+    <logger name="redis.clients" level="DEBUG" additivity="true" />
 
 
     <root level="INFO">

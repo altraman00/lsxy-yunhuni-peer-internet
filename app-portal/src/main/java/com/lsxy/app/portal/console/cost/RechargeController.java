@@ -307,7 +307,7 @@ public class RechargeController extends AbstractPortalController {
      * @return
      * @throws Exception
      */
-    private RechargeVO createRechargeVO(Recharge recharge) throws Exception {
+    private RechargeVO createRechargeVO(Recharge recharge) throws InvocationTargetException, IllegalAccessException {
         RechargeVO vo = new RechargeVO();
         BeanUtils.copyProperties2(vo,recharge,true);
         vo.setStatusName(RechargeStatus.valueOf(vo.getStatus()).getName());

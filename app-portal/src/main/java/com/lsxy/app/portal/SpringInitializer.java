@@ -2,6 +2,7 @@ package com.lsxy.app.portal;
 
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.lsxy.app.portal.config.SpringStartupConfig;
+import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.core.web.SpringContextUtil;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -49,6 +50,7 @@ public class SpringInitializer implements WebApplicationInitializer{
 
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
         ctx.register(SpringStartupConfig.class);
+
 
         ctx.setServletContext(container);
         CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();

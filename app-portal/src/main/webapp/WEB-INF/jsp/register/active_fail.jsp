@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-    <%@include file="/inc/meta.jsp" %>
+    <title>激活失败</title>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
-    <title>重置密码</title>
 </head>
 <body class="register-bg">
 <!--  container -->
@@ -15,7 +15,7 @@
     <div class="box">
         <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png"/>
         <div class="text">
-            如果有云呼你账号，<a href="${ctx}/login">立即登录</a>
+            如果有云呼你账号，<a href="${ctx }/login">立即登录</a>
         </div>
     </div>
 </div>
@@ -23,24 +23,10 @@
 
 <div class="register_container">
     <div class="row box">
-        <div class="col-md-12 text-left article-box">
-            <p class="size16"><strong>尊敬的lxp5820用户：</strong></p>
-            <br/>
-            <p>以下为云呼你重置密码的安全链接，如果您没有发起重置密码的请求，请不用理会该邮件，谢谢！</p>
-            <br/>
-            <a href="#">http://localhost/forget/resetpassword?key=123456</a>
-            <br/>
-            <br/>
-            <br/>
-            <p>请注意：</p>
-            <p>为安全起见，此链接将在自发送之时起 72 小时后过期。</p>
-            <p>如果您无法访问此链接，请将整个 URL 复制并粘贴到浏览器中。</p>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <p>云呼你团队</p>
-            <p>2016年06月22日</p>
+        <div class="col-md-12 text-center">
+            <img src="${resPrefixUrl }/images/register/icon_12.png"/>
+            <p class="p">激活失败：${erInfo}</p>
+            <p><a href="${ctx}/reg/index">点击重新注册</a></p>
         </div>
     </div>
 </div>

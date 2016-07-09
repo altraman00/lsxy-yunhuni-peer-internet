@@ -4,7 +4,7 @@
 <html lang="en" class="no-js">
 <head>
     <title>密码重置成功</title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
 </head>

@@ -4,7 +4,7 @@
 <html lang="en" class="no-js">
 <head>
     <title>忘记密码</title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -111,23 +111,13 @@
 
     function reg_code(){
         var mobileCode = $("#code").val();
-        $.get(ctx + "/mc/check", {"mc":mobileCode},
+        var mobile = $("#mobile").val();
+        $.get(ctx + "/mc/check", {"mc":mobileCode,"mobile":mobile},
                 function(data){
-                    switch (data){
-                        case 0:
-                            tipsmsg("验证码错误，请重新输入","mobileCodeTips");
-                            break;
-                        case 1:
-                            document.getElementById('mobileForm').submit();
-                            break;
-                        case 2:
-                            tipsmsg("此验证码达到最大验证次数，请重新获取","mobileCodeTips");
-                            break;
-                        case 3:
-                            tipsmsg("验证码过期，请重新获取","mobileCodeTips");
-                            break;
-                        default:
-                            tipsmsg("系统繁忙，请稍候！","mobileCodeTips");
+                    if(data.flag){
+                        document.getElementById('mobileForm').submit();
+                    }else{
+                        tipsmsg(data.err,"mobileCodeTips");
                     }
                 });
     }

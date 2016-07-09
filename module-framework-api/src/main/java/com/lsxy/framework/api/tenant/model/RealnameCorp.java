@@ -31,7 +31,6 @@ public class RealnameCorp extends IdEntity {
     private String  type03Prop03;//type03_prop03 [三证分离]营业执照号
     private String  type03Prop04;//type03_prop04 [三证分离]营业执照照片
     private int status;//实名认证状态
-    private Date createTime;//创建时间
     public RealnameCorp() {
     }
 
@@ -67,16 +66,6 @@ public class RealnameCorp extends IdEntity {
     public void setStatus(int status) {
         this.status = status;
     }
-
-    @Column(name = "create_time")
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
 
     @Column(name = "name")
     public String getName() {
