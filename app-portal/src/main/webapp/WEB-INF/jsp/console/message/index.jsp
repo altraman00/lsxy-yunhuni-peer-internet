@@ -42,9 +42,9 @@
                                     <tbody>
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
-                                            <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd"/></td>
+                                            <td <c:if test="${result.status==0}">class="bg"</c:if>><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd"/></td>
                                             <td>${result.message.content}</td>
-                                            <td><a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageObj.currentPageNo}&pageSize=${ pageObj.pageSize}">删除</a></td>
+                                            <td><a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageObj.currentPageNo}">删除</a></td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
