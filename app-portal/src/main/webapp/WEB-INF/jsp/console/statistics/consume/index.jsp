@@ -70,7 +70,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <input type="radio" name="stime" value="month" class="selectdata" checked/>日统计
-                                        <input type="radio" name="stime" value="year" class="selectdata" />月统计
+                                        <input type="radio" name="stime" value="year" class="selectdata ml-15" />月统计
                                     </div>
                                 </div>
                                 <div class="row">
@@ -162,7 +162,7 @@
             $('.monthform').hide();
         }else{
             $('.monthform').show();
-            $('.yearform').hide();s
+            $('.yearform').hide();
         }
         initchart();
     });
@@ -246,6 +246,9 @@
      * starttime 时间
      * endtime 对比时间
      */
+    var tdata;
+    var seriesjson;
+    var typeAll;
     function initchart(){
         var type = $('input[name="stime"]:checked').val();
         var type1 = 'day';
@@ -261,15 +264,16 @@
             dataType: "json",
             success : function(data){
                 resultData = data;
-                var tdata = new Array();
+                tdata = new Array();
                 var count = 0;
                 for(var i=0;i<resultData.length;i++){
                     tdata[i]=resultData[i].name;
                     count+=resultData[i].data.length;
                 }
-                var seriesjson=JSON.stringify(resultData);
+                seriesjson=JSON.stringify(resultData);
                 seriesjson = eval('('+seriesjson+')');
-                charts(tdata,seriesjson,type);
+                typeAll=type;
+                charts(tdata,seriesjson,typeAll);
                 updatetable(count);
             },
             fail:function(){
@@ -391,7 +395,10 @@
         });
     }
 
-
+    //当浏览器大小变化时
+    $(window).resize(function () {
+        charts(tdata,seriesjson,typeAll);
+    });
 
 
 </script>
