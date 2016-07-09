@@ -24,7 +24,7 @@
 <div class="register_container">
     <div class="row box">
         <div class="col-md-12 text-center">
-            <img src="${resPrefixUrl }/images/register/icon_12.png"/>
+            <img src="${resPrefixUrl }/images/register/sign-error-icon.png"/>
             <p class="p">激活失败：${erInfo}</p>
             <p><a href="${ctx}/reg/index">点击重新注册</a></p>
         </div>

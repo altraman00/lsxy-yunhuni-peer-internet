@@ -24,7 +24,7 @@
 <div class="register_container">
     <div class="row box">
         <div class="col-md-12 text-center">
-            <img src="${resPrefixUrl }/images/register/icon_12.png"/>
+            <img src="${resPrefixUrl }/images/register/sign-error-icon.png"/>
             <p class="p">密码重置失败：${erInfo}</p>
         </div>
     </div>

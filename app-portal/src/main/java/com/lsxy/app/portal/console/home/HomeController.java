@@ -85,26 +85,30 @@ public class HomeController extends AbstractPortalController {
 
         //获取账务
         Billing billing = billingResponse.getData();
-        //余额正数部分
-        vo.setBalanceInt(billing.getBalance().intValue()+"");
-        //余额小数部分
-        DecimalFormat df   = new DecimalFormat("######0.00");
-        String format = df.format(billing.getBalance());
-        vo.setBalanceDec(format.substring(format.indexOf('.') + 1, format.length()));
-        //语音剩余量
-        vo.setVoiceRemain(billing.getVoiceRemain());
-        //短信剩余量
-        vo.setSmsRemain(billing.getSmsRemain());
-        //会议剩余量
-        vo.setConferenceRemain(billing.getConferenceRemain());
+        if(billing != null){
+            //余额正数部分
+            vo.setBalanceInt(billing.getBalance().intValue()+"");
+            //余额小数部分
+            DecimalFormat df   = new DecimalFormat("######0.00");
+            String format = df.format(billing.getBalance());
+            vo.setBalanceDec(format.substring(format.indexOf('.') + 1, format.length()));
+            //语音剩余量
+            vo.setVoiceRemain(billing.getVoiceRemain());
+            //短信剩余量
+            vo.setSmsRemain(billing.getSmsRemain());
+            //会议剩余量
+            vo.setConferenceRemain(billing.getConferenceRemain());
+        }
 
         //当前线路情况(暂时给个数字)
         vo.setLineNum(10);
 
         //此处调用鉴权账号（凭证）RestApi
         ApiCertificate cert = getApiCertificate(token);
-        vo.setRestApi(CERT_REST_PREFIX + "/" + cert.getCertId() + "/");
-        vo.setSecretKey(cert.getSecretKey());
+        if(cert != null){
+            vo.setRestApi(CERT_REST_PREFIX + "/" + cert.getCertId() + "/");
+            vo.setSecretKey(cert.getSecretKey());
+        }
         List<App> appList = getApps(token);
 
         List<AppStateVO> appStateVOs = new ArrayList<>();

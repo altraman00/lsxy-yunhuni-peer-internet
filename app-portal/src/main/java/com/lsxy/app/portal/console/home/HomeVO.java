@@ -9,9 +9,9 @@ import java.util.List;
  */
 public class HomeVO {
 
-    private String balanceInt;              //余额整数
+    private String balanceInt = "0";              //余额整数
 
-    private String balanceDec;              //余额小数
+    private String balanceDec = "00";              //余额小数
 
     private Integer lineNum ;               //当前线路数量
 
