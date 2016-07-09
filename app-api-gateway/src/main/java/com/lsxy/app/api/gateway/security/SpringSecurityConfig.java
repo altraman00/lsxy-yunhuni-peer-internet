@@ -1,22 +1,26 @@
 package com.lsxy.app.api.gateway.security;
 
+import com.lsxy.app.api.gateway.security.auth.RestAuthenticationProvider;
+import com.lsxy.app.api.gateway.security.auth.SignatureAuthFilter;
+import com.lsxy.app.api.gateway.security.ip.BlackIpListFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authentication.dao.ReflectionSaltSource;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import javax.servlet.Filter;
+
+import static org.apache.zookeeper.ZooDefs.OpCode.auth;
 
 /**
  * Created by Tandy on 2016/6/7.
@@ -29,6 +33,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private RestAuthenticationProvider restAuthenticationProvider;
+//
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -36,24 +41,20 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         if(logger.isDebugEnabled()){
             logger.debug("初始化Spring Security安全框架");
         }
+        http.csrf().disable();
+
 
         http.authorizeRequests()
-                .antMatchers("/**").access("hasRole('ROLE_TENANT_USER')")
+                .antMatchers("/**").authenticated()
                 .and().httpBasic()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         ;
-        http.addFilterBefore(new SignatureAuthFilter(authenticationManager()), BasicAuthenticationFilter.class);
 
-//        http.addFilter(headerAuthenticationFilter());
+        http.addFilterBefore(new SignatureAuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new BlackIpListFilter(),SignatureAuthFilter.class);
+
     }
-//
-//    @Bean
-//    public TokenPreAuthenticationFilter headerAuthenticationFilter() throws Exception {
-//        return new TokenPreAuthenticationFilter(authenticationManager());
-//    }
-
-
 
     /**
      * 配置校验器
@@ -65,6 +66,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication().withUser("user001").password("123").roles("TENANT_USER");
         auth.authenticationProvider(restAuthenticationProvider);
     }
+
+
 
 }
 

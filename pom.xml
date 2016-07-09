@@ -23,7 +23,6 @@
         <module>app-oc</module>
         <module>app-backend</module>
         <module>app-api-gateway</module>
-        <module>resources</module>
         <module>service-framework</module>
         <module>service-yunhuni</module>
         <module>module-framework-api</module>

@@ -42,7 +42,7 @@ public class AuthController extends AbstractRestController {
     @RequestMapping("/find_auth_status")
     public RestResponse findAuthStatus() throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
-        HashMap map = new HashMap();
+        HashMap<String,Object> map = new HashMap<>();
         //获取租户对象
         Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         map.put("userName",userName);
