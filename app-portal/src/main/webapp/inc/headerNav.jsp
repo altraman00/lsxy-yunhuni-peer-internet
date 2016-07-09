@@ -17,7 +17,7 @@
         <li class="dropdown hidden-xs a-color"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-fw fa-book"></i>文档中心
         </a></li>
-        <li class="hidden-xs"> <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-bell"></i> <span class="bg-danger <c:if test="${homeVO.messageNum>0}">header-msg</c:if>"  onclick="window.location.href='${ctx}/console/message/account_message/index'"></span> </a>
+        <li class="hidden-xs"> <a href="#" class="dropdown-toggle" onclick="window.location.href='${ctx}/console/message/account_message/index'" data-toggle="dropdown"> <i class="fa fa-bell"></i> <span class="bg-danger <c:if test="${homeVO.messageNum>0}">header-msg</c:if>" ></span> </a>
             <!--<section class="dropdown-menu aside-xl">-->
                 <!--<section class="panel bg-white">-->
                     <!--<header class="panel-heading b-light bg-light"> <strong>您有<span class="count">2</span>通知</strong> </header>-->
