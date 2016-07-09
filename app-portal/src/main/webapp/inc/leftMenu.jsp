@@ -51,10 +51,10 @@
 							<i class="fa fa-caret-down icon"> </i><span>统计查询</span> </a>
 						<ul class="nav lt list">
 							<li>
-								<a data-toggle="tooltip" data-placement='right' title='消费统计' href="${ctx}/console/statistics/consume/index" class="nav-router" data-router="statistics"> <i class="fa fa-calendar icon"></i> <span>消费统计</span> </a>
+								<a data-toggle="tooltip" data-placement='right' title='消费统计' href="${ctx}/console/statistics/consume/index" class="nav-router" data-router="statistics/consume"> <i class="fa fa-calendar icon"></i> <span>消费统计</span> </a>
 							</li>
 							<li>
-								<a data-toggle="tooltip" data-placement='right' title='会话统计' href="statistics_conversation.html"><i class="fa fa-clock-o icon" aria-hidden="true"> </i> <span>会话统计</span> </a>
+								<a data-toggle="tooltip" data-placement='right' title='会话统计' href="${ctx}/console/statistics/session/index"  class="nav-router" data-router="statistics/session"><i class="fa fa-clock-o icon" aria-hidden="true"> </i> <span>会话统计</span> </a>
 							</li>
 							<li>
 								<a data-toggle="tooltip" data-placement='right' title='详单查询' href="statistics_find.html"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>详单查询</span> </a>

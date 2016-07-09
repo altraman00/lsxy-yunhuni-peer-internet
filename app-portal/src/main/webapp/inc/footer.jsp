@@ -13,6 +13,9 @@
 		if(pathSplit.length > 2){
 			node = pathSplit[2]
 		}
+		if(node=='statistics'){
+			node=pathSplit[2]+'/'+pathSplit[3];
+		}
 		if(node != null && node != ""){
 			$('.nav-router').each(function(){
 				var nav = $(this).attr('data-router');
