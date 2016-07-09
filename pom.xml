@@ -33,9 +33,8 @@
         <module>module-framework-sms</module>
         <module>module-framework-third</module>
         <module>module-framework-mail</module>
-        <module>service-framework</module>
-        <module>service-yunhuni</module>
         <module>module-service-api</module>
+        <module>module-service</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -92,7 +91,11 @@
                 <artifactId>module-service-api</artifactId>
                 <version>1.0.2-SNAPSHOT</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-service</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-mail</artifactId>

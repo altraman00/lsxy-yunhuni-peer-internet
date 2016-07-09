@@ -1,7 +1,8 @@
-package com.lsxy.framework.api.gateway.service;
+package com.lsxy.framework.gateway.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.gateway.dao.ApiInvokeLogDao;
+import com.lsxy.framework.api.gateway.service.ApiInvokeLogService;
+import com.lsxy.framework.gateway.dao.ApiInvokeLogDao;
 import com.lsxy.framework.api.gateway.model.ApiInvokeLog;
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.api.sms.service.SMSSendLogService;

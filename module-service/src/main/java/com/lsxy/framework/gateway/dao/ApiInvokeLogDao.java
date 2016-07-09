@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.gateway.dao;
+package com.lsxy.framework.gateway.dao;
 
 
 

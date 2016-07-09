@@ -39,11 +39,7 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>service-framework</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lsxy</groupId>
-            <artifactId>service-yunhuni</artifactId>
+            <artifactId>module-service</artifactId>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
