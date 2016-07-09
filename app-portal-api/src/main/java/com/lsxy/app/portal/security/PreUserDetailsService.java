@@ -2,6 +2,8 @@ package com.lsxy.app.portal.security;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.PasswordUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +22,7 @@ import java.util.List;
 @Service("preUserDetailsService")
 public class PreUserDetailsService implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
+    public static final Logger logger = LoggerFactory.getLogger(PreUserDetailsService.class);
     @Autowired
     private RedisCacheService cacheManager;
 
@@ -34,6 +37,9 @@ public class PreUserDetailsService implements AuthenticationUserDetailsService<P
 
     @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
+        if(logger.isDebugEnabled()){
+            logger.debug("验证身份Token：{}",token);
+        }
         String principal = (String) token.getPrincipal();
         User user = null;
         if(!StringUtils.isEmpty(principal)) {
@@ -46,6 +52,9 @@ public class PreUserDetailsService implements AuthenticationUserDetailsService<P
         }
         if(user == null){
             throw new UsernameNotFoundException(principal);
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("验证身份通过：{}->{}",token,user.getUsername());
         }
         return user;
     }
