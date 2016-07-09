@@ -1,4 +1,4 @@
-package com.lsxy.framework.core.exceptions;
+package com.lsxy.framework.mail;
 
 public class MailConfigNotEnabledException extends Exception {
 	/**
