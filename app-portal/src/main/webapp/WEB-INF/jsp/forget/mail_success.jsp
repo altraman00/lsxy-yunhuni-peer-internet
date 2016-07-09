@@ -5,7 +5,7 @@
 <head>
     <title>忘记密码</title>
 
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
 
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
@@ -30,7 +30,7 @@
             <div class="email-box">
                 <img src="${resPrefixUrl }/images/index/mail.png"/>
                 <p class="p">您的初始化密码安全链接已发送至邮箱地址：</p>
-                <p><a href="mailto:${email}">去邮箱收取邮件</a></p>
+                <p><a class="btn_actemail"  data-email="${email}" >去邮箱收取邮件</a></p>
             </div>
         </div>
     </div>
@@ -48,7 +48,7 @@
 <script src="${resPrefixUrl }/bower_components/jquery/dist/jquery.min.js"></script>
 <!--bootstrapvalidator-->
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.js"></script>
-
+<script src="${resPrefixUrl }/js/register/reg_success.js" ></script>
 
 </body>
 </html>

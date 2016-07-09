@@ -114,8 +114,10 @@ public abstract class AbstractService<T> implements BaseService<T> {
         Query query = this.getEm().createQuery(hql);
         query.setParameter(property.replace(".", ""), value);
         int count = query.executeUpdate();
-        logger.debug("hql:"+hql);
-        logger.debug("result:"+count);
+        if(logger.isDebugEnabled()){
+            logger.debug("hql:"+hql);
+            logger.debug("result:"+count);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -191,7 +193,9 @@ public abstract class AbstractService<T> implements BaseService<T> {
      * from LoginLog ll where ll.personId='' order by ll.dt desc
      */
     public Page findByCustom(String jpql,boolean excludeDeleted,int pageNo,int pageSize,Object ... params){
-        logger.debug("findByCustom:"+jpql);
+        if(logger.isDebugEnabled()){
+            logger.debug("findByCustom:"+jpql);
+        }
         if(excludeDeleted)
             jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
         pageNo--;
@@ -214,6 +218,41 @@ public abstract class AbstractService<T> implements BaseService<T> {
         List list = query.getResultList();
         Page page = new Page((pageNo)*pageSize+1,totalCount,pageSize,list);
         return page;
+    }
+
+    /**
+     * 根据条件查询总数
+     * @param jpql
+     * @param params 参数
+     * @return
+     */
+    public long countByCustom(String jpql,Object ... params){
+        return this.countByCustom(jpql,true,params);
+    }
+
+    /**
+     * 根据条件查询总数
+     * @param jpql
+     * @param excludeDeleted 是否排除已删除的
+     * @param params 参数
+     * @return
+     */
+    public long countByCustom(String jpql,boolean excludeDeleted,Object ... params){
+        if(logger.isDebugEnabled()){
+            logger.debug("findByCustom:"+jpql);
+        }
+        if(excludeDeleted){
+            jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
+        }
+        String countJpql = " select count(*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
+        Query query = this.em.createQuery(countJpql);
+        for (int i = 0; i < params.length; i++) {
+            Object object = params[i];
+            query.setParameter(i+1, object);
+        }
+        Object obj = query.getSingleResult();
+        long totalCount = (Long) obj;
+        return totalCount;
     }
 
 }

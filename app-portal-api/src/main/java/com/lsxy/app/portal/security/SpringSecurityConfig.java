@@ -42,7 +42,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/rest/**").access("hasRole('ROLE_TENANT_USER')")
                 .and().httpBasic()
                 .and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
 
         http.addFilter(headerAuthenticationFilter());

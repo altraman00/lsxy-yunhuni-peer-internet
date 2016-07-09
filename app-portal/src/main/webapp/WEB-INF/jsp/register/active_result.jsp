@@ -7,7 +7,7 @@
         <c:if test="${not empty info}">${info}</c:if>
         <c:if test="${empty info}">激活成功</c:if>
     </title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
 </head>

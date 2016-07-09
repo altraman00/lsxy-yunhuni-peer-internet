@@ -1,6 +1,11 @@
 package com.lsxy.app.portal.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -17,12 +22,24 @@ import java.util.List;
  */
 @Service("userDetailsService")
 public class APIUserDetailsService implements UserDetailsService{
+    @Autowired
+    AccountService accountService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        //此处临时固定，后面调用jREST接口
-        User user = new User("user001",PasswordUtil.springSecurityPasswordEncode("password","user001"),true,true,true,true,roles("ROLE_TENANT_USER"));
-        return user;
+        Account account;
+        try {
+            //根据登录用户名来查找用户
+            account = accountService.findAccountByLoginName(username);
+        } catch (MatchMutiEntitiesException e) {
+            throw new RuntimeException("存在多个相同的用户名",e);
+        }
+        if(account == null){
+            throw new UsernameNotFoundException("用户不存在");
+        }else{
+            User user = new User(account.getUserName(),account.getPassword(),true,true,true,true,roles("ROLE_TENANT_USER"));
+            return user;
+        }
     }
 
 

@@ -18,6 +18,11 @@ public class Account extends IdEntity {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public static final int STATUS_NOT_ACTIVE = 0; 	//账号未激活
+	public static final int STATUS_LOCK = 1; 		//账号锁定
+	public static final int STATUS_NORMAL = 2; 		//账号正常
+	public static final int STATUS_ABNORMAL = 3; 	//账号异常
+	public static final int STATUS_EXPIRE = 4; 		//账号过期
 
 	private String userName;
 	private Tenant tenant;                //所属租户
@@ -41,15 +46,6 @@ public class Account extends IdEntity {
 	private String province;//省份
 
 	private String city;//城市
-	private Date createTime;//创建时间
-	@Column(name = "create_time")
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
 
 	@Column(name = "username")
 	public String getUserName() {

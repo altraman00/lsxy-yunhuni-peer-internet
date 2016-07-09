@@ -4,7 +4,7 @@
 <html lang="en" class="no-js">
 <head>
     <title>找回密码</title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
 </head>
@@ -35,6 +35,7 @@
                     <input type="hidden" name="submission_token" value="${submission_token}" />
 
                     <input type="hidden" name="resetType" value="${resetType}" />
+                    <input type="hidden" name="emailKey" value="${emailKey}">
                     <div class="form-group">
                         <lable class="col-lg-2 text-right">新的密码</lable>
                         <div class="col-lg-9">

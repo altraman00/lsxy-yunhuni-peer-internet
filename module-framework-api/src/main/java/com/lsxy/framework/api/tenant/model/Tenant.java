@@ -16,12 +16,16 @@ import javax.persistence.Table;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_tenant")
 public class Tenant extends IdEntity{
+	public  static final Integer  AUTH_NO= 100;//未认证
+
 	private static final long serialVersionUID = 1L;
 	//是否实名
 	private int isRealAuth;
 
 	//租户识别码
 	private String tenantUid;
+
+	private String registerUserId; //注册的账号ID
 
 	@Column(name = "is_real_auth")
 	public int getIsRealAuth() {
@@ -39,5 +43,14 @@ public class Tenant extends IdEntity{
 
 	public void setTenantUid(String tenantUid) {
 		this.tenantUid = tenantUid;
+	}
+
+	@Column(name = "reg_user_id")
+	public String getRegisterUserId() {
+		return registerUserId;
+	}
+
+	public void setRegisterUserId(String registerUserId) {
+		this.registerUserId = registerUserId;
 	}
 }

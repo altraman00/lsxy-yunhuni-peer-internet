@@ -35,6 +35,10 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
             <artifactId>service-framework</artifactId>
         </dependency>
         <dependency>

@@ -4,7 +4,7 @@
 <html lang="en" class="no-js">
 <head>
     <title>注册</title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet"  type="text/css" />
 </head>
@@ -36,22 +36,22 @@
                     <input type="hidden" name="submission_token" value="${submission_token}" />
                     <div class="form-group">
                         <lable class="col-lg-3 text-right">会员名称</lable>
-                        <div class="col-md-9 ">
-                            <input type="text" name="username" placeholder="请输入账号" class="form-control input-form" id="form-username" />
+                        <div class="col-lg-9 ">
+                            <input type="text" name="userName" placeholder="请输入账号" class="form-control input-form" id="form-username" />
                             <p class="tips">6~25个字符，建议中文名称</p>
                         </div>
                     </div>
                     <div class="form-group">
                         <lable class="col-lg-3 text-right">绑定手机</lable>
                         <div class="col-lg-9">
-                            <input type="text" name="mobile" placeholder="请输入账号" class="form-control input-form" id="form-mobile" maxlength="11"  />
+                            <input type="text" name="mobile" placeholder="请输入手机号" class="form-control input-form" id="form-mobile" maxlength="11"  />
                             <p class="tips"></p>
                         </div>
                     </div>
                     <div class="form-group">
                         <lable class="col-lg-3 text-right">绑定邮箱地址</lable>
                         <div class="col-lg-9">
-                            <input type="text" name="email" placeholder="请输入账号" class="form-control input-form" id="form-email"  />
+                            <input type="text" name="email" placeholder="请输入邮箱" class="form-control input-form" id="form-email"  />
                             <p class="tips">注册后，邮箱地址收到账号激活邮件</p>
                         </div>
                     </div>
@@ -117,23 +117,13 @@
             tipsmsg("请填入验证码","mobileCodeTips");
             return;
         }
-        $.get(ctx + "/mc/check", {"mc":mobileCode},
+        var mobile = $("#form-mobile").val();
+        $.get(ctx + "/mc/check", {"mc":mobileCode,"mobile":mobile},
             function(data){
-                switch (data){
-                    case 0:
-                        tipsmsg("验证码错误，请重新输入","mobileCodeTips");
-                        break;
-                    case 1:
-                        document.getElementById('defaultForm').submit();
-                        break;
-                    case 2:
-                        tipsmsg("此验证码达到最大验证次数，请重新获取","mobileCodeTips");
-                        break;
-                    case 3:
-                        tipsmsg("验证码过期，请重新获取","mobileCodeTips");
-                        break;
-                    default:
-                        tipsmsg("系统繁忙，请稍候！","mobileCodeTips");
+                if(data.flag){
+                    document.getElementById('defaultForm').submit();
+                }else{
+                    tipsmsg(data.err,"mobileCodeTips");
                 }
         });
 
@@ -150,13 +140,13 @@
     //检验账号是否注册
     function reg_isexit(){
         var bol = false;
-        var username = $('#form-username').val();
+        var userName = $('#form-username').val();
         var mobile = $('#form-mobile').val();
         var email = $('#form-email').val();
         $.ajax({
             type: "get",
             url: ctx + "/reg/info_check",
-            data: { username: username,mobile:mobile,email:email },   //id
+            data: { userName: userName,mobile:mobile,email:email },   //id
             async: false,
             dataType: "json",
             success: function(result) {

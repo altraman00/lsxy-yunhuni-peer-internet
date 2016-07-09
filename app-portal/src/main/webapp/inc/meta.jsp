@@ -34,7 +34,7 @@
 
 
 <title><%=SystemConfig.getProperty("portal.system.title") %></title>
-<meta charset="UTF-8" />
+<meta charset="utf-8" />
 <meta name="description" content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 <!-- Custom CSS -->

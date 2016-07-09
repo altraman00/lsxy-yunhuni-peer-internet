@@ -33,12 +33,4 @@ public class Message extends IdEntity{
     public void setContent(String content) {
         this.content = content;
     }
-    @Column(name = "create_time")
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
 }

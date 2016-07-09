@@ -4,7 +4,7 @@
 <html lang="en" class="no-js">
 <head>
     <title>注册失败</title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -24,7 +24,8 @@
 <div class="register_container">
     <div class="row box">
         <div class="col-md-12 text-center">
-            <img src="${resPrefixUrl }/images/register/icon_12.png"/>
+            <img src="${resPrefixUrl }/images/register/sign-error-icon.png"/>
+
             <p class="p">注册失败：${erInfo}</p>
             <p><a href="${ctx}/reg/index">点击重新注册</a></p>
         </div>

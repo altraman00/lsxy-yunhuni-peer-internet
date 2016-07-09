@@ -4,7 +4,7 @@
 <html lang="en" class="no-js">
 <head>
     <title>注册成功</title>
-    <%@include file="/inc/meta.jsp" %>
+    <%@include file="/inc/metaLogin.jsp" %>
     <!--index.css-->
     <link href="${resPrefixUrl }/stylesheets/register.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -25,8 +25,8 @@
     <div class="row box">
         <div class="col-md-12 text-center">
             <img src="${resPrefixUrl }/images/register/icon_12.png"/>
-            <p class="p">账号注册成功，请24小时内前往邮箱收取邮件激活账号 ${email}</p>
-            <p><a href="#">去邮箱收取邮件</a></p>
+            <p class="p">账号注册成功，请72小时内前往邮箱收取邮件激活账号 ${email}</p>
+            <p><a class="btn_actemail"  data-email="${email}" >去邮箱收取邮件</a></p>
         </div>
     </div>
 </div>
@@ -43,7 +43,7 @@
 <script src="${resPrefixUrl }/bower_components/jquery/dist/jquery.min.js"></script>
 <!--bootstrapvalidator-->
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.js"></script>
-
+<script src="${resPrefixUrl }/js/register/reg_success.js" ></script>
 
 </body>
 </html>
