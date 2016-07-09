@@ -4,13 +4,20 @@ import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.mail.MailConfigNotEnabledException;
+import com.lsxy.framework.mail.MailContentNullException;
+import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.lsxy.framework.web.rest.RestResponse.failed;
 
@@ -28,6 +35,8 @@ public class RegisterController {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    MailService mailService;
     /**
      * 用户注册信息检查
      * @param userName 用户名
@@ -68,7 +77,6 @@ public class RegisterController {
         RestResponse response;
         try {
             Account account = accountService.activeAccount(accountId, password);
-            //TODO MQ事件，发邮件通知账号已经激活
             response = RestResponse.success(account);
         } catch (RegisterException e) {
             response = RestResponse.failed("0001",e.getMessage());
@@ -84,7 +92,7 @@ public class RegisterController {
      * @return
      */
     @RequestMapping("/create_account")
-    public RestResponse createAccount(String userName,String mobile,String email){
+    public RestResponse createAccount(String userName,String mobile,String email) throws MailConfigNotEnabledException, MailContentNullException {
         RestResponse response;
         //创建用户前再进行一次校验
         int result = accountService.checkRegInfo(userName,mobile,email);
@@ -94,6 +102,14 @@ public class RegisterController {
                 response = RestResponse.success(account);
                 //TODO MQ事件，发送激活邮件
                 String uuid = UUIDGenerator.uuid();
+                Map<String,String> params = new HashMap<>();
+                params.put("host", SystemConfig.getProperty("portal.system.root.url"));
+                params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
+                params.put("uid",account.getId());
+                params.put("code",uuid);
+                params.put("username",account.getUserName());
+                mailService.send("账号激活",account.getEmail(),"01-portal-notify-account-activate.vm",params);
+
                 if(logger.isDebugEnabled()){
                     logger.debug("发邮件，key：{},accountId:{}，userName:{}",uuid,account.getId(),account.getUserName());
                 }

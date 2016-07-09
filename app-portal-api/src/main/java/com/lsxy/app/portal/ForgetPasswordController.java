@@ -2,13 +2,20 @@ package com.lsxy.app.portal;
 
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.mail.MailConfigNotEnabledException;
+import com.lsxy.framework.mail.MailContentNullException;
+import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 忘记密码
@@ -24,6 +31,9 @@ public class ForgetPasswordController {
 
     @Autowired
     private RedisCacheService cacheManager;
+
+    @Autowired
+    MailService mailService;
 
     /**
      * 忘记密码-检查邮箱是否存在
@@ -53,14 +63,20 @@ public class ForgetPasswordController {
      * @return
      */
     @RequestMapping("/send_email")
-    public RestResponse sendEmail(String email){
+    public RestResponse sendEmail(String email) throws MailConfigNotEnabledException, MailContentNullException {
         //发送邮件（参数是一个UUID），并将其存到数据库（redis?）
         String uuid = UUIDGenerator.uuid();
+
+        //TODO MQ事件，发送邮件
+        Map<String,String> params = new HashMap<>();
+        params.put("host", SystemConfig.getProperty("portal.system.root.url"));
+        params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
+        params.put("key",uuid);
+        mailService.send("账号激活",email,"02-portal-notify-reset-password.vm",params);
         cacheManager.set(uuid,email,72 * 60 * 60);
         if(logger.isDebugEnabled()){
             logger.debug("邮件重置密码：code:{},email:{}",uuid,email);
         }
-        //TODO MQ事件，发送邮件
         return RestResponse.success(null);
     }
 
