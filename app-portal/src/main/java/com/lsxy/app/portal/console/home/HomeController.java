@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.home;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -82,7 +83,9 @@ public class HomeController extends AbstractPortalController {
     private HomeVO buildHomeVO(String token){
         HomeVO vo = new HomeVO();
         RestResponse<Billing> billingResponse = getBilling(token);
-
+        //获取未读消息
+        Long  messageNum = (Long)countMessage(token).getData();
+        vo.setMessageNum(messageNum);
         //获取账务
         Billing billing = billingResponse.getData();
         //余额正数部分
@@ -128,6 +131,14 @@ public class HomeController extends AbstractPortalController {
         return vo;
     }
 
+    /**
+     * 获取未读消息
+     * @return
+     */
+    private RestResponse countMessage(String token){
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/message/account_message/count?status=0";
+        return  RestRequest.buildSecurityRequest(token).get(uri, Long.class);
+    }
     /**
      * 获取账务信息
      * @param token

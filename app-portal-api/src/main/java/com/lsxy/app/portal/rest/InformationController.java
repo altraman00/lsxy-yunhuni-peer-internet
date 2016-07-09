@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +34,7 @@ public class InformationController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         Account oldAccount = accountService.findAccountByUserName(userName);
         try {
-            BeanUtils.copyProperties2(oldAccount, account, false);
+            EntityUtils.copyProperties(oldAccount, account);
         } catch (Exception e) {
             return RestResponse.failed("4001","转换类失败");
         }

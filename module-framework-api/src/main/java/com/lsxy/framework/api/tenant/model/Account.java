@@ -26,7 +26,7 @@ public class Account extends IdEntity {
 	private String password;            //密码
 	private String mm;
 
-	private int status;                    //账号状态			租户用户状态：0-未激活 1-LOCK 2-正常  3-异常
+	private Integer status;                    //账号状态			租户用户状态：0-未激活 1-LOCK 2-正常  3-异常
 
 	private String address;//地址
 
@@ -104,11 +104,11 @@ public class Account extends IdEntity {
 
 
 	@Column(name = "status")
-	public int getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 

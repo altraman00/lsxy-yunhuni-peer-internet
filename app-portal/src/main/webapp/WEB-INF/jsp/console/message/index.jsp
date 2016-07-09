@@ -31,7 +31,7 @@
                         <section class="scrollable wrapper w-f">
 
                             <section class="panel panel-default pos-rlt clearfix ">
-                                <table class="table table-striped cost-table-history">
+                                <table class="table table-striped cost-table-history news-table">
                                     <thead>
                                     <tr>
                                         <th>消息时间</th>
@@ -61,11 +61,10 @@
         </section>
     </section>
 </section>
-
+<%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/history.js'> </script>
-<%@include file="/inc/footer.jsp"%>
 <script type="text/javascript">
     var msg = '${msg}';
     if(msg==''){}else{alert(msg);}

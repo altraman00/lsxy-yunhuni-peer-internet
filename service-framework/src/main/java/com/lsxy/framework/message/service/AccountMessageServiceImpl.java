@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 
 /**
@@ -37,5 +38,20 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         String hql = "from AccountMessage obj where obj.account.id="+account.getId()+" and obj.status <>-1 order by status asc,create_time desc";
         Page<AccountMessage> page =  this.pageList(hql,pageNo,pageSize);
         return page;
+    }
+
+    @Override
+    public Long count(String userName, Integer status) {
+        Long result = 0l;
+        Account  account = accountService.findAccountByUserName(userName);
+        String hql = "select count(1) from AccountMessage obj where deleted=0 and obj.account.id=?1 and obj.status=?2 ";
+        Query query = this.getEm().createQuery(hql);
+        query.setParameter(1,account.getId());
+        query.setParameter(2,status);
+        Object obj = query.getSingleResult();
+        if(obj instanceof Long){
+            result = (Long) obj;
+        }
+        return result;
     }
 }

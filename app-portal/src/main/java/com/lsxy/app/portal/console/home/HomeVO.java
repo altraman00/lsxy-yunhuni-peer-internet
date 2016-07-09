@@ -8,10 +8,10 @@ import java.util.List;
  * Created by liups on 2016/6/27.
  */
 public class HomeVO {
+    private Long messageNum = 0l;//未读消息数量
+    private String balanceInt = "0";              //余额整数
 
-    private String balanceInt;              //余额整数
-
-    private String balanceDec;              //余额小数
+    private String balanceDec = "00";              //余额小数
 
     private Integer lineNum ;               //当前线路数量
 
@@ -26,6 +26,14 @@ public class HomeVO {
     private String secretKey;               //secretKey
 
    private List<AppStateVO> appStateVOs;    //应用
+
+    public Long getMessageNum() {
+        return messageNum;
+    }
+
+    public void setMessageNum(Long messageNum) {
+        this.messageNum = messageNum;
+    }
 
     public String getBalanceInt() {
         return balanceInt;
