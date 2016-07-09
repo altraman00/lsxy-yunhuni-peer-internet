@@ -17,4 +17,12 @@ public interface AccountMessageService extends BaseService<AccountMessage>{
      * @return
      */
     public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize);
+
+    /**
+     * 获取指定状态的记录数
+     * @param userName 用户名
+     * @param status 状态
+     * @return
+     */
+    public Long count(String userName,Integer status);
 }
