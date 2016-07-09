@@ -110,24 +110,29 @@ public class RegisterController {
         String cUid = cacheManager.get(code);
         if(StringUtils.isNotBlank(uid)&&uid.equals(cUid)){
             Integer accountStatus = getAccountStatus(uid);
-            if(Account.STATUS_NOT_ACTIVE == accountStatus){
-                //没有激活,前往激活页面
-                model.put("uid",uid);
-                model.put("username",username);
-                model.put("code",code);
-                returnView = "register/active";
-            }else if(Account.STATUS_NORMAL == accountStatus){
-                //已经激活
-                model.put("info","账户已经激活");
-                returnView = "register/active_result";
+            if(accountStatus != null){
+                if(Account.STATUS_NOT_ACTIVE == accountStatus){
+                    //没有激活,前往激活页面
+                    model.put("uid",uid);
+                    model.put("username",username);
+                    model.put("code",code);
+                    returnView = "register/active";
+                }else if(Account.STATUS_NORMAL == accountStatus){
+                    //已经激活
+                    model.put("info","账户已经激活");
+                    returnView = "register/active_result";
+                }else{
+                    model.put("erInfo","账号已过期");
+                    returnView = "register/active_fail";
+                }
             }else{
-                model.put("erInfo","账号已过期");
+                model.put("erInfo","参数异常");
                 returnView = "register/active_fail";
             }
         }else{
-            //
+            //检查用户是否激活
             Integer accountStatus = getAccountStatus(uid);
-            if(accountStatus == 2){
+            if(accountStatus != null && accountStatus == 2){
                 model.put("info","账户已经激活");
                 returnView = "register/active_result";
             }else{
