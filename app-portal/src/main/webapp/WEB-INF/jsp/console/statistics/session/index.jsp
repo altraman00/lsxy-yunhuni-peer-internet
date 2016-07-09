@@ -159,6 +159,8 @@
      * starttime 时间
      * endtime 对比时间
      */
+    var xdAll="";
+    var ydAll="";
     function initchart(){
         var type = $('input[name="stime"]:checked').val();
         var type1 = 'day';
@@ -174,33 +176,18 @@
             dataType: "json",
             success : function(data){
                 resultData = data;
-                var tdata = new Array();
-                var count = 0;
-                for(var i=0;i<resultData.length;i++){
-                    tdata[i]=resultData[i].name;
-                    count+=resultData[i].data.length;
+                xdAll = JSON.stringify(resultData[0]);
+                Array.prototype.max = function(){
+                    return Math.max.apply({},this)
                 }
-                var seriesjson=JSON.stringify(resultData);
-                seriesjson = eval('('+seriesjson+')');
-                charts(tdata,seriesjson,type);
-                updatetable(count);
+                xdAll = eval('('+xdAll+')');
+                ydAll = JSON.stringify(resultData[1]);
+                ydAll = eval('('+ydAll+')');
+                charts(xdAll,ydAll,resultData[0].max(),resultData[1].max());
             },
             fail:function(){
             }
         });
-        //数据处理
-        if(type=='year'){
-            //注意 tdata 等于 seriesjson[name]
-            var tdata = new Array('2016年','2017年');
-            var seriesjson  ="[{name:'2016年',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90]},{name:'2017年',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
-            var seriesjson = eval('('+seriesjson+')');
-        }else{
-            //注意 tdata 等于 seriesjson[name]
-            var tdata = new Array('5月','6月');
-            var seriesjson  ="[{name:'5月',type:'line',data:[120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101, 134, 90, 230, 210,120, 132, 101,4000]},{name:'6月',type:'line',data:[220, 182, 191, 234, 290, 330, 310]}]";
-            var seriesjson = eval('('+seriesjson+')');
-        }
-        charts(tdata,seriesjson,type);
     }
 
     var t = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
@@ -258,18 +245,18 @@
      * @param tdata 标题项
      * @param tdata 标题项
      */
-    function charts(tdata,series,type){
-        var type = $('input[name="stime"]:checked').val();
+    function charts(xd,yd,xdMax,xyMax){
+//        var type = $('input[name="stime"]:checked').val();
         var Xdata = monthData;
-
-        if(type=='year'){
-            Xdata = timeData;
-            var xd = moneyDataYear();
-            var yd = meetDataYear();
-        }else{
-            var xd = moneyDataMonth();
-            var yd = meetDataMonth();
-        }
+//
+//        if(type=='year'){
+//            Xdata = timeData;
+//            var xd = moneyDataYear();
+//            var yd = meetDataYear();
+//        }else{
+//            var xd = moneyDataMonth();
+//            var yd = meetDataMonth();
+//        }
 
         var myChart = echarts.init(document.getElementById('ecpanel'),'wonderland');
         option = {
@@ -323,7 +310,7 @@
                     type: 'value',
                     scale: true,
                     name: '会话(次)',
-                    max: 30,
+                    max: xyMax,
                     min: 0,
                     boundaryGap: [0.2, 0.2]
                 },
@@ -331,7 +318,7 @@
                     type: 'value',
                     scale: true,
                     name: '消费额(元)',
-                    max: 1200,
+                    max: xdMax,
                     min: 0,
                     boundaryGap: [0.2, 0.2]
                 }

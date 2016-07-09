@@ -8,7 +8,6 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yuhuni.api.app.model.App;
-import javassist.bytecode.stackmap.TypeData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -30,8 +29,8 @@ import java.util.List;
 public class SessionStatisticsController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(SessionStatisticsController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
-    private static final int SESSION = 1;
-    private static final int CONSUME = 2;
+    private static final int SESSION = 1; //会话统计
+    private static final int CONSUME = 2; //消费统计
     /**
      * 消费统计首页
      * @param request
@@ -57,20 +56,22 @@ public class SessionStatisticsController extends AbstractPortalController {
         String uri = restPrefixUrl +   "/rest/app/list";
         return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
     }
+
     /**
      * 异步获取图表显示信息
      * @param request
+     * @param type 类型 日统计，月统计
+     * @param startTime 统计时间
+     * @param appId 应用
      * @return
      */
     @RequestMapping("/list")
     @ResponseBody
     public List list(HttpServletRequest request,String type,String startTime,String appId){
         List list = new ArrayList();
-        if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){//日统计比较
-            
-        }else{//月统计
-
-        }
+        List tempList = getList(request,type,appId,startTime);
+        list.add(getArrays(tempList,CONSUME));
+        list.add(getArrays(tempList,SESSION));
         return list;
     }
 
@@ -79,6 +80,7 @@ public class SessionStatisticsController extends AbstractPortalController {
      * @param request
      * @param appId 应用id
      * @param startTime 开始时间
+     * @param type 统计类型
      * @return
      */
     private List getList(HttpServletRequest request,String type,String appId,String startTime){
@@ -93,6 +95,7 @@ public class SessionStatisticsController extends AbstractPortalController {
     /**
      * 获取列表数据
      * @param list 待处理的list
+     * @param type 统计类型
      * @return
      */
     private double[] getArrays(List list,int type) {
