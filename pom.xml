@@ -36,6 +36,7 @@
         <module>module-framework-sms</module>
         <module>app-third-join-gateway</module>
         <module>module-framework-third</module>
+        <module>module-framework-mail</module>
     </modules>
     <packaging>pom</packaging>
     <dependencyManagement>
@@ -138,10 +139,18 @@
                 <version>5.1.38</version>
                 <scope>runtime</scope>
             </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4</version>
+            </dependency>
 
 
-
-
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+                <version>1.7</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
