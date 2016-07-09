@@ -8,14 +8,12 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.tenant.dao.AccountDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.Date;
 
