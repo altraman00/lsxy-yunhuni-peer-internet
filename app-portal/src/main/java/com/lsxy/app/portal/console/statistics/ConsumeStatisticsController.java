@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.console.statistics;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.console.customer.FeedbackController;
 import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.api.consume.model.ConsumeMonth;
 import com.lsxy.framework.config.SystemConfig;
@@ -31,7 +30,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/console/statistics/consume/")
 public class ConsumeStatisticsController extends AbstractPortalController {
-    private static final Logger logger = LoggerFactory.getLogger(FeedbackController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConsumeStatisticsController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 消费统计首页

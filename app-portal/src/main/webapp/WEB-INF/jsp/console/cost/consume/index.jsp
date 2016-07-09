@@ -88,6 +88,7 @@
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;消费记录</span>
                         </div>
+                        <form:form role="form" action="${ctx}/console/cost/consume" method="post">
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
@@ -97,19 +98,19 @@
                                                 <div class="row">
                                                     <a class="current_month">本月</a>
                                                     <a class="last_month">上月</a>
-
                                                     从
-                                                    <input type="text" class="datepicker currentMonth form-control" value='' data-date-end-date="0m" />
+                                                    <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" />
                                                     到
-                                                    <input type="text" class="datepicker lastMonth form-control" value='' data-date-end-date="0m" />
-                                                    <button class="btn btn-primary query">查询</button>
+                                                    <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" />
+                                                    <button class="btn btn-primary query" type="button"  id="findform" >查询</button>
+                                                    <span class="tips-error" ></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </section>
+                            </form:form>
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <table class="table table-striped cost-table-history">
                                     <thead>
@@ -122,52 +123,21 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td scope="row">1</td>
-                                        <td>2016-01-01 10:10:00</td>
-                                        <td>100.00</td>
-                                        <td>套餐加油包</td>
-                                        <td>100分钟语音加油包</td>
-                                    </tr>
-                                    <tr>
-                                        <td scope="row">1</td>
-                                        <td>2016-01-01 10:10:00</td>
-                                        <td>100.00</td>
-                                        <td>套餐加油包</td>
-                                        <td>100分钟语音加油包</td>
-                                    </tr>
-                                    <tr>
-                                        <td scope="row">1</td>
-                                        <td>2016-01-01 10:10:00</td>
-                                        <td>100.00</td>
-                                        <td>套餐加油包</td>
-                                        <td>100分钟语音加油包</td>
-                                    </tr>
+                                    <c:forEach items="${pageObj.result}" var="result" varStatus="s">
+                                        <tr>
+                                            <td scope="row">${s.index+1}</td>
+                                            <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd hh:mm:ss"></fmt:formatDate></td>
+                                            <td><fmt:formatNumber value="${result.amount}" pattern="0.00"></fmt:formatNumber> </td>
+                                            <td>${reuslt.type}</td>
+                                            <td>${result.remark}</td>
+                                        </tr>
+                                    </c:forEach>
                                     </tbody>
                                 </table>
                             </section>
-                            <section class="panel panel-default yunhuni-personal">
-                                <nav class='pageWrap'>
-                                    <ul class="pagination">
-                                        <li>
-                                            <a href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li class="active"><a href="#">1</a></li>
-                                        <li><a href="#">2</a></li>
-                                        <li><a href="#">3</a></li>
-                                        <li><a href="#">4</a></li>
-                                        <li><a href="#">5</a></li>
-                                        <li>
-                                            <a href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </section>
-
+                            <c:set var="pageUrl" value="${ctx}/console/cost/consume"></c:set>
+                            <c:set var="extraParam" value="&startTime=${startTime}&endTime=${endTime}"></c:set>
+                            <%@include file="/inc/pagefooter.jsp" %>
                         </section>
                     </section>
                 </aside>
