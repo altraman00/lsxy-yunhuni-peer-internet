@@ -9,10 +9,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +30,6 @@ import java.util.Map;
 @RequestMapping("/reg")
 public class RegisterController {
 
-    public static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     @Autowired
     private RedisCacheService cacheManager;
 
@@ -66,43 +62,39 @@ public class RegisterController {
      * 用户注册
      */
     @RequestMapping(value = "/register",method = RequestMethod.POST)
-//    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
-    public String register(HttpServletRequest request,@Nonnull String userName, @Nonnull String mobile,@Nonnull String email){
-        WebUtils.logRequestParams(request);
-        logger.debug("contentType:{}",request.getContentType());
-
+    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
+    public ModelAndView register(HttpServletRequest request,@Nonnull String userName, @Nonnull String mobile,@Nonnull String email){
         Map<String,String> model = new HashMap<>();
         String erInfo = "erInfo";
         String erPage = "register/fail";
         String successPage = "register/success";
-        return "hello";
-//        //获取手机验证码
-//        MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
-//        if(checker != null){
-//            if(checker.getMobile().equals(mobile) && checker.isPass()){
-//                try {
-//                    //调用创建账号方法
-//                    createAccount(userName,mobile,email);
-//                } catch (RegisterException e) {
-//                    model.put(erInfo,e.getMessage());
-//                    return new ModelAndView(erPage,model);
-//                }
-//                //将手机验证码删除
-//                MobileCodeUtils.removeMobileCodeChecker(request);
-//
-//                //返回页面，通知查收邮件激活账号
-//                model.put("email",email);
-//                return new ModelAndView(successPage,model);
-//            }else{
-//                //提示信息：手机验证没通过
-//                model.put(erInfo,"手机验证没通过");
-//                return new ModelAndView(erPage,model);
-//            }
-//        }else{
-//            //提示信息：手机验证码过期
-//            model.put(erInfo,"手机验证码过期");
-//            return new ModelAndView(erPage,model);
-//        }
+        //获取手机验证码
+        MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+        if(checker != null){
+            if(checker.getMobile().equals(mobile) && checker.isPass()){
+                try {
+                    //调用创建账号方法
+                    createAccount(userName,mobile,email);
+                } catch (RegisterException e) {
+                    model.put(erInfo,e.getMessage());
+                    return new ModelAndView(erPage,model);
+                }
+                //将手机验证码删除
+                MobileCodeUtils.removeMobileCodeChecker(request);
+
+                //返回页面，通知查收邮件激活账号
+                model.put("email",email);
+                return new ModelAndView(successPage,model);
+            }else{
+                //提示信息：手机验证没通过
+                model.put(erInfo,"手机验证没通过");
+                return new ModelAndView(erPage,model);
+            }
+        }else{
+            //提示信息：手机验证码过期
+            model.put(erInfo,"手机验证码过期");
+            return new ModelAndView(erPage,model);
+        }
 
     }
 
