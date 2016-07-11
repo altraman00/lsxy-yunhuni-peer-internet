@@ -124,19 +124,9 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
                 this.save(account);
                 Tenant tenant = account.getTenant();
                 //创建主鉴权账号
-                ApiCertificate cert = new ApiCertificate();
-                cert.setTenant(tenant);
-                cert.setCertId(UUIDGenerator.uuid());
-                cert.setSecretKey(UUIDGenerator.uuid());
-                apiCertificateService.save(cert);
+                createApiCertificate(tenant);
                 //帐务数据创建
-                Billing billing = new Billing();
-                billing.setTenant(tenant);
-                billing.setBalance(0.00);
-                billing.setSmsRemain(0);
-                billing.setVoiceRemain(0);
-                billing.setConferenceRemain(0);
-                billingService.save(billing);
+                createBilling(tenant);
             }else{
                 throw new RegisterException("注册信息不可用，已存在重复的注册信息！");
             }
@@ -148,6 +138,25 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
             throw new RegisterException("账号激活失败");
         }
         return account;
+    }
+
+    //创建主鉴权账号
+    private void createApiCertificate(Tenant tenant) {
+        ApiCertificate cert = new ApiCertificate();
+        cert.setTenant(tenant);
+        cert.setCertId(UUIDGenerator.uuid());
+        cert.setSecretKey(UUIDGenerator.uuid());
+        apiCertificateService.save(cert);
+    }
+    //帐务数据创建
+    private void createBilling(Tenant tenant) {
+        Billing billing = new Billing();
+        billing.setTenant(tenant);
+        billing.setBalance(0.00);
+        billing.setSmsRemain(0);
+        billing.setVoiceRemain(0);
+        billing.setConferenceRemain(0);
+        billingService.save(billing);
     }
 
     @Override
