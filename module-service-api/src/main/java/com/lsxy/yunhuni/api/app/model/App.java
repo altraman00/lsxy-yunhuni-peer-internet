@@ -23,7 +23,7 @@ public class App extends IdEntity {
     private String industry;//所属行业
     private String whiteList;//服务器白名单
     private String url;//回调URL
-    private Integer isAuthPower;//是否鉴权,0否，1是
+    private Integer isAuth;//是否鉴权,0否，1是
     private String baseServiceType;//基础服务类型
     private Integer isVoiceDirectly;//是否语音直拨 0否，1是
     private Integer isVoiceCallback;//是否语音回拨0否，1是
@@ -100,13 +100,13 @@ public class App extends IdEntity {
     public void setUrl(String url) {
         this.url = url;
     }
-    @Column(name = "is_auth_power")
-    public Integer getIsAuthPower() {
-        return isAuthPower;
+    @Column(name = "is_auth")
+    public Integer getIsAuth() {
+        return isAuth;
     }
 
-    public void setIsAuthPower(Integer isAuthPower) {
-        this.isAuthPower = isAuthPower;
+    public void setIsAuth(Integer isAuthPower) {
+        this.isAuth = isAuth;
     }
     @Column(name = "base_service_type")
     public String getBaseServiceType() {

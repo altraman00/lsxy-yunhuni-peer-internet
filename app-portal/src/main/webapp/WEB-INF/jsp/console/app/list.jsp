@@ -36,7 +36,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="application_create.html">创建应用</a>
+                                                <a href="${ctx}/console/app/index">创建应用</a>
                                             </div>
                                         </li>
                                     </ul>
