@@ -9,4 +9,6 @@ import com.lsxy.framework.api.consume.model.BillMonth;
  */
 public interface BillMonthService extends BaseService<BillMonth> {
 
+    BillMonth getBillMonth(String userName, String appId, String month);
+
 }

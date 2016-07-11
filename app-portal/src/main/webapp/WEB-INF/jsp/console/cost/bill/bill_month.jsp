@@ -46,7 +46,7 @@
                                             </li>
                                             <li>
                                                 <div class="aside-li-a active">
-                                                    <a href="${ctx}/console/cost/recharge/list">月结账单</a>
+                                                    <a href="${ctx}/console/cost/bill_month/get">月结账单</a>
                                                 </div>
                                             </li>
                                         </ul>
@@ -96,13 +96,13 @@
                                                 <div class="panel-body clearfix border-top-none personal-base">
                                                     <div class="row">
                                                         <lable class="">月份：</lable>
-                                                        <input type="text" class="datepicker form-control" value='' data-date-end-date="0m" />
+                                                        <input type="text" class="datepicker form-control" value='${month}' data-date-end-date="0m" />
                                                         <button class="btn btn-primary query">查询</button>
                                                     </div>
                                                     <div class="row">
                                                         <lable class="">按应用：</lable>
-                                                        <select class="form-control">
-                                                            <option value="0">全局</option>
+                                                        <select class="form-control" name="appId">
+                                                            <option value="">所有应用</option>
                                                             <option value="1">身份证</option>
                                                         </select>
                                                     </div>
@@ -115,7 +115,7 @@
                                 <section class="panel panel-default yunhuni-personal">
                                     <div class="fix-padding">
                                         <p class="bg-success price_info">
-                                            2016-05 消费总额  <span class="text-warning"> 2000.00</span> 元
+                                            ${month} 消费总额  <span class="text-warning"> 2000.00</span> 元
                                         </p>
                                     </div>
                                 </section>
