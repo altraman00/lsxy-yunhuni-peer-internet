@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-api</artifactId>
+            <artifactId>module-service-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
@@ -39,11 +39,7 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>service-framework</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lsxy</groupId>
-            <artifactId>service-yunhuni</artifactId>
+            <artifactId>module-service</artifactId>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>

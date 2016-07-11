@@ -1,7 +1,7 @@
 package com.lsxy.app.api.gateway.security.auth;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.yuhuni.api.apicertificate.service.ApiCertificateService;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

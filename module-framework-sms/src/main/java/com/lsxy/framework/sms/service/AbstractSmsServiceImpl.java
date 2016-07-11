@@ -4,8 +4,6 @@ import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.api.sms.service.SMSSendLogService;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 
 import java.io.StringWriter;
 import java.util.Map;

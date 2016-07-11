@@ -23,20 +23,19 @@
         <module>app-oc</module>
         <module>app-backend</module>
         <module>app-api-gateway</module>
-        <module>service-framework</module>
-        <module>service-yunhuni</module>
-        <module>module-framework-api</module>
-        <module>module-yunhuni-api</module>
+        <module>app-portal-api</module>
+        <module>app-third-join-gateway</module>
         <module>module-framework-core</module>
         <module>module-framework-web</module>
         <module>module-framework-mq</module>
         <module>module-framework-cache</module>
         <module>module-framework-config</module>
-        <module>app-portal-api</module>
         <module>module-framework-sms</module>
-        <module>app-third-join-gateway</module>
         <module>module-framework-third</module>
         <module>module-framework-mail</module>
+        <module>module-service-api</module>
+        <module>module-service</module>
+
     </modules>
     <packaging>pom</packaging>
     <dependencyManagement>
@@ -89,12 +88,12 @@
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
-                <artifactId>module-framework-api</artifactId>
+                <artifactId>module-service-api</artifactId>
                 <version>1.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
-                <artifactId>module-yunhuni-api</artifactId>
+                <artifactId>module-service</artifactId>
                 <version>1.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>

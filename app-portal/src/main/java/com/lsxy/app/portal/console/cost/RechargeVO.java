@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.yuhuni.api.recharge.model.Recharge;
+import com.lsxy.yunhuni.api.recharge.model.Recharge;
 
 import java.util.Date;
 

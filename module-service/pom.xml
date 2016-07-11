@@ -11,5 +11,14 @@
 
     <artifactId>module-service</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+    </dependencies>
 </project>
