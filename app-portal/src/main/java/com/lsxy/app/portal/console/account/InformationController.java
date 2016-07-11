@@ -27,6 +27,10 @@ public class InformationController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
 
+
+
+
+
     /**
      * 基本资料首页入口
      * @param request
