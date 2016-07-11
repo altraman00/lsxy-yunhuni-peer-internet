@@ -135,6 +135,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
                 billing.setBalance(0.00);
                 billing.setSmsRemain(0);
                 billing.setVoiceRemain(0);
+                billing.setConferenceRemain(0);
                 billingService.save(billing);
             }else{
                 throw new RegisterException("注册信息不可用，已存在重复的注册信息！");
