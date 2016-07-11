@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.app.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 
 import java.util.List;
@@ -11,5 +12,19 @@ import java.util.List;
  * Created by liups on 2016/6/29.
  */
 public interface AppService extends BaseService<App> {
-    List<App> findAppByUserName(String userName) throws MatchMutiEntitiesException;
+    /**
+     * 获取记录的集合
+     * @param userName
+     * @return
+     */
+    List<App> findAppByUserName(String userName)  ;
+
+    /**
+     * 获取分页信息
+     * @param userName 用户名
+     * @param pageNo 第几页
+     * @param pageSize 每页面记录数
+     * @return
+     */
+    Page<App> pageList(String userName,Integer pageNo,Integer pageSize);
 }
