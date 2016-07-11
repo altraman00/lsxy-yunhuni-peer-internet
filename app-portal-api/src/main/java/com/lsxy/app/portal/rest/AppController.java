@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -42,5 +43,19 @@ public class AppController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         Page<App> page = appService.pageList(userName,pageNo,pageSize);
         return RestResponse.success(page);
+    }
+
+    /**
+     * 更新应用状态
+     * @param id 应用id
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    @RequestMapping("/delete")
+    public RestResponse delete(String id) throws InvocationTargetException, IllegalAccessException {
+        App oldApp = appService.findById(id);
+        appService.delete(oldApp);
+        return RestResponse.success(oldApp);
     }
 }

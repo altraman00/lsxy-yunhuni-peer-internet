@@ -83,19 +83,19 @@
                                             <td>${result.id}</td>
                                             <c:if test="${result.status==1}"><td class="success" >已上线</td></c:if>
                                             <c:if test="${result.status==2}"><td  class="nosuccess">未上线</td></c:if>
-                                            <td><fmt:formatDate value="${result.create_time}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
+                                            <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="application_detail.html">详情</a> <span ></span>
-                                                <a href="">删除</a> <span ></span>
+                                                <a href="" onclick="deleteApp(${result.id})">删除</a> <span ></span>
+                                                <c:if test="${result.status==2}"> <a class="tabtarget" data-toggle="3" >申请上线</a></c:if>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
                                 </table>
                             </section>
-                            <c:set var="pageUrl" value="${ctx}/console/cost/recharge/list"></c:set>
+                            <c:set var="pageUrl" value="${ctx}/console/app/list"></c:set>
                             <%@include file="/inc/pagefooter.jsp" %>
-
                         </section>
                     </section>
                 </aside>
@@ -229,6 +229,24 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/list.js'> </script>
+<script type="text/javascript">
+    function deleteApp(id){
+        $.ajax({
+            url : "${ctx}/console/app/delete",
+            type : 'post',
+            async: false,//使用同步的方式,true为异步方式
+            data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(data){
+                alert(data.msg);
+                window.location.href='${ctx}/console/app/list?pageNo=${ pageObj.currentPageNo}&pageSize=${pageObj.pageSize}';
+            },
+            fail:function(){
+                alert('网络异常，请稍后重试');
+            }
+        });
+    }
+</script>
 </body>
 </html>
 

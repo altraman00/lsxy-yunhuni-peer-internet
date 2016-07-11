@@ -11,9 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 应用
@@ -34,6 +37,7 @@ public class AppController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<App>> restResponse = pageList(request,pageNo,pageSize);
         Page<App> pageObj = restResponse.getData();
+        mav.addObject("msg",request.getSession().getAttribute("msg"));
         mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/app/list");
         return mav;
@@ -50,5 +54,30 @@ public class AppController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = restPrefixUrl + "/rest/app/page_list?pageNo={1}&pageSize={2}";
         return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,pageNo,pageSize);
+    }
+    /**
+     * 删除应用
+     * @param request
+     * @return
+     */
+    @RequestMapping("/delete")
+    @ResponseBody
+    public Map delete(HttpServletRequest request, String id){
+        deleteApp(request,id);
+        Map map = new HashMap();
+        map.put("msg","删除成功");
+        return map;
+    }
+
+    /**
+     * 将应用状态改为删除
+     * @param request
+     * @param id 应用id
+     * @return
+     */
+    private RestResponse deleteApp(HttpServletRequest request,String id){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl + "/rest/app/delete?id={1}";
+        return RestRequest.buildSecurityRequest(token).get(uri,App.class,id);
     }
 }
