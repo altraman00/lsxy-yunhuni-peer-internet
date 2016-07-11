@@ -12,14 +12,26 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app")
 public class App extends IdEntity {
-    public static int STATUS_ONLINE = 1;
-    public static int STATUS_NOT_ONLINE = 2;
+    public static int STATUS_ONLINE = 1;//上线
+    public static int STATUS_NOT_ONLINE = 2;//没上线
 
-    private Tenant tenant;
-    private String name;
-    private int status;
-    private String description;
-
+    private Tenant tenant;//所属租户
+    private String name;//应用名字
+    private int status;//应用状态
+    private String description;//应用描述
+    private String type;//应用类型
+    private String industry;//所属行业
+    private String whiteList;//服务器白名单
+    private String url;//回调URL
+    private Integer isAuthPower;//是否鉴权,0否，1是
+    private String baseServiceType;//基础服务类型
+    private Integer isVoiceDirectly;//是否语音直拨 0否，1是
+    private Integer isVoiceCallback;//是否语音回拨0否，1是
+    private String advancedServiceType;//高级语音定制服务类型
+    private Integer isSessionService;//是否会议服务0否，1是
+    private Integer isRecording;//是否录音服务0否，1是
+    private Integer isVoiceValidate;//是否语音验证码0否，1是
+    private Integer isIvrService;//是否IVR定制服务0否，1是
     @ManyToOne
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
@@ -55,5 +67,109 @@ public class App extends IdEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    @Column(name = "industry")
+    public String getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
+    }
+    @Column(name = "white_list")
+    public String getWhiteList() {
+        return whiteList;
+    }
+
+    public void setWhiteList(String whiteList) {
+        this.whiteList = whiteList;
+    }
+    @Column(name = "url")
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    @Column(name = "is_auth_power")
+    public Integer getIsAuthPower() {
+        return isAuthPower;
+    }
+
+    public void setIsAuthPower(Integer isAuthPower) {
+        this.isAuthPower = isAuthPower;
+    }
+    @Column(name = "base_service_type")
+    public String getBaseServiceType() {
+        return baseServiceType;
+    }
+
+    public void setBaseServiceType(String baseServiceType) {
+        this.baseServiceType = baseServiceType;
+    }
+    @Column(name = "is_voice_directly")
+    public Integer getIsVoiceDirectly() {
+        return isVoiceDirectly;
+    }
+
+    public void setIsVoiceDirectly(Integer isVoiceDirectly) {
+        this.isVoiceDirectly = isVoiceDirectly;
+    }
+    @Column(name = "is_voice_callback")
+    public Integer getIsVoiceCallback() {
+        return isVoiceCallback;
+    }
+
+    public void setIsVoiceCallback(Integer isVoiceCallback) {
+        this.isVoiceCallback = isVoiceCallback;
+    }
+    @Column(name = "advanced_service_type")
+    public String getAdvancedServiceType() {
+        return advancedServiceType;
+    }
+
+    public void setAdvancedServiceType(String advancedServiceType) {
+        this.advancedServiceType = advancedServiceType;
+    }
+    @Column(name = "is_session_service")
+    public Integer getIsSessionService() {
+        return isSessionService;
+    }
+
+    public void setIsSessionService(Integer isSessionService) {
+        this.isSessionService = isSessionService;
+    }
+    @Column(name = "is_recording")
+    public Integer getIsRecording() {
+        return isRecording;
+    }
+
+    public void setIsRecording(Integer isRecording) {
+        this.isRecording = isRecording;
+    }
+    @Column(name = "is_voice_validate")
+    public Integer getIsVoiceValidate() {
+        return isVoiceValidate;
+    }
+
+    public void setIsVoiceValidate(Integer isVoiceValidate) {
+        this.isVoiceValidate = isVoiceValidate;
+    }
+    @Column(name = "is_ivr_service")
+    public Integer getIsIvrService() {
+        return isIvrService;
+    }
+
+    public void setIsIvrService(Integer isIvrService) {
+        this.isIvrService = isIvrService;
     }
 }
