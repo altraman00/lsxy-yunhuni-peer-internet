@@ -9,7 +9,12 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.tenant.dao.AccountDao;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
+import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
+import com.lsxy.yunhuni.api.billing.model.Billing;
+import com.lsxy.yunhuni.api.billing.service.BillingService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +33,12 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Autowired
     private TenantService tenantService;
+
+    @Autowired
+    private ApiCertificateService apiCertificateService;
+
+    @Autowired
+    BillingService billingService;
 
     @Override
     public BaseDaoInterface<Account, Serializable> getDao() {
@@ -112,12 +123,19 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
                 account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
                 this.save(account);
                 Tenant tenant = account.getTenant();
-                //TODO 创建主鉴权账号
-
-                //TODO 帐务数据创建
-
-                //TODO 默认将用户手机号作为当前租户的测试号码
-
+                //创建主鉴权账号
+                ApiCertificate cert = new ApiCertificate();
+                cert.setTenant(tenant);
+                cert.setCertId(UUIDGenerator.uuid());
+                cert.setSecretKey(UUIDGenerator.uuid());
+                apiCertificateService.save(cert);
+                //帐务数据创建
+                Billing billing = new Billing();
+                billing.setTenant(tenant);
+                billing.setBalance(0.00);
+                billing.setSmsRemain(0);
+                billing.setVoiceRemain(0);
+                billingService.save(billing);
             }else{
                 throw new RegisterException("注册信息不可用，已存在重复的注册信息！");
             }
