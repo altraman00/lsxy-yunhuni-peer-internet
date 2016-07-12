@@ -31,7 +31,7 @@
                 <P class="col-md-3 text-right">云呼你会员注册</P>
             </div>
             <div class="row">
-                <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" >
+                <form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" accept-charset="utf-8">
                     <!-- 防止表单重复提交要加这个隐藏变量 -->
                     <input type="hidden" name="submission_token" value="${submission_token}" />
                     <div class="form-group">
@@ -61,7 +61,9 @@
                         </div>
                     </div>
                     <!--提示-->
-                </form:form>
+                        <input type="hidden" name="${_csrf.parameterName}"
+                               value="${_csrf.token}" />
+                </form>
                 <div class="form-group">
                     <div class="col-lg-9 col-lg-offset-3">
                         <span id="showtips" class="tips-error" style="display: none" >用户名已经存在</span>
@@ -143,10 +145,11 @@
         var userName = $('#form-username').val();
         var mobile = $('#form-mobile').val();
         var email = $('#form-email').val();
+        var _csrf = $("input[name='_csrf']").val();
         $.ajax({
-            type: "get",
+            type: "post",
             url: ctx + "/reg/info_check",
-            data: { userName: userName,mobile:mobile,email:email },   //id
+            data: { userName: userName,mobile:mobile,email:email,_csrf:_csrf},   //id
             async: false,
             dataType: "json",
             success: function(result) {

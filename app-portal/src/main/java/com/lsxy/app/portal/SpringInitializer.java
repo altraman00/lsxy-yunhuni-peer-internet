@@ -54,6 +54,7 @@ public class SpringInitializer implements WebApplicationInitializer{
 
         ctx.setServletContext(container);
         CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setForceEncoding(true);
         characterEncodingFilter.setEncoding("UTF-8");
 
         container.addFilter("characterEncodingFilter",characterEncodingFilter).addMappingForUrlPatterns(null,false,"/*");

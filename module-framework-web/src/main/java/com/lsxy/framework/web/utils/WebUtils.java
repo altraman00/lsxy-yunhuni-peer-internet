@@ -20,6 +20,8 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.security.SecurityUser;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -27,8 +29,7 @@ import com.lsxy.framework.core.utils.StringUtil;
  */
 @SuppressWarnings("unchecked")
 public class WebUtils {
-	private static Log logger = LogFactory.getLog(WebUtils.class);
-
+	public static final Logger logger = LoggerFactory.getLogger(WebUtils.class);
 	private WebUtils() {
 	}
 	
@@ -151,7 +152,18 @@ public class WebUtils {
 			}
 		}
 		
-		logger.debug("Http请求 ["+getRemoteAddress(request)+"]["+request.getSession().getId()+"]"+request.getRequestURL()+" 参数如下：");
+		logger.debug("Http请求 ["+getRemoteAddress(request)+"]["+request.getSession().getId()+"]"+request.getRequestURL()+" ");
+		logger.debug("ContentType：{}",request.getContentType());
+		logger.debug("Method:{}",request.getMethod());
+		logger.debug("Encoding:{}",request.getCharacterEncoding());
+		logger.debug("Headers:");
+		Enumeration headerNames = request.getHeaderNames();
+		while(headerNames.hasMoreElements()){
+			String name = (String) headerNames.nextElement();
+			String value = request.getHeader(name);
+			logger.debug("   {}:{}",name,value);
+		}
+		logger.debug("Params：");
 		Enumeration<String> params = request.getParameterNames();
 		while(params.hasMoreElements()){
 			String paramName = params.nextElement();

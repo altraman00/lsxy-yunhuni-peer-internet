@@ -94,18 +94,24 @@
                                         <div class="col-md-12 padder-v fix-padding">
                                             <div class='wrapperBox cost_month'>
                                                 <div class="panel-body clearfix border-top-none personal-base">
-                                                    <div class="row">
-                                                        <lable class="">月份：</lable>
-                                                        <input type="text" class="datepicker form-control" value='${month}' data-date-end-date="0m" />
-                                                        <button class="btn btn-primary query">查询</button>
-                                                    </div>
-                                                    <div class="row">
-                                                        <lable class="">按应用：</lable>
-                                                        <select class="form-control" name="appId">
-                                                            <option value="">所有应用</option>
-                                                            <option value="1">身份证</option>
-                                                        </select>
-                                                    </div>
+                                                    <form action="${ctx}/console/cost/bill_month/get" method="get">
+                                                        <div class="row">
+                                                            <lable class="">月份：</lable>
+                                                            <input type="text" class="datepicker form-control" value='${month}' name="month" data-date-end-date="0m" />
+                                                            <button class="btn btn-primary query">查询</button>
+                                                        </div>
+                                                        <div class="row">
+                                                            <lable class="">按应用：</lable>
+                                                            <select class="form-control" name="appId">
+                                                                <option value="">所有应用</option>
+                                                                <c:forEach var="app" items="${appList}">
+                                                                    <option value="${app.id}"
+                                                                    <c:if test="${app.id eq appId}">selected="selected"</c:if>
+                                                                    >${app.name}</option>
+                                                                </c:forEach>
+                                                            </select>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -115,7 +121,7 @@
                                 <section class="panel panel-default yunhuni-personal">
                                     <div class="fix-padding">
                                         <p class="bg-success price_info">
-                                            ${month} 消费总额  <span class="text-warning"> 2000.00</span> 元
+                                            ${month} 消费总额  <span class="text-warning"> <fmt:formatNumber value="${billMonth.sumAmount==null?0:billMonth.sumAmount}" pattern="0.00"/></span> 元
                                         </p>
                                     </div>
                                 </section>
@@ -126,15 +132,27 @@
                                         <caption>消费项目</caption>
                                         <tr>
                                             <td class="extend_width">单向外呼 : </td>
-                                            <td> 120 元</td>
+                                            <td> <fmt:formatNumber value="${billMonth.singleWayCall==null?0:billMonth.singleWayCall}" pattern="0.00"/> 元</td>
                                             <td class="extend_width">双向外呼 :</td>
-                                            <td> 120 元</td>
+                                            <td> <fmt:formatNumber value="${billMonth.bothWayCall==null?0:billMonth.bothWayCall}" pattern="0.00"/> 元</td>
                                         </tr>
                                         <tr>
-                                            <td class="extend_width">单向外呼 : </td>
-                                            <td> 120 元</td>
-                                            <td class="extend_width">双向外呼 :</td>
-                                            <td> 120 元</td>
+                                            <td class="extend_width">电话会议 : </td>
+                                            <td> <fmt:formatNumber value="${billMonth.callConference==null?0:billMonth.callConference}" pattern="0.00"/> 元</td>
+                                            <td class="extend_width">电话接入IVR :</td>
+                                            <td> <fmt:formatNumber value="${billMonth.ivrCall==null?0:billMonth.ivrCall}" pattern="0.00"/> 元</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="extend_width">IVR外呼放音 : </td>
+                                            <td> <fmt:formatNumber value="${billMonth.ivrRevoice==null?0:billMonth.ivrRevoice}" pattern="0.00"/> 元</td>
+                                            <td class="extend_width">短信 :</td>
+                                            <td> <fmt:formatNumber value="${billMonth.sms==null?0:billMonth.sms}" pattern="0.00"/> 元</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="extend_width">电话通知 : </td>
+                                            <td> <fmt:formatNumber value="${billMonth.callNotice==null?0:billMonth.callNotice}" pattern="0.00"/> 元</td>
+                                            <td class="extend_width">通话录音 :</td>
+                                            <td> <fmt:formatNumber value="${billMonth.callRecord==null?0:billMonth.callRecord}" pattern="0.00"/> 元</td>
                                         </tr>
                                     </table>
                                     <button class="cost_history_download btn btn-default btn-sm">账单下载</button>
