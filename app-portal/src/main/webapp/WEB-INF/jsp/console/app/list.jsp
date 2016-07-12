@@ -295,7 +295,7 @@
                         data : {'id':id,'operate':'delete','${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
-                            showtoast(data.msg+id);
+                            showtoast(data.msg);
                         },
                         fail:function(){
                             showtoast('网络异常，请稍后重试');
