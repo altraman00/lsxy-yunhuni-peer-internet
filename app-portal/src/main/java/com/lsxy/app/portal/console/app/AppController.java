@@ -1,6 +1,5 @@
 package com.lsxy.app.portal.console.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.EntityUtils;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +34,7 @@ public class AppController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/list")
-    public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
+    public ModelAndView list(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<App>> restResponse = pageList(request,pageNo,pageSize);
         Page<App> pageObj = restResponse.getData();
@@ -45,7 +43,30 @@ public class AppController extends AbstractPortalController {
         mav.setViewName("/console/app/list");
         return mav;
     }
-
+    /**
+     * 创建应用首页
+     * @param request
+     * @return
+     */
+    @RequestMapping("/index")
+    public ModelAndView index(HttpServletRequest request){
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/console/app/index");
+        return mav;
+    }
+    /**
+     * 创建应用
+     * @param request
+     * @return
+     */
+    @RequestMapping("/create")
+    @ResponseBody
+    public Map create(HttpServletRequest request, App app){
+        saveApp(request,app,"create");
+        Map map = new HashMap();
+        map.put("msg","应用创建成功");
+        return map;
+    }
     /**
      * 获取分页信息
      * @param request

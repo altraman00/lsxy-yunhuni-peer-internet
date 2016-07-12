@@ -303,7 +303,7 @@
                     });
                     $('#app-'+id).remove();
                 }else{
-                    showtoast('取消');
+                    //showtoast('取消');
                 }
             });
         }
