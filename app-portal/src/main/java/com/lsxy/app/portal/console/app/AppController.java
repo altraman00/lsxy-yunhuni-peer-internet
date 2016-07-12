@@ -44,6 +44,32 @@ public class AppController extends AbstractPortalController {
         return mav;
     }
     /**
+     * 应用详细首页
+     * @param request
+     * @return
+     */
+    @RequestMapping("/detail")
+    public ModelAndView detail(HttpServletRequest request,String id){
+        ModelAndView mav = new ModelAndView();
+        RestResponse<App> restResponse = findById(request,id);
+        App app = restResponse.getData();
+        mav.addObject("app",app);
+        mav.setViewName("/console/app/detail");
+        return mav;
+    }
+
+    /**
+     * 根据应用id获取应用
+     * @param request
+     * @param id
+     * @return
+     */
+    private RestResponse findById(HttpServletRequest request,String id){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl + "/rest/app/find?id={1}";
+        return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,id);
+    }
+    /**
      * 创建应用首页
      * @param request
      * @return
