@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
@@ -110,6 +111,7 @@ public class RegisterController {
                 params.put("uid",account.getId());
                 params.put("code",uuid);
                 params.put("username",  URLEncoder.encode(account.getUserName(), "utf-8"));
+                params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
                 mailService.send("账号激活",account.getEmail(),"01-portal-notify-account-activate.vm",params);
 
                 if(logger.isDebugEnabled()){
