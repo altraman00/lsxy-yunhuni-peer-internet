@@ -1,18 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@include file="/inc/import.jsp" %>
-
 <!DOCTYPE html>
 <html>
+
+<!-- header -->
 <head>
     <%@include file="/inc/meta.jsp" %>
+
 </head>
+
 <body>
 <section class="vbox">
     <%@include file="/inc/headerNav.jsp"%>
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <aside class="bg-Green lter aside hidden-print include" data-include="aside" id="nav"></aside>
             <!-- /.aside -->
             <section id="content">
                 <section class="hbox stretch">
@@ -37,12 +40,12 @@
                                                 </div>
                                             </li>
                                             <li>
-                                                <div class="aside-li-a active">
+                                                <div class="aside-li-a">
                                                     <a href="${ctx}/console/cost/recharge/list">充值订单</a>
                                                 </div>
                                             </li>
                                             <li>
-                                                <div class="aside-li-a">
+                                                <div class="aside-li-a active">
                                                     <a href="${ctx}/console/cost/bill_month/get">月结账单</a>
                                                 </div>
                                             </li>
@@ -59,13 +62,13 @@
                                         <nav class="hidden-xs">
                                             <ul class="nav">
                                                 <li>
-                                                    <div class="aside-li-a">
+                                                    <div class="aside-li-a ">
                                                         <a href="./cost_invoice.html">发票信息</a>
                                                     </div>
                                                 </li>
                                                 <li>
                                                     <div class="aside-li-a">
-                                                        <a href="./cost_invoice_record.html">发票记录</a>
+                                                        <a href="./cost_invoice_record.html">发票申请</a>
                                                     </div>
                                                 </li>
                                             </ul>
@@ -73,9 +76,9 @@
                                     </div>
                                 </section>
                             </section>
+
                         </section>
                     </aside>
-
                     <aside>
                         <section class="vbox xbox">
                             <!-- 如果没有三级导航 这段代码注释-->
@@ -83,72 +86,80 @@
                                     class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                             </div>
                             <div class="wrapper header">
-                                <span class="border-left">&nbsp;充值订单记录</span>
+                                <span class="border-left">&nbsp;月结账单</span>
                             </div>
                             <section class="scrollable wrapper w-f">
                                 <section class="panel panel-default yunhuni-personal">
                                     <div class="row m-l-none m-r-none bg-light lter">
                                         <div class="col-md-12 padder-v fix-padding">
-                                            <div class='wrapperBox cost_month cost_month_select'>
+                                            <div class='wrapperBox cost_month'>
                                                 <div class="panel-body clearfix border-top-none personal-base">
-                                                    <form action="${ctx}/console/cost/recharge/list" method="get">
+                                                    <form action="${ctx}/console/cost/bill_month/get" method="get">
                                                         <div class="row">
-                                                            从
-                                                            <input type="text" class="datepicker currentMonth form-control" name="startTime" value='${startTime}' data-date-end-date="0m" />
-                                                            到
-                                                            <input type="text" class="datepicker lastMonth form-control" name="endTime" value='${endTime}' data-date-end-date="0m" />
+                                                            <lable class="">月份：</lable>
+                                                            <input type="text" class="datepicker form-control" value='${month}' name="month" data-date-end-date="0m" />
                                                             <button class="btn btn-primary query">查询</button>
+                                                        </div>
+                                                        <div class="row">
+                                                            <lable class="">按应用：</lable>
+                                                            <select class="form-control" name="appId">
+                                                                <option value="">所有应用</option>
+                                                                <c:forEach var="app" items="${appList}">
+                                                                    <option value="${app.id}"
+                                                                    <c:if test="${app.id eq appId}">selected="selected"</c:if>
+                                                                    >${app.name}</option>
+                                                                </c:forEach>
+                                                            </select>
                                                         </div>
                                                     </form>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </section>
-                                <section class="panel panel-default pos-rlt clearfix ">
-                                    <table class="table table-striped cost-table-history tablelist">
-                                        <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>订单号</th>
-                                            <th>金额</th>
-                                            <th>充值方式</th>
-                                            <th>订单创建时间</th>
-                                            <th>支付状态</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <c:forEach items="${pageObj.result}" var="result" varStatus="s">
-                                            <tr>
-                                                <td scope="row">${s.index+1}</td>
-                                                <td>${result.orderId}</td>
-                                                <td><fmt:formatNumber value="${ result.amount}" pattern="#0.00" /> </td>
-                                                <td>
-                                                    ${result.typeName}
-                                                </td>
-                                                <td>
-                                                    <fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-                                                </td>
-                                                <td>
-                                                    <c:if test="${'NOTPAID' eq result.status}">
-                                                        <a href="${ctx}/console/cost/recharge/get?orderId=${result.orderId}" class="nosuccess text-underline" >${result.statusName}</a>
-                                                    </c:if>
-                                                    <c:if test="${'PAID' eq result.status}">
-                                                        <a class="success">${result.statusName}</a>
-                                                    </c:if>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                        </tbody>
-                                    </table>
+                                <section class="panel panel-default yunhuni-personal">
+                                    <div class="fix-padding">
+                                        <p class="bg-success price_info">
+                                            ${month} 消费总额  <span class="text-warning"> <fmt:formatNumber value="${billMonth.sumAmount==null?0:billMonth.sumAmount}" pattern="0.00"/></span> 元
+                                        </p>
+                                    </div>
                                 </section>
-                                <c:set var="pageUrl" value="${ctx}/console/cost/recharge/list"></c:set>
-                                <c:set var="extraParam" value="&startTime=${startTime}&endTime=${endTime}"></c:set>
-                                <%@include file="/inc/pagefooter.jsp" %>
+
+                                <section class="panel panel-default pos-rlt clearfix ">
+
+                                    <table class="cost-table table table-striped">
+                                        <caption>消费项目</caption>
+                                        <tr>
+                                            <td class="extend_width">单向外呼 : </td>
+                                            <td> <fmt:formatNumber value="${billMonth.singleWayCall==null?0:billMonth.singleWayCall}" pattern="0.00"/> 元</td>
+                                            <td class="extend_width">双向外呼 :</td>
+                                            <td> <fmt:formatNumber value="${billMonth.bothWayCall==null?0:billMonth.bothWayCall}" pattern="0.00"/> 元</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="extend_width">电话会议 : </td>
+                                            <td> <fmt:formatNumber value="${billMonth.callConference==null?0:billMonth.callConference}" pattern="0.00"/> 元</td>
+                                            <td class="extend_width">电话接入IVR :</td>
+                                            <td> <fmt:formatNumber value="${billMonth.ivrCall==null?0:billMonth.ivrCall}" pattern="0.00"/> 元</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="extend_width">IVR外呼放音 : </td>
+                                            <td> <fmt:formatNumber value="${billMonth.ivrRevoice==null?0:billMonth.ivrRevoice}" pattern="0.00"/> 元</td>
+                                            <td class="extend_width">短信 :</td>
+                                            <td> <fmt:formatNumber value="${billMonth.sms==null?0:billMonth.sms}" pattern="0.00"/> 元</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="extend_width">电话通知 : </td>
+                                            <td> <fmt:formatNumber value="${billMonth.callNotice==null?0:billMonth.callNotice}" pattern="0.00"/> 元</td>
+                                            <td class="extend_width">通话录音 :</td>
+                                            <td> <fmt:formatNumber value="${billMonth.callRecord==null?0:billMonth.callRecord}" pattern="0.00"/> 元</td>
+                                        </tr>
+                                    </table>
+                                    <button class="cost_history_download btn btn-default btn-sm">账单下载</button>
+                                </section>
                             </section>
                         </section>
                     </aside>
-
                 </section>
                 <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
             </section>
@@ -158,7 +169,7 @@
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
-<script type="text/javascript" src="${resPrefixUrl }/js/cost/order.js"></script><!--must-->
+<script type="text/javascript" src='${resPrefixUrl }/js/cost/month.js'> </script>
 </body>
 </html>
 

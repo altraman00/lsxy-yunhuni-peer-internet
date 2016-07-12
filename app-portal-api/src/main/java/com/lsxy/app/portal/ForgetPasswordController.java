@@ -3,6 +3,7 @@ package com.lsxy.app.portal;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
@@ -72,6 +73,7 @@ public class ForgetPasswordController {
         params.put("host", SystemConfig.getProperty("portal.system.root.url"));
         params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
         params.put("key",uuid);
+        params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
         mailService.send("账号激活",email,"02-portal-notify-reset-password.vm",params);
         cacheManager.set(uuid,email,72 * 60 * 60);
         if(logger.isDebugEnabled()){

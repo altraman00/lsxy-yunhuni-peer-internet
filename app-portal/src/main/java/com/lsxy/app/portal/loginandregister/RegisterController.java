@@ -42,7 +42,7 @@ public class RegisterController {
     /**
      * 检查注册信息是否已被使用
      */
-    @RequestMapping(value = "/info_check" , method = RequestMethod.GET)
+    @RequestMapping(value = "/info_check" , method = RequestMethod.POST)
     @ResponseBody
     public Map infoCheck(@Nonnull String userName, @Nonnull String mobile,@Nonnull String email){
         Map<String,Object> result = new HashMap<>();
