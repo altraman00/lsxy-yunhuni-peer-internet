@@ -38,7 +38,7 @@ public class EntityUtils extends org.apache.commons.beanutils.BeanUtils {
 	 * @param obj
 	 * @return
      */
-	public static Map toMap(Object obj){
+	public static Map toRequestMap(Object obj){
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> map = mapper.convertValue(obj, Map.class);
 		map.remove("deleted");
