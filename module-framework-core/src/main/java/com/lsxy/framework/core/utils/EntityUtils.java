@@ -1,5 +1,6 @@
 package com.lsxy.framework.core.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.beanutils.DynaBean;
 import org.apache.commons.beanutils.DynaProperty;
 import org.apache.commons.beanutils.PropertyUtilsBean;
@@ -32,6 +33,22 @@ public class EntityUtils extends org.apache.commons.beanutils.BeanUtils {
 	private EntityUtils() {
 	}
 
+	/**
+	 * 将对象转换成Map对象，并移除日期版本等字段，如需传日期类的，单独put
+	 * @param obj
+	 * @return
+     */
+	public static Map toMap(Object obj){
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> map = mapper.convertValue(obj, Map.class);
+		map.remove("deleted");
+		map.remove("createTime");
+		map.remove("lastTime");
+		map.remove("deleteTime");
+		map.remove("sortNo");
+		map.remove("version");
+		return map;
+	}
 	/**
 	 * 复制javabean属性,可指定是否将null值的属性进行复制
 	 * @param dest

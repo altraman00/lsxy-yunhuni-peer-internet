@@ -3,6 +3,7 @@ package com.lsxy.app.portal.console.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,9 +81,8 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse saveApp(HttpServletRequest request,App app,String operate){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/app/delete?id={1}";
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.convertValue(app, Map.class);
+        String uri = restPrefixUrl +   "/rest/app/save";
+        Map<String, Object> map = EntityUtils.toMap(app);
         map.put("operate",operate);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
     }

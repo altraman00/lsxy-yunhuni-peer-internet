@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,7 +53,8 @@ public class AppController extends AbstractRestController {
      * @param operate 操作类型
      * @return
      */
-    public RestResponse save(App app,String operate)throws InvocationTargetException, IllegalAccessException{
+    @RequestMapping("/save")
+    public RestResponse save(App app,String operate) throws InvocationTargetException, IllegalAccessException {
         App resultApp = null;
         if("delete".equals(operate)){//将应用更新为删除状态
             resultApp = appService.findById(app.getId());
