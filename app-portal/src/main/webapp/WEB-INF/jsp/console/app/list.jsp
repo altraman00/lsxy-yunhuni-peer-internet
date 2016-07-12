@@ -59,7 +59,7 @@
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-12 padder-v fix-padding">
-                                        <a href="application_create.html" class="btn btn-primary query">创建应用</a>
+                                        <a href="${ctx}/console/app/index" class="btn btn-primary query">创建应用</a>
                                     </div>
                                 </div>
                             </section>
@@ -86,9 +86,9 @@
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="application_detail.html">详情</a> <span ></span>
-                                                <a onclick="delapp(${result.id},${result.status})" >删除</a> <span ></span>
-                                                <c:if test="${result.status==2}"> <a onclick="tabtarget(${result.id})" >申请上线</a></c:if>
-                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp(${result.id})">下线</a></span></c:if>
+                                                <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
+                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}')" >申请上线</a></c:if>
+                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>
                                             </td>
 
                                         </tr>
@@ -289,13 +289,13 @@
             bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
                 if(result){
                     $.ajax({
-                        url : "${ctx}/console/app/delete",
+                        url : "${ctx}/console/app/save",
                         type : 'post',
                         async: false,//使用同步的方式,true为异步方式
-                        data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                        data : {'id':id,'operate':'delete','${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
-                            showtoast(data.msg);
+                            showtoast(data.msg+id);
                         },
                         fail:function(){
                             showtoast('网络异常，请稍后重试');

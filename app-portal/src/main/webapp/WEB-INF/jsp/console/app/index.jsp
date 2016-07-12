@@ -155,6 +155,7 @@
 </section>
 </section>
 <div class="tips-toast"></div>
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/create.js'></script>
 
@@ -163,7 +164,32 @@
         var result = $('#application_create').data('bootstrapValidator').isValid();
         if(result==true){
             //提交表单
-            alert(10000);
+            var tempVal = $('#application_create').serialize().split("&");
+            var dataVal = { '${_csrf.parameterName}':'${_csrf.token}'}
+            dataVal['operate']='create';
+            for(var i=0;i<tempVal.length;i++){
+                var temp = tempVal[i].split("=");
+                if(temp[0].indexOf("is")==0){
+                    dataVal[temp[0]]=temp[1]=='on'?'1':'0';
+                }else{
+                    dataVal[temp[0]]=temp[1];
+                }
+            }
+            $.ajax({
+                url : "${ctx}/console/app/save",
+                type : 'post',
+                async: false,//使用同步的方式,true为异步方式
+                data :dataVal,
+                dataType: "json",
+                success : function(data){
+                    showtoast(data.msg);
+                    //$('#result_message').html(data.msg);
+                    //$('#result_message').show();
+                },
+                fail:function(){
+                    alert('网络异常，请稍后重试');
+                }
+            });
         }
         else{
             $('#application_create').bootstrapValidator('validate');

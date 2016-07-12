@@ -1,6 +1,8 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -23,7 +25,8 @@ import java.util.List;
 public class AppController extends AbstractRestController {
     @Autowired
     private AppService appService;
-
+    @Autowired
+    private TenantService tenantService;
     /**
      * 查找当前用户的应用
      * @throws Exception
@@ -55,6 +58,7 @@ public class AppController extends AbstractRestController {
      */
     @RequestMapping("/save")
     public RestResponse save(App app,String operate) throws InvocationTargetException, IllegalAccessException {
+        String userName = getCurrentAccountUserName();
         App resultApp = null;
         if("delete".equals(operate)){//将应用更新为删除状态
             resultApp = appService.findById(app.getId());
@@ -64,6 +68,8 @@ public class AppController extends AbstractRestController {
             EntityUtils.copyProperties(resultApp, app);
             resultApp = appService.save(resultApp);
         }else if("create".equals(operate)){//新建应用
+            Tenant tenant = tenantService.findTenantByUserName(userName);
+            app.setTenant(tenant);
             resultApp = appService.save(app);
         }
         return RestResponse.success(resultApp);

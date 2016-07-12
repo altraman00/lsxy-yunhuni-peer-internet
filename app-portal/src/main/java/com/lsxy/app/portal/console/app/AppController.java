@@ -55,19 +55,6 @@ public class AppController extends AbstractPortalController {
         return mav;
     }
     /**
-     * 创建应用
-     * @param request
-     * @return
-     */
-    @RequestMapping("/create")
-    @ResponseBody
-    public Map create(HttpServletRequest request, App app){
-        saveApp(request,app,"create");
-        Map map = new HashMap();
-        map.put("msg","应用创建成功");
-        return map;
-    }
-    /**
      * 获取分页信息
      * @param request
      * @param pageNo
@@ -80,16 +67,26 @@ public class AppController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,pageNo,pageSize);
     }
     /**
-     * 删除应用
+     * 操作应用
      * @param request
      * @return
      */
-    @RequestMapping("/delete")
+    @RequestMapping("/save")
     @ResponseBody
-    public Map delete(HttpServletRequest request, App app){
-        saveApp(request,app,"delete");
+    public Map save(HttpServletRequest request, App app,String operate){
+        String msg = "无效操作";
+        if("delete".equals(operate)){//删除应用
+            msg = "删除成功";
+        }else if("create".equals(operate)){//新增应用
+            app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
+            msg = "新建应用成功";
+        }
+        App resultApp = (App)saveApp(request,app,operate).getData();
+        if(resultApp==null){
+            msg = "无效操作";
+        }
         Map map = new HashMap();
-        map.put("msg","删除成功");
+        map.put("msg",msg);
         return map;
     }
 
