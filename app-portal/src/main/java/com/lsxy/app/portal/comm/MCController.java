@@ -1,8 +1,11 @@
 package com.lsxy.app.portal.comm;
 
+import com.lsxy.app.portal.utils.InternetProtocolUtil;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +21,10 @@ import java.util.Map;
 @RequestMapping("/mc")
 @Controller
 public class MCController {
+    public static final String IP_CODE_PREFIX = "ip_code_";
+
+    @Autowired
+    RedisCacheService redisCacheService;
     /**
      * 发送手机验证码
      */
@@ -78,6 +85,29 @@ public class MCController {
             return "1";
         }else{
             return result.getErrorMsg();
+        }
+    }
+
+
+
+
+    public boolean isNeedValidateCode(HttpServletRequest request){
+        Long expire = 60 * 60L;
+        Integer maxNum = 3;
+        String remoteAddr = InternetProtocolUtil.getRemoteAddr(request);
+        if(StringUtils.isNotBlank(remoteAddr)){
+            String key = IP_CODE_PREFIX + remoteAddr;
+            //获取缓存里的IP请求的次数，并加1
+            long num = redisCacheService.incr(key);
+            //将有效时间设置为规定的时间
+            redisCacheService.expire(key,expire);
+            if(num >= maxNum){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
         }
     }
 
