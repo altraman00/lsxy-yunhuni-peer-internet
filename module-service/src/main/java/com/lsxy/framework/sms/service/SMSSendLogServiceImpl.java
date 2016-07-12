@@ -27,7 +27,7 @@ public class SMSSendLogServiceImpl extends AbstractService<SMSSendLog> implement
 
     @Override
     public Page<SMSSendLog> findByMobile(String mobile, int pageNo, int pageSize) {
-        String hql = "from SMSSendLog obj where obj.sendTo=?1";
-        return this.findByCustom(hql,pageNo,pageSize);
+        String hql = "from SMSSendLog obj where obj.sendTo=?1 order by obj.createTime desc";
+        return this.findByCustom(hql,true,pageNo,pageSize,mobile);
     }
 }
