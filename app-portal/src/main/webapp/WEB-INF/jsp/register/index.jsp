@@ -31,7 +31,7 @@
                 <P class="col-md-3 text-right">云呼你会员注册</P>
             </div>
             <div class="row">
-                <form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" accept-charset="utf-8">
+                <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" acceptCharset="utf-8">
                     <!-- 防止表单重复提交要加这个隐藏变量 -->
                     <input type="hidden" name="submission_token" value="${submission_token}" />
                     <div class="form-group">
@@ -61,9 +61,7 @@
                         </div>
                     </div>
                     <!--提示-->
-                        <input type="hidden" name="${_csrf.parameterName}"
-                               value="${_csrf.token}" />
-                </form>
+                </form:form>
                 <div class="form-group">
                     <div class="col-lg-9 col-lg-offset-3">
                         <span id="showtips" class="tips-error" style="display: none" >用户名已经存在</span>
