@@ -6,6 +6,7 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,10 +31,64 @@ public class MCController {
      */
     @RequestMapping(value = "/send",method = RequestMethod.GET)
     @ResponseBody
-    public void getMobileCode(HttpServletRequest request,String mobile){
+    public Map send(HttpServletRequest request,String mobile,String validateCode){
+        Map<String,Object> model = new HashMap<>();
         if(StringUtils.isNotBlank(mobile)){
-            sendMobileCode(mobile);
+            //TODO 从配置文件里取出各个配置
+            Long expire = 30 * 60L;
+            Integer maxNum = 3;
+            String remoteAddr = InternetProtocolUtil.getRemoteAddr(request);
+            if(StringUtils.isNotBlank(remoteAddr)){
+                String key = IP_CODE_PREFIX + remoteAddr;
+                //获取缓存里的IP请求的次数，并加1
+                long num = redisCacheService.incr(key);
+                //将有效时间设置为规定的时间
+                redisCacheService.expire(key,expire);
+                //是否发送验证码
+                boolean sendMC;
+                if(num > maxNum){
+                    //检验图形验证码
+                    String expect = (String) request.getSession().getAttribute(PortalConstants.VC_KEY);
+                    if(StringUtils.isBlank(expect)){
+                        //没有，若没有图形验证码，返回需要图入图形认证码的提示
+                        model.put("flag",false); //认证错误
+                        model.put("vc",true);  //下一次输入要输入图形认证码
+                        model.put("err","请输入图形验证码"); //错误信息
+                        sendMC = false;
+                    }else if(!expect.equalsIgnoreCase(validateCode)){
+                        //错误，图形验证码一次验证不过就清空
+                        request.getSession().removeAttribute(PortalConstants.VC_KEY);
+                        model.put("flag",false);
+                        model.put("vc",true);
+                        if(StringUtils.isBlank(validateCode)){
+                            model.put("err","请输入图形验证码");
+                        }else{
+                            model.put("err","图形认证码错误");
+                        }
+                        sendMC = false;
+                    }else{
+                        //正确，清空图形验证码
+                        request.getSession().removeAttribute(PortalConstants.VC_KEY);
+                        model.put("flag",true); //认证通过
+                        sendMC = true;
+                    }
+                }else{
+                    model.put("flag",true); //认证通过
+                    sendMC = true;
+                }
+                if(sendMC){
+                    //发送手机验证码
+                    sendMobileCode(mobile);
+                }
+            }else{
+                model.put("flag",false);
+                model.put("err","IP异常");
+            }
+        }else{
+            model.put("flag",false);
+            model.put("err","请输入手机号");
         }
+        return model;
     }
 
     /**
@@ -85,29 +140,6 @@ public class MCController {
             return "1";
         }else{
             return result.getErrorMsg();
-        }
-    }
-
-
-
-
-    public boolean isNeedValidateCode(HttpServletRequest request){
-        Long expire = 60 * 60L;
-        Integer maxNum = 3;
-        String remoteAddr = InternetProtocolUtil.getRemoteAddr(request);
-        if(StringUtils.isNotBlank(remoteAddr)){
-            String key = IP_CODE_PREFIX + remoteAddr;
-            //获取缓存里的IP请求的次数，并加1
-            long num = redisCacheService.incr(key);
-            //将有效时间设置为规定的时间
-            redisCacheService.expire(key,expire);
-            if(num >= maxNum){
-                return false;
-            }else{
-                return true;
-            }
-        }else{
-            return false;
         }
     }
 
