@@ -3,9 +3,8 @@ package com.lsxy.framework.sms.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.sms.model.SMSSendLog;
 import com.lsxy.framework.api.sms.service.SMSSendLogService;
-import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.sms.dao.SMSSendLogDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,9 @@ public class SMSSendLogServiceImpl extends AbstractService<SMSSendLog> implement
         return smsSendLogDao;
     }
 
-
-
+    @Override
+    public Page<SMSSendLog> findByMobile(String mobile, int pageNo, int pageSize) {
+        String hql = "from SMSSendLog obj where obj.sendTo=?1";
+        return this.findByCustom(hql,pageNo,pageSize);
+    }
 }
