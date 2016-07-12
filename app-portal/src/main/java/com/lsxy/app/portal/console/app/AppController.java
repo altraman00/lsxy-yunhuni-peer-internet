@@ -100,7 +100,7 @@ public class AppController extends AbstractPortalController {
     private RestResponse saveApp(HttpServletRequest request,App app,String operate){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/app/save";
-        Map<String, Object> map = EntityUtils.toMap(app);
+        Map<String, Object> map = EntityUtils.toRequestMap(app);
         map.put("operate",operate);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
     }
