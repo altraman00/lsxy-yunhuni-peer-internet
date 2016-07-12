@@ -10,7 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
  * Created by Tandy on 2016/6/7.
@@ -50,6 +52,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .ignoringAntMatchers(loginPage,logoutPage,"/test/upload/*");
 //                .and()
 //                    .exceptionHandling().accessDeniedPage("/exception/403");
+
+
+                //CharacterEncodingFilter 过滤器如果碰到Security，必须添加在Security前面，否则会出现乱码问题
+                CharacterEncodingFilter filter = new CharacterEncodingFilter();
+                filter.setEncoding("UTF-8");
+                filter.setForceEncoding(true);
+                http.addFilterBefore(filter,CsrfFilter.class);
     }
 
     @Bean
