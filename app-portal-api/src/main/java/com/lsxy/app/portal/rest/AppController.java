@@ -1,6 +1,8 @@
 package com.lsxy.app.portal.rest;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.base.IdEntity;
+import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -46,16 +48,23 @@ public class AppController extends AbstractRestController {
     }
 
     /**
-     * 更新应用状态
-     * @param id 应用id
+     * 更新应用信息
+     * @param app app对象
+     * @param operate 操作类型
      * @return
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
-    @RequestMapping("/delete")
-    public RestResponse delete(String id) throws InvocationTargetException, IllegalAccessException {
-        App oldApp = appService.findById(id);
-        appService.delete(oldApp);
-        return RestResponse.success(oldApp);
+    public RestResponse save(App app,String operate)throws InvocationTargetException, IllegalAccessException{
+        App resultApp = null;
+        if("delete".equals(operate)){//将应用更新为删除状态
+            resultApp = appService.findById(app.getId());
+            appService.delete(resultApp);
+        }else if("update".equals(operate)){//更新应用信息
+            resultApp = appService.findById(app.getId());
+            EntityUtils.copyProperties(resultApp, app);
+            resultApp = appService.save(resultApp);
+        }else if("create".equals(operate)){//新建应用
+            resultApp = appService.save(app);
+        }
+        return RestResponse.success(resultApp);
     }
 }

@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.console.app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
@@ -62,22 +63,26 @@ public class AppController extends AbstractPortalController {
      */
     @RequestMapping("/delete")
     @ResponseBody
-    public Map delete(HttpServletRequest request, String id){
-        deleteApp(request,id);
+    public Map delete(HttpServletRequest request, App app){
+        saveApp(request,app,"delete");
         Map map = new HashMap();
         map.put("msg","删除成功");
         return map;
     }
 
     /**
-     * 将应用状态改为删除
+     * 操作应用
      * @param request
-     * @param id 应用id
+     * @param app 应用对象
+     * @param operate 操作类型 删除delete，更新update，新建create
      * @return
      */
-    private RestResponse deleteApp(HttpServletRequest request,String id){
+    private RestResponse saveApp(HttpServletRequest request,App app,String operate){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl + "/rest/app/delete?id={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri,App.class,id);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(app, Map.class);
+        map.put("operate",operate);
+        return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
     }
 }
