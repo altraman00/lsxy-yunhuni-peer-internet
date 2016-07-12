@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest;
+package com.lsxy.app.portal.rest.test;
 
 import com.lsxy.framework.sms.service.SmsService;
 import com.lsxy.framework.web.rest.RestResponse;

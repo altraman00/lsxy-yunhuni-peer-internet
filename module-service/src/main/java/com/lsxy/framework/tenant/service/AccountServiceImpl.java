@@ -67,6 +67,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public Account findAccountByUserName(String userName) {
+
         return accountDao.findByUserNameAndStatus(userName,Account.STATUS_NORMAL);
     }
 

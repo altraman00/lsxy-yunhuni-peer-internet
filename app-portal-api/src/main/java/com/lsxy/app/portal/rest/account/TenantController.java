@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest;
+package com.lsxy.app.portal.rest.account;
 
 import com.lsxy.framework.api.tenant.model.Tenant;
 import org.springframework.web.bind.annotation.RequestMapping;
