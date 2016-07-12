@@ -172,7 +172,7 @@
                 if(temp[0].indexOf("is")==0){
                     dataVal[temp[0]]=temp[1]=='on'?'1':'0';
                 }else{
-                    dataVal[temp[0]]=temp[1];
+                    dataVal[temp[0]]=decodeURI(decodeURI((temp[1]),"UTF-8"));
                 }
             }
             $.ajax({
