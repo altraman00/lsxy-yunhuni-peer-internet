@@ -82,6 +82,7 @@ public class AppController extends AbstractPortalController {
     @ResponseBody
     public Map create(HttpServletRequest request, App app){
         app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
+        createApp(request,app);
         Map map = new HashMap();
         map.put("msg","新建应用成功");
         return map;
