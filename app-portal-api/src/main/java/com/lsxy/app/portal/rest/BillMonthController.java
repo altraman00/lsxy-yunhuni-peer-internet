@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by liups on 2016/7/11.
  */
@@ -26,7 +28,7 @@ public class BillMonthController extends AbstractRestController {
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
         }
         String userName = getCurrentAccountUserName();
-        BillMonth billMonth = billMonthService.getBillMonth(userName, appId, month);
+        List<BillMonth> billMonth = billMonthService.getBillMonths(userName, appId, month);
         return RestResponse.success(billMonth);
     }
 }

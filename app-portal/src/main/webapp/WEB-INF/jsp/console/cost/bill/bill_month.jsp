@@ -115,13 +115,12 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </section>
                                 <section class="panel panel-default yunhuni-personal">
                                     <div class="fix-padding">
                                         <p class="bg-success price_info">
-                                            ${month} 消费总额  <span class="text-warning"> <fmt:formatNumber value="${billMonth.sumAmount==null?0:billMonth.sumAmount}" pattern="0.00"/></span> 元
+                                            ${month} 消费总额  <span class="text-warning"> <fmt:formatNumber value="${sumAmount==null?0:sumAmount}" pattern="0.00"/></span> 元
                                         </p>
                                     </div>
                                 </section>
@@ -130,30 +129,18 @@
 
                                     <table class="cost-table table table-striped">
                                         <caption>消费项目</caption>
-                                        <tr>
-                                            <td class="extend_width">单向外呼 : </td>
-                                            <td> <fmt:formatNumber value="${billMonth.singleWayCall==null?0:billMonth.singleWayCall}" pattern="0.00"/> 元</td>
-                                            <td class="extend_width">双向外呼 :</td>
-                                            <td> <fmt:formatNumber value="${billMonth.bothWayCall==null?0:billMonth.bothWayCall}" pattern="0.00"/> 元</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="extend_width">电话会议 : </td>
-                                            <td> <fmt:formatNumber value="${billMonth.callConference==null?0:billMonth.callConference}" pattern="0.00"/> 元</td>
-                                            <td class="extend_width">电话接入IVR :</td>
-                                            <td> <fmt:formatNumber value="${billMonth.ivrCall==null?0:billMonth.ivrCall}" pattern="0.00"/> 元</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="extend_width">IVR外呼放音 : </td>
-                                            <td> <fmt:formatNumber value="${billMonth.ivrRevoice==null?0:billMonth.ivrRevoice}" pattern="0.00"/> 元</td>
-                                            <td class="extend_width">短信 :</td>
-                                            <td> <fmt:formatNumber value="${billMonth.sms==null?0:billMonth.sms}" pattern="0.00"/> 元</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="extend_width">电话通知 : </td>
-                                            <td> <fmt:formatNumber value="${billMonth.callNotice==null?0:billMonth.callNotice}" pattern="0.00"/> 元</td>
-                                            <td class="extend_width">通话录音 :</td>
-                                            <td> <fmt:formatNumber value="${billMonth.callRecord==null?0:billMonth.callRecord}" pattern="0.00"/> 元</td>
-                                        </tr>
+                                        <c:forEach items="${billMonths}" var="billMonth" varStatus="s">
+                                            <c:if test="${s.index % 2 == 0}">
+                                            <tr>
+                                            </c:if>
+                                                <td class="extend_width">${billMonth.type} : </td>
+                                                <td> <fmt:formatNumber value="${billMonth.amount==null?0:billMonth.amount}" pattern="0.00"/> 元</td>
+                                            <c:if test="${s.index % 2 == 1 || fn:length(billMonths) == (s.index -1)}">
+                                            </tr>
+                                            </c:if>
+                                        </c:forEach>
+
+
                                     </table>
                                     <button class="cost_history_download btn btn-default btn-sm">账单下载</button>
                                 </section>
