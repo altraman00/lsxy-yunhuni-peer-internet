@@ -105,7 +105,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" placeholder="" class="form-control input-form notEmpty"/>
+                                                <input type="text" name="url" placeholder="" class="form-control input-form"/>
                                             </div>
                                         </div>
 
@@ -165,8 +165,7 @@
         if(result==true){
             //提交表单
             var tempVal = $('#application_create').serialize().split("&");
-            var dataVal = { '${_csrf.parameterName}':'${_csrf.token}'}
-            dataVal['operate']='create';
+            var dataVal = { '${_csrf.parameterName}':'${_csrf.token}'};
             for(var i=0;i<tempVal.length;i++){
                 var temp = tempVal[i].split("=");
                 if(temp[0].indexOf("is")==0){
@@ -176,18 +175,16 @@
                 }
             }
             $.ajax({
-                url : "${ctx}/console/app/save",
+                url : "${ctx}/console/app/create",
                 type : 'post',
                 async: false,//使用同步的方式,true为异步方式
                 data :dataVal,
                 dataType: "json",
                 success : function(data){
-                    showtoast(data.msg);
-                    //$('#result_message').html(data.msg);
-                    //$('#result_message').show();
+                    showtoastAppIndex(data.msg);
                 },
                 fail:function(){
-                    alert('网络异常，请稍后重试');
+                    showtoast('网络异常，请稍后重试');
                 }
             });
         }
@@ -196,6 +193,14 @@
         }
 
     });
+    function showtoastAppIndex(tips) {
+        $('.tips-toast').css('display','block').html(tips);
+        setTimeout("hidetoastAppIndex()",2000);
+    }
+    function hidetoastAppIndex(){
+        $('.tips-toast').fadeOut(1000);
+        window.location.href="${ctx}/console/app/list";
+    }
 </script>
 
 </body>
