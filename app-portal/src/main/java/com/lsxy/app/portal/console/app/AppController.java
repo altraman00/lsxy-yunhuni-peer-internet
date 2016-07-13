@@ -69,6 +69,7 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/delete")
     @ResponseBody
     public Map delete(HttpServletRequest request,String id){
+        deleteApp(request,id);
         Map map = new HashMap();
         map.put("msg","删除成功");
         return map;
