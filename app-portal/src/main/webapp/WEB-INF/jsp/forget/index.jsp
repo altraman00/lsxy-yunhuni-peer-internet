@@ -73,8 +73,8 @@
                             <div class="col-md-5">
                                 <button class="sendcode" type="button" id="send-code" >发送验证码</button>
                             </div>
-                            <div class="input in-block" id="second-codeblock" ></div>
                         </div>
+                        <div class="row code-box" id="second-codeblock" ></div>
                         <div class="row">
                             <div class="col-md-12">
                                 <span id="mobileCodeTips" class="tips-error" style="display: none" ></span>
@@ -130,7 +130,7 @@
         var mobile = $("input[name='mobile']").val();
         var vCode = "";
         if(mobile == ""){
-            tipsmsg("请填入手机号","mobileCodeTips");
+            tipsmsg("请填入手机号","mobileTips");
             return false;
         }else{
             var bol = checkMobile(mobile);//手机是否有效
@@ -140,7 +140,8 @@
                     if($('#second-code').length>0){
                         var second = $('#second-code').val();
                         if(second.length!=4){
-                            tipsmsg('请输入四位验证码','mobileCodeTips'); return false;
+                            tipsmsg('请输入四位验证码','secondcodeTips');
+                            return false;
                         }
                     }
                     vCode = $("#second-code").val();
