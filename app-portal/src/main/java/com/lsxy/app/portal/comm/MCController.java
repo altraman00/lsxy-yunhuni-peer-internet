@@ -2,6 +2,7 @@ package com.lsxy.app.portal.comm;
 
 import com.lsxy.app.portal.utils.InternetProtocolUtil;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
@@ -34,18 +35,16 @@ public class MCController {
     public Map send(HttpServletRequest request,String mobile,String validateCode){
         Map<String,Object> model = new HashMap<>();
         if(StringUtils.isNotBlank(mobile)){
-            //TODO 从配置文件里取出各个配置
-            Long expire = 30 * 60L;
-            Integer maxNum = 3;
+            Long expire = Long.parseLong(SystemConfig.getProperty("global.sms.vc.ip.expire",(30*60)+""));
+            Integer maxNum = Integer.parseInt(SystemConfig.getProperty("global.sms.vc.ip.count",3+""));
             String remoteAddr = InternetProtocolUtil.getRemoteAddr(request);
             if(StringUtils.isNotBlank(remoteAddr)){
                 String key = IP_CODE_PREFIX + remoteAddr;
                 //获取缓存里的IP请求的次数，并加1
                 long num = redisCacheService.incr(key);
-                //将有效时间设置为规定的时间
+                //将缓存有效时间设置为规定的时间(超过有效时间后将清空并重新计数)
                 redisCacheService.expire(key,expire);
-                //是否发送验证码
-                boolean sendMC;
+                boolean sendMC;  //是否发送验证码
                 if(num > maxNum){
                     //检验图形验证码
                     String expect = (String) request.getSession().getAttribute(PortalConstants.VC_KEY);
