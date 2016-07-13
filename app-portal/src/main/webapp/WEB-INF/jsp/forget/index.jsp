@@ -63,6 +63,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <input class="form-control" name="mobile" id="mobile" placeholder="输入注册手机号"  />
+                                <small id="mobileTips" class="help-block tips-error" ></small>
                             </div>
                         </div>
                         <div class="row">
@@ -126,7 +127,7 @@
     function send_mobile_code(){
         var mobile = $("input[name='mobile']").val();
         if(mobile == ""){
-            tipsmsg("请填入手机号","mobileCodeTips");
+            tipsmsg("请填入手机号","mobileTips");
             return false;
         }else{
             var bol = false;
@@ -141,7 +142,7 @@
                         bol = true;
                     }else{
                         //显示showtips
-                        tipsmsg(result.err,"mobileCodeTips");
+                        tipsmsg(result.err,"mobileTips");
                     }
                 }
             });
