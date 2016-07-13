@@ -66,8 +66,8 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse findById(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/app/find?id={1}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,id);
+        String uri = restPrefixUrl + "/rest/app/find_by_id?id={1}";
+        return RestRequest.buildSecurityRequest(token).get(uri,App.class,id);
     }
     /**
      * 创建应用首页
@@ -75,8 +75,13 @@ public class AppController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request){
+    public ModelAndView index(HttpServletRequest request,String id){
         ModelAndView mav = new ModelAndView();
+        if(id!=null&&id.length()>0) {//修改时使用
+            RestResponse<App> restResponse = findById(request, id);
+            App app = restResponse.getData();
+            mav.addObject("app", app);
+        }
         mav.setViewName("/console/app/index");
         return mav;
     }
@@ -106,6 +111,8 @@ public class AppController extends AbstractPortalController {
         }else if("create".equals(operate)){//新增应用
             app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
             msg = "新建应用成功";
+        }else if("update".equals(operate)){
+            msg = "应用修改成功";
         }
         App resultApp = (App)saveApp(request,app,operate).getData();
         if(resultApp==null){

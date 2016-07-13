@@ -50,6 +50,16 @@ public class AppController extends AbstractRestController {
     }
 
     /**
+     * 根据appId查找应用
+     * @param id 应用id
+     * @return
+     */
+    @RequestMapping("/find_by_id")
+    public RestResponse findById(String id){
+        App app = appService.findById(id);
+        return RestResponse.success(app);
+    }
+    /**
      * 更新应用信息
      * @param app app对象
      * @param operate 操作类型
