@@ -61,6 +61,10 @@
                                 <div class="row">
 
                                     <form role="form" action="./index.html" method="post" class="register-form" id="application_create">
+                                        <c:if test="${app.id!=null}">
+                                            <input type="hidden" name="id" value="${app.id}">
+                                            <input type="hidden" name="status" value="${app.status}">
+                                        </c:if>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
                                             <div class="col-md-4">

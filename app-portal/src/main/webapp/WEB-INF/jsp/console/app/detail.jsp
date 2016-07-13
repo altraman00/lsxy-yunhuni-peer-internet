@@ -102,7 +102,10 @@
                                         监听通知：
                                     </div>
                                     <div class="col-md-10 ">
-                                        <p><c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if></p>
+                                        <p>
+                                            <c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if>
+                                            <c:if test="${app.isAuth!='1'}">没有启动监听</c:if>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="row ">
