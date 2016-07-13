@@ -96,7 +96,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse deleteApp(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/delete?{1}";
+        String uri = restPrefixUrl +   "/rest/app/delete?id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
