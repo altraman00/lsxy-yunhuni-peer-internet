@@ -289,7 +289,7 @@
             bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
                 if(result){
                     $.ajax({
-                        url : "${ctx}/console/app/save",
+                        url : "${ctx}/console/app/delete",
                         type : 'post',
                         async: false,//使用同步的方式,true为异步方式
                         data : {'id':id,'operate':'delete','${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象

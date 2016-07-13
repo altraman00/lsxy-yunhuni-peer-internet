@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.console.app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.EntityUtils;
@@ -38,7 +39,6 @@ public class AppController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<App>> restResponse = pageList(request,pageNo,pageSize);
         Page<App> pageObj = restResponse.getData();
-        mav.addObject("msg",request.getSession().getAttribute("msg"));
         mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/app/list");
         return mav;
@@ -66,42 +66,48 @@ public class AppController extends AbstractPortalController {
         String uri = restPrefixUrl + "/rest/app/page_list?pageNo={1}&pageSize={2}";
         return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,pageNo,pageSize);
     }
-    /**
-     * 操作应用
-     * @param request
-     * @return
-     */
-    @RequestMapping("/save")
+    @RequestMapping("/delete")
     @ResponseBody
-    public Map save(HttpServletRequest request, App app,String operate){
-        String msg = "无效操作";
-        if("delete".equals(operate)){//删除应用
-            msg = "删除成功";
-        }else if("create".equals(operate)){//新增应用
-            app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
-            msg = "新建应用成功";
-        }
-        App resultApp = (App)saveApp(request,app,operate).getData();
-        if(resultApp==null){
-            msg = "无效操作";
-        }
+    public Map delete(HttpServletRequest request,String id){
         Map map = new HashMap();
-        map.put("msg",msg);
+        map.put("msg","删除成功");
         return map;
     }
-
     /**
-     * 操作应用
+     * 新建应用
      * @param request
-     * @param app 应用对象
-     * @param operate 操作类型 删除delete，更新update，新建create
      * @return
      */
-    private RestResponse saveApp(HttpServletRequest request,App app,String operate){
+    @RequestMapping("/create")
+    @ResponseBody
+    public Map create(HttpServletRequest request, App app){
+        app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
+        Map map = new HashMap();
+        map.put("msg","新建应用成功");
+        return map;
+    }
+    /**
+     * 删除应用
+     * @param request
+     * @param id 应用id
+     * @return
+     */
+    private RestResponse deleteApp(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/save";
-        Map<String, Object> map = EntityUtils.toRequestMap(app);
-        map.put("operate",operate);
+        String uri = restPrefixUrl +   "/rest/app/delete?{1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
+    }
+    /**
+     * 新建应用
+     * @param request
+     * @param app 应用对象
+     * @return
+     */
+    private RestResponse createApp(HttpServletRequest request,App app){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app/create";
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(app, Map.class);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
     }
 }
