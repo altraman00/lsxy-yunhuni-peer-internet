@@ -1,8 +1,8 @@
 package com.lsxy.app.portal.console.app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -58,6 +58,33 @@ public class AppController extends AbstractPortalController {
         }
         mav.setViewName("/console/app/index");
         return mav;
+    }
+
+    /**
+     * 详情页入口
+     * @param request
+     * @param id
+     * @return
+     */
+    @RequestMapping("/detail")
+    public ModelAndView detail(HttpServletRequest request,String id){
+        ModelAndView mav = new ModelAndView();
+        RestResponse<App> restResponse = findById(request, id);
+        App app = restResponse.getData();
+        mav.addObject("app", app);
+        mav.setViewName("/console/app/index");
+        return mav;
+    }
+    /**
+     * 根据id查找应用
+     * @param request
+     * @param id
+     * @return
+     */
+    private RestResponse findById(HttpServletRequest request,String id ){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app/find_by_id?{1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
      * 获取分页信息
