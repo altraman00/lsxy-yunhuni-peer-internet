@@ -62,7 +62,7 @@
                                     </div>
                                 </div>
                             </section>
-                            <section class="panel panel-default pos-rlt clearfix ">
+                            <section class="panel panel-default pos-rlt clearfix appliaction-detail">
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-130">
                                         应用名称：
@@ -121,11 +121,11 @@
                                         绑定测试号：
                                     </div>
                                     <div class="col-md-3 " >
-                                        <span href="">13971068693</span>
-                                        <span href="">13971068693</span>
-                                        <span href="">13971068693</span>
-                                        <span href="">13971068693</span>
-                                        <span href="">13971068693</span>
+                                        <c:forEach items="${testNumBindList}" var="testNumBind">
+                                            <c:if test="${testNumBind.app.id==app.id}">
+                                                <span href="">${testNumBind.number}</span>
+                                            </c:if>
+                                        </c:forEach>
                                     </div>
                                     <div class="col-md-4 " >
                                         <a class="modalShow" data-id="one">绑定交互测试号</a>
@@ -241,17 +241,12 @@
     <div class="content">
         <p class="info">注意：一个测试号码同一时间只能绑定到一个应用，绑定完成后，其之前的绑定关系将会被解除</p>
         <div class="input-box ">
-            <form action="" method="">
-                <div class="row mt-20">
-                    <div class="col-md-4">  <input type="checkbox" class="check-box" />13971068693</div>
-                    <div class="col-md-4">  <input type="checkbox" class="check-box" />13971068693</div>
-                    <div class="col-md-4">  <input type="checkbox" class="check-box" />13971068693</div>
-                </div>
-                <div class="row mt-20">
-                    <div class="col-md-4">  <input type="checkbox" class="check-box" />13971068693</div>
-                    <div class="col-md-4">  <input type="checkbox" class="check-box" />13971068693</div>
-                    <div class="col-md-4">  <input type="checkbox" class="check-box" />13971068693</div>
-                </div>
+            <form action="${ctx}/" method="">
+                <c:forEach items="${testNumBindList}" var="testNumBind" varStatus="s">
+                    <c:if test="${s.index+1/3==0}"><div class="row mt-20"></c:if>
+                    <div class="col-md-4">  <input type="checkbox" class="check-box" <c:if test="${testNumBind.app.id==app.id}">checked </c:if> />${testNumBind.number}</div>
+                    <c:if test="${s.index+1/3==0}"></div></c:if>
+                </c:forEach>
             </form>
         </div>
     </div>

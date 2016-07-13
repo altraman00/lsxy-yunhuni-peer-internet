@@ -2,11 +2,13 @@ package com.lsxy.app.portal.console.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.console.telenum.TestNumBindController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,10 +41,19 @@ public class AppController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<App>> restResponse = pageList(request,pageNo,pageSize);
         Page<App> pageObj = restResponse.getData();
-        mav.addObject("msg",request.getSession().getAttribute("msg"));
         mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/app/list");
         return mav;
+    }
+    /**
+     * 获取租户下所有测试绑定号码
+     * @param request
+     * @return
+     */
+    private RestResponse getTestNumBindList(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/test_num_bind/list";
+        return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
     }
     /**
      * 创建应用首页
@@ -72,6 +84,8 @@ public class AppController extends AbstractPortalController {
         RestResponse<App> restResponse = findById(request, id);
         App app = restResponse.getData();
         mav.addObject("app", app);
+        List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
+        mav.addObject("testNumBindList",testNumBindList);
         mav.setViewName("/console/app/detail");
         return mav;
     }

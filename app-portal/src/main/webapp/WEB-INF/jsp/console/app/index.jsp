@@ -196,7 +196,13 @@
                 data :dataVal,
                 dataType: "json",
                 success : function(data){
-                    showtoastAppIndex(data.msg);
+                    var url = "";
+                    if($('#validateBtn').html().trim()=='创建'){
+                        url="${ctx}/console/app/list";
+                    }else{
+                        url="${ctx}/console/app/detail?id=${app.id}";
+                    }
+                    showtoast(data.msg,url);
                 },
                 fail:function(){
                     showtoast('网络异常，请稍后重试');
@@ -206,20 +212,7 @@
         else{
             $('#application_create').bootstrapValidator('validate');
         }
-
     });
-    function showtoastAppIndex(tips) {
-        $('.tips-toast').css('display','block').html(tips);
-        setTimeout("hidetoastAppIndex()",2000);
-    }
-    function hidetoastAppIndex(){
-        $('.tips-toast').fadeOut(1000);
-        if($('#validateBtn').html().trim()=='创建'){
-            window.location.href="${ctx}/console/app/list";
-        }else{
-            window.location.href="${ctx}/console/app/detail?id=${app.id}";
-        }
-    }
 </script>
 
 </body>
