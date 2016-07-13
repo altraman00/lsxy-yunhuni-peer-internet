@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.app;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -33,7 +34,7 @@ public class AppController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/list")
-    public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
+    public ModelAndView list(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
         ModelAndView mav = new ModelAndView();
         RestResponse<Page<App>> restResponse = pageList(request,pageNo,pageSize);
         Page<App> pageObj = restResponse.getData();
@@ -42,7 +43,17 @@ public class AppController extends AbstractPortalController {
         mav.setViewName("/console/app/list");
         return mav;
     }
-
+    /**
+     * 创建应用首页
+     * @param request
+     * @return
+     */
+    @RequestMapping("/index")
+    public ModelAndView index(HttpServletRequest request){
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/console/app/index");
+        return mav;
+    }
     /**
      * 获取分页信息
      * @param request
@@ -56,28 +67,41 @@ public class AppController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,pageNo,pageSize);
     }
     /**
-     * 删除应用
+     * 操作应用
      * @param request
      * @return
      */
-    @RequestMapping("/delete")
+    @RequestMapping("/save")
     @ResponseBody
-    public Map delete(HttpServletRequest request, String id){
-        deleteApp(request,id);
+    public Map save(HttpServletRequest request, App app,String operate){
+        String msg = "无效操作";
+        if("delete".equals(operate)){//删除应用
+            msg = "删除成功";
+        }else if("create".equals(operate)){//新增应用
+            app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
+            msg = "新建应用成功";
+        }
+        App resultApp = (App)saveApp(request,app,operate).getData();
+        if(resultApp==null){
+            msg = "无效操作";
+        }
         Map map = new HashMap();
-        map.put("msg","删除成功");
+        map.put("msg",msg);
         return map;
     }
 
     /**
-     * 将应用状态改为删除
+     * 操作应用
      * @param request
-     * @param id 应用id
+     * @param app 应用对象
+     * @param operate 操作类型 删除delete，更新update，新建create
      * @return
      */
-    private RestResponse deleteApp(HttpServletRequest request,String id){
+    private RestResponse saveApp(HttpServletRequest request,App app,String operate){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/app/delete?id={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri,App.class,id);
+        String uri = restPrefixUrl +   "/rest/app/save";
+        Map<String, Object> map = EntityUtils.toRequestMap(app);
+        map.put("operate",operate);
+        return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
     }
 }
