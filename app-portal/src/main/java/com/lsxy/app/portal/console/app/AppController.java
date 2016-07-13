@@ -101,6 +101,7 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/delete")
     @ResponseBody
     public Map delete(HttpServletRequest request,String id){
+        deleteApp(request,id);
         Map map = new HashMap();
         map.put("msg","删除成功");
         return map;
@@ -127,7 +128,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse deleteApp(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/delete?{1}";
+        String uri = restPrefixUrl +   "/rest/app/delete?id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**

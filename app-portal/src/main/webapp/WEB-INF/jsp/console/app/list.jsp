@@ -292,7 +292,7 @@
                         url : "${ctx}/console/app/delete",
                         type : 'post',
                         async: false,//使用同步的方式,true为异步方式
-                        data : {'id':id,'operate':'delete','${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                        data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
                             showtoast(data.msg);
