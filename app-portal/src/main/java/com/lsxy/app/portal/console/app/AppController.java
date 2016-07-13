@@ -72,7 +72,7 @@ public class AppController extends AbstractPortalController {
         RestResponse<App> restResponse = findById(request, id);
         App app = restResponse.getData();
         mav.addObject("app", app);
-        mav.setViewName("/console/app/index");
+        mav.setViewName("/console/app/detail");
         return mav;
     }
     /**
@@ -83,7 +83,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse findById(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/find_by_id?{1}";
+        String uri = restPrefixUrl +   "/rest/app/find_by_id?id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
@@ -132,6 +132,19 @@ public class AppController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
+     * 更新应用
+     * @param request
+     * @return
+     */
+    @RequestMapping("/update")
+    @ResponseBody
+    public Map update(HttpServletRequest request, App app){
+        updateApp(request,app);
+        Map map = new HashMap();
+        map.put("msg","应用修改成功");
+        return map;
+    }
+    /**
      * 新建应用
      * @param request
      * @param app 应用对象
@@ -140,6 +153,19 @@ public class AppController extends AbstractPortalController {
     private RestResponse createApp(HttpServletRequest request,App app){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/app/create";
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(app, Map.class);
+        return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
+    }
+    /**
+     * 更新应用
+     * @param request
+     * @param app 应用对象
+     * @return
+     */
+    private RestResponse updateApp(HttpServletRequest request,App app){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app/update";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(app, Map.class);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);

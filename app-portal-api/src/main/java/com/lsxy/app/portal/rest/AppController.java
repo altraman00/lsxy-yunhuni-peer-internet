@@ -85,4 +85,17 @@ public class AppController extends AbstractRestController {
         app = appService.save(app);
         return RestResponse.success(app);
     }
+    /**
+     * 新建应用
+     * @param app app对象
+     * @return
+     */
+    @RequestMapping("/update")
+    public RestResponse update(App app ) throws InvocationTargetException, IllegalAccessException {
+        String userName = getCurrentAccountUserName();
+        App resultApp = appService.findById(app.getId());
+        EntityUtils.copyProperties(resultApp,app);
+        resultApp = appService.save(resultApp);
+        return RestResponse.success(resultApp);
+    }
 }

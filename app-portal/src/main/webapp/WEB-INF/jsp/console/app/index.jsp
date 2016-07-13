@@ -108,7 +108,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form notEmpty"/>
+                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form"/>
                                             </div>
                                         </div>
 
@@ -177,7 +177,6 @@
             //提交表单
             var tempVal = $('#application_create').serialize().split("&");
             var dataVal = { '${_csrf.parameterName}':'${_csrf.token}'}
-            dataVal['operate']=tempType;
             for(var i=0;i<tempVal.length;i++){
                 var temp = tempVal[i].split("=");
                 if(temp[0].indexOf("is")==0){
@@ -187,7 +186,7 @@
                 }
             }
             $.ajax({
-                url : "${ctx}/console/app/create",
+                url : "${ctx}/console/app/"+tempType,
                 type : 'post',
                 async: false,//使用同步的方式,true为异步方式
                 data :dataVal,
@@ -211,7 +210,11 @@
     }
     function hidetoastAppIndex(){
         $('.tips-toast').fadeOut(1000);
-        window.location.href="${ctx}/console/app/list";
+        if($('#validateBtn').html().trim()=='创建'){
+            window.location.href="${ctx}/console/app/list";
+        }else{
+            window.location.href="${ctx}/console/app/detail?id=${app.id}";
+        }
     }
 </script>
 
