@@ -33,8 +33,10 @@ public class BillMonthController extends AbstractPortalController {
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
         }
         String token = this.getSecurityToken(request);
-        BillMonth billMonth = getBillMonthRest(token, appId, month);
-        model.put("billMonth",billMonth);
+        List<BillMonth> billMonths = getBillMonthRest(token, appId, month);
+        Double sumAmount = billMonths.stream().map(b -> b.getAmount()).reduce(0D, (sum, item) -> sum + item);
+        model.put("sumAmount",sumAmount);
+        model.put("billMonths",billMonths);
         model.put("appList",getAppList(token));
         model.put("month",month);
         model.put("appId",appId);
@@ -48,9 +50,9 @@ public class BillMonthController extends AbstractPortalController {
      * @param month 查询时间（月份）
      * @return
      */
-    private BillMonth getBillMonthRest(String token,String appId, String month){
+    private List<BillMonth> getBillMonthRest(String token,String appId, String month){
         String getUrl = PortalConstants.REST_PREFIX_URL + "/rest/bill_month/get?appId={1}&month={2}";
-        RestResponse<BillMonth> response = RestRequest.buildSecurityRequest(token).get(getUrl, BillMonth.class, appId, month);
+        RestResponse<List<BillMonth>> response = RestRequest.buildSecurityRequest(token).getList(getUrl, BillMonth.class, appId, month);
         return response.getData();
     }
 
