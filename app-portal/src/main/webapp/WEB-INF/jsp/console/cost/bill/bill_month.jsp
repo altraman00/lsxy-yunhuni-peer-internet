@@ -124,26 +124,29 @@
                                         </p>
                                     </div>
                                 </section>
+                                <c:if test="${billMonths != null && fn:length(billMonths)>0}">
+                                    <section class="panel panel-default pos-rlt clearfix ">
 
-                                <section class="panel panel-default pos-rlt clearfix ">
+                                        <table class="cost-table table table-striped">
+                                            <caption>消费项目</caption>
+                                            <c:forEach items="${billMonths}" var="billMonth" varStatus="s">
+                                                <c:if test="${s.index % 2 == 0}">
+                                                <tr>
+                                                </c:if>
+                                                    <td class="extend_width">${billMonth.type} : </td>
+                                                    <td> <fmt:formatNumber value="${billMonth.amount==null?0:billMonth.amount}" pattern="0.00"/> 元</td>
+                                                <c:if test="${s.index % 2 == 1 || (s.index + 1) == fn:length(billMonths)}">
+                                                    <c:if test="${s.index % 2 == 0}">
+                                                        <td class="extend_width"></td><td></td>
+                                                    </c:if>
+                                                </tr>
+                                                </c:if>
+                                            </c:forEach>
 
-                                    <table class="cost-table table table-striped">
-                                        <caption>消费项目</caption>
-                                        <c:forEach items="${billMonths}" var="billMonth" varStatus="s">
-                                            <c:if test="${s.index % 2 == 0}">
-                                            <tr>
-                                            </c:if>
-                                                <td class="extend_width">${billMonth.type} : </td>
-                                                <td> <fmt:formatNumber value="${billMonth.amount==null?0:billMonth.amount}" pattern="0.00"/> 元</td>
-                                            <c:if test="${s.index % 2 == 1 || fn:length(billMonths) == (s.index -1)}">
-                                            </tr>
-                                            </c:if>
-                                        </c:forEach>
-
-
-                                    </table>
-                                    <button class="cost_history_download btn btn-default btn-sm">账单下载</button>
-                                </section>
+                                        </table>
+                                        <button class="cost_history_download btn btn-default btn-sm">账单下载</button>
+                                    </section>
+                                </c:if>
                             </section>
                         </section>
                     </aside>
