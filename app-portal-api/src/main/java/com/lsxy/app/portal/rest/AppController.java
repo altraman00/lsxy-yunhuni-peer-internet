@@ -60,27 +60,29 @@ public class AppController extends AbstractRestController {
         return RestResponse.success(app);
     }
     /**
-     * 更新应用信息
+     * 删除应用
+     * @param id
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
+    @RequestMapping("/delete")
+    public RestResponse save(String id) throws InvocationTargetException, IllegalAccessException {
+        App resultApp = appService.findById(id);
+        appService.delete(resultApp);
+        return RestResponse.success(resultApp);
+    }
+    /**
+     * 新建应用
      * @param app app对象
-     * @param operate 操作类型
      * @return
      */
-    @RequestMapping("/save")
-    public RestResponse save(App app,String operate) throws InvocationTargetException, IllegalAccessException {
+    @RequestMapping("/create")
+    public RestResponse create(App app ){
         String userName = getCurrentAccountUserName();
-        App resultApp = null;
-        if("delete".equals(operate)){//将应用更新为删除状态
-            resultApp = appService.findById(app.getId());
-            appService.delete(resultApp);
-        }else if("update".equals(operate)){//更新应用信息
-            resultApp = appService.findById(app.getId());
-            EntityUtils.copyProperties(resultApp, app);
-            resultApp = appService.save(resultApp);
-        }else if("create".equals(operate)){//新建应用
-            Tenant tenant = tenantService.findTenantByUserName(userName);
-            app.setTenant(tenant);
-            resultApp = appService.save(app);
-        }
-        return RestResponse.success(resultApp);
+        Tenant tenant = tenantService.findTenantByUserName(userName);
+        app.setTenant(tenant);
+        app = appService.save(app);
+        return RestResponse.success(app);
     }
 }

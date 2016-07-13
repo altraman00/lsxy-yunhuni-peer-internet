@@ -61,10 +61,6 @@
                                 <div class="row">
 
                                     <form role="form" action="./index.html" method="post" class="register-form" id="application_create">
-                                        <c:if test="${app.id!=null}">
-                                            <input type="hidden" name="id" value="${app.id}">
-                                            <input type="hidden" name="status" value="${app.status}">
-                                        </c:if>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
                                             <div class="col-md-4">
@@ -191,15 +187,13 @@
                 }
             }
             $.ajax({
-                url : "${ctx}/console/app/save",
+                url : "${ctx}/console/app/create",
                 type : 'post',
                 async: false,//使用同步的方式,true为异步方式
                 data :dataVal,
                 dataType: "json",
                 success : function(data){
-                    showtoast(data.msg);
-                    //$('#result_message').html(data.msg);
-                    //$('#result_message').show();
+                    showtoastAppIndex(data.msg);
                 },
                 fail:function(){
                     showtoast('网络异常，请稍后重试');
@@ -211,6 +205,14 @@
         }
 
     });
+    function showtoastAppIndex(tips) {
+        $('.tips-toast').css('display','block').html(tips);
+        setTimeout("hidetoastAppIndex()",2000);
+    }
+    function hidetoastAppIndex(){
+        $('.tips-toast').fadeOut(1000);
+        window.location.href="${ctx}/console/app/list";
+    }
 </script>
 
 </body>
