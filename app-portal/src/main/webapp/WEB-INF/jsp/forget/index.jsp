@@ -63,6 +63,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <input class="form-control" name="mobile" id="mobile" placeholder="输入注册手机号"  />
+                                <small class="help-block tips-error" id="mobileTips" ></small>
                             </div>
                         </div>
                         <div class="row">
@@ -158,13 +159,15 @@
                         }else if(result.vc){
                             sendResult = false;
                             //发送不成功，且要输入图形验证码
-                            tipsmsg(result.err,'mobileCodeTips');
+                            tipsmsg(result.err,'secondcodeTips');
                             isVc = true;
 
                             //启动二次校验
                             $('#second-code').show();
-                            var html = '<div class="code-title">验证码 :</div><input class="code form-control" type="text" name="" id="second-code" onkeyup="clearErrMsg()"/>';
-                            html += '<a class="code-img"><img id="imgValidateCode" src="' + ctx + '/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"></a>';
+
+                            var html = '<div class="col-md-7"><input class="form-control" name=""  placeholder="验证码"  id="second-code" onkeyup="clearErrMsg()"/><small class="help-block tips-error" id="secondcodeTips"></small></div><div class="col-md-5">';
+                            html += '<span class="code-img"><img id="imgValidateCode" src="' + ctx + '/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"></span></div>';
+
                             $('#second-codeblock').html(html);
 
                         }else{
@@ -179,6 +182,10 @@
     }
 
     function checkMobile(mobile){
+        if(regMobile(mobile) == false){
+            tipsmsg("无效手机号码","mobileTips");
+            return false;
+        }
         var bol = false;
         $.ajax({
             type: "get",
@@ -191,7 +198,7 @@
                     bol = true;
                 }else{
                     //显示showtips
-                    tipsmsg(result.err,"mobileCodeTips");
+                    tipsmsg(result.err,"mobileTips");
                 }
             }
         });
