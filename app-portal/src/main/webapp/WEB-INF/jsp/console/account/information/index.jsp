@@ -155,27 +155,18 @@
     {
         new PCAS("province","city","${account.province}","${account.city}");
         var myselect = $(".province");
-        // myselect.selectmenu("refresh");
         myselect = $(".city");
-        // myselect.selectmenu("refresh");
-        // myselect = $(".area");
     }
     $('#personalAuthForm').bootstrapValidator('validate');
     $('#validateBtn, #validateBtnPersonal').click(function(){
         var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
         if(result==true){
             //提交表单
-            var tempVal = $('#personalAuthForm').serialize().split("&");
-            var dataVal = { '${_csrf.parameterName}':'${_csrf.token}'};
-            for(var i=0;i<tempVal.length;i++){
-                var temp = tempVal[i].split("=");
-                dataVal[temp[0]]=decodeURI(decodeURI((temp[1]),"UTF-8"));
-            }
             $.ajax({
                 url : "${ctx}/console/account/update",
                 type : 'post',
                 async: false,//使用同步的方式,true为异步方式
-                data :dataVal,
+                data :getFormJson("#personalAuthForm"),
                 dataType: "json",
                 success : function(data){
                     showtoast(data.msg);

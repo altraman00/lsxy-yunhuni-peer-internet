@@ -36,7 +36,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a ">
-                                                <a href="${ctx}/console/account/information/index">基本资料</a>
+                                                <a href="${ctx}/console/account/index">基本资料</a>
                                             </div>
                                         </li>
                                         <li>
@@ -98,7 +98,7 @@
 
                                         <div class="form-group">
                                             <div class="col-md-9 remove-padding">
-                                                <button type="submit"  class="btn btn-primary  btn-form">保存</button>
+                                                <a id="validateBtn" class="btn btn-primary  btn-form">保存</a>
                                             </div>
                                         </div>
                                     </form:form>
@@ -112,11 +112,32 @@
     </section>
 </section>
 </section>
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/personal/password.js'></script>
 <script type="text/javascript">
-    var msg = '${msg}';
-    if(msg==''){}else{alert(msg);}
+    $('#validateBtn').click(function(){
+        var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
+        showtoast(result);
+        if(result==true){
+            //提交表单
+            $.ajax({
+                url : "${ctx}/console/account/safety/edit_psw",
+                type : 'post',
+                async: false,//使用同步的方式,true为异步方式
+                data :getFormJson("#personalAuthForm"),
+                dataType: "json",
+                success : function(data){
+                    showtoast(data.msg);
+                },
+                fail:function(){
+                    showtoast('网络异常，请稍后重试');
+                }
+            });
+        }else{
+            $('#personalAuthForm').bootstrapValidator('validate');
+        }
+    });
 </script>
 </body>
 </html>

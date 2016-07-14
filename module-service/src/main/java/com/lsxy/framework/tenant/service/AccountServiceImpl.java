@@ -54,6 +54,23 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         return accountDao;
     }
 
+
+    @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "account", key = "'account_' + #entity.userName", beforeInvocation = true),
+                    @CacheEvict(value = "account", key = "'account_' + #entity.email", beforeInvocation = true),
+                    @CacheEvict(value = "account", key = "'account_' + #entity.mobile", beforeInvocation = true),
+                    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
+            },
+            put = {
+                    @CachePut(value = "entity", key = "'entity_' + #entity.id",unless = "#entity == null")
+            }
+    )
+    public Account save(Account entity) {
+        return getDao().save(entity);
+    }
+
     @Override
     public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException {
         String hql = "from Account obj where (obj.userName=?1 or obj.email=?2 or obj.mobile=?3) and obj.status=?4";

@@ -75,4 +75,5 @@ public class AccountController  extends AbstractPortalController {
         String uri = restPrefixUrl + "/rest/account/update";
         return  RestRequest.buildSecurityRequest(token).post(uri,paramsMap, Account.class);
     }
+
 }
