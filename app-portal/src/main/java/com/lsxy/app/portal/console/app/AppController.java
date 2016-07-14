@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -111,5 +112,42 @@ public class AppController extends AbstractPortalController {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(app, Map.class);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
+    }
+
+    /**
+     * 获取应用的上线步骤
+     * @param request
+     * @param appId 应用ID
+     * @return
+     */
+    @RequestMapping(value = "get_online_step",method = RequestMethod.GET)
+    public Map<String,Object> getAppOnlineStep(HttpServletRequest request,String appId){
+        Map<String,Object> model = new HashMap<>();
+        String token = getSecurityToken(request);
+        RestResponse<String> response = getAppOnlineStepRest(token,appId);
+        if(response.isSuccess()){
+            model.put("flag",true);
+            model.put("onlineStep",response.getData());
+        }else{
+            model.put("flag",true);
+            model.put("err",response.getErrorMsg());
+        }
+        return model;
+    }
+
+    private RestResponse<String> getAppOnlineStepRest(String token, String appId) {
+        String url = restPrefixUrl + "/rest/app/get_online_step?appId={1}";
+        return RestRequest.buildSecurityRequest(token).get(url,String.class,appId);
+    }
+
+    @RequestMapping(value = "update_online_step",method = RequestMethod.GET)
+    public Map<String,Object> updateOnlineStep(HttpServletRequest request,String appId,String step){
+        Map<String,Object> model = new HashMap<>();
+        return model;
+    }
+
+    private RestResponse<Boolean> updateOnlineStepRest(String token,String appId,String step){
+        String url = restPrefixUrl + "/rest/app/update_online_step?appId={1}&step={2}";
+        return RestRequest.buildSecurityRequest(token).get(url,Boolean.class,appId,step);
     }
 }

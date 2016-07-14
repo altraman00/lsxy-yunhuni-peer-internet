@@ -87,7 +87,7 @@
                                             <td class="operation">
                                                 <a href="application_detail.html">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
-                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}')" >申请上线</a></c:if>
+                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.onlineStep}')" >申请上线</a></c:if>
                                                 <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>
                                             </td>
 
@@ -110,6 +110,7 @@
 
 
 
+<input type="hidden" id="modal-appid" value="" step-id="0"/>
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg"  style="display: none"></div>
 <div id="mobilebox" class="appliation-modal-box" style="display: none;">
@@ -132,7 +133,7 @@
                 </ul>
             </div>
 
-            <div class="contentModal" style="display: ">
+            <div class="contentModal" style="display: none">
                 <!--未认证显示-->
                 <div class="input text-center" style="display: none">
                     <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
@@ -196,34 +197,9 @@
             <div class="input">
                 <div class="tips-error moadltips1 text-center" style="display: none">错误提示信息</div>
             </div>
-
         </div>
     </div>
-
-
-    <div class="addmobile2" style="display: none">
-        <div class="title">重新绑定手机号<a class="close_a modalCancel"></a></div>
-        <div class="content">
-            <div class="margintop30"></div>
-            <div class="input ">
-                <input class=" form-control modalMobile" type="text" name="" placeholder="输入手机号码" maxlength="11" />
-            </div>
-            <div class="input">
-                <input class="code form-control modalCode" type="text" name="mobile" placeholder="验证码" />
-                <button class="code-button" id="send-code" >发送验证码</button>
-            </div>
-            <div class="input">
-                <div class="tips-error moadltips2" style="display: none">请先填写手机号码</div>
-            </div>
-        </div>
-        <div class="footer">
-            <a class="cancel modalCancel">返回</a>
-            <a class="sure modalSuer2">确认</a>
-        </div>
-    </div>
-
 </div>
-
 
 
 <div class="tips-toast"></div>
@@ -265,15 +241,6 @@
         $('#creatIVR').html(ivr);
 
     }
-
-
-    function syncpay(){
-
-    }
-
-
-
-
 
 
     /**

@@ -38,7 +38,7 @@
                                             </span>
                                             <div class="box-footer">
                                                 <a class="btn btn-primary" href="${ctx}/console/cost/recharge">充值</a>
-                                                <a class="btn btn-default" href="${ctx}/console/cost/recharg">消费情况</a>
+                                                <a class="btn btn-default" href="${ctx}/console/cost/consume">消费情况</a>
                                             </div>
                                         </div>
                                     </div>

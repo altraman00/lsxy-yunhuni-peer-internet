@@ -31,9 +31,7 @@ public class AuthController extends AbstractRestController {
     private TenantService tenantService;
     @Autowired
     private AccountService accountService;
-    private  static final Integer  AUTH_NO= 100;//未认证
-    private  static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
-    private  static final Integer AUTH_ONESELF_SUCESS = 1;//个人认证成功
+
 
     /**
      * 获取实名认证状态
@@ -47,21 +45,21 @@ public class AuthController extends AbstractRestController {
         Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         map.put("userName",userName);
         map.put("status",tenant.getIsRealAuth());
-        if(AUTH_COMPANY_SUCESS==tenant.getIsRealAuth()){
-            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),AUTH_COMPANY_SUCESS);
+        if(Tenant.AUTH_COMPANY_SUCESS==tenant.getIsRealAuth()){
+            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_COMPANY_SUCESS);
             if(realnameCorp!=null) {
                 map.put("name", realnameCorp.getName());
                 map.put("time", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
-                map.put("status",AUTH_NO);
+                map.put("status",Tenant.AUTH_NO);
             }
-        }else if(AUTH_ONESELF_SUCESS==tenant.getIsRealAuth()){
-            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),AUTH_ONESELF_SUCESS);
+        }else if(Tenant.AUTH_ONESELF_SUCESS==tenant.getIsRealAuth()){
+            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCESS);
             if(realnamePrivate!=null) {
                 map.put("name", realnamePrivate.getName());
                 map.put("time", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
-                map.put("status",AUTH_NO);
+                map.put("status",Tenant.AUTH_NO);
             }
         }
 

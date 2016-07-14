@@ -17,7 +17,8 @@ public class App extends IdEntity {
 
     private Tenant tenant;//所属租户
     private String name;//应用名字
-    private int status;//应用状态
+    private Integer status;//应用状态
+    private Integer onlineStep;//应用上线步骤
     private String description;//应用描述
     private String type;//应用类型
     private String industry;//所属行业
@@ -50,12 +51,21 @@ public class App extends IdEntity {
     }
 
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    @Column(name = "online_step")
+    public Integer getOnlineStep() {
+        return onlineStep;
+    }
+
+    public void setOnlineStep(Integer onlineStep) {
+        this.onlineStep = onlineStep;
     }
 
     @Column(name = "description")
