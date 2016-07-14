@@ -23,11 +23,9 @@ public class App extends IdEntity {
     private String industry;//所属行业
     private String whiteList;//服务器白名单
     private String url;//回调URL
-    private Integer isAuthPower;//是否鉴权,0否，1是
-    private String baseServiceType;//基础服务类型
+    private Integer isAuth;//是否鉴权,0否，1是
     private Integer isVoiceDirectly;//是否语音直拨 0否，1是
     private Integer isVoiceCallback;//是否语音回拨0否，1是
-    private String advancedServiceType;//高级语音定制服务类型
     private Integer isSessionService;//是否会议服务0否，1是
     private Integer isRecording;//是否录音服务0否，1是
     private Integer isVoiceValidate;//是否语音验证码0否，1是
@@ -100,22 +98,15 @@ public class App extends IdEntity {
     public void setUrl(String url) {
         this.url = url;
     }
-    @Column(name = "is_auth_power")
-    public Integer getIsAuthPower() {
-        return isAuthPower;
+    @Column(name = "is_auth")
+    public Integer getIsAuth() {
+        return isAuth;
     }
 
-    public void setIsAuthPower(Integer isAuthPower) {
-        this.isAuthPower = isAuthPower;
-    }
-    @Column(name = "base_service_type")
-    public String getBaseServiceType() {
-        return baseServiceType;
+    public void setIsAuth(Integer isAuthPower) {
+        this.isAuth = isAuth;
     }
 
-    public void setBaseServiceType(String baseServiceType) {
-        this.baseServiceType = baseServiceType;
-    }
     @Column(name = "is_voice_directly")
     public Integer getIsVoiceDirectly() {
         return isVoiceDirectly;
@@ -132,14 +123,7 @@ public class App extends IdEntity {
     public void setIsVoiceCallback(Integer isVoiceCallback) {
         this.isVoiceCallback = isVoiceCallback;
     }
-    @Column(name = "advanced_service_type")
-    public String getAdvancedServiceType() {
-        return advancedServiceType;
-    }
 
-    public void setAdvancedServiceType(String advancedServiceType) {
-        this.advancedServiceType = advancedServiceType;
-    }
     @Column(name = "is_session_service")
     public Integer getIsSessionService() {
         return isSessionService;

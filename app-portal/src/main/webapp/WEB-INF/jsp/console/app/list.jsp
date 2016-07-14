@@ -36,7 +36,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="application_create.html">创建应用</a>
+                                                <a href="${ctx}/console/app/index">创建应用</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -59,12 +59,12 @@
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-12 padder-v fix-padding">
-                                        <a href="application_create.html" class="btn btn-primary query">创建应用</a>
+                                        <a href="${ctx}/console/app/index" class="btn btn-primary query">创建应用</a>
                                     </div>
                                 </div>
                             </section>
                             <section class="panel panel-default pos-rlt clearfix ">
-                                <table class="table table-striped cost-table-history tablelist">
+                                <table class="table table-striped cost-table-history tablelist" id="tableModal">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -77,18 +77,20 @@
                                     </thead>
                                     <tbody>
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
-                                        <tr>
+                                        <tr id="app-${result.id}">
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.name}</td>
                                             <td>${result.id}</td>
-                                            <c:if test="${result.status==1}"><td class="success" >已上线</td></c:if>
-                                            <c:if test="${result.status==2}"><td  class="nosuccess">未上线</td></c:if>
+                                            <c:if test="${result.status==1}"><td class="success"  id="statusapp-${s.index+1}">已上线</td></c:if>
+                                            <c:if test="${result.status==2}"><td  class="nosuccess" id="statusapp-${s.index+1}">未上线</td></c:if>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="application_detail.html">详情</a> <span ></span>
-                                                <a href="" onclick="deleteApp(${result.id})">删除</a> <span ></span>
-                                                <c:if test="${result.status==2}"> <a class="tabtarget" data-toggle="3" >申请上线</a></c:if>
+                                                <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
+                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}')" >申请上线</a></c:if>
+                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>
                                             </td>
+
                                         </tr>
                                     </c:forEach>
                                     </tbody>
@@ -96,6 +98,7 @@
                             </section>
                             <c:set var="pageUrl" value="${ctx}/console/app/list"></c:set>
                             <%@include file="/inc/pagefooter.jsp" %>
+
                         </section>
                     </section>
                 </aside>
@@ -129,10 +132,10 @@
                 </ul>
             </div>
 
-            <div class="contentModal" style="display:">
+            <div class="contentModal" style="display: ">
                 <!--未认证显示-->
                 <div class="input text-center" style="display: none">
-                    <img src="images/index/l6.png" alt="" class="sre" />
+                    <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
                     <p>您还没有经过实名认证，请进行实名认证！</p>
                 </div>
                 <div class="input text-center" style="display: none">
@@ -141,7 +144,7 @@
                 <!---end--->
                 <!--认证显示-->
                 <div class="input text-center">
-                    <img src="images/index/l6.png" alt="" class="sre" />
+                    <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
                     <p>您已成功进行实名认证，点击进入下一步!</p>
                 </div>
                 <div class="input text-center" >
@@ -155,12 +158,13 @@
                     <p>您选择开通IVR功能，我们给您分配了一个IVR号码供应用使用IVR功能</p>
                 </div>
                 <div class="input text-center">
-                    <div class="defulatTips">
+                    <div class="defulatTips" id="creatIVR" >
                         0898-77887748858
                     </div>
                     <a onclick="nolike()" class="font14">不喜欢 换一个?</a>
                 </div>
-
+                <div class="hideIVR">
+                </div>
                 <div class="input text-center" >
                     <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="2">下一步</a>
                 </div>
@@ -170,18 +174,19 @@
                 <div class="input text-center">
                     <p>您需要支付：<span class="money">998.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：0.00 元 &nbsp;&nbsp;&nbsp; <span class="nomoney">!!余额不足</span>&nbsp;&nbsp;&nbsp;<a href="cost_recharge_sure.html">充值</a> </p>
                 </div>
-                <div class="input text-center">
+                <div class="input text-center mb-0 mt-0">
                     <div class="defulatTips">IVR号码租用费：1000元</div>
                     <div class="defulatTips">IVR功能使用费：100元/月</div>
                 </div>
-                <div class="input text-center" >
+                <div class="ivrserver"><input type="checkbox" name="readcheckbox" id="readbook" />已阅读<a target="_blank" href="ivragreement.html" >IVR服务协议</a></div>
+                <div class="input text-center mt-0" >
                     <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3">确认支付</a>
                 </div>
             </div>
 
             <div class="contentModal" style="display:none ">
                 <div class="input text-center" >
-                    <img src="images/index/l1.png" alt="" class="sre" />
+                    <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
                     <p>上线成功</p>
                 </div>
                 <div class="input text-center" >
@@ -220,33 +225,116 @@
 </div>
 
 
-<script>
-    function nolike(){
 
-    }
-</script>
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/list.js'> </script>
-<script type="text/javascript">
-    function deleteApp(id){
-        $.ajax({
-            url : "${ctx}/console/app/delete",
-            type : 'post',
-            async: false,//使用同步的方式,true为异步方式
-            data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
-                alert(data.msg);
-                window.location.href='${ctx}/console/app/list?pageNo=${ pageObj.currentPageNo}&pageSize=${pageObj.pageSize}';
-            },
-            fail:function(){
-                alert('网络异常，请稍后重试');
+<script>
+    /**
+     * @param id 应用id
+     */
+    function tabtarget(id){
+        cleanModal();
+        $('#modal-appid').val(id);
+        showBox();
+    }
+
+    var ivrnumber = 1;
+
+    //生成IVR
+    function creatIVR(){
+        $('.hideIVR').html('');
+        //异步生成
+        var ivr = ['02000100','02000200','02000300','0200400','0200500'];
+        for (var i = 0; i < ivr.length; i++) {
+            $('.hideIVR').append('<sapn class="hideIVR-p-'+(i+1)+'">'+ivr[i]+'</sapn>');
+        }
+        //赋值第一个
+        $('#creatIVR').html(ivr[0]);
+        ivrnumber = 1;
+    }
+
+    function nolike(){
+        ivrnumber++;
+        if(ivrnumber==6){
+            ivrnumber = 1;
+        }
+        var ivr = $('.hideIVR-p-'+ivrnumber).html();
+        $('#creatIVR').html(ivr);
+
+    }
+
+
+    function syncpay(){
+
+    }
+
+
+
+
+
+
+    /**
+     * 应用id
+     * status 该应用状态
+     */
+    function delapp(id,status){
+        bootbox.setLocale("zh_CN");
+        if(status==1){
+            bootbox.alert("当前应用正在运营中，请将起下线后进行删除", function(result) {}); return;
+        }
+        if(status==2){
+            bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
+                if(result){
+                    $.ajax({
+                        url : "${ctx}/console/app/delete",
+                        type : 'post',
+                        async: false,//使用同步的方式,true为异步方式
+                        data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                        dataType: "json",
+                        success : function(data){
+                            showtoast(data.msg);
+                        },
+                        fail:function(){
+                            showtoast('网络异常，请稍后重试');
+                        }
+                    });
+                    $('#app-'+id).remove();
+                }else{
+                    //showtoast('取消');
+                }
+            });
+        }
+    }
+
+
+    //应用下线
+    function lineapp(id){
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
+            if(result){
+                $('#trb-'+id).html('');
+                $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
+                $('#trb-'+id).html('<a onclick="tabtarget('+id+')">申请上线</a>');
+                showtoast('下线成功');
+            }else{
+                showtoast('取消');
             }
+
         });
     }
+
+
+
+
+    //监听支付状态 返回true success
+    function syncpay(){
+        return true;
+    }
 </script>
+
 </body>
 </html>
 
