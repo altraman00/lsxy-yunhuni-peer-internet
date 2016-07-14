@@ -39,7 +39,7 @@ public class InformationController extends AbstractRestController {
         }
         oldAccount  = accountService.save(oldAccount);
         if(oldAccount == null){
-            return RestResponse.failed("0020","更新数据库失败");
+            return RestResponse.failed("0020","更新数据库失败 ");
         }
         return RestResponse.success(oldAccount);
     }

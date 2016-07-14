@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.console.telenum;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.app.portal.console.account.InformationController;
@@ -41,8 +42,8 @@ public class TestNumBindController extends AbstractPortalController{
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
         RestResponse<List<TestNumBind>> restResponse = list(request);
-        List<TestNumBind> testMobileBindList = restResponse.getData();
-        mav.addObject("testMobileBindList",testMobileBindList);
+        List<TestNumBind> testNumBindList = restResponse.getData();
+        mav.addObject("testNumBindList",testNumBindList);
         mav.setViewName("/console/telenum/bind/index");
         return mav;
     }
@@ -55,28 +56,27 @@ public class TestNumBindController extends AbstractPortalController{
     private RestResponse list(HttpServletRequest request){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/test_num_bind/list";
-        Map map = new HashMap();
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, List.class);
+        return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
     }
 
     /**
      * 绑定手机号码
      * @param request
-      @param number
+      @param testNumBind
      * @return
      */
     @RequestMapping("/save")
     @ResponseBody
-    public Map save(HttpServletRequest request,String number){
+    public Map save(HttpServletRequest request,TestNumBind testNumBind){
         Map hs = new HashMap();
-        RestResponse<TestNumBind> restResponse = saveNumber(request,number);
+        RestResponse<TestNumBind> restResponse = saveNumber(request,testNumBind);
         TestNumBind testMobileBind = restResponse.getData();
         if("0020".equals(restResponse.getErrorCode())){
             hs.put("sucess", RESULT_FIAL);
             hs.put("msg",restResponse.getErrorMsg());
         }else{
             String status = IS_FALSE;
-            if(number.equals(testMobileBind.getNumber())){
+            if(testNumBind.getNumber().equals(testMobileBind.getNumber())){
                 status = IS_TRUE;
             }
             if(IS_TRUE.equals(status)) {
@@ -93,16 +93,43 @@ public class TestNumBindController extends AbstractPortalController{
     }
 
     /**
-     * 测试手机绑定号码
+     * 应用绑定号码更新
      * @param request
-     * @param number 测试绑定手机
+     * @param numbers 测试号码id集合
+     * @param appId 应用id
      * @return
      */
-    private RestResponse saveNumber(HttpServletRequest request,String number){
+    @RequestMapping("/update_app_number")
+    @ResponseBody
+    public Map updateAppNumber(HttpServletRequest request,String numbers, String appId){
+        updateAppNumberRest(request,numbers,appId);
+        Map hs = new HashMap();
+        hs.put("msg","应用绑定号码更新成功");
+        return hs;
+    }
+    /**
+     * 测试手机绑定号码
+     * @param request
+     * @param numbers 测试号码id集合
+     * @param appId 应用id
+     * @return
+     */
+    private RestResponse updateAppNumberRest(HttpServletRequest request,String numbers ,String appId){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl + "/rest/test_num_bind/update_app_number?numbers={1}&appId={2}";
+        return  RestRequest.buildSecurityRequest(token).get(uri, TestNumBind.class,numbers,appId);
+    }
+    /**
+     * 测试手机绑定号码
+     * @param request
+     * @param testNumBind 测试绑定手机
+     * @return
+     */
+    private RestResponse saveNumber(HttpServletRequest request,TestNumBind testNumBind){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/test_num_bind/save";
-        Map map = new HashMap();
-        map.put("number",number);
+        ObjectMapper mapper = new ObjectMapper();
+        Map map = mapper.convertValue(testNumBind,Map.class);
         return  RestRequest.buildSecurityRequest(token).post(uri,map, TestNumBind.class);
     }
 

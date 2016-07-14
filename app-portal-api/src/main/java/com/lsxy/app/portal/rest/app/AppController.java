@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest.app;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -49,6 +50,16 @@ public class AppController extends AbstractRestController {
     }
 
     /**
+     * 根据appId查找应用
+     * @param id 应用id
+     * @return
+     */
+    @RequestMapping("/find_by_id")
+    public RestResponse findById(String id){
+        App app = appService.findById(id);
+        return RestResponse.success(app);
+    }
+    /**
      * 删除应用
      * @param id
      * @return
@@ -73,5 +84,18 @@ public class AppController extends AbstractRestController {
         app.setTenant(tenant);
         app = appService.save(app);
         return RestResponse.success(app);
+    }
+    /**
+     * 新建应用
+     * @param app app对象
+     * @return
+     */
+    @RequestMapping("/update")
+    public RestResponse update(App app ) throws InvocationTargetException, IllegalAccessException {
+        String userName = getCurrentAccountUserName();
+        App resultApp = appService.findById(app.getId());
+        EntityUtils.copyProperties(resultApp,app);
+        resultApp = appService.save(resultApp);
+        return RestResponse.success(resultApp);
     }
 }

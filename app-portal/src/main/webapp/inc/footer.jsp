@@ -25,11 +25,16 @@
 			});
 		}
 	})
-	function showtoast(tips) {
+	function showtoast(tips,url) {
+		$('.tips-toast').hide().html('');
 		$('.tips-toast').css('display','block').html(tips);
-		setTimeout("hidetoast()",2000);
+		setInterval(function(){hidetoast(url);},3000)
 	}
-	function hidetoast(){
-		$('.tips-toast').fadeOut(1000);
+	function hidetoast(url){
+		$('.tips-toast').hide();
+		if(url!=undefined && url!='' && url!='undefined'){
+			window.location.href=url;
+		}
 	}
+
 </script>
