@@ -127,8 +127,8 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>基础语音服务</strong></p>
-                                                <p><input type="checkbox" name="isVoiceDirectly" <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;语音外呼(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
-                                                <p><input type="checkbox" name="isVoiceCallback" <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;双向回拨(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
+                                                <p><input type="checkbox" name="isVoiceDirectly" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;语音外呼(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
+                                                <p><input type="checkbox" name="isVoiceCallback" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;双向回拨(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
 
                                             </div>
                                         </div>
@@ -136,10 +136,10 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>高级语音定制服务</strong></p>
-                                                <p><input type="checkbox" name="isSessionService" <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a href="">会议服务</a>(可与互联网会议、视频 会议融合参会，提供丰富的会议管理功能)</p>
-                                                <p><input type="checkbox" name="isRecording" <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>录音服务</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
-                                                <p><input type="checkbox" name="isVoiceValidate" <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>语音验证码</a>(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
-                                                <p><input type="checkbox" name="isIvrService" <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>IVR定制服务</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
+                                                <p><input type="checkbox" name="isSessionService" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a href="">会议服务</a>(可与互联网会议、视频 会议融合参会，提供丰富的会议管理功能)</p>
+                                                <p><input type="checkbox" name="isRecording" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>录音服务</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
+                                                <p><input type="checkbox" name="isVoiceValidate" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>语音验证码</a>(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
+                                                <p><input type="checkbox" name="isIvrService" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>IVR定制服务</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
                                                 <div class="tips ml-36">
                                                     <p class="app-tips ">IVR定制服务开启后，该应用将产生100元/月的功能费，上线时开始收取，多个应用开启并上线会叠加收费</p>
                                                 </div>
