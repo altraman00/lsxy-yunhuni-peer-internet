@@ -1,12 +1,15 @@
 package com.lsxy.framework.config;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * 读取系统配置的工具方法
@@ -68,7 +71,29 @@ public class SystemConfig {
 	public static String getProperty(String name){
 		return getProperty(name, null);
 	}
-	
+
+	/**
+	 * 获取map集合属性，格式如下：
+	 *  cache.redis.expires=\
+                account:30;\
+                tenant:30
+	 * @param name 属性名称
+	 * @return
+     */
+	public static  Map<String,String> getMapProperty(String name){
+		Map<String,String> resultMap = new HashMap<>();
+		String value = getProperty(name);
+		if(StringUtils.isNotEmpty(value)){
+			String items[] = value.split(";");
+			for (String item:items ) {
+				int idx = item.indexOf(":");
+				if( idx >0){
+                    resultMap.put(item.substring(0,idx),item.substring(idx + 1));
+				}
+			}
+		}
+		return resultMap;
+	}
 	/**
 	 * 
 	 *描述：取得指定属性的值,如果没有配置该值，则给出一个默认的配置值
