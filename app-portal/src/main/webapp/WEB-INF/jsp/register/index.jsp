@@ -141,7 +141,7 @@
             if($('#second-code').length>0){
                 var second = $('#second-code').val();
                 if(second.length!=4){
-                    tipsmsg('请输入四位验证码','mobileCodeTips'); return;
+                    tipsmsg('请输入四位验证码','mobileCodeTips'); return false;
                 }
             }
             vCode = $("#second-code").val();
