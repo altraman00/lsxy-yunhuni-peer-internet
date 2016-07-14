@@ -35,8 +35,8 @@ public class BillMonthServiceImpl extends AbstractService<BillMonth> implements 
     }
 
     @Override
-    public BillMonth getBillMonth(String userName, String appId, String month) {
-        BillMonth billMonth = null;
+    public List<BillMonth> getBillMonths(String userName, String appId, String month) {
+        List<BillMonth> billMonths = null;
         Tenant tenant = tenantService.findTenantByUserName(userName);
         Date dt = DateUtils.parseDate(month, "yyyy-MM");
         if(StringUtils.isBlank(month)){
@@ -44,24 +44,20 @@ public class BillMonthServiceImpl extends AbstractService<BillMonth> implements 
         }
         if(StringUtils.isBlank(appId)){
             try {
-                String hql = "select new BillMonth(b.tenantId,b.dt,sum(b.singleWayCall),sum(b.bothWayCall),sum(b.callConference),sum(b.ivrCall)," +
-                         "sum(b.ivrRevoice),sum(b.sms),sum(b.callNotice),sum(b.callRecord)) " +
-                         "from BillMonth b group by b.tenantId,b.dt having (b.tenantId=?1 and b.dt=?2)";
+                String hql = "select new BillMonth(b.tenantId,b.dt,b.type,sum(b.amount)) " +
+                         "from BillMonth b group by b.tenantId,b.dt,b.type having (b.tenantId=?1 and b.dt=?2)";
                 Query query = this.getEm().createQuery(hql);
                 query.setParameter(1, tenant.getId());
                 query.setParameter(2,dt);
-                billMonth = (BillMonth) query.getSingleResult();
+                billMonths = (List<BillMonth>) query.getResultList();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }else{
-            List<BillMonth> billMonths = billMonthDao.findByTenantIdAndAppIdAndDt(tenant.getId(), appId, dt);
-            if(billMonths != null && billMonths.size()>0){
-                billMonth = billMonths.get(0);
-            }
+            billMonths = billMonthDao.findByTenantIdAndAppIdAndDt(tenant.getId(), appId, dt);
         }
 
-        return billMonth;
+        return billMonths;
     }
 }
 
