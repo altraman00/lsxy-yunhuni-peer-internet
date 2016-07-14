@@ -1,13 +1,17 @@
 package com.lsxy.framework.base;
 
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.HqlUtil;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.api.base.BaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,6 +43,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
     }
 
     @Override
+    @Cacheable(value="entity",key="'entity_'+#id",unless = "#result == null")
     public T findById(String id) {
         return getDao().findOne(id);
     }
@@ -48,16 +53,25 @@ public abstract class AbstractService<T> implements BaseService<T> {
         return getDao().count();
     }
 
-    @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
+            },
+            put = {
+                    @CachePut(value = "entity", key = "'entity_' + #entity.id",unless = "#entity == null")
+            }
+    )
     public T save(T entity) {
         return getDao().save(entity);
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
     public void delete(Serializable id) throws IllegalAccessException, InvocationTargetException {
         this.logicDelete(id);
     }
 
+    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
     @Override
     public void delete(T entity) throws IllegalAccessException, InvocationTargetException {
         this.logicDelete(entity);
@@ -81,6 +95,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
+    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
     public void logicDelete(Serializable id) throws IllegalAccessException, InvocationTargetException{
         T obj = this.getDao().findOne(id);
         this.logicDelete(obj);
@@ -92,6 +107,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
+    @CacheEvict(value = "entity", key = "'entity_' + #obj.id", beforeInvocation = true)
     public void logicDelete(T obj) throws IllegalAccessException, InvocationTargetException{
         if(obj != null){
             BeanUtils.setProperty(obj, "deleted", true);
