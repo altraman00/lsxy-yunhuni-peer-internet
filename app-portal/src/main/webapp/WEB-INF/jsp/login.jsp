@@ -41,7 +41,7 @@
 					</div>
 				</div>
 
-				<div class="form-group form-block"  >
+				<div class="form-group form-block" >
 					<div class="col-md-6 remove-padding remember" >
 						<input type="checkbox" class="remember-check" />   记住我
 					</div>
@@ -93,7 +93,7 @@
 	$(document).ready(function() {
 
 		$('#imgValidateCode').click(function() {
-			$("#imgValidateCode").prop("src","${ctx}/vc/get?dt="+(new Date().getTime()));
+			$("#imgValidateCode").prop("src",ctx +  "/vc/get?dt="+(new Date().getTime()));
 		});
 
 	});
