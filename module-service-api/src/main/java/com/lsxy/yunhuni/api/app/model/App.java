@@ -103,7 +103,7 @@ public class App extends IdEntity {
         return isAuth;
     }
 
-    public void setIsAuth(Integer isAuth) {
+    public void setIsAuth(Integer isAuthPower) {
         this.isAuth = isAuth;
     }
 

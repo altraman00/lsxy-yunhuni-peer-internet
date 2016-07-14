@@ -1,7 +1,6 @@
 package com.lsxy.yunhuni.api.app.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 
