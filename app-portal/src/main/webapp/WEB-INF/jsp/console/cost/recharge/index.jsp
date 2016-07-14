@@ -43,7 +43,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="./cost_month.html">月结账单</a>
+                                                <a href="${ctx}/console/cost/bill_month/get">月结账单</a>
                                             </div>
                                         </li>
                                     </ul>

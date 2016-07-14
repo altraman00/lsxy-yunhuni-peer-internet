@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_yy_resource_telenum")
 public class ResourceTelenum extends IdEntity{
-    private int status;//1:已被租用 0:未被租用
+    private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
     private Tenant tenant;//所属租户
 
@@ -27,11 +27,11 @@ public class ResourceTelenum extends IdEntity{
     }
 
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
     @Column(name = "tel_number")

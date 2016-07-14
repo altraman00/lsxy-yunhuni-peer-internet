@@ -5,6 +5,7 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 
@@ -20,7 +21,7 @@ public interface RechargeService extends BaseService<Recharge> {
      * @param amount 充值金额
      * @return
      */
-    Recharge createRecharge(String userName, String type, Double amount) throws Exception;
+    Recharge createRecharge(String userName, String type, BigDecimal amount) throws Exception;
 
     /**
      * 根据orderId获取充值订单
@@ -37,7 +38,7 @@ public interface RechargeService extends BaseService<Recharge> {
      * @param totalFee
      * @return
      */
-    Recharge paySuccess(String orderId, Double totalFee) throws MatchMutiEntitiesException;
+    Recharge paySuccess(String orderId, BigDecimal totalFee) throws MatchMutiEntitiesException;
 
     /**
      * 充值记录

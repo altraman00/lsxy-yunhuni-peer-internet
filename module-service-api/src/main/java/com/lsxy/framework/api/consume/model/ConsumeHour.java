@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -15,29 +16,29 @@ import java.util.Date;
 @Table(schema="db_lsxy_base",name = "tb_base_consume_hour")
 public class ConsumeHour extends IdEntity {
     private Date dt;//统计时间
-    private int hour;//统计小时 区间0-23
-    private double amongAmount;//消费统计 decimal(10,0) DEFAULT NULL,
-    private double sumAmount;//消费金额,
-    private int amongSessionConut;//会话数统计
-    private int sumSessionCount;//会话统计
+    private Integer hour;//统计小时 区间0-23
+    private BigDecimal amongAmount;//消费统计 decimal(10,0) DEFAULT NULL,
+    private BigDecimal sumAmount;//消费金额,
+    private Integer amongSessionConut;//会话数统计
+    private Integer sumSessionCount;//会话统计
     private String appId;//所属应用,
     private String tenantId;//所属租户
 
     @Column(name = "hour")
-    public int getHour() {
+    public Integer getHour() {
         return hour;
     }
 
-    public void setHour(int hour) {
+    public void setHour(Integer hour) {
         this.hour = hour;
     }
 
     @Column(name = "sum_amount")
-    public double getSumAmount() {
+    public BigDecimal getSumAmount() {
         return sumAmount;
     }
 
-    public void setSumAmount(double sumAmount) {
+    public void setSumAmount(BigDecimal sumAmount) {
         this.sumAmount = sumAmount;
     }
     @Column(name = "dt")
@@ -49,11 +50,11 @@ public class ConsumeHour extends IdEntity {
         this.dt = dt;
     }
     @Column(name = "among_amount")
-    public double getAmongAmount() {
+    public BigDecimal getAmongAmount() {
         return amongAmount;
     }
 
-    public void setAmongAmount(double amongAmount) {
+    public void setAmongAmount(BigDecimal amongAmount) {
         this.amongAmount = amongAmount;
     }
     @Column(name = "among_session_count")

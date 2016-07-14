@@ -14,8 +14,8 @@ import java.util.Date;
 public class PlayVoiceFile extends IdEntity {
     private String url;     //文件URL
     private App app;        //所属APP
-    private double size;    //文件大小
-    private int status;     //审核状态
+    private Double size;    //文件大小
+    private Integer status;     //审核状态
     private String checker; //审核人
     private Date checkTime; //审核时间
 
@@ -39,20 +39,20 @@ public class PlayVoiceFile extends IdEntity {
     }
 
     @Column(name = "size")
-    public double getSize() {
+    public Double getSize() {
         return size;
     }
 
-    public void setSize(double size) {
+    public void setSize(Double size) {
         this.size = size;
     }
 
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

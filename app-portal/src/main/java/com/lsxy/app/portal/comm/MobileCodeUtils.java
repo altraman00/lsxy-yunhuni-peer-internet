@@ -1,6 +1,9 @@
 package com.lsxy.app.portal.comm;
 
+import com.lsxy.app.portal.utils.InternetProtocolUtil;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by liups on 2016/6/25.
  */
 public class MobileCodeUtils {
+
 
     public static MobileCodeChecker getMobileCodeChecker(HttpServletRequest request){
         Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
@@ -18,10 +22,19 @@ public class MobileCodeUtils {
         }
     }
 
+    /**
+     * 验证通过的手机将其存入session
+     * @param request
+     * @param checker
+     */
     public static void setMobileCodeChecker(HttpServletRequest request,MobileCodeChecker checker){
         request.getSession().setAttribute(PortalConstants.MC_KEY,checker);
     }
 
+    /**
+     * 认证的后续功能完成后，将缓存清掉
+     * @param request
+     */
     public static void removeMobileCodeChecker(HttpServletRequest request){
         Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
         if(obj != null && obj instanceof MobileCodeChecker){

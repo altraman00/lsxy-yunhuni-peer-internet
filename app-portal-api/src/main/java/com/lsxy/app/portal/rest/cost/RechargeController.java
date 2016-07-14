@@ -16,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -42,7 +43,7 @@ public class RechargeController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/create_recharge")
-    public RestResponse createRecharge(String type,Double amount){
+    public RestResponse createRecharge(String type,BigDecimal amount){
         RestResponse result;
         try {
             Recharge recharge =  rechargeService.createRecharge(this.getCurrentAccountUserName(),type,amount);
