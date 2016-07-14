@@ -1,13 +1,12 @@
 package com.lsxy.app.portal.comm;
 
-import com.lsxy.app.portal.utils.InternetProtocolUtil;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,7 +36,7 @@ public class MCController {
         if(StringUtils.isNotBlank(mobile)){
             Long expire = Long.parseLong(SystemConfig.getProperty("global.sms.vc.ip.expire",(30*60)+""));
             Integer maxNum = Integer.parseInt(SystemConfig.getProperty("global.sms.vc.ip.count",3+""));
-            String remoteAddr = InternetProtocolUtil.getRemoteAddr(request);
+            String remoteAddr = WebUtils.getRemoteAddress(request);
             if(StringUtils.isNotBlank(remoteAddr)){
                 String key = IP_CODE_PREFIX + remoteAddr;
                 //获取缓存里的IP请求的次数，并加1
