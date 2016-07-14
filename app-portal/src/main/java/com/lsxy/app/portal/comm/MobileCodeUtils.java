@@ -1,9 +1,6 @@
 package com.lsxy.app.portal.comm;
 
-import com.lsxy.app.portal.utils.InternetProtocolUtil;
-import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
-import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
