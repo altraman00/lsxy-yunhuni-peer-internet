@@ -102,21 +102,6 @@ public abstract class SecurityFilter implements Filter {
      */
 	public abstract SecurityUserRepository getSecurityUserRepository();
 
-	/**
-	 * 是否是被排除的路径
-	 * @param request
-	 * @return
-	 */
-	private boolean isExcludePath(HttpServletRequest request, String requrl) {
-		if(excludePath != null){
-			for (String p : excludePath) {
-				if(requrl.startsWith(p.trim())){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * @see Filter#init(FilterConfig)
@@ -128,51 +113,6 @@ public abstract class SecurityFilter implements Filter {
 		}
 	}
 
-//
-	/**
-	 * 创建和声云Token cookie
-	 * @param response
-	 */
-	private void createHesyunToken(HttpServletRequest request,HttpServletResponse response,String	username) {
-		long time = new Date().getTime();
-		String token = this.getHsyToken(request);
-		if(StringUtil.isEmpty(token)){
-			logger.debug("not found token cookie,generat it");
-			try {
-				String encodeToken = EncryptDecryptData.encrypt(SystemConfig.getProperty("DES_ENCRYPT_KEY","376B4A409E5789CE"), time+"_"+username);
-				logger.debug("login token:"+encodeToken);
-				Cookie cookie = new Cookie("hesyuntoken", encodeToken);
-				cookie.setDomain(SystemConfig.getProperty("system.sso.domain",".hesyun.com"));
-				cookie.setHttpOnly(true);
-				cookie.setPath("/");
-				response.addCookie(cookie);
-			} catch (Exception ex){
-				ex.printStackTrace();
-			}
 
-		}
-	}
-
-
-	/**
-	 * 从请求对新中获取hsytoken cookie value
-	 *
-	 * @param request
-	 * @return
-	 */
-	private String getHsyToken(HttpServletRequest request) {
-		String token = null;
-
-		Cookie[] cookies = request.getCookies();
-		if(cookies != null){
-			for (Cookie cookie : cookies) {
-				if(cookie.getName().equals("hesyuntoken")){
-					token = cookie.getValue();
-					break;
-				}
-			}
-		}
-		return token;
-	}
 
 }

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <included>
-    <property name="LOG_HOME" value="/opt/yunhuni/logs" />
 
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
     <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
     <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
 
+
     <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
     <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
+    <property name="LOG_HOME" value="/opt/yunhuni/logs" />
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoder默认配置为PartternLayoutEncoder    -->
@@ -40,16 +41,14 @@
             <MaxFileSize>10MB</MaxFileSize>
         </triggeringPolicy>
     </appender>
-    <logger name="com.lsxy" level="DEBUG" additivity="true" />
-    <logger name="org.springframework.security" level="DEBUG" additivity="true" />
-    <logger name="org.hibernate" level="INFO" additivity="true" />
-    <logger name="redis.clients" level="DEBUG" additivity="true" />
-    <logger name="org.springframework.data" level="DEBUG" additivity="true" />
 
+    <logger name="com.lsxy" level="INFO" additivity="true" />
+    <logger name="org.springframework" level="INFO" additivity="true" />
+    <logger name="org.hibernate" level="INFO" additivity="true" />
 
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <!--<appender-ref ref="ROLLINGFILE" />-->
+        <appender-ref ref="FILE" />
     </root>
 </included>
