@@ -36,7 +36,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/account/information/index">基本资料</a>
+                                                <a href="${ctx}/console/account/index">基本资料</a>
                                             </div>
                                         </li>
                                         <li>
@@ -61,8 +61,9 @@
                                 <span class="border-left">&nbsp;基本资料</span></div>
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
-                                    <form:form role="form" action="${ctx}/console/account/information/edit" method="post" class="register-form"
+                                    <form:form role="form" action="" method="post" class="register-form"
                                           id="personalAuthForm">
+                                        <input type="hidden" name="id" value="${account.id}"/>
                                         <p class="noticeInfo hr text-success"><strong>请完善以下信息，方便我们更好的为您服务</strong> </p>
                                         <div class="form-group">
                                             <span class="hr text-label" ><strong>业务信息</strong></span>
@@ -72,23 +73,23 @@
                                             <lable class="col-md-3 text-right">应用行业：</lable>
                                             <div class="col-md-4 ">
                                                 <select name="industry" id="" class="form-control">
-                                                    <option value="互联网" <c:if test="${informationVo.industry == '互联网'}"> selected</c:if> >互联网</option>
-                                                    <option value="餐饮" <c:if test="${informationVo.industry == '餐饮'}"> selected</c:if> >餐饮</option>
-                                                    <option value="金融" <c:if test="${informationVo.industry == '金融'}"> selected</c:if> >金融</option>
+                                                    <option value="互联网" <c:if test="${account.industry == '互联网'}"> selected</c:if> >互联网</option>
+                                                    <option value="餐饮" <c:if test="${account.industry == '餐饮'}"> selected</c:if> >餐饮</option>
+                                                    <option value="金融" <c:if test="${account.industry == '金融'}"> selected</c:if> >金融</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">主要业务：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="business" placeholder="" value="${informationVo.business}  "
+                                                <input type="text" name="business" placeholder="" value="${account.business}  "
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">网站：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" placeholder="" value="${informationVo.url}"
+                                                <input type="text" name="url" placeholder="" value="${account.url}"
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
@@ -113,7 +114,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">通讯地址：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="address" placeholder="" value="${informationVo.address}"
+                                                <input type="text" name="address" placeholder="" value="${account.address}"
                                                        class="form-control input-form notEmpty" />
                                             </div>
                                         </div>
@@ -122,7 +123,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">联系电话：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" placeholder="例如:20-88888888" value="${informationVo.mobile}" name="mobile"
+                                                <input type="text" placeholder="例如:20-88888888" value="${account.phone}" name="phone"
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
@@ -130,8 +131,7 @@
 
                                         <div class="form-group">
                                             <div class="col-md-9">
-                                                <button id="validateBtn" type="submit" class="validateBtnNormal btn btn-primary  btn-form">保存</button>
-                                                <%--<a id="validateBtn" onclick="" class="validateBtnNormal btn btn-primary  btn-form">保存</a>--%>
+                                                <a id="validateBtn"  class="validateBtnNormal btn btn-primary  btn-form">保存</a>
                                             </div>
                                         </div>
                                     </form:form>
@@ -146,22 +146,48 @@
 </section>
 </section>
 
-
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script src="${resPrefixUrl }/js/province.js"></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/personal/auth.js'></script>
 <script>
     function initPCAS()
     {
-        new PCAS("province","city","${informationVo.province}","${informationVo.city}");
+        new PCAS("province","city","${account.province}","${account.city}");
         var myselect = $(".province");
         // myselect.selectmenu("refresh");
         myselect = $(".city");
         // myselect.selectmenu("refresh");
         // myselect = $(".area");
     }
-    var msg = '${msg}';
-    if(msg==''){}else{alert(msg);}
+    $('#personalAuthForm').bootstrapValidator('validate');
+    $('#validateBtn, #validateBtnPersonal').click(function(){
+        var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
+        if(result==true){
+            //提交表单
+            var tempVal = $('#personalAuthForm').serialize().split("&");
+            var dataVal = { '${_csrf.parameterName}':'${_csrf.token}'};
+            for(var i=0;i<tempVal.length;i++){
+                var temp = tempVal[i].split("=");
+                dataVal[temp[0]]=decodeURI(decodeURI((temp[1]),"UTF-8"));
+            }
+            $.ajax({
+                url : "${ctx}/console/account/update",
+                type : 'post',
+                async: false,//使用同步的方式,true为异步方式
+                data :dataVal,
+                dataType: "json",
+                success : function(data){
+                    showtoast(data.msg);
+                },
+                fail:function(){
+                    showtoast('网络异常，请稍后重试');
+                }
+            });
+        }else{
+            $('#personalAuthForm').bootstrapValidator('validate');
+        }
+    });
 </script>
 </body>
 </html>

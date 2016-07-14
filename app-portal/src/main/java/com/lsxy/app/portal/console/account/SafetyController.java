@@ -138,10 +138,8 @@ public class SafetyController extends AbstractPortalController {
      */
     private RestResponse validationPassword(HttpServletRequest request,String oldPws){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/account/safety/validation_password";
-        Map map = new HashMap();
-        map.put("password",oldPws);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map,  String.class);
+        String uri = restPrefixUrl +   "/rest/account/safety/validation_password?password={1}";
+        return  RestRequest.buildSecurityRequest(token).get(uri,  String.class,oldPws);
     }
 
     /**
@@ -182,10 +180,8 @@ public class SafetyController extends AbstractPortalController {
      */
     private RestResponse<Account> saveMobile(HttpServletRequest request,String mobile) {
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +  "/rest/account/safety/save_mobile";
-        Map map = new HashMap();
-        map.put("mobile",mobile);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
+        String uri = restPrefixUrl +  "/rest/account/safety/save_mobile?mobile={1}";
+        return  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
     }
 
 }

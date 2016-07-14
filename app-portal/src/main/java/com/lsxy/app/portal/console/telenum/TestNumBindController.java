@@ -3,7 +3,6 @@ package com.lsxy.app.portal.console.telenum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.MobileCodeUtils;
-import com.lsxy.app.portal.console.account.InformationController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -27,7 +26,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/console/telenum/bind")
 public class TestNumBindController extends AbstractPortalController{
-    private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestNumBindController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     private static final String RESULT_SUCESS = "2";//处理结果-成功
     private static final String RESULT_FIAL = "-2";//处理结果-失败
