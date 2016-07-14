@@ -65,7 +65,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     @Override
     public Recharge paySuccess(String orderId, BigDecimal totalFee) throws MatchMutiEntitiesException {
         Recharge recharge = rechargeDao.findByOrderId(orderId);
-        if(recharge != null && recharge.getAmount().equals(totalFee)){
+        if(recharge != null && recharge.getAmount().compareTo(totalFee)==0){
             String status = recharge.getStatus();
             //如果充值记录是未支付状态，则将支付状态改成已支付，并将钱加到账务表里
             if(RechargeStatus.NOTPAID.name().equals(status)){
