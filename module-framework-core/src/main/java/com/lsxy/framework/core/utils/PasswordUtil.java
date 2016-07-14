@@ -60,7 +60,7 @@ public class PasswordUtil {
 	 * @return
 	 */
 	public static String desencode(String password){
-		String key = SystemConfig.getProperty("DES_ENCRYPT_KEY");
+		String key = SystemConfig.getProperty("global.encrypt.des.key");
 		String result = "";
 		try {
 			result = EncryptDecryptData.encrypt(key,password);
@@ -92,7 +92,7 @@ public class PasswordUtil {
 	 * @return
 	 */
 	public static String desdecode(String password){
-		String key = SystemConfig.getProperty("DES_ENCRYPT_KEY");
+		String key = SystemConfig.getProperty("global.encrypt.des.key");
 		String result="";
 		try {
 			result = EncryptDecryptData.decrypt(key,password);

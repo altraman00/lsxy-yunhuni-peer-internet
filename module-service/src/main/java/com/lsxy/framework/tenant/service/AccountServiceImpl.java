@@ -16,7 +16,13 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -27,6 +33,9 @@ import java.util.Date;
  */
 @Service
 public class AccountServiceImpl extends AbstractService<Account> implements AccountService {
+
+
+    public static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Autowired
     private AccountDao accountDao;
@@ -44,7 +53,6 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     public BaseDaoInterface<Account, Serializable> getDao() {
         return accountDao;
     }
-
 
     @Override
     public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException {
@@ -66,9 +74,16 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
     @Override
+    @Cacheable(value="account",key = "'account_'+#userName" ,unless="#result == null")
     public Account findAccountByUserName(String userName) {
 
-        return accountDao.findByUserNameAndStatus(userName,Account.STATUS_NORMAL);
+        Account account = accountDao.findByUserNameAndStatus(userName,Account.STATUS_NORMAL);
+
+        if (logger.isDebugEnabled()){
+                logger.debug("-> findAccountByUserName In DB {} result: {}",userName,account);
+         }
+
+        return account;
     }
 
     @Override
@@ -122,6 +137,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
                 //修改激活状态,设置密码
                 account.setStatus(Account.STATUS_NORMAL);
                 account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
+                account.setMm(PasswordUtil.desencode(password));
                 this.save(account);
                 Tenant tenant = account.getTenant();
                 //创建主鉴权账号
@@ -176,6 +192,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     public void resetPwdByEmail(String email, String password) {
         Account account = accountDao.findByEmailAndStatus(email, Account.STATUS_NORMAL);
         account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
+        account.setMm(PasswordUtil.desencode(password));
         this.save(account);
     }
 
@@ -183,6 +200,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     public void resetPwdByMobile(String mobile, String password) {
         Account account = accountDao.findByMobileAndStatus(mobile,Account.STATUS_NORMAL);
         account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
+        account.setMm(PasswordUtil.desencode(password));
         this.save(account);
     }
 

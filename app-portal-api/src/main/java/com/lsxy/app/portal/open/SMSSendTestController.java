@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest.test;
+package com.lsxy.app.portal.open;
 
 import com.lsxy.framework.sms.service.SmsService;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -13,7 +13,7 @@ import java.util.Map;
  * Created by Tandy on 2016/7/7.
  */
 @RestController
-@RequestMapping("/rest/sms")
+@RequestMapping("/open/sms")
 public class SMSSendTestController {
 
 
