@@ -74,7 +74,7 @@ public class ForgetPasswordController {
         params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
         params.put("key",uuid);
         params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
-        mailService.send("账号激活",email,"02-portal-notify-reset-password.vm",params);
+        mailService.send("重置密码",email,"02-portal-notify-reset-password.vm",params);
         cacheManager.set(uuid,email,72 * 60 * 60);
         if(logger.isDebugEnabled()){
             logger.debug("邮件重置密码：code:{},email:{}",uuid,email);
