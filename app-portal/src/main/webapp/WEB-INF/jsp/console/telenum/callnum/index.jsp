@@ -82,7 +82,7 @@
                                                 <c:if test="${result.rentStatus==0}">欠费</c:if>
                                                 <c:if test="${result.rentStatus==1}">正常</c:if>
                                             </td>
-                                            <td><a href="#">${result.app.name}</a></td>
+                                            <td><a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a></td>
                                             <td><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></td>
                                         </tr>
                                     </c:forEach>
