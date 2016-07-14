@@ -64,7 +64,7 @@
                                             <ul class="nav">
                                                 <li>
                                                     <div class="aside-li-a active">
-                                                        <a href="./cost_invoice.html">发票信息</a>
+                                                        <a href="${ctx}/console/cost/invoice_info">发票信息</a>
                                                     </div>
                                                 </li>
                                                 <li>
@@ -97,40 +97,44 @@
 
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">发票类型：</lable>
-                                                <lable class="col-md-6  line34">企业增值税专用票</lable>
+                                                <lable class="col-md-6  line34">
+                                                    <c:if test="${invoiceInfo.type == 1}">人增值税普通发票</c:if>
+                                                    <c:if test="${invoiceInfo.type == 2}">企业增值税普通票</c:if>
+                                                    <c:if test="${invoiceInfo.type == 3}">企业增值税专用票</c:if>
+                                                </lable>
                                             </div>
 
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">发票抬头：</lable>
-                                                <lable class="col-md-9 line34 "> 流水行云</lable>
+                                                <lable class="col-md-9 line34 "> ${invoiceInfo.title}</lable>
                                             </div>
                                             <!--企业增值税专用显示-->
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right ">纳税人识别号：</lable>
-                                                <lable class="col-md-9 line34 "> 509175918471494</lable>
-                                            </div>
+                                            <c:if test="${invoiceInfo.type == 3}">
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right ">纳税人识别号：</lable>
+                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.taxpayerNum}</lable>
+                                                </div>
 
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right ">银行账号：</lable>
-                                                <lable class="col-md-9 line34 ">4412345646541165165</lable>
-                                            </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right ">银行账号：</lable>
+                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.bank}</lable>
+                                                </div>
 
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right ">开户行：</lable>
+                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.bankAccount}</lable>
+                                                </div>
 
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right ">开户行：</lable>
-                                                <lable class="col-md-9 line34 ">广东省广州市天河区建设银行龙口东分行</lable>
-                                            </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right ">注册地址：</lable>
+                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.regAddress}</lable>
+                                                </div>
 
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right ">注册地址：</lable>
-                                                <lable class="col-md-9 line34 ">广东省广州市天河区羊城创意园311号B座24</lable>
-                                            </div>
-
-
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right ">企业电话：</lable>
-                                                <lable class="col-md-9 line34 ">0202200220</lable>
-                                            </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right ">企业电话：</lable>
+                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.phone}</lable>
+                                                </div>
+                                            </c:if>
                                             <!--企业增值税专用显示-->
 
                                             <div class="form-group">
@@ -139,21 +143,21 @@
 
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">收取地址：</lable>
-                                                <lable class="col-md-9 line34 ">广东省广州市天河区羊城创意园311号B座24</lable>
+                                                <lable class="col-md-9 line34 "> ${invoiceInfo.receiveAddress}</lable>
 
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">收件人：</lable>
-                                                <lable class="col-md-9 line34 ">谭老师</lable>
+                                                <lable class="col-md-9 line34 "> ${invoiceInfo.receivePeople}</lable>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">手机号：</lable>
-                                                <lable class="col-md-9 line34 ">13611460986</lable>
+                                                <lable class="col-md-9 line34 "> ${invoiceInfo.receiveMobile}</lable>
                                             </div>
 
                                             <div class="form-group">
                                                 <div class="col-md-3 text-right">
-                                                    <a class=" btn btn-primary  btn-form" href="cost_invoice_edit.html">编辑</a>
+                                                    <a class=" btn btn-primary  btn-form" href="${ctx}/console/cost/invoice_info/edit">编辑</a>
                                                 </div>
                                             </div>
 
