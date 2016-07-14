@@ -45,6 +45,7 @@ public class AppController extends AbstractPortalController {
         mav.setViewName("/console/app/list");
         return mav;
     }
+
     /**
      * 获取租户下所有测试绑定号码
      * @param request

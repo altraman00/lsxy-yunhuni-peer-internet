@@ -30,7 +30,7 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
     }
 
     @Override
-    public List<TestNumBind> findByNumber(String userName, String number) throws MatchMutiEntitiesException{
+    public List<TestNumBind> findByNumber(String userName, String number)  {
         Tenant tenant = tenantService.findTenantByUserName(userName) ;
         String hql = "from TestNumBind obj where obj.number=?1 ";
         List<TestNumBind> list = this.findByCustomWithParams(hql, number);
@@ -38,10 +38,16 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
     }
 
     @Override
-    public List<TestNumBind> findAll(String userName) throws MatchMutiEntitiesException{
+    public List<TestNumBind> findAll(String userName,String appId)  {
         Tenant tenant = tenantService.findTenantByUserName(userName) ;
+        List<TestNumBind> list = null;
         String hql = "from TestNumBind obj where obj.tenant.id=?1 ";
-        List<TestNumBind> list = this.findByCustomWithParams(hql, tenant.getId());
+        if(appId!=null&&appId.length()>0){
+            hql +=" obj.app.id=?2 ";
+            list = this.findByCustomWithParams(hql, tenant.getId(),appId);
+        }else{
+            list = this.findByCustomWithParams(hql, tenant.getId());
+        }
         return list;
     }
 }

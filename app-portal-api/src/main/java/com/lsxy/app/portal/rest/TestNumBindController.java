@@ -28,12 +28,11 @@ public class TestNumBindController extends AbstractRestController {
     /**
      * 获取用户下的所有测试号码
      * @return
-     * @throws MatchMutiEntitiesException
      */
     @RequestMapping("/list")
-    public RestResponse list() throws MatchMutiEntitiesException {
+    public RestResponse list()   {
         String userName = getCurrentAccountUserName();
-        List<TestNumBind> list = testMobileBindService.findAll(userName);
+        List<TestNumBind> list = testMobileBindService.findAll(userName,"");
         return RestResponse.success(list);
     }
 
@@ -45,7 +44,7 @@ public class TestNumBindController extends AbstractRestController {
      * @throws IllegalAccessException
      */
     @RequestMapping("/disbind")
-    public RestResponse disbind(String number) throws InvocationTargetException, IllegalAccessException, MatchMutiEntitiesException {
+    public RestResponse disbind(String number) throws InvocationTargetException, IllegalAccessException {
         String userName = getCurrentAccountUserName();
         List<TestNumBind> testMobileBindList = testMobileBindService.findByNumber(userName,number);
         for(int i=0;i<testMobileBindList.size();i++) {
@@ -59,13 +58,13 @@ public class TestNumBindController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/save")
-    public RestResponse save(String number) throws MatchMutiEntitiesException {
+    public RestResponse save(String number)   {
         String userName = getCurrentAccountUserName();
         List<TestNumBind> testMobileBindList = testMobileBindService.findByNumber(userName,number);
         if(testMobileBindList.size()>0){
             return RestResponse.failed("0020","号码已被绑定");
         }
-        List<TestNumBind> list = testMobileBindService.findAll(userName);
+        List<TestNumBind> list = testMobileBindService.findAll(userName,"");
         if(list.size()>5){
             return RestResponse.failed("0030","绑定号码已超过5个");
         }
@@ -75,6 +74,17 @@ public class TestNumBindController extends AbstractRestController {
         testNumBind.setNumber(number);
         testNumBind = testMobileBindService.save(testNumBind);
         return RestResponse.success(testNumBind);
+    }
+    /**
+     * 测试号码绑定
+     * @param numbers 绑定号码id集合
+     * @param appId 应用id
+     * @return
+     */
+    @RequestMapping("/update_app_number")
+    public RestResponse updateAppNumber(String numbers,String appId){
+
+        return RestResponse.success(null);
     }
 
 }

@@ -120,10 +120,10 @@
                                     <div class="col-md-1 remove-padding width-130">
                                         绑定测试号：
                                     </div>
-                                    <div class="col-md-3 " >
+                                    <div class="col-md-3 " id="testNumBind">
                                         <c:forEach items="${testNumBindList}" var="testNumBind">
                                             <c:if test="${testNumBind.app.id==app.id}">
-                                                <span href="">${testNumBind.number}</span>
+                                                <span name="testNum">${testNumBind.number} </span>
                                             </c:if>
                                         </c:forEach>
                                     </div>
@@ -137,8 +137,8 @@
                                     </div>
                                     <div class="col-md-10 ">
                                         <p>
-                                            <c:if test="${result.status==1}"><span class="success">已上线</span></c:if>
-                                            <c:if test="${result.status==2}"><span class="nosuccess">未上线</span></c:if>
+                                            <c:if test="${app.status==1}"><span class="success">已上线</span></c:if>
+                                            <c:if test="${app.status==2}"><span class="nosuccess">未上线</span></c:if>
                                         </p>
                                     </div>
                                 </div>
@@ -241,10 +241,10 @@
     <div class="content">
         <p class="info">注意：一个测试号码同一时间只能绑定到一个应用，绑定完成后，其之前的绑定关系将会被解除</p>
         <div class="input-box ">
-            <form action="${ctx}/" method="">
+            <form role="form" action="${ctx}/console/account/information/edit" method="post" class="register-form" id="testNumBindForm">
                 <c:forEach items="${testNumBindList}" var="testNumBind" varStatus="s">
                     <c:if test="${s.index+1/3==0}"><div class="row mt-20"></c:if>
-                    <div class="col-md-4">  <input type="checkbox" class="check-box" <c:if test="${testNumBind.app.id==app.id}">checked </c:if> />${testNumBind.number}</div>
+                    <div class="col-md-4">  <input type="checkbox" name="testName-${testNumBind.number}" class="check-box" <c:if test="${testNumBind.app.id==app.id}" >checked </c:if> value="${testNumBind.id}" />${testNumBind.number}</div>
                     <c:if test="${s.index+1/3==0}"></div></c:if>
                 </c:forEach>
             </form>
@@ -361,7 +361,37 @@
      */
     $('.modalSureOne').click(function(){
         var id = $(this).attr('data-id');
+        var tempVal = $('#testNumBindForm').serialize().split("&");
+        var testNumBindHtml = "";
+        var number = "";
+        for(var i=0;i<tempVal.length;i++){
+            var temp = tempVal[i].split("=");
+            testNumBindHtml += '<span>'+temp[0].split('-')[1]+' </span>';
+            number+=temp[1]+",";
+        }
+        ;
+        if(number.lastIndexOf(",")!=-1&&number.lastIndexOf(",")==(number.length-1)){
+            alert(123);
+        }
+
+        $('#testNumBind').html(testNumBindHtml);
         hideModal(id);
+        return;
+        $.ajax({
+            url : "${ctx}/console/app/",
+            type : 'post',
+            async: false,//使用同步的方式,true为异步方式
+            data :{ 'number':number,'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},
+            dataType: "json",
+            success : function(data){
+                $('#testNumBind').html(testNumBindHtml);
+                hideModal(id);
+                showtoast(data.msg);
+            },
+            fail:function(){
+                showtoast('网络异常，请稍后重试');
+            }
+        });
     });
 
 

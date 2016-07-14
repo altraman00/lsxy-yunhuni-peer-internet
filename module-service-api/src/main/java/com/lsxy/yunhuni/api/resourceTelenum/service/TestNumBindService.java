@@ -14,9 +14,10 @@ public interface TestNumBindService extends BaseService<TestNumBind>  {
     /**
      * 查询全部测试绑定号码
      * @param userName 用户名
+     * @param appId 应用id
      * @return
      */
-    public List<TestNumBind> findAll(String userName) throws MatchMutiEntitiesException;
+    public List<TestNumBind> findAll(String userName,String appId)  ;
 
     /**
      * 根据手机号码查找测试号码对象
@@ -24,7 +25,7 @@ public interface TestNumBindService extends BaseService<TestNumBind>  {
      * @param userName 用户名
      * @return
      */
-    public List<TestNumBind> findByNumber(String userName, String number) throws MatchMutiEntitiesException;
+    public List<TestNumBind> findByNumber(String userName, String number)  ;
 
 
 }

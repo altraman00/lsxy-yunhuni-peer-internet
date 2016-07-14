@@ -92,7 +92,33 @@ public class TestNumBindController extends AbstractPortalController{
         return hs;
     }
 
-
+    /**
+     * 应用绑定号码更新
+     * @param request
+     * @param numbers 测试号码id集合
+     * @param appId 应用id
+     * @return
+     */
+    @RequestMapping("/update_app_number")
+    @ResponseBody
+    public Map updateAppNumber(HttpServletRequest request,String numbers, String appId){
+        updateAppNumberRest(request,numbers,appId);
+        Map hs = new HashMap();
+        hs.put("msg","应用绑定号码更新成功");
+        return hs;
+    }
+    /**
+     * 测试手机绑定号码
+     * @param request
+     * @param numbers 测试号码id集合
+     * @param appId 应用id
+     * @return
+     */
+    private RestResponse updateAppNumberRest(HttpServletRequest request,String numbers ,String appId){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl + "/rest/test_num_bind/update_app_number?numbers={1}&appId={2}";
+        return  RestRequest.buildSecurityRequest(token).get(uri, TestNumBind.class,numbers,appId);
+    }
     /**
      * 测试手机绑定号码
      * @param request
