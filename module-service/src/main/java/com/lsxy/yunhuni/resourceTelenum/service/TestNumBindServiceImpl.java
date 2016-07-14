@@ -11,6 +11,7 @@ import com.lsxy.yunhuni.resourceTelenum.dao.TestNumBindDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.List;
 
@@ -38,16 +39,10 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
     }
 
     @Override
-    public List<TestNumBind> findAll(String userName,String appId)  {
+    public List<TestNumBind> findAll(String userName)  {
         Tenant tenant = tenantService.findTenantByUserName(userName) ;
-        List<TestNumBind> list = null;
         String hql = "from TestNumBind obj where obj.tenant.id=?1 ";
-        if(appId!=null&&appId.length()>0){
-            hql +=" obj.app.id=?2 ";
-            list = this.findByCustomWithParams(hql, tenant.getId(),appId);
-        }else{
-            list = this.findByCustomWithParams(hql, tenant.getId());
-        }
+        List<TestNumBind> list = this.findByCustomWithParams(hql, tenant.getId());
         return list;
     }
 }

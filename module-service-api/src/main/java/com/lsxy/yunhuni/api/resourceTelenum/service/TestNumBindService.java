@@ -14,10 +14,9 @@ public interface TestNumBindService extends BaseService<TestNumBind>  {
     /**
      * 查询全部测试绑定号码
      * @param userName 用户名
-     * @param appId 应用id
      * @return
      */
-    public List<TestNumBind> findAll(String userName,String appId)  ;
+    public List<TestNumBind> findAll(String userName )  ;
 
     /**
      * 根据手机号码查找测试号码对象

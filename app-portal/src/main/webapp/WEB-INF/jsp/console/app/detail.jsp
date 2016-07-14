@@ -361,31 +361,30 @@
      */
     $('.modalSureOne').click(function(){
         var id = $(this).attr('data-id');
-        var tempVal = $('#testNumBindForm').serialize().split("&");
-        var testNumBindHtml = "";
-        var number = "";
-        for(var i=0;i<tempVal.length;i++){
-            var temp = tempVal[i].split("=");
-            testNumBindHtml += '<span>'+temp[0].split('-')[1]+' </span>';
-            number+=temp[1]+",";
+        var allNum = $('#testNumBindForm').serialize();
+        var testNumBindHtml = "";//回显示内容
+        var numbers = "";//重新绑定手机号码
+        if(allNum.trim().length>0){
+            var tempVal = allNum.split("&");
+            for(var i=0;i<tempVal.length;i++){
+                var temp = tempVal[i].split("=");
+                testNumBindHtml += '<span>'+temp[0].split('-')[1]+' </span>';
+                numbers+=temp[1]+",";
+            }
+            if(numbers.lastIndexOf(",")!=-1&&numbers.lastIndexOf(",")==(numbers.length-1)){
+                numbers =  ","+numbers;
+            }
         }
-        ;
-        if(number.lastIndexOf(",")!=-1&&number.lastIndexOf(",")==(number.length-1)){
-            alert(123);
-        }
-
-        $('#testNumBind').html(testNumBindHtml);
-        hideModal(id);
-        return;
         $.ajax({
-            url : "${ctx}/console/app/",
+            url : "${ctx}/console/telenum/bind/update_app_number",
             type : 'post',
             async: false,//使用同步的方式,true为异步方式
-            data :{ 'number':number,'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},
+            data :{ 'numbers':numbers,'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},
             dataType: "json",
             success : function(data){
                 $('#testNumBind').html(testNumBindHtml);
                 hideModal(id);
+
                 showtoast(data.msg);
             },
             fail:function(){
