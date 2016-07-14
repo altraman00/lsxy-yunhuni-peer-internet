@@ -160,7 +160,6 @@
                         }else if(result.vc){
                             sendResult = false;
                             //发送不成功，且要输入图形验证码
-                            tipsmsg(result.err,'secondcodeTips');
                             isVc = true;
 
                             //启动二次校验
@@ -171,6 +170,7 @@
 
                             $('#second-codeblock').html(html);
 
+                            tipsmsg(result.err,'secondcodeTips');
                         }else{
                             sendResult = false;
                             tipsmsg(result.err,'mobileCodeTips');
