@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,7 +95,7 @@ public class RegisterController {
      * @return
      */
     @RequestMapping("/create_account")
-    public RestResponse createAccount(String userName,String mobile,String email) throws MailConfigNotEnabledException, MailContentNullException {
+    public RestResponse createAccount(String userName,String mobile,String email) throws Exception {
         RestResponse response;
         //创建用户前再进行一次校验
         int result = accountService.checkRegInfo(userName,mobile,email);
@@ -100,14 +103,15 @@ public class RegisterController {
             Account account = accountService.createAccount(userName,mobile,email);
             if(account != null){
                 response = RestResponse.success(account);
-                //TODO MQ事件，发送激活邮件
+                //TODO 发送激活邮件
                 String uuid = UUIDGenerator.uuid();
                 Map<String,String> params = new HashMap<>();
                 params.put("host", SystemConfig.getProperty("portal.system.root.url"));
                 params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
                 params.put("uid",account.getId());
                 params.put("code",uuid);
-                params.put("username",account.getUserName());
+                params.put("username",  URLEncoder.encode(account.getUserName(), "utf-8"));
+                params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
                 mailService.send("账号激活",account.getEmail(),"01-portal-notify-account-activate.vm",params);
 
                 if(logger.isDebugEnabled()){

@@ -3,6 +3,7 @@ package com.lsxy.app.portal.console.cost;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  */
 public class RechargeVO extends Recharge{
     private Tenant tenant;                //所属租户
-    private Double amount;                //充值金额
+    private BigDecimal amount;                //充值金额
     private String type;                  //充值方式
     private String status;                //充值状态
     private String orderId;               //订单ID
@@ -35,12 +36,12 @@ public class RechargeVO extends Recharge{
     }
 
     @Override
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
     @Override
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

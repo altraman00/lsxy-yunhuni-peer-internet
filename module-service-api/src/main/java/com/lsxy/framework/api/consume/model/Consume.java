@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Date;
 public class Consume extends IdEntity {
     private Date dt;//消费时间
     private String type;//消费类型 目前直接存名字
-    private double amount;//消费金额
+    private BigDecimal amount;//消费金额
     private String remark;//备注
     private String appId;//所属应用编号（仅用查询，如需关联应用等合并结构后改）
     private Tenant tenant;//所属租户
@@ -45,11 +46,11 @@ public class Consume extends IdEntity {
         this.type = type;
     }
     @Column(name = "amount")
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
     @Column(name = "app_id")
