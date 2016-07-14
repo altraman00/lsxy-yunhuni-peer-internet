@@ -16,7 +16,7 @@ public class Feedback extends IdEntity {
     private static final long serialVersionUID = 1L;
 
     private String content;// 内容
-    private int status;//状态 '0未处理;1已处理',
+    private Integer status;//状态 '0未处理;1已处理',
     Tenant tenant;//所属租户
     Account account;//所属用户
 
@@ -34,11 +34,11 @@ public class Feedback extends IdEntity {
     }
 
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class AccountMessage extends IdEntity {
     private Message message;//对于消息
     private Account account;//所属用户
-    private int status;//消息状态 '0未处理;1已读;-1已删除'
+    private Integer status;//消息状态 '0未处理;1已读;-1已删除'
 
     @ManyToOne
     @JoinColumn(name = "message_id")
@@ -35,11 +35,11 @@ public class AccountMessage extends IdEntity {
         this.account = account;
     }
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }

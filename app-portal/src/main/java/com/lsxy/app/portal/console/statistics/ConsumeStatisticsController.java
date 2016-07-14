@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -146,9 +147,9 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[i]=((ConsumeMonth)obj).getSumAmount();
+                list1[i]=((ConsumeMonth)obj).getSumAmount().doubleValue();
             }else if(obj instanceof ConsumeDay){
-                list1[i]=((ConsumeDay)obj).getSumAmount();
+                list1[i]=((ConsumeDay)obj).getSumAmount().doubleValue();
             }
         }
         return list1;

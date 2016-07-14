@@ -20,7 +20,7 @@ public class Tenant extends IdEntity {
 
 	private static final long serialVersionUID = 1L;
 	//是否实名
-	private int isRealAuth;
+	private Integer isRealAuth;
 
 	//租户识别码
 	private String tenantUid;
@@ -28,11 +28,11 @@ public class Tenant extends IdEntity {
 	private String registerUserId; //注册的账号ID
 
 	@Column(name = "is_real_auth")
-	public int getIsRealAuth() {
+	public Integer getIsRealAuth() {
 		return isRealAuth;
 	}
 
-	public void setIsRealAuth(int isRealAuth) {
+	public void setIsRealAuth(Integer isRealAuth) {
 		this.isRealAuth = isRealAuth;
 	}
 

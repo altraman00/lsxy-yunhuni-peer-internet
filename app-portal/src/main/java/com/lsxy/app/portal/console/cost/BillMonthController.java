@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class BillMonthController extends AbstractPortalController {
         }
         String token = this.getSecurityToken(request);
         List<BillMonth> billMonths = getBillMonthRest(token, appId, month);
-        Double sumAmount = billMonths.stream().map(b -> b.getAmount()).reduce(0D, (sum, item) -> sum + item);
+        BigDecimal sumAmount = billMonths.stream().map(b -> b.getAmount()).reduce(new BigDecimal(0), (sum, item) -> sum.add(item));
         model.put("sumAmount",sumAmount);
         model.put("billMonths",billMonths);
         model.put("appList",getAppList(token));
