@@ -90,8 +90,9 @@
             <div class="code-title">验证码 :</div>
             <input class="code form-control" type="text" name="mobileCode" id="mobileCode"/>
             <button class="code-button" id="send-code" >发送验证码</button>
-            <span id="mobileCodeTips" class="tips-error" style="display: none" ></span>
         </div>
+        <div class="input in-block" id="second-codeblock" ></div>
+        <p id="mobileCodeTips" class="text-center tips-error" ></p>
     </div>
     <div class="footer">
         <a id="modal-hidden" class="cancel">返回</a>
@@ -129,11 +130,54 @@
 
     });
 
+    var isVc = false;       //是否需要图形验证码
     function send_mobile_code(){
+        var sendResult = false; //是否发送手机验证码成功
+
         var mobile = $("input[name='mobile']").val();
-        //异步发送验证码
-        $.get(ctx + "/mc/send",{"mobile":mobile});
-        return true;
+        var vCode = "";
+        if(isVc){
+            //校验四位验证码是否正确
+            if($('#second-code').length>0){
+                var second = $('#second-code').val();
+                if(second.length!=4){
+                    tipsmsg('请输入四位验证码','mobileCodeTips'); return false;
+                }
+            }
+            vCode = $("#second-code").val();
+        }
+        //ajax发送验证码
+        $.ajax({
+            type: "get",
+            url: ctx + "/mc/send",
+            data: {"mobile":mobile,validateCode:vCode},   //id
+            async: false,
+            dataType: "json",
+            success: function(result) {
+                if(result.flag){
+                    //发送成功
+                    sendResult = true;
+                }else if(result.vc){
+                    sendResult = false;
+                    //发送不成功，且要输入图形验证码
+                    tipsmsg(result.err,'mobileCodeTips');
+                    isVc = true;
+
+                    //启动二次校验
+                    $('#second-code').show();
+                    var html = '<div class="code-title">验证码 :</div><input class="code form-control" type="text" name="" id="second-code" onkeyup="clearErrMsg()"/>';
+                    html += '<a class="code-img"><img id="imgValidateCode" src="' + ctx + '/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"></a>';
+                    $('#second-codeblock').html(html);
+
+                }else{
+                    sendResult = false;
+                    tipsmsg(result.err,'mobileCodeTips');
+                }
+            }
+        });
+
+        //获取验证码
+        return sendResult;
     }
 
 
@@ -163,6 +207,13 @@
     }
 
 
+    function clearErrMsg(){
+        $('.tips-error').hide();
+    }
+
+    function changeImgCode(){
+        $("#imgValidateCode").prop("src",ctx + "/vc/get?dt="+(new Date().getTime()));
+    }
 </script>
 
 </body>
