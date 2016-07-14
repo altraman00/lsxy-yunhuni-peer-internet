@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest;
+package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.web.rest.RestResponse;

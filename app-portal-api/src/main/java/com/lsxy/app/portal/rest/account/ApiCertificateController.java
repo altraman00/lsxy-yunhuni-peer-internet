@@ -1,4 +1,4 @@
-package com.lsxy.app.portal.rest;
+package com.lsxy.app.portal.rest.account;
 
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
