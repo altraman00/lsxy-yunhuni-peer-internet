@@ -31,7 +31,7 @@
                                     <nav class="hidden-xs">
                                         <ul class="nav">
                                             <li>
-                                                <div class="aside-li-a active">
+                                                <div class="aside-li-a">
                                                     <a href="${ctx}/console/cost/consume">消费记录</a>
                                                 </div>
                                             </li>
@@ -47,7 +47,7 @@
                                             </li>
                                             <li>
                                                 <div class="aside-li-a">
-                                                    <a href="./cost_month.html">月结账单</a>
+                                                    <a href="${ctx}/console/cost/bill_month/get">月结账单</a>
                                                 </div>
                                             </li>
                                         </ul>

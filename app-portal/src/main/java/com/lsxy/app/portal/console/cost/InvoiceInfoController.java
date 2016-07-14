@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.console.cost;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.api.consume.model.Consume;
@@ -38,7 +39,7 @@ public class InvoiceInfoController extends AbstractPortalController {
         return new ModelAndView(returView,model);
     }
 
-    @RequestMapping(value = "/edit",method = RequestMethod.POST)
+    @RequestMapping(value = "/edit",method = RequestMethod.GET)
     public ModelAndView edit(HttpServletRequest request){
         String returView;
         Map<String,Object> model = new HashMap<>();
@@ -54,13 +55,15 @@ public class InvoiceInfoController extends AbstractPortalController {
         String returView;
         Map<String,Object> model = new HashMap<>();
         String token = this.getSecurityToken(request);
-        saveInvoiceInfo(token,invoiceInfo);
+        saveInvoiceInfo(token, invoiceInfo);
         returView = "redirect:/console/cost/invoice_info";
         return new ModelAndView(returView,model);
     }
 
     private void saveInvoiceInfo(String token, InvoiceInfo invoiceInfo) {
-
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_info/save";
+        Map<String, Object> map = new ObjectMapper().convertValue(invoiceInfo, Map.class);
+        RestRequest.buildSecurityRequest(token).post(url, map,InvoiceInfo.class);
     }
 
     /**

@@ -31,7 +31,7 @@
                                     <nav class="hidden-xs">
                                         <ul class="nav">
                                             <li>
-                                                <div class="aside-li-a active">
+                                                <div class="aside-li-a">
                                                     <a href="${ctx}/console/cost/consume">消费记录</a>
                                                 </div>
                                             </li>
@@ -69,7 +69,7 @@
                                                 </li>
                                                 <li>
                                                     <div class="aside-li-a">
-                                                        <a href="./cost_invoice_record.html">发票申请</a>
+                                                        <a href="${ctx}/console/cost/bill_month/get">发票申请</a>
                                                     </div>
                                                 </li>
                                             </ul>
@@ -92,32 +92,34 @@
                                 </div>
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="row">
-                                        <div class="form-group">
-                                            <span class="hr text-label" ><strong>发票信息:</strong></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <lable class="col-md-3 text-right">发票类型：</lable>
-                                            <div class="invoice_select col-md-6 ">
-                                                <input type="radio" name="invoice" class="invoice_radio" value="1"
-                                                       <c:if test="${invoiceInfo == null || invoiceInfo.type == 1}">checked="checked"</c:if>
-                                                       data-val="1"/>人增值税普通发票
-                                                <input type="radio" name="invoice" class="invoice_radio" value="2"
-                                                       <c:if test="${invoiceInfo.type == 2}">checked="checked"</c:if>
-                                                       data-val="2">
-                                                企业增值税普通票
-                                                <input type="radio" name="invoice" class="invoice_radio" value="3"
-                                                       <c:if test="${invoiceInfo.type == 3}">checked="checked"</c:if>
-                                                       data-val="3">
-                                                企业增值税专用票
+                                        <div class="register-form padding-15">
+                                            <div class="form-group">
+                                                <span class="hr text-label" ><strong>发票信息:</strong></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <lable class="col-md-3 text-right">发票类型：</lable>
+                                                <div class="invoice_select col-md-6 ">
+                                                    <input type="radio" name="invoice" class="invoice_radio" value="1"
+                                                           <c:if test="${invoiceInfo == null || invoiceInfo.type == 1}">checked="checked"</c:if>
+                                                           data-val="1"/>人增值税普通发票
+                                                    <input type="radio" name="invoice" class="invoice_radio" value="2"
+                                                           <c:if test="${invoiceInfo.type == 2}">checked="checked"</c:if>
+                                                           data-val="2">
+                                                    企业增值税普通票
+                                                    <input type="radio" name="invoice" class="invoice_radio" value="3"
+                                                           <c:if test="${invoiceInfo.type == 3}">checked="checked"</c:if>
+                                                           data-val="3">
+                                                    企业增值税专用票
+                                                </div>
                                             </div>
                                         </div>
 
                                         <!--个人普通-->
                                         <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
-                                               id="costInvoiceForm">
-                                            <input type="hidden" name="id" value="${invoiceInfo.id}"/>
-                                            <input type="hidden" name="invoice" value="1"/>
+                                               id="personInvoiceForm">
                                             <div class='personal radiotap' data-val="1">
+                                                <input type="hidden" name="id" value="${invoiceInfo.id}"/>
+                                                <input type="hidden" name="type" value="1"/>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">发票抬头：</lable>
                                                     <div class="col-md-4 ">
@@ -162,10 +164,10 @@
                                         </form:form>
                                         <!--企业普通-->
                                         <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
-                                               id="costInvoiceForm">
-                                            <input type="hidden" name="id" value="${invoiceInfo.id}"/>
-                                            <input type="hidden" name="invoice" value="2"/>
-                                            <div class='company radiotap' data-val="2">
+                                               id="comInvoiceForm">
+                                            <div class='company radiotap' data-val="2" >
+                                                <input type="hidden" name="id" value="${invoiceInfo.id}"/>
+                                                <input type="hidden" name="type" value="2"/>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">发票抬头：</lable>
                                                     <div class="col-md-4 ">
@@ -211,10 +213,10 @@
 
                                         <!--企业专用-->
                                         <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
-                                                   id="costInvoiceForm">
-                                            <input type="hidden" name="id" value="${invoiceInfo.id}"/>
-                                            <input type="hidden" name="invoice" value="3"/>
+                                                   id="comSpecialInvoiceForm">
                                             <div class="companyex radiotap" data-val="3" style="display: none">
+                                                <input type="hidden" name="id" value="${invoiceInfo.id}"/>
+                                                <input type="hidden" name="type" value="3"/>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">发票抬头：</lable>
                                                     <div class="col-md-4 ">
@@ -225,7 +227,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">纳税人识别号：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="text" name="" placeholder="" name="taxpayerNum"  value="${invoiceInfo.receiveMobile}"
+                                                        <input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}"
                                                                class="form-control input-form notEmpty"/>
                                                     </div>
                                                 </div>
@@ -305,6 +307,13 @@
 </section>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
+<script>
+    function getSelectRadio(){
+        return $(":radio[name='invoice']:checked").val();
+    }
+
+
+</script>
 </body>
 
 </html>

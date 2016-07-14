@@ -37,4 +37,14 @@ public class InvoiceInfoServiceImpl extends AbstractService<InvoiceInfo> impleme
         }
         return invoiceInfo;
     }
+
+    @Override
+    public InvoiceInfo create(InvoiceInfo invoiceInfo, String userName) {
+        Tenant tenant = tenantService.findTenantByUserName(userName);
+        invoiceInfo.setTenant(tenant);
+        this.save(invoiceInfo);
+        return invoiceInfo;
+    }
+
+
 }
