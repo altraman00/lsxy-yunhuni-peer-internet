@@ -18,7 +18,7 @@ public class RealnamePrivate extends IdEntity {
     private String idNumber;//'身份证号
     private String idPhoto;//身份证照片
     private String idType;//认证证件类型
-    private int status;//实名认证状态
+    private Integer status;//实名认证状态
     public RealnamePrivate() {
     }
 
@@ -43,11 +43,11 @@ public class RealnamePrivate extends IdEntity {
         this.tenant = tenant;
     }
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

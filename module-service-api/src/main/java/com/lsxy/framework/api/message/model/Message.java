@@ -14,15 +14,15 @@ import java.util.Date;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_message")
 public class Message extends IdEntity {
-    private int type;//消息类型
+    private Integer type;//消息类型
     private String content;//消息内容
     private Date createTime;//创建时间
     @Column(name = "type")
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(Integer type) {
         this.type = type;
     }
     @Column(name = "content")

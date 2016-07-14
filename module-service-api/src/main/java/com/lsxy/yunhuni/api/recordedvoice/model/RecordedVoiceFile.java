@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class RecordedVoiceFile extends IdEntity {
     private String url;     //文件URL
     private App app;        //所属APP
-    private double size;    //文件大小
+    private Double size;    //文件大小
     private CallSession callSession; //所属会话
 
     @Column(name = "url")
@@ -37,11 +37,11 @@ public class RecordedVoiceFile extends IdEntity {
     }
 
     @Column(name = "size")
-    public double getSize() {
+    public Double getSize() {
         return size;
     }
 
-    public void setSize(double size) {
+    public void setSize(Double size) {
         this.size = size;
     }
 

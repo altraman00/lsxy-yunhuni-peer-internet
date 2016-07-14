@@ -16,16 +16,16 @@ public class CallSession extends IdEntity {
     public static final int STATUS_OVER = 2;
     public static final int STATUS_RINGING = 3;
 
-    private int status;         //状态
+    private Integer status;         //状态
     private App app;            //所属APP
     private Tenant tenant;      //所属tenant
 
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -26,7 +27,7 @@ public class CallRecord extends IdEntity {
     private Date callStartTime; //呼叫开始时间
     private Date callAckTime;   //呼叫应答时间
     private Date callEndTime;   //呼叫结束时间
-    private double cost;        //成本价
+    private BigDecimal cost;        //成本价
 
     @Column(name = "area_id")
     public String getAreaId() {
@@ -148,11 +149,11 @@ public class CallRecord extends IdEntity {
     }
 
     @Column(name = "cost")
-    public double getCost() {
+    public BigDecimal getCost() {
         return cost;
     }
 
-    public void setCost(double cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 }

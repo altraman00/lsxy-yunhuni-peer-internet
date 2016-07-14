@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -17,7 +18,7 @@ public class BillMonth extends IdEntity {
     private Date dt;                    //统计时间
     private Integer month;              //月份
     private String type;                //统计项目
-    private Double amount;              //总额
+    private BigDecimal amount;              //总额
     private String appId;               //所属应用
     private String tenantId;            //所属租户
 
@@ -25,7 +26,7 @@ public class BillMonth extends IdEntity {
 
     }
 
-    public BillMonth(String tenantId,Date dt,String type,Double amount){
+    public BillMonth(String tenantId,Date dt,String type,BigDecimal amount){
         this.tenantId = tenantId;
         this.dt = dt;
         this.type = type;
@@ -60,11 +61,11 @@ public class BillMonth extends IdEntity {
     }
 
     @Column(name = "amount")
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
