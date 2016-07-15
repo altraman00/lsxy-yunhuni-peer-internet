@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * 账务
@@ -14,7 +15,7 @@ import javax.persistence.*;
 public class Billing extends IdEntity {
 
     private Tenant tenant;                //所属租户
-    private Double balance;               //余额
+    private BigDecimal balance;               //余额
     private Integer voiceRemain;          //剩余语音流量（分钟）
     private Integer smsRemain;            //语音短信余量（条）
     private Integer conferenceRemain;     //会议剩余量（分钟）
@@ -29,11 +30,11 @@ public class Billing extends IdEntity {
     }
 
     @Column(name = "balance")
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

@@ -6,6 +6,7 @@ import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * 充值记录表
@@ -16,7 +17,7 @@ import javax.persistence.*;
 public class Recharge  extends IdEntity {
 
     private Tenant tenant;                //所属租户
-    private Double amount;                //充值金额
+    private BigDecimal amount;                //充值金额
     private String type;                  //充值方式 参考RechargeType
     private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
@@ -24,7 +25,7 @@ public class Recharge  extends IdEntity {
     public Recharge() {
     }
 
-    public Recharge(Tenant tenant, Double amount, RechargeType type, RechargeStatus status, String orderId) {
+    public Recharge(Tenant tenant, BigDecimal amount, RechargeType type, RechargeStatus status, String orderId) {
         this.tenant = tenant;
         this.amount = amount;
         this.type = type.name();
@@ -43,11 +44,11 @@ public class Recharge  extends IdEntity {
     }
 
     @Column(name = "amount")
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

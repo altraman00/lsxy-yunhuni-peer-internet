@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.recharge.model;
 import com.lsxy.framework.api.base.IdEntity;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * 第三方支付记录表
@@ -16,7 +17,7 @@ public class ThirdPayRecord extends IdEntity {
     private String orderId;             //订单ID
     private String tradeNo;             //第三方支付平台的交易号
     private String tradeStatus;         //交易状态
-    private Double totalFee;            //交易金额
+    private BigDecimal totalFee;            //交易金额
     private String sellerId;            //卖家在第三方支付的账号ID
     private String buyerId;             //买家在第三方支付的账号ID
     private String sellerName;          //卖家在第三方支付的用户名
@@ -69,11 +70,11 @@ public class ThirdPayRecord extends IdEntity {
     }
 
     @Column(name = "total_fee")
-    public Double getTotalFee() {
+    public BigDecimal getTotalFee() {
         return totalFee;
     }
 
-    public void setTotalFee(Double totalFee) {
+    public void setTotalFee(BigDecimal totalFee) {
         this.totalFee = totalFee;
     }
 

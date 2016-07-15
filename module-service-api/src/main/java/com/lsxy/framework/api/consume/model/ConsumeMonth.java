@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -15,28 +16,28 @@ import java.util.Date;
 @Table(schema="db_lsxy_base",name = "tb_base_consume_month")
 public class ConsumeMonth extends IdEntity {
     private Date dt;//统计时间
-    private int month;//统计月 区间1-12
-    private double amongAmount;//消费统计 decimal(10,0) DEFAULT NULL,
-    private double sumAmount;//消费金额,
-    private int amongSessionConut;//会话数统计
-    private int sumSessionCount;//会话统计
+    private Integer month;//统计月 区间1-12
+    private BigDecimal amongAmount;//消费统计 decimal(10,0) DEFAULT NULL,
+    private BigDecimal sumAmount;//消费金额,
+    private Integer amongSessionConut;//会话数统计
+    private Integer sumSessionCount;//会话统计
     private String appId;//所属应用,
     private String tenantId;//所属租户
     @Column(name = "month")
-    public int getMonth() {
+    public Integer getMonth() {
         return month;
     }
 
-    public void setMonth(int month) {
+    public void setMonth(Integer month) {
         this.month = month;
     }
 
     @Column(name = "sum_amount")
-    public double getSumAmount() {
+    public BigDecimal getSumAmount() {
         return sumAmount;
     }
 
-    public void setSumAmount(double sumAmount) {
+    public void setSumAmount(BigDecimal sumAmount) {
         this.sumAmount = sumAmount;
     }
     @Column(name = "dt")
@@ -48,27 +49,27 @@ public class ConsumeMonth extends IdEntity {
         this.dt = dt;
     }
     @Column(name = "among_amount")
-    public double getAmongAmount() {
+    public BigDecimal getAmongAmount() {
         return amongAmount;
     }
 
-    public void setAmongAmount(double amongAmount) {
+    public void setAmongAmount(BigDecimal amongAmount) {
         this.amongAmount = amongAmount;
     }
     @Column(name = "among_session_count")
-    public int getAmongSessionConut() {
+    public Integer getAmongSessionConut() {
         return amongSessionConut;
     }
 
-    public void setAmongSessionConut(int amongSessionConut) {
+    public void setAmongSessionConut(Integer amongSessionConut) {
         this.amongSessionConut = amongSessionConut;
     }
     @Column(name = "sum_session_count")
-    public int getSumSessionCount() {
+    public Integer getSumSessionCount() {
         return sumSessionCount;
     }
 
-    public void setSumSessionCount(int sumSessionCount) {
+    public void setSumSessionCount(Integer sumSessionCount) {
         this.sumSessionCount = sumSessionCount;
     }
     @Column(name = "tenant_id")

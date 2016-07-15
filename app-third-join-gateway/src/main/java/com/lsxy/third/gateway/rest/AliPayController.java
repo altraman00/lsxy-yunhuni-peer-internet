@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class AliPayController extends AbstractAPIController{
                 payRecord.setOrderId(params.get("out_trade_no"));
                 payRecord.setTradeNo(params.get("trade_no"));
                 payRecord.setTradeStatus(params.get("trade_status"));
-                payRecord.setTotalFee(new Double(params.get("total_fee").trim()));
+                payRecord.setTotalFee(new BigDecimal(params.get("total_fee").trim()));
                 payRecord.setSellerId(params.get("seller_id"));
                 payRecord.setBuyerId(params.get("buyer_id"));
                 payRecord.setSellerName(params.get("seller_email"));

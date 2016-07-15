@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class MobileCodeUtils {
 
+
     public static MobileCodeChecker getMobileCodeChecker(HttpServletRequest request){
         Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
         if(obj != null && obj instanceof MobileCodeChecker){
@@ -18,10 +19,19 @@ public class MobileCodeUtils {
         }
     }
 
+    /**
+     * 验证通过的手机将其存入session
+     * @param request
+     * @param checker
+     */
     public static void setMobileCodeChecker(HttpServletRequest request,MobileCodeChecker checker){
         request.getSession().setAttribute(PortalConstants.MC_KEY,checker);
     }
 
+    /**
+     * 认证的后续功能完成后，将缓存清掉
+     * @param request
+     */
     public static void removeMobileCodeChecker(HttpServletRequest request){
         Object obj = request.getSession().getAttribute(PortalConstants.MC_KEY);
         if(obj != null && obj instanceof MobileCodeChecker){

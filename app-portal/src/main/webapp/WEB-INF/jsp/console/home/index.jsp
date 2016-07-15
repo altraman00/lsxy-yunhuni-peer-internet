@@ -188,7 +188,8 @@
 
     // restfult api 重新生成confirm
     $('.reset_sk_confirm').on('click',function(e){
-        bootbox.confirm("确定重新生成么", function(result) {
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确定重新生成secretKey么", function(result) {
             if(result){
                 $.ajax({
                     type: "get",
