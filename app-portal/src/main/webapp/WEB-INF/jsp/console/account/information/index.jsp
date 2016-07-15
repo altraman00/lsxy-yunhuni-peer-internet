@@ -73,9 +73,12 @@
                                             <lable class="col-md-3 text-right">应用行业：</lable>
                                             <div class="col-md-4 ">
                                                 <select name="industry" id="" class="form-control">
-                                                    <option value="互联网" <c:if test="${account.industry == '互联网'}"> selected</c:if> >互联网</option>
-                                                    <option value="餐饮" <c:if test="${account.industry == '餐饮'}"> selected</c:if> >餐饮</option>
+                                                    <option value="通讯" <c:if test="${account.industry == '通讯'}"> selected</c:if> >通讯</option>
+                                                    <option value="教育" <c:if test="${account.industry == '教育'}"> selected</c:if> >教育</option>
+                                                    <option value="医疗" <c:if test="${account.industry == '医疗'}"> selected</c:if> >医疗</option>
+                                                    <option value="电力" <c:if test="${account.industry == '电力'}"> selected</c:if> >电力</option>
                                                     <option value="金融" <c:if test="${account.industry == '金融'}"> selected</c:if> >金融</option>
+                                                    <option value="其他" <c:if test="${account.industry == '其他'}"> selected</c:if> >其他</option>
                                                 </select>
                                             </div>
                                         </div>

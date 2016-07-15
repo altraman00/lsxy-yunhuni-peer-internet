@@ -98,7 +98,7 @@
 
                                         <div class="form-group">
                                             <div class="col-md-9 remove-padding">
-                                                <a id="validateBtn" class="btn btn-primary  btn-form">保存</a>
+                                                <a id="validateBtn" class="btn btn-primary  btn-form" >保存</a>
                                             </div>
                                         </div>
                                     </form:form>
@@ -118,8 +118,8 @@
 <script type="text/javascript">
     $('#validateBtn').click(function(){
         var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
-        showtoast(result);
         if(result==true){
+            $('#validateBtn').attr('disabled','disabled');
             //提交表单
             $.ajax({
                 url : "${ctx}/console/account/safety/edit_psw",
@@ -128,10 +128,16 @@
                 data :getFormJson("#personalAuthForm"),
                 dataType: "json",
                 success : function(data){
-                    showtoast(data.msg);
+                    if(data.code=='0'){
+                        showtoast(data.msg,'${ctx}/console/account/safety/index');
+                    }else{
+                        showtoast(data.msg);
+                        $('#validateBtn').removeAttr('disabled');
+                    }
                 },
                 fail:function(){
                     showtoast('网络异常，请稍后重试');
+                    $('#validateBtn').removeAttr('disabled');
                 }
             });
         }else{

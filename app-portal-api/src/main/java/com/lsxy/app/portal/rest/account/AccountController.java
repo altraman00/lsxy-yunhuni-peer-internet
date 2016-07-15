@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.reflect.InvocationTargetException;
 
 /**
+ * 用户管理
  * Created by Tandy on 2016/6/14.
+ * Edit by zhangxb on 2016/07/15
  */
 @RequestMapping("/rest/account")
 @PreAuthorize("hasAuthority('ROLE_TENANT_USER')")
@@ -45,9 +47,7 @@ public class AccountController extends AbstractRestController {
     public RestResponse saveInformation(Account account) throws InvocationTargetException, IllegalAccessException {
         String userName = getCurrentAccountUserName();
         Account oldAccount = accountService.findAccountByUserName(userName);
-        String o1 = oldAccount.getPassword();
         EntityUtils.copyProperties(oldAccount, account);
-        String o2 = oldAccount.getPassword();
         oldAccount  = accountService.save(oldAccount);
         return RestResponse.success(oldAccount);
     }
