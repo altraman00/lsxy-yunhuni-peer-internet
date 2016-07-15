@@ -134,8 +134,9 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">所属行业：</lable>
                                                 <div class="col-md-4">
-                                                    <c:set var="industry" value="${account.industry}"></c:set>
-                                                    <%@ include file="/inc/industry.jsp"%>
+                                                    <select name="industry" id="" class="form-control">
+                                                        <%@ include file="/inc/industry.jsp"%>
+                                                    </select>
                                                 </div>
                                             </div>
 
