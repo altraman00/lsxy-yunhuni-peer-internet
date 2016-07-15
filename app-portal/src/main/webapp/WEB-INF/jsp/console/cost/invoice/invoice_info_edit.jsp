@@ -308,9 +308,7 @@
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
 <script>
-    function getSelectRadio(){
-        return $(":radio[name='invoice']:checked").val();
-    }
+
 
 
 </script>
