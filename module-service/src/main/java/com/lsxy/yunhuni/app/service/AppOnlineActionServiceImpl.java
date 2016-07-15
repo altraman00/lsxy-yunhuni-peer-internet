@@ -7,12 +7,14 @@ import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.app.dao.AppOnlineActionDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 
 /**
  * Created by liups on 2016/7/15.
  */
+@Service
 public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction> implements AppOnlineActionService {
     @Autowired
     AppOnlineActionDao appOnlineActionDao;

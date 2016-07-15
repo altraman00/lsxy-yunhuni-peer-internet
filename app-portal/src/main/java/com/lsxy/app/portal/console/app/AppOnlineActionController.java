@@ -6,8 +6,10 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -18,7 +20,7 @@ import java.util.Map;
  * Created by liups on 2016/7/15.
  */
 @Controller
-@RequestMapping("/console/app_online")
+@RequestMapping("/console/app_action")
 public class AppOnlineActionController extends AbstractPortalController {
     /**
      * 获取应用的上线步骤
@@ -26,15 +28,16 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId 应用ID
      * @return
      */
-    @RequestMapping(value = "get_action",method = RequestMethod.GET)
-    public Map<String,Object> getOnlineAction(HttpServletRequest request, String appId){
+    @RequestMapping(value = "/get/{appId}",method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String,Object> getOnlineAction(HttpServletRequest request,@PathVariable("appId") String appId){
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
         RestResponse<AppOnlineAction> response = getOnlineActionRest(token,appId);
         if(response.isSuccess()){
             model.put("flag",true);
             if(response.getData() != null){
-                model.put("onlineStep",response.getData());
+                model.put("action",response.getData().getAction());
             }
         }else{
             model.put("flag",false);

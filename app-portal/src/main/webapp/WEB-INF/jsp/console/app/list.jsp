@@ -87,7 +87,7 @@
                                             <td class="operation">
                                                 <a href="application_detail.html">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
-                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}')" >申请上线</a></c:if>
+                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.isIvrService==1?1:0}')" >申请上线</a></c:if>
                                                 <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>
                                             </td>
 
@@ -111,6 +111,7 @@
 
 
 <input type="hidden" value="" id="modal-appid" />
+
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg" ></div>
 <div id="mobilebox-1" class="appliation-modal-box" style="display: none;">
@@ -133,25 +134,29 @@
                 </ul>
             </div>
 
-            <div class="contentModal" style="display: none" data-action="1">
+            <div class="contentModal" data-action="1">
                 <!--未认证显示-->
-                <div class="input text-center" style="display: none">
-                    <img src="images/index/l6.png" alt="" class="sre" />
-                    <p>您还没有经过实名认证，请进行实名认证！</p>
+                <div class="not-real-auth" style="display: none">
+                    <div class="input text-center " >
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您还没有经过实名认证，请进行实名认证！</p>
+                    </div>
+                    <div class="input text-center" >
+                        <a href="${ctx}/console/account/auth/index" type="button"  class="btn btn-primary btn-box">实名认证</a>
+                    </div>
                 </div>
-                <div class="input text-center" style="display: none">
-                    <a href="" type="button"  class="btn btn-primary btn-box">实名认证</a>
-                </div>
-                <!--end-->
+                <!---end--->
                 <!--认证显示-->
-                <div class="input text-center" >
-                    <img src="images/index/l6.png" alt="" class="sre" />
-                    <p>您已成功进行实名认证，点击进入下一步!</p>
+                <div class="real-auth">
+                    <div class="input text-center" >
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您已成功进行实名认证，点击进入下一步!</p>
+                    </div>
                 </div>
                 <div class="input text-center" >
                     <a type="button"  class="btn btn-primary btn-box tabModalBtn"  data-id="2" data-fun="creatIVR()">下一步</a>
                 </div>
-                <!--end-->
+                <!---end--->
             </div>
 
             <div class="contentModal" style="display: none" data-action="2">
@@ -189,7 +194,7 @@
 
             <div class="contentModal" style="display:none " data-action="4">
                 <div class="input text-center" >
-                    <img src="images/index/l1.png" alt="" class="sre" />
+                    <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
                     <p>上线成功</p>
                 </div>
                 <div class="input text-center" >
@@ -206,9 +211,9 @@
 </div>
 
 
-<div id="mobilebox-2" class="appliation-modal-box" style="display: none" >
+<div id="mobilebox-0" class="appliation-modal-box" style="display: none" >
     <div class="addmobile1" >
-        <div class="title">应用上线流程<a class="close_a modalCancel" data-type="2"></a></div>
+        <div class="title">应用上线流程<a class="close_a modalCancel" data-type="0"></a></div>
         <div class="content" >
             <!--nav-->
             <div class="nav-modal-box">
@@ -222,30 +227,34 @@
                 </ul>
             </div>
 
-            <div class="contentModal" style="display: none" data-action="1">
+            <div class="contentModal" data-action="1">
                 <!--未认证显示-->
-                <div class="input text-center" style="display: none">
-                    <img src="images/index/l6.png" alt="" class="sre" />
-                    <p>您还没有经过实名认证，请进行实名认证！</p>
+                <div class="not-real-auth" style="display: none">
+                    <div class="input text-center" >
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您还没有经过实名认证，请进行实名认证！</p>
+                    </div>
+                    <div class="input text-center" >
+                        <a href="${ctx}/console/account/auth/index" type="button"  class="btn btn-primary btn-box">实名认证</a>
+                    </div>
                 </div>
-                <div class="input text-center" style="display: none">
-                    <a href="" type="button"  class="btn btn-primary btn-box">实名认证</a>
-                </div>
-                <!---end-->
+                <!---end--->
                 <!--认证显示-->
-                <div class="input text-center">
-                    <img src="images/index/l6.png" alt="" class="sre" />
-                    <p>您已成功进行实名认证，点击进入下一步!</p>
+                <div class="real-auth">
+                    <div class="input text-center">
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您已成功进行实名认证，点击进入下一步!</p>
+                    </div>
                 </div>
                 <div class="input text-center" >
                     <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="2" >下一步</a>
                 </div>
-                <!--end-->
+                <!---end--->
             </div>
 
             <div class="contentModal" style="display: none" data-action="2">
                 <div class="input text-center" >
-                    <img src="images/index/l1.png" alt="" class="sre" />
+                    <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
                     <p>上线成功</p>
                 </div>
                 <div class="input text-center" >
@@ -258,6 +267,7 @@
 
         </div>
     </div>
+
 </div>
 
 
@@ -267,6 +277,25 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/list.js'> </script>
 <script>
+
+    function isRealAuth(){
+        var realAuth = null;
+        //获取用户实名认证状态
+        $.ajax({
+            url : "${ctx}/console/account/auth/is_real_auth",
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            dataType: "json",
+            success : function(data){
+                isRealAuth = data;
+            },
+            fail:function(){
+                showtoast('网络异常，请稍后重试');
+            }
+        });
+        return realAuth;
+    }
+
     /**
      * @param id 应用id
      * @param type 类型
@@ -277,15 +306,45 @@
         $('#modal-appid').val(id);
         //步骤
         var index = 0;
-        if(index==0){
-            cleanModal(type);
-        }else{
-            //当前步骤
-
+        var flag = true;//是否能上线
+        $.ajax({
+            url : "${ctx}/console/app_action/get/"+ id ,
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            dataType: "json",
+            success : function(data){
+                if(data && data.action != null){
+                    switch (data.action){
+                        case 11: index = 2;break;   //选号
+                        case 12: index = 3;break;   //支付
+                        case 13: index = 2;break;   //支付返回选号
+                        case 14: showtoast('应用已上线');flag = false;break;   //上线完成
+                        case 21: index = 0;break;   //下线
+                        default: index = 0;break;
+                    }
+                }
+            },
+            fail:function(){
+                flag = false;
+                showtoast('网络异常，请稍后重试');
+            }
+        });
+        var realAuth = isRealAuth();
+        if(flag && realAuth != null){
+            if(index==0){
+                if(realAuth){
+                    $("div.real-auth").show();
+                }else{
+                    $("div.not-real-auth").show();
+                }
+                //初始化
+                cleanModal(type);
+            }
+            modalAction(index + 1);
+            showBox(type);
         }
-        modalAction(1);
-        showBox(type);
     }
+
 
 
     var ivrnumber = 1;
@@ -301,6 +360,7 @@
         //赋值第一个
         $('#creatIVR').html(ivr[0]);
         ivrnumber = 1;
+        return true;
     }
 
     function nolike(){
@@ -370,6 +430,24 @@
     //监听支付状态 返回true success
     function syncpay(){
         return true;
+    }
+
+
+    function createorder(){
+        return true;
+    }
+
+    function pay(){
+        if(!$('#readbook').is(':checked')) {
+            showtoast('请先阅读IVR协议');
+            return false;
+        }
+        return true;
+    }
+
+    //重选择事件
+    function resetIVR(){
+        tabModalBtn(2,'creatIVR()');
     }
 </script>
 
