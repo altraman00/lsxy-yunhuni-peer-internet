@@ -92,131 +92,31 @@
                                 </div>
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="row">
-                                        <div class="register-form padding-15">
+                                        <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
+                                                   id="invoiceForm">
+
                                             <div class="form-group">
                                                 <span class="hr text-label" ><strong>发票信息:</strong></span>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">发票类型：</lable>
                                                 <div class="invoice_select col-md-6 ">
-                                                    <input type="radio" name="invoice" class="invoice_radio" value="1"
+                                                    <input type="radio" name="type" class="invoice_radio" value="1"
                                                            <c:if test="${invoiceInfo == null || invoiceInfo.type == 1}">checked="checked"</c:if>
                                                            data-val="1"/>人增值税普通发票
-                                                    <input type="radio" name="invoice" class="invoice_radio" value="2"
+                                                    <input type="radio" name="type" class="invoice_radio" value="2"
                                                            <c:if test="${invoiceInfo.type == 2}">checked="checked"</c:if>
                                                            data-val="2">
                                                     企业增值税普通票
-                                                    <input type="radio" name="invoice" class="invoice_radio" value="3"
+                                                    <input type="radio" name="type" class="invoice_radio" value="3"
                                                            <c:if test="${invoiceInfo.type == 3}">checked="checked"</c:if>
                                                            data-val="3">
                                                     企业增值税专用票
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!--个人普通-->
-                                        <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
-                                               id="personInvoiceForm">
-                                            <div class='personal radiotap' data-val="1">
+                                            <div class="radiotap" >
                                                 <input type="hidden" name="id" value="${invoiceInfo.id}"/>
-                                                <input type="hidden" name="type" value="1"/>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right extend_label">发票抬头：</lable>
-                                                    <div class="col-md-4 ">
-                                                        <input type="text" placeholder="" name="title"  value="${invoiceInfo.title}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <span class="hr text-label"><strong>邮寄信息:</strong></span>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">收取地址：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="receiveAddress" value="${invoiceInfo.receiveAddress}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">收件人：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="receivePeople"  value="${invoiceInfo.receivePeople}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">手机号：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="receiveMobile"  value="${invoiceInfo.receiveMobile}"
-                                                               class="form-control input-form mobile"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="col-md-3 text-right">
-                                                        <a id="validateBtnPersonal"
-                                                           class=" btn btn-primary  btn-form">保存</a>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </form:form>
-                                        <!--企业普通-->
-                                        <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
-                                               id="comInvoiceForm">
-                                            <div class='company radiotap' data-val="2" >
-                                                <input type="hidden" name="id" value="${invoiceInfo.id}"/>
-                                                <input type="hidden" name="type" value="2"/>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">发票抬头：</lable>
-                                                    <div class="col-md-4 ">
-                                                        <input type="text" placeholder="" name="title"  value="${invoiceInfo.title}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <span class="hr text-label"><strong>邮寄信息:</strong></span>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">收取地址：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder=""  name="receiveAddress" value="${invoiceInfo.receiveAddress}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">收件人：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="receivePeople"  value="${invoiceInfo.receivePeople}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">手机号：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="receiveMobile"  value="${invoiceInfo.receiveMobile}"
-                                                               class="form-control input-form mobile"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="col-md-3 text-right">
-                                                        <a id="validateBtnCompany"
-                                                           class=" btn btn-primary  btn-form">保存</a>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </form:form>
-
-                                        <!--企业专用-->
-                                        <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
-                                                   id="comSpecialInvoiceForm">
-                                            <div class="companyex radiotap" data-val="3" style="display: none">
-                                                <input type="hidden" name="id" value="${invoiceInfo.id}"/>
-                                                <input type="hidden" name="type" value="3"/>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">发票抬头：</lable>
                                                     <div class="col-md-4 ">
@@ -224,43 +124,46 @@
                                                                class="form-control input-form notEmpty"/>
                                                     </div>
                                                 </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">纳税人识别号：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}"
-                                                               class="form-control input-form notEmpty"/>
+                                                <!--企业专用票start-->
+                                                <div id="comSpecial" class="invoice-type" data-val="3">
+                                                    <div class="form-group">
+                                                        <lable class="col-md-3 text-right ">纳税人识别号：</lable>
+                                                        <div class="col-md-4">
+                                                            <input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}"
+                                                                   class="form-control input-form notEmpty"/>
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">银行账户：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="bankAccount"  value="${invoiceInfo.bankAccount}"
-                                                               class="form-control input-form notEmpty"/>
+                                                    <div class="form-group">
+                                                        <lable class="col-md-3 text-right ">银行账户：</lable>
+                                                        <div class="col-md-4">
+                                                            <input type="text" placeholder="" name="bankAccount"  value="${invoiceInfo.bankAccount}"
+                                                                   class="form-control input-form notEmpty"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <lable class="col-md-3 text-right ">开户行：</lable>
+                                                        <div class="col-md-4">
+                                                            <input type="text" placeholder="" name="bank"  value="${invoiceInfo.bank}"
+                                                                   class="form-control input-form notEmpty"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <lable class="col-md-3 text-right ">注册地址：</lable>
+                                                        <div class="col-md-4">
+                                                            <input type="text" placeholder="" name="regAddress"  value="${invoiceInfo.regAddress}"
+                                                                   class="form-control input-form notEmpty"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <lable class="col-md-3 text-right ">企业电话：</lable>
+                                                        <div class="col-md-4">
+                                                            <input type="text" placeholder="" name="phone"  value="${invoiceInfo.phone}"
+                                                                   class="form-control input-form notEmpty"/>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">开户行：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="bank"  value="${invoiceInfo.bank}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">注册地址：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="regAddress"  value="${invoiceInfo.regAddress}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">企业电话：</lable>
-                                                    <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="phone"  value="${invoiceInfo.phone}"
-                                                               class="form-control input-form notEmpty"/>
-                                                    </div>
-                                                </div>
-
+                                                <!--企业专用票end-->
                                                 <div class="form-group">
                                                     <span class="hr text-label"><strong>邮寄信息:</strong></span>
                                                 </div>
