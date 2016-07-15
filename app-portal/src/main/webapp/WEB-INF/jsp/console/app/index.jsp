@@ -85,8 +85,10 @@
                                             <div class="col-md-4 ">
                                                 <select name="type" class="form-control notEmpty">
                                                     <option value="">请选择应用类型</option>
-                                                    <option value="餐饮" <c:if test="${app.type=='餐饮'}">selected</c:if> >餐饮</option>
-                                                    <option value="金融" <c:if test="${app.type=='金融'}">selected</c:if> >金融</option>
+                                                    <option value="网页" <c:if test="${app.type=='网页'}">selected</c:if>>网页</option>
+                                                    <option value="PC" <c:if test="${app.type=='PC'}">selected</c:if>>PC</option>
+                                                    <option value="移动" <c:if test="${app.type=='移动'}">selected</c:if>>移动</option>
+                                                    <option value="其他" <c:if test="${app.type=='其他'}">selected</c:if>>其他</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -95,8 +97,8 @@
                                             <div class="col-md-4 ">
                                                 <select name="industry"  class="form-control notEmpty">
                                                     <option value="">请选择应用类型</option>
-                                                    <option value="餐饮" <c:if test="${app.industry=='餐饮'}">selected</c:if>>餐饮</option>
-                                                    <option value="金融" <c:if test="${app.industry=='金融'}">selected</c:if>>金融</option>
+                                                    <c:set var="industry" value="${app.industry}"></c:set>
+                                                    <%@ include file="/inc/industry.jsp"%>
                                                 </select>
                                             </div>
                                         </div>
