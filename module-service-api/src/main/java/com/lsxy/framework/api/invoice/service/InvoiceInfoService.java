@@ -9,4 +9,6 @@ import com.lsxy.framework.api.invoice.model.InvoiceInfo;
  */
 public interface InvoiceInfoService extends BaseService<InvoiceInfo> {
     InvoiceInfo getByUserName(String userName);
+
+    InvoiceInfo create(InvoiceInfo invoiceInfo,String userName);
 }
