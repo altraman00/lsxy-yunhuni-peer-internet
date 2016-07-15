@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.account;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -77,12 +78,15 @@ public class AuthController extends AbstractRestController {
     private RestResponse svePrivateAuth( String status, RealnamePrivate realnamePrivate) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         //获取租户对象
-        Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
+        Account acount  = accountService.findAccountByUserName(userName);
+        Tenant tenant = acount.getTenant();
         tenant.setIsRealAuth(Integer.valueOf(status));
         realnamePrivate.setTenant(tenant);
         //保存到数据库
         realnamePrivate = realnaePrivateService.save(realnamePrivate);
         tenantService.save(tenant);
+        acount.setTenant(tenant);
+        accountService.save(acount);
         return RestResponse.success(realnamePrivate);
     }
 
@@ -96,13 +100,16 @@ public class AuthController extends AbstractRestController {
     public RestResponse saveCorpAuth( String status,RealnameCorp realnameCorp) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         //获取租户对象
-        Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
+        Account acount  = accountService.findAccountByUserName(userName);
+        Tenant tenant = acount.getTenant();
         tenant.setIsRealAuth(Integer.valueOf(status));
         realnameCorp.setTenant(tenant);
         //保存到数据库
         realnameCorp = realnameCorpService.save(realnameCorp);
         //修改租户中实名认证状态
         tenantService.save(tenant);
+        acount.setTenant(tenant);
+        accountService.save(acount);
         return RestResponse.success(realnameCorp);
     }
 }

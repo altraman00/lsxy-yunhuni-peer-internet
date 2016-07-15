@@ -25,10 +25,14 @@
 			});
 		}
 	})
+	var showtoastNum='';
 	function showtoast(tips,url) {
+		if(showtoastNum!=''){
+			clearInterval(showtoastNum);
+		}
 		$('.tips-toast').hide().html('');
 		$('.tips-toast').css('display','block').html(tips);
-		setInterval(function(){hidetoast(url);},3000)
+		showtoastNum = setInterval(function(){hidetoast(url);},3000)
 	}
 	function hidetoast(url){
 		$('.tips-toast').hide();
