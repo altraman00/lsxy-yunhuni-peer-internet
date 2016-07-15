@@ -73,23 +73,23 @@
                                                 <input type="hidden"  name="privateId">
                                                 <lable class="col-md-3 text-right">真实姓名：</lable>
                                                 <div class="col-md-4 ">
-                                                    <input type="text" name="privateName" placeholder="" class="form-control input-form"   />
+                                                    <input type="text" name="privateName" placeholder="" class="form-control input-form notEmpty"   />
                                                     <p class="tips">与所使用认证的证件一致的姓名名称</p>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">证件类型：</lable>
                                                 <div class="col-md-4">
-                                                    <select class="form-control" name="idType" >
+                                                    <select class="form-control " name="idType" >
                                                         <option value="0">身份证</option>
-                                                        <option value="1">身份证</option>
+                                                        <option value="1">护照</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">证件号码：</lable>
                                                 <div class="col-md-4" >
-                                                    <input type="text" name="idNumber" placeholder="" class="form-control input-form"  />
+                                                    <input type="text" name="idNumber" placeholder="" class="form-control input-form notEmpty"  />
                                                 </div>
                                             </div>
                                             <div class="form-group">
