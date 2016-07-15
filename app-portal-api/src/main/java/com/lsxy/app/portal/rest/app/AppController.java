@@ -75,22 +75,5 @@ public class AppController extends AbstractRestController {
         return RestResponse.success(app);
     }
 
-    /**
-     * 获取应用状态
-     * @param appId
-     * @return
-     */
-    @RequestMapping("get_online_step")
-    public RestResponse<String> getOnlineStep(String appId){
-        RestResponse response;
-        App app = appService.findById(appId);
-        if(app != null){
-            response = RestResponse.success(app.getStatus());
-        }else{
-            response = RestResponse.failed("0000","应用不存在");
-        }
-        return response;
-    }
-
 
 }

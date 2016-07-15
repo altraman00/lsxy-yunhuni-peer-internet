@@ -87,7 +87,7 @@
                                             <td class="operation">
                                                 <a href="application_detail.html">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
-                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.onlineStep}')" >申请上线</a></c:if>
+                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}')" >申请上线</a></c:if>
                                                 <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>
                                             </td>
 
@@ -110,20 +110,20 @@
 
 
 
-<input type="hidden" id="modal-appid" value="" step-id="0"/>
+<input type="hidden" value="" id="modal-appid" />
 <!---mobilebox-->
-<div class="shadow-bg" id="show-bg"  style="display: none"></div>
-<div id="mobilebox" class="appliation-modal-box" style="display: none;">
+<div class="shadow-bg" id="show-bg" ></div>
+<div id="mobilebox-1" class="appliation-modal-box" style="display: none;">
     <div class="addmobile1" >
-        <div class="title">应用上线流程<a class="close_a modalCancel"></a></div>
+        <div class="title">应用上线流程<a class="close_a modalCancel" data-type="1"></a></div>
         <div class="content" >
             <!--nav-->
             <div class="nav-modal-box">
                 <ul class="nav-modal">
-                    <li><span class="spot s-active"></span><span class="lines"></span> </li>
-                    <li><span class="spot"></span><span class="lines"></span>  </li>
-                    <li><span class="spot"></span><span class="lines"></span>  </li>
-                    <li><span class="spot"></span> </li>
+                    <li><a class="spot" data-action="1"></a><span class="lines"></span> </li>
+                    <li><a class="spot" data-action="2"></a><span class="lines"></span></li>
+                    <li><a class="spot" data-action="3"></a><span class="lines"></span></li>
+                    <li><a class="spot" data-action="4"></a> </li>
                 </ul>
                 <ul class="nav-modal-text">
                     <li><span class="text">实名认证</span> </li>
@@ -133,28 +133,28 @@
                 </ul>
             </div>
 
-            <div class="contentModal" style="display: none">
+            <div class="contentModal" style="display: none" data-action="1">
                 <!--未认证显示-->
                 <div class="input text-center" style="display: none">
-                    <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                    <img src="images/index/l6.png" alt="" class="sre" />
                     <p>您还没有经过实名认证，请进行实名认证！</p>
                 </div>
                 <div class="input text-center" style="display: none">
                     <a href="" type="button"  class="btn btn-primary btn-box">实名认证</a>
                 </div>
-                <!---end--->
+                <!--end-->
                 <!--认证显示-->
-                <div class="input text-center">
-                    <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                <div class="input text-center" >
+                    <img src="images/index/l6.png" alt="" class="sre" />
                     <p>您已成功进行实名认证，点击进入下一步!</p>
                 </div>
                 <div class="input text-center" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="1">下一步</a>
+                    <a type="button"  class="btn btn-primary btn-box tabModalBtn"  data-id="2" data-fun="creatIVR()">下一步</a>
                 </div>
-                <!---end--->
+                <!--end-->
             </div>
 
-            <div class="contentModal" style="display: none">
+            <div class="contentModal" style="display: none" data-action="2">
                 <div class="input text-center">
                     <p>您选择开通IVR功能，我们给您分配了一个IVR号码供应用使用IVR功能</p>
                 </div>
@@ -167,27 +167,29 @@
                 <div class="hideIVR">
                 </div>
                 <div class="input text-center" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="2">下一步</a>
+                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3" data-fun="createorder()" >下一步</a>
                 </div>
             </div>
 
-            <div class="contentModal" style="display: none">
-                <div class="input text-center">
+            <div class="contentModal" style="display: none" data-action="3">
+                <div class="input text-center mt-0">
                     <p>您需要支付：<span class="money">998.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：0.00 元 &nbsp;&nbsp;&nbsp; <span class="nomoney">!!余额不足</span>&nbsp;&nbsp;&nbsp;<a href="cost_recharge_sure.html">充值</a> </p>
                 </div>
                 <div class="input text-center mb-0 mt-0">
+                    <div class="defulatTips">IVR号码：121212121</div>
                     <div class="defulatTips">IVR号码租用费：1000元</div>
                     <div class="defulatTips">IVR功能使用费：100元/月</div>
                 </div>
                 <div class="ivrserver"><input type="checkbox" name="readcheckbox" id="readbook" />已阅读<a target="_blank" href="ivragreement.html" >IVR服务协议</a></div>
                 <div class="input text-center mt-0" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3">确认支付</a>
+                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="4" data-fun="pay()">确认支付</a>
+                    <a type="button"  class="btn btn-primary btn-box" onclick="resetIVR()">重新选择</a>
                 </div>
             </div>
 
-            <div class="contentModal" style="display:none ">
+            <div class="contentModal" style="display:none " data-action="4">
                 <div class="input text-center" >
-                    <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
+                    <img src="images/index/l1.png" alt="" class="sre" />
                     <p>上线成功</p>
                 </div>
                 <div class="input text-center" >
@@ -197,6 +199,63 @@
             <div class="input">
                 <div class="tips-error moadltips1 text-center" style="display: none">错误提示信息</div>
             </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<div id="mobilebox-2" class="appliation-modal-box" style="display: none" >
+    <div class="addmobile1" >
+        <div class="title">应用上线流程<a class="close_a modalCancel" data-type="2"></a></div>
+        <div class="content" >
+            <!--nav-->
+            <div class="nav-modal-box">
+                <ul class="nav-modal navw-150">
+                    <li><a class="spot" data-action="1"></a><span class="lines"></span> </li>
+                    <li><a class="spot" data-action="2"></a></li>
+                </ul>
+                <ul class="nav-modal-text navw-150">
+                    <li><span class="text">实名认证</span> </li>
+                    <li class=" mr-0"><span class="text">上线</span>  </li>
+                </ul>
+            </div>
+
+            <div class="contentModal" style="display: none" data-action="1">
+                <!--未认证显示-->
+                <div class="input text-center" style="display: none">
+                    <img src="images/index/l6.png" alt="" class="sre" />
+                    <p>您还没有经过实名认证，请进行实名认证！</p>
+                </div>
+                <div class="input text-center" style="display: none">
+                    <a href="" type="button"  class="btn btn-primary btn-box">实名认证</a>
+                </div>
+                <!---end-->
+                <!--认证显示-->
+                <div class="input text-center">
+                    <img src="images/index/l6.png" alt="" class="sre" />
+                    <p>您已成功进行实名认证，点击进入下一步!</p>
+                </div>
+                <div class="input text-center" >
+                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="2" >下一步</a>
+                </div>
+                <!--end-->
+            </div>
+
+            <div class="contentModal" style="display: none" data-action="2">
+                <div class="input text-center" >
+                    <img src="images/index/l1.png" alt="" class="sre" />
+                    <p>上线成功</p>
+                </div>
+                <div class="input text-center" >
+                    <a href="" class="btn btn-primary btn-box tabModalBtn"  data-fun="" >上线成功</a>
+                </div>
+            </div>
+            <div class="input">
+                <div class="tips-error moadltips1 text-center" style="display: none">错误提示信息</div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -210,12 +269,24 @@
 <script>
     /**
      * @param id 应用id
+     * @param type 类型
+     * type 1 ivr  2no ivr
      */
-    function tabtarget(id){
-        cleanModal();
+    function tabtarget(id,type){
+        //赋值appid
         $('#modal-appid').val(id);
-        showBox();
+        //步骤
+        var index = 0;
+        if(index==0){
+            cleanModal(type);
+        }else{
+            //当前步骤
+
+        }
+        modalAction(1);
+        showBox(type);
     }
+
 
     var ivrnumber = 1;
 
