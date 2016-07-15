@@ -78,7 +78,6 @@ public class Account extends IdEntity {
 	}
 
 	@Column(name = "password")
-	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}

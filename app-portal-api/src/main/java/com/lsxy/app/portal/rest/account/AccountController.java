@@ -45,7 +45,9 @@ public class AccountController extends AbstractRestController {
     public RestResponse saveInformation(Account account) throws InvocationTargetException, IllegalAccessException {
         String userName = getCurrentAccountUserName();
         Account oldAccount = accountService.findAccountByUserName(userName);
+        String o1 = oldAccount.getPassword();
         EntityUtils.copyProperties(oldAccount, account);
+        String o2 = oldAccount.getPassword();
         oldAccount  = accountService.save(oldAccount);
         return RestResponse.success(oldAccount);
     }
