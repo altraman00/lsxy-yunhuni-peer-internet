@@ -134,10 +134,8 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">所属行业：</lable>
                                                 <div class="col-md-4">
-                                                    <select class="form-control" name="fieldCode">
-                                                        <option value="0">通讯</option>
-                                                        <option value="1">身份证</option>
-                                                    </select>
+                                                    <c:set var="industry" value="${account.industry}"></c:set>
+                                                    <%@ include file="/inc/industry.jsp"%>
                                                 </div>
                                             </div>
 
@@ -215,7 +213,7 @@
         form.submit();
     }
     var msg = '${msg}';
-    if(msg==''){}else{alert(msg);}
+    if(msg==''){}else{showtoast(msg);}
 </script>
 </body>
 </html>

@@ -16,7 +16,7 @@ public class RealnameCorp extends IdEntity {
     private Tenant tenant;//所属租户
     private String  name;// 企业名称
     private String  addr;// 企业地址
-    private String  fieldCode;// 所属行业代号,数据字典
+    private String  industry;// 所属行业
     private String  contacts1;// 联系人1
     private String  contacts2;// 联系人2
     private String  authType;// 认证类型
@@ -33,10 +33,10 @@ public class RealnameCorp extends IdEntity {
     public RealnameCorp() {
     }
 
-    public RealnameCorp(String tenantId,String name,String addr,String fieldCode,String authType,String type01Prop01,String type01Prop02,String type02Prop01,String type02Prop02,String type03Prop02 ){
+    public RealnameCorp(String tenantId,String name,String addr,String industry,String authType,String type01Prop01,String type01Prop02,String type02Prop01,String type02Prop02,String type03Prop02 ){
         this.name = name;
         this.addr = addr;
-        this.fieldCode = fieldCode;
+        this.industry = industry;
         this.authType = authType;
         this.type01Prop01 = type01Prop01;
         this.type01Prop02 = type01Prop02;
@@ -82,14 +82,15 @@ public class RealnameCorp extends IdEntity {
     public void setAddr(String addr) {
         this.addr = addr;
     }
-    @Column(name = "field_code")
-    public String getFieldCode() {
-        return fieldCode;
+    @Column(name = "industry")
+    public String getIndustry() {
+        return industry;
     }
 
-    public void setFieldCode(String fieldCode) {
-        this.fieldCode = fieldCode;
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
+
     @Column(name = "contacts1")
     public String getContacts1() {
         return contacts1;

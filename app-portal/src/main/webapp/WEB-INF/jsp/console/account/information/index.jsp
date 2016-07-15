@@ -72,14 +72,8 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用行业：</lable>
                                             <div class="col-md-4 ">
-                                                <select name="industry" id="" class="form-control">
-                                                    <option value="通讯" <c:if test="${account.industry == '通讯'}"> selected</c:if> >通讯</option>
-                                                    <option value="教育" <c:if test="${account.industry == '教育'}"> selected</c:if> >教育</option>
-                                                    <option value="医疗" <c:if test="${account.industry == '医疗'}"> selected</c:if> >医疗</option>
-                                                    <option value="电力" <c:if test="${account.industry == '电力'}"> selected</c:if> >电力</option>
-                                                    <option value="金融" <c:if test="${account.industry == '金融'}"> selected</c:if> >金融</option>
-                                                    <option value="其他" <c:if test="${account.industry == '其他'}"> selected</c:if> >其他</option>
-                                                </select>
+                                                <c:set var="industry" value="${account.industry}"></c:set>
+                                                <%@ include file="/inc/industry.jsp"%>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -126,7 +120,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">联系电话：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" placeholder="例如:20-88888888" value="${account.phone}" name="phone"
+                                                <input type="text" placeholder="例如:020-88888888" value="${account.phone}" name="phone"
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
@@ -160,8 +154,8 @@
         var myselect = $(".province");
         myselect = $(".city");
     }
-    $('#personalAuthForm').bootstrapValidator('validate');
     $('#validateBtn, #validateBtnPersonal').click(function(){
+        $('#personalAuthForm').bootstrapValidator('validate');
         var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
         if(result==true){
             //提交表单
@@ -178,8 +172,6 @@
                     showtoast('网络异常，请稍后重试');
                 }
             });
-        }else{
-            $('#personalAuthForm').bootstrapValidator('validate');
         }
     });
 </script>
