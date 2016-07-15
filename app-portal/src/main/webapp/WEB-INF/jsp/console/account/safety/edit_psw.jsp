@@ -78,7 +78,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-4 remove-padding ">
+                                            <div class="col-md-4 remove-padding moretips ">
                                                 <input type="password" name="newPassword" placeholder="新密码"
                                                        class="form-control input-form newpassword" />
                                             </div>
