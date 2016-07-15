@@ -60,7 +60,7 @@
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
 
-                                    <form role="form" action="./index.html" method="post" class="register-form" id="application_create">
+                                    <form:form role="form" action="./index.html" method="post" class="register-form" id="application_create">
                                         <c:if test="${app.id!=null}">
                                             <input type="hidden" name="id" value="${app.id}">
                                             <input type="hidden" name="status" value="${app.status}">
@@ -156,7 +156,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                    </form>
+                                    </form:form>
                                 </div>
                             </div>
                         </section>
@@ -173,29 +173,18 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/application/create.js'></script>
 
 <script>
-    if($('#validateBtn').html().trim()=='修改'){
-        $('#application_create').bootstrapValidator('validate');
-    }
     $('#validateBtn').click(function(){
+        $('#application_create').bootstrapValidator('validate');
         var result = $('#application_create').data('bootstrapValidator').isValid();
         if(result==true){
+            $('#validateBtn').attr('disabled','disabled');
             var tempType = $('#validateBtn').html().trim()=='创建'?"create":"update";
             //提交表单
-            var tempVal = $('#application_create').serialize().split("&");
-            var dataVal = { '${_csrf.parameterName}':'${_csrf.token}'}
-            for(var i=0;i<tempVal.length;i++){
-                var temp = tempVal[i].split("=");
-                if(temp[0].indexOf("is")==0){
-                    dataVal[temp[0]]=temp[1]=='on'?'1':'0';
-                }else{
-                    dataVal[temp[0]]=decodeURI(decodeURI((temp[1]),"UTF-8"));
-                }
-            }
             $.ajax({
                 url : "${ctx}/console/app/"+tempType,
                 type : 'post',
                 async: false,//使用同步的方式,true为异步方式
-                data :dataVal,
+                data :getFormJson("#application_create"),
                 dataType: "json",
                 success : function(data){
                     var url = "";
@@ -208,12 +197,11 @@
                 },
                 fail:function(){
                     showtoast('网络异常，请稍后重试');
+                    $('#validateBtn').removeAttr('disabled');
                 }
             });
         }
-        else{
-            $('#application_create').bootstrapValidator('validate');
-        }
+
     });
 </script>
 
