@@ -344,4 +344,22 @@ public class WebUtils {
         }
         return null;
 	}
+
+	/**
+	 * 获取请求参数作为map返回
+	 * @param request
+	 * @return
+     */
+	public static Map<String,Object> getRequestParams(HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<>();
+		Enumeration<String> params = request.getParameterNames();
+		while(params.hasMoreElements()){
+			String paramName = params.nextElement();
+			String value = request.getParameter(paramName);
+			logger.debug(paramName+":"+value);
+			result.put(paramName,value);
+		}
+
+		return result;
+	}
 }

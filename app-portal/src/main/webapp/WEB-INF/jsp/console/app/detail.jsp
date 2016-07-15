@@ -384,7 +384,6 @@
             success : function(data){
                 $('#testNumBind').html(testNumBindHtml);
                 hideModal(id);
-
                 showtoast(data.msg);
             },
             fail:function(){
@@ -641,18 +640,6 @@
         $('#voicetable').find(".voicetr").remove();
         $('#voicetable').append(html);
     }
-
-
-
-    function showtoast(tips) {
-        $('.tips-toast').css('display','block').html(tips);
-        setTimeout("hidetoast()",2000);
-    }
-    function hidetoast(){
-        $('.tips-toast').fadeOut(1000);
-    }
-
-
 
     $('#myTab li').click(function(){
         var type = $(this).attr('data-id');

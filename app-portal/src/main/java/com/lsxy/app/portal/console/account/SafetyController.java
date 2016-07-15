@@ -79,18 +79,20 @@ public class SafetyController extends AbstractPortalController {
      * @return
      */
     @RequestMapping(value="/edit_psw" ,method = RequestMethod.POST)
-    public ModelAndView editPsw(HttpServletRequest request, String oldPassword,String newPassword){
+    @ResponseBody
+    public Map editPsw(HttpServletRequest request, String oldPassword,String newPassword){
         ModelAndView mav = new ModelAndView();
         RestResponse<String> restResponse = savePassword(request,oldPassword, newPassword);
         String status = restResponse.getData();
-        //TODO 0修改成功 -1表示失败
+        Map map = new HashMap();
         if(IS_TRUE.equals(status) ){
-            mav.addObject("msg", "修改成功！");
+            map.put("code","0");
+            map.put("msg", "修改成功！");
         }else{
-            mav.addObject("msg", restResponse.getErrorMsg());
+            map.put("code","1");
+            map.put("msg", restResponse.getErrorMsg());
         }
-        mav.setViewName("/console/account/safety/edit_psw");
-        return mav;
+        return map;
     }
 
     /**
@@ -138,10 +140,8 @@ public class SafetyController extends AbstractPortalController {
      */
     private RestResponse validationPassword(HttpServletRequest request,String oldPws){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/account/safety/validation_password";
-        Map map = new HashMap();
-        map.put("password",oldPws);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map,  String.class);
+        String uri = restPrefixUrl +   "/rest/account/safety/validation_password?password={1}";
+        return  RestRequest.buildSecurityRequest(token).get(uri,  String.class,oldPws);
     }
 
     /**
@@ -182,10 +182,8 @@ public class SafetyController extends AbstractPortalController {
      */
     private RestResponse<Account> saveMobile(HttpServletRequest request,String mobile) {
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +  "/rest/account/safety/save_mobile";
-        Map map = new HashMap();
-        map.put("mobile",mobile);
-        return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
+        String uri = restPrefixUrl +  "/rest/account/safety/save_mobile?mobile={1}";
+        return  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
     }
 
 }

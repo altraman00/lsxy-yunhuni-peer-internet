@@ -17,7 +17,7 @@ public class AuthVo implements Serializable {
 
     private String corpName;//企业名称
     private String addr;//企业地址
-    private String fieldCode;//所属行业
+    private String industry;//所属行业
 
     private String authType;//认证类型
     private String type01Prop01;//[一照一码]营业执照照片
@@ -87,12 +87,13 @@ public class AuthVo implements Serializable {
         this.addr = addr;
     }
 
-    public String getFieldCode() {
-        return fieldCode;
+
+    public String getIndustry() {
+        return industry;
     }
 
-    public void setFieldCode(String fieldCode) {
-        this.fieldCode = fieldCode;
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
 
     public String getAuthType() {
@@ -143,23 +144,5 @@ public class AuthVo implements Serializable {
         this.type03Prop02 = type03Prop02;
     }
 
-    @Override
-    public String toString() {
-        return "AuthVo{" +
-                "idType='" + idType + '\'' +
-                ", privateName='" + privateName + '\'' +
-                ", idNumber='" + idNumber + '\'' +
-                ", idPhoto='" + idPhoto + '\'' +
-                ", privateTenantId='" + privateTenantId + '\'' +
-                ", corpName='" + corpName + '\'' +
-                ", addr='" + addr + '\'' +
-                ", fieldCode='" + fieldCode + '\'' +
-                ", authType='" + authType + '\'' +
-                ", type01Prop01='" + type01Prop01 + '\'' +
-                ", type01Prop02='" + type01Prop02 + '\'' +
-                ", type02Prop01='" + type02Prop01 + '\'' +
-                ", type02Prop02='" + type02Prop02 + '\'' +
-                ", type03Prop02='" + type03Prop02 + '\'' +
-                '}';
-    }
+
 }
