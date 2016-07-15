@@ -35,6 +35,7 @@
         <module>module-framework-mail</module>
         <module>module-service-api</module>
         <module>module-service</module>
+        <module>module-framework-oss</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -154,7 +155,11 @@
                 <artifactId>velocity</artifactId>
                 <version>1.7</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>2.2.3.2-FOR-TFS</version>
+            </dependency>
 
 
             <dependency>
