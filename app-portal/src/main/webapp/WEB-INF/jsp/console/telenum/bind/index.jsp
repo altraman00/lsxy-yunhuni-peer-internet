@@ -112,9 +112,7 @@
         </section>
     </section>
 </section>
-
-
-
+<div class="tips-toast"></div>
 
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg"></div>
@@ -123,15 +121,17 @@
     <div class="content">
         <div class="margintop30"></div>
         <div class="input ">
-            手机号：<span id="modalmobile"></span>
+            手机号：<span id="modalmobile" ></span>
         </div>
         <div class="input">
             <input class="code form-control modalCode" type="text" name="mobile" placeholder="验证码" />
             <button class="code-button" id="send-code" >发送验证码</button>
         </div>
-        <div class="input">
-            <div class="tips-error moadltips" style="display: none">请先填写手机号码</div>
-        </div>
+        <div class="input in-block" id="second-codeblock"></div>
+
+
+        <p class="tips-error moadltips text-center msgcode" style="display:none ">请先填写手机号码</p>
+
     </div>
     <div class="footer">
         <a class="cancel modalCancel">返回</a>
@@ -139,57 +139,87 @@
     </div>
 </div>
 
-
+<div class="tips-toast"></div>
+<%@include file="/inc/footer.jsp"%>
+<script type="text/javascript" src='${resPrefixUrl }/js/number/band.js'></script>
 <script >
     /**
      * 发送验证码
      */
+    var isVc = false;//是否需要图形验证码
+    var sendCodeResult=false;
     function sendCode(){
-        if(regMobile()==false){
-            showmsg('手机格式有误','moadltips'); return false;
-        }
         var mobile = $('#modalmobile').html();
+        if(regMobile(mobile)==false){
+            showmsg('请输入正确的手机格式','msgcode'); return false;
+        }
+        var sendResult = false; //是否发送手机验证码成功
+        var vCode = "";
+        if(isVc){
+            //校验四位验证码是否正确
+            if($('#second-code').length>0){
+                var second = $('#second-code').val();
+                if(second.length!=4){
+                    showmsg('请输入四位验证码','msgcode'); return false;
+                }
+            }
+            vCode = $("#second-code").val();
+        }
         $.ajax({
             url : "${ctx}/mc/send",
             type : 'get',
-            async: true,//使用同步的方式,true为异步方式
-            data : {'mobile':mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            //dataType: "json",
-            success : function(data){
+            async: false,//使用同步的方式,true为异步方式
+            data : {'mobile':mobile,'validateCode':vCode,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(result){
+                if(result.flag){
+                    showmsg('发送短信验证码成功','msgcode');
+                    $('#second-codeblock').html('');
+                    sendResult = true;
+                }else if(result.vc){
+                    sendResult = false;
+                    //发送不成功，且要输入图形验证码
+                    showmsg(result.err,'msgcode');
+                    isVc = true;
+                    //启动二次校验
+                    var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
+                    html += '&nbsp;&nbsp;<a class="code-img"><img src="${ctx}/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"  id="imgValidateCode" ></a></div>';
+                    $('#second-codeblock').html(html);
+
+                }else{
+                    sendResult = false;
+                    showmsg(result.err,'msgcode');
+                }
             },
             fail:function(){
+                showmsg("网络异常，请稍后重试",'msgcode');
             }
         });
-        alert("发送短信成功!")
+        sendCodeResult =  sendResult;
+        return sendResult;
     }
-
     /**
      * 发送成功
      */
     function sureCode(){
-        var mc = $('.modalCode').val();
-        if(mc.length!=4){
-            showmsg('请输入四位数的验证码','moadltips2'); return false;
+        var id =  $('#modalmobile').attr('data-id');
+        var pro = $('#voild-'+id).prop('disabled');
+        if(!sendCodeResult){
+            showmsg('尚未发送短信验证码','msgcode'); return false;
         }
-        //验证验证码
-        var sType = {
-            '0':'验证码错误',
-            '1':'验证通过',
-            '2':'验证达到最大次数',
-            '3':'验证码过期',
-            '5':'验证最大次数'
+        var code = $('.modalCode').val();
+        if(code.length!=4){
+            showmsg('请输入四位数的验证码','msgcode'); return false;
         }
-        // alert('检验验证码是否正确 , 绑定手机');
-
+        var mobile = $('#modalmobile').html();
         $.ajax({
             url : "${ctx}/mc/check",
             type : 'get',
             async: false,//使用同步的方式,true为异步方式
-            data : {'mc':mc,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            data : {'mc':code,"mobile":mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
             dataType: "json",
-            success : function(data) {
-                var result = data;
-                if (result == 1) {//验证通过
+            success : function(data){
+                if(data.flag){
                     //开始绑定手机号码
                     var id =  $('#modalmobile').attr('data-id');
                     var pro = $('#voild-'+id).prop('disabled');
@@ -204,10 +234,8 @@
                         async: false,//使用同步的方式,true为异步方式
                         data : {'number':number,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
-                        success : function(data){
-
-                            if(data.sucess==2) {
-                                alert(sType[result]+', '+data.msg);
+                        success : function(result){
+                            if(result.sucess==2) {
                                 if(pro){
                                     //解除绑定
                                     $('#voild-'+id).val('');
@@ -218,28 +246,43 @@
                                     $('#voild-'+id).attr('disabled',"true");
                                     $('#btn-'+id).html('解除绑定');
                                 }
+                                $('.modalCancel').click();
+                                showtoast(result.msg);
                             }else{
-                                alert(data.msg);
+                                showmsg(result.msg,'msgcode');
                             }
                         },
                         fail:function(){
-                            alert('网络异常，请稍后重试');
+                            showmsg('网络异常，请稍后重试','msgcode');
                         }
 
                     });
-
                 }else{
-                    alert(sType[result]);
+                    showmsg(data.err,'msgcode');
                 }
-            },fail:function(){
+            },
+            fail:function(){
+                showmsg('网络异常，请稍后重试','msgcode');
             }
-        })
+        });
+
+        return;
+        if(pro){
+            //解除绑定
+            $('#voild-'+id).val('');
+            $('#voild-'+id).removeAttr('disabled');
+
+            $('#btn-'+id).html('验证');
+        }else{
+            //验证成功
+            $('#voild-'+id).attr('disabled',"true");
+            $('#btn-'+id).html('解除绑定');
+        }
         $('.modalCancel').click();
     }
+    function changeImgCode(){
+        $("#imgValidateCode").prop("src",  '${ctx}'+"/vc/get?dt="+new Date());
+    }
 </script>
-
-
-<%@include file="/inc/footer.jsp"%>
-<script type="text/javascript" src='${resPrefixUrl }/js/number/band.js'></script>
 </body>
 </html>

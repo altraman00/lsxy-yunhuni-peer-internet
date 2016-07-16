@@ -279,6 +279,7 @@
             }
         });
         sendCodeResult =  sendResult;
+        return sendResult;
     }
 
     $('.modalSuer1').click(function(){
