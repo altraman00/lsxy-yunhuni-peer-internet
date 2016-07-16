@@ -131,40 +131,59 @@ public class AppOnlineActionController extends AbstractPortalController {
         return result;
     }
 
+    /**
+     * 重设IVR号码rest调用
+     * @param token
+     * @param appId
+     * @return
+     */
     private RestResponse<AppOnlineAction> resetIvrRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/reset_ivr?appId={1}";
         return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
+    /**
+     * 直接上线rest调用
+     * @param token
+     * @param appId
+     * @return
+     */
     private RestResponse<AppOnlineAction> directOnlineRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/directOnline?appId={1}";
         return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
+    /**
+     * 应用上线支付rest调用
+     * @param token
+     * @param appId
+     * @return
+     */
     private RestResponse<AppOnlineAction> payRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/pay?appId={1}";
         return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
+    /**
+     * 获取支付页面rest调用
+     * @param token
+     * @param appId
+     * @return
+     */
     private RestResponse<AppOnlineAction> getPayRest(String token, String appId,String ivr) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/get_pay?appId={1}&ivr={2}";
         return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId,ivr);
     }
 
+    /**
+     * 获取应用当前动作rest调用
+     * @param token
+     * @param appId
+     * @return
+     */
     private RestResponse<AppOnlineAction> getOnlineActionRest(String token, String appId) {
         String url = PortalConstants.REST_PREFIX_URL + "/rest/app_online/{1}";
         return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
-    }
-
-    @RequestMapping(value = "new_action",method = RequestMethod.GET)
-    public Map<String,Object> newOnlineAction(HttpServletRequest request,String appId,String step){
-        Map<String,Object> model = new HashMap<>();
-        return model;
-    }
-
-    private RestResponse<Boolean> newOnlineActionRest(String token,String appId,String step){
-        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/new_action?appId={1}&step={2}";
-        return RestRequest.buildSecurityRequest(token).get(url,Boolean.class,appId,step);
     }
 
     /**

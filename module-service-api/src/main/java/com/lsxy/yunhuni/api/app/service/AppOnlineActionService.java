@@ -49,5 +49,11 @@ public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
      */
     AppOnlineAction actionOfDirectOnline(String userName, String appId);
 
+    /**
+     * 应用取消支付，重选号码
+     * @param userName
+     * @param appId
+     * @return
+     */
     AppOnlineAction resetIvr(String userName, String appId);
 }
