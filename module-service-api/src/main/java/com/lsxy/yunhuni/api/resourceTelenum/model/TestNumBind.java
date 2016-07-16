@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.yunhuni.api.app.model.App;
 
 import javax.persistence.*;
 
@@ -14,6 +15,7 @@ import javax.persistence.*;
 public class TestNumBind extends IdEntity {
     private String number;//测试号码
     Tenant tenant;//所属租户
+    App app;//所属应用
 
     @Column( name = "number")
     public String getNumber() {
@@ -22,6 +24,15 @@ public class TestNumBind extends IdEntity {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+    @ManyToOne
+    @JoinColumn( name = "app_id")
+    public App getApp() {
+        return app;
+    }
+
+    public void setApp(App app) {
+        this.app = app;
     }
 
     @ManyToOne

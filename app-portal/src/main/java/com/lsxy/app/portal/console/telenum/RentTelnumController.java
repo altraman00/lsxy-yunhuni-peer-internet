@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.console.telenum;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.console.account.InformationController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -23,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/console/telenum/callnum")
 public class RentTelnumController extends AbstractPortalController {
-    private static final Logger logger = LoggerFactory.getLogger(InformationController.class);
+    private static final Logger logger = LoggerFactory.getLogger(RentTelnumController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
 
     /**
