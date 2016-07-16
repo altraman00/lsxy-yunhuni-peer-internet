@@ -47,9 +47,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     //默认的登陆只支持post请求，这里改变登出的路径匹配器，使其支持get请求
                     .logout().logoutRequestMatcher(new AntPathRequestMatcher(logoutPage)).logoutSuccessUrl(loginPage)
                 .and()
-                    .csrf()
+                    .csrf().disable();
                     //登录登出不用csrf
-                    .ignoringAntMatchers(loginPage,logoutPage,"/test/upload/*");
+//                    .ignoringAntMatchers(loginPage,logoutPage,"/test/upload/*");
 //                .and()
 //                    .exceptionHandling().accessDeniedPage("/exception/403");
 

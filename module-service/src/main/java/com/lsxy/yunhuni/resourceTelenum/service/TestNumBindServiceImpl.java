@@ -11,6 +11,7 @@ import com.lsxy.yunhuni.resourceTelenum.dao.TestNumBindDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
     }
 
     @Override
-    public List<TestNumBind> findByNumber(String userName, String number) throws MatchMutiEntitiesException{
+    public List<TestNumBind> findByNumber(String userName, String number)  {
         Tenant tenant = tenantService.findTenantByUserName(userName) ;
         String hql = "from TestNumBind obj where obj.number=?1 ";
         List<TestNumBind> list = this.findByCustomWithParams(hql, number);
@@ -38,7 +39,7 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
     }
 
     @Override
-    public List<TestNumBind> findAll(String userName) throws MatchMutiEntitiesException{
+    public List<TestNumBind> findAll(String userName)  {
         Tenant tenant = tenantService.findTenantByUserName(userName) ;
         String hql = "from TestNumBind obj where obj.tenant.id=?1 ";
         List<TestNumBind> list = this.findByCustomWithParams(hql, tenant.getId());

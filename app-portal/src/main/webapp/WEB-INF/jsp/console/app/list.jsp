@@ -85,7 +85,7 @@
                                             <c:if test="${result.status==2}"><td  class="nosuccess" id="statusapp-${s.index+1}">未上线</td></c:if>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
-                                                <a href="application_detail.html">详情</a> <span ></span>
+                                                <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
                                                 <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}')" >申请上线</a></c:if>
                                                 <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>

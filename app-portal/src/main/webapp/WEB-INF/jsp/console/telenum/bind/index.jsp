@@ -67,18 +67,18 @@
                                                 测试号码用于在应用上线前用于外呼、会议或其他业务调试，在应用未上线阶段，所有语音、会议业务仅限于已经绑定的测试号码测试号码允许绑定5个
                                             </p>
 
-                                            <c:forEach items="${testMobileBindList}"  var="testMobileBind" varStatus="s" >
+                                            <c:forEach items="${testNumBindList}"  var="testNumBind" varStatus="s" >
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right">号码${s.index+1}：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="text" name="" placeholder="" value="${testMobileBind.number}" class="form-control input-form limit20" id="voild-${s.index+1}" disabled/>
+                                                        <input type="text" name="" placeholder="" value="${testNumBind.number}" class="form-control input-form limit20" id="voild-${s.index+1}" disabled/>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <a  class="showMobilebox line32"  data-id="${s.index+1}" id="btn-${s.index+1}" >解除绑定</a>
                                                     </div>
                                                 </div>
                                             </c:forEach>
-                                            <c:forEach begin="${fn:length(testMobileBindList) +1}" end="5" varStatus="s" >
+                                            <c:forEach begin="${fn:length(testNumBindList) +1}" end="5" varStatus="s" >
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right">号码${s.index}：</lable>
                                                     <div class="col-md-4">

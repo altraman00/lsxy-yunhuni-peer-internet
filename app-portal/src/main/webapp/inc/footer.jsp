@@ -25,11 +25,34 @@
 			});
 		}
 	})
-	function showtoast(tips) {
+	var showtoastNum='';
+	function showtoast(tips,url) {
+		if(showtoastNum!=''){
+			clearInterval(showtoastNum);
+		}
+		$('.tips-toast').hide().html('');
 		$('.tips-toast').css('display','block').html(tips);
-		setTimeout("hidetoast()",2000);
+		showtoastNum = setInterval(function(){hidetoast(url);},3000)
 	}
-	function hidetoast(){
-		$('.tips-toast').fadeOut(1000);
+	function hidetoast(url){
+		$('.tips-toast').hide();
+		if(url!=undefined && url!='' && url!='undefined'){
+			window.location.href=url;
+		}
+	}
+	function getFormJson(form) {
+		var o = {};
+		var a = $(form).serializeArray();
+		$.each(a, function () {
+			if (o[this.name] !== undefined) {
+				if (!o[this.name].push) {
+					o[this.name] = [o[this.name]];
+				}
+				o[this.name].push(this.value || '');
+			} else {
+				o[this.name] = this.value || '';
+			}
+		});
+		return o;
 	}
 </script>
