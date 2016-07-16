@@ -12,9 +12,9 @@ import java.io.Serializable;
 public interface AppOnlineActionDao extends BaseDaoInterface<AppOnlineAction, Serializable> {
     /**
      * 根据状态获取应用的动作
-     * @param app
+     * @param appId
      * @param statusAvtive
      * @return
      */
-    AppOnlineAction findByAppAndStatus(App app, int statusAvtive);
+    AppOnlineAction findByAppIdAndStatus(String appId, int statusAvtive);
 }

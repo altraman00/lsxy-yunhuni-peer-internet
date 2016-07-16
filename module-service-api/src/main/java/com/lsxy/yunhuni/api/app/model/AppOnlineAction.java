@@ -21,6 +21,9 @@ public class AppOnlineAction extends IdEntity {
     public static final int ACTION_ONLINE = 14;     //上线完成
 
     public static final int ACTION_OFFLINE = 21;    //下线
+
+    public static final int PAY_STATUS_PAID = 1;
+    public static final int PAY_STATUS_NOPAID = 2;
     /*
     一个应用进行中的动作只能有一个
      */
@@ -34,6 +37,19 @@ public class AppOnlineAction extends IdEntity {
     private Integer type;               //1、上线 2、下线
     private Integer action;             //上线动作（操作动作：11 选号，12支付，13上线取消（支付返回选号），14上线完成）下线动作（操作动作：21 下线）
     private Integer status;             //1 进行中，2 已完成
+
+    public AppOnlineAction() {
+    }
+
+    public AppOnlineAction(String telNumber, Integer payStatus, BigDecimal amount, App app, Integer type, Integer action, Integer status) {
+        this.telNumber = telNumber;
+        this.payStatus = payStatus;
+        this.amount = amount;
+        this.app = app;
+        this.type = type;
+        this.action = action;
+        this.status = status;
+    }
 
     @Column(name = "tel_number ")
     public String getTelNumber() {
