@@ -71,7 +71,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         App app = appService.findById(appId);
         AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
         //应用上线--选号
-        if( app.getStatus() == App.STATUS_OFFLINE &&(activeAction == null || activeAction.getAction() == AppOnlineAction.ACTION_OFFLINE)){
+        if( app.getStatus() == App.STATUS_OFFLINE ){
             if(activeAction != null){
                 activeAction.setStatus(AppOnlineAction.STATUS_DONE);
                 this.save(activeAction);
@@ -177,9 +177,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     public AppOnlineAction actionOfDirectOnline(String userName, String appId) {
         App app = appService.findById(appId);
         if(app.getIsIvrService() == null || app.getIsIvrService() == 0){
-            AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
             //应用上线--直接上线
-            if( app.getStatus() == App.STATUS_OFFLINE &&(activeAction == null || activeAction.getAction() == AppOnlineAction.ACTION_OFFLINE)){
+            AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+            if( app.getStatus() == App.STATUS_OFFLINE ){
                 if(activeAction != null){
                     activeAction.setStatus(AppOnlineAction.STATUS_DONE);
                     this.save(activeAction);
@@ -190,8 +190,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 app.setStatus(App.STATUS_ONLINE);
                 appService.save(app);
                 return newAction;
-            }else if(activeAction.getAction() == AppOnlineAction.ACTION_ONLINE){
-                //当应用正处于已经上线状态时，反回当前动作
+            }else if(app.getStatus() == App.STATUS_ONLINE ){
                 return activeAction;
             }else{
                 throw new RuntimeException("数据错误");
@@ -229,32 +228,29 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     @Override
     public App offline(String appId) {
         App app = appService.findById(appId);
-        AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
-        if(activeAction != null && app!= null){
-            if(app.getStatus() == App.STATUS_OFFLINE && activeAction.getAction() == AppOnlineAction.ACTION_ONLINE){
+        if(app!= null && app.getStatus() == App.STATUS_ONLINE){
+            AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+            if(activeAction != null){
                 //将上一步设为已完成
                 activeAction.setStatus(AppOnlineAction.STATUS_DONE);
                 this.save(activeAction);
-                //生成新的动作
-                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
-                this.save(newAction);
-                //应用状态改为下线
-                app.setStatus(App.STATUS_OFFLINE);
-                appService.save(app);
-                if(app.getIsIvrService() != null && app.getIsIvrService() ==1){
-                    //当应用有ivr功能时，改变IVR号码的租用关系
-                    List<ResourcesRent> list = resourcesRentService.findByAppId(app.getId());
-                    if(list != null && list.size() > 0){
-                        for(ResourcesRent rent:list){
-                            rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
-                            resourcesRentService.save(rent);
-                        }
-                    }
-                }
-                return app;
-            }else{
-                throw new RuntimeException("数据错误");
             }
+            //生成新的动作
+            AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
+            this.save(newAction);
+            //应用状态改为下线
+            app.setStatus(App.STATUS_OFFLINE);
+            appService.save(app);
+            if(app.getIsIvrService() != null && app.getIsIvrService() ==1){
+                //当应用有ivr功能时，改变IVR号码的租用关系
+                ResourcesRent rent = resourcesRentService.findByAppId(app.getId());
+                if(rent != null){
+                    rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+                    rent.setApp(null);
+                    resourcesRentService.save(rent);
+                }
+            }
+            return app;
         }else{
             throw new RuntimeException("数据错误");
         }

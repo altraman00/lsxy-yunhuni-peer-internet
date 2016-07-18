@@ -81,8 +81,8 @@
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.name}</td>
                                             <td>${result.id}</td>
-                                            <c:if test="${result.status==1}"><td class="success"  id="statusapp-${s.index+1}">已上线</td></c:if>
-                                            <c:if test="${result.status==2}"><td  class="nosuccess" id="statusapp-${s.index+1}">未上线</td></c:if>
+                                            <c:if test="${result.status==1}"><td class="success"  id="statusapp-${result.id}">已上线</td></c:if>
+                                            <c:if test="${result.status==2}"><td  class="nosuccess" id="statusapp-${result.id}">未上线</td></c:if>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
@@ -453,7 +453,6 @@
         bootbox.setLocale("zh_CN");
         bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result){
             if(result){
-                var isIvrService = 0;
                 $.ajax({
                     url : ctx + "/console/app_action/offline",
                     type : 'post',
@@ -462,7 +461,11 @@
                     dataType: "json",
                     success : function(data){
                         if(data.flag){
-                            data.app.isIvrService==1?1:0
+                            var isIvrService = data.app.isIvrService==1?1:0;
+                            $('#trb-'+id).html('');
+                            $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
+                            $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\')">申请上线</a>');
+                            showtoast('下线成功');
                         }else{
                             result = false;
                             showtoast(data.err?data.err:'数据异常，请稍后重试！');
@@ -473,10 +476,6 @@
                     }
                 });
 
-                $('#trb-'+id).html('');
-                $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
-                $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\'),">申请上线</a>');
-                showtoast('下线成功');
             }else{
                 showtoast('取消');
             }

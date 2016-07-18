@@ -231,7 +231,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId
      * @return
      */
-    @RequestMapping(value = "/offline",method = RequestMethod.GET)
+    @RequestMapping(value = "/offline",method = RequestMethod.POST)
     @ResponseBody
     public Map offline(HttpServletRequest request,String appId){
         Map<String,Object> result = new HashMap<>();

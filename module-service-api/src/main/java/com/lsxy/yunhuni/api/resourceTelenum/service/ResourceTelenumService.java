@@ -10,7 +10,17 @@ import java.util.List;
  * Created by zhangxb on 2016/7/1.
  */
 public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
+    /**
+     * 从号码池中获取闲置的号码
+     * @param count
+     * @return
+     */
     List<String> getFreeTeleNum(int count);
 
+    /**
+     * 根据号码从号码池中获取号资源
+     * @param telNumber
+     * @return
+     */
     ResourceTelenum findByTelNumber(String telNumber);
 }

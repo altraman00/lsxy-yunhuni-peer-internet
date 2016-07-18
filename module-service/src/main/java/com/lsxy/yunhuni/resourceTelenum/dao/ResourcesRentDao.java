@@ -12,5 +12,5 @@ import java.util.List;
  */
 public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serializable> {
 
-    List<ResourcesRent> findByAppId(String appId);
+    ResourcesRent findByAppId(String appId);
 }

@@ -24,5 +24,5 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param appId
      * @return
      */
-    List<ResourcesRent> findByAppId(String appId);
+    ResourcesRent findByAppId(String appId);
 }
