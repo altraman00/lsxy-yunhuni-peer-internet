@@ -6,7 +6,6 @@ import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
@@ -58,7 +57,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         App app = appService.findById(appId);
         AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
         //应用上线--选号
-        if( app.getStatus() == App.STATUS_NOT_ONLINE &&(activeAction == null || activeAction.getAction() == AppOnlineAction.ACTION_OFFLINE)){
+        if( app.getStatus() == App.STATUS_OFFLINE &&(activeAction == null || activeAction.getAction() == AppOnlineAction.ACTION_OFFLINE)){
             if(activeAction != null){
                 activeAction.setStatus(AppOnlineAction.STATUS_DONE);
                 this.save(activeAction);
@@ -124,6 +123,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //应用状态改为上线
                     app.setStatus(App.STATUS_ONLINE);
                     appService.save(app);
+                    //TODO 当应用有ivr功能时，绑定IVR号码绑定
                     return newAction;
                 }else{
                     throw new NotEnoughMoneyException("余额不足");
@@ -145,7 +145,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         if(app.getIsIvrService() == null || app.getIsIvrService() == 0){
             AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
             //应用上线--直接上线
-            if( app.getStatus() == App.STATUS_NOT_ONLINE &&(activeAction == null || activeAction.getAction() == AppOnlineAction.ACTION_OFFLINE)){
+            if( app.getStatus() == App.STATUS_OFFLINE &&(activeAction == null || activeAction.getAction() == AppOnlineAction.ACTION_OFFLINE)){
                 if(activeAction != null){
                     activeAction.setStatus(AppOnlineAction.STATUS_DONE);
                     this.save(activeAction);
@@ -174,7 +174,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         //应用上线--支付完成
         if(activeAction != null ) {
             if (activeAction.getAction() == AppOnlineAction.ACTION_PAYING) {
-                //将正在支付设为已完成
+                //将上一步设为已完成
                 activeAction.setStatus(AppOnlineAction.STATUS_DONE);
                 this.save(activeAction);
                 //插入一条取消支付的动作（状态为已完成）
@@ -192,4 +192,28 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }
     }
 
+    @Override
+    public App offline(String appId) {
+        App app = appService.findById(appId);
+        AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+        if(activeAction != null && app!= null){
+            if(app.getStatus() == App.STATUS_OFFLINE && activeAction.getAction() == AppOnlineAction.ACTION_ONLINE){
+                //将上一步设为已完成
+                activeAction.setStatus(AppOnlineAction.STATUS_DONE);
+                this.save(activeAction);
+                //生成新的动作
+                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
+                this.save(newAction);
+                //应用状态改为下线
+                app.setStatus(App.STATUS_OFFLINE);
+                appService.save(app);
+                //TODO 当应用有ivr功能时，解除IVR号码绑定
+                return app;
+            }else{
+                throw new RuntimeException("数据错误");
+            }
+        }else{
+            throw new RuntimeException("数据错误");
+        }
+    }
 }

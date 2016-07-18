@@ -2,7 +2,6 @@ package com.lsxy.app.portal.console.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.console.telenum.TestNumBindController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -129,7 +128,7 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/create")
     @ResponseBody
     public Map create(HttpServletRequest request, App app){
-        app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
+        app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
         createApp(request,app);
         Map map = new HashMap();
         map.put("msg","新建应用成功");

@@ -88,7 +88,7 @@
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
                                                 <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.isIvrService==1?1:0}')" >申请上线</a></c:if>
-                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>
+                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}')">下线</a></span></c:if>
                                             </td>
 
                                         </tr>
@@ -448,13 +448,33 @@
 
 
     //应用下线
-    function lineapp(id){
+    function offline(id){
         bootbox.setLocale("zh_CN");
-        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
+        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result){
             if(result){
+                var isIvrService = 0;
+                $.ajax({
+                    url : ctx + "/console/app_action/offline",
+                    type : 'post',
+                    async: false,//使用同步的方式,true为异步方式
+                    data : {'appId':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            data.app.isIvrService==1?1:0
+                        }else{
+                            result = false;
+                            showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                        }
+                    },
+                    fail:function(){
+                        showtoast('网络异常，请稍后重试');
+                    }
+                });
+
                 $('#trb-'+id).html('');
                 $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
-                $('#trb-'+id).html('<a onclick="tabtarget('+id+')">申请上线</a>');
+                $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\'),">申请上线</a>');
                 showtoast('下线成功');
             }else{
                 showtoast('取消');
@@ -463,6 +483,7 @@
         });
     }
 
+    //获取订单（进入应用上线支付页面）
     function getOrder(){
         var result = true;
         var appId = $('#modal-appid').val();

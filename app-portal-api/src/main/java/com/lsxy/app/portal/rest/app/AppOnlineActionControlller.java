@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -120,6 +121,18 @@ public class AppOnlineActionControlller extends AbstractRestController {
         if(isBelong){
             AppOnlineAction action = appOnlineActionService.resetIvr(userName,appId);
             return RestResponse.success(action);
+        }else{
+            return RestResponse.failed("0000","应用不属于用户");
+        }
+    }
+
+    @RequestMapping("/offline")
+    public RestResponse offline(String appId){
+        String userName = getCurrentAccountUserName();
+        boolean isBelong = appService.isAppBelongToUser(userName, appId);
+        if(isBelong){
+            App app = appOnlineActionService.offline(appId);
+            return RestResponse.success(app);
         }else{
             return RestResponse.failed("0000","应用不属于用户");
         }
