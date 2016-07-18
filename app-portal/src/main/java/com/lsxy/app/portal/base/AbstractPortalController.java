@@ -36,7 +36,7 @@ public abstract class AbstractPortalController {
      */
     public Account getCurrentAccount(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/account/get";
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/account/get/current";
         RestResponse<Account> restResponse = RestRequest.buildSecurityRequest(token).get(uri, Account.class);
         Account account = restResponse.getData();
         return account;
