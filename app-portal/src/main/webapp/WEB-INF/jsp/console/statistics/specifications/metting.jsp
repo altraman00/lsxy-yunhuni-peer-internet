@@ -31,7 +31,7 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a ">
-                                                <a href="${ctx}/console/statistics/specifications/">语音呼叫</a>
+                                                <a href="${ctx}/console/statistics/specifications/call">语音呼叫</a>
                                             </div>
                                         </li>
                                         <li>

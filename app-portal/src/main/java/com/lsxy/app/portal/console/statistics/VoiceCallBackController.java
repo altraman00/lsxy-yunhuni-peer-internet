@@ -12,12 +12,12 @@ import javax.servlet.http.HttpServletRequest;
  * Created by zhangxb on 2016/7/18.
  */
 @Controller
-@RequestMapping("/console/statistics/specifications/call")
-public class VoiceCallController  extends AbstractPortalController {
+@RequestMapping("/console/statistics/specifications/callback")
+public class VoiceCallBackController extends AbstractPortalController {
     @RequestMapping("")
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/console/statistics/specifications/call");
+        mav.setViewName("/console/statistics/specifications/callback");
         return mav;
     }
 }
