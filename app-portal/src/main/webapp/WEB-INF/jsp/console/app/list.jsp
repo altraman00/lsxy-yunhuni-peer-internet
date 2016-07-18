@@ -278,6 +278,7 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/application/list.js'> </script>
 <script>
 
+    //判断是否实名认证
     function isRealAuth(){
         var realAuth = null;
         //获取用户实名认证状态
@@ -309,7 +310,7 @@
         var flag = true;//是否能显示上线框
         //获取应用所处的步骤
         $.ajax({
-            url : "${ctx}/console/app_action/"+ id ,
+            url : ctx + "/console/app_action/"+ id ,
             type : 'get',
             async: false,//使用同步的方式,true为异步方式
             dataType: "json",
@@ -373,7 +374,7 @@
         var appId = $('#modal-appid').val();
         $('.hideIVR').html('');
         var ivr = [];
-        //异步生成
+        //远端生成
         $.ajax({
             url : ctx + "/console/app_action/select_ivr/" + appId,
             type : 'get',
@@ -589,6 +590,7 @@
 
         tabModalBtn(2,'creatIVR()');
     }
+
 
 
     //监听支付状态 返回true success

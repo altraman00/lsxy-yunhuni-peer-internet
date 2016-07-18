@@ -44,7 +44,6 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public List<ResourcesRent> findByAppId(String appId) {
-        List<ResourcesRent> list = resourcesRentDao.findByAppId(appId);
-        return null;
+        return resourcesRentDao.findByAppId(appId);
     }
 }

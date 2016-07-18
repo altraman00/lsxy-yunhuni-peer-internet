@@ -93,7 +93,7 @@ public class ResourcesRent extends IdEntity {
         this.resourceTelenum = resourceTelenum;
     }
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "app_id")
     public App getApp() {
         return app;
