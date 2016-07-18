@@ -10,15 +10,15 @@ import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
+import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 应用上线动作
@@ -37,6 +37,8 @@ public class AppOnlineActionControlller extends AbstractRestController {
     TenantService tenantService;
     @Autowired
     RedisCacheService redisCacheService;
+    @Autowired
+    ResourceTelenumService resourceTelenumService;
 
     @RequestMapping("/{appId}")
     public RestResponse<AppOnlineAction> getOnlineAction(@PathVariable("appId")String appId){
@@ -88,6 +90,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
     @RequestMapping("/pay")
     public RestResponse pay(String appId){
         String userName = getCurrentAccountUserName();
+        Tenant tenant = tenantService.findTenantByUserName(userName);
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
             AppOnlineAction action = null;
@@ -97,6 +100,12 @@ public class AppOnlineActionControlller extends AbstractRestController {
             } catch (NotEnoughMoneyException e) {
                 e.printStackTrace();
                 return RestResponse.failed("0000","余额不足");
+            } catch (TeleNumberBeOccupiedException e) {
+                //号码资源被占用，则清空redis缓存的号码，重新从号码池中取新的号码
+                e.printStackTrace();
+                String temStr = getFreeNumber(5);
+                redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
+                return RestResponse.failed("0000","IVR号码已被占用，请重新选择号码！");
             }
         }else{
             return RestResponse.failed("0000","应用不属于用户");
@@ -146,10 +155,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
     private String getFreeNumber(Integer n){
         //--start
         //TODO  从号码池中选出5个空闲的号码
-        List<String> numbers = new ArrayList<>();
-        for(int i =0;i<n;i++) {
-            numbers.add(getRandomNumber(10)+"");
-        }
+        List<String> numbers = resourceTelenumService.getFreeTeleNum(5);
         //--end
         //生成字符串
         StringBuilder builder = new StringBuilder();
@@ -167,26 +173,6 @@ public class AppOnlineActionControlller extends AbstractRestController {
     }
 
 
-    /**
-     * 模拟号码池
-     * 得到n位长度的随机数（临时用于生成IVR号）
-     * @param n 随机数的长度
-     * @return 返回 n位的随机整数
-     */
-    private static int getRandomNumber(int n){
-        int temp = 0;
-        int min = (int) Math.pow(10, n-1);
-        int max = (int) Math.pow(10, n);
-        Random rand = new Random();
-
-        while(true){
-            temp = rand.nextInt(max);
-            if(temp >= min)
-                break;
-        }
-
-        return temp;
-    }
 }
 
 

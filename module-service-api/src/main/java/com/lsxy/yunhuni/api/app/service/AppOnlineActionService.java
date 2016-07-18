@@ -36,7 +36,7 @@ public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
     AppOnlineAction actionOfInPay(String appId, String ivr, boolean contains);
 
     /**
-     * 应用动作执行--上线
+     * 应用动作执行--上线(应用包含ivr服务)
      * @param appId 应用ID
      * @return
      */

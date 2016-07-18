@@ -12,6 +12,9 @@ import javax.persistence.*;
 @Entity
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_yy_resource_telenum")
 public class ResourceTelenum extends IdEntity{
+    public static final int STATUS_RENTED = 1;
+    public static final int STATUS_FREE = 0;
+
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
     private Tenant tenant;//所属租户

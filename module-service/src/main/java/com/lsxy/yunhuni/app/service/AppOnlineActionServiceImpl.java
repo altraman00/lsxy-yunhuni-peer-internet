@@ -6,6 +6,7 @@ import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
@@ -13,13 +14,20 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
+import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppOnlineActionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liups on 2016/7/15.
@@ -40,6 +48,12 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Autowired
     TenantService tenantService;
+
+    @Autowired
+    ResourceTelenumService resourceTelenumService;
+
+    @Autowired
+    ResourcesRentService resourcesRentService;
 
     @Override
     public BaseDaoInterface<AppOnlineAction, Serializable> getDao() {
@@ -106,6 +120,26 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 Tenant tenant = tenantService.findTenantByUserName(userName);
                 Billing billing = billingService.findBillingByTenantId(tenant.getId());
                 if(billing.getBalance().compareTo(activeAction.getAmount()) >= 0){
+                    //当应用有ivr功能时，绑定IVR号码绑定
+                    //判断ivr号码是否被占用
+                    if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
+                        ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(activeAction.getTelNumber());
+                        if(resourceTelenum != null && resourceTelenum.getStatus() != null && resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED){
+                            //如果ivr号码被占用，则抛也异常
+                            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+                        }else{
+                            //保存号码资源
+                            resourceTelenum.setTenant(tenant);
+                            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
+                            resourceTelenumService.save(resourceTelenum);
+                            // 保存号码租用关系
+                            Date date = new Date();
+                            String nextMonth = DateUtils.getNextMonth(DateUtils.getDate(date, "yyyy-MM"), "yyyy-MM");
+                            Date expireDate = DateUtils.parseDate(nextMonth, "yyyy-MM");    //号码到期时间
+                            ResourcesRent resourcesRent = new ResourcesRent(tenant,app,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_USING);
+                            resourcesRentService.save(resourcesRent);
+                        }
+                    }
                     //TODO 调用扣费接口
                     billing.setBalance(billing.getBalance().subtract(activeAction.getAmount()));
                     billingService.save(billing);
@@ -123,7 +157,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //应用状态改为上线
                     app.setStatus(App.STATUS_ONLINE);
                     appService.save(app);
-                    //TODO 当应用有ivr功能时，绑定IVR号码绑定
+
                     return newAction;
                 }else{
                     throw new NotEnoughMoneyException("余额不足");
@@ -207,7 +241,16 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 //应用状态改为下线
                 app.setStatus(App.STATUS_OFFLINE);
                 appService.save(app);
-                //TODO 当应用有ivr功能时，解除IVR号码绑定
+                if(app.getIsIvrService() != null && app.getIsIvrService() ==1){
+                    //当应用有ivr功能时，改变IVR号码的租用关系
+                    List<ResourcesRent> list = resourcesRentService.findByAppId(app.getId());
+                    if(list != null && list.size() > 0){
+                        for(ResourcesRent rent:list){
+                            rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+                            resourcesRentService.save(rent);
+                        }
+                    }
+                }
                 return app;
             }else{
                 throw new RuntimeException("数据错误");
@@ -216,4 +259,5 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             throw new RuntimeException("数据错误");
         }
     }
+
 }

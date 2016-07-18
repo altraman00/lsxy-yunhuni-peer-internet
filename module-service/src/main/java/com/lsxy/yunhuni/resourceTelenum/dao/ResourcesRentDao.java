@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 呼入号码DAO
@@ -11,4 +12,5 @@ import java.io.Serializable;
  */
 public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serializable> {
 
+    List<ResourcesRent> findByAppId(String appId);
 }

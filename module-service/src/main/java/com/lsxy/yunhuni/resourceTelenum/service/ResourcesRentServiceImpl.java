@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 /**
  * 租户号码租用service
@@ -37,5 +40,11 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         String hql = "from ResourcesRent obj where obj.tenant.id=?1";
         Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
+    }
+
+    @Override
+    public List<ResourcesRent> findByAppId(String appId) {
+        List<ResourcesRent> list = resourcesRentDao.findByAppId(appId);
+        return null;
     }
 }

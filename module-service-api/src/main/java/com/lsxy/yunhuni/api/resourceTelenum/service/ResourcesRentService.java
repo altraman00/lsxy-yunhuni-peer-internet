@@ -5,6 +5,8 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 
+import java.util.List;
+
 /**
  * 租户号码租用service
  * Created by zhangxb on 2016/7/1.
@@ -15,5 +17,12 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param tenantId 租户id
      * @return
      */
-    public Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize) throws MatchMutiEntitiesException;
+    Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize) throws MatchMutiEntitiesException;
+
+    /**
+     * 根据ID获取租用关系
+     * @param appId
+     * @return
+     */
+    List<ResourcesRent> findByAppId(String appId);
 }
