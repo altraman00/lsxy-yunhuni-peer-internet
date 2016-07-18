@@ -2,7 +2,6 @@ package com.lsxy.app.portal.base;
 
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.web.rest.RestResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 

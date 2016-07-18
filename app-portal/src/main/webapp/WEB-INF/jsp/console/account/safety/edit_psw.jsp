@@ -36,7 +36,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a ">
-                                                <a href="${ctx}/console/account/information/index">基本资料</a>
+                                                <a href="${ctx}/console/account/index">基本资料</a>
                                             </div>
                                         </li>
                                         <li>
@@ -72,19 +72,19 @@
                                     <form:form role="form" action="${ctx}/console/account/safety/edit_psw" method="post" class="register-form"
                                           id="personalAuthForm">
                                         <div class="form-group">
-                                            <div class="col-md-4 remove-padding">
+                                            <div class="col-md-4 remove-padding moretips">
                                                 <input type="password" name="oldPassword" placeholder="原密码"
                                                        class="form-control input-form password" />
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-4 remove-padding ">
+                                            <div class="col-md-4 remove-padding moretips ">
                                                 <input type="password" name="newPassword" placeholder="新密码"
                                                        class="form-control input-form newpassword" />
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <div class="col-md-4 remove-padding">
+                                            <div class="col-md-4 remove-padding moretips">
                                                 <input type="password" name="" placeholder="确认新的密码"
                                                        class="form-control input-form repassword" />
                                             </div>
@@ -98,7 +98,7 @@
 
                                         <div class="form-group">
                                             <div class="col-md-9 remove-padding">
-                                                <button type="submit"  class="btn btn-primary  btn-form">保存</button>
+                                                <a id="validateBtn" class="btn btn-primary  btn-form" >保存</a>
                                             </div>
                                         </div>
                                     </form:form>
@@ -112,11 +112,38 @@
     </section>
 </section>
 </section>
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/personal/password.js'></script>
 <script type="text/javascript">
-    var msg = '${msg}';
-    if(msg==''){}else{alert(msg);}
+    $('#validateBtn').click(function(){
+        var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
+        if(result==true){
+            $('#validateBtn').attr('disabled','disabled');
+            //提交表单
+            $.ajax({
+                url : "${ctx}/console/account/safety/edit_psw",
+                type : 'post',
+                async: false,//使用同步的方式,true为异步方式
+                data :getFormJson("#personalAuthForm"),
+                dataType: "json",
+                success : function(data){
+                    if(data.code=='0'){
+                        showtoast(data.msg,'${ctx}/console/account/safety/index');
+                    }else{
+                        showtoast(data.msg);
+                        $('#validateBtn').removeAttr('disabled');
+                    }
+                },
+                fail:function(){
+                    showtoast('网络异常，请稍后重试');
+                    $('#validateBtn').removeAttr('disabled');
+                }
+            });
+        }else{
+            $('#personalAuthForm').bootstrapValidator('validate');
+        }
+    });
 </script>
 </body>
 </html>

@@ -36,7 +36,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a ">
-                                                <a href="${ctx}/console/account/information/index">基本资料</a>
+                                                <a href="${ctx}/console/account/index">基本资料</a>
                                             </div>
                                         </li>
                                         <li>

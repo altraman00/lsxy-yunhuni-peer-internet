@@ -3,11 +3,11 @@ package com.lsxy.app.portal.console.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,16 +44,61 @@ public class AppController extends AbstractPortalController {
         mav.setViewName("/console/app/list");
         return mav;
     }
+
+    /**
+     * 获取租户下所有测试绑定号码
+     * @param request
+     * @return
+     */
+    private RestResponse getTestNumBindList(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/test_num_bind/list";
+        return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
+    }
     /**
      * 创建应用首页
      * @param request
      * @return
      */
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request){
+    public ModelAndView index(HttpServletRequest request,String id){
         ModelAndView mav = new ModelAndView();
+        if(id!=null&&id.length()>0) {//修改时使用
+            RestResponse<App> restResponse = findById(request, id);
+            App app = restResponse.getData();
+            mav.addObject("app", app);
+        }
         mav.setViewName("/console/app/index");
         return mav;
+    }
+
+    /**
+     * 详情页入口
+     * @param request
+     * @param id
+     * @return
+     */
+    @RequestMapping("/detail")
+    public ModelAndView detail(HttpServletRequest request,String id){
+        ModelAndView mav = new ModelAndView();
+        RestResponse<App> restResponse = findById(request, id);
+        App app = restResponse.getData();
+        mav.addObject("app", app);
+        List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
+        mav.addObject("testNumBindList",testNumBindList);
+        mav.setViewName("/console/app/detail");
+        return mav;
+    }
+    /**
+     * 根据id查找应用
+     * @param request
+     * @param id
+     * @return
+     */
+    private RestResponse findById(HttpServletRequest request,String id ){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app/get/id={1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
      * 获取分页信息
@@ -63,7 +109,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse pageList(HttpServletRequest request,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/app/page_list?pageNo={1}&pageSize={2}";
+        String uri = restPrefixUrl + "/rest/app/plist?pageNo={1}&pageSize={2}";
         return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,pageNo,pageSize);
     }
     @RequestMapping("/delete")
@@ -100,6 +146,19 @@ public class AppController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
+     * 更新应用
+     * @param request
+     * @return
+     */
+    @RequestMapping("/update")
+    @ResponseBody
+    public Map update(HttpServletRequest request, App app){
+        updateApp(request,app);
+        Map map = new HashMap();
+        map.put("msg","应用修改成功");
+        return map;
+    }
+    /**
      * 新建应用
      * @param request
      * @param app 应用对象
@@ -108,6 +167,19 @@ public class AppController extends AbstractPortalController {
     private RestResponse createApp(HttpServletRequest request,App app){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/app/create";
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(app, Map.class);
+        return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
+    }
+    /**
+     * 更新应用
+     * @param request
+     * @param app 应用对象
+     * @return
+     */
+    private RestResponse updateApp(HttpServletRequest request,App app){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app/update";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(app, Map.class);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);

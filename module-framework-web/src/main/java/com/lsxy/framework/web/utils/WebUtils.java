@@ -154,16 +154,7 @@ public class WebUtils {
 		
 		logger.debug("Http请求 ["+getRemoteAddress(request)+"]["+request.getSession().getId()+"]"+request.getRequestURL()+" ");
 		logger.debug("ContentType：{}",request.getContentType());
-		logger.debug("Method:{}",request.getMethod());
-		logger.debug("Encoding:{}",request.getCharacterEncoding());
-		logger.debug("Headers:");
-		Enumeration headerNames = request.getHeaderNames();
-		while(headerNames.hasMoreElements()){
-			String name = (String) headerNames.nextElement();
-			String value = request.getHeader(name);
-			logger.debug("   {}:{}",name,value);
-		}
-		logger.debug("Params：");
+		logger.debug("参数如下：");
 		Enumeration<String> params = request.getParameterNames();
 		while(params.hasMoreElements()){
 			String paramName = params.nextElement();
@@ -352,5 +343,23 @@ public class WebUtils {
             }
         }
         return null;
+	}
+
+	/**
+	 * 获取请求参数作为map返回
+	 * @param request
+	 * @return
+     */
+	public static Map<String,Object> getRequestParams(HttpServletRequest request) {
+		Map<String, Object> result = new HashMap<>();
+		Enumeration<String> params = request.getParameterNames();
+		while(params.hasMoreElements()){
+			String paramName = params.nextElement();
+			String value = request.getParameter(paramName);
+			logger.debug(paramName+":"+value);
+			result.put(paramName,value);
+		}
+
+		return result;
 	}
 }

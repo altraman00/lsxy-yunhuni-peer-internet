@@ -204,6 +204,7 @@
         }else{
             $('.'+id+'contrast').hide();
             $(this).html('对比');
+            initchart();
         }
     });
 
@@ -376,7 +377,9 @@
                 var data =[];
                 for(var i=0;i<resultData.length;i++){
                     var tempData = new Date(resultData[i].dt);
-                    var temp = [tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate(),resultData[i].sumAmount];
+                    var tempDataStr = tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate();
+                    if(type=='year'){tempDataStr =  tempData.getFullYear()+"-"+(tempData.getMonth()+1);}
+                    var temp = [tempDataStr,resultData[i].sumAmount];
                     data[i]=temp;
                 }
                 //var seriesjson=JSON.stringify(resultData);

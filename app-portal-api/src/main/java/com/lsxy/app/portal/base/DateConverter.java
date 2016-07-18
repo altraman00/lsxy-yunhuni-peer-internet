@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -21,7 +20,7 @@ public class DateConverter implements Converter<String, Date> {
     public Date convert(String s) {
         long ltime = 0L;
         Date date = null;
-        if(StringUtils.isNotBlank(s)){
+        if(StringUtils.isNotEmpty(s)){
             try{
                 ltime = Long.parseLong(s);
                 date = new Date(ltime);

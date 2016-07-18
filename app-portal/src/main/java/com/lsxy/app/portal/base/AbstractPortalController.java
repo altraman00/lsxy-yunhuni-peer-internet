@@ -2,6 +2,9 @@ package com.lsxy.app.portal.base;
 
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.exceptions.TokenMissingException;
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.web.rest.RestRequest;
+import com.lsxy.framework.web.rest.RestResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,5 +27,18 @@ public abstract class AbstractPortalController {
             throw new TokenMissingException("token丢失");
         }
         return token;
+    }
+
+    /**
+     * 获取用户的当前对象
+     * @param request
+     * @return
+     */
+    public Account getCurrentAccount(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/account/get/current";
+        RestResponse<Account> restResponse = RestRequest.buildSecurityRequest(token).get(uri, Account.class);
+        Account account = restResponse.getData();
+        return account;
     }
 }
