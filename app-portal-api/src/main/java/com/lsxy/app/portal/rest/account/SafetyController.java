@@ -45,9 +45,8 @@ public class SafetyController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/save_mobile")
-    public RestResponse saveMobile( String mobile) throws MatchMutiEntitiesException {
-        String userName = getCurrentAccountUserName();
-        Account account = accountService.findAccountByUserName(userName);
+    public RestResponse saveMobile( String mobile) {
+        Account account = getCurrentAccount();
         account.setMobile(mobile);
         account = accountService.save(account);
         return RestResponse.success(account);
@@ -59,8 +58,8 @@ public class SafetyController extends AbstractRestController {
      * @param newPassword 新密码
      * @return
      */
-    @RequestMapping("/save_password")
-    public RestResponse savePassword(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
+    @RequestMapping("/modify_pwd")
+    public RestResponse modifyPwd(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
         if(oldPassword!=null&&oldPassword.length()>0){
