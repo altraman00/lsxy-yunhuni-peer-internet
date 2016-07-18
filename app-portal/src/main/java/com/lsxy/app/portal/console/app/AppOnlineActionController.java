@@ -170,7 +170,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @return
      */
     private RestResponse<AppOnlineAction> directOnlineRest(String token, String appId) {
-        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/directOnline?appId={1}";
+        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/direct_online?appId={1}";
         return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 

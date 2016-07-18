@@ -142,7 +142,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     @Override
     public AppOnlineAction actionOfDirectOnline(String userName, String appId) {
         App app = appService.findById(appId);
-        if(app.getIsIvrService() == 0){
+        if(app.getIsIvrService() == null || app.getIsIvrService() == 0){
             AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
             //应用上线--直接上线
             if( app.getStatus() == App.STATUS_NOT_ONLINE &&(activeAction == null || activeAction.getAction() == AppOnlineAction.ACTION_OFFLINE)){
@@ -152,6 +152,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 }
                 AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
+                //应用状态改为上线
+                app.setStatus(App.STATUS_ONLINE);
+                appService.save(app);
                 return newAction;
             }else if(activeAction.getAction() == AppOnlineAction.ACTION_ONLINE){
                 //当应用正处于已经上线状态时，反回当前动作
