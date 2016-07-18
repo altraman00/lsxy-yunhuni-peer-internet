@@ -20,7 +20,7 @@ public class DateConverter implements Converter<String, Date> {
     public Date convert(String s) {
         long ltime = 0L;
         Date date = null;
-        if(StringUtils.isNotBlank(s)){
+        if(StringUtils.isNotEmpty(s)){
             try{
                 ltime = Long.parseLong(s);
                 date = new Date(ltime);
