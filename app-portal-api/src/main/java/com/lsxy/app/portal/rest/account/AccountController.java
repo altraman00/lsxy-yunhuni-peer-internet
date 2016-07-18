@@ -29,8 +29,8 @@ public class AccountController extends AbstractRestController {
      * 根据用户名获取用户对象
      * @return
      */
-    @RequestMapping("/get")
-    public RestResponse getAccount()  {
+    @RequestMapping("/get/current")
+    public RestResponse getCurrentAccountResponse()  {
         return RestResponse.success(getCurrentAccount());
     }
 
