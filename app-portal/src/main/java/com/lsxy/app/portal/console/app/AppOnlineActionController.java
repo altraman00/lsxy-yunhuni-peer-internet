@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.app;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
@@ -17,6 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.lsxy.framework.api.tenant.model.Tenant.AUTH_COMPANY_SUCESS;
+import static com.lsxy.framework.api.tenant.model.Tenant.AUTH_ONESELF_SUCESS;
+import static com.lsxy.framework.web.rest.RestRequest.buildSecurityRequest;
 
 /**
  * 应用上线动作
@@ -53,15 +58,23 @@ public class AppOnlineActionController extends AbstractPortalController {
     @RequestMapping(value = "/select_ivr/{appId}",method = RequestMethod.GET)
     @ResponseBody
     public Map getSelectIvr(HttpServletRequest request,@PathVariable("appId") String appId){
+        String token = getSecurityToken(request);
         Map<String,Object> result = new HashMap<>();
-        RestResponse<String[]> response = getSelectIvrRest(getSecurityToken(request), appId);
-        String[] data = response.getData();
-        if(response.isSuccess() && data != null && data.length>0){
-            result.put("flag",true);
-            result.put("result",data);
+        //是否实名认证
+        boolean isRealAuth = findAuthStatus(token);
+        if(isRealAuth){
+            RestResponse<String[]> response = getSelectIvrRest(token, appId);
+            String[] data = response.getData();
+            if(response.isSuccess() && data != null && data.length>0){
+                result.put("flag",true);
+                result.put("result",data);
+            }else{
+                result.put("flag",false);
+                result.put("err","数据异常");
+            }
         }else{
             result.put("flag",false);
-            result.put("err","数据异常");
+            result.put("err","用户未实名认证");
         }
         return result;
     }
@@ -106,13 +119,21 @@ public class AppOnlineActionController extends AbstractPortalController {
     @RequestMapping(value = "/direct_online",method = RequestMethod.GET)
     @ResponseBody
     public Map directOnline(HttpServletRequest request,String appId){
+        String token = getSecurityToken(request);
         Map<String,Object> result = new HashMap<>();
-        RestResponse<AppOnlineAction> response = directOnlineRest(getSecurityToken(request),appId);
-        if(response.isSuccess() ){
-            result.put("flag",true);
+        //是否实名认证
+        boolean isRealAuth = findAuthStatus(token);
+        if(isRealAuth){
+            RestResponse<AppOnlineAction> response = directOnlineRest(token,appId);
+            if(response.isSuccess() ){
+                result.put("flag",true);
+            }else{
+                result.put("flag",false);
+                result.put("err", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
+            }
         }else{
             result.put("flag",false);
-            result.put("err", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
+            result.put("err","用户未实名认证");
         }
         return result;
     }
@@ -139,7 +160,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     private RestResponse<AppOnlineAction> resetIvrRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/reset_ivr?appId={1}";
-        return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
+        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
     /**
@@ -150,7 +171,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     private RestResponse<AppOnlineAction> directOnlineRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/directOnline?appId={1}";
-        return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
+        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
     /**
@@ -161,7 +182,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     private RestResponse<AppOnlineAction> payRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/pay?appId={1}";
-        return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
+        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
     /**
@@ -172,7 +193,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     private RestResponse<AppOnlineAction> getPayRest(String token, String appId,String ivr) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/get_pay?appId={1}&ivr={2}";
-        return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId,ivr);
+        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId,ivr);
     }
 
     /**
@@ -183,7 +204,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     private RestResponse<AppOnlineAction> getOnlineActionRest(String token, String appId) {
         String url = PortalConstants.REST_PREFIX_URL + "/rest/app_online/{1}";
-        return RestRequest.buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
+        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
     /**
@@ -194,7 +215,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     public RestResponse<String[]> getSelectIvrRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/select_ivr/{1}";
-        return RestRequest.buildSecurityRequest(token).get(url,String[].class,appId);
+        return buildSecurityRequest(token).get(url,String[].class,appId);
     }
 
     /**
@@ -205,7 +226,25 @@ public class AppOnlineActionController extends AbstractPortalController {
     private RestResponse<Billing> getBilling(String token) {
         //此处调用账务restApi
         String billingUrl = PortalConstants.REST_PREFIX_URL + "/rest/billing/get";
-        return RestRequest.buildSecurityRequest(token).get(billingUrl,Billing.class);
+        return buildSecurityRequest(token).get(billingUrl,Billing.class);
+    }
+
+    /**
+     * 获取后台状态的rest请求方法
+     * @return
+     */
+    private boolean findAuthStatus(String token){
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/account/auth/find_auth_status";
+        RestResponse response = RestRequest.buildSecurityRequest(token).get(uri, HashMap.class);
+        boolean flag = false;
+        if(response.isSuccess() && response.getData() != null){
+            Map result = (Map) response.getData();
+            int authStatus  = Integer.valueOf((result.get("status")+""));
+            if (Tenant.AUTH_ONESELF_SUCESS == authStatus || Tenant.AUTH_COMPANY_SUCESS == authStatus) {
+                flag = true;
+            }
+        }
+        return flag;
     }
 
 }
