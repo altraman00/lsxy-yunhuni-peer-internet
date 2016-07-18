@@ -42,15 +42,13 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     }
 
     @Override
-    public Recharge createRecharge(String username, String type, Double amount) throws Exception {
+    public Recharge createRecharge(String username, String type, BigDecimal amount) throws Exception {
         Recharge recharge = null;
         //充值类型一定要是规定好的类型,当没有该类型时，枚举类会抛出IllegalArgumentException异常
         RechargeType rechargeType = RechargeType.valueOf(type);
-        if(rechargeType != null && amount > 0 && username != null){
+        if(rechargeType != null && amount.compareTo(new BigDecimal(0))==1 && username != null){
             Tenant tenant = tenantService.findTenantByUserName(username);
             if(tenant != null){
-                BigDecimal bg = new BigDecimal(amount);
-                amount = bg.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                 String orderId = UUIDGenerator.uuid();
                 recharge = new Recharge(tenant,amount,rechargeType, RechargeStatus.NOTPAID,orderId);
                 rechargeDao.save(recharge);
@@ -65,9 +63,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     }
 
     @Override
-    public Recharge paySuccess(String orderId, Double totalFee) throws MatchMutiEntitiesException {
+    public Recharge paySuccess(String orderId, BigDecimal totalFee) throws MatchMutiEntitiesException {
         Recharge recharge = rechargeDao.findByOrderId(orderId);
-        if(recharge != null && recharge.getAmount().equals(totalFee)){
+        if(recharge != null && recharge.getAmount().compareTo(totalFee)==0){
             String status = recharge.getStatus();
             //如果充值记录是未支付状态，则将支付状态改成已支付，并将钱加到账务表里
             if(RechargeStatus.NOTPAID.name().equals(status)){
@@ -76,7 +74,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
                 Tenant tenant = recharge.getTenant();
                 //更新账务表的余额
                 Billing billing = billingService.findBillingByTenantId(tenant.getId());
-                billing.setBalance(billing.getBalance() + recharge.getAmount());
+                billing.setBalance(billing.getBalance().add(recharge.getAmount()));
                 rechargeDao.save(recharge);
                 billingService.save(billing);
             }

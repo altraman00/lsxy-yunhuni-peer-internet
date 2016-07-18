@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -64,7 +65,7 @@ public class RechargeController extends AbstractPortalController {
      */
     @RequestMapping(value = "/create",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
-    public ModelAndView sure(HttpServletRequest request,String type,Double amount) throws Exception {
+    public ModelAndView sure(HttpServletRequest request,String type,BigDecimal amount) throws Exception {
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
         Recharge recharge = createRecharge(token,type,amount);
@@ -184,7 +185,7 @@ public class RechargeController extends AbstractPortalController {
      * @param amount 金额
      * @return
      */
-    private Recharge createRecharge(String token, String type, Double amount) {
+    private Recharge createRecharge(String token, String type, BigDecimal amount) {
         //此处调用生成订单restApi
         String orderUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/create_recharge";
         Map<String,Object> map = new HashMap();
@@ -226,7 +227,7 @@ public class RechargeController extends AbstractPortalController {
      * @param model 传进来一个装载的map
      * @param amount 金额
      */
-    private void amountFormat(Map<String, Object> model, Double amount) {
+    private void amountFormat(Map<String, Object> model, BigDecimal amount) {
         if(amount != null){
             //余额整数部分
             model.put("balanceInt",amount.intValue());
@@ -271,7 +272,7 @@ public class RechargeController extends AbstractPortalController {
                 payRecord.setOrderId(params.get("out_trade_no"));
                 payRecord.setTradeNo(params.get("trade_no"));
                 payRecord.setTradeStatus(params.get("trade_status"));
-                payRecord.setTotalFee(new Double(params.get("total_fee").trim()));
+                payRecord.setTotalFee(new BigDecimal(params.get("total_fee").trim()));
                 payRecord.setSellerId(params.get("seller_id"));
                 payRecord.setBuyerId(params.get("buyer_id"));
                 payRecord.setSellerName(params.get("seller_email"));

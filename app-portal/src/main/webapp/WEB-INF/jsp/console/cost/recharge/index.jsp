@@ -43,7 +43,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="./cost_month.html">月结账单</a>
+                                                <a href="${ctx}/console/cost/bill_month/get">月结账单</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -60,7 +60,7 @@
                                         <ul class="nav">
                                             <li>
                                                 <div class="aside-li-a">
-                                                    <a href="./cost_invoice.html">发票信息</a>
+                                                    <a href="${ctx}/console/cost/invoice_info">发票信息</a>
                                                 </div>
                                             </li>
                                             <li>

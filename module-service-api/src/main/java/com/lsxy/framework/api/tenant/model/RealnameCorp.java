@@ -29,7 +29,7 @@ public class RealnameCorp extends IdEntity {
     private String  type03Prop02;//type03_prop02 [三证分离]税务登记证照片
     private String  type03Prop03;//type03_prop03 [三证分离]营业执照号
     private String  type03Prop04;//type03_prop04 [三证分离]营业执照照片
-    private int status;//实名认证状态
+    private Integer status;//实名认证状态
     public RealnameCorp() {
     }
 
@@ -58,11 +58,11 @@ public class RealnameCorp extends IdEntity {
         return serialVersionUID;
     }
     @Column(name = "status")
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

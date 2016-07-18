@@ -38,7 +38,7 @@
                                             </span>
                                             <div class="box-footer">
                                                 <a class="btn btn-primary" href="${ctx}/console/cost/recharge">充值</a>
-                                                <a class="btn btn-default" href="${ctx}/console/cost/recharg">消费情况</a>
+                                                <a class="btn btn-default" href="${ctx}/console/cost/consume">消费情况</a>
                                             </div>
                                         </div>
                                     </div>
@@ -188,7 +188,8 @@
 
     // restfult api 重新生成confirm
     $('.reset_sk_confirm').on('click',function(e){
-        bootbox.confirm("确定重新生成么", function(result) {
+        bootbox.setLocale("zh_CN");
+        bootbox.confirm("确定重新生成secretKey么", function(result) {
             if(result){
                 $.ajax({
                     type: "get",

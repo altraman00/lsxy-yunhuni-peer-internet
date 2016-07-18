@@ -68,7 +68,7 @@ public class SafetyController extends AbstractRestController {
             oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
             newPassword = PasswordUtil.springSecurityPasswordEncode(newPassword,userName);
             if(oldPassword.equals(newPassword)){
-                return RestResponse.failed("1003","新密碼不能与原密碼相同");
+                return RestResponse.failed("1003","新密码不能与原密码相同");
             }
             if(oldPassword.equalsIgnoreCase(account.getPassword())){
                 account.setPassword(newPassword);

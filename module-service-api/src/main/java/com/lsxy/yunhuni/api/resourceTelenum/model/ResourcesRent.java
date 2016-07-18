@@ -22,7 +22,7 @@ public class ResourcesRent extends IdEntity {
     private String resType;//res_type 1-号码资源 2-线路资源 3-待扩展,
     private Date rentDt;//rent_dt 租用时间,
     private Date rentExpire;//rent_expire到期时间,
-    private int rentStatus;//rent_status租用状态,
+    private Integer rentStatus;//rent_status租用状态,
 
     @Column(name = "res_type")
     public String getResType() {
@@ -57,11 +57,11 @@ public class ResourcesRent extends IdEntity {
     }
 
     @Column(name = "rent_status")
-    public int getRentStatus() {
+    public Integer getRentStatus() {
         return rentStatus;
     }
 
-    public void setRentStatus(int rentStatus) {
+    public void setRentStatus(Integer rentStatus) {
         this.rentStatus = rentStatus;
     }
 

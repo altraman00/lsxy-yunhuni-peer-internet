@@ -26,6 +26,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -186,7 +187,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     private void createBilling(Tenant tenant) {
         Billing billing = new Billing();
         billing.setTenant(tenant);
-        billing.setBalance(0.00);
+        billing.setBalance(new BigDecimal(0.00));
         billing.setSmsRemain(0);
         billing.setVoiceRemain(0);
         billing.setConferenceRemain(0);

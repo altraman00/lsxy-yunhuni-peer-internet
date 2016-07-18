@@ -27,7 +27,7 @@
 		<div class="row">
 			<form role="form" action="${ctx}/login" method="post" class="login-form" id="defaultForm">
 				<div class="form-group">
-					<input type="text" name="username" placeholder="请输入账号" class="form-username form-control" id="form-username">
+					<input type="text" name="username" placeholder="请输入账号、手机号或邮箱" class="form-username form-control" id="form-username">
 				</div>
 				<div class="form-group">
 					<input type="password" name="password" placeholder="请输入密码" class="form-password form-control" id="form-password" />
@@ -41,7 +41,7 @@
 					</div>
 				</div>
 
-				<div class="form-group form-block"  >
+				<div class="form-group form-block" >
 					<div class="col-md-6 remove-padding remember" >
 						<input type="checkbox" class="remember-check" />   记住我
 					</div>
@@ -93,7 +93,7 @@
 	$(document).ready(function() {
 
 		$('#imgValidateCode').click(function() {
-			$("#imgValidateCode").prop("src","${ctx}/vc/get?dt="+(new Date().getTime()));
+			$("#imgValidateCode").prop("src",ctx +  "/vc/get?dt="+(new Date().getTime()));
 		});
 
 	});
