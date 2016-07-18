@@ -1,12 +1,12 @@
 package com.lsxy.app.portal.base;
 
 import com.lsxy.framework.core.utils.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -18,7 +18,7 @@ public class DateConverter implements Converter<String, Date> {
     private static final Logger logger = LoggerFactory.getLogger(DateConverter.class);
     @Override
     public Date convert(String s) {
-        if(s==null||s.length()==0){return null;}
+        if(StringUtils.isNotBlank(s)){return null;}
         long ltime = 0L;
         Date date = null;
         try{

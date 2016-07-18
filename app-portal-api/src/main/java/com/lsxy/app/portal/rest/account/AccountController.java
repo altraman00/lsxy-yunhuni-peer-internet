@@ -30,7 +30,7 @@ public class AccountController extends AbstractRestController {
      * 根据用户名获取用户对象
      * @return
      */
-    @RequestMapping("/find_by_username")
+    @RequestMapping("/byun")
     public RestResponse findByUserName() throws MatchMutiEntitiesException {
         Account account = accountService.findAccountByUserName(getCurrentAccountUserName());
         return RestResponse.success(account);

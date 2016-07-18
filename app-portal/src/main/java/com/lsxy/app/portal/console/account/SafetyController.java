@@ -57,7 +57,7 @@ public class SafetyController extends AbstractPortalController {
      */
     private RestResponse findByUsername(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +  "/rest/account/find_by_username";
+        String uri = restPrefixUrl +  "/rest/account/byun";
         Map map = new HashMap();
         return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
     }

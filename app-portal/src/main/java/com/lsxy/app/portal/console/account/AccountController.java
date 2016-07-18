@@ -48,7 +48,7 @@ public class AccountController  extends AbstractPortalController {
      */
     private RestResponse findByUsername(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/account/find_by_username";
+        String uri = restPrefixUrl +   "/rest/account/byun";
         return  RestRequest.buildSecurityRequest(token).get(uri, Account.class);
     }
     /**
