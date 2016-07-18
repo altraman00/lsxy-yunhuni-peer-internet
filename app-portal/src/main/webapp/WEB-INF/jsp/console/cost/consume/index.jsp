@@ -63,7 +63,7 @@
                                         <ul class="nav">
                                             <li>
                                                 <div class="aside-li-a">
-                                                    <a href="./cost_invoice.html">索取发票</a>
+                                                    <a href="${ctx}/console/cost/invoice_info">发票信息</a>
                                                 </div>
                                             </li>
                                             <li>
