@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
@@ -25,4 +26,8 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     ResourcesRent findByAppId(String appId);
+
+    ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
+
+    String[] findOwnUnusedNum(Tenant tenant);
 }

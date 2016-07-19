@@ -17,11 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static com.lsxy.framework.api.tenant.model.Tenant.AUTH_COMPANY_SUCESS;
-import static com.lsxy.framework.api.tenant.model.Tenant.AUTH_ONESELF_SUCESS;
 import static com.lsxy.framework.web.rest.RestRequest.buildSecurityRequest;
 
 /**
@@ -75,9 +72,9 @@ public class AppOnlineActionController extends AbstractPortalController {
         //是否实名认证
         boolean isRealAuth = findAuthStatus(token);
         if(isRealAuth){
-            RestResponse<String[]> response = getSelectIvrRest(token, appId);
-            String[] data = response.getData();
-            if(response.isSuccess() && data != null && data.length>0){
+            RestResponse<Map> response = getSelectIvrRest(token, appId);
+            Map<String,Object> data = response.getData();
+            if(response.isSuccess() && data != null && (data.get("selectIvr") != null || data.get("ownIvr") != null)){
                 result.put("flag",true);
                 result.put("result",data);
             }else{
@@ -98,9 +95,9 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId
      * @return
      */
-    public RestResponse<String[]> getSelectIvrRest(String token, String appId) {
+    public RestResponse<Map> getSelectIvrRest(String token, String appId) {
         String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/select_ivr/{1}";
-        return buildSecurityRequest(token).get(url,String[].class,appId);
+        return buildSecurityRequest(token).get(url,Map.class,appId);
     }
 
     @RequestMapping(value = "/get_pay",method = RequestMethod.GET)

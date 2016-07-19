@@ -370,10 +370,11 @@
     var ivrnumber = 1;
     //生成IVR
     function creatIVR(){
-        var result = true;
+        var result = false;
         var appId = $('#modal-appid').val();
         $('.hideIVR').html('');
         var ivr = [];
+        var ownIvr = [];
         //远端生成
         $.ajax({
             url : ctx + "/console/app_action/select_ivr/" + appId,
@@ -381,8 +382,10 @@
             async: false,//使用同步的方式,true为异步方式
             dataType: "json",
             success : function(data){
-                if(data.flag && data.result != null && data.result.length >0){
-                    ivr = data.result;
+                if(data.flag && data.result != null ){
+                    ivr = data.result.selectIvr;
+                    ownIvr = data.result.ownIvr;
+                    result = true;
                 }else{
                     result = false;
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
@@ -485,7 +488,7 @@
 
     //获取订单（进入应用上线支付页面）
     function getOrder(){
-        var result = true;
+        var result = false;
         var appId = $('#modal-appid').val();
         var ivr = $('#creatIVR').html();//当为创建支付订单时（Action），ivr取值有效，当为取出原有的订单时，ivr取值用数据库中的值（在后台中处理）
         $.ajax({
@@ -502,6 +505,7 @@
                     if(data.action.amount > data.balance){
                         $(".nomoney").show();
                     }
+                    result = true;
                 }else{
                     result = false;
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
@@ -523,7 +527,7 @@
             showtoast('请先阅读IVR协议');
             return false;
         }
-        var result = true;
+        var result = false;
         var appId = $('#modal-appid').val();
         $.ajax({
             url : ctx + "/console/app_action/pay",
@@ -535,6 +539,8 @@
                 if(!data.flag){
                     result = false;
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                }else{
+                    result = true;
                 }
             },
             fail:function(){
@@ -546,7 +552,7 @@
     }
 
     function directOnline(){
-        var result = true;
+        var result = false;
         var appId = $('#modal-appid').val();
         $.ajax({
             url : ctx + "/console/app_action/direct_online",
@@ -558,6 +564,8 @@
                 if(!data.flag){
                     result = false;
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                }else{
+                    result = true;
                 }
             },
             fail:function(){

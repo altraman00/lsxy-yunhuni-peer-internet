@@ -15,8 +15,9 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_resources_rent")
 public class ResourcesRent extends IdEntity {
     public static final String RESTYPE_TELENUM = "1";
-    public static final int RENT_STATUS_USING = 1;
-    public static final int RENT_STATUS_UNUSED = 2;
+    public static final int RENT_STATUS_USING = 1;      //正在使用
+    public static final int RENT_STATUS_UNUSED = 2;     //没在使用，但号码归属于租户
+    public static final int RENT_STATUS_RELEASE = 3;    //被释放，号码不属于租户
 
     private Tenant tenant;//tenant_id所属租户
     private App app;//app_id 关联应用

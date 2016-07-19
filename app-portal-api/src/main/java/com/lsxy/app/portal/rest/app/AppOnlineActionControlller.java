@@ -12,13 +12,16 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
 import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 应用上线动作
@@ -39,6 +42,8 @@ public class AppOnlineActionControlller extends AbstractRestController {
     RedisCacheService redisCacheService;
     @Autowired
     ResourceTelenumService resourceTelenumService;
+    @Autowired
+    ResourcesRentService resourcesRentService;
 
     @RequestMapping("/{appId}")
     public RestResponse<AppOnlineAction> getOnlineAction(@PathVariable("appId")String appId){
@@ -52,8 +57,9 @@ public class AppOnlineActionControlller extends AbstractRestController {
      * @return
      */
     @RequestMapping("/select_ivr/{appId}")
-    public RestResponse<String[]> getSelectIvr(@PathVariable("appId") String appId){
-        String[] result;
+    public RestResponse<Map> getSelectIvr(@PathVariable("appId") String appId){
+        Map result = new HashMap();
+        String[] selectIvr;
         String userName = getCurrentAccountUserName();
         Tenant tenant = tenantService.findTenantByUserName(userName);
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
@@ -65,7 +71,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
                 temStr = getFreeNumber(5);
                 redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
             }
-            result = temStr.split(",");
+            selectIvr = temStr.split(",");
+            result.put("selectIvr",selectIvr);
+            //获取用户拥有的空闲号
+            String[] ownUnusedNum = resourcesRentService.findOwnUnusedNum(tenant);
+            result.put("ownIvr",ownUnusedNum);
             return RestResponse.success(result);
         }else{
             return RestResponse.failed("0000","应用不属于用户");

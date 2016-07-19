@@ -124,10 +124,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
                         ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(activeAction.getTelNumber());
-                        if(resourceTelenum != null && resourceTelenum.getStatus() != null && resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED){
-                            //如果ivr号码被占用，则抛也异常
-                            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
-                        }else{
+                        if(resourceTelenum.getStatus() == null || resourceTelenum.getStatus()== ResourceTelenum.STATUS_FREE){
                             //保存号码资源
                             resourceTelenum.setTenant(tenant);
                             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
@@ -138,14 +135,38 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                             Date expireDate = DateUtils.parseDate(nextMonth, "yyyy-MM");    //号码到期时间
                             ResourcesRent resourcesRent = new ResourcesRent(tenant,app,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_USING);
                             resourcesRentService.save(resourcesRent);
+                        }else if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED){
+                            //如果号码被租用
+                            //租用是不是这个租户
+                            if(!resourceTelenum.getTenant().getId().equals(tenant.getId())){
+                                throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+                            }else{
+                                //是这个租户，则查询租用记录，有没有正在用的
+                                ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
+                                if(resourcesRent == null){
+                                    throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+                                }else if(!resourcesRent.getTenant().getId().equals(tenant.getId()) || resourcesRent.getApp() != null){
+                                    throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+                                }else{
+                                    resourcesRent.setApp(app);
+                                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
+                                    resourcesRentService.save(resourcesRent);
+                                }
+                            }
+                        }else{
+                            //如果ivr号码被占用，则抛也异常
+                            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
                         }
                     }
                     //TODO 调用扣费接口
-                    billing.setBalance(billing.getBalance().subtract(activeAction.getAmount()));
-                    billingService.save(billing);
-                    //插入消费记录
-                    Consume consume = new Consume(new Date(),"应用上线",activeAction.getAmount(),"应用上线",appId,tenant);
-                    consumeService.save(consume);
+                    //当支付金额为0时，既上线不用支付，就不用插入消费记录
+                    if(activeAction.getAmount().compareTo(new BigDecimal(0)) == 0){
+                        billing.setBalance(billing.getBalance().subtract(activeAction.getAmount()));
+                        billingService.save(billing);
+                        //插入消费记录
+                        Consume consume = new Consume(new Date(),"应用上线",activeAction.getAmount(),"应用上线",appId,tenant);
+                        consumeService.save(consume);
+                    }
                     //将上一步设为已支付和完成
                     activeAction.setStatus(AppOnlineAction.STATUS_DONE);
                     activeAction.setPayStatus(AppOnlineAction.PAY_STATUS_PAID);
