@@ -154,7 +154,16 @@ public class WebUtils {
 		
 		logger.debug("Http请求 ["+getRemoteAddress(request)+"]["+request.getSession().getId()+"]"+request.getRequestURL()+" ");
 		logger.debug("ContentType：{}",request.getContentType());
-		logger.debug("参数如下：");
+		logger.debug("Method:{}",request.getMethod());
+		logger.debug("Encoding:{}",request.getCharacterEncoding());
+		logger.debug("Headers:");
+		Enumeration headerNames = request.getHeaderNames();
+		while(headerNames.hasMoreElements()){
+			String name = (String) headerNames.nextElement();
+			String value = request.getHeader(name);
+			logger.debug("   {}:{}",name,value);
+		}
+		logger.debug("Params：");
 		Enumeration<String> params = request.getParameterNames();
 		while(params.hasMoreElements()){
 			String paramName = params.nextElement();
