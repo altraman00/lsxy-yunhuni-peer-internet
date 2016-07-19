@@ -6,8 +6,6 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 
-import java.util.List;
-
 /**
  * 租户号码租用service
  * Created by zhangxb on 2016/7/1.

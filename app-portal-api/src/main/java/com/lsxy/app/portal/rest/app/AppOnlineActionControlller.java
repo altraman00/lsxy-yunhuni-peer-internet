@@ -82,6 +82,12 @@ public class AppOnlineActionControlller extends AbstractRestController {
         }
     }
 
+    /**
+     * 获取或生成支付订单
+     * @param appId
+     * @param ivr
+     * @return
+     */
     @RequestMapping("/get_pay")
     public RestResponse getPay(String appId,String ivr){
         String userName = getCurrentAccountUserName();
@@ -100,6 +106,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
         }
     }
 
+    /**
+     * 支付上线
+     * @param appId
+     * @return
+     */
     @RequestMapping("/pay")
     public RestResponse pay(String appId){
         String userName = getCurrentAccountUserName();
@@ -126,6 +137,12 @@ public class AppOnlineActionControlller extends AbstractRestController {
             return RestResponse.failed("0000","应用不属于用户");
         }
     }
+
+    /**
+     * 直接上线
+     * @param appId
+     * @return
+     */
     @RequestMapping("/direct_online")
     public RestResponse directOnline(String appId){
         String userName = getCurrentAccountUserName();
@@ -138,6 +155,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
         }
     }
 
+    /**
+     * 重选IVR号码
+     * @param appId
+     * @return
+     */
     @RequestMapping("/reset_ivr")
     public RestResponse resetIvr(String appId){
         String userName = getCurrentAccountUserName();
@@ -150,6 +172,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
         }
     }
 
+    /**
+     * 下线
+     * @param appId
+     * @return
+     */
     @RequestMapping("/offline")
     public RestResponse offline(String appId){
         String userName = getCurrentAccountUserName();
@@ -169,7 +196,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
      */
     private String getFreeNumber(Integer n){
         //--start
-        //TODO  从号码池中选出5个空闲的号码
+        //从号码池中选出5个空闲的号码
         List<String> numbers = resourceTelenumService.getFreeTeleNum(5);
         //--end
         //生成字符串

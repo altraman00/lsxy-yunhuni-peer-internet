@@ -1,7 +1,6 @@
 package com.lsxy.yunhuni.app.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 
 import java.io.Serializable;

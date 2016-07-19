@@ -64,6 +64,12 @@ public class AppOnlineActionController extends AbstractPortalController {
         return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
+    /**
+     * 获取可供选择的号码
+     * @param request
+     * @param appId
+     * @return
+     */
     @RequestMapping(value = "/select_ivr/{appId}",method = RequestMethod.GET)
     @ResponseBody
     public Map getSelectIvr(HttpServletRequest request,@PathVariable("appId") String appId){
@@ -100,6 +106,13 @@ public class AppOnlineActionController extends AbstractPortalController {
         return buildSecurityRequest(token).get(url,Map.class,appId);
     }
 
+    /**
+     * 生成或获取支付订单
+     * @param request
+     * @param appId
+     * @param ivr
+     * @return
+     */
     @RequestMapping(value = "/get_pay",method = RequestMethod.GET)
     @ResponseBody
     public Map getPay(HttpServletRequest request,String appId,String ivr){
@@ -135,6 +148,12 @@ public class AppOnlineActionController extends AbstractPortalController {
     }
 
 
+    /**
+     * 支付上线
+     * @param request
+     * @param appId
+     * @return
+     */
     @RequestMapping(value = "/pay",method = RequestMethod.GET)
     @ResponseBody
     public Map pay(HttpServletRequest request,String appId){
@@ -162,6 +181,12 @@ public class AppOnlineActionController extends AbstractPortalController {
     }
 
 
+    /**
+     * 直接上线（没有IVR功能）
+     * @param request
+     * @param appId
+     * @return
+     */
     @RequestMapping(value = "/direct_online",method = RequestMethod.GET)
     @ResponseBody
     public Map directOnline(HttpServletRequest request,String appId){
@@ -196,6 +221,12 @@ public class AppOnlineActionController extends AbstractPortalController {
         return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
     }
 
+    /**
+     * 重新选择IVR号吗
+     * @param request
+     * @param appId
+     * @return
+     */
     @RequestMapping(value = "/reset_ivr",method = RequestMethod.GET)
     @ResponseBody
     public Map resetIvr(HttpServletRequest request,String appId){
