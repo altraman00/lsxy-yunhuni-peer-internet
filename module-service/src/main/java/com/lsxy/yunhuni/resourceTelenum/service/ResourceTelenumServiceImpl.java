@@ -2,7 +2,6 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.RandomNumberUtil;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
@@ -13,8 +12,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static javafx.scene.input.KeyCode.R;
 
 /**
  * 全局号码资源service
