@@ -14,7 +14,7 @@
     <artifactId>app-api-gateway</artifactId>
 
     <properties>
-        <start-class>com.lsxy.app.api.gateway.MainClass</start-class>
+        <start-class>com.lsxy.app.api.gateway.com.lsxy.area.server.MainClass</start-class>
         <java.version>1.8</java.version>
     </properties>
 
