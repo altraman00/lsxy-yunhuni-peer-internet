@@ -70,6 +70,7 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
                                             </div>
+                                            <span class="span-required">*</span>
                                         </div>
                                         <p class="tips">20字符以内，符合<a href="">应用审核规范</a></p>
 
@@ -91,6 +92,7 @@
                                                     <option value="其他" <c:if test="${app.type=='其他'}">selected</c:if>>其他</option>
                                                 </select>
                                             </div>
+                                            <span class="span-required">*</span>
                                         </div>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">所属行业：</lable>
@@ -101,6 +103,7 @@
                                                     <%@ include file="/inc/industry.jsp"%>
                                                 </select>
                                             </div>
+                                            <span class="span-required">*</span>
                                         </div>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">服务器白名单：</lable>

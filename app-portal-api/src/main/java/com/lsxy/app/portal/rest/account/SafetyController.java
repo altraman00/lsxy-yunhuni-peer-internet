@@ -6,6 +6,7 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,9 +46,8 @@ public class SafetyController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/save_mobile")
-    public RestResponse saveMobile( String mobile) throws MatchMutiEntitiesException {
-        String userName = getCurrentAccountUserName();
-        Account account = accountService.findAccountByUserName(userName);
+    public RestResponse saveMobile( String mobile) {
+        Account account = getCurrentAccount();
         account.setMobile(mobile);
         account = accountService.save(account);
         return RestResponse.success(account);
@@ -59,18 +59,18 @@ public class SafetyController extends AbstractRestController {
      * @param newPassword 新密码
      * @return
      */
-    @RequestMapping("/save_password")
-    public RestResponse savePassword(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
+    @RequestMapping("/modify_pwd")
+    public RestResponse modifyPwd(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
-        if(oldPassword!=null&&oldPassword.length()>0){
+        if(!StringUtils.isNotEmpty(oldPassword)){
             // 密码加密
             oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
             newPassword = PasswordUtil.springSecurityPasswordEncode(newPassword,userName);
             if(oldPassword.equals(newPassword)){
-                return RestResponse.failed("1003","新密碼不能与原密碼相同");
+                return RestResponse.failed("1003","新密码不能与原密码相同");
             }
-            if(oldPassword.equalsIgnoreCase(account.getPassword())){
+            if(oldPassword.equals(account.getPassword())){
                 account.setPassword(newPassword);
                 account = accountService.save(account);
                 if(account!=null){

@@ -19,10 +19,9 @@ public class DateConverter implements Converter<String, Date> {
     private static final Logger logger = LoggerFactory.getLogger(DateConverter.class);
     @Override
     public Date convert(String s) {
-        if(s==null||s.length()==0){return null;}
         long ltime = 0L;
         Date date = null;
-        if(StringUtils.isNotBlank(s)){
+        if(StringUtils.isNotEmpty(s)){
             try{
                 ltime = Long.parseLong(s);
                 date = new Date(ltime);

@@ -3,7 +3,6 @@ package com.lsxy.app.portal.rest.account;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +29,9 @@ public class AccountController extends AbstractRestController {
      * 根据用户名获取用户对象
      * @return
      */
-    @RequestMapping("/find_by_username")
-    public RestResponse findByUserName() throws MatchMutiEntitiesException {
-        Account account = accountService.findAccountByUserName(getCurrentAccountUserName());
-        return RestResponse.success(account);
+    @RequestMapping("/get/current")
+    public RestResponse getCurrentAccountResponse()  {
+        return RestResponse.success(getCurrentAccount());
     }
 
     /**

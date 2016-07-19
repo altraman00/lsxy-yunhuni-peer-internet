@@ -42,26 +42,12 @@ public class SafetyController extends AbstractPortalController {
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        RestResponse<Account> restResponse = findByUsername(request);
-        Account account = restResponse.getData();
-        SafetyVo safetyVo = new SafetyVo(account);
+        SafetyVo safetyVo = new SafetyVo(getCurrentAccount(request));
         request.getSession().setAttribute("safetyVo",safetyVo);
         mav.addObject("safetyVo",safetyVo);
         mav.setViewName("/console/account/safety/index");
         return mav;
     }
-
-    /**
-     * 获取用户信息的rest请求
-     * @return
-     */
-    private RestResponse findByUsername(HttpServletRequest request){
-        String token = getSecurityToken(request);
-        String uri = restPrefixUrl +  "/rest/account/find_by_username";
-        Map map = new HashMap();
-        return  RestRequest.buildSecurityRequest(token).post(uri,map,  Account.class);
-    }
-
 
     /**
      * 修改密码首页
@@ -82,7 +68,7 @@ public class SafetyController extends AbstractPortalController {
     @ResponseBody
     public Map editPsw(HttpServletRequest request, String oldPassword,String newPassword){
         ModelAndView mav = new ModelAndView();
-        RestResponse<String> restResponse = savePassword(request,oldPassword, newPassword);
+        RestResponse<String> restResponse = modifyPwd(request,oldPassword, newPassword);
         String status = restResponse.getData();
         Map map = new HashMap();
         if(IS_TRUE.equals(status) ){
@@ -101,9 +87,9 @@ public class SafetyController extends AbstractPortalController {
      * @param newPassword 新密码
      * @return
      */
-    private RestResponse savePassword(HttpServletRequest request,String oldPassword,String newPassword){
+    private RestResponse modifyPwd(HttpServletRequest request,String oldPassword,String newPassword){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/account/safety/save_password";
+        String uri = restPrefixUrl + "/rest/account/safety/modify_pwd";
         Map map = new HashMap();
         map.put("oldPassword",oldPassword);
         map.put("newPassword",newPassword);

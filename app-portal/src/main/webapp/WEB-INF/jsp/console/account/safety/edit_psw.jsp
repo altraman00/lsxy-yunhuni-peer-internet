@@ -72,7 +72,7 @@
                                     <form:form role="form" action="${ctx}/console/account/safety/edit_psw" method="post" class="register-form"
                                           id="personalAuthForm">
                                         <div class="form-group">
-                                            <div class="col-md-4 remove-padding">
+                                            <div class="col-md-4 remove-padding moretips">
                                                 <input type="password" name="oldPassword" placeholder="原密码"
                                                        class="form-control input-form password" />
                                             </div>

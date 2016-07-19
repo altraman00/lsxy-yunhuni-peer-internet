@@ -97,7 +97,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse findById(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/find_by_id?id={1}";
+        String uri = restPrefixUrl +   "/rest/app/get/id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
@@ -109,7 +109,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse pageList(HttpServletRequest request,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/app/page_list?pageNo={1}&pageSize={2}";
+        String uri = restPrefixUrl + "/rest/app/plist?pageNo={1}&pageSize={2}";
         return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,pageNo,pageSize);
     }
     @RequestMapping("/delete")
