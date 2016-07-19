@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <contextName>area-server</contextName>
+    <property name="APP_NAME" value="area-server" />
+    <include resource="logback-yunhuni.xml"/>
+    <logger name="org.springframework" level="DEBUG" additivity="true" />
+
+</configuration>
