@@ -64,7 +64,9 @@ public class AppOnlineActionControlller extends AbstractRestController {
         Tenant tenant = tenantService.findTenantByUserName(userName);
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
-            appOnlineActionService.actionOfSelectNum(appId);
+            //获取用户拥有的空闲号
+            String[] ownUnusedNum = resourcesRentService.findOwnUnusedNum(tenant);
+            result.put("ownIvr",ownUnusedNum);
             //从号码池中选出5个空闲的号码放到Redis供用户选择(若Redis已有，则直接取Redis中的值)
             String temStr = redisCacheService.get(ALTERNATIVE_IVR_PREFIX + tenant.getId());
             if(StringUtils.isBlank(temStr)) {
@@ -73,9 +75,12 @@ public class AppOnlineActionControlller extends AbstractRestController {
             }
             selectIvr = temStr.split(",");
             result.put("selectIvr",selectIvr);
-            //获取用户拥有的空闲号
-            String[] ownUnusedNum = resourcesRentService.findOwnUnusedNum(tenant);
-            result.put("ownIvr",ownUnusedNum);
+            //如果号码池中没有号码，用户也没有空闲的号码，则抛出异常
+            if((ownUnusedNum == null || ownUnusedNum.length <= 0) && (selectIvr == null || selectIvr.length <= 0)){
+                return RestResponse.failed("0000","数据异常");
+            }else{
+                appOnlineActionService.actionOfSelectNum(appId);
+            }
             return RestResponse.success(result);
         }else{
             return RestResponse.failed("0000","应用不属于用户");
