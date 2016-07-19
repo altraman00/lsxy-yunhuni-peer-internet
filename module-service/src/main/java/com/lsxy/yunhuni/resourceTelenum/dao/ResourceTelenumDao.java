@@ -6,8 +6,6 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import java.io.Serializable;
 import java.util.List;
 
-import static javafx.scene.input.KeyCode.R;
-
 /**
  * 全局号码DAO
  * Created by zhangxb on 2016/7/1.
