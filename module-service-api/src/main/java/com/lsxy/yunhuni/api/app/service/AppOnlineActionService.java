@@ -30,10 +30,11 @@ public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
      * 应用动作执行--正在支付
      * @param appId 应用ID
      * @param ivr ivr号
+     * @param tenant 租户
      * @param contains IVR号是否属于可选号码池
      * @return
      */
-    AppOnlineAction actionOfInPay(String appId, String ivr, boolean contains);
+    AppOnlineAction actionOfInPay(String appId, String ivr, Tenant tenant,boolean contains);
 
     /**
      * 应用动作执行--上线(应用包含ivr服务)

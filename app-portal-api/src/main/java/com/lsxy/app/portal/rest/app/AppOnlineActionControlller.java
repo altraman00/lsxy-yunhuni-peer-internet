@@ -88,9 +88,12 @@ public class AppOnlineActionControlller extends AbstractRestController {
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         Tenant tenant = tenantService.findTenantByUserName(userName);
         if(isBelong){
+            boolean contains = false;
             String temStr = redisCacheService.get(ALTERNATIVE_IVR_PREFIX + tenant.getId());
-            boolean contains = temStr.contains(ivr.trim());//可选号码池中是否存在该ivr
-            AppOnlineAction action = appOnlineActionService.actionOfInPay(appId,ivr,contains);
+            if(StringUtils.isNotBlank(temStr)){
+                contains = temStr.contains(ivr.trim());//可选号码池中是否存在该ivr
+            }
+            AppOnlineAction action = appOnlineActionService.actionOfInPay(appId,ivr,tenant,contains);
             return RestResponse.success(action);
         }else{
             return RestResponse.failed("0000","应用不属于用户");
@@ -106,6 +109,8 @@ public class AppOnlineActionControlller extends AbstractRestController {
             AppOnlineAction action = null;
             try {
                 action = appOnlineActionService.actionOfOnline(userName,appId);
+                //将号码池中的号码清掉
+                redisCacheService.del(ALTERNATIVE_IVR_PREFIX + tenant.getId());
                 return RestResponse.success(action);
             } catch (NotEnoughMoneyException e) {
                 e.printStackTrace();

@@ -160,16 +160,25 @@
             </div>
 
             <div class="contentModal" style="display: none" data-action="2">
-                <div class="input text-center">
-                    <p>您选择开通IVR功能，我们给您分配了一个IVR号码供应用使用IVR功能</p>
-                </div>
-                <div class="input text-center">
-                    <div class="defulatTips" id="creatIVR" >
-
+                <div id="selectNewIvr" style="display: none">
+                    <div class="input text-center">
+                        <p>您选择开通IVR功能，我们给您分配了一个IVR号码供应用使用IVR功能</p>
                     </div>
-                    <a onclick="nolike()" class="font14">不喜欢 换一个?</a>
+                    <div class="input text-center">
+                        <div class="defulatTips" id="creatIVR" ></div>
+                        <a onclick="nolike()" class="font14">不喜欢 换一个?</a>
+                    </div>
+                    <div class="hideIVR">
+                    </div>
                 </div>
-                <div class="hideIVR">
+                <div id="selectOwnIvr" >
+                    <div class="input text-center">
+                        <p>您选择开通IVR功能，请从您拥有的IVR号在选择一个供使用</p>
+                    </div>
+                    <div class="input text-center">
+                        <select id="ownIvr" >
+                        </select>
+                    </div>
                 </div>
                 <div class="input text-center" >
                     <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3" data-fun="getOrder()" >下一步</a>
@@ -182,12 +191,14 @@
                 </div>
                 <div class="input text-center mb-0 mt-0">
                     <div class="defulatTips">IVR号码：<span id="selectIvr"></span></div>
-                    <div class="defulatTips">IVR号码租用费：1000元</div>
-                    <div class="defulatTips">IVR功能使用费：100元/月</div>
+                    <div id="payMoneyInfo" style="display: none">
+                        <div class="defulatTips">IVR号码租用费：1000元</div>
+                        <div class="defulatTips">IVR功能使用费：100元/月</div>
+                    </div>
                 </div>
                 <div class="ivrserver"><input type="checkbox" name="readcheckbox" id="readbook" />已阅读<a target="_blank" href="ivragreement.html" >IVR服务协议</a></div>
                 <div class="input text-center mt-0" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="4" data-fun="pay()">确认支付</a>
+                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="4" data-fun="pay()" id="payButton">确认支付</a>
                     <a type="button"  class="btn btn-primary btn-box" onclick="resetIVR()">重新选择</a>
                 </div>
             </div>
@@ -396,12 +407,22 @@
                 showtoast('网络异常，请刷新重试');
             }
         });
-
-        for (var i = 0; i < ivr.length; i++) {
-            $('.hideIVR').append('<sapn class="hideIVR-p-'+(i+1)+'">'+ivr[i]+'</sapn>');
+        if(ownIvr.length > 0){
+            $("#selectOwnIvr").show();
+            $("#selectNewIvr").hide();
+            for(var i = 0;i<ownIvr.length;i++){
+                $('#ownIvr').append('<option value="'+ ownIvr[i]+'">'+ownIvr[i]+'</option>')
+            }
+            $('#creatIVR').html(ownIvr[0]);
+        }else{
+            $("#selectOwnIvr").hide();
+            $("#selectNewIvr").show();
+            for (var i = 0; i < ivr.length; i++) {
+                $('.hideIVR').append('<sapn class="hideIVR-p-'+(i+1)+'">'+ivr[i]+'</sapn>');
+                //赋值第一个
+            }
+            $('#creatIVR').html(ivr[0]);
         }
-        //赋值第一个
-        $('#creatIVR').html(ivr[0]);
         ivrnumber = 1;
         return result;
     }
@@ -505,10 +526,17 @@
                     if(data.action.amount > data.balance){
                         $(".nomoney").show();
                     }
+                    if(data.action.amount == 0){
+                        $("#payMoneyInfo").hide();
+                        $("#payButton").text("确定上线");
+                    }else{
+                        $("#payMoneyInfo").show();
+                        $("#payButton").text("确定支付");
+                    }
                     result = true;
                 }else{
                     result = false;
-                    showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                    showtoast(data.err?data.err:'数据异常，请稍后刷新重试！');
                 }
             },
             fail:function(){
@@ -604,6 +632,10 @@
     function syncpay(){
         return true;
     }
+
+    $("#ownIvr").change(function(){
+        $('#creatIVR').html($(this).val());
+    })
 </script>
 
 </body>

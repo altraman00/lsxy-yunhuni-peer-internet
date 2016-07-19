@@ -84,20 +84,42 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     }
 
     @Override
-    public AppOnlineAction actionOfInPay(String appId, String ivr, boolean contains) {
+    public AppOnlineAction actionOfInPay(String appId, String ivr,Tenant tenant, boolean contains) {
         App app = new App();
         app.setId(appId);
         AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
         //应用上线--正在支付
         if(activeAction != null ){
-            if(activeAction.getAction() == AppOnlineAction.ACTION_SELECT_NUM && contains){
+            if(activeAction.getAction() == AppOnlineAction.ACTION_SELECT_NUM ){
                 //当上一步是应用选号中时，如果ivr属于号码池，则生成新的动作--正在支付
-                activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                this.save(activeAction);
-                BigDecimal amount = new BigDecimal(1000 + 100);
-                AppOnlineAction newAction = new AppOnlineAction(ivr,AppOnlineAction.PAY_STATUS_NOPAID,amount,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
-                this.save(newAction);
-                return newAction;
+                if(contains){
+                    activeAction.setStatus(AppOnlineAction.STATUS_DONE);
+                    this.save(activeAction);
+                    BigDecimal amount = new BigDecimal(1000 + 100);
+                    AppOnlineAction newAction = new AppOnlineAction(ivr,AppOnlineAction.PAY_STATUS_NOPAID,amount,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
+                    this.save(newAction);
+                    return newAction;
+                }else{
+                    ResourceTelenum telenum = resourceTelenumService.findByTelNumber(ivr);
+                    //是这个租户，则查询租用记录，有没有正在用的
+                    if(telenum != null && telenum.getTenant().getId().equals(tenant.getId())){
+                        ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(telenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
+                        if(resourcesRent == null){
+                            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+                        }else if(!resourcesRent.getTenant().getId().equals(tenant.getId()) || resourcesRent.getApp() != null){
+                            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+                        }else{
+                            //号码没被占用，创建支付动作（支付金额为0）
+                            activeAction.setStatus(AppOnlineAction.STATUS_DONE);
+                            this.save(activeAction);
+                            AppOnlineAction newAction = new AppOnlineAction(ivr,AppOnlineAction.PAY_STATUS_NOPAID,new BigDecimal(0),app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
+                            this.save(newAction);
+                            return newAction;
+                        }
+                    }else{
+                        throw new RuntimeException("数据错误");
+                    }
+                }
             }else if(activeAction.getAction() == AppOnlineAction.ACTION_PAYING){
                 //当应用正处于正在支付时，反回当前动作
                 return activeAction;
