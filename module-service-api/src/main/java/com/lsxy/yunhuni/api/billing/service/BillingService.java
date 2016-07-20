@@ -14,12 +14,12 @@ public interface BillingService extends BaseService<Billing> {
      * @param username 用户名
      * @return 账务
      */
-    Billing findBillingByUserName(String username) throws MatchMutiEntitiesException;
+    Billing findBillingByUserName(String username);
 
     /**
      * 根据租户ID查找账务
      * @param tenantId 租户ID
      * @return 账务
      */
-    Billing findBillingByTenantId(String tenantId) throws MatchMutiEntitiesException;
+    Billing findBillingByTenantId(String tenantId);
 }

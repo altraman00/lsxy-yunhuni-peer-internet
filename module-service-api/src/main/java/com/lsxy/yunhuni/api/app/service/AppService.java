@@ -26,4 +26,12 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     Page<App> pageList(String userName,Integer pageNo,Integer pageSize);
+
+    /**
+     * 应用是否属于用户
+     * @param userName
+     * @param appId
+     * @return
+     */
+    boolean isAppBelongToUser(String userName, String appId);
 }
