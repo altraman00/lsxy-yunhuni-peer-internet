@@ -301,7 +301,7 @@
             success : function(data){
                 realAuth = data;
             },
-            fail:function(){
+            error:function(){
                 showtoast('网络异常，请稍后重试');
             }
         });
@@ -337,7 +337,7 @@
                     }
                 }
             },
-            fail:function(){
+            error:function(){
                 flag = false;
                 showtoast('网络异常，请稍后重试');
             }
@@ -403,7 +403,7 @@
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -460,7 +460,7 @@
                         success : function(data){
                             showtoast(data.msg);
                         },
-                        fail:function(){
+                        error:function(){
                             showtoast('网络异常，请稍后重试');
                         }
                     });
@@ -496,7 +496,7 @@
                             showtoast(data.err?data.err:'数据异常，请稍后重试！');
                         }
                     },
-                    fail:function(){
+                    error:function(){
                         showtoast('网络异常，请稍后重试');
                     }
                 });
@@ -540,7 +540,7 @@
                     showtoast(data.err?data.err:'数据异常，请稍后刷新重试！');
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -572,7 +572,7 @@
                     result = true;
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -597,7 +597,7 @@
                     result = true;
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -619,7 +619,7 @@
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
                 }
             },
-            fail:function(){
+            error:function(){
                 showtoast('网络异常，请刷新重试');
             }
         });
