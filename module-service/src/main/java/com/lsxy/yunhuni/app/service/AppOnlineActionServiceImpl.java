@@ -198,13 +198,13 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                                 }
                             }
                         }else{
-                            //如果ivr号码被占用，则抛也异常
+                            //如果ivr号码被占用，则抛出异常
                             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
                         }
                     }
-                    //TODO 调用扣费接口
-                    //当支付金额为0时，既上线不用支付，就不用插入消费记录
-                    if(action.getAmount().compareTo(new BigDecimal(0)) == 0){
+                    //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
+                    if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
+                        //TODO 调用扣费接口
                         billing.setBalance(billing.getBalance().subtract(action.getAmount()));
                         billingService.save(billing);
                         //插入消费记录
