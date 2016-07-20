@@ -81,7 +81,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">主要业务：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="business" placeholder="" value="${account.business}  "
+                                                <input type="text" name="business" placeholder="" value="${account.business}"
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
