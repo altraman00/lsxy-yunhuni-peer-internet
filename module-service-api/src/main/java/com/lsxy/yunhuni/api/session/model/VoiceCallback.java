@@ -16,7 +16,7 @@ import java.util.Date;
 public class VoiceCallback extends IdEntity {
     private Date startTime;//发起时间
     private Date endTime;//结束时间
-    private String formNum;//发起方
+    private String fromNum;//发起方
     private String toNum;//接收方
     private Integer endMode;//结束方式
     @Column( name = "startTime")
@@ -35,14 +35,15 @@ public class VoiceCallback extends IdEntity {
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
-    @Column( name = "form_num")
-    public String getFormNum() {
-        return formNum;
+    @Column( name = "from_num")
+    public String getFromNum() {
+        return fromNum;
     }
 
-    public void setFormNum(String formNum) {
-        this.formNum = formNum;
+    public void setFromNum(String fromNum) {
+        this.fromNum = fromNum;
     }
+
     @Column( name = "to_num")
     public String getToNum() {
         return toNum;

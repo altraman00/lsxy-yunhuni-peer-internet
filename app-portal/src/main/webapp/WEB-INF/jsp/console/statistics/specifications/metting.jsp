@@ -77,9 +77,15 @@
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
                             <section class="panel panel-default pos-rlt clearfix ">
-                                <ul id="myTab" class="nav nav-tabs">
-                                    <li class="active"><a href="#play" data-toggle="tab">会议应用1</a></li>
-                                    <li><a href="#voice" data-toggle="tab">会议应用2</a></li>
+                                <ul id="myTab" class="nav nav-tabs" name="appId">
+                                    <c:forEach items="${appList}" var="app" varStatus="s">
+                                        <li
+                                                <c:if test="${app.id==appId}"> class="active"</c:if>
+                                                <c:if test="${appId==null&&s.index==0}"> class="active"</c:if>
+                                        >
+                                            <a href="" data-toggle="tab" onclick="appSubmit('${app.id}')">${app.name}</a>
+                                        </li>
+                                    </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <form  method="get">
@@ -95,7 +101,7 @@
                                             </div>
                                         </div>
                                     </form>
-                                    <div class="tab-pane fade in active" id="play">
+                                    <div >
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
@@ -106,7 +112,6 @@
                                                 <th>呼叫时间</th>
                                                 <th>参与者</th>
                                                 <th>参与类型</th>
-                                                <th>通话状态</th>
                                                 <th>时长（秒）</th>
                                                 <th>消费金额（元）</th>
                                             </tr>
@@ -118,118 +123,23 @@
                                                 <td>13611460986</td>
                                                 <!--拨入 创建 邀请-->
                                                 <td>拨入</td>
-                                                <td>正常</td>
                                                 <td>1'23"</td>
                                                 <td>5.0</td>
                                             </tr>
-                                            <tr>
-                                                <td>IDMK25656S45564SD</td>
-                                                <td>2016-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>创建</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>5.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>IDMK25656S45564SD</td>
-                                                <td>2016-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>邀请</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>5.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>IDMK25656S45564SD</td>
-                                                <td>2016-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>拨入</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>5.0</td>
-                                            </tr>
+                                            <c:forEach items="${pageObj.result}" var="result" varStatus="s">
+                                                <tr>
+                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
+                                                    <td>${result.fromNum}</td>
+                                                    <td>${result.toNum}</td>
+                                                    <td>${result.callTimeLong}</td>
+                                                    <td>${result.cost}</td>
+                                                </tr>
+                                            </c:forEach>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="tab-pane fade" id="voice">
-                                        <table class="table table-striped cost-table-history">
-                                            <thead>
-                                            <tr>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：100元</span></th>
-                                            </tr>
-                                            <tr>
-                                                <th>会议标识ID</th>
-                                                <th>呼叫时间</th>
-                                                <th>参与者</th>
-                                                <th>参与类型</th>
-                                                <th>通话状态</th>
-                                                <th>时长（秒）</th>
-                                                <th>消费金额（元）</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>IDMK25656S45564SD</td>
-                                                <td>2016-07-12</td>
-                                                <td>13611460986</td>
-                                                <!--拨入 创建 邀请-->
-                                                <td>拨入</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>5.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>IDMK25656S45564SD</td>
-                                                <td>2016-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>创建</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>5.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>IDMK25656S45564SD</td>
-                                                <td>2016-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>邀请</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>5.0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>IDMK25656S45564SD</td>
-                                                <td>2016-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>拨入</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>5.0</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <section class="panel panel-default yunhuni-personal">
-                                        <nav class="pageWrap">
-                                            <ul class="pagination">
-                                                <li>
-                                                    <a href="#" aria-label="Previous">
-                                                        <span aria-hidden="true">«</span>
-                                                    </a>
-                                                </li>
-                                                <li class="active"><a href="#">1</a></li>
-                                                <li><a href="#">2</a></li>
-                                                <li><a href="#">3</a></li>
-                                                <li><a href="#">4</a></li>
-                                                <li><a href="#">5</a></li>
-                                                <li>
-                                                    <a href="#" aria-label="Next">
-                                                        <span aria-hidden="true">»</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </nav>
-                                    </section>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/specifications/call"></c:set>
+                                    <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
                         </section>
@@ -245,6 +155,12 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <!--must-->
 <script type="text/javascript" src='${resPrefixUrl }/js/statistics/find.js'> </script>
+<script type="text/javascript" >
+    function appSubmit(appId){
+        $('#appId').val(appId);
+        $('#mainForm').submit();
+    }
+</script>
 </body>
 </html>
 

@@ -19,7 +19,7 @@ import java.util.Date;
 public class VoiceCdr extends IdEntity {
     public static final Integer COST_TYPE_DEDUCT = 1;
     public static final Integer COST_TYPE_COST = 2;
-    private String session;//会话ID
+    private String sessionId;//会话ID
     private String areaId;//所属区域
     private String tenantId;//所属租户
     private String  appId;//所属应用
@@ -28,23 +28,23 @@ public class VoiceCdr extends IdEntity {
     private String relevanceId;//根据会话类型关联对应类型的表的记录
     private String recordUrl;//录音文件URL
     private Integer recordSize;//录音文件大小
-    private String formNum;//主叫
+    private String fromNum;//主叫
     private String toNum;//被叫
     private Date callStartDt;//呼叫开始时间
     private Date callAckDt;//呼叫应答时间
     private Date callEndDt;//呼叫结束时间
-    private long callTimeLong;//呼叫时长
+    private Integer callTimeLong;//呼叫时长
     private BigDecimal cost;//消费金额
-    private long deduct;//扣量
+    private Integer deduct;//扣量
     private String unit;//计量单位
     private Integer costType;//1.扣量2.扣费
     @Column( name = "session_id")
-    public String getSession() {
-        return session;
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setSession(String session) {
-        this.session = session;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
     @Column( name = "area_id")
     public String getAreaId() {
@@ -59,15 +59,15 @@ public class VoiceCdr extends IdEntity {
         return tenantId;
     }
 
-    public void setTenant(String tenantId) {
+    public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
     @Column( name = "app_id")
-    public String getApp() {
+    public String getAppId() {
         return appId;
     }
 
-    public void setApp(String appId) {
+    public void setAppId(String appId) {
         this.appId = appId;
     }
     @Column( name = "line_id")
@@ -110,13 +110,13 @@ public class VoiceCdr extends IdEntity {
     public void setRecordSize(Integer recordSize) {
         this.recordSize = recordSize;
     }
-    @Column( name = "form_num")
-    public String getFormNum() {
-        return formNum;
+    @Column( name = "from_num")
+    public String getFromNum() {
+        return fromNum;
     }
 
-    public void setFormNum(String formNum) {
-        this.formNum = formNum;
+    public void setFromNum(String fromNum) {
+        this.fromNum = fromNum;
     }
     @Column( name = "to_num")
     public String getToNum() {
@@ -150,14 +150,17 @@ public class VoiceCdr extends IdEntity {
     public void setCallEndDt(Date callEndDt) {
         this.callEndDt = callEndDt;
     }
+
     @Column( name = "call_time_long")
-    public long getCallTimeLong() {
+    public Integer getCallTimeLong() {
         return callTimeLong;
     }
 
-    public void setCallTimeLong(long callTimeLong) {
+    public void setCallTimeLong(Integer callTimeLong) {
         this.callTimeLong = callTimeLong;
     }
+
+
     @Column( name = "cost")
     public BigDecimal getCost() {
         return cost;
@@ -167,13 +170,16 @@ public class VoiceCdr extends IdEntity {
         this.cost = cost;
     }
     @Column( name = "deduct")
-    public long getDeduct() {
+    public Integer getDeduct() {
         return deduct;
     }
 
-    public void setDeduct(long deduct) {
+    public void setDeduct(Integer deduct) {
         this.deduct = deduct;
     }
+
+
+
     @Column( name = "unit")
     public String getUnit() {
         return unit;

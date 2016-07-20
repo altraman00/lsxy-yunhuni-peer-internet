@@ -77,25 +77,32 @@
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
                             <section class="panel panel-default pos-rlt clearfix ">
-                                <ul id="myTab" class="nav nav-tabs">
-                                    <li class="active"><a href="#play" data-toggle="tab">语音应用1</a></li>
-                                    <li><a href="#voice" data-toggle="tab">语音应用2</a></li>
+                                <ul id="myTab" class="nav nav-tabs" name="appId">
+                                    <c:forEach items="${appList}" var="app" varStatus="s">
+                                        <li
+                                                <c:if test="${app.id==appId}"> class="active"</c:if>
+                                                <c:if test="${appId==null&&s.index==0}"> class="active"</c:if>
+                                        >
+                                            <a href="" data-toggle="tab" onclick="appSubmit('${app.id}')">${app.name}</a>
+                                        </li>
+                                    </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form  method="get">
+                                    <form:form action="${ctx}/console/statistics/specifications/callback" method="post" id="mainForm">
                                         <div class="row statistics_row" >
+                                            <input type="hidden" id="appId" name="appId" value="">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" name="" class="form-control currentDay " value="2016-06-27" />
+                                                <input type="text" name="time" class="form-control currentDay "  value="${time}"  />
                                             </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
                                             </div>
                                         </div>
-                                    </form>
-                                    <div class="tab-pane fade in active" id="play">
+                                    </form:form>
+                                    <div>
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
@@ -105,120 +112,25 @@
                                                 <th>呼叫时间</th>
                                                 <th>主叫</th>
                                                 <th>被叫</th>
-                                                <th>通话状态</th>
                                                 <th>时长（秒）</th>
                                                 <th>消费金额（元）</th>
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
+                                            <c:forEach items="${pageObj.result}" var="result" varStatus="s">
+                                                <tr>
+                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
+                                                    <td>${result.fromNum}</td>
+                                                    <td>${result.toNum}</td>
+                                                    <td>${result.callTimeLong}</td>
+                                                    <td>${result.cost}</td>
+                                                </tr>
+                                            </c:forEach>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div class="tab-pane fade" id="voice">
-
-                                        <table class="table table-striped cost-table-history ">
-                                            <thead>
-                                            <tr>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：111元</span></th>
-                                            </tr>
-                                            <tr>
-                                                <th>呼叫时间</th>
-                                                <th>主叫</th>
-                                                <th>被叫</th>
-                                                <th>通话状态</th>
-                                                <th>时长（秒）</th>
-                                                <th>消费金额（元）</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2015-07-12</td>
-                                                <td>13611460986</td>
-                                                <td>02065612354</td>
-                                                <td>正常</td>
-                                                <td>1'23"</td>
-                                                <td>0.01</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <section class="panel panel-default yunhuni-personal">
-                                        <nav class="pageWrap">
-                                            <ul class="pagination">
-                                                <li>
-                                                    <a href="#" aria-label="Previous">
-                                                        <span aria-hidden="true">«</span>
-                                                    </a>
-                                                </li>
-                                                <li class="active"><a href="#">1</a></li>
-                                                <li><a href="#">2</a></li>
-                                                <li><a href="#">3</a></li>
-                                                <li><a href="#">4</a></li>
-                                                <li><a href="#">5</a></li>
-                                                <li>
-                                                    <a href="#" aria-label="Next">
-                                                        <span aria-hidden="true">»</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </nav>
-                                    </section>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/specifications/callback"></c:set>
+                                    <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
                         </section>
@@ -234,6 +146,12 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <!--must-->
 <script type="text/javascript" src='${resPrefixUrl }/js/statistics/find.js'> </script>
+<script type="text/javascript" >
+    function appSubmit(appId){
+        $('#appId').val(appId);
+        $('#mainForm').submit();
+    }
+</script>
 </body>
 </html>
 
