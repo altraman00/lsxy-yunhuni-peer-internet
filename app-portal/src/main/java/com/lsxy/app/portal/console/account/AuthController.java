@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -90,6 +91,25 @@ public class AuthController extends AbstractPortalController {
         }
 
         return mav;
+    }
+
+    /**
+     * 获取用户是否实名认证
+     * @return
+     */
+    @RequestMapping(value = "/is_real_auth",method = RequestMethod.GET)
+    @ResponseBody
+    public Boolean isRealAuth(HttpServletRequest request){
+        RestResponse response = findAuthStatus(request);
+        boolean flag = false;
+        if(response.isSuccess() && response.getData() != null){
+            Map result = (Map) response.getData();
+            int authStatus  = Integer.valueOf((result.get("status")+""));
+            if (AUTH_ONESELF_SUCESS == authStatus || AUTH_COMPANY_SUCESS == authStatus) {
+                flag = true;
+            }
+        }
+        return flag;
     }
 
     /**

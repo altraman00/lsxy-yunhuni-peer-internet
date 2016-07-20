@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * 全局号码资源service
@@ -22,4 +25,39 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
         return this.resourceTelenumDao;
     }
+
+    @Override
+    public List<String> getFreeTeleNum(int count){
+        List<String> result = new ArrayList<>();
+        List<ResourceTelenum> telenums = resourceTelenumDao.findFirst50ByStatus(ResourceTelenum.STATUS_FREE);
+        if(telenums != null && telenums.size() > 0){
+            int size = telenums.size();
+            if(size <= count){
+                //如果号码池中的号太少，则只取出号码池中的数量的号码即可
+                for(ResourceTelenum telenum:telenums){
+                    result.add(telenum.getTelNumber());
+                }
+            }else{
+                List<Integer> ranList = new ArrayList<>();
+                Random random = new Random();
+                for(int i = 0;i< count;i++){
+                    Integer ranNum = random.nextInt(size - 1);
+                    if(ranList.contains(ranNum)){
+                        i--;
+                    }else{
+                        ranList.add(ranNum);
+                        result.add(telenums.get(ranNum).getTelNumber());
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public ResourceTelenum findByTelNumber(String telNumber) {
+        return resourceTelenumDao.findByTelNumber(telNumber);
+    }
+
+
 }
