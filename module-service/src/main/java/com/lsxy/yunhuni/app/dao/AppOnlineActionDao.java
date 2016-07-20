@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by liups on 2016/7/15.
@@ -15,5 +16,5 @@ public interface AppOnlineActionDao extends BaseDaoInterface<AppOnlineAction, Se
      * @param statusAvtive
      * @return
      */
-    AppOnlineAction findByAppIdAndStatus(String appId, int statusAvtive);
+    List<AppOnlineAction> findByAppIdAndStatusOrderByCreateTimeDesc(String appId, int statusAvtive);
 }
