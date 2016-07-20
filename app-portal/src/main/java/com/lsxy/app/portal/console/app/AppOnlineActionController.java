@@ -37,7 +37,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     @RequestMapping(value = "/{appId}",method = RequestMethod.GET)
     @ResponseBody
-    public Map<String,Object> getOnlineAction(HttpServletRequest request,@PathVariable("appId") String appId){
+    public Map<String,Object> getOnlineAction(HttpServletRequest request,@PathVariable String appId){
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
         RestResponse<AppOnlineAction> response = getOnlineActionRest(token,appId);
@@ -72,7 +72,7 @@ public class AppOnlineActionController extends AbstractPortalController {
      */
     @RequestMapping(value = "/select_ivr/{appId}",method = RequestMethod.GET)
     @ResponseBody
-    public Map getSelectIvr(HttpServletRequest request,@PathVariable("appId") String appId){
+    public Map getSelectIvr(HttpServletRequest request,@PathVariable String appId){
         String token = getSecurityToken(request);
         Map<String,Object> result = new HashMap<>();
         //是否实名认证

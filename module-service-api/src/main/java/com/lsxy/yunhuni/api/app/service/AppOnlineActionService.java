@@ -14,7 +14,7 @@ import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
 public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
 
     /**
-     * 获取应用当前进行中的动作
+     * 获取应用当前进行中的动作(正常情况下，只会有0-1个有效的上线动作对象)
      * @param appId
      * @return
      */
