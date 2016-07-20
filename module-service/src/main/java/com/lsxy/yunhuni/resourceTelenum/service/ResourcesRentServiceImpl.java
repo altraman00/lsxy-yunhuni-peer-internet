@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 租户号码租用service
@@ -37,5 +39,28 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         String hql = "from ResourcesRent obj where obj.tenant.id=?1";
         Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
+    }
+
+    @Override
+    public ResourcesRent findByAppId(String appId) {
+        return resourcesRentDao.findByAppId(appId);
+    }
+
+    @Override
+    public ResourcesRent findByResourceTelenumIdAndStatus(String id, int status) {
+        return resourcesRentDao.findByResourceTelenumIdAndRentStatus(id,status);
+    }
+
+    @Override
+    public String[] findOwnUnusedNum(Tenant tenant) {
+        List<String> telNums = new ArrayList<>();
+        List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
+        if(list != null && list.size()>0){
+            for(ResourcesRent rent:list){
+                String telNumber = rent.getResourceTelenum().getTelNumber();
+                telNums.add(telNumber);
+            }
+        }
+        return telNums.toArray(new String[]{});
     }
 }
