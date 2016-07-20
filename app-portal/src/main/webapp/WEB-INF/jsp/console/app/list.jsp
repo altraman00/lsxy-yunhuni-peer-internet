@@ -384,6 +384,7 @@
         var result = false;
         var appId = $('#modal-appid').val();
         $('.hideIVR').html('');
+        $('#ownIvr').html('');
         var ivr = [];
         var ownIvr = [];
         //远端生成
@@ -414,7 +415,7 @@
                 $('#ownIvr').append('<option value="'+ ownIvr[i]+'">'+ownIvr[i]+'</option>')
             }
             $('#creatIVR').html(ownIvr[0]);
-        }else{
+        }else if(ivr.length > 0){
             $("#selectOwnIvr").hide();
             $("#selectNewIvr").show();
             for (var i = 0; i < ivr.length; i++) {

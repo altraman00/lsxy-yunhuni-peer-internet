@@ -25,9 +25,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 
 /**
  * Created by liups on 2016/7/15.
@@ -62,23 +62,33 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Override
     public AppOnlineAction findActiveActionByAppId(String appId) {
-        AppOnlineAction action = appOnlineActionDao.findByAppIdAndStatus(appId, AppOnlineAction.STATUS_AVTIVE);
-        return action;
+        List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+        if(actionList != null && actionList.size() > 0){
+            return actionList.get(0);
+        }else{
+            return null;
+        }
     }
 
     @Override
     public void actionOfSelectNum(String appId) {
         App app = appService.findById(appId);
-        AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+        AppOnlineAction action = null;
+        List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+        if(actionList != null && actionList.size() > 0){
+            action = actionList.get(0);
+        }
         //应用上线--选号
         if( app.getStatus() == App.STATUS_OFFLINE ){
-            if(activeAction != null){
-                activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                this.save(activeAction);
+            if(action != null){
+                for(AppOnlineAction a:actionList){
+                    a.setStatus(AppOnlineAction.STATUS_DONE);
+                    this.save(a);
+                }
             }
             AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
             this.save(newAction);
-        }else if(activeAction.getAction() != AppOnlineAction.ACTION_SELECT_NUM){
+        }else if(action.getAction() != AppOnlineAction.ACTION_SELECT_NUM){
             throw new RuntimeException("数据错误");
         }
     }
@@ -87,16 +97,22 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     public AppOnlineAction actionOfInPay(String appId, String ivr,Tenant tenant, boolean contains) {
         App app = new App();
         app.setId(appId);
-        AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+        AppOnlineAction action = null;
+        List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+        if(actionList != null && actionList.size() > 0){
+            action = actionList.get(0);
+        }
         //应用上线--正在支付
-        if(activeAction != null ){
-            if(activeAction.getAction() == AppOnlineAction.ACTION_SELECT_NUM ){
+        if(action != null ){
+            if(action.getAction() == AppOnlineAction.ACTION_SELECT_NUM ){
                 //当上一步是应用选号中时，如果ivr属于号码池，则生成新的动作--正在支付
                 if(contains){
-                    activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                    this.save(activeAction);
+                    for(AppOnlineAction a:actionList){
+                        a.setStatus(AppOnlineAction.STATUS_DONE);
+                        this.save(a);
+                    }
                     BigDecimal amount = new BigDecimal(1000 + 100);
-                    AppOnlineAction newAction = new AppOnlineAction(ivr,AppOnlineAction.PAY_STATUS_NOPAID,amount,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
+                    AppOnlineAction newAction = new AppOnlineAction(ivr, AppOnlineAction.PAY_STATUS_NOPAID,amount,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
                     this.save(newAction);
                     return newAction;
                 }else{
@@ -110,9 +126,11 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
                         }else{
                             //号码没被占用，创建支付动作（支付金额为0）
-                            activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                            this.save(activeAction);
-                            AppOnlineAction newAction = new AppOnlineAction(ivr,AppOnlineAction.PAY_STATUS_NOPAID,new BigDecimal(0),app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
+                            for(AppOnlineAction a:actionList){
+                                a.setStatus(AppOnlineAction.STATUS_DONE);
+                                this.save(a);
+                            }
+                            AppOnlineAction newAction = new AppOnlineAction(ivr, AppOnlineAction.PAY_STATUS_NOPAID,new BigDecimal(0),app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
                             this.save(newAction);
                             return newAction;
                         }
@@ -120,9 +138,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                         throw new RuntimeException("数据错误");
                     }
                 }
-            }else if(activeAction.getAction() == AppOnlineAction.ACTION_PAYING){
+            }else if(action.getAction() == AppOnlineAction.ACTION_PAYING){
                 //当应用正处于正在支付时，反回当前动作
-                return activeAction;
+                return action;
             }else{
                 throw new RuntimeException("数据错误");
             }
@@ -134,18 +152,22 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     @Override
     public AppOnlineAction actionOfOnline(String userName, String appId) throws NotEnoughMoneyException{
         App app = appService.findById(appId);
-        AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+        AppOnlineAction action = null;
+        List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+        if(actionList != null && actionList.size() > 0){
+            action = actionList.get(0);
+        }
         //应用上线--支付完成
-        if(activeAction != null ){
-            if(activeAction.getAction() == AppOnlineAction.ACTION_PAYING){
+        if(action != null ){
+            if(action.getAction() == AppOnlineAction.ACTION_PAYING){
                 //当上一步是应用正在支付中时，如果余额足够，则生成新的动作--上线
                 Tenant tenant = tenantService.findTenantByUserName(userName);
                 Billing billing = billingService.findBillingByTenantId(tenant.getId());
-                if(billing.getBalance().compareTo(activeAction.getAmount()) >= 0){
+                if(billing.getBalance().compareTo(action.getAmount()) >= 0){
                     //当应用有ivr功能时，绑定IVR号码绑定
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
-                        ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(activeAction.getTelNumber());
+                        ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(action.getTelNumber());
                         if(resourceTelenum.getStatus() == null || resourceTelenum.getStatus()== ResourceTelenum.STATUS_FREE){
                             //保存号码资源
                             resourceTelenum.setTenant(tenant);
@@ -176,23 +198,27 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                                 }
                             }
                         }else{
-                            //如果ivr号码被占用，则抛也异常
+                            //如果ivr号码被占用，则抛出异常
                             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
                         }
                     }
-                    //TODO 调用扣费接口
-                    //当支付金额为0时，既上线不用支付，就不用插入消费记录
-                    if(activeAction.getAmount().compareTo(new BigDecimal(0)) == 0){
-                        billing.setBalance(billing.getBalance().subtract(activeAction.getAmount()));
+                    //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
+                    if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
+                        //TODO 调用扣费接口
+                        billing.setBalance(billing.getBalance().subtract(action.getAmount()));
                         billingService.save(billing);
                         //插入消费记录
-                        Consume consume = new Consume(new Date(),"应用上线",activeAction.getAmount(),"应用上线",appId,tenant);
+                        Consume consume = new Consume(new Date(),"应用上线",action.getAmount(),"应用上线",appId,tenant);
                         consumeService.save(consume);
                     }
                     //将上一步设为已支付和完成
-                    activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                    activeAction.setPayStatus(AppOnlineAction.PAY_STATUS_PAID);
-                    this.save(activeAction);
+                    for(AppOnlineAction a:actionList){
+                        a.setStatus(AppOnlineAction.STATUS_DONE);
+                        if(a.getPayStatus() == AppOnlineAction.PAY_STATUS_NOPAID){
+                            a.setPayStatus(AppOnlineAction.PAY_STATUS_PAID);
+                        }
+                        this.save(a);
+                    }
                     //先成新的动作--生成新的动作--上线中
                     AppOnlineAction newAction = new AppOnlineAction(null,null,null,
                             app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
@@ -205,9 +231,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 }else{
                     throw new NotEnoughMoneyException("余额不足");
                 }
-            }else if(activeAction.getAction() == AppOnlineAction.ACTION_ONLINE){
+            }else if(action.getAction() == AppOnlineAction.ACTION_ONLINE){
                 //当应用正处于已经上线状态时，反回当前动作
-                return activeAction;
+                return action;
             }else{
                 throw new RuntimeException("数据错误");
             }
@@ -221,11 +247,17 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         App app = appService.findById(appId);
         if(app.getIsIvrService() == null || app.getIsIvrService() == 0){
             //应用上线--直接上线
-            AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+            AppOnlineAction action = null;
+            List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+            if(actionList != null && actionList.size() > 0){
+                action = actionList.get(0);
+            }
             if( app.getStatus() == App.STATUS_OFFLINE ){
-                if(activeAction != null){
-                    activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                    this.save(activeAction);
+                if(action != null){
+                    for(AppOnlineAction a:actionList){
+                        a.setStatus(AppOnlineAction.STATUS_DONE);
+                        this.save(a);
+                    }
                 }
                 AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
@@ -234,7 +266,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 appService.save(app);
                 return newAction;
             }else if(app.getStatus() == App.STATUS_ONLINE ){
-                return activeAction;
+                return action;
             }else{
                 throw new RuntimeException("数据错误");
             }
@@ -246,13 +278,19 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     @Override
     public AppOnlineAction resetIvr(String userName, String appId) {
         App app = appService.findById(appId);
-        AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
+        AppOnlineAction action = null;
+        List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+        if(actionList != null && actionList.size() > 0){
+            action = actionList.get(0);
+        }
         //应用上线--支付完成
-        if(activeAction != null ) {
-            if (activeAction.getAction() == AppOnlineAction.ACTION_PAYING) {
+        if(action != null ) {
+            if (action.getAction() == AppOnlineAction.ACTION_PAYING) {
                 //将上一步设为已完成
-                activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                this.save(activeAction);
+                for(AppOnlineAction a:actionList){
+                    a.setStatus(AppOnlineAction.STATUS_DONE);
+                    this.save(a);
+                }
                 //插入一条取消支付的动作（状态为已完成）
                 AppOnlineAction resetAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_CANCEL_PAY,AppOnlineAction.STATUS_DONE);
                 this.save(resetAction);
@@ -272,11 +310,17 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     public App offline(String appId) {
         App app = appService.findById(appId);
         if(app!= null && app.getStatus() == App.STATUS_ONLINE){
-            AppOnlineAction activeAction = this.findActiveActionByAppId(appId);
-            if(activeAction != null){
+            AppOnlineAction action = null;
+            List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+            if(actionList != null && actionList.size() > 0){
+                action = actionList.get(0);
+            }
+            if(action != null){
                 //将上一步设为已完成
-                activeAction.setStatus(AppOnlineAction.STATUS_DONE);
-                this.save(activeAction);
+                for(AppOnlineAction a:actionList){
+                    a.setStatus(AppOnlineAction.STATUS_DONE);
+                    this.save(a);
+                }
             }
             //生成新的动作
             AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
