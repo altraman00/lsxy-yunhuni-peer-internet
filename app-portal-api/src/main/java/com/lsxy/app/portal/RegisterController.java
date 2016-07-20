@@ -14,6 +14,7 @@ import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -110,7 +111,6 @@ public class RegisterController {
                 params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
                 params.put("uid",account.getId());
                 params.put("code",uuid);
-                params.put("username",  URLEncoder.encode(account.getUserName(), "utf-8"));
                 params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
                 mailService.send("账号激活",account.getEmail(),"01-portal-notify-account-activate.vm",params);
 
@@ -128,19 +128,20 @@ public class RegisterController {
     }
 
     /**
-     * 获取账号状态
+     * 获取账号
      * @param accountId
      * @return
      */
-    @RequestMapping("/account_status")
-    public RestResponse accountStatus(String accountId){
+    @RequestMapping("/account/{accountId}")
+    public RestResponse getAccount(@PathVariable String accountId){
         RestResponse response;
         Account account = accountService.findById(accountId);
         if(account != null){
-            response = RestResponse.success(account.getStatus());
+            response = RestResponse.success(account);
         }else{
             response = failed("0000","账号不存在");
         }
         return  response;
     }
+
 }
