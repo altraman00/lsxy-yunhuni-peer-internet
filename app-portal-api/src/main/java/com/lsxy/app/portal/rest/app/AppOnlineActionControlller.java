@@ -4,6 +4,7 @@ import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
@@ -30,7 +31,7 @@ import java.util.Map;
 @RequestMapping("/rest/app_online")
 @RestController
 public class AppOnlineActionControlller extends AbstractRestController {
-    public static final String ALTERNATIVE_IVR_PREFIX = "alternative_ivr_";     //个人备选IVR号存在redis中的前缀
+    public static final String ALTERNATIVE_IVR_PREFIX = "IVR_TELENUM_SEL_";     //个人备选IVR号存在redis中的前缀
 
     @Autowired
     AppOnlineActionService appOnlineActionService;
@@ -46,7 +47,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
     ResourcesRentService resourcesRentService;
 
     @RequestMapping("/{appId}")
-    public RestResponse<AppOnlineAction> getOnlineAction(@PathVariable("appId")String appId){
+    public RestResponse<AppOnlineAction> getOnlineAction(@PathVariable String appId){
         AppOnlineAction action = appOnlineActionService.findActiveActionByAppId(appId);
         return RestResponse.success(action);
     }
@@ -57,7 +58,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
      * @return
      */
     @RequestMapping("/select_ivr/{appId}")
-    public RestResponse<Map> getSelectIvr(@PathVariable("appId") String appId){
+    public RestResponse<Map> getSelectIvr(@PathVariable String appId){
         Map result = new HashMap();
         String[] selectIvr;
         String userName = getCurrentAccountUserName();
@@ -200,23 +201,16 @@ public class AppOnlineActionControlller extends AbstractRestController {
      * @return
      */
     private String getFreeNumber(Integer n){
+        String result = "";
         //--start
         //从号码池中选出5个空闲的号码
         List<String> numbers = resourceTelenumService.getFreeTeleNum(5);
         //--end
         //生成字符串
-        StringBuilder builder = new StringBuilder();
-        boolean flag=false;
-        for(String tem:numbers){
-            if (flag) {
-                builder.append(",");
-            }else {
-                flag=true;
-            }
-            builder.append(tem);
+        if(numbers != null && numbers.size()>0){
+            result = StringUtil.join(numbers,",");
         }
-
-        return builder.toString();
+        return result;
     }
 
 
