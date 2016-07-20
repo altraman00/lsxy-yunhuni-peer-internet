@@ -106,7 +106,8 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：100元</span></th>
+                                                <c:if test="${sum==null}"><c:set var="sum" value="0"></c:set> </c:if>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum}" pattern="0.00"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
@@ -123,7 +124,7 @@
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
                                                     <td>${result.callTimeLong}</td>
-                                                    <td>${result.cost}</td>
+                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

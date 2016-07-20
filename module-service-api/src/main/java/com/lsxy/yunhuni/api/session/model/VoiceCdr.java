@@ -38,6 +38,16 @@ public class VoiceCdr extends IdEntity {
     private Integer deduct;//扣量
     private String unit;//计量单位
     private Integer costType;//1.扣量2.扣费
+    private Integer joinType;//0创建1邀请加入，2呼入加入
+    @Column( name = "join_type")
+    public Integer getJoinType() {
+        return joinType;
+    }
+
+    public void setJoinType(Integer joinType) {
+        this.joinType = joinType;
+    }
+
     @Column( name = "session_id")
     public String getSessionId() {
         return sessionId;
