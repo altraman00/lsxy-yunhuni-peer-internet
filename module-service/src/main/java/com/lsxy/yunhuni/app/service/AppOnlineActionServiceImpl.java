@@ -169,34 +169,11 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
                         ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(action.getTelNumber());
                         if(resourceTelenum.getStatus() == null || resourceTelenum.getStatus()== ResourceTelenum.STATUS_FREE){
-                            //保存号码资源
-                            resourceTelenum.setTenant(tenant);
-                            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
-                            resourceTelenumService.save(resourceTelenum);
-                            // 保存号码租用关系
-                            Date date = new Date();
-                            String nextMonth = DateUtils.getNextMonth(DateUtils.getDate(date, "yyyy-MM"), "yyyy-MM");
-                            Date expireDate = DateUtils.parseDate(nextMonth, "yyyy-MM");    //号码到期时间
-                            ResourcesRent resourcesRent = new ResourcesRent(tenant,app,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_USING);
-                            resourcesRentService.save(resourcesRent);
+                            //生成新的号码租用关系
+                            this.newResourcesRent(app, tenant, resourceTelenum);
                         }else if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED){
-                            //如果号码被租用
-                            //租用是不是这个租户
-                            if(!resourceTelenum.getTenant().getId().equals(tenant.getId())){
-                                throw new TeleNumberBeOccupiedException("IVR号码已被占用");
-                            }else{
-                                //是这个租户，则查询租用记录，有没有正在用的
-                                ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
-                                if(resourcesRent == null){
-                                    throw new TeleNumberBeOccupiedException("IVR号码已被占用");
-                                }else if(!resourcesRent.getTenant().getId().equals(tenant.getId()) || resourcesRent.getApp() != null){
-                                    throw new TeleNumberBeOccupiedException("IVR号码已被占用");
-                                }else{
-                                    resourcesRent.setApp(app);
-                                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
-                                    resourcesRentService.save(resourcesRent);
-                                }
-                            }
+                            //如果号码已被租用,则根据租用关系进行判断并处理
+                            this.alterResourcesRent(app, tenant, resourceTelenum);
                         }else{
                             //如果ivr号码被占用，则抛出异常
                             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
@@ -204,12 +181,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     }
                     //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
                     if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
-                        //TODO 调用扣费接口
-                        billing.setBalance(billing.getBalance().subtract(action.getAmount()));
-                        billingService.save(billing);
-                        //插入消费记录
-                        Consume consume = new Consume(new Date(),"应用上线",action.getAmount(),"应用上线",appId,tenant);
-                        consumeService.save(consume);
+                        //支付扣费，并插入消费记录
+                        this.pay(appId, action.getAmount(), tenant, billing);
                     }
                     //将上一步设为已支付和完成
                     for(AppOnlineAction a:actionList){
@@ -226,7 +199,6 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //应用状态改为上线
                     app.setStatus(App.STATUS_ONLINE);
                     appService.save(app);
-
                     return newAction;
                 }else{
                     throw new NotEnoughMoneyException("余额不足");
@@ -240,6 +212,67 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }else{
             throw new RuntimeException("数据错误");
         }
+    }
+
+    /**
+     * 支付扣费，并插入消费记录
+     * @param appId
+     * @param amount
+     * @param tenant
+     * @param billing
+     */
+    private void pay(String appId, BigDecimal amount, Tenant tenant, Billing billing) {
+        //TODO 调用扣费接口
+        billing.setBalance(billing.getBalance().subtract(amount));
+        billingService.save(billing);
+        //插入消费记录
+        Consume consume = new Consume(new Date(),"应用上线",amount,"应用上线",appId,tenant);
+        consumeService.save(consume);
+    }
+
+    /**
+     * 如果号码已被租用,则根据租用关系进行判断并处理
+     * @param app 应用
+     * @param tenant 租户
+     * @param resourceTelenum 号码资源
+     */
+    private void alterResourcesRent(App app, Tenant tenant, ResourceTelenum resourceTelenum) {
+        //如果号码被租用
+        //租用是不是这个租户
+        if(!resourceTelenum.getTenant().getId().equals(tenant.getId())){
+            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+        }else{
+            //是这个租户，则查询租用记录，有没有正在用的
+            ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
+            if(resourcesRent == null){
+                throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+            }else if(!resourcesRent.getTenant().getId().equals(tenant.getId()) || resourcesRent.getApp() != null){
+                throw new TeleNumberBeOccupiedException("IVR号码已被占用");
+            }else{
+                resourcesRent.setApp(app);
+                resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
+                resourcesRentService.save(resourcesRent);
+            }
+        }
+    }
+
+    /**
+     * 生成新的号码租用关系
+     * @param app 应用
+     * @param tenant 租户
+     * @param resourceTelenum 号码资源
+     */
+    private void newResourcesRent(App app, Tenant tenant, ResourceTelenum resourceTelenum) {
+        //保存号码资源
+        resourceTelenum.setTenant(tenant);
+        resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
+        resourceTelenumService.save(resourceTelenum);
+        // 保存号码租用关系
+        Date date = new Date();
+        String nextMonth = DateUtils.getNextMonth(DateUtils.getDate(date, "yyyy-MM"), "yyyy-MM");
+        Date expireDate = DateUtils.parseDate(nextMonth, "yyyy-MM");    //号码到期时间
+        ResourcesRent resourcesRent = new ResourcesRent(tenant,app,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_USING);
+        resourcesRentService.save(resourcesRent);
     }
 
     @Override

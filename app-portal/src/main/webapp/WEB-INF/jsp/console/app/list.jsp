@@ -449,7 +449,7 @@
     function delapp(id,status){
         bootbox.setLocale("zh_CN");
         if(status==1){
-            bootbox.alert("当前应用正在运营中，请将起下线后进行删除", function(result) {}); return;
+            bootbox.alert("当前应用正在运营中，请将其下线后进行删除", function(result) {}); return;
         }
         if(status==2){
             bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
