@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Clob;
@@ -1167,7 +1168,51 @@ public class StringUtil extends StringUtils{
             return null;
         }
     }
-	
+
+	/**
+	 * 将对象的属性名及父类的属性名，转换成sql查询的条件
+	 * @param clazz
+	 * @return
+     */
+	public static String sqlName(Class clazz){
+
+		String result = "";
+		//父类参数
+		Field[] fs = clazz.getSuperclass().getDeclaredFields();
+		for(int i=0;i<fs.length;i++){
+			if(!"serialVersionUID".equals(fs[i].getName())&&!"sortNo".equals(fs[i].getName())&&!(fs[i].getName().charAt(0)>='A'&&fs[i].getName().charAt(0)<='Z')){
+				result += " " + toSqlName(fs[i].getName()) + " as " + fs[i].getName() + " ,";
+			}
+
+		}
+		//本身参数
+		Field[] fs1 = clazz.getDeclaredFields();
+		for(int i=0;i<fs1.length;i++){
+			if(!"serialVersionUID".equals(fs1[i].getName())&&!"sortNo".equals(fs1[i].getName())&&!(fs1[i].getName().charAt(0)>='A'&&fs1[i].getName().charAt(0)<='Z')){
+				result += " " + toSqlName(fs1[i].getName()) + " as " + fs1[i].getName() + " ,";
+			}
+		}
+		return  result.substring(0,result.length()-1);
+	}
+
+	/**
+	 * 将驼峰命名规则的name转换成数据库的name
+	 * @param objName
+	 * @return
+     */
+	public static String toSqlName(String objName){
+		String result = "";
+		for(int j=0;j<objName.length();j++){
+			char c = objName.charAt(j);
+			if(c>='A'&&c<='Z'){
+				c+=32;
+				result +="_"+c;
+			}else{
+				result +=c;
+			}
+		}
+		return result;
+	}
 	public static void main(String[] args) {
 		System.out.println(Base64.encodeBase64String("我是中国人，哈哈哈abc123!@#$%^&*(".getBytes()));
 	}
