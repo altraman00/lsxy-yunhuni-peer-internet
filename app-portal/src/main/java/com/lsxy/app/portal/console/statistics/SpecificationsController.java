@@ -53,7 +53,8 @@ public class SpecificationsController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_RECORDING,map.get("time"),map.get("appId")).getData());
+        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_RECORDING,map.get("time"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/specifications/recording");
         return mav;
     }
@@ -62,6 +63,7 @@ public class SpecificationsController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_IVR,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_IVR,map.get("time"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/specifications/ivr");
         return mav;
@@ -71,6 +73,7 @@ public class SpecificationsController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_MEETING,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_MEETING,map.get("time"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/specifications/metting");
         return mav;
@@ -80,6 +83,7 @@ public class SpecificationsController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/specifications/callback");
         return mav;

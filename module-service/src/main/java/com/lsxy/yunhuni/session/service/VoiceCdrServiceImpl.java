@@ -5,6 +5,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import com.lsxy.yunhuni.session.dao.VoiceCdrDao;
@@ -58,7 +59,11 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 
     @Override
     public BigDecimal sumCost( Integer type ,String tenantId, String time, String appId) {
-        String sql = "select sum(cost) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where deleted=0 and type=? and tenant_id=? and app_id=? ";
+        String costType = "cost";
+        if(CallSession.TYPE_VOICE_RECORDING==type){
+            costType = "record_size";
+        }
+        String sql = "select sum("+costType+") from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where deleted=0 and type=? and tenant_id=? and app_id=? ";
         BigDecimal result = this.jdbcTemplate.queryForObject(sql,BigDecimal.class,new Object[]{type,tenantId,appId});
         return result;
     }

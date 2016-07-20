@@ -88,24 +88,26 @@
                                     </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form  method="get">
+                                    <form:form action="${ctx}/console/statistics/specifications/recording" method="post" id="mainForm">
                                         <div class="row statistics_row" >
+                                            <input type="hidden" id="appId" name="appId" value="">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" name="" class="form-control currentDay " value="2016-06-27" />
+                                                <input type="text" name="time" class="form-control currentDay " value="${time}" />
                                             </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
                                             </div>
                                         </div>
-                                    </form>
+                                    </form:form>
                                     <div>
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <th colspan="6"><span class="p-money">存储容量：150M</span></th>
+                                                <c:if test="${sum==null}"><c:set var="sum" value="0"></c:set> </c:if>
+                                                <th colspan="6"><span class="p-money">存储容量：<fmt:formatNumber value="${sum}" pattern="0.00"></fmt:formatNumber> M</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
@@ -122,13 +124,13 @@
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
                                                     <td>${result.callTimeLong}</td>
-                                                    <td>${result.cost}</td>
+                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/specifications/call"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/specifications/recording"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
