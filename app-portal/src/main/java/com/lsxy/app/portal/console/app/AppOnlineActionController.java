@@ -48,7 +48,7 @@ public class AppOnlineActionController extends AbstractPortalController {
             }
         }else{
             model.put("flag",false);
-            model.put("err",response.getErrorMsg());
+            model.put("msg",response.getErrorMsg());
         }
         return model;
     }
@@ -85,11 +85,11 @@ public class AppOnlineActionController extends AbstractPortalController {
                 result.put("result",data);
             }else{
                 result.put("flag",false);
-                result.put("err","数据异常");
+                result.put("msg","数据异常");
             }
         }else{
             result.put("flag",false);
-            result.put("err","用户未实名认证");
+            result.put("msg","用户未实名认证");
         }
         return result;
     }
@@ -130,7 +130,7 @@ public class AppOnlineActionController extends AbstractPortalController {
             result.put("balance",billing.getBalance());
         }else{
             result.put("flag",false);
-            result.put("err","数据异常");
+            result.put("msg","数据异常");
         }
         return result;
     }
@@ -164,7 +164,7 @@ public class AppOnlineActionController extends AbstractPortalController {
             result.put("flag",true);
         }else{
             result.put("flag",false);
-            result.put("err", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
+            result.put("msg", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
         }
         return result;
     }
@@ -200,11 +200,11 @@ public class AppOnlineActionController extends AbstractPortalController {
                 result.put("flag",true);
             }else{
                 result.put("flag",false);
-                result.put("err", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
+                result.put("msg", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
             }
         }else{
             result.put("flag",false);
-            result.put("err","用户未实名认证");
+            result.put("msg","用户未实名认证");
         }
         return result;
     }
@@ -236,7 +236,7 @@ public class AppOnlineActionController extends AbstractPortalController {
             result.put("flag",true);
         }else{
             result.put("flag",false);
-            result.put("err", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
+            result.put("msg", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
         }
         return result;
     }
@@ -269,7 +269,7 @@ public class AppOnlineActionController extends AbstractPortalController {
             result.put("app",response.getData());
         }else{
             result.put("flag",false);
-            result.put("err", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
+            result.put("msg", StringUtils.isBlank(response.getErrorMsg())?"数据异常":response.getErrorMsg());
         }
         return result;
     }
