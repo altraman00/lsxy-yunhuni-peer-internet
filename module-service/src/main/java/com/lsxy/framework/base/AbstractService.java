@@ -8,10 +8,12 @@ import com.lsxy.framework.core.utils.HqlUtil;
 import com.lsxy.framework.core.utils.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -21,6 +23,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.List;
 
 @SuppressWarnings({"unchecked","rawtypes"})
@@ -30,6 +33,16 @@ public abstract class AbstractService<T> implements BaseService<T> {
     private Logger logger = LoggerFactory.getLogger(com.google.common.util.concurrent.AbstractService.class);
 
     public abstract BaseDaoInterface<T,Serializable> getDao();
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @PersistenceContext
     private EntityManager em;
@@ -170,8 +183,21 @@ public abstract class AbstractService<T> implements BaseService<T> {
             return results.get(0);
         }
     }
-
-
+    public Page queryForPage(String sql,Class clazz,Object ...params){
+        jdbcTemplate.queryForList(sql,clazz,params);
+        return null;
+    }
+    /**
+     * 使用原生sql查询
+     * @param sql 原生sql
+     * @param clazz 返回值类型
+     * @param params 请求参数，按问号排序
+     * @param <T1>
+     * @return
+     */
+    public <T1> T1  queryForObject(String sql,Class<T1> clazz,Object ...params){
+        return jdbcTemplate.queryForObject(sql,params,clazz);
+    }
 
     /**
      * 自定义查询方法，不带分页,默认排除掉deleted数据
