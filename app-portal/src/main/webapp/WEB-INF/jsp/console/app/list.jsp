@@ -337,6 +337,8 @@
                         case 21: index = 1;break;   //下线
                         default: index = 1;break;
                     }
+                }else{
+                    alert(data.msg)
                 }
             },
             error:function(){
@@ -403,7 +405,7 @@
                     result = true;
                 }else{
                     result = false;
-                    showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
                 }
             },
             error:function(){
@@ -498,7 +500,7 @@
                             showtoast('下线成功');
                         }else{
                             result = false;
-                            showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                            showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
                         }
                     },
                     error:function(){
@@ -543,7 +545,7 @@
                     result = true;
                 }else{
                     result = false;
-                    showtoast(data.err?data.err:'数据异常，请稍后刷新重试！');
+                    showtoast(data.msg?data.msg:'数据异常，请稍后刷新重试！');
                 }
             },
             error:function(){
@@ -574,7 +576,7 @@
             success : function(data){
                 if(!data.flag){
                     result = false;
-                    showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
                 }else{
                     result = true;
                 }
@@ -600,7 +602,7 @@
             success : function(data){
                 if(!data.flag){
                     result = false;
-                    showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
                 }else{
                     result = true;
                 }
@@ -625,7 +627,7 @@
             dataType: "json",
             success : function(data){
                 if(!data.flag){
-                    showtoast(data.err?data.err:'数据异常，请稍后重试！');
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
                 }
             },
             error:function(){
