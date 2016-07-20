@@ -297,11 +297,12 @@
             url : ctx + "/console/account/auth/is_real_auth",
             type : 'get',
             async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
             dataType: "json",
             success : function(data){
                 realAuth = data;
             },
-            fail:function(){
+            error:function(){
                 showtoast('网络异常，请稍后重试');
             }
         });
@@ -324,6 +325,7 @@
             url : ctx + "/console/app_action/"+ id ,
             type : 'get',
             async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
             dataType: "json",
             success : function(data){
                 if(data && data.action != null){
@@ -337,7 +339,7 @@
                     }
                 }
             },
-            fail:function(){
+            error:function(){
                 flag = false;
                 showtoast('网络异常，请稍后重试');
             }
@@ -392,6 +394,7 @@
             url : ctx + "/console/app_action/select_ivr/" + appId,
             type : 'get',
             async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
             dataType: "json",
             success : function(data){
                 if(data.flag && data.result != null ){
@@ -403,7 +406,7 @@
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -455,12 +458,13 @@
                         url : ctx + "/console/app/delete",
                         type : 'post',
                         async: false,//使用同步的方式,true为异步方式
+                        timeout:2*60*1000,
                         data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
                             showtoast(data.msg);
                         },
-                        fail:function(){
+                        error:function(){
                             showtoast('网络异常，请稍后重试');
                         }
                     });
@@ -482,6 +486,7 @@
                     url : ctx + "/console/app_action/offline",
                     type : 'post',
                     async: false,//使用同步的方式,true为异步方式
+                    timeout:2*60*1000,
                     data : {'appId':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                     dataType: "json",
                     success : function(data){
@@ -496,7 +501,7 @@
                             showtoast(data.err?data.err:'数据异常，请稍后重试！');
                         }
                     },
-                    fail:function(){
+                    error:function(){
                         showtoast('网络异常，请稍后重试');
                     }
                 });
@@ -517,6 +522,7 @@
             url : ctx + "/console/app_action/get_pay",
             type : 'get',
             data : {appId:appId,ivr:ivr},//这里使用json对象
+            timeout:2*60*1000,
             async: false,//使用同步的方式,true为异步方式
             dataType: "json",
             success : function(data){
@@ -540,7 +546,7 @@
                     showtoast(data.err?data.err:'数据异常，请稍后刷新重试！');
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -562,6 +568,7 @@
             url : ctx + "/console/app_action/pay",
             type : 'get',
             data : {appId:appId},//这里使用json对象
+            timeout:2*60*1000,
             async: false,//使用同步的方式,true为异步方式
             dataType: "json",
             success : function(data){
@@ -572,7 +579,7 @@
                     result = true;
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -587,6 +594,7 @@
             url : ctx + "/console/app_action/direct_online",
             type : 'get',
             data : {appId:appId},//这里使用json对象
+            timeout:2*60*1000,
             async: false,//使用同步的方式,true为异步方式
             dataType: "json",
             success : function(data){
@@ -597,7 +605,7 @@
                     result = true;
                 }
             },
-            fail:function(){
+            error:function(){
                 result = false;
                 showtoast('网络异常，请刷新重试');
             }
@@ -612,6 +620,7 @@
             url : ctx + "/console/app_action/reset_ivr",
             type : 'get',
             data : {appId:appId},//这里使用json对象
+            timeout:2*60*1000,
             async: false,//使用同步的方式,true为异步方式
             dataType: "json",
             success : function(data){
@@ -619,10 +628,10 @@
                     showtoast(data.err?data.err:'数据异常，请稍后重试！');
                 }
             },
-            fail:function(){
+            error:function(){
                 showtoast('网络异常，请刷新重试');
             }
-        });
+        })
 
         tabModalBtn(2,'creatIVR()');
     }
