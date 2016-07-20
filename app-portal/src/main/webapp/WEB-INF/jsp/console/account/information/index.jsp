@@ -160,7 +160,6 @@
         $('#personalAuthForm').bootstrapValidator('validate');
         var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
         if(result==true){
-            $('#validateBtn').attr('disabled','disabled');
             //提交表单
             $.ajax({
                 url : "${ctx}/console/account/update",
@@ -173,7 +172,6 @@
                 },
                 fail:function(){
                     showtoast('网络异常，请稍后重试');
-                    $('#validateBtn').removeAttr('disabled');
                 }
             });
         }
