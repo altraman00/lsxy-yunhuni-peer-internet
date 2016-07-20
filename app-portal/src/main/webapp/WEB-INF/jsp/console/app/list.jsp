@@ -337,8 +337,6 @@
                         case 21: index = 1;break;   //下线
                         default: index = 1;break;
                     }
-                }else{
-                    alert(data.msg)
                 }
             },
             error:function(){

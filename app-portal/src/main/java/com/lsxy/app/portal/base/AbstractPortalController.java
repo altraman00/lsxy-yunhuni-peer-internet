@@ -6,19 +6,12 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.lsxy.framework.cache.FrameworkCacheConfig.logger;
 
 /**
  * Created by liups on 2016/6/28.
