@@ -20,6 +20,19 @@ public class Consume extends IdEntity {
     private String remark;//备注
     private String appId;//所属应用编号（仅用查询，如需关联应用等合并结构后改）
     private Tenant tenant;//所属租户
+
+    public Consume() {
+    }
+
+    public Consume(Date dt, String type, BigDecimal amount, String remark, String appId, Tenant tenant) {
+        this.dt = dt;
+        this.type = type;
+        this.amount = amount;
+        this.remark = remark;
+        this.appId = appId;
+        this.tenant = tenant;
+    }
+
     @Column(name = "remark")
     public String getRemark() {
         return remark;

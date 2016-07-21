@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app")
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线
-    public static int STATUS_NOT_ONLINE = 2;//没上线
+    public static int STATUS_OFFLINE = 2;//没上线
 
     private Tenant tenant;//所属租户
     private String name;//应用名字

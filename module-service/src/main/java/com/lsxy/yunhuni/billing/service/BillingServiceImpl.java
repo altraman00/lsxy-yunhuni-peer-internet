@@ -29,7 +29,7 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
         return billingDao;
     }
     @Override
-    public Billing findBillingByUserName(String username) throws MatchMutiEntitiesException {
+    public Billing findBillingByUserName(String username){
         Billing billing = null;
         Tenant tenant = tenantService.findTenantByUserName(username);
         if(tenant != null){
@@ -39,8 +39,13 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
     }
 
     @Override
-    public Billing findBillingByTenantId(String tenantId) throws MatchMutiEntitiesException {
+    public Billing findBillingByTenantId(String tenantId) {
         String hql = "from Billing obj where obj.tenant.id=?1";
-        return this.findUnique(hql,tenantId);
+        try {
+            return this.findUnique(hql,tenantId);
+        } catch (MatchMutiEntitiesException e) {
+            e.printStackTrace();
+            throw new RuntimeException("存在多个对应账务信息");
+        }
     }
 }

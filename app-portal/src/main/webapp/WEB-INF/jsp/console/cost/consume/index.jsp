@@ -126,9 +126,9 @@
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
                                             <td scope="row">${s.index+1}</td>
-                                            <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd hh:mm:ss"></fmt:formatDate></td>
+                                            <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
                                             <td><fmt:formatNumber value="${result.amount}" pattern="0.00"></fmt:formatNumber> </td>
-                                            <td>${reuslt.type}</td>
+                                            <td>${result.type}</td>
                                             <td>${result.remark}</td>
                                         </tr>
                                     </c:forEach>

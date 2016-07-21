@@ -32,7 +32,7 @@
 		}
 		$('.tips-toast').hide().html('');
 		$('.tips-toast').css('display','block').html(tips);
-		showtoastNum = setInterval(function(){hidetoast(url);},3000)
+		showtoastNum = setTimeout(function(){hidetoast(url);},3000);
 	}
 	function hidetoast(url){
 		$('.tips-toast').hide();

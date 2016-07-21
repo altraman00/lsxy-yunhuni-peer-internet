@@ -46,4 +46,15 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         Page<App> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
     }
+
+    @Override
+    public boolean isAppBelongToUser(String userName, String appId) {
+        Tenant tenant = tenantService.findTenantByUserName(userName);
+        App app = appDao.findOne(appId);
+        if(app != null && tenant != null){
+            return app.getTenant().getId().equals(tenant.getId());
+        }else{
+            return false;
+        }
+    }
 }
