@@ -260,7 +260,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
         if(excludeDeleted){
             jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
         }
-        String countJpql = " select count(*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
+        String countJpql = " select count(1) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
         Query query = this.em.createQuery(countJpql);
         for (int i = 0; i < params.length; i++) {
             Object object = params[i];

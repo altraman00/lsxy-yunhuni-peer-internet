@@ -15,11 +15,14 @@ import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.model.ThirdPayRecord;
+import com.sun.istack.internal.NotNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -124,13 +127,8 @@ public class RechargeController extends AbstractPortalController {
      * @return
      */
     @RequestMapping(value = "/list")
-    public ModelAndView list(HttpServletRequest request,Integer  pageNo, Integer pageSize,String startTime,String endTime) throws Exception {
-        if(pageNo == null){
-            pageNo = 1;
-        }
-        if(pageSize == null){
-            pageSize = 20;
-        }
+    public ModelAndView list(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer  pageNo,@RequestParam(defaultValue = "20")  Integer pageSize,
+                             String startTime, String endTime) throws Exception {
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
         Page page = getRechargePage(pageNo, pageSize, startTime, endTime, token);
