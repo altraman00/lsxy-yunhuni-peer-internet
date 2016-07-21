@@ -13,7 +13,6 @@ import org.reflections.Reflections;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.web.SpringContextUtil;
-import com.lsxy.framework.mq.MQEvent;
 
 /**
  * 全局事务handler工厂类

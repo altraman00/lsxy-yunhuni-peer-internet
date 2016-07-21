@@ -2,7 +2,7 @@ package com.lsxy.framework.mq.ons;
 
 import java.util.Properties;
 
-import com.lsxy.framework.mq.MQEvent;
+import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.AbstractMQProducer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;

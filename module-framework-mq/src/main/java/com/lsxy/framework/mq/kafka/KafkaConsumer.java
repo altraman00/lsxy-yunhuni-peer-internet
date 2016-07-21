@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import com.lsxy.framework.mq.MQEvent;
+import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.GlobalEventHandler;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;

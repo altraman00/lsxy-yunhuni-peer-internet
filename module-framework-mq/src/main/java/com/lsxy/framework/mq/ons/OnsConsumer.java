@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import com.lsxy.framework.mq.MQEvent;
+import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
 import com.lsxy.framework.mq.api.GlobalEventHandler;
 import com.lsxy.framework.mq.api.GlobalEventHandlerFactory;

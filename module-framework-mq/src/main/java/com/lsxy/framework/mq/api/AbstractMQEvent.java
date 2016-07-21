@@ -1,4 +1,4 @@
-package com.lsxy.framework.mq;
+package com.lsxy.framework.mq.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

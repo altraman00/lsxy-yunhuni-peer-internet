@@ -1,6 +1,5 @@
 package com.lsxy.framework.mq.api;
 
-import com.lsxy.framework.mq.MQEvent;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;

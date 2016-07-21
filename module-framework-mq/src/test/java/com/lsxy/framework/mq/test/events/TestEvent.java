@@ -1,7 +1,6 @@
 package com.lsxy.framework.mq.test.events;
 
-import com.lsxy.framework.mq.AbstractMQEvent;
-import com.lsxy.framework.mq.MQEvent;
+import com.lsxy.framework.mq.api.AbstractMQEvent;
 
 /**
  * Created by Tandy on 2016/7/21.

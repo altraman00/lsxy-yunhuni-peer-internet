@@ -1,4 +1,4 @@
-package com.lsxy.framework.mq;
+package com.lsxy.framework.mq.api;
 
 import javax.jms.Destination;
 
@@ -6,8 +6,6 @@ import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jms.core.JmsTemplate;
-
-import com.lsxy.framework.mq.api.AbstractMQProducer;
 
 public class MQManager {
 	

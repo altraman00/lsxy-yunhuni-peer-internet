@@ -1,4 +1,4 @@
-package com.lsxy.framework.mq;
+package com.lsxy.framework.mq.api;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
