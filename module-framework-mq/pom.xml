@@ -38,12 +38,10 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-cache</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-core</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
         </dependency>
 
         <!-- http://mvnrepository.com/artifact/javax.jms/jms-api -->
@@ -73,6 +71,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-config</artifactId>
         </dependency>
 
 
