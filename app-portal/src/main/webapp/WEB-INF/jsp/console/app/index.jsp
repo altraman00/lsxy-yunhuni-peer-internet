@@ -98,7 +98,7 @@
                                             <lable class="col-md-3 text-right">所属行业：</lable>
                                             <div class="col-md-4 ">
                                                 <select name="industry"  class="form-control notEmpty">
-                                                    <option value="">请选择行业</option>
+                                                    <option value="">请选择所属行业</option>
                                                     <c:set var="industry" value="${app.industry}"></c:set>
                                                     <%@ include file="/inc/industry.jsp"%>
                                                 </select>
@@ -122,7 +122,7 @@
                                         </div>
 
                                         <p class="tips">
-                                           <input type="checkbox" name="isAuth" value="1" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨，回拨，互联网语音，视频通话会涉及鉴权流程，勾选但未实现会呼叫失效)
+                                            <input type="checkbox" name="isAuth" value="1" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨，回拨，互联网语音，视频通话会涉及鉴权流程，勾选但未实现会呼叫失效)
                                             <a href="">回调说明文档</a> </a>
                                         </p>
                                         <div class="form-group min-height20">

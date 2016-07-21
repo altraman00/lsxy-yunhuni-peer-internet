@@ -73,6 +73,14 @@
                                 </div>
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-130">
+                                        应用描述：
+                                    </div>
+                                    <div class="col-md-10 ">
+                                        <p>${app.description}</p>
+                                    </div>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-md-1 remove-padding width-130">
                                         应用类型：
                                     </div>
                                     <div class="col-md-10 ">
@@ -87,7 +95,14 @@
                                         <p>${app.industry}</p>
                                     </div>
                                 </div>
-
+                                <div class="row ">
+                                    <div class="col-md-1 remove-padding width-130">
+                                        服务器白名单：
+                                    </div>
+                                    <div class="col-md-10 ">
+                                        <p>${app.whiteList}</p>
+                                    </div>
+                                </div>
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-130">
                                         APPID：
