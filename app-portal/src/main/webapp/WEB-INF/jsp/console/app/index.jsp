@@ -98,7 +98,7 @@
                                             <lable class="col-md-3 text-right">所属行业：</lable>
                                             <div class="col-md-4 ">
                                                 <select name="industry"  class="form-control notEmpty">
-                                                    <option value="">请选择应用类型</option>
+                                                    <option value="">请选择所属行业</option>
                                                     <c:set var="industry" value="${app.industry}"></c:set>
                                                     <%@ include file="/inc/industry.jsp"%>
                                                 </select>
