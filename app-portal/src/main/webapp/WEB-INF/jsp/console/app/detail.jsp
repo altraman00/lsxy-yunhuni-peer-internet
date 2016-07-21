@@ -178,10 +178,9 @@
                                             2、每个帐号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
                                         </p>
                                         <div class="form-group">
-                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" /></div>
-                                            <div class="col-md-1"><button class="btn btn-primary">查询</button></div>
-                                            <div class="col-md-3 sizebox ">
-                                                共计500M，已占用100M
+                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
+                                            <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
                                         </div>
 
@@ -244,8 +243,8 @@
             </section>
             <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
         </section>
+        </section>
     </section>
-</section>
 
 
 
@@ -341,15 +340,16 @@
             <div class="input-box ">
                 <div class="row  mt-10">
                     <div class="col-md-6">
-                        <button type="button" class="btn btn-primary singlefile" >单文件上传</button>
+                        <input type="file" value="" class="input-text form-control" multiple="multiple" />
                     </div>
-                    <input type="file" value="" class="input-text form-control"  id="singlefile" style="display: none" />
+
                 </div>
                 <div class="row text-left mt-10">
-                    <div class="col-md-12">
-                        <button type="button" class="btn btn-primary batchfile">批量上传</button>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+                            <span class="sr-only">60% Complete</span>
+                        </div>
                     </div>
-                    <input type="file" value="" class="input-text form-control" id="batchfile" style="display: none" multiple="multiple" />
                     <p>允许一次选择20个文件，并且建议在网络环境好的情况下使用，以防止上传错误文件</p>
                 </div>
             </div>
@@ -516,12 +516,25 @@
                                     $('#editmark-tips').html('请填写备注内容'); return false;
                                 }
                                 //异步请求修改数据
-
-                                //成功执行
-                                if(type=='1'){
-                                    $('#remark-b-'+id).html('修改备注');
-                                }
-                                $('#remark-a-'+id).html(remark);
+                                $.ajax({
+                                    url : "${ctx}/console/app/file/modify",
+                                    type : 'post',
+                                    async: false,//使用false同步的方式,true为异步方式
+                                    data : {'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                                    dataType: "json",
+                                    success : function(data){
+                                        if(data.flag){
+                                            showtoast("修改成功");
+                                            //成功执行
+                                            if(type=='1'){
+                                                $('#remark-b-'+id).html('修改备注');
+                                            }
+                                            $('#remark-a-'+id).html(remark);
+                                        }else{
+                                            showtoast("修改失败");
+                                        }
+                                    }
+                                });
                             }
                         }
                     }
@@ -552,8 +565,21 @@
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
-                showtoast('删除成功');
-                $('#play-'+id).remove();
+                $.ajax({
+                    url : "${ctx}/console/app/file/delete",
+                    type : 'post',
+                    async: false,//使用false同步的方式,true为异步方式
+                    data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            showtoast("删除成功");
+                            $('#play-'+id).remove();
+                        }else{
+                            showtoast("删除失败");
+                        }
+                    }
+                });
             }
         });
     }
@@ -576,16 +602,27 @@
         var page = new Page(count,listRow,showPageCount,pageId,voiceTable);
         page.show();
     }
-
-
-
-
+    //默认加载放音文件分页
+    $(function () {
+        upplay();
+    });
     /**
      *触发放音文件分页
      */
     function upplay(){
         //获取数据总数
-        var count = 55;
+        var count = 0;
+        var name = $('#name').val();
+        $.ajax({
+            url : "${ctx}/console/app/file/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                count=resultData.list.length;
+            }
+        });
         //每页显示数量
         var listRow = 3;
         //显示多少个分页按钮
@@ -605,30 +642,41 @@
      * */
     var playTable = function(nowPage,listRows)
     {
-
-        var data = [
-            ['1','1.wav','-1','1M','备注2'],
-            ['2','12.wav','0','1M','备注3'],
-            ['3','13.wav','1','1M','备注3']
-        ];
-        //-1 0 1
-        var html ='';
-        //数据列表
-        for(var i = 0 ; i<data.length; i++){
-            html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-            if(data[i][2]==-1){
-                html+='<td class="nosuccess">审核不通过</td>';
-            }else if(data[i][2]==1){
-                html+='<td class="success">已审核</td>';
-            }else{
-                html+='<td>待审核</td>';
+        var name = $('#name').val();
+        $.ajax({
+            url : "${ctx}/console/app/file/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                $('#voiceFilePlay').html("共计"+resultData.fileRemainSize+"M,已占用"+resultData.fileTotalSize+"M");
+                var data =[];
+                for(var i;i<resultData.list.length;i++){
+                    var tempFile = resultData.list[i];
+                    var tempFileSize = tempFile.size/1000/1000;
+                    var temp = [tempFile.id,tempFile.name,tempFile.status,tempFile,tempFileSize+"M",tempFile.remark];
+                    data[i]=temp;
+                }
+                var html ='';
+                //数据列表
+                for(var i = 0 ; i<data.length; i++){
+                    html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                    if(data[i][2]==-1){
+                        html+='<td class="nosuccess">审核不通过</td>';
+                    }else if(data[i][2]==1){
+                        html+='<td class="success">已审核</td>';
+                    }else{
+                        html+='<td>待审核</td>';
+                    }
+                    html+='<td>'+data[i][3]+'</td>';
+                    html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
+                    html+='<td class="operation"> <a onclick="delplay('+data[i][0]+')" >删除</a> <span ></span> <a onclick="editremark('+data[i][0]+')" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                }
+                $('#playtable').find(".playtr").remove();
+                $('#playtable').append(html);
             }
-            html+='<td>'+data[i][3]+'</td>';
-            html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-            html+='<td class="operation"> <a onclick="delplay('+data[i][0]+')" >删除</a> <span ></span> <a onclick="editremark('+data[i][0]+')" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
-        }
-        $('#playtable').find(".playtr").remove();
-        $('#playtable').append(html);
+        });
     }
 
 
