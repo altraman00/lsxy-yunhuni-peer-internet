@@ -2,18 +2,26 @@ package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
+import com.lsxy.framework.api.invoice.model.InvoiceInfo;
+import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import scala.annotation.target.param;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -27,7 +35,8 @@ import java.util.Map;
 @RequestMapping("/console/cost/invoice_apply")
 public class InvoiceApplyController extends AbstractPortalController {
 
-    @RequestMapping("/page")
+    @RequestMapping(value = "/page",method = RequestMethod.GET)
+
     public ModelAndView page(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "5") Integer pageSize){
         Map<String,Object> model = new HashMap<>();
         String token = this.getSecurityToken(request);
@@ -56,7 +65,7 @@ public class InvoiceApplyController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).getPage(url, InvoiceApply.class,pageNo,pageSize).getData();
     }
 
-    @RequestMapping("/apply_info")
+    @RequestMapping(value = "/apply_info",method = RequestMethod.GET)
     @ResponseBody
     public Map applyInfo(HttpServletRequest request,String start,String end){
         Map result = new HashMap();
@@ -85,5 +94,48 @@ public class InvoiceApplyController extends AbstractPortalController {
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/apply_amount?start={1}&end={2}";
         return RestRequest.buildSecurityRequest(token).get(url, BigDecimal.class,start,end);
     }
+
+    @RequestMapping(value = "/to_apply",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
+    public ModelAndView toApply(HttpServletRequest request,String start,String end) throws Exception {
+        Map<String,Object> model = new HashMap<>();
+        String token = this.getSecurityToken(request);
+        InvoiceInfo invoiceInfo = getInvoiceInfo(token);
+        if(invoiceInfo == null){
+            throw new RuntimeException("找不到发票信息");
+        }
+        InvoiceApply apply = new InvoiceApply();
+        EntityUtils.copyProperties(apply,invoiceInfo);
+        apply.setStart(DateUtils.parseDate(start,"yyyy-MM"));
+        apply.setEnd(DateUtils.parseDate(end,"yyyy-MM"));
+        RestResponse<BigDecimal> response = applyAmount(token, start, end);
+        if(response.isSuccess()){
+            double amount = response.getData().doubleValue();
+            if(amount <= 0){
+                throw new RuntimeException("没有可开的发票金额！");
+            }
+            apply.setAmount(new BigDecimal(amount));
+        }
+        model.put("apply",apply);
+        return new ModelAndView("console/cost/invoice/invoice_apply_edit",model);
+    }
+
+    /**
+     * 获取用户发票信息
+     * @return
+     */
+    private InvoiceInfo getInvoiceInfo(String token){
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_info/get";
+        RestResponse<InvoiceInfo> response = RestRequest.buildSecurityRequest(token).get(url, InvoiceInfo.class);
+        return response.getData();
+    }
+
+    @RequestMapping(value = "/save",method = RequestMethod.POST)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
+    public ModelAndView save(HttpServletRequest request){
+        Map<String,Object> paramsMap = WebUtils.getRequestParams(request);
+        return new ModelAndView("redirect:console/cost/invoice/page");
+    }
+
 
 }

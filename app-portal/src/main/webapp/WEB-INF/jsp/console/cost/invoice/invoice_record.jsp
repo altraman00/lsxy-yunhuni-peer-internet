@@ -111,13 +111,13 @@
                                         <section class="col-md-12 padder-v fix-padding">
                                             <div class='wrapperBox cost_month'>
                                                 <div class="panel-body clearfix border-top-none ">
-                                                    <form action="" method="post">
+                                                    <form action="${ctx}/console/cost/invoice_apply/to_apply" method="get">
                                                         <div class="row">
                                                             选择开票时间：
                                                             <!--默认第一条消费记录的时间-->
-                                                            <input type="text" class="form-control" readonly="readonly"
-                                                                   value='${start}' />到
-                                                            <input type="text" class="datepicker form-control"
+                                                            <input type="text" class="form-control" readonly="readonly" name="start"
+                                                                   value='${start}' id="datestart"/>到
+                                                            <input type="text" class="datepicker form-control" name="end"
                                                                    data-date-end-date="0m" value=''  id="dateend"/>
                                                             <a class="btn btn-primary query">查询</a>
                                                             <span class="tips-error querytips"></span>
@@ -290,7 +290,7 @@
 </div>
 <!-- /.modal -->
 
-
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'></script>
@@ -321,33 +321,43 @@
         $('#ininvoicetime').html(starttime + ' 至 ' + endtime);
 
         //异步获取开局发票金额
-        var price = "100.01";
-
-
-        var priceInt = parseInt(price);
-        var priceFloat = parseFloat(price).toFixed(2);
-        var strs = new Array(); //定义一数组
-        strs = price.split("."); //字符分割
-        for (i = 0; i < strs.length; i++) {
-            strs[i];
+        var price = 0.00;
+        var flag = false;
+        $.ajax({
+            url : ctx + "/console/cost/invoice_apply/apply_info",
+            data:{start:starttime,end:endtime},
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
+            dataType: "json",
+            success : function(data){
+                if(data.flag){
+                    price = data.applyAmount;
+                    flag = true;
+                }else{
+                    showtoast(data.msg?data.msg:'数据异常');
+                }
+            },
+            error:function(){
+                showtoast('网络异常，请稍后重试');
+            }
+        });
+        if(!flag){
+            return;
         }
+        var priceArr = price.toFixed(2).split("."); //字符分割
+        var priceInt = priceArr[0];
+        var priceFloat = priceArr[1];
+
         $('#invoice-price').html(priceInt + '.').attr('data-money', priceInt);
-        if (strs[1] != '') {
-            priceFloat = strs[1];
-        }
-
         $('#invoice-point').html(priceFloat);
-
         $('#invoice-url').html('查看详情');
 
         var con = condition();
         if (con) {
             $('#sendinvoice').removeAttr('disabled');
         }
-
-
     });
-
 
     $('#invoice-url').click(function(){
         //列表加载数据

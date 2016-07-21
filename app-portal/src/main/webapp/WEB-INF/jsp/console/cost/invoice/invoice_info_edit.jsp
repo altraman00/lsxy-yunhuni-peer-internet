@@ -94,6 +94,8 @@
                                     <div class="row">
                                         <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
                                                    id="invoiceForm">
+                                            <!-- 防止表单重复提交要加这个隐藏变量 -->
+                                            <input type="hidden" name="submission_token" value="${submission_token}" />
 
                                             <div class="form-group">
                                                 <span class="hr text-label" ><strong>发票信息:</strong></span>
@@ -208,6 +210,8 @@
         </section>
     </section>
 </section>
+
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
 <script>

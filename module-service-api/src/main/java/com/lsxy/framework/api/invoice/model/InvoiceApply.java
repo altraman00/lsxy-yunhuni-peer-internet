@@ -23,6 +23,7 @@ public class InvoiceApply extends IdEntity {
     private Date end;               //结束时间
     private Integer status;         //状态
     private String remark;          //备注
+    private Date applyTime;          //申请时间
     private Tenant tenant;          //租户
     private Integer type;            //发票类型
     private String title;             //发票抬头
@@ -78,6 +79,15 @@ public class InvoiceApply extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "apply_time")
+    public Date getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
     }
 
     @OneToOne

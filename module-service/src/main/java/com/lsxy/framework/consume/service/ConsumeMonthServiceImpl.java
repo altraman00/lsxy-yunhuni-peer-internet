@@ -85,7 +85,7 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
                 throw new IllegalArgumentException("参数异常");
             }
             if(StringUtils.isNotBlank(end)){
-                endTime = format.parse(start);
+                endTime = format.parse(end);
             }
             if(endTime != null){
                 hql = "select sum(obj.amongAmount) from ConsumeMonth obj where obj.tenantId = ?1 and obj.dt between ?2 and ?3";
