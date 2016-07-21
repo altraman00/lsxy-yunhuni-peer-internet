@@ -111,6 +111,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                         a.setStatus(AppOnlineAction.STATUS_DONE);
                         this.save(a);
                     }
+                    //TODO 根据产品策略获取支付金额
                     BigDecimal amount = new BigDecimal(1000 + 100);
                     AppOnlineAction newAction = new AppOnlineAction(ivr, AppOnlineAction.PAY_STATUS_NOPAID,amount,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_PAYING,AppOnlineAction.STATUS_AVTIVE);
                     this.save(newAction);
@@ -167,17 +168,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //当应用有ivr功能时，绑定IVR号码绑定
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
-                        ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(action.getTelNumber());
-                        if(resourceTelenum.getStatus() == null || resourceTelenum.getStatus()== ResourceTelenum.STATUS_FREE){
-                            //生成新的号码租用关系
-                            this.newResourcesRent(app, tenant, resourceTelenum);
-                        }else if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED){
-                            //如果号码已被租用,则根据租用关系进行判断并处理
-                            this.alterResourcesRent(app, tenant, resourceTelenum);
-                        }else{
-                            //如果ivr号码被占用，则抛出异常
-                            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
-                        }
+                        this.bindIvrToApp(app, action.getTelNumber(), tenant);
                     }
                     //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
                     if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
@@ -211,6 +202,26 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             }
         }else{
             throw new RuntimeException("数据错误");
+        }
+    }
+
+    /**
+     * 绑定Ivr号到应用
+     * @param app
+     * @param ivr
+     * @param tenant
+     */
+    private void bindIvrToApp(App app, String ivr, Tenant tenant) {
+        ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(ivr);
+        if(resourceTelenum.getStatus() == null || resourceTelenum.getStatus()== ResourceTelenum.STATUS_FREE){
+            //生成新的号码租用关系
+            this.newResourcesRent(app, tenant, resourceTelenum);
+        }else if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED){
+            //如果号码已被租用,则根据租用关系进行判断并处理
+            this.alterResourcesRent(app, tenant, resourceTelenum);
+        }else{
+            //如果ivr号码被占用，则抛出异常
+            throw new TeleNumberBeOccupiedException("IVR号码已被占用");
         }
     }
 
