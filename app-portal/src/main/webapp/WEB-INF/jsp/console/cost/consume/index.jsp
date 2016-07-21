@@ -88,7 +88,7 @@
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;消费记录</span>
                         </div>
-                        <form:form role="form" action="${ctx}/console/cost/consume" method="post">
+                        <form:form role="form" action="${ctx}/console/cost/consume" method="post" id="mainForm">
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
@@ -102,7 +102,7 @@
                                                     <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" />
                                                     到
                                                     <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" />
-                                                    <button class="btn btn-primary query" type="submit"  id="findform" >查询</button>
+                                                    <button class="btn btn-primary query" type="button" id="findform" >查询</button>
                                                     <span class="tips-error" ></span>
                                                 </div>
                                             </div>
@@ -151,6 +151,22 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/history.js'> </script>
+<script type="text/javascript">
+    function compareTime(starttime,endtime){
+        if(!starttime){
+            return '请填写开始时间';
+        }
+        if(!endtime){
+            return '请填写结束时间';
+        }
+        var d1 = new Date(starttime.replace(/\-/g, "\/"));
+        var d2 = new Date(endtime.replace(/\-/g, "\/"));
+        if(d1>d2){
+            return '时间范围填写有误';
+        }
+        $('#mainForm').submit();
+    }
+</script>
 </body>
 </html>
 
