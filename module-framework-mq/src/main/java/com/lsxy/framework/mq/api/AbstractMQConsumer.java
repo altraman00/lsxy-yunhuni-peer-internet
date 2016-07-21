@@ -18,7 +18,7 @@ public abstract class AbstractMQConsumer {
 	private static final Log logger = LogFactory.getLog(AbstractMQConsumer.class);
 	@Autowired
 	private GlobalEventHandlerFactory globalEventHandlerFactory;
-	
+
 	public abstract void init();
 
 	public abstract void start();
@@ -26,8 +26,8 @@ public abstract class AbstractMQConsumer {
 	public abstract void destroy();
 
 	public abstract void await();
-	
-	
+
+
 	public String[] getTopics(){
 		String t = SystemConfig.getProperty("mq.subscribe.topics");
 		String[] topics = null;
