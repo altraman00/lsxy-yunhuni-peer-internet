@@ -133,16 +133,15 @@
                                                         </div>
                                                         <div class="row invoiceapply"  >
                                                             <div>开票时间：
-                                                                <span id="ininvoicetime"> </span>
+                                                                <span id="ininvoicetime" data-start="" data-end="" ></span>
                                                             </div>
                                                         </div>
                                                         <div class="row invoiceapply">
+                                                            <input type="hidden" id="invoicePrice" value="0.00"/>
                                                             <div>已选开具发票金额：
-                                                            <span class="price" id="invoice-price"
-                                                                  data-money="0">0.</span><span class="point"
-                                                                                                id="invoice-point">00</span>
+                                                            <span class="price" id="invoice-price" data-money="0">0.</span><span class="point" id="invoice-point">00</span>
                                                                 元
-                                                                <a id="invoice-url"></a>
+                                                                <a id="invoice-url" ></a>
                                                                 <button class="btn btn-primary float-right" id="sendinvoice"
                                                                         type="submit"
                                                                         disabled>开发发票
@@ -203,7 +202,7 @@
                                                     </c:if>
                                                     <c:if test="${result.status == 2}">
                                                         <span class="nosuccess" data-toggle="tooltip" title="${result.remark}">
-                                                            异常
+                                                            异常<i class="fa fa-exclamation-triangle"></i>
                                                         </span>
                                                     </c:if>
                                                 </td>
@@ -319,14 +318,12 @@
             return false;
         }
         //清空数据
-        $('#invoice-price').html('0.').attr('data-money', '0');
+        $('#invoice-price').html('0.').attr('data-money', '0.00');
         $('#invoice-point').html('00');
         $('#invoice-url').html('');
 
-
         //显示时间
-        $('#ininvoicetime').html(starttime + ' 至 ' + endtime);
-
+        $('#ininvoicetime').html(starttime + ' 至 ' + endtime).attr('data-start',starttime).attr('data-end',endtime);
         //异步获取开局发票金额
         var price = 0.00;
         var flag = false;
@@ -356,7 +353,7 @@
         var priceInt = priceArr[0];
         var priceFloat = priceArr[1];
 
-        $('#invoice-price').html(priceInt + '.').attr('data-money', priceInt);
+        $('#invoice-price').html(priceInt + '.').attr('data-money', price.toFixed(2));
         $('#invoice-point').html(priceFloat);
         $('#invoice-url').html('查看详情');
 
@@ -367,19 +364,39 @@
     });
 
     $('#invoice-url').click(function(){
-        //列表加载数据
-        var html ='';
+        var flag = false;
         //标题时间段
-        var starttime = $('#datestart').val();
-        var endtime   = $('#dateend').val();
-        var money =  100;
+        var starttime = $('#ininvoicetime').attr('data-start');
+        var endtime   = $('#ininvoicetime').attr('data-end');
+        var money =  $('#invoice-price').attr('data-money');
         //时间
         $('#cost-detail-time').html(starttime+' 至 '+ endtime);
         //消费金额
-        $('#cost-detail-money').html(100);
-
+        $('#cost-detail-money').html(money);
         //获取数据总数
         var count = 11;
+        $.ajax({
+            url : ctx + "/console/cost/invoice_apply/count_day_consume",
+            data:{start:starttime,end:endtime},
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
+            dataType: "json",
+            success : function(data){
+                if(data.flag){
+                    flag = true;
+                    count = data.count;
+                }else{
+                    showtoast(data.msg?data.msg:'数据异常');
+                }
+            },
+            error:function(){
+                showtoast('网络异常，请稍后重试');
+            }
+        });
+        if(!flag){
+            return;
+        }
         //每页显示数量
         var listRow = 3;
         //显示多少个分页按钮
@@ -400,57 +417,78 @@
      * @param nowPage 当前页数
      * @param listRows 每页显示多少条数据
      * */
-    var searchTable = function(nowPage,listRows)
-    {
+    var searchTable = function(nowPage,listRows){
+        var starttime = $('#ininvoicetime').attr('data-start');
+        var endtime   = $('#ininvoicetime').attr('data-end');
+        var result = [];
+        $.ajax({
+            url : ctx + "/console/cost/invoice_apply/list_day_consume",
+            data:{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
+            dataType: "json",
+            success : function(data){
+                if(data.flag){
+                    result = data.result;
+                }else{
+                    showtoast(data.msg?data.msg:'数据异常');
+                }
+            },
+            error:function(){
+                showtoast('网络异常，请稍后重试');
+            }
+        });
 
-        var data = [
-            ['2016-06-07', '1000.00'],
-            ['2016-06-06', '1000.00'],
-            ['2016-06-05', '1000.00']
-        ];
         var html ='';
         //数据列表
-
-        for(var i = 0 ; i<data.length; i++){
-            html +='<div class="row c-title"><div class="col-md-3">'+data[i][0]+'</div><div class="col-md-6">'+data[i][1]+'</div><div class="col-md-3"><a onclick="showModalDetail(this)"  data-id="collapse-'+i+'">展开</a><span data-toggle="collapse" href="#collapse-'+i+'" id="collapse-'+i+'-show" ></span></div></div><div id="collapse-'+i+'" class="content accordion-body collapse" style="height: 0px; "><div class="accordion-inner"><div class="row" id="collapse-'+i+'-content"></div></div></div>';
+        for(var i = 0 ; i<result.length; i++){
+            var tempDate = new Date(result[i].dt);
+            var tempDataStr = tempDate.getFullYear()+"-"+(tempDate.getMonth()+1)+"-"+tempDate.getDate();
+            html +='<div class="row c-title"><div class="col-md-3">'+ tempDataStr +'</div><div class="col-md-6">'+result[i].amongAmount.toFixed(2)+'</div><div class="col-md-3"><a onclick="showModalDetail(this)"  data-id="'+tempDataStr+'">展开</a><span data-toggle="collapse" href="#collapse-'+tempDataStr+'" id="collapse-'+tempDataStr+'-show" ></span></div></div><div id="collapse-'+tempDataStr+'" class="content accordion-body collapse" style="height: 0px; "><div class="accordion-inner"><div class="row" id="collapse-'+tempDataStr+'-content"></div></div></div>';
         }
         $('#modal-content').html('');
         $('#modal-content').html(html);
     }
 
-
     function showModalDetail(obj){
+        //组装数据
+        var result = [];
         var id = obj.getAttribute('data-id');
         var title = obj.innerHTML;
         if(title=='展开'){
             //ajax
+            $.ajax({
+                url : ctx + "/console/cost/bill_day/list",
+                data:{day:id},
+                type : 'get',
+                async: false,//使用同步的方式,true为异步方式
+                timeout:2*60*1000,
+                dataType: "json",
+                success : function(data){
+                    if(data.flag){
+                        result = data.result;
+                    }else{
+                        showtoast(data.msg?data.msg:'数据异常');
+                    }
+                },
+                error:function(){
+                    showtoast('网络异常，请稍后重试');
+                }
+            });
 
-            //组装数据
-            var d = [
-                { title : '单项外呼', price :'120元' },
-                { title : '双向呼叫', price :'120元' },
-                { title : '电话会议', price :'120元' },
-                { title : '电话接入IVR', price :'120元' },
-                { title : 'IVR外呼放音', price :'120元' },
-                { title : '短信', price :'120元' },
-                { title : '电话通知', price :'120元' },
-                { title : '通话录音', price :'120元' },
-                { title : 'IVR功能费', price :'120元' },
-                { title : 'IVR号码租用费', price :'120元' },
-                { title : '录音文件存储', price :'120元' }
-            ];
             var html ='';
-            for(var i=0 ; i<d.length; i++){
-                html+='<div class="col-md-6"><span class="col-md-6">'+d[i]['title']+'：</span><div class="col-md-6">'+d[i]['price']+'</div></div>';
+            for(var i=0 ; i<result.length; i++){
+                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amount.toFixed(2)+'</div></div>';
             }
 
-            document.getElementById(id+'-content').innerHTML=html;
+            document.getElementById('collapse-'+id+'-content').innerHTML=html;
             //显示
-            document.getElementById(id+'-show').click();
+            document.getElementById('collapse-'+id+'-show').click();
             obj.innerHTML='收起';
         }else{
 
-            document.getElementById(id+'-show').click();
+            document.getElementById('collapse-'+id+'-show').click();
             obj.innerHTML='展开';
         }
     }
@@ -465,9 +503,6 @@
     function hideladding(){
         $('.modal-loadding').hide();
     }
-
-
-
 
 
     function sendsubmit() {

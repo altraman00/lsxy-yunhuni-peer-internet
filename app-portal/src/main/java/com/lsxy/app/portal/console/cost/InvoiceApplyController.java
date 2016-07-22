@@ -2,7 +2,11 @@ package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.app.portal.console.statistics.ConsumeStatisticsVo;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
+import com.lsxy.framework.api.consume.model.BillDay;
+import com.lsxy.framework.api.consume.model.BillMonth;
+import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -22,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,8 +37,8 @@ import java.util.Map;
 @RequestMapping("/console/cost/invoice_apply")
 public class InvoiceApplyController extends AbstractPortalController {
 
-    @RequestMapping(value = "/page",method = RequestMethod.GET)
 
+    @RequestMapping(value = "/page",method = RequestMethod.GET)
     public ModelAndView page(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "5") Integer pageSize){
         Map<String,Object> model = new HashMap<>();
         String token = this.getSecurityToken(request);
@@ -176,6 +181,39 @@ public class InvoiceApplyController extends AbstractPortalController {
         InvoiceApply apply = getApply(token, id);
         model.put("apply",apply);
         return new ModelAndView("console/cost/invoice/invoice_apply_detail",model);
+    }
+
+
+    @RequestMapping(value = "/count_day_consume" ,method = RequestMethod.GET)
+    @ResponseBody
+    public Map countDayConsume(HttpServletRequest request,String start,String end){
+        Map result = new HashMap();
+        String token = this.getSecurityToken(request);
+        Long count = this.countDayConsumeRest(token,start,end);
+        result.put("flag",true);
+        result.put("count",count);
+        return result;
+    }
+
+    private Long countDayConsumeRest(String token,String start,String end) {
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/consume_day/count_by_time?startTime={1}&endTime={2}";
+        return RestRequest.buildSecurityRequest(token).get(url,Long.class,start,end).getData();
+    }
+
+    @RequestMapping(value = "/list_day_consume",method = RequestMethod.GET)
+    @ResponseBody
+    public Map listDayConsume(HttpServletRequest request,String start,String end,Integer pageNo,Integer pageSize){
+        Map model = new HashMap();
+        String token = this.getSecurityToken(request);
+        List result = this.listDayConsumeRest(token,start,end,pageNo,pageSize);
+        model.put("flag",true);
+        model.put("result",result);
+        return model;
+    }
+
+    private List listDayConsumeRest(String token, String start, String end,Integer pageNo,Integer pageSize) {
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/consume_day/list_by_time?startTime={1}&endTime={2}&pageNo={3}&pageSize={4}";
+        return RestRequest.buildSecurityRequest(token).getList(url,ConsumeDay.class,start,end,pageNo,pageSize).getData();
     }
 
 }
