@@ -332,34 +332,37 @@
 </div>
 
 <!---上传文件--->
-<div class="modal-box application-detail-box" id="modalfour" style="display:none ">
+<div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
     <div class="title">文件上传<a class="close_a modalCancel" data-id="four"></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
-        <form action="" method="post" id="">
+        <form:form action="${ctx}/console/app/file/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();">
             <div class="input-box ">
                 <div class="row  mt-10">
-                    <div class="col-md-6">
-                        <input type="file" value="" class="input-text form-control" multiple="multiple" />
+                    <input type="hidden" name="appId" value="${app.id}">
+                    <div class="col-md-2">
+                        文件 :
                     </div>
-
-                </div>
-                <div class="row text-left mt-10">
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-                            <span class="sr-only">60% Complete</span>
+                    <div class="col-md-10">
+                        <input type="file" value="" class="input-text form-control" name="file" id="singlefile" multiple="multiple" />
+                        <div class="progress h10 mt-10">
+                            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"  aria-valuemin="0" aria-valuemax="100" style="width: 0%" id="uploadLength">
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div class="row text-left mt-10">
                     <p>允许一次选择20个文件，并且建议在网络环境好的情况下使用，以防止上传错误文件</p>
                 </div>
             </div>
-        </form>
+        </form:form>
     </div>
     <div class="footer">
         <a class="cancel modalCancel" data-id="four">返回</a>
         <a class="sure modalSureFour" data-id="four">确认</a>
     </div>
 </div>
+
 
 
 <div class="tips-toast"></div>
@@ -467,8 +470,9 @@
      * 文件上传地址
      */
     $('.modalSureFour').click(function(){
-        var id = $(this).attr('data-id');
-        hideModal(id)
+        $('#uploadMianForm').submit();
+        //var id = $(this).attr('data-id');
+        //hideModal(id)
     });
 
     /**
@@ -620,6 +624,7 @@
             data : {'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
             dataType: "json",
             success : function(resultData){
+                alert(JSON.stringify(resultData));
                 count=resultData.list.length;
             }
         });
@@ -713,9 +718,19 @@
             upplay();
         }
     });
-
-
-
+    var timer = "";
+    function startUpload(){
+        timer = window.setTimeout(startListener,1000);
+        return true;
+    }
+    var timeAllTemp = 0;
+    function startListener(){
+        $('#uploadLength').attr("style","width:"+timeAllTemp+"%");
+        if(timeAllTemp==100){
+            clearTimeout(timer);
+        }
+        timeAllTemp+=10;
+    }
 
 </script>
 

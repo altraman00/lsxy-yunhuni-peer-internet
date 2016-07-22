@@ -65,11 +65,6 @@
             <artifactId>json-path</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-oss</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>

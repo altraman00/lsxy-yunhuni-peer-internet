@@ -1,11 +1,13 @@
 package com.lsxy.app.portal.rest.file;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
@@ -29,7 +31,7 @@ public class VoiceFilePlayController extends AbstractRestController {
     @Autowired
     VoiceFilePlayService voiceFilePlayService;
     @Autowired
-    private OSSService ossService;
+    AppService appService;
     @Autowired
     private BillingService billingService;
     /**
@@ -42,7 +44,7 @@ public class VoiceFilePlayController extends AbstractRestController {
         String repository=SystemConfig.getProperty("global.oss.aliyun.bucket");
         VoiceFilePlay voiceFilePlay =  voiceFilePlayService.findById(id);
         try {
-            ossService.deleteObject(repository, voiceFilePlay.getFileKey());
+           // ossService.deleteObject(repository, voiceFilePlay.getFileKey());
             //删除OSS文件成功，删除数据库记录
             voiceFilePlayService.delete(voiceFilePlay);
             //删除记录成功,更新剩余存储容量大小
@@ -61,9 +63,13 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/create")
-    public RestResponse createRemark(VoiceFilePlay voiceFilePlay){
+    public RestResponse createRemark(VoiceFilePlay voiceFilePlay,String appId){
         //将对象保存数据库
         voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
+        App app = appService.findById(appId);
+        voiceFilePlay.setApp(app);
+        Account account = getCurrentAccount();
+        voiceFilePlay.setTenant(account.getTenant());
         //更新账户表
         Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
         billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
@@ -94,7 +100,7 @@ public class VoiceFilePlayController extends AbstractRestController {
     @RequestMapping("/plist")
     public RestResponse pageList(Integer pageNo,Integer pageSize,String name,String appId){
         Tenant tenant = getCurrentAccount().getTenant();
-        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,tenant.getId(),appId);
+        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,tenant.getId());
         return RestResponse.success(page);
     }
 }
