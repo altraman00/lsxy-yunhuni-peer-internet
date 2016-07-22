@@ -13,10 +13,7 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import scala.annotation.target.param;
 
@@ -43,8 +40,13 @@ public class InvoiceApplyController extends AbstractPortalController {
         Map startInfo = getStartInfo(token);
         Page<InvoiceApply> page = getPage(token, pageNo, pageSize);
         model.putAll(startInfo);
-        Object amountStr = startInfo.get("amount");
-        BigDecimal amount = new BigDecimal((Double) amountStr);
+        Object amountObj = startInfo.get("amount");
+        BigDecimal amount = new BigDecimal(0.00);
+        if(amountObj instanceof String){
+            amount = new BigDecimal((String) amountObj);
+        }else if(amountObj instanceof Double){
+            amount = new BigDecimal((Double) amountObj);
+        }
         //余额整数部分
         model.put("amountInt",amount.intValue());
         //余额小数部分
@@ -106,6 +108,8 @@ public class InvoiceApplyController extends AbstractPortalController {
         }
         InvoiceApply apply = new InvoiceApply();
         EntityUtils.copyProperties(apply,invoiceInfo);
+        //发票信息的ID会复制过去，所以清除掉
+        apply.setId(null);
         apply.setStart(DateUtils.parseDate(start,"yyyy-MM"));
         apply.setEnd(DateUtils.parseDate(end,"yyyy-MM"));
         RestResponse<BigDecimal> response = applyAmount(token, start, end);
@@ -133,9 +137,45 @@ public class InvoiceApplyController extends AbstractPortalController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView save(HttpServletRequest request){
+        String token = this.getSecurityToken(request);
         Map<String,Object> paramsMap = WebUtils.getRequestParams(request);
-        return new ModelAndView("redirect:console/cost/invoice/page");
+        this.save(token,paramsMap);
+        return new ModelAndView("redirect:/console/cost/invoice_apply/page");
     }
 
+    private RestResponse save(String token,Map map){
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/save";
+        return RestRequest.buildSecurityRequest(token).post(url, map,InvoiceApply.class);
+    }
+
+    @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
+    public ModelAndView edit(HttpServletRequest request,@PathVariable String id){
+        Map model = new HashMap();
+        String token = this.getSecurityToken(request);
+        InvoiceApply apply = getApply(token, id);
+        if(apply == null ){
+            throw new RuntimeException("找不到申请信息");
+        }
+        if(apply.getStatus() != InvoiceApply.STATUS_EXCEPTION){
+            throw new RuntimeException("只有异常的申请才能进行修改");
+        }
+        model.put("apply",apply);
+        return new ModelAndView("console/cost/invoice/invoice_apply_edit",model);
+    }
+
+    private InvoiceApply getApply(String token,String id){
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/get/{1}";
+        return RestRequest.buildSecurityRequest(token).get(url,InvoiceApply.class,id).getData();
+    }
+
+    @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
+    public ModelAndView getDetail(HttpServletRequest request,@PathVariable String id){
+        Map model = new HashMap();
+        String token = this.getSecurityToken(request);
+        InvoiceApply apply = getApply(token, id);
+        model.put("apply",apply);
+        return new ModelAndView("console/cost/invoice/invoice_apply_detail",model);
+    }
 
 }

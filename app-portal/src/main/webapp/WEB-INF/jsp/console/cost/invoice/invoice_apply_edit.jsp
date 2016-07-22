@@ -149,7 +149,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">注册地址：</lable>
-                                                    <lable class="col-md-4"><input name="bank" placeholder="请填写注册地址" value="${apply.bank}" class="form-control input-form notEmpty" data-bv-field="notEmpty"/></lable>
+                                                    <lable class="col-md-4"><input name="bank" placeholder="请填写注册地址" value="${apply.regAddress}" class="form-control input-form notEmpty" data-bv-field="notEmpty"/></lable>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">企业电话：</lable>
@@ -178,7 +178,6 @@
                                                     <input type="text" name="receiveMobile" placeholder="请填写手机号码" value="${apply.receiveMobile}" class="form-control input-form notEmpty" data-bv-field="notEmpty" />
                                                 </div>
                                             </div>
-
 
                                             <div class="form-group">
                                                 <div class="col-md-3 text-right">

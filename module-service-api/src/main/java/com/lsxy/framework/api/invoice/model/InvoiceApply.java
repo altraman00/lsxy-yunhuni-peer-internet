@@ -35,6 +35,8 @@ public class InvoiceApply extends IdEntity {
     private String receiveAddress;  //收取地址
     private String receivePeople;  //收件人
     private String receiveMobile;  //手机号
+    private String expressCom;  //快递公司
+    private String expressNo;  //快递单号
 
     @Column(name = "amount")
     public BigDecimal getAmount() {
@@ -188,5 +190,23 @@ public class InvoiceApply extends IdEntity {
 
     public void setReceiveMobile(String receiveMobile) {
         this.receiveMobile = receiveMobile;
+    }
+
+    @Column(name = "express_com")
+    public String getExpressCom() {
+        return expressCom;
+    }
+
+    public void setExpressCom(String expressCom) {
+        this.expressCom = expressCom;
+    }
+
+    @Column(name = "express_no")
+    public String getExpressNo() {
+        return expressNo;
+    }
+
+    public void setExpressNo(String expressNo) {
+        this.expressNo = expressNo;
     }
 }

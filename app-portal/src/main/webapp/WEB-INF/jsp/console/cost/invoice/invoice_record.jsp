@@ -208,7 +208,14 @@
                                                     </c:if>
                                                 </td>
                                                 <td>${result.title}</td>
-                                                <td><a href="cost_invoice_detail.html">查看详情</a></td>
+                                                <td>
+                                                    <c:if test="${result.status == 0 || result.status == 1}">
+                                                        <a href="${ctx}/console/cost/invoice_apply/detail/${result.id}">查看详情</a>
+                                                    </c:if>
+                                                    <c:if test="${result.status == 2}">
+                                                        <a class="nosuccess" href="${ctx}/console/cost/invoice_apply/edit/${result.id}">重新申请</a>
+                                                    </c:if>
+                                                </td>
                                             </tr>
                                         </c:forEach>
                                     </table>
