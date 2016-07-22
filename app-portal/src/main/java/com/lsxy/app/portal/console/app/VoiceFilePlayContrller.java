@@ -139,43 +139,38 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ){
         String tenantId = getCurrentAccount(request).getTenant().getId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
-
-        List list = new ArrayList();
+        UploadEntity oss = new UploadEntity();
         try {
             if (null != multipartfiles && multipartfiles.length > 0) {
                 //遍历并保存文件
-                for (MultipartFile file : multipartfiles) {
+                oss.setUploadTotalSize(multipartfiles.length);
+                for (int i=0;i< multipartfiles.length;i++) {
+                    MultipartFile file  = multipartfiles[i];
                     String name = file.getOriginalFilename();//文件名
                     long size = file.getSize();
                     String fileKey = getFileKey(tenantId,appId,ymd);
                     boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name,repository,fileKey);
-                    Map temp = new HashMap();
-                    temp.put("name",name);
                     if(flag){//文件保存成功，将对象保存数据库
                         RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
                         if(restResponse.isSuccess()){
                             logger.info("文件上传成功",name);
-                            temp.put("flag",true);
-                            temp.put("msg",name+"上传成功");
+                            oss.setStatus(oss.getStatus()+name+"文件上传");
                         }else{
                             logger.info("上传成功，保存失败",name);
-                            temp.put("flag",false);
-                            temp.put("msg",name+"上传成功，保存失败");
                             ossService.deleteObject(repository, fileKey);
+                            oss.setStatus(oss.getStatus()+name+"文件上传失败");
                         }
                     }else{
                         logger.info("上创失败",name);
-                        temp.put("flag",false);
-                        temp.put("msg",name+"上创失败");
+                        oss.setStatus(oss.getStatus()+name+"文件上传失败");
                     }
-                    list.add(temp);
+                    oss.setReadTotalSize(i+1);
+                    request.getSession().setAttribute("ossUpload",oss);
                 }
             }
         }catch (Exception e){
         }
-        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("upload_ps");
-        fuploadStatus.setFlag(true);//流程结束
-        request.getSession().setAttribute("upload_ps",fuploadStatus);
+        oss.setFlag(true);
     }
     /**
      * 删除放音文件rest
@@ -204,21 +199,21 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     @RequestMapping("/status"  )
     @ResponseBody
     public Map  status(HttpServletRequest request ){
-        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("upload_ps");
+        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("ossUpload");
         Map map = new HashMap();
-        //计算上传完成的百分比
-        long percentComplete = (long) Math.floor(((double) fuploadStatus.getReadTotalSize() / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
-        if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize()) || (fuploadStatus.getCancel() == true)) {
-            if(fuploadStatus.isFlag()) {
-                map.put("flag",true );
-                map.put("percentComplete", percentComplete);
-            }else{
-                map.put("flag",false );
-                map.put("percentComplete", 90);
-            }
-        } else {
+        if(fuploadStatus==null){
             map.put("flag",false);
-            map.put("percentComplete",percentComplete);
+            map.put("percentComplete",0);
+        }else{
+            //计算上传完成的百分比
+            long percentComplete = (long) Math.floor(((double) fuploadStatus.getReadTotalSize() / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
+             if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize())) {
+                 map.put("flag",true);
+                 map.put("percentComplete",percentComplete);
+             }else{
+                 map.put("flag",false);
+                 map.put("percentComplete",percentComplete);
+             }
         }
         return map;
     }
