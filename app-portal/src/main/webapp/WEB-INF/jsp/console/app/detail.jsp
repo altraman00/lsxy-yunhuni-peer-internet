@@ -64,7 +64,7 @@
                             </section>
                             <section class="panel panel-default pos-rlt clearfix appliaction-detail">
                                 <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
+                                    <div class="col-md-1 remove-padding width-">
                                         应用名称：
                                     </div>
                                     <div class="col-md-10 ">
@@ -96,7 +96,7 @@
                                     </div>
                                 </div>
                                 <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
+                                    <div class="col-md-1 remove-padding width-140">
                                         服务器白名单：
                                     </div>
                                     <div class="col-md-10 ">
@@ -190,8 +190,8 @@
                                                 <th width="20%">标题</th>
                                                 <th width="10%">状态</th>
                                                 <th width="10%">大小</th>
-                                                <th width="45%">备注</th>
-                                                <th width="10%">操作</th>
+                                                <th width="35%">备注</th>
+                                                <th width="20%">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -570,10 +570,11 @@
     /**
      * 删除操作
      */
-    function delplay(id){
+    function delplay(idType){
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
+                var id = new String(idType.id).replace("delete-","");
                 $.ajax({
                     url : "${ctx}/console/app/file/delete",
                     type : 'post',
@@ -583,6 +584,7 @@
                     success : function(data){
                         if(data.flag){
                             showtoast("删除成功");
+                            fileTotalSoze();
                             $('#play-'+id).remove();
                         }else{
                             showtoast("删除失败");
@@ -642,8 +644,26 @@
         var page = new Page(count,listRow,showPageCount,pageId,playTable);
         page.show();
     }
-
-
+    var fileTotalSoze = function(){
+        $.ajax({
+            url : "${ctx}/console/app/file/total",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData) {
+                $('#voiceFilePlay').html("共计" + resultFileSize(resultData.fileTotalSize) + ",已占用" + resultFileSize(resultData.fileRemainSize)+ "");
+            }
+        });
+    }
+    var resultFileSize = function(temp){
+        if(temp>1024){
+            temp = (temp/1024/1024).toFixed(2)+"M";
+        }else{
+            temp = temp+"b";
+        }
+        return temp;
+    }
     /**
      * 分页回调方法
      * @param nowPage 当前页数
@@ -659,12 +679,10 @@
             data : {'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
             dataType: "json",
             success : function(resultData){
-                $('#voiceFilePlay').html("共计"+resultData.fileTotalSize+"M,已占用"+resultData.fileRemainSize+"M");
                 var data =[];
                 for(var j=0;j<resultData.list.result.length;j++){
                     var tempFile = resultData.list.result[j];
-                    var tempFileSize = tempFile.size/1000/1000;
-                    var temp = [tempFile.id,tempFile.name,tempFile.status,tempFileSize+"M",tempFile.remark];
+                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark];
                     data[j]=temp;
                 }
                 var html ='';
@@ -680,7 +698,7 @@
                     }
                     html+='<td>'+data[i][3]+'</td>';
                     html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-                    html+='<td class="operation"> <a onclick="delplay('+data[i][0]+')" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                    html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
                 }
                 $('#playtable').find(".playtr").remove();
                 $('#playtable').append(html);
@@ -739,17 +757,21 @@
                 if(resultData.flag){
                     clearTimeout(timer);
                     showtoast('上传成功');
+                    fileTotalSoze();
+                    upplay();
                     var id = $('.modalSureFour').attr('data-id');
                     hideModal(id);
                     //清除内容
                     $('#resetForm').click();
                     $('#uploadLength').attr("style","width:"+0+"%");
+                }else{
+                    startUpload();
                 }
 
             }
         });
     }
-
+    fileTotalSoze();
 </script>
 
 </body>

@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -34,6 +35,8 @@ public class VoiceFilePlayController extends AbstractRestController {
     AppService appService;
     @Autowired
     private BillingService billingService;
+    @Autowired
+    private OSSService ossService;
     /**
      * 根据放音文件id删除放音文件
      * @param id
@@ -44,7 +47,7 @@ public class VoiceFilePlayController extends AbstractRestController {
         String repository=SystemConfig.getProperty("global.oss.aliyun.bucket");
         VoiceFilePlay voiceFilePlay =  voiceFilePlayService.findById(id);
         try {
-           // ossService.deleteObject(repository, voiceFilePlay.getFileKey());
+            ossService.deleteObject(repository, voiceFilePlay.getFileKey());
             //删除OSS文件成功，删除数据库记录
             voiceFilePlayService.delete(voiceFilePlay);
             //删除记录成功,更新剩余存储容量大小

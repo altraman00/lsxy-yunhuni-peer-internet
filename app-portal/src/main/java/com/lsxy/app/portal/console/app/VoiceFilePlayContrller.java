@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -35,6 +34,21 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     private  String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
     @Autowired
     private OSSService ossService;
+
+    /**
+     * 查询文件容量
+     * @param request
+     * @return
+     */
+    @RequestMapping("/total")
+    @ResponseBody
+    public Map fileTotalSize(HttpServletRequest request){
+        Map map = new HashMap();
+        Billing billing = (Billing)getBilling(request).getData();
+        map.put("fileRemainSize",billing.getFileTotalSize()-billing.getFileRemainSize());
+        map.put("fileTotalSize",billing.getFileTotalSize());
+        return map;
+    }
     /**
      * 获取分页数据
      * @param request
@@ -47,9 +61,6 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     @ResponseBody
     public Map VoiceFilePlay(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize, String appId,String name){
         Map map = new HashMap();
-        Billing billing = (Billing)getBilling(request).getData();
-        map.put("fileRemainSize",new DecimalFormat("#.00").format(billing.getFileRemainSize()/1000/1000));
-        map.put("fileTotalSize",new DecimalFormat("#.00").format(billing.getFileTotalSize()/1000/1000));
         map.put("list",pageListVoiceFilePlay(request,pageNo,pageSize,appId,name).getData());
         return map;
     }
@@ -93,7 +104,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     private RestResponse deleteVoiceFilePlay(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/delete?id={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri, Billing.class,id);
+        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,id);
     }
     /**
      * 查询放音文件
@@ -128,6 +139,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ){
         String tenantId = getCurrentAccount(request).getTenant().getId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
+
         List list = new ArrayList();
         try {
             if (null != multipartfiles && multipartfiles.length > 0) {
@@ -149,6 +161,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                             logger.info("上传成功，保存失败",name);
                             temp.put("flag",false);
                             temp.put("msg",name+"上传成功，保存失败");
+                            ossService.deleteObject(repository, fileKey);
                         }
                     }else{
                         logger.info("上创失败",name);
@@ -160,6 +173,9 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
             }
         }catch (Exception e){
         }
+        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("upload_ps");
+        fuploadStatus.setFlag(true);//流程结束
+        request.getSession().setAttribute("upload_ps",fuploadStatus);
     }
     /**
      * 删除放音文件rest
@@ -193,8 +209,13 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         //计算上传完成的百分比
         long percentComplete = (long) Math.floor(((double) fuploadStatus.getReadTotalSize() / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
         if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize()) || (fuploadStatus.getCancel() == true)) {
-            map.put("flag",true);
-            map.put("percentComplete",percentComplete);
+            if(fuploadStatus.isFlag()) {
+                map.put("flag",true );
+                map.put("percentComplete", percentComplete);
+            }else{
+                map.put("flag",false );
+                map.put("percentComplete", 90);
+            }
         } else {
             map.put("flag",false);
             map.put("percentComplete",percentComplete);
