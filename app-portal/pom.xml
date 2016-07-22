@@ -78,7 +78,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-mail</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-oss</artifactId>
+        </dependency>
 
 
     </dependencies>

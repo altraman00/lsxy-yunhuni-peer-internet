@@ -103,5 +103,16 @@ public class OSSServiceImpl implements OSSService{
         return keysLst;
     }
 
+    @Override
+    public void deleteObject(String repository, String path) throws UnsupportedOperationException {
+        try {
+            // 初始化 OSSClient
+            OSSClient client = afb.getObject();
+            client.deleteObject(repository,path);
+        }catch (Exception ex){
+            throw new UnsupportedOperationException();
+        }
+    }
+
 
 }

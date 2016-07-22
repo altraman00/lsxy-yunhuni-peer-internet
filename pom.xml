@@ -112,6 +112,13 @@
                 <artifactId>service-yunhuni</artifactId>
                 <version>1.0.2-SNAPSHOT</version>
             </dependency>
+
+
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-oss</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
