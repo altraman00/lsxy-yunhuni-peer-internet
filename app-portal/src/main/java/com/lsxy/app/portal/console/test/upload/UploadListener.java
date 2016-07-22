@@ -1,6 +1,8 @@
 package com.lsxy.app.portal.console.test.upload;
 
 import org.apache.commons.fileupload.ProgressListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
 
@@ -9,7 +11,7 @@ import javax.servlet.http.HttpSession;
  * Created by zhangxb on 2016/6/20.
  */
 public class UploadListener implements ProgressListener {
-
+    private static final Logger logger = LoggerFactory.getLogger(UploadListener.class);
     private HttpSession session;
     public UploadListener() {
     }
@@ -34,7 +36,7 @@ public class UploadListener implements ProgressListener {
             fuploadStatus.setCurrentUploadFileNum(pItems);
             fuploadStatus.setProcessRunningTime(System.currentTimeMillis());
         }
-        //System.out.println("已经读取：" + pBytesRead);
+        logger.info("已经读取：" + fuploadStatus.getStatus());
         session.setAttribute("upload_ps", fuploadStatus);
     }
 }

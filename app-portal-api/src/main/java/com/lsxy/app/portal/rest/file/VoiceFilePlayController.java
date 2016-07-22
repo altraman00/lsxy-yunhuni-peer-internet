@@ -53,6 +53,7 @@ public class VoiceFilePlayController extends AbstractRestController {
             //删除记录成功,更新剩余存储容量大小
             Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
             billing.setFileRemainSize(billing.getFileRemainSize()+voiceFilePlay.getSize());
+            billingService.save(billing);
         }catch(Exception e){
             logger.error("删除OSS文件：{1}失败，异常{2}",voiceFilePlay.getFileKey(),e);
             return RestResponse.failed("0000","OSS删除失败");
