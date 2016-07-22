@@ -336,7 +336,7 @@
     <div class="title">文件上传<a class="close_a modalCancel" data-id="four"></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
-        <form:form action="${ctx}/console/app/file/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();">
+        <form:form action="${ctx}/console/app/file/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();" target="hidden_frame">
             <div class="input-box ">
                 <div class="row  mt-10">
                     <input type="hidden" name="appId" value="${app.id}">
@@ -355,6 +355,8 @@
                     <p>允许一次选择20个文件，并且建议在网络环境好的情况下使用，以防止上传错误文件</p>
                 </div>
             </div>
+            <iframe name='hidden_frame' id="hidden_frame" style='display:none'></iframe>
+            <input type="reset" id="resetForm" hidden/>
         </form:form>
     </div>
     <div class="footer">
@@ -374,6 +376,7 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 
 <script>
+
     /**
      *绑定测试电话号码
      */
@@ -470,6 +473,7 @@
      * 文件上传地址
      */
     $('.modalSureFour').click(function(){
+        $('#uploadLength').show();
         $('#uploadMianForm').submit();
         //var id = $(this).attr('data-id');
         //hideModal(id)
@@ -491,10 +495,10 @@
 
 
     /**
-     *
+     *生成修改备注文件
      *
      * */
-    function editremark(id,type){
+    function editremark(thisT,type){
         $('#editmark-tips').html('');
         bootbox.setLocale("zh_CN");
         bootbox.dialog({
@@ -519,6 +523,7 @@
                                 if(!remark){
                                     $('#editmark-tips').html('请填写备注内容'); return false;
                                 }
+                                var id = new String(thisT.id).replace('remark-b-','');
                                 //异步请求修改数据
                                 $.ajax({
                                     url : "${ctx}/console/app/file/modify",
@@ -624,8 +629,7 @@
             data : {'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
             dataType: "json",
             success : function(resultData){
-                alert(JSON.stringify(resultData));
-                count=resultData.list.length;
+                count=resultData.list.totalCount;
             }
         });
         //每页显示数量
@@ -655,13 +659,13 @@
             data : {'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
             dataType: "json",
             success : function(resultData){
-                $('#voiceFilePlay').html("共计"+resultData.fileRemainSize+"M,已占用"+resultData.fileTotalSize+"M");
+                $('#voiceFilePlay').html("共计"+resultData.fileTotalSize+"M,已占用"+resultData.fileRemainSize+"M");
                 var data =[];
-                for(var i;i<resultData.list.length;i++){
-                    var tempFile = resultData.list[i];
+                for(var j=0;j<resultData.list.result.length;j++){
+                    var tempFile = resultData.list.result[j];
                     var tempFileSize = tempFile.size/1000/1000;
-                    var temp = [tempFile.id,tempFile.name,tempFile.status,tempFile,tempFileSize+"M",tempFile.remark];
-                    data[i]=temp;
+                    var temp = [tempFile.id,tempFile.name,tempFile.status,tempFileSize+"M",tempFile.remark];
+                    data[j]=temp;
                 }
                 var html ='';
                 //数据列表
@@ -676,7 +680,7 @@
                     }
                     html+='<td>'+data[i][3]+'</td>';
                     html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-                    html+='<td class="operation"> <a onclick="delplay('+data[i][0]+')" >删除</a> <span ></span> <a onclick="editremark('+data[i][0]+')" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                    html+='<td class="operation"> <a onclick="delplay('+data[i][0]+')" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
                 }
                 $('#playtable').find(".playtr").remove();
                 $('#playtable').append(html);
@@ -723,13 +727,27 @@
         timer = window.setTimeout(startListener,1000);
         return true;
     }
-    var timeAllTemp = 0;
     function startListener(){
-        $('#uploadLength').attr("style","width:"+timeAllTemp+"%");
-        if(timeAllTemp==100){
-            clearTimeout(timer);
-        }
-        timeAllTemp+=10;
+        $.ajax({
+            url : "${ctx}/console/app/file/status",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                $('#uploadLength').attr("style","width:"+resultData.percentComplete+"%");
+                if(resultData.flag){
+                    clearTimeout(timer);
+                    showtoast('上传成功');
+                    var id = $('.modalSureFour').attr('data-id');
+                    hideModal(id);
+                    //清除内容
+                    $('#resetForm').click();
+                    $('#uploadLength').attr("style","width:"+0+"%");
+                }
+
+            }
+        });
     }
 
 </script>

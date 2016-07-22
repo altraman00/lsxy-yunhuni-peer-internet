@@ -65,14 +65,16 @@ public class VoiceFilePlayController extends AbstractRestController {
     @RequestMapping("/create")
     public RestResponse createRemark(VoiceFilePlay voiceFilePlay,String appId){
         //将对象保存数据库
-        voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
         App app = appService.findById(appId);
+        voiceFilePlay.setRemark("");
         voiceFilePlay.setApp(app);
         Account account = getCurrentAccount();
         voiceFilePlay.setTenant(account.getTenant());
+        voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
         //更新账户表
         Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
         billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
+        billingService.save(billing);
         return RestResponse.success(voiceFilePlay);
     }
     /**

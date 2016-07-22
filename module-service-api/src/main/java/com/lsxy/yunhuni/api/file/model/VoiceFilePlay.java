@@ -28,7 +28,7 @@ public class VoiceFilePlay extends IdEntity {
     private String checker;//审核人
     private Date checkTime;//审核时间
     @ManyToOne
-    @JoinColumn(name="tenant_id")
+    @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
     }
@@ -37,7 +37,7 @@ public class VoiceFilePlay extends IdEntity {
         this.tenant = tenant;
     }
     @ManyToOne
-    @JoinColumn(name="app_id")
+    @JoinColumn(name = "app_id")
     public App getApp() {
         return app;
     }

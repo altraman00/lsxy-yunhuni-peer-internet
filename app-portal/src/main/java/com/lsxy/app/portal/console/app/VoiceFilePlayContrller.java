@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -69,8 +68,8 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     private RestResponse modifyVoiceFilePlay(HttpServletRequest request,String id,String remark){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/modify?id={1}&remard={2}";
-        return RestRequest.buildSecurityRequest(token).get(uri, Billing.class,id,remark);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/modify?id={1}&remark={2}";
+        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,id,remark);
     }
     /**
      * 删除放音文件
@@ -144,13 +143,17 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                         RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
                         if(restResponse.isSuccess()){
                             logger.info("文件上传成功",name);
-                            temp.put("status","上传成功");
+                            temp.put("flag",true);
+                            temp.put("msg",name+"上传成功");
                         }else{
-                            temp.put("status","上传成功，保存失败");
-                            //TODO 删除文件
+                            logger.info("上传成功，保存失败",name);
+                            temp.put("flag",false);
+                            temp.put("msg",name+"上传成功，保存失败");
                         }
                     }else{
-                        temp.put("status","上创失败");
+                        logger.info("上创失败",name);
+                        temp.put("flag",false);
+                        temp.put("msg",name+"上创失败");
                     }
                     list.add(temp);
                 }
@@ -181,27 +184,21 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     /**
      * 查看文件上传进度
      * @param request
-     * @param response
      */
     @RequestMapping("/status"  )
-    public void  status(HttpServletRequest request, HttpServletResponse response){
+    @ResponseBody
+    public Map  status(HttpServletRequest request ){
         UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("upload_ps");
-
-        try {
-            //计算上传完成的百分比
-            long percentComplete = (long) Math.floor(((double) fuploadStatus.getReadTotalSize() / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
-            System.out.println("com:" + percentComplete);
-            response.setContentType("text/xml");
-            response.setCharacterEncoding("UTF-8");
-            response.setHeader("Cache-Control", "no-cache");
-            if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize()) || (fuploadStatus.getCancel() == true)) {
-                response.getWriter().write(fuploadStatus.getStatus().toString() + "success");
-            } else {
-                response.getWriter().write(fuploadStatus.getStatus().toString() + "<div class=\"prog-border\"><div class=\"prog-bar\" style=\"width: "
-                        + percentComplete + "%;\"></div></div>");
-            }
-        }catch (Exception e){
-            e.printStackTrace();
+        Map map = new HashMap();
+        //计算上传完成的百分比
+        long percentComplete = (long) Math.floor(((double) fuploadStatus.getReadTotalSize() / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
+        if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize()) || (fuploadStatus.getCancel() == true)) {
+            map.put("flag",true);
+            map.put("percentComplete",percentComplete);
+        } else {
+            map.put("flag",false);
+            map.put("percentComplete",percentComplete);
         }
+        return map;
     }
 }
