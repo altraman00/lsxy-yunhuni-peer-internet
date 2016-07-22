@@ -333,7 +333,7 @@
 
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
-    <div class="title">文件上传<a class="close_a modalCancel" data-id="four"></a></div>
+    <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four"></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
         <form:form action="${ctx}/console/app/file/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();" target="hidden_frame">
@@ -360,7 +360,7 @@
         </form:form>
     </div>
     <div class="footer">
-        <a class="cancel modalCancel" data-id="four">返回</a>
+        <a class="cancel modalCancel-app-up" data-id="four">返回</a>
         <a class="sure modalSureFour" data-id="four">确认</a>
     </div>
 </div>
@@ -376,7 +376,14 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 
 <script>
-
+    $('.modalCancel-app-up').click(function(){
+        clearTimeout(timer);
+        $('#resetForm').click();
+        $('#uploadLength').attr("style","width:"+0+"%");
+        var id = $(this).attr('data-id');
+        $('#modal'+id).fadeOut();
+        $('#show-bg').fadeOut();
+    });
     /**
      *绑定测试电话号码
      */
