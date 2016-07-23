@@ -2,10 +2,7 @@ package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.app.portal.console.statistics.ConsumeStatisticsVo;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
-import com.lsxy.framework.api.consume.model.BillDay;
-import com.lsxy.framework.api.consume.model.BillMonth;
 import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
@@ -19,10 +16,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import scala.annotation.target.param;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -38,6 +33,13 @@ import java.util.Map;
 public class InvoiceApplyController extends AbstractPortalController {
 
 
+    /**
+     * 发票申请首页
+     * @param request
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value = "/page",method = RequestMethod.GET)
     public ModelAndView page(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "5") Integer pageSize){
         Map<String,Object> model = new HashMap<>();
@@ -62,16 +64,35 @@ public class InvoiceApplyController extends AbstractPortalController {
         return new ModelAndView("console/cost/invoice/invoice_record",model);
     }
 
+    /**
+     * 获取用户发票申请的开始时间rest调用
+     * @param token
+     * @return
+     */
     private Map getStartInfo(String token){
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/start_info";
         return RestRequest.buildSecurityRequest(token).get(url, Map.class).getData();
     }
 
+    /**
+     * 获取历史发票申请记录分页信息rest调用
+     * @param token
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
     private Page<InvoiceApply> getPage(String token, Integer pageNo, Integer pageSize){
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/page?pageNo={1}&pageSize={2}";
         return RestRequest.buildSecurityRequest(token).getPage(url, InvoiceApply.class,pageNo,pageSize).getData();
     }
 
+    /**
+     * 获取所选时间段能开的发票信息
+     * @param request
+     * @param start
+     * @param end
+     * @return
+     */
     @RequestMapping(value = "/apply_info",method = RequestMethod.GET)
     @ResponseBody
     public Map applyInfo(HttpServletRequest request,String start,String end){
@@ -97,11 +118,26 @@ public class InvoiceApplyController extends AbstractPortalController {
         return result;
     }
 
+    /**
+     * 获取某时段的发票申请的金额rest调用
+     * @param token
+     * @param start
+     * @param end
+     * @return
+     */
     private RestResponse<BigDecimal> applyAmount(String token,String start,String end){
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/apply_amount?start={1}&end={2}";
         return RestRequest.buildSecurityRequest(token).get(url, BigDecimal.class,start,end);
     }
 
+    /**
+     * 到填写发票申请页
+     * @param request
+     * @param start
+     * @param end
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/to_apply",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView toApply(HttpServletRequest request,String start,String end) throws Exception {
@@ -130,7 +166,7 @@ public class InvoiceApplyController extends AbstractPortalController {
     }
 
     /**
-     * 获取用户发票信息
+     * 获取用户发票信息rest调用
      * @return
      */
     private InvoiceInfo getInvoiceInfo(String token){
@@ -139,6 +175,11 @@ public class InvoiceApplyController extends AbstractPortalController {
         return response.getData();
     }
 
+    /**
+     * 保存发票申请
+     * @param request
+     * @return
+     */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView save(HttpServletRequest request){
@@ -148,11 +189,23 @@ public class InvoiceApplyController extends AbstractPortalController {
         return new ModelAndView("redirect:/console/cost/invoice_apply/page");
     }
 
+    /**
+     * 保存rest调用
+     * @param token
+     * @param map
+     * @return
+     */
     private RestResponse save(String token,Map map){
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/save";
         return RestRequest.buildSecurityRequest(token).post(url, map,InvoiceApply.class);
     }
 
+    /**
+     * 异常的发票申请从这个方法进发票修改页
+     * @param request
+     * @param id
+     * @return
+     */
     @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView edit(HttpServletRequest request,@PathVariable String id){
@@ -169,11 +222,23 @@ public class InvoiceApplyController extends AbstractPortalController {
         return new ModelAndView("console/cost/invoice/invoice_apply_edit",model);
     }
 
+    /**
+     * 获取某个申请的详情rest调用
+     * @param token
+     * @param id
+     * @return
+     */
     private InvoiceApply getApply(String token,String id){
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/get/{1}";
         return RestRequest.buildSecurityRequest(token).get(url,InvoiceApply.class,id).getData();
     }
 
+    /**
+     * 发票申请详情
+     * @param request
+     * @param id
+     * @return
+     */
     @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
     public ModelAndView getDetail(HttpServletRequest request,@PathVariable String id){
         Map model = new HashMap();
@@ -184,6 +249,13 @@ public class InvoiceApplyController extends AbstractPortalController {
     }
 
 
+    /**
+     * 日消费统计数获取
+     * @param request
+     * @param start
+     * @param end
+     * @return
+     */
     @RequestMapping(value = "/count_day_consume" ,method = RequestMethod.GET)
     @ResponseBody
     public Map countDayConsume(HttpServletRequest request,String start,String end){
@@ -195,11 +267,23 @@ public class InvoiceApplyController extends AbstractPortalController {
         return result;
     }
 
+    /**
+     * 日消费统计数获取rest调用
+     * @return
+     */
     private Long countDayConsumeRest(String token,String start,String end) {
         String url = PortalConstants.REST_PREFIX_URL + "/rest/consume_day/count_by_time?startTime={1}&endTime={2}";
         return RestRequest.buildSecurityRequest(token).get(url,Long.class,start,end).getData();
     }
 
+    /**
+     * 日消费统计Ajax分页列表
+     * @param start
+     * @param end
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value = "/list_day_consume",method = RequestMethod.GET)
     @ResponseBody
     public Map listDayConsume(HttpServletRequest request,String start,String end,Integer pageNo,Integer pageSize){
@@ -211,6 +295,11 @@ public class InvoiceApplyController extends AbstractPortalController {
         return model;
     }
 
+    /**
+     * 日消费统计Ajax分页列表rest调用
+     * @param token
+     * @return
+     */
     private List listDayConsumeRest(String token, String start, String end,Integer pageNo,Integer pageSize) {
         String url = PortalConstants.REST_PREFIX_URL + "/rest/consume_day/list_by_time?startTime={1}&endTime={2}&pageNo={3}&pageSize={4}";
         return RestRequest.buildSecurityRequest(token).getList(url,ConsumeDay.class,start,end,pageNo,pageSize).getData();

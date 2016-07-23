@@ -22,6 +22,12 @@ public class BillDayController extends AbstractRestController {
     @Autowired
     BillDayService gillDayService;
 
+    /**
+     * 获取某一日的日结账单
+     * @param appId
+     * @param day
+     * @return
+     */
     @RequestMapping("/get")
     public RestResponse get(String appId, String day){
         if(StringUtils.isBlank(day)){

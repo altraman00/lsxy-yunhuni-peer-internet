@@ -25,6 +25,13 @@ import java.util.Map;
 @RequestMapping("/console/cost/bill_day")
 public class BillDayController extends AbstractPortalController {
 
+    /**
+     * Ajax获取日结账单
+     * @param request
+     * @param appId
+     * @param day
+     * @return
+     */
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ResponseBody
     public Map list(HttpServletRequest request, String appId, String day){
@@ -41,7 +48,7 @@ public class BillDayController extends AbstractPortalController {
     }
 
     /**
-     * 获取月结账单RestApi调用
+     * 获取日结账单RestApi调用
      * @param token
      * @param appId 应用ID
      * @param day 查询时间（日期）

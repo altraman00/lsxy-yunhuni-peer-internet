@@ -3,12 +3,10 @@ package com.lsxy.app.portal.rest.cost;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.consume.service.ConsumeMonthService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
-import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +35,10 @@ public class InvoiceApplyController extends AbstractRestController {
     @Autowired
     InvoiceInfoService invoiceInfoService;
 
+    /**
+     * 获取用户发票申请所能开始的时间，以及所能开发票的总金额
+     * @return
+     */
     @RequestMapping("/start_info")
     public RestResponse getStart(){
         Map<String,Object> result = new HashMap<>();
@@ -59,6 +60,12 @@ public class InvoiceApplyController extends AbstractRestController {
         return RestResponse.success(result);
     }
 
+    /**
+     * 发票申请分页获取
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
     @RequestMapping("/page")
     public RestResponse page(Integer pageNo,Integer pageSize){
         Tenant tenant = tenantService.findTenantByUserName(this.getCurrentAccountUserName());
@@ -66,6 +73,12 @@ public class InvoiceApplyController extends AbstractRestController {
         return RestResponse.success(page);
     }
 
+    /**
+     * 某一时段的发票金额
+     * @param start
+     * @param end
+     * @return
+     */
     @RequestMapping("/apply_amount")
     public RestResponse applyAmount(String start,String end){
         Tenant tenant = tenantService.findTenantByUserName(this.getCurrentAccountUserName());
@@ -73,6 +86,11 @@ public class InvoiceApplyController extends AbstractRestController {
         return RestResponse.success(bigDecimal);
     }
 
+    /**
+     * 保存发票申请信息
+     * @param apply
+     * @return
+     */
     @RequestMapping("/save")
     public RestResponse save(InvoiceApply apply){
         String userName = this.getCurrentAccountUserName();
@@ -81,11 +99,17 @@ public class InvoiceApplyController extends AbstractRestController {
         if(StringUtils.isBlank(apply.getId())){
             result = invoiceApplyService.create(apply,userName);
         }else{
+            //修改
             result = invoiceApplyService.update(apply, userName);
         }
         return RestResponse.success(result);
     }
 
+    /**
+     * 根据ID获取申请信息
+     * @param id
+     * @return
+     */
     @RequestMapping("/get/{id}")
     public RestResponse get(@PathVariable String id){
         InvoiceApply a = invoiceApplyService.findById(id);
