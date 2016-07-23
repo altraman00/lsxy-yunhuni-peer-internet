@@ -59,8 +59,8 @@ public class OnsMQTest extends SpringBootTestCase{
     @Autowired
     private MQService mqService;
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+//    @Autowired
+//    private JmsTemplate jmsTemplate;
 
 //    @Autowired
 //    private Receiver receiver;

@@ -119,4 +119,10 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 	public void afterPropertiesSet() throws Exception {
 		this.init();
 	}
+
+	public static void main(String[] args) {
+		OnsConsumer consumer = new OnsConsumer();
+		consumer.init();
+		consumer.start();
+	}
 }
