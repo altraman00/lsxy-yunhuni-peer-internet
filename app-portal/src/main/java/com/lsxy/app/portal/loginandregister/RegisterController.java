@@ -9,6 +9,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -44,7 +45,7 @@ public class RegisterController {
      */
     @RequestMapping(value = "/info_check" , method = RequestMethod.POST)
     @ResponseBody
-    public Map infoCheck(@Nonnull String userName, @Nonnull String mobile,@Nonnull String email){
+    public Map infoCheck(String userName,  String mobile, String email){
         Map<String,Object> result = new HashMap<>();
         result.put("flag",true);
         try {
@@ -63,7 +64,7 @@ public class RegisterController {
      */
     @RequestMapping(value = "/register",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
-    public ModelAndView register(HttpServletRequest request,@Nonnull String userName, @Nonnull String mobile,@Nonnull String email){
+    public ModelAndView register(HttpServletRequest request, String userName, String mobile,String email){
         Map<String,String> model = new HashMap<>();
         String erInfo = "erInfo";
         String erPage = "register/fail";
@@ -103,7 +104,7 @@ public class RegisterController {
      */
     @RequestMapping(value = "/mail_active",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
-    public ModelAndView mailActive(@Nonnull String uid,@Nonnull String code){
+    public ModelAndView mailActive(String uid,String code){
         Map<String,String> model = new HashMap<>();
         String returnView;
         //检查邮件是否有效

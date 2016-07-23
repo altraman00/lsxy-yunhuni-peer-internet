@@ -51,6 +51,7 @@ public class BillDayServiceImpl extends AbstractService<BillDay> implements Bill
                 billDays = (List<BillDay>) query.getResultList();
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }else{
             billDays = billDayDao.findByTenantIdAndAppIdAndDt(tenant.getId(), appId, dt);

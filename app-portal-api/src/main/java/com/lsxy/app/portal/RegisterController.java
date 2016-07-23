@@ -7,8 +7,6 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.mail.MailConfigNotEnabledException;
-import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 

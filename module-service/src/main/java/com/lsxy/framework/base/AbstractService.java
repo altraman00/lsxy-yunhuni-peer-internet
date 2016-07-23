@@ -226,7 +226,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
     }
 
     /**
-     * 获取分页里面的数据 注：传进来的页数要先减去1
+     * 获取分页里面的数据 注：传进来的 pageNo 要先减去 1
      * @return
      */
     public List getPageList(String jpql, boolean excludeDeleted,int pageNo, int pageSize, Object... params) {

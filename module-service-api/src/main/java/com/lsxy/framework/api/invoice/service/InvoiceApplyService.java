@@ -18,8 +18,8 @@ public interface InvoiceApplyService extends BaseService<InvoiceApply> {
     /**
      * 获取发票申请记录
      * @param tenantId
-     * @param pageNo
-     * @param pageSize
+     * @param pageNo 当前页
+     * @param pageSize 每一页的数量
      * @return
      */
     Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize);
