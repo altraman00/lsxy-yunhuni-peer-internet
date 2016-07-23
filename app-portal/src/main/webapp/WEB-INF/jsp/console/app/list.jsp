@@ -81,14 +81,14 @@
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.name}</td>
                                             <td>${result.id}</td>
-                                            <c:if test="${result.status==1}"><td class="success"  id="statusapp-${s.index+1}">已上线</td></c:if>
-                                            <c:if test="${result.status==2}"><td  class="nosuccess" id="statusapp-${s.index+1}">未上线</td></c:if>
+                                            <c:if test="${result.status==1}"><td ><span class="success"  id="statusapp-${result.id}">已上线</span></td></c:if>
+                                            <c:if test="${result.status==2}"><td ><span class="nosuccess" id="statusapp-${result.id}">未上线</span></td></c:if>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
-                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}')" >申请上线</a></c:if>
-                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="lineapp('${result.id}')">下线</a></span></c:if>
+                                                <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.isIvrService==1?1:0}')" >申请上线</a></c:if>
+                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}')">下线</a></span></c:if>
                                             </td>
 
                                         </tr>
@@ -110,19 +110,21 @@
 
 
 
+<input type="hidden" value="" id="modal-appid" />
+
 <!---mobilebox-->
-<div class="shadow-bg" id="show-bg"  style="display: none"></div>
-<div id="mobilebox" class="appliation-modal-box" style="display: none;">
+<div class="shadow-bg" id="show-bg" ></div>
+<div id="mobilebox-1" class="appliation-modal-box" style="display: none;">
     <div class="addmobile1" >
-        <div class="title">应用上线流程<a class="close_a modalCancel"></a></div>
+        <div class="title">应用上线流程<a class="close_a modalCancel" data-type="1"></a></div>
         <div class="content" >
             <!--nav-->
             <div class="nav-modal-box">
                 <ul class="nav-modal">
-                    <li><span class="spot s-active"></span><span class="lines"></span> </li>
-                    <li><span class="spot"></span><span class="lines"></span>  </li>
-                    <li><span class="spot"></span><span class="lines"></span>  </li>
-                    <li><span class="spot"></span> </li>
+                    <li><a class="spot" data-action="1"></a><span class="lines"></span> </li>
+                    <li><a class="spot" data-action="2"></a><span class="lines"></span></li>
+                    <li><a class="spot" data-action="3"></a><span class="lines"></span></li>
+                    <li><a class="spot" data-action="4"></a> </li>
                 </ul>
                 <ul class="nav-modal-text">
                     <li><span class="text">实名认证</span> </li>
@@ -132,59 +134,76 @@
                 </ul>
             </div>
 
-            <div class="contentModal" style="display: ">
+            <div class="contentModal" data-action="1">
                 <!--未认证显示-->
-                <div class="input text-center" style="display: none">
-                    <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
-                    <p>您还没有经过实名认证，请进行实名认证！</p>
-                </div>
-                <div class="input text-center" style="display: none">
-                    <a href="" type="button"  class="btn btn-primary btn-box">实名认证</a>
+                <div class="not-real-auth" style="display: none">
+                    <div class="input text-center " >
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您还没有经过实名认证，请进行实名认证！</p>
+                    </div>
+                    <div class="input text-center" >
+                        <a href="${ctx}/console/account/auth/index" type="button"  class="btn btn-primary btn-box">实名认证</a>
+                    </div>
                 </div>
                 <!---end--->
                 <!--认证显示-->
-                <div class="input text-center">
-                    <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
-                    <p>您已成功进行实名认证，点击进入下一步!</p>
-                </div>
-                <div class="input text-center" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="1">下一步</a>
+                <div class="real-auth">
+                    <div class="input text-center" >
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您已成功进行实名认证，点击进入下一步!</p>
+                    </div>
+                    <div class="input text-center" >
+                        <a type="button"  class="btn btn-primary btn-box tabModalBtn"  data-id="2" data-fun="creatIVR()">下一步</a>
+                    </div>
                 </div>
                 <!---end--->
             </div>
 
-            <div class="contentModal" style="display: none">
-                <div class="input text-center">
-                    <p>您选择开通IVR功能，我们给您分配了一个IVR号码供应用使用IVR功能</p>
-                </div>
-                <div class="input text-center">
-                    <div class="defulatTips" id="creatIVR" >
-                        0898-77887748858
+            <div class="contentModal" style="display: none" data-action="2">
+                <div id="selectNewIvr" style="display: none">
+                    <div class="input text-center">
+                        <p>您选择开通IVR功能，我们给您分配了一个IVR号码供应用使用IVR功能</p>
                     </div>
-                    <a onclick="nolike()" class="font14">不喜欢 换一个?</a>
+                    <div class="input text-center">
+                        <div class="defulatTips" id="creatIVR" ></div>
+                        <a onclick="nolike()" class="font14">不喜欢 换一个?</a>
+                    </div>
+                    <div class="hideIVR">
+                    </div>
                 </div>
-                <div class="hideIVR">
+                <div id="selectOwnIvr" >
+                    <div class="input text-center">
+                        <p>您选择开通IVR功能，请从您拥有的IVR号在选择一个供使用</p>
+                    </div>
+                    <div class="input text-center">
+                        <select id="ownIvr" >
+                        </select>
+                    </div>
                 </div>
                 <div class="input text-center" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="2">下一步</a>
+                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3" data-fun="getOrder()" >下一步</a>
                 </div>
             </div>
 
-            <div class="contentModal" style="display: none">
-                <div class="input text-center">
-                    <p>您需要支付：<span class="money">998.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：0.00 元 &nbsp;&nbsp;&nbsp; <span class="nomoney">!!余额不足</span>&nbsp;&nbsp;&nbsp;<a href="cost_recharge_sure.html">充值</a> </p>
+            <div class="contentModal" style="display: none" data-action="3">
+                <div class="input text-center mt-0">
+                    <p>您需要支付：<span class="money" id="payAmount">1100.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：<span id="balance">1100.00</span> 元 &nbsp;&nbsp;&nbsp; <span class="nomoney" style="display: none">!!余额不足</span>&nbsp;&nbsp;&nbsp;<a href="${ctx}/console/cost/recharge" target="_blank">充值</a> </p>
                 </div>
                 <div class="input text-center mb-0 mt-0">
-                    <div class="defulatTips">IVR号码租用费：1000元</div>
-                    <div class="defulatTips">IVR功能使用费：100元/月</div>
+                    <div class="defulatTips">IVR号码：<span id="selectIvr"></span></div>
+                    <div id="payMoneyInfo" style="display: none">
+                        <div class="defulatTips">IVR号码租用费：1000元</div>
+                        <div class="defulatTips">IVR功能使用费：100元/月</div>
+                    </div>
                 </div>
                 <div class="ivrserver"><input type="checkbox" name="readcheckbox" id="readbook" />已阅读<a target="_blank" href="ivragreement.html" >IVR服务协议</a></div>
                 <div class="input text-center mt-0" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3">确认支付</a>
+                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="4" data-fun="pay()" id="payButton">确认支付</a>
+                    <a type="button"  class="btn btn-primary btn-box" onclick="resetIVR()">重新选择</a>
                 </div>
             </div>
 
-            <div class="contentModal" style="display:none ">
+            <div class="contentModal" style="display:none " data-action="4">
                 <div class="input text-center" >
                     <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
                     <p>上线成功</p>
@@ -200,30 +219,67 @@
         </div>
     </div>
 
+</div>
 
-    <div class="addmobile2" style="display: none">
-        <div class="title">重新绑定手机号<a class="close_a modalCancel"></a></div>
-        <div class="content">
-            <div class="margintop30"></div>
-            <div class="input ">
-                <input class=" form-control modalMobile" type="text" name="" placeholder="输入手机号码" maxlength="11" />
+
+<div id="mobilebox-0" class="appliation-modal-box" style="display: none" >
+    <div class="addmobile1" >
+        <div class="title">应用上线流程<a class="close_a modalCancel" data-type="0"></a></div>
+        <div class="content" >
+            <!--nav-->
+            <div class="nav-modal-box">
+                <ul class="nav-modal navw-150">
+                    <li><a class="spot" data-action="1"></a><span class="lines"></span> </li>
+                    <li><a class="spot" data-action="2"></a></li>
+                </ul>
+                <ul class="nav-modal-text navw-150">
+                    <li><span class="text">实名认证</span> </li>
+                    <li class=" mr-0"><span class="text">上线</span>  </li>
+                </ul>
+            </div>
+
+            <div class="contentModal" data-action="1">
+                <!--未认证显示-->
+                <div class="not-real-auth" style="display: none">
+                    <div class="input text-center" >
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您还没有经过实名认证，请进行实名认证！</p>
+                    </div>
+                    <div class="input text-center" >
+                        <a href="${ctx}/console/account/auth/index" type="button"  class="btn btn-primary btn-box">实名认证</a>
+                    </div>
+                </div>
+                <!---end--->
+                <!--认证显示-->
+                <div class="real-auth">
+                    <div class="input text-center">
+                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" class="sre" />
+                        <p>您已成功进行实名认证，点击进入下一步!</p>
+                    </div>
+                    <div class="input text-center" >
+                        <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="2" data-fun="directOnline()">下一步</a>
+                    </div>
+                </div>
+                <!---end--->
+            </div>
+
+            <div class="contentModal" style="display: none" data-action="2">
+                <div class="input text-center" >
+                    <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
+                    <p>上线成功</p>
+                </div>
+                <div class="input text-center" >
+                    <a href="" class="btn btn-primary btn-box tabModalBtn"  data-fun="" >上线成功</a>
+                </div>
             </div>
             <div class="input">
-                <input class="code form-control modalCode" type="text" name="mobile" placeholder="验证码" />
-                <button class="code-button" id="send-code" >发送验证码</button>
+                <div class="tips-error moadltips1 text-center" style="display: none">错误提示信息</div>
             </div>
-            <div class="input">
-                <div class="tips-error moadltips2" style="display: none">请先填写手机号码</div>
-            </div>
-        </div>
-        <div class="footer">
-            <a class="cancel modalCancel">返回</a>
-            <a class="sure modalSuer2">确认</a>
+
         </div>
     </div>
 
 </div>
-
 
 
 <div class="tips-toast"></div>
@@ -232,28 +288,147 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/list.js'> </script>
 <script>
+
+    //判断是否实名认证
+    function isRealAuth(){
+        var realAuth = null;
+        //获取用户实名认证状态
+        $.ajax({
+            url : ctx + "/console/account/auth/is_real_auth",
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
+            dataType: "json",
+            success : function(data){
+                realAuth = data;
+            },
+            error:function(){
+                showtoast('网络异常，请稍后重试');
+            }
+        });
+        return realAuth;
+    }
+
     /**
      * @param id 应用id
+     * @param type 类型
+     * type 1 ivr  2no ivr
      */
-    function tabtarget(id){
-        cleanModal();
+    function tabtarget(id,type){
+        //赋值appid
         $('#modal-appid').val(id);
-        showBox();
+        //步骤
+        var index = 1;
+        var flag = true;//是否能显示上线框
+        //获取应用所处的步骤
+        $.ajax({
+            url : ctx + "/console/app_action/"+ id ,
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
+            dataType: "json",
+            success : function(data){
+                if(data && data.action != null){
+                    switch (data.action){
+                        case 11: index = 2;break;   //选号
+                        case 12: index = 3;break;   //支付
+                        case 13: index = 2;break;   //支付返回选号
+                        case 14: showtoast('应用已上线');flag = false;break;   //上线完成
+                        case 21: index = 1;break;   //下线
+                        default: index = 1;break;
+                    }
+                }
+            },
+            error:function(){
+                flag = false;
+                showtoast('网络异常，请稍后重试');
+            }
+        });
+        if(flag){
+            //进入实名认证
+            if(index == 1){
+                var realAuth = isRealAuth();
+                if(realAuth != null){
+                    if(realAuth){
+                        $("div.real-auth").show();
+                        $("div.not-real-auth").hide();
+                    }else{
+                        $("div.real-auth").hide();
+                        $("div.not-real-auth").show();
+                    }
+                    //初始化
+                    cleanModal(type);
+                }else{
+                    flag = false;
+                }
+            //进入选号
+            }else if(index == 2){
+                if(!creatIVR()){
+                    flag = false;
+                }
+            }else if(index == 3){
+                if(!getOrder()){
+                    flag = false;
+                }
+            }
+            //是否最后显示上线框
+            if(flag){
+                modalAction(index);
+                showBox(type);
+            }
+        }
+
     }
 
     var ivrnumber = 1;
-
     //生成IVR
     function creatIVR(){
+        var result = false;
+        var appId = $('#modal-appid').val();
         $('.hideIVR').html('');
-        //异步生成
-        var ivr = ['02000100','02000200','02000300','0200400','0200500'];
-        for (var i = 0; i < ivr.length; i++) {
-            $('.hideIVR').append('<sapn class="hideIVR-p-'+(i+1)+'">'+ivr[i]+'</sapn>');
+        $('#ownIvr').html('');
+        var ivr = [];
+        var ownIvr = [];
+        //远端生成
+        $.ajax({
+            url : ctx + "/console/app_action/select_ivr/" + appId,
+            type : 'get',
+            async: false,//使用同步的方式,true为异步方式
+            timeout:2*60*1000,
+            dataType: "json",
+            success : function(data){
+                if(data.flag && data.result != null ){
+                    ivr = data.result.selectIvr;
+                    ownIvr = data.result.ownIvr;
+                    result = true;
+                }else{
+                    result = false;
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
+                }
+            },
+            error:function(){
+                result = false;
+                showtoast('网络异常，请刷新重试');
+            }
+        });
+        if(ownIvr.length > 0){
+            $("#selectOwnIvr").show();
+            $("#selectNewIvr").hide();
+            for(var i = 0;i<ownIvr.length;i++){
+                $('#ownIvr').append('<option value="'+ ownIvr[i]+'">'+ownIvr[i]+'</option>')
+            }
+            $('#creatIVR').html(ownIvr[0]);
+        }else if(ivr.length > 0){
+            $("#selectOwnIvr").hide();
+            $("#selectNewIvr").show();
+            for (var i = 0; i < ivr.length; i++) {
+                $('.hideIVR').append('<sapn class="hideIVR-p-'+(i+1)+'">'+ivr[i]+'</sapn>');
+                //赋值第一个
+            }
+            $('#creatIVR').html(ivr[0]);
         }
-        //赋值第一个
-        $('#creatIVR').html(ivr[0]);
         ivrnumber = 1;
+        return result;
     }
 
     function nolike(){
@@ -267,15 +442,6 @@
     }
 
 
-    function syncpay(){
-
-    }
-
-
-
-
-
-
     /**
      * 应用id
      * status 该应用状态
@@ -283,21 +449,22 @@
     function delapp(id,status){
         bootbox.setLocale("zh_CN");
         if(status==1){
-            bootbox.alert("当前应用正在运营中，请将起下线后进行删除", function(result) {}); return;
+            bootbox.alert("当前应用正在运营中，请将其下线后进行删除", function(result) {}); return;
         }
         if(status==2){
             bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
                 if(result){
                     $.ajax({
-                        url : "${ctx}/console/app/delete",
+                        url : ctx + "/console/app/delete",
                         type : 'post',
                         async: false,//使用同步的方式,true为异步方式
+                        timeout:2*60*1000,
                         data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
                         dataType: "json",
                         success : function(data){
                             showtoast(data.msg);
                         },
-                        fail:function(){
+                        error:function(){
                             showtoast('网络异常，请稍后重试');
                         }
                     });
@@ -311,14 +478,34 @@
 
 
     //应用下线
-    function lineapp(id){
+    function offline(id){
         bootbox.setLocale("zh_CN");
-        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
+        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result){
             if(result){
-                $('#trb-'+id).html('');
-                $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
-                $('#trb-'+id).html('<a onclick="tabtarget('+id+')">申请上线</a>');
-                showtoast('下线成功');
+                $.ajax({
+                    url : ctx + "/console/app_action/offline",
+                    type : 'post',
+                    async: false,//使用同步的方式,true为异步方式
+                    timeout:2*60*1000,
+                    data : {'appId':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            var isIvrService = data.app.isIvrService==1?1:0;
+                            $('#trb-'+id).html('');
+                            $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
+                            $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\')">申请上线</a>');
+                            showtoast('下线成功');
+                        }else{
+                            result = false;
+                            showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
+                        }
+                    },
+                    error:function(){
+                        showtoast('网络异常，请稍后重试');
+                    }
+                });
+
             }else{
                 showtoast('取消');
             }
@@ -326,6 +513,128 @@
         });
     }
 
+    //获取订单（进入应用上线支付页面）
+    function getOrder(){
+        var result = false;
+        var appId = $('#modal-appid').val();
+        var ivr = $('#creatIVR').html();//当为创建支付订单时（Action），ivr取值有效，当为取出原有的订单时，ivr取值用数据库中的值（在后台中处理）
+        $.ajax({
+            url : ctx + "/console/app_action/get_pay",
+            type : 'get',
+            data : {appId:appId,ivr:ivr},//这里使用json对象
+            timeout:2*60*1000,
+            async: false,//使用同步的方式,true为异步方式
+            dataType: "json",
+            success : function(data){
+                if(data.flag && data.action != null && data.balance != null){
+                    $("#selectIvr").html(data.action.telNumber);
+                    $("#payAmount").html(data.action.amount.toFixed(2));
+                    $("#balance").html(data.balance.toFixed(2));
+                    if(data.action.amount > data.balance){
+                        $(".nomoney").show();
+                    }
+                    if(data.action.amount == 0){
+                        $("#payMoneyInfo").hide();
+                        $("#payButton").text("确定上线");
+                    }else{
+                        $("#payMoneyInfo").show();
+                        $("#payButton").text("确定支付");
+                    }
+                    result = true;
+                }else{
+                    result = false;
+                    showtoast(data.msg?data.msg:'数据异常，请稍后刷新重试！');
+                }
+            },
+            error:function(){
+                result = false;
+                showtoast('网络异常，请刷新重试');
+            }
+        });
+        return result;
+    }
+
+    /**
+     * 支付
+     */
+    function pay(){
+        if(!$('#readbook').is(':checked')) {
+            showtoast('请先阅读IVR协议');
+            return false;
+        }
+        var result = false;
+        var appId = $('#modal-appid').val();
+        $.ajax({
+            url : ctx + "/console/app_action/pay",
+            type : 'get',
+            data : {appId:appId},//这里使用json对象
+            timeout:2*60*1000,
+            async: false,//使用同步的方式,true为异步方式
+            dataType: "json",
+            success : function(data){
+                if(!data.flag){
+                    result = false;
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
+                }else{
+                    result = true;
+                }
+            },
+            error:function(){
+                result = false;
+                showtoast('网络异常，请刷新重试');
+            }
+        });
+        return result;
+    }
+
+    function directOnline(){
+        var result = false;
+        var appId = $('#modal-appid').val();
+        $.ajax({
+            url : ctx + "/console/app_action/direct_online",
+            type : 'get',
+            data : {appId:appId},//这里使用json对象
+            timeout:2*60*1000,
+            async: false,//使用同步的方式,true为异步方式
+            dataType: "json",
+            success : function(data){
+                if(!data.flag){
+                    result = false;
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
+                }else{
+                    result = true;
+                }
+            },
+            error:function(){
+                result = false;
+                showtoast('网络异常，请刷新重试');
+            }
+        });
+        return result;
+    }
+
+    //重选择事件
+    function resetIVR(){
+        var appId = $('#modal-appid').val();
+        $.ajax({
+            url : ctx + "/console/app_action/reset_ivr",
+            type : 'get',
+            data : {appId:appId},//这里使用json对象
+            timeout:2*60*1000,
+            async: false,//使用同步的方式,true为异步方式
+            dataType: "json",
+            success : function(data){
+                if(!data.flag){
+                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
+                }
+            },
+            error:function(){
+                showtoast('网络异常，请刷新重试');
+            }
+        })
+
+        tabModalBtn(2,'creatIVR()');
+    }
 
 
 
@@ -333,6 +642,10 @@
     function syncpay(){
         return true;
     }
+
+    $("#ownIvr").change(function(){
+        $('#creatIVR').html($(this).val());
+    })
 </script>
 
 </body>

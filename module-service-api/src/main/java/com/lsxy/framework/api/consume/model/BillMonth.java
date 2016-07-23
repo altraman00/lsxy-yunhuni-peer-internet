@@ -26,6 +26,9 @@ public class BillMonth extends IdEntity {
 
     }
 
+    /**
+     * 用于Hql查询，别删
+     */
     public BillMonth(String tenantId,Date dt,String type,BigDecimal amount){
         this.tenantId = tenantId;
         this.dt = dt;

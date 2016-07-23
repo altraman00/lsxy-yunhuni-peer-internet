@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <contextName>module-service-test</contextName>
+    <property name="APP_NAME" value="module-service-test" />
+    <include resource="logback-yunhuni.xml"/>
+
+</configuration>

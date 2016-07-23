@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app")
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线
-    public static int STATUS_NOT_ONLINE = 2;//没上线
+    public static int STATUS_OFFLINE = 2;//没上线
 
     private Tenant tenant;//所属租户
     private String name;//应用名字
@@ -30,6 +30,7 @@ public class App extends IdEntity {
     private Integer isRecording;//是否录音服务0否，1是
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
+
     @ManyToOne
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
@@ -103,10 +104,9 @@ public class App extends IdEntity {
         return isAuth;
     }
 
-    public void setIsAuth(Integer isAuthPower) {
+    public void setIsAuth(Integer isAuth) {
         this.isAuth = isAuth;
     }
-
     @Column(name = "is_voice_directly")
     public Integer getIsVoiceDirectly() {
         return isVoiceDirectly;

@@ -68,7 +68,7 @@
                                             </li>
                                             <li>
                                                 <div class="aside-li-a">
-                                                    <a href="./cost_invoice_record.html">发票记录</a>
+                                                    <a href="${ctx}/console/cost/invoice_apply/page">发票申请</a>
                                                 </div>
                                             </li>
                                         </ul>
@@ -88,7 +88,7 @@
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;消费记录</span>
                         </div>
-                        <form:form role="form" action="${ctx}/console/cost/consume" method="post">
+                        <form:form role="form" action="${ctx}/console/cost/consume" method="post" id="mainForm">
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
@@ -102,7 +102,7 @@
                                                     <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" />
                                                     到
                                                     <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" />
-                                                    <button class="btn btn-primary query" type="submit"  id="findform" >查询</button>
+                                                    <button class="btn btn-primary query" type="button" id="findform" >查询</button>
                                                     <span class="tips-error" ></span>
                                                 </div>
                                             </div>
@@ -126,9 +126,9 @@
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
                                             <td scope="row">${s.index+1}</td>
-                                            <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd hh:mm:ss"></fmt:formatDate></td>
+                                            <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
                                             <td><fmt:formatNumber value="${result.amount}" pattern="0.00"></fmt:formatNumber> </td>
-                                            <td>${reuslt.type}</td>
+                                            <td>${result.type}</td>
                                             <td>${result.remark}</td>
                                         </tr>
                                     </c:forEach>
@@ -151,6 +151,22 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/history.js'> </script>
+<script type="text/javascript">
+    function compareTime(starttime,endtime){
+        if(!starttime){
+            return '请填写开始时间';
+        }
+        if(!endtime){
+            return '请填写结束时间';
+        }
+        var d1 = new Date(starttime.replace(/\-/g, "\/"));
+        var d2 = new Date(endtime.replace(/\-/g, "\/"));
+        if(d1>d2){
+            return '时间范围填写有误';
+        }
+        $('#mainForm').submit();
+    }
+</script>
 </body>
 </html>
 

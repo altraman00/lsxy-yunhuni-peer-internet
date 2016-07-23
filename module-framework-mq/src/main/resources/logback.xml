@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <contextName>module-framework-mq-test</contextName>
+    <property name="APP_NAME" value="module-framework-mq-test" />
+    <include resource="logback-yunhuni.xml"/>
+    <logger name="org.springframework.jms" level="DEBUG" additivity="true" />
+    <logger name="com.lsxy.framework.mq" level="DEBUG" additivity="true" />
+
+</configuration>

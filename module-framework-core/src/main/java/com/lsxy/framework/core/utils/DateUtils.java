@@ -41,7 +41,7 @@ public class DateUtils {
     }
 
     public static Date parseDate(String date) {
-	     return parseDate(date,new String[] { "yyyy-MM-dd", "yyyy/MM/dd","yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm" });
+	     return parseDate(date,new String[] { "yyyy-MM","yyyy-MM-dd", "yyyy/MM/dd","yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm" });
     }
     public static Date parseDate(String date,String ... partten) {
         Date dt = null;

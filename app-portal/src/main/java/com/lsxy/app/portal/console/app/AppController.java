@@ -26,7 +26,7 @@ import java.util.Map;
  * Created by zhangxb on 2016/7/11.
  */
 @Controller
-@RequestMapping("/console/app/")
+@RequestMapping("/console/app")
 public class AppController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(AppController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
@@ -97,7 +97,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse findById(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/get/id={1}";
+        String uri = restPrefixUrl + "/rest/app/get/{1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
@@ -128,7 +128,7 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/create")
     @ResponseBody
     public Map create(HttpServletRequest request, App app){
-        app.setStatus(App.STATUS_NOT_ONLINE);//设置状态为未上线
+        app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
         createApp(request,app);
         Map map = new HashMap();
         map.put("msg","新建应用成功");
