@@ -1,4 +1,4 @@
-package com.lsxy.framework.mq;
+package com.lsxy.framework.mq.api;
 
 
 public interface MQEvent {
@@ -23,5 +23,11 @@ public interface MQEvent {
 	 * @return
 	 */
 	public String toJson();
+
+	/**
+	 * 消息生成发送时的时间戳
+	 * @return
+     */
+	public long getTimestamp();
 
 }

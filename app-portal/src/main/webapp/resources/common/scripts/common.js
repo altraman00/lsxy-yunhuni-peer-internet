@@ -768,8 +768,8 @@ parseDateCHS = function(dateString) {
 	// /解析常用的中文日期并返回日期对象。
 	// /</summary>
 	// /<param name="dateString" type="string">
-	// /日期字符串。包含的格式有："xxxx(xx)-xx-xx xx:xx:xx","xxxx(xx).xx.xx xx:xx:xx",
-	// /"xxxx(xx)年xx月xx日 xx时xx分xx秒"
+	// /日期字符串。包含的格式有："xxxx(sender)-sender-sender sender:sender:sender","xxxx(sender).sender.sender sender:sender:sender",
+	// /"xxxx(sender)年xx月xx日 xx时xx分xx秒"
 	// /</param>
 	var regExp1 = /^\d{4}-\d{1,2}-\d{1,2}( \d{1,2}:\d{1,2}:\d{1,2})?$/;
 	var regExp2 = /^\d{4}\.\d{1,2}\.\d{1,2}( \d{1,2}:\d{1,2}:\d{1,2})?$/;
