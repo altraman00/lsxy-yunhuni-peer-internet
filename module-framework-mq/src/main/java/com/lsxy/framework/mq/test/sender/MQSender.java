@@ -61,7 +61,7 @@ public class MQSender extends SpringBootTestCase{
 //            TimeUnit.SECONDS.sleep(1);
 //        }
 
-        int count = 1;
+        int count = 1000;
         while(count-->0){
 
             try {
