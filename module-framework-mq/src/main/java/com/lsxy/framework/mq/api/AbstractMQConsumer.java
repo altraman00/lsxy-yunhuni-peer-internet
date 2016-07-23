@@ -19,7 +19,7 @@ public abstract class AbstractMQConsumer implements  MQConsumer{
 	private MQMessageParser mqMessageParser;
 
 	public String[] getTopics(){
-		String t = SystemConfig.getProperty("mq.subscribe.topics","test_yunhuni_topic_framework_tenant");
+		String t = SystemConfig.getProperty("global.mq.subscribe.topics","yunhuni_topic_framework_tenant");
 		String[] topics = null;
 		if(StringUtil.isNotEmpty(t)){
 			topics = t.split(",");
