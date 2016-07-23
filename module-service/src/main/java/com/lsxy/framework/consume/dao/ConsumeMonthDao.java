@@ -4,7 +4,6 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.consume.model.ConsumeMonth;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 消费月统计DAO
