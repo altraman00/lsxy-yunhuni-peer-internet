@@ -59,4 +59,12 @@ public interface OSSService {
      */
     public List<String> listObjects(String repository,String path) throws Exception;
 
+    /**
+     * 删除指定的文件对象
+     * @param repository
+     * @param path
+     * @throws UnsupportedOperationException
+     */
+    public void deleteObject(String repository,String path) throws UnsupportedOperationException;
+
 }

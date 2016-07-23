@@ -20,6 +20,7 @@ public class CallSession extends IdEntity {
     public static final Integer TYPE_VOICE_MEETING = 3;
     public static final Integer TYPE_VOICE_IVR = 4;
     public static final Integer TYPE_VOICE_VOICECODE = 5;
+    public static final Integer TYPE_VOICE_RECORDING = 6;
 
     private Integer status;         //状态
     private App app;            //所属APP
