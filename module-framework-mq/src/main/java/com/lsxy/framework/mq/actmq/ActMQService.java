@@ -1,16 +1,13 @@
 package com.lsxy.framework.mq.actmq;
 
-import com.aliyun.openservices.ons.jms.domain.JmsBaseTopic;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.ons.OnsCondition;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 

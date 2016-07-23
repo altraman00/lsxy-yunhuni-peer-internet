@@ -1,7 +1,5 @@
 package com.lsxy.framework.mq.actmq;
 
-import com.aliyun.openservices.ons.jms.domain.JmsBaseConnectionFactory;
-import com.lsxy.framework.mq.ons.OnsCondition;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -10,8 +8,6 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.stereotype.Component;
 
 import javax.jms.ConnectionFactory;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Created by Tandy on 2016/7/21.
@@ -22,6 +18,8 @@ import java.net.URISyntaxException;
 @Configuration
 @Conditional(ActMQCondition.class)
 public class ActMQConfig {
+
+
     @Bean
     public ConnectionFactory getConnectionFactory(){
 //        mq.broker.url=failover:(tcp://v1mq01.hesyun.com:61616)
@@ -34,9 +32,11 @@ public class ActMQConfig {
         String userName= "admin";
         String password = "admin";
 
-        ActiveMQConnectionFactory amcf = new ActiveMQConnectionFactory(userName,password,brokerUrl);
+        ActiveMQConnectionFactory amcf = new  ActiveMQConnectionFactory(userName,password,brokerUrl);
         CachingConnectionFactory cf = new CachingConnectionFactory(amcf);
+//        cf.setClientId("test_client_001");
         return cf;
-
     }
+
+
 }

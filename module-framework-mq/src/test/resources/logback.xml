@@ -3,5 +3,6 @@
     <contextName>module-framework-mq-test</contextName>
     <property name="APP_NAME" value="module-framework-mq-test" />
     <include resource="logback-yunhuni.xml"/>
+    <logger name="org.springframework.jms" level="DEBUG" additivity="true" />
 
 </configuration>

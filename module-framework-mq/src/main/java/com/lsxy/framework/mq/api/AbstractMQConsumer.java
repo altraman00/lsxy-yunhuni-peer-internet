@@ -10,25 +10,18 @@ import org.springframework.util.Assert;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.StringUtil;
 
+import javax.jms.MessageListener;
+
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractMQConsumer {
+public abstract class AbstractMQConsumer implements  MQConsumer{
 
 	private static final Log logger = LogFactory.getLog(AbstractMQConsumer.class);
 	@Autowired
 	private GlobalEventHandlerFactory globalEventHandlerFactory;
 
-	public abstract void init();
-
-	public abstract void start();
-
-	public abstract void destroy();
-
-	public abstract void await();
-
-
 	public String[] getTopics(){
-		String t = SystemConfig.getProperty("mq.subscribe.topics");
+		String t = SystemConfig.getProperty("mq.subscribe.topics","test_yunhuni_topic_framework_tenant");
 		String[] topics = null;
 		if(StringUtil.isNotEmpty(t)){
 			topics = t.split(",");

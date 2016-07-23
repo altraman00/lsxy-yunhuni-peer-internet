@@ -3,6 +3,8 @@ package com.lsxy.framework.mq.api;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.jms.JMSException;
+
 /**
  * 全局事件监听
  * @author tandy
@@ -22,7 +24,7 @@ public class GlobalEventListener {
 		this.consumer = consumer;
 	}
 
-	public void init(){
+	public void init() throws JMSException {
 		logger.debug("GlobalEventListener init");
 		consumer.start();
 		logger.debug("GlobalEventListener started successfull");

@@ -58,7 +58,7 @@ public class KafkaConsumer extends AbstractMQConsumer {
 	/**
 	 * 订阅主题
 	 * 
-	 * @param topics
+//	 * @param topics
 	 *            topic逗号分隔
 	 */
 	private void subscribTopics() {
@@ -113,16 +113,16 @@ public class KafkaConsumer extends AbstractMQConsumer {
 	}	
 	
 
-	@Override
-	public void await() {
-		try {
-			while (!threadPools.awaitTermination(1, TimeUnit.MINUTES)) {
-				logger.debug("------------------------");
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
+//	@Override
+//	public void await() {
+//		try {
+//			while (!threadPools.awaitTermination(1, TimeUnit.MINUTES)) {
+//				logger.debug("------------------------");
+//			}
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 
 	@Override

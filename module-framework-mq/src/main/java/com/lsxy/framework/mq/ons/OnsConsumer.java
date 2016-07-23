@@ -1,32 +1,30 @@
 package com.lsxy.framework.mq.ons;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import com.lsxy.framework.mq.api.MQEvent;
+import com.aliyun.openservices.ons.api.*;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
 import com.lsxy.framework.mq.api.GlobalEventHandler;
 import com.lsxy.framework.mq.api.GlobalEventHandlerFactory;
+import com.lsxy.framework.mq.api.MQEvent;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.stereotype.Component;
 
-import com.aliyun.openservices.ons.api.Action;
-import com.aliyun.openservices.ons.api.ConsumeContext;
-import com.aliyun.openservices.ons.api.Consumer;
-import com.aliyun.openservices.ons.api.Message;
-import com.aliyun.openservices.ons.api.MessageListener;
-import com.aliyun.openservices.ons.api.ONSFactory;
-import com.aliyun.openservices.ons.api.PropertyKeyConst;
-import com.lsxy.framework.config.SystemConfig;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 
 @SuppressWarnings({"rawtypes","unchecked"})
-public class OnsConsumer extends AbstractMQConsumer implements MessageListener{
+
+@Component
+@Conditional(OnsCondition.class)
+public class OnsConsumer extends AbstractMQConsumer implements MessageListener,InitializingBean,DisposableBean{
 	private static final Log logger = LogFactory.getLog(OnsConsumer.class);
 	private Consumer consumer;
-	private GlobalEventHandlerFactory globalEventHandlerFactory;
-	
+
 	private String[] topics = null;
 	
 	@Override
@@ -40,9 +38,9 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener{
 			}
 			
 			Properties properties = new Properties();
-			properties.put(PropertyKeyConst.ConsumerId, SystemConfig.getProperty("mq.ons.cid"));
-			properties.put(PropertyKeyConst.AccessKey, SystemConfig.getProperty("mq.ons.ak","3qPjLmZrmSgXHQKn"));
-			properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","CUB2Fl0NXtOnB5qfpNFOGf4VhVAte1"));
+			properties.put(PropertyKeyConst.ConsumerId, SystemConfig.getProperty("mq.ons.cid","CID_YUNHUNI-TENANT-001"));
+			properties.put(PropertyKeyConst.AccessKey, SystemConfig.getProperty("mq.ons.ak","nfgEUCKyOdVMVbqQ"));
+			properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW"));
 			consumer = ONSFactory.createConsumer(properties);
 			logger.debug("ons consumer build success,ready to start");
 			this.start();
@@ -67,17 +65,17 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener{
 		consumer.shutdown();
 	}
 
-	@Override
-	public void await() {
-		while(consumer.isStarted()){
-			try {
-				TimeUnit.SECONDS.sleep(10);
-				logger.debug("-------------------------");
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+//	@Override
+//	public void await() {
+//		while(consumer.isStarted()){
+//			try {
+//				TimeUnit.SECONDS.sleep(10);
+//				logger.debug("-------------------------");
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 	
 	public Action consume(Message message, ConsumeContext context) {
@@ -101,7 +99,7 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener{
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
 				logger.debug("parse msg to MQEvent object and id is :"	+ event.getId());
-				GlobalEventHandler handler = globalEventHandlerFactory.getHandler(event.getEventName());
+				GlobalEventHandler handler = this.getGlobalEventHandlerFactory().getHandler(event.getEventName());
 				if (handler != null) {
 					logger.debug("found a handler for the event:" + event.getId() + "--" + handler.getClass().getName());
 					handler.handle(event);
@@ -117,15 +115,8 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener{
 	}
 
 
-	public GlobalEventHandlerFactory getGlobalEventHandlerFactory() {
-		return globalEventHandlerFactory;
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.init();
 	}
-
-
-	public void setGlobalEventHandlerFactory(
-			GlobalEventHandlerFactory globalEventHandlerFactory) {
-		this.globalEventHandlerFactory = globalEventHandlerFactory;
-	}
-	
-	
 }
