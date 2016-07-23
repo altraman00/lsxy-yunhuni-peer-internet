@@ -38,10 +38,10 @@ public class BillMonthServiceImpl extends AbstractService<BillMonth> implements 
     public List<BillMonth> getBillMonths(String userName, String appId, String month) {
         List<BillMonth> billMonths = null;
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        Date dt = DateUtils.parseDate(month, "yyyy-MM");
         if(StringUtils.isBlank(month)){
             throw new IllegalArgumentException("月份为空");
         }
+        Date dt = DateUtils.parseDate(month, "yyyy-MM");
         if(StringUtils.isBlank(appId)){
             try {
                 String hql = "select new BillMonth(b.tenantId,b.dt,b.type,sum(b.amount)) " +
