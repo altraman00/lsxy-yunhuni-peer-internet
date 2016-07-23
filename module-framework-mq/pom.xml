@@ -6,6 +6,7 @@
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
         <version>1.0.2-SNAPSHOT</version>
+        <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -82,10 +83,6 @@
             <artifactId>module-framework-config</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
-        </dependency>
     </dependencies>
 
 </project>
