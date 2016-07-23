@@ -1,5 +1,6 @@
 package com.lsxy.framework.mq.actmq;
 
+import com.lsxy.framework.config.SystemConfig;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -28,9 +29,9 @@ public class ActMQConfig {
 //        mq.broker.userName=jmsbind
 //        mq.broker.password=rg4yy2
 //        mq.handlers.package=com.hesyun.app.support.mq.handles
-        String brokerUrl = "failover:(tcp://localhost:61616)";
-        String userName= "admin";
-        String password = "admin";
+        String brokerUrl = SystemConfig.getProperty("global.mq.activemq.url","failover:(tcp://localhost:61616)");
+        String userName= SystemConfig.getProperty("global.mq.activemq.username","admin");
+        String password = SystemConfig.getProperty("global.mq.activemq.password","admin");
 
         ActiveMQConnectionFactory amcf = new  ActiveMQConnectionFactory(userName,password,brokerUrl);
         CachingConnectionFactory cf = new CachingConnectionFactory(amcf);

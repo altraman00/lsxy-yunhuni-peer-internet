@@ -5,5 +5,5 @@ package com.lsxy.framework.mq.api;
  */
 public interface MQService {
 
-    public void publishTopicEvent(MQEvent event);
+    public void publish(AbstractMQEvent event);
 }

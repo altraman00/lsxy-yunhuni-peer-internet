@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,10 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
     public static final Logger logger = LoggerFactory.getLogger(ActMQConsumer.class);
     
     private Session session;
-    private ActiveMQConnection connection;
+    private Connection connection;
+
+    @Autowired
+    private ConnectionFactory connectionFactory;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -37,12 +41,12 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
 
     @Override
     public void init() throws JMSException {
-        String brokerUrl = "tcp://localhost:61616";
-        String queueName = "test_yunhuni_topic_framework_tenant";
-        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
-        factory.setUserName("admin");
-        factory.setPassword("admin");
-        connection = (ActiveMQConnection)factory.createConnection();
+//        String brokerUrl = "tcp://localhost:61616";
+//        String queueName = "test_yunhuni_topic_framework_tenant";
+//        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
+//        factory.setUserName("admin");
+//        factory.setPassword("admin");
+        connection = connectionFactory.createConnection();
     }
 
     @Override
@@ -74,14 +78,20 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
     public void onMessage(Message message) {
 
         if (logger.isDebugEnabled()){
-            logger.debug("收到消息："+ message);
+            logger.debug("收到消息[原始]："+ message);
          }
         if(message instanceof  TextMessage){
             TextMessage tm = (TextMessage) message;
             try {
                 String msg = tm.getText();
 
+                if (logger.isDebugEnabled()){
+                        logger.debug("收到消息[BSE64]:{}",msg);
+                 }
                 MQEvent event = this.parseMessage(msg);
+                if (logger.isDebugEnabled()){
+                        logger.debug("消息解析后："+event.getId());
+                 }
                 MQMessageHandler handler = this.getMqHandlerFactory().getHandler(event);
                 if(handler != null){
                     handler.handleMessage(event);

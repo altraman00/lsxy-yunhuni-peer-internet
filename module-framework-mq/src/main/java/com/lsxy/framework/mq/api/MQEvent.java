@@ -24,4 +24,10 @@ public interface MQEvent {
 	 */
 	public String toJson();
 
+	/**
+	 * 消息生成发送时的时间戳
+	 * @return
+     */
+	public long getTimestamp();
+
 }

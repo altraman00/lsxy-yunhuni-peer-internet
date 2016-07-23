@@ -5,8 +5,6 @@ import com.lsxy.framework.core.test.SpringBootTestCase;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.test.events.TestEvent;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +12,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.jms.annotation.EnableJms;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,14 +24,14 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Import(value={FrameworkMQConfig.class, FrameworkCacheConfig.class})
-@SpringApplicationConfiguration(value=OnsMQTest.class)
-@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(value=MQSender.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 @EnableAutoConfiguration
 @EnableJms
+@ComponentScan
+public class MQSender extends SpringBootTestCase{
 
-public class OnsMQTest extends SpringBootTestCase{
-
-    public static final Logger logger = LoggerFactory.getLogger(OnsMQTest.class);
+    public static final Logger logger = LoggerFactory.getLogger(MQSender.class);
 
 //
 //    @Autowired
@@ -47,8 +46,9 @@ public class OnsMQTest extends SpringBootTestCase{
 //    @Autowired
 //    private Receiver receiver;
 
-    @Test
-    public void test001() throws InterruptedException {
+//    @Test
+    @PostConstruct
+    public void sendTest() throws InterruptedException {
 //        Assert.notNull(cf);
 //        Assert.notNull(mqService);
 
@@ -61,7 +61,9 @@ public class OnsMQTest extends SpringBootTestCase{
 //            TimeUnit.SECONDS.sleep(1);
 //        }
 
-        while(true){
+        int count = 1;
+        while(count-->0){
+
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
@@ -69,7 +71,7 @@ public class OnsMQTest extends SpringBootTestCase{
             }
             long startDt = System.currentTimeMillis();
             TestEvent te = new TestEvent();
-            mqService.publishTopicEvent(te);
+            mqService.publish(te);
 
             if (logger.isDebugEnabled()){
                     logger.debug("发送消息 完成："+te.getId() + "  花费："+(System.currentTimeMillis()-startDt)+"ms");
@@ -80,7 +82,8 @@ public class OnsMQTest extends SpringBootTestCase{
     }
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext ctx = SpringApplication.run(OnsMQTest.class);
+        ConfigurableApplicationContext ctx = SpringApplication.run(MQSender.class);
+        ctx.close();
     }
 
 }

@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -27,6 +28,9 @@ public class OnsProducer  extends AbstractMQProducer implements InitializingBean
 
 	private final static Log logger = LogFactory.getLog(OnsProducer.class);
 	 private Producer producer;
+
+	@Autowired
+	private OnsMQConfig onsMQConfig;
 	@Override
 	public void publishEvent(MQEvent event) {
 		Assert.notNull(event);
@@ -57,15 +61,12 @@ public class OnsProducer  extends AbstractMQProducer implements InitializingBean
 	
 	public void init(){
 		logger.debug("try to build ons producer");
-		Properties properties = new Properties();
-		//        String accessKey = "nfgEUCKyOdVMVbqQ";
-//        String secretKey = "HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW";
-//        String cid = "CID_YUNHUNI-TENANT-001";
-//        String pid = "PID_YUNHUNI-TENANT-001";
+		Properties properties =onsMQConfig.getOnsProperties();
 
-        properties.put(PropertyKeyConst.ProducerId, SystemConfig.getProperty("mq.ons.pid","PID_YUNHUNI-TENANT-001"));
-        properties.put(PropertyKeyConst.AccessKey,SystemConfig.getProperty("mq.ons.ak","nfgEUCKyOdVMVbqQ"));
-        properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW"));
+//        properties.put(PropertyKeyConst.ProducerId, SystemConfig.getProperty("mq.ons.pid","PID_YUNHUNI-TENANT-001"));
+//        properties.put(PropertyKeyConst.AccessKey,SystemConfig.getProperty("mq.ons.ak","nfgEUCKyOdVMVbqQ"));
+//        properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW"));
+
         logger.debug("ons properties:"+properties);
         producer = ONSFactory.createProducer(properties);
         logger.debug("ons producer build success,ready to start");

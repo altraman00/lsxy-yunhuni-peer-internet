@@ -1,6 +1,7 @@
 package com.lsxy.framework.mq.actmq;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
+import com.lsxy.framework.mq.api.AbstractMQService;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQService;
 import org.apache.activemq.command.ActiveMQTopic;
@@ -18,21 +19,20 @@ import javax.jms.Destination;
  */
 @Component
 @Conditional(ActMQCondition.class)
-public class ActMQService implements MQService {
+public class ActMQService extends AbstractMQService {
 
     public static final Logger logger = LoggerFactory.getLogger(ActMQService.class);
     @Autowired
     private JmsTemplate jmsTemplate;
 
     @Override
-    public void publishTopicEvent(MQEvent event) {
-
+    protected void publishEvent(AbstractMQEvent event) {
         if(jmsTemplate != null){
             if(event instanceof AbstractMQEvent){
                 if (logger.isDebugEnabled()){
                     logger.debug("发布事件："+event.getEventName());
                     logger.debug("事件内容：{}" + event);
-                 }
+                }
                 Destination dest = new ActiveMQTopic(event.getTopicName());
                 jmsTemplate.send(dest,(AbstractMQEvent)event);
             }

@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -23,8 +24,12 @@ import java.util.Properties;
 @Lazy(value = true)
 @Conditional(OnsCondition.class)
 public class OnsConsumer extends AbstractMQConsumer implements MessageListener,InitializingBean,DisposableBean{
+
 	private static final Log logger = LogFactory.getLog(OnsConsumer.class);
 	private Consumer consumer;
+
+	@Autowired
+	private OnsMQConfig onsMQConfig;
 
 	private String[] topics = null;
 	
@@ -38,10 +43,13 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 				return;
 			}
 			
-			Properties properties = new Properties();
-			properties.put(PropertyKeyConst.ConsumerId, SystemConfig.getProperty("mq.ons.cid","CID_YUNHUNI-TENANT-001"));
-			properties.put(PropertyKeyConst.AccessKey, SystemConfig.getProperty("mq.ons.ak","nfgEUCKyOdVMVbqQ"));
-			properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW"));
+//			Properties properties = new Properties();
+//			properties.put(PropertyKeyConst.ConsumerId, SystemConfig.getProperty("global.mq.ons.cid","CID_YUNHUNI-TENANT-001"));
+//			properties.put(PropertyKeyConst.AccessKey, SystemConfig.getProperty("global.mq.ons.ak","nfgEUCKyOdVMVbqQ"));
+//			properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("global.mq.ons.sk","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW"));
+
+			Properties properties = onsMQConfig.getOnsProperties();
+
 			consumer = ONSFactory.createConsumer(properties);
 			logger.debug("ons consumer build success,ready to start");
 

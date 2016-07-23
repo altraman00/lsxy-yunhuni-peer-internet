@@ -8,6 +8,7 @@ import com.lsxy.framework.mq.api.AbstractMQEvent;
 public class TestEvent extends AbstractMQEvent{
 
 
+
     @Override
     public String getTopicName() {
         return "test_yunhuni_topic_framework_tenant";

@@ -1,9 +1,6 @@
 package com.lsxy.framework.mq.ons;
 
-import com.lsxy.framework.mq.api.AbstractMQEvent;
-import com.lsxy.framework.mq.api.MQEvent;
-import com.lsxy.framework.mq.api.MQProducer;
-import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Conditional(OnsCondition.class)
-public class OnsMQService implements MQService {
+public class OnsMQService extends AbstractMQService{
 
     public static final Logger logger = LoggerFactory.getLogger(OnsMQService.class);
 
@@ -23,15 +20,12 @@ public class OnsMQService implements MQService {
     private MQProducer mqProducer;
 
     @Override
-    public void publishTopicEvent(MQEvent event) {
-
-            if(event instanceof AbstractMQEvent){
-                if (logger.isDebugEnabled()){
-                    logger.debug("发布事件："+event.getEventName());
-                    logger.debug("事件内容：{}" + event);
-                 }
-
-                mqProducer.publishEvent(event);
+    protected void publishEvent(AbstractMQEvent event) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("发布事件：" + event.getEventName());
+            logger.debug("事件内容：{}" + event);
         }
+
+        mqProducer.publishEvent(event);
     }
 }

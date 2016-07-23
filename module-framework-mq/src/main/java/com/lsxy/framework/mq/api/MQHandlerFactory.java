@@ -5,24 +5,22 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.io.Resource;
+import org.reflections.Reflections;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
-import org.springframework.core.type.classreading.MetadataReader;
-import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ClassUtils;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.web.SpringContextUtil;
+
+import static com.lsxy.framework.core.web.SpringContextUtil.getBean;
 
 /**
  * MQ事件Handler查找
@@ -32,14 +30,21 @@ import com.lsxy.framework.core.web.SpringContextUtil;
 @Component
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class MQHandlerFactory {
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
 	public MQHandlerFactory(){
 	}
 	private static final Log logger = LogFactory.getLog(MQHandlerFactory.class);
 	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();  
-	private final String RESOURCE_PATTERN = "/**/*.class";  
+	private final String RESOURCE_PATTERN = "/**/*.class";
+
+	private String handleBasePackages =  SystemConfig.getProperty("global.mq.handle.basepackage","com.lsxy");
+
 	
 	//初始化的handlers  <MQEventClassName,Handler>
-	private Map<String,Class<? extends MQMessageHandler<? extends MQEvent>>> handlersMap =
+	private Map<String,Class<? extends MQMessageHandler>> handlersMap =
 			new HashMap<>();
 	
 	/** 
@@ -49,37 +54,43 @@ public class MQHandlerFactory {
 	 */
 	@PostConstruct
 	public void loadMQHandlers() throws IOException{
-		logger.debug("MQHandlerFactory.loadMQHandlers"); 
-		String pkg = SystemConfig.getProperty("mq.handlers.package","com.lsxy");
-		 String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +  
-                 ClassUtils.convertClassNameToResourcePath(pkg) + RESOURCE_PATTERN;  
-		 Resource[] res = resourcePatternResolver.getResources(pattern);
-		 MetadataReaderFactory readerFactory = new CachingMetadataReaderFactory(resourcePatternResolver);  
-		 TypeFilter filter = new AnnotationTypeFilter(MQHandler.class);
-         for (Resource resource : res) {  
-             if (resource.isReadable()) {  
-                 MetadataReader reader = readerFactory.getMetadataReader(resource);  
-                 if(filter.match(reader, readerFactory)){
-                	 String className = reader.getClassMetadata().getClassName();  
-                	 try {
-						Class<? extends MQMessageHandler<MQEvent>> clazzx = (Class<? extends MQMessageHandler<MQEvent>>) Class.forName(className);
-						Object x = clazzx.getGenericSuperclass();
-						if(x instanceof ParameterizedType){
-							Type[] types =  ((ParameterizedType)x).getActualTypeArguments();
-							 for (Type tv : types) {
-								if (tv instanceof Class) {
-									this.handlersMap.put(((Class) tv).getName(),clazzx);
-								}
-							} 
-						}
-					} catch (ClassNotFoundException e) { 
-						e.printStackTrace();
-					}
-                 }
-                
-             }  
-         }  
+		this.init();
 	}
+
+
+	/**
+	 * 初始化handler集合，扫描类路径中所有的handler并放入map中方便使用
+	 */
+	public void init(){
+		logger.debug("scan package "+ handleBasePackages +" for global event handlers");
+		Reflections reflections = new Reflections(handleBasePackages);
+		Set<Class<? extends MQMessageHandler>> handlers = reflections.getSubTypesOf(MQMessageHandler.class);
+		logger.debug("found "+handlers.size()+" handlers");
+		for (Class<? extends MQMessageHandler> handlerClass : handlers) {
+			String eventClassName = getEventClassName(handlerClass);
+			logger.debug("[GEH]"+handlerClass+" for " + eventClassName);
+			//一开始初始化的时候，handler映射表中对应类名的处理handler设置为空，只需要知道有这个处理类就可以了
+			this.handlersMap.put(eventClassName, handlerClass);
+		}
+	}
+	/**
+	 * 根据handler class 获取handler类的实现接口所使用的泛型类名，用于确定该handler是处理什么类型事件的handler
+	 * @param handlerClass
+	 * @return
+	 */
+	private String getEventClassName(
+			Class<? extends MQMessageHandler> handlerClass) {
+		String result = null;
+		Type[] x = handlerClass.getGenericInterfaces();
+		for (Type type : x) {
+			if(type instanceof ParameterizedType){
+				Class<?> classx = (Class<?>) ((ParameterizedType)type).getActualTypeArguments()[0];
+				result = classx.getName();
+			}
+		}
+		return result;
+	}
+
 
 	/**
 	 * 获取指定handler类的类名
@@ -99,7 +110,7 @@ public class MQHandlerFactory {
 		MQMessageHandler result = null;
 		Class handlerClass = this.getHandlerClass(event.getClass());
 		if(handlerClass != null){
-			result = (MQMessageHandler)SpringContextUtil.getApplicationContext().getBean(handlerClass);
+			result = (MQMessageHandler) applicationContext.getBean(handlerClass);
 		}
 		return result;
 		

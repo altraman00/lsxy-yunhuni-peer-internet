@@ -21,7 +21,7 @@ public class MQManager {
 //	 * 向mq server发布一个事件主题
 //	 * 如果是全局事件，就发到kafka，否则丢到activemq
 //	 */
-//	public void publishTopicEvent(MQEvent event){
+//	public void publish(MQEvent event){
 //		//如果拥有全局事件注解，就发布全局事件
 //		if(event.getClass().isAnnotationPresent(GlobalEvent.class)){
 //			publishGlobalEvent(event);

@@ -16,13 +16,17 @@ import javax.jms.*;
 /**
  * Created by Tandy on 2016/7/21.
  */
-@Component
+//@Component
 public class Receiver {
 
-    @Autowired
     private MQConsumer mqConsumer;
 
-    @PostConstruct
+    public Receiver(MQConsumer mqConsumer){
+        this.mqConsumer = mqConsumer;
+    }
+
+
+//    @PostConstruct
     public void start() throws JMSException {
         mqConsumer.start();
     }
@@ -40,9 +44,9 @@ public class Receiver {
 //    }
 
 //    @JmsListener(destination = "test_yunhuni_topic_framework_tenant", containerFactory = "myJmsContainerFactory")
-    public void receiveMessage(String message) {
-        System.out.println("=====hahhahahah======>" + message + ">");
-    }
+//    public void receiveMessage(String message) {
+//        System.out.println("=====hahhahahah======>" + message + ">");
+//    }
 
 //
 //    @PostConstruct
