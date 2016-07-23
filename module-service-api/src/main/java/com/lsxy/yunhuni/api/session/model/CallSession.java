@@ -27,7 +27,7 @@ public class CallSession extends IdEntity {
     private Tenant tenant;      //所属tenant
     private String relevanceId;//关联标识
     private Integer type;//会话类型1.语音呼叫 2.双向回拨 3.会议 4.IVR定制服务  5.语音验证码
-    @Column(name = "relevance_Id")
+    @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
     }

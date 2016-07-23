@@ -27,8 +27,8 @@ import java.util.Map;
  * Created by zhangxb on 2016/7/18.
  */
 @Controller
-@RequestMapping("/console/statistics/specifications")
-public class SpecificationsController extends AbstractPortalController {
+@RequestMapping("/console/statistics/billdetail")
+public class BillDetailController extends AbstractPortalController {
     /**
      * 语音呼叫
      * @param request
@@ -45,7 +45,7 @@ public class SpecificationsController extends AbstractPortalController {
         mav.addAllObjects(map);
         mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
-        mav.setViewName("/console/statistics/specifications/call");
+        mav.setViewName("/console/statistics/billdetail/call");
         return mav;
     }
     /**
@@ -63,7 +63,7 @@ public class SpecificationsController extends AbstractPortalController {
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_VOICECODE,map.get("time"),map.get("appId")).getData());
-        mav.setViewName("/console/statistics/specifications/code");
+        mav.setViewName("/console/statistics/billdetail/code");
         return mav;
     }
     /**
@@ -82,7 +82,7 @@ public class SpecificationsController extends AbstractPortalController {
         mav.addAllObjects(map);
         mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_RECORDING,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_RECORDING,map.get("time"),map.get("appId")).getData());
-        mav.setViewName("/console/statistics/specifications/recording");
+        mav.setViewName("/console/statistics/billdetail/recording");
         return mav;
     }
     /**
@@ -101,7 +101,7 @@ public class SpecificationsController extends AbstractPortalController {
         mav.addAllObjects(map);
         mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_IVR,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_IVR,map.get("time"),map.get("appId")).getData());
-        mav.setViewName("/console/statistics/specifications/ivr");
+        mav.setViewName("/console/statistics/billdetail/ivr");
         return mav;
     }
     /**
@@ -120,7 +120,7 @@ public class SpecificationsController extends AbstractPortalController {
         mav.addAllObjects(map);
         mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_MEETING,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_MEETING,map.get("time"),map.get("appId")).getData());
-        mav.setViewName("/console/statistics/specifications/metting");
+        mav.setViewName("/console/statistics/billdetail/metting");
         return mav;
     }
     /**
@@ -139,7 +139,7 @@ public class SpecificationsController extends AbstractPortalController {
         mav.addAllObjects(map);
         mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
-        mav.setViewName("/console/statistics/specifications/callback");
+        mav.setViewName("/console/statistics/billdetail/callback");
         return mav;
     }
 
