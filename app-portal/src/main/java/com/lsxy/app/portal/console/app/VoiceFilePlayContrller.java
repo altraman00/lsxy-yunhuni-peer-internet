@@ -28,10 +28,11 @@ import java.util.*;
  * Created by zhangxb on 2016/7/21.
  */
 @Controller
-@RequestMapping("/console/app/file")
+@RequestMapping("/console/app/file/play")
 public class VoiceFilePlayContrller extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayContrller.class);
     private  String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
+    private String maxSize = SystemConfig.getProperty("portal.voiceflieplay.maxsize");
     @Autowired
     private OSSService ossService;
 
@@ -44,9 +45,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     @ResponseBody
     public Map fileTotalSize(HttpServletRequest request){
         Map map = new HashMap();
+        Long fileTotalSize = Long.parseLong(maxSize)*1024*1024;
         Billing billing = (Billing)getBilling(request).getData();
-        map.put("fileRemainSize",billing.getFileTotalSize()-billing.getFileRemainSize());
-        map.put("fileTotalSize",billing.getFileTotalSize());
+        map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());
+        map.put("fileTotalSize",fileTotalSize);
         return map;
     }
     /**
