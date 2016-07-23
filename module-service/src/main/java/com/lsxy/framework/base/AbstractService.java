@@ -27,7 +27,7 @@ import java.util.List;
 @Transactional
 public abstract class AbstractService<T> implements BaseService<T> {
 
-    private Logger logger = LoggerFactory.getLogger(com.google.common.util.concurrent.AbstractService.class);
+    private Logger logger = LoggerFactory.getLogger(AbstractService.class);
 
     public abstract BaseDaoInterface<T,Serializable> getDao();
 
