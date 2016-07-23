@@ -59,14 +59,18 @@ public class VoiceFileRecordController extends AbstractRestController {
     public RestResponse deleteAll(String appId,Date startTime,Date endTime){
         Tenant tenant = getCurrentAccount().getTenant();
         int result = voiceFileRecordService.batchUpdateStatus(appId,tenant.getId(),startTime,endTime);
-        List<VoiceFileRecord> list = voiceFileRecordService.list(appId,tenant.getId(),startTime,endTime);
-        //开始删除文件
-        for(int i=0;i<list.size();i++){
-            boolean flag = false;
-            try{
-                flag = FileUtil.delFile(path+list.get(i).getUrl());
-            }catch(Exception e){}
-            logger.info(path+list.get(0).getUrl()+"删除结果:"+flag);
+        if(result>0){
+            List<VoiceFileRecord> list = voiceFileRecordService.list(appId,tenant.getId(),startTime,endTime);
+            //开始删除文件
+            for(int i=0;i<list.size();i++){
+                boolean flag = false;
+                try{
+                    flag = FileUtil.delFile(path+list.get(i).getUrl());
+                }catch(Exception e){}
+                logger.info(path+list.get(0).getUrl()+"删除结果:"+flag);
+            }
+        }else{
+           return RestResponse.failed("0000","删除失败");
         }
         return RestResponse.success(result);
     }

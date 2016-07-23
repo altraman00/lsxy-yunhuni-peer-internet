@@ -496,13 +496,22 @@
     $('.modalSureThree').click(function(){
         var id = $(this).attr('data-id');
         var r=confirm("确认删除所选文件")
-        if (r==true)
-        {
-
-
-        }
-        else
-        {
+        if (r==true){
+            $.ajax({
+                url : "${ctx}/console/app/file/record/batch_delete",
+                type : 'post',
+                async: false,//使用false同步的方式,true为异步方式
+                data : {'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                dataType: "json",
+                success : function(data){
+                    if(data.flag){
+                        showtoast("批量删除成功");
+                    }else{
+                        showtoast("批量删除失败");
+                    }
+                }
+            });
+        }else{
             hideModal(id)
         }
     });

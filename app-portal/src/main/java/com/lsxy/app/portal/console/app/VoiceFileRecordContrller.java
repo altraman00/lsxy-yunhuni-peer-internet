@@ -94,10 +94,40 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
      */
     private RestResponse deleteVoiceFileRecord(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/delete?id={1}";
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/delete?id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, VoiceFileRecord.class,id);
     }
 
+    /**
+     * 批量删除
+     * @param request
+     * @param appId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @RequestMapping("/batch_delete")
+    @ResponseBody
+    public Map batchDelete(HttpServletRequest request,String appId,String startTime,String endTime){
+        RestResponse restResponse = batchDeleteVoiceFileRecord(request,appId,startTime,endTime);
+        Map map = new HashMap();
+        map.put("flag",restResponse.isSuccess());
+        return map;
+    }
+
+    /**
+     * 批量删除rest
+     * @param request
+     * @param appId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    private RestResponse batchDeleteVoiceFileRecord(HttpServletRequest request,String appId,String startTime,String endTime){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/batch/delete?appId={1}&startTime={2}&endTime={3}";
+        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFileRecord.class,appId,startTime,endTime);
+    }
     /**
      * 生成压缩文件
      * @param request
@@ -126,7 +156,7 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
      */
     private RestResponse zipVoiceFileRecord(HttpServletRequest request,String appId,String startTime,String endTime){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/batch/download?appId={1}&startTime={2}&endTime={3}";
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/batch/download?appId={1}&startTime={2}&endTime={3}";
         return RestRequest.buildSecurityRequest(token).get(uri, String.class,appId,startTime,endTime);
     }
 }
