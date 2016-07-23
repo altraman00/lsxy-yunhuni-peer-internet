@@ -473,7 +473,7 @@
                 dataType: "json",
                 success : function(data){
                     if(data.flag){
-                        String fileName = new String(data.fileName);
+                        var fileName = new String(data.fileName);
                         var index = fileName.lastIndexOf("/");
                         var name = fileName.substring(index,fileName.length);
                         //添加加载文件信息
