@@ -16,5 +16,13 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      */
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize,Integer type,String tenantId,String time,String appId);
 
+    /**
+     * 统计消费情况
+     * @param type 类型
+     * @param tenantId 租户id
+     * @param time 时间
+     * @param appId 应用id
+     * @return
+     */
     public BigDecimal sumCost(Integer type, String tenantId, String time, String appId);
 }
