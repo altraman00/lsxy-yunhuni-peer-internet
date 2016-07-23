@@ -3,15 +3,15 @@ package com.lsxy.framework.mq.ons;
 import com.aliyun.openservices.ons.api.*;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
-import com.lsxy.framework.mq.api.GlobalEventHandler;
-import com.lsxy.framework.mq.api.GlobalEventHandlerFactory;
 import com.lsxy.framework.mq.api.MQEvent;
+import com.lsxy.framework.mq.api.MQMessageHandler;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -20,6 +20,7 @@ import java.util.Properties;
 @SuppressWarnings({"rawtypes","unchecked"})
 
 @Component
+@Lazy(value = true)
 @Conditional(OnsCondition.class)
 public class OnsConsumer extends AbstractMQConsumer implements MessageListener,InitializingBean,DisposableBean{
 	private static final Log logger = LogFactory.getLog(OnsConsumer.class);
@@ -43,8 +44,7 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 			properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW"));
 			consumer = ONSFactory.createConsumer(properties);
 			logger.debug("ons consumer build success,ready to start");
-			this.start();
-			logger.debug("ons consumer start successfully ");
+
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
@@ -58,6 +58,7 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 			consumer.subscribe(topic, "*",this);	
 		}
 		consumer.start();
+		logger.debug("ons consumer start successfully ");
 	}
 
 	@Override
@@ -99,10 +100,10 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
 				logger.debug("parse msg to MQEvent object and id is :"	+ event.getId());
-				GlobalEventHandler handler = this.getGlobalEventHandlerFactory().getHandler(event.getEventName());
+				MQMessageHandler handler = this.getMqHandlerFactory().getHandler(event);
 				if (handler != null) {
 					logger.debug("found a handler for the event:" + event.getId() + "--" + handler.getClass().getName());
-					handler.handle(event);
+					handler.handleMessage(event);
 				} else {
 					logger.debug("have not defined a handler for the event:" + event.getEventName());
 				}

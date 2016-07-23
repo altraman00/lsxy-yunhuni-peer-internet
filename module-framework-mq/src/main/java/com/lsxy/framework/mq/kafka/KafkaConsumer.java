@@ -1,27 +1,20 @@
 package com.lsxy.framework.mq.kafka;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.mq.api.AbstractMQConsumer;
 import com.lsxy.framework.mq.api.MQEvent;
-import com.lsxy.framework.mq.api.GlobalEventHandler;
+import com.lsxy.framework.mq.api.MQMessageHandler;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.mq.api.AbstractMQConsumer;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SuppressWarnings({"rawtypes","unchecked"})
 public class KafkaConsumer extends AbstractMQConsumer {
@@ -88,10 +81,10 @@ public class KafkaConsumer extends AbstractMQConsumer {
 								MQEvent event = consumer.parseMessage(msg);
 								if (event != null) {
 									logger.debug("parse msg to MQEvent object and id is :"	+ event.getId());
-									GlobalEventHandler handler = getGlobalEventHandlerFactory().getHandler(event.getEventName());
+									MQMessageHandler handler = getMqHandlerFactory().getHandler(event);
 									if (handler != null) {
 										logger.debug("found a handler for the event:" + event.getId() + "--" + handler.getClass().getName());
-										handler.handle(event);
+										handler.handleMessage(event);
 									} else {
 										logger.debug("have not defined a handler for the event:" + event.getEventName());
 									}

@@ -1,8 +1,12 @@
 package com.lsxy.framework.mq.actmq;
 
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
+import com.lsxy.framework.mq.api.MQEvent;
+import com.lsxy.framework.mq.api.MQMessageHandler;
+import com.lsxy.framework.mq.exceptions.InvalidMQEventMessageException;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -68,8 +72,24 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
 
     @Override
     public void onMessage(Message message) {
+
         if (logger.isDebugEnabled()){
-                logger.debug("收到消息："+ message);
+            logger.debug("收到消息："+ message);
          }
+        if(message instanceof  TextMessage){
+            TextMessage tm = (TextMessage) message;
+            try {
+                String msg = tm.getText();
+
+                MQEvent event = this.parseMessage(msg);
+                MQMessageHandler handler = this.getMqHandlerFactory().getHandler(event);
+                if(handler != null){
+                    handler.handleMessage(event);
+                }
+            } catch (JMSException | InvalidMQEventMessageException e) {
+                logger.error("处理消息出现异常：{}",e);
+                e.printStackTrace();
+            }
+        }
     }
 }

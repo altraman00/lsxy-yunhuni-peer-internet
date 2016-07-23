@@ -15,7 +15,7 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.AbstractMQProducer;
 
-public class KafkaProducer extends AbstractMQProducer implements MQProducer{
+public class KafkaProducer extends AbstractMQProducer {
 	
 	private Log logger = LogFactory.getLog(KafkaProducer.class);
 	private Producer<String, MQEvent> producer;

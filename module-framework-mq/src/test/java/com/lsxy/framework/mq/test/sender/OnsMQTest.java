@@ -1,42 +1,23 @@
-package com.lsxy.framework.mq.test;
+package com.lsxy.framework.mq.test.sender;
 
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.core.test.SpringBootTestCase;
 import com.lsxy.framework.mq.FrameworkMQConfig;
-import com.lsxy.framework.mq.api.MQManager;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.test.events.TestEvent;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.EnableJms;
-import org.springframework.jms.config.JmsListenerContainerFactory;
-import org.springframework.jms.config.SimpleJmsListenerContainerFactory;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.Assert;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
-import java.util.Date;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableAutoConfiguration
 @EnableJms
+
 public class OnsMQTest extends SpringBootTestCase{
 
     public static final Logger logger = LoggerFactory.getLogger(OnsMQTest.class);

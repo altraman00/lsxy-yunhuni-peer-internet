@@ -39,18 +39,18 @@ public class MQHandlerFactory {
 	private final String RESOURCE_PATTERN = "/**/*.class";  
 	
 	//初始化的handlers  <MQEventClassName,Handler>
-	private Map<String,Class<? extends AbstractMessageHandle<AbstractMQEvent>>> handlersMap = new HashMap<String,Class<? extends AbstractMessageHandle<AbstractMQEvent>>>();
+	private Map<String,Class<? extends MQMessageHandler<? extends MQEvent>>> handlersMap =
+			new HashMap<>();
 	
 	/** 
 	 * 加载所有的handlers类
-	 * @param clazz
 	 * @return
 	 * @throws IOException
 	 */
 	@PostConstruct
 	public void loadMQHandlers() throws IOException{
 		logger.debug("MQHandlerFactory.loadMQHandlers"); 
-		String pkg = SystemConfig.getProperty("mq.handlers.package","com.hesyun");
+		String pkg = SystemConfig.getProperty("mq.handlers.package","com.lsxy");
 		 String pattern = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +  
                  ClassUtils.convertClassNameToResourcePath(pkg) + RESOURCE_PATTERN;  
 		 Resource[] res = resourcePatternResolver.getResources(pattern);
@@ -62,7 +62,7 @@ public class MQHandlerFactory {
                  if(filter.match(reader, readerFactory)){
                 	 String className = reader.getClassMetadata().getClassName();  
                 	 try {
-						Class<? extends AbstractMessageHandle<AbstractMQEvent>> clazzx = (Class<? extends AbstractMessageHandle<AbstractMQEvent>>) Class.forName(className);
+						Class<? extends MQMessageHandler<MQEvent>> clazzx = (Class<? extends MQMessageHandler<MQEvent>>) Class.forName(className);
 						Object x = clazzx.getGenericSuperclass();
 						if(x instanceof ParameterizedType){
 							Type[] types =  ((ParameterizedType)x).getActualTypeArguments();
@@ -92,14 +92,14 @@ public class MQHandlerFactory {
 	
 	/**
 	 * 获取指定mq事件对象的handler
-	 * @param clazz
+	 * @param event 触发的事件
 	 * @return
 	 */
-	public AbstractMessageHandle getHandler(Class clazz){
-		AbstractMessageHandle result = null;
-		Class handlerClass = this.getHandlerClass(clazz);
+	public MQMessageHandler getHandler(MQEvent event){
+		MQMessageHandler result = null;
+		Class handlerClass = this.getHandlerClass(event.getClass());
 		if(handlerClass != null){
-			result = (AbstractMessageHandle)SpringContextUtil.getApplicationContext().getBean(handlerClass);
+			result = (MQMessageHandler)SpringContextUtil.getApplicationContext().getBean(handlerClass);
 		}
 		return result;
 		

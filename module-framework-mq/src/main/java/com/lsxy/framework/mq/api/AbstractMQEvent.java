@@ -25,7 +25,17 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
 public abstract class AbstractMQEvent implements MQEvent,MessageCreator,Serializable {
 	
 	private String id = UUIDGenerator.uuid();
-	
+
+	private  long timestamp;
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	/**
 	 * 
 	 */
@@ -78,26 +88,7 @@ public abstract class AbstractMQEvent implements MQEvent,MessageCreator,Serializ
 		}
 		return result;
 	}
-	
-	/**
-	 * 对象从base64反向构建
-	 * @param base64
-	 * @return
-	 */
-	public static AbstractMQEvent buildFromBase64(String base64){
-		byte[] bytes = Base64.decodeBase64(base64);
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-		AbstractMQEvent event = null;
-		try {
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			Object obj = ois.readObject();
-			event = (AbstractMQEvent) obj;
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return event;
-	}
-	
+
 	/**
 	 * 输出消息体
 	 */

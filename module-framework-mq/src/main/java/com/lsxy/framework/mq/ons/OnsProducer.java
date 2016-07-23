@@ -23,7 +23,7 @@ import com.lsxy.framework.config.SystemConfig;
 
 @Component
 @Conditional(OnsCondition.class)
-public class OnsProducer  extends AbstractMQProducer implements MQProducer,InitializingBean,DisposableBean {
+public class OnsProducer  extends AbstractMQProducer implements InitializingBean,DisposableBean {
 
 	private final static Log logger = LogFactory.getLog(OnsProducer.class);
 	 private Producer producer;
