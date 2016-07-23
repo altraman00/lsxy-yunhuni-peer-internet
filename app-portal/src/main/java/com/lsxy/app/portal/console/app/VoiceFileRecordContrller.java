@@ -20,6 +20,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/console/app/file/record")
 public class VoiceFileRecordContrller extends AbstractPortalController {
+
     /**
      * 获取分页数据
      * @param request
@@ -56,8 +57,8 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
      */
     @RequestMapping("/sum")
     @ResponseBody
-    public Map sum(HttpServletRequest request,String appId){
-        Map map =  (Map)sumAndCount(request,appId).getData();
+    public Map sum(HttpServletRequest request,String appId,String startTime,String end){
+        Map map =  (Map)sumAndCount(request,appId,startTime,end).getData();
         return map;
     }
 
@@ -67,10 +68,10 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
      * @param appId
      * @return
      */
-    private RestResponse sumAndCount(HttpServletRequest request,String appId){
+    private RestResponse sumAndCount(HttpServletRequest request,String appId,String startTime,String endTime){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&startTime={2}&endTime={3}";
+        return RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId,startTime,endTime);
     }
     /**
      * 删除放音文件
@@ -78,7 +79,7 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
      * @param id
      * @return
      */
-    @RequestMapping("/deletes")
+    @RequestMapping("/delete")
     @ResponseBody
     public Map delete(HttpServletRequest request, String id){
         RestResponse restResponse = deleteVoiceFileRecord(request,id);
@@ -93,7 +94,39 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
      */
     private RestResponse deleteVoiceFileRecord(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/deletes?id={1}";
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/delete?id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, VoiceFileRecord.class,id);
+    }
+
+    /**
+     * 生成压缩文件
+     * @param request
+     * @param appId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @RequestMapping("/zip")
+    @ResponseBody
+    public Map zip(HttpServletRequest request,String appId,String startTime,String endTime){
+        Map map = new HashMap();
+        RestResponse restResponse = zipVoiceFileRecord(request,appId,startTime,endTime);
+        map.put("flag",restResponse.isSuccess());
+        map.put("fileName",restResponse.getData());
+        return map;
+    }
+
+    /**
+     * zip
+     * @param request
+     * @param appId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    private RestResponse zipVoiceFileRecord(HttpServletRequest request,String appId,String startTime,String endTime){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/batch/download?appId={1}&startTime={2}&endTime={3}";
+        return RestRequest.buildSecurityRequest(token).get(uri, String.class,appId,startTime,endTime);
     }
 }

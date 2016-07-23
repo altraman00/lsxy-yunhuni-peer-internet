@@ -3,8 +3,7 @@ package com.lsxy.app.portal.rest.file;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.FileUtil;
-import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class VoiceFileRecordController extends AbstractRestController {
         return RestResponse.success(result);
     }
     /**
-     * 批量删除
+     * 批量下载
      * @param appId
      * @param startTime
      * @param endTime
@@ -81,13 +81,16 @@ public class VoiceFileRecordController extends AbstractRestController {
     public RestResponse batchDownload(String appId,Date startTime,Date endTime){
         Tenant tenant = getCurrentAccount().getTenant();
         List<VoiceFileRecord> list = voiceFileRecordService.list(appId,tenant.getId(),startTime,endTime);
-        String result = "";
+        //生成文件名 开始时间yyyyMMdd+结束时间yyyyMMdd+随机数(3位)+文件类型后缀
+        String fileName = path+DateUtils.formatDate(startTime,"yyyyMMdd")+"-"+DateUtils.formatDate(endTime,"yyyyMMdd")+"-"+RandomNumberUtil.randomLong(3)+".zip";
+        List<String> orgins = new ArrayList();
         for(int i=0;i<list.size();i++){
-            //进行对文件进行压缩
-            //
+            orgins.add(path+list.get(i).getName());
         }
+        //进行压缩
+        ZipUtil.zip(orgins,fileName);
         //返回zip文件的完整路径
-        return RestResponse.success(result);
+        return RestResponse.success(fileName);
     }
 
     /**

@@ -208,8 +208,7 @@
                                             2、可配置录音文件存储周期，超过7天按相应的存储资费计费，10元/天。
                                         </p>
                                         <div class="form-group">
-                                            <div class="col-md-3 remove-padding line32 font14">
-                                                录音文件总计占用：100M
+                                            <div class="col-md-3 remove-padding line32 font14" id="voiceFileRecord">
                                             </div>
                                             <div class="col-md-9 text-right">
                                                 <a class="btn modalShow right" data-id="three">批量删除</a> <a class="btn modalShow right" data-id="two" >批量下载</a>
@@ -287,11 +286,6 @@
             </div>
 
             <div class="row scrolldiv" id="scrolldivtwo">
-                <p>--扫描文件</p>
-                <p>--共计  200  个文件   200M</p>
-                <p>--开始压缩打包</p>
-                <p>--压缩打包完成 20160601-20160603-001.zip</p>
-                <p>--压缩包生成完成：<a href="#" target="_blank">点击下载</a></p>
             </div>
         </div>
     </div>
@@ -444,7 +438,6 @@
         var id = $(this).attr('data-id');
         $('#scrolldiv'+id).html('');
         $('.moadltips'+id).html('');
-        //异步查询文件信息
 
         //获取时间
         var starttime = $('#datestart'+id).val();
@@ -453,11 +446,48 @@
         if(tips){
             $('.moadltips'+id).html(tips); return false;
         }
-
-        //添加加载文件信息
-        var html  = '  <p>--共计  200  个文件   200M</p>';
-        html+='<p>--统计完成</p>';
-        $('#scrolldiv'+id).append(html);
+        var html  = "";
+        //异步查询文件信息
+        $.ajax({
+            url : "${ctx}/console/app/file/record/sum",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(data){
+                //添加加载文件信息
+                html  = '  <p>--共计  '+data.total+'  个文件   '+resultFileSize(data.size )+'</p>';
+                html+='<p>--统计完成</p>';
+                $('#scrolldiv'+id).append(html);
+            }
+        });
+        //two 表示的是批量下载
+        if(id=='two'){
+            html +='<p>--开始压缩打包</p>';
+            $('#scrolldiv'+id).append(html);
+            $.ajax({
+                url : "${ctx}/console/app/file/record/zip",
+                type : 'post',
+                async: false,//使用false同步的方式,true为异步方式
+                data : {'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                dataType: "json",
+                success : function(data){
+                    if(data.flag){
+                        String fileName = new String(data.fileName);
+                        var index = fileName.lastIndexOf("/");
+                        var name = fileName.substring(index,fileName.length);
+                        //添加加载文件信息
+                        html  = '<p>--压缩打包完成 '+name+'</p>';
+                        html+='<p>--压缩包生成完成：<a href="#" target="_blank">点击下载</a></p>';
+                        $('#scrolldiv'+id).append(html);
+                    }else{
+                        html  = '<p>--压缩打包失败</p>';
+                        html+='<p>--请稍后重试</p>';
+                        $('#scrolldiv'+id).append(html);
+                    }
+                }
+            });
+        }
     });
 
     /**
@@ -468,7 +498,8 @@
         var r=confirm("确认删除所选文件")
         if (r==true)
         {
-            //提交表单确认删除
+
+
         }
         else
         {
@@ -564,11 +595,27 @@
     /**
      * 删除操作
      */
-    function delvoice(id){
+    function delvoice(idType){
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
-                $('#voice-'+id).remove();
+                var id = new String(idType.id).replace("voice-record-","");
+                $.ajax({
+                    url : "${ctx}/console/app/file/record/delete",
+                    type : 'post',
+                    async: false,//使用false同步的方式,true为异步方式
+                    data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            showtoast("删除成功");
+                            recordFileTotalSize();
+                            $('#voice-'+id).remove();
+                        }else{
+                            showtoast("删除失败");
+                        }
+                    }
+                });
             }
         });
     }
@@ -601,25 +648,24 @@
             }
         });
     }
-
-
-
     /**
-     *触发录音文件分页
+     * 查询录音文件占存储空间的大小
      */
-    function upvoice(){
-        //获取数据总数
-        var count = 55;
-        //每页显示数量
-        var listRow = 3;
-        //显示多少个分页按钮
-        var showPageCount = 5;
-        //指定id，创建分页标签
-        var pageId = 'voicepage';
-        //searchTable 为方法名
-        var page = new Page(count,listRow,showPageCount,pageId,voiceTable);
-        page.show();
-    }
+    var recordFileTotalSize = function(){
+        $.ajax({
+            url : "${ctx}/console/app/file/record/sum",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData) {
+                $('#voiceFileRecord').html("录音文件总计占用："+resultFileSize(resultData.size ));
+            }
+        });
+    };
+
+
+
     //默认加载放音文件分页
     $(function () {
         upplay();
@@ -662,7 +708,7 @@
                 $('#voiceFilePlay').html("共计" + resultFileSize(resultData.fileTotalSize) + ",已占用" + resultFileSize(resultData.fileRemainSize)+ "");
             }
         });
-    }
+    };
     var resultFileSize = function(temp){
         if(temp>1024){
             temp = (temp/1024/1024).toFixed(2)+"M";
@@ -713,7 +759,33 @@
         });
     }
 
-
+    /**
+     *触发录音文件分页
+     */
+    function upvoice(){
+        recordFileTotalSize();
+        //获取数据总数
+        var count = 0;
+        $.ajax({
+            url : "${ctx}/console/app/file/record/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : { 'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                count=resultData.list.totalCount;
+            }
+        });
+        //每页显示数量
+        var listRow = 3;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'voicepage';
+        //searchTable 为方法名
+        var page = new Page(count,listRow,showPageCount,pageId,voiceTable);
+        page.show();
+    }
     /**
      * 分页回调方法
      * @param nowPage 当前页数
@@ -721,21 +793,30 @@
      * */
     var voiceTable = function(nowPage,listRows)
     {
-        var data = [
-            ['1','20160606122333-[sessionid]','1M','123'],
-            ['2','20160606122333-[sessionid]','1M','12'],
-            ['3','20160606122333-[sessionid]','1M','123'],
-            ['4','20160606122333-[sessionid]','1M','123']
-        ];
-        var html ='';
-        for(var i = 0 ; i<data.length; i++){
-            html +='<tr class="voicetr" id="voice-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-            html+='<td>'+data[i][2]+'</td>';
-            html+='<td>'+data[i][3]+'</td>';
-            html+='<td class="operation"><a >下载</a> <span ></span><a onclick="delvoice('+data[i][0]+')" >删除</a></td></tr>';
-        }
-        $('#voicetable').find(".voicetr").remove();
-        $('#voicetable').append(html);
+        $.ajax({
+            url : "${ctx}/console/app/file/record/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                var data =[];
+                for(var j=0;j<resultData.list.result.length;j++){
+                    var tempFile = resultData.list.result[j];
+                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.duration];
+                    data[j]=temp;
+                }
+                var html ='';
+                for(var i = 0 ; i<data.length; i++){
+                    html +='<tr class="voicetr" id="voice-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                    html+='<td>'+data[i][2]+'</td>';
+                    html+='<td>'+data[i][3]+'</td>';
+                    html+='<td class="operation"><a >下载</a> <span ></span><a onclick="delvoice(this)" id="voice-record-'+data[i][0]+'" >删除</a></td></tr>';
+                }
+                $('#voicetable').find(".voicetr").remove();
+                $('#voicetable').append(html);
+            }
+        });
     }
 
     $('#myTab li').click(function(){
