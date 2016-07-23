@@ -29,4 +29,26 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @return
      */
     public List<ConsumeDay> list(String userName, String appId, String startTime);
+
+    /**
+     * 获取一定时间的统计数据的总数 时间为月份 yyyy-MM
+     * @param userName
+     * @param appId 应用ID，可为空
+     * @param startTime 开始时间，不可为空
+     * @param endTime 结果时间，不可为空
+     * @return
+     */
+    Long countByTime(String userName, String appId, String startTime, String endTime);
+
+    /**
+     * 获取一定时间的统计数据 时间为月份 yyyy-MM
+     * @param userName
+     * @param appId 应用ID，可为空
+     * @param startTime 开始时间，不可为空
+     * @param endTime 结果时间，不可为空
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    List<ConsumeDay> pageListByTime(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize);
 }

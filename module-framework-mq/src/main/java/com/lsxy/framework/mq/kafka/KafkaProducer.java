@@ -2,6 +2,7 @@ package com.lsxy.framework.mq.kafka;
 
 import java.util.Properties;
 
+import com.lsxy.framework.mq.api.MQProducer;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -11,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.Assert;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.mq.MQEvent;
+import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.AbstractMQProducer;
 
 public class KafkaProducer extends AbstractMQProducer {

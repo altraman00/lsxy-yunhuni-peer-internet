@@ -52,6 +52,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-service-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-cache</artifactId>
+        </dependency>
 
 
     </dependencies>
