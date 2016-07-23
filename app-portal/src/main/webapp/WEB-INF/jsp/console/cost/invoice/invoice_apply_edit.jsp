@@ -149,7 +149,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">注册地址：</lable>
-                                                    <lable class="col-md-4"><input name="bank" placeholder="请填写注册地址" value="${apply.regAddress}" class="form-control input-form notEmpty" data-bv-field="notEmpty"/></lable>
+                                                    <lable class="col-md-4"><input name="regAddress" placeholder="请填写注册地址" value="${apply.regAddress}" class="form-control input-form notEmpty" data-bv-field="notEmpty"/></lable>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">企业电话：</lable>
@@ -184,7 +184,7 @@
                                                     <button class="btn btn-primary  btn-form ">提交申请</button>
                                                 </div>
                                                 <div class="col-md-4 ">
-                                                    <button class=" btn btn-default  btn-form">取消</button>
+                                                    <a href="${ctx}/console/cost/invoice_apply/page" class=" btn btn-default  btn-form">取消</a>
                                                 </div>
                                             </div>
                                         </form:form>
