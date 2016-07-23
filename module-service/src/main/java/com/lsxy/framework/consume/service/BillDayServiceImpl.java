@@ -1,12 +1,12 @@
 package com.lsxy.framework.consume.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.consume.model.BillMonth;
-import com.lsxy.framework.api.consume.service.BillMonthService;
+import com.lsxy.framework.api.consume.model.BillDay;
+import com.lsxy.framework.api.consume.service.BillDayService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.consume.dao.BillMonthDao;
+import com.lsxy.framework.consume.dao.BillDayDao;
 import com.lsxy.framework.core.utils.DateUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,45 +18,46 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by liups on 2016/7/11.
+ * Created by liups on 2016/7/22.
  */
 @Service
-public class BillMonthServiceImpl extends AbstractService<BillMonth> implements BillMonthService {
+public class BillDayServiceImpl extends AbstractService<BillDay> implements BillDayService {
     @Autowired
-    BillMonthDao billMonthDao;
+    BillDayDao billDayDao;
 
     @Autowired
     TenantService tenantService;
+
     @Override
-    public BaseDaoInterface<BillMonth, Serializable> getDao() {
-        return this.billMonthDao;
+    public BaseDaoInterface<BillDay, Serializable> getDao() {
+        return this.billDayDao;
     }
 
     @Override
-    public List<BillMonth> getBillMonths(String userName, String appId, String month) {
-        List<BillMonth> billMonths = null;
+    public List<BillDay> getBillDays(String userName, String appId, String day) {
+        List<BillDay> billDays = null;
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        if(StringUtils.isBlank(month)){
-            throw new IllegalArgumentException("月份为空");
+        if(StringUtils.isBlank(day)){
+            throw new IllegalArgumentException("日期为空");
         }
-        Date dt = DateUtils.parseDate(month, "yyyy-MM");
+        Date dt = DateUtils.parseDate(day, "yyyy-MM-dd");
         if(StringUtils.isBlank(appId)){
             try {
-                String hql = "select new BillMonth(b.tenantId,b.dt,b.type,sum(b.amount)) " +
-                         "from BillMonth b group by b.tenantId,b.dt,b.type having (b.tenantId=?1 and b.dt=?2)";
+                String hql = "select new BillDay(b.tenantId,b.dt,b.type,sum(b.amount)) " +
+                        "from BillDay b group by b.tenantId,b.dt,b.type having (b.tenantId=?1 and b.dt=?2)";
                 Query query = this.getEm().createQuery(hql);
                 query.setParameter(1, tenant.getId());
                 query.setParameter(2,dt);
-                billMonths = (List<BillMonth>) query.getResultList();
+                billDays = (List<BillDay>) query.getResultList();
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }else{
-            billMonths = billMonthDao.findByTenantIdAndAppIdAndDt(tenant.getId(), appId, dt);
+            billDays = billDayDao.findByTenantIdAndAppIdAndDt(tenant.getId(), appId, dt);
         }
 
-        return billMonths;
+        return billDays;
     }
-}
 
+}

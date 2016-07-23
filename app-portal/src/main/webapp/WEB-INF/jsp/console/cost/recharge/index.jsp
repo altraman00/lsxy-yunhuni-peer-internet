@@ -65,7 +65,7 @@
                                             </li>
                                             <li>
                                                 <div class="aside-li-a">
-                                                    <a href="./cost_invoice_record.html">发票记录</a>
+                                                    <a href="${ctx}/console/cost/invoice_apply/page">发票申请</a>
                                                 </div>
                                             </li>
                                         </ul>

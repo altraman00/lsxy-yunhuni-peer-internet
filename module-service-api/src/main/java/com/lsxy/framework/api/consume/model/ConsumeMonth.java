@@ -17,10 +17,10 @@ import java.util.Date;
 public class ConsumeMonth extends IdEntity {
     private Date dt;//统计时间
     private Integer month;//统计月 区间1-12
-    private BigDecimal amongAmount;//消费统计 decimal(10,0) DEFAULT NULL,
-    private BigDecimal sumAmount;//消费金额,
-    private Integer amongSessionConut;//会话数统计
-    private Integer sumSessionCount;//会话统计
+    private BigDecimal amongAmount;//本月消费统计 decimal(20,4) DEFAULT NULL,
+    private BigDecimal sumAmount;//累计消费金额,
+    private Integer amongSessionConut;//本月会话数统计
+    private Integer sumSessionCount;//累计会话统计
     private String appId;//所属应用,
     private String tenantId;//所属租户
     @Column(name = "month")

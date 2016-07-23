@@ -9,27 +9,25 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 月结账单
- * Created by liups on 2016/7/11.
+ * Created by liups on 2016/7/22.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_bill_month")
-public class BillMonth extends IdEntity {
+@Table(schema="db_lsxy_base",name = "tb_base_bill_day")
+public class BillDay extends IdEntity {
     private Date dt;                    //统计时间
-    private Integer month;              //月份
+    private Integer day;              //天
     private String type;                //统计项目
     private BigDecimal amount;              //总额
     private String appId;               //所属应用
     private String tenantId;            //所属租户
 
-    public BillMonth(){
-
+    public BillDay() {
     }
 
     /**
      * 用于Hql查询，别删
      */
-    public BillMonth(String tenantId,Date dt,String type,BigDecimal amount){
+    public BillDay(String tenantId, Date dt, String type, BigDecimal amount){
         this.tenantId = tenantId;
         this.dt = dt;
         this.type = type;
@@ -45,13 +43,13 @@ public class BillMonth extends IdEntity {
         this.dt = dt;
     }
 
-    @Column(name = "month")
-    public Integer getMonth() {
-        return month;
+    @Column(name = "day")
+    public Integer getDay() {
+        return day;
     }
 
-    public void setMonth(Integer month) {
-        this.month = month;
+    public void setDay(Integer day) {
+        this.day = day;
     }
 
     @Column(name = "type")

@@ -3,6 +3,7 @@ package com.lsxy.app.portal.console.cost;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -38,6 +39,7 @@ public class InvoiceInfoController extends AbstractPortalController {
     }
 
     @RequestMapping(value = "/edit",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView edit(HttpServletRequest request){
         String returView;
         Map<String,Object> model = new HashMap<>();
@@ -49,6 +51,7 @@ public class InvoiceInfoController extends AbstractPortalController {
     }
 
     @RequestMapping(value = "/save",method = RequestMethod.POST)
+    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView edit(HttpServletRequest request,InvoiceInfo invoiceInfo){
         String returView;
         Map<String,Object> model = new HashMap<>();
