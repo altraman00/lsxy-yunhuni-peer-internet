@@ -2,11 +2,17 @@ package com.lsxy.framework.mq.ons;
 
 import java.util.Properties;
 
-import com.lsxy.framework.mq.MQEvent;
+import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.AbstractMQProducer;
+import com.lsxy.framework.mq.api.MQProducer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.aliyun.openservices.ons.api.Message;
@@ -16,9 +22,15 @@ import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.aliyun.openservices.ons.api.SendResult;
 import com.lsxy.framework.config.SystemConfig;
 
-public class OnsProducer  extends AbstractMQProducer {
+@Component
+@Conditional(OnsCondition.class)
+public class OnsProducer  extends AbstractMQProducer implements InitializingBean,DisposableBean {
+
 	private final static Log logger = LogFactory.getLog(OnsProducer.class);
 	 private Producer producer;
+
+	@Autowired
+	private OnsMQConfig onsMQConfig;
 	@Override
 	public void publishEvent(MQEvent event) {
 		Assert.notNull(event);
@@ -49,10 +61,12 @@ public class OnsProducer  extends AbstractMQProducer {
 	
 	public void init(){
 		logger.debug("try to build ons producer");
-		Properties properties = new Properties();
-        properties.put(PropertyKeyConst.ProducerId, SystemConfig.getProperty("mq.ons.pid","PID_TENANT_SERVICE"));
-        properties.put(PropertyKeyConst.AccessKey,SystemConfig.getProperty("mq.ons.ak","3qPjLmZrmSgXHQKn"));
-        properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","CUB2Fl0NXtOnB5qfpNFOGf4VhVAte1"));
+		Properties properties =onsMQConfig.getOnsProperties();
+
+//        properties.put(PropertyKeyConst.ProducerId, SystemConfig.getProperty("mq.ons.pid","PID_YUNHUNI-TENANT-001"));
+//        properties.put(PropertyKeyConst.AccessKey,SystemConfig.getProperty("mq.ons.ak","nfgEUCKyOdVMVbqQ"));
+//        properties.put(PropertyKeyConst.SecretKey, SystemConfig.getProperty("mq.ons.sk","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW"));
+
         logger.debug("ons properties:"+properties);
         producer = ONSFactory.createProducer(properties);
         logger.debug("ons producer build success,ready to start");
@@ -71,5 +85,10 @@ public class OnsProducer  extends AbstractMQProducer {
 		Properties properties = new Properties();
 		properties.put("a", "1");
 		System.out.println(properties);
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.init();
 	}
 }

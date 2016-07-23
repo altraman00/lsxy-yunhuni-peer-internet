@@ -51,7 +51,7 @@
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-mq</artifactId>
+            <artifactId>module-framework-cache</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
