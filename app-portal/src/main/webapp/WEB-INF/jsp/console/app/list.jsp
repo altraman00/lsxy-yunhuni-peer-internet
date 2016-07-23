@@ -81,8 +81,8 @@
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.name}</td>
                                             <td>${result.id}</td>
-                                            <c:if test="${result.status==1}"><td class="success"  id="statusapp-${result.id}">已上线</td></c:if>
-                                            <c:if test="${result.status==2}"><td  class="nosuccess" id="statusapp-${result.id}">未上线</td></c:if>
+                                            <c:if test="${result.status==1}"><td ><span class="success"  id="statusapp-${result.id}">已上线</span></td></c:if>
+                                            <c:if test="${result.status==2}"><td ><span class="nosuccess" id="statusapp-${result.id}">未上线</span></td></c:if>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
