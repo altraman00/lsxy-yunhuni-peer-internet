@@ -2,8 +2,6 @@ package com.lsxy.framework.mq.api;
 
 import javax.jms.JMSException;
 
-import static javafx.scene.input.KeyCode.T;
-
 /**
  * Created by Tandy on 2016/7/23.
  */
