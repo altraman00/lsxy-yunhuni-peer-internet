@@ -31,32 +31,32 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a ">
-                                                <a href="${ctx}/console/statistics/specifications/call">语音呼叫</a>
+                                                <a href="${ctx}/console/statistics/billdetail/call">语音呼叫</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/specifications/callback">语音回拨</a>
+                                                <a href="${ctx}/console/statistics/billdetail/callback">语音回拨</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/specifications/metting">会议服务</a>
+                                                <a href="${ctx}/console/statistics/billdetail/metting">会议服务</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/specifications/ivr">IVR定制服务</a>
+                                                <a href="${ctx}/console/statistics/billdetail/ivr">IVR定制服务</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/specifications/code">语音验证码</a>
+                                                <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/statistics/specifications/recording">录音服务</a>
+                                                <a href="${ctx}/console/statistics/billdetail/recording">录音服务</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -88,7 +88,7 @@
                                     </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form:form action="${ctx}/console/statistics/specifications/recording" method="post" id="mainForm">
+                                    <form:form action="${ctx}/console/statistics/billdetail/recording" method="post" id="mainForm">
                                         <div class="row statistics_row" >
                                             <input type="hidden" id="appId" name="appId" value="">
                                             <div class="col-md-1">
@@ -130,7 +130,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/specifications/recording"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/recording"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>

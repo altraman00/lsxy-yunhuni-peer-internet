@@ -71,7 +71,6 @@ public class EntityUtils extends org.apache.commons.beanutils.BeanUtils {
 			while (entries.hasNext()) {
 				Map.Entry entry = (Map.Entry) entries.next();
 				String name = (String) entry.getKey();
-				System.out.print(name);
 				if(ArrayUtils.contains(excludeCopyProperties,name)){
 					continue;
 				}
