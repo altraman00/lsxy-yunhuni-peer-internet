@@ -336,7 +336,7 @@
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four"></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
-        <form:form action="${ctx}/console/app/file/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();" target="hidden_frame">
+        <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();" target="hidden_frame">
             <div class="input-box ">
                 <div class="row  mt-10">
                     <input type="hidden" name="appId" value="${app.id}">
@@ -533,7 +533,7 @@
                                 var id = new String(thisT.id).replace('remark-b-','');
                                 //异步请求修改数据
                                 $.ajax({
-                                    url : "${ctx}/console/app/file/modify",
+                                    url : "${ctx}/console/app/file/play/modify",
                                     type : 'post',
                                     async: false,//使用false同步的方式,true为异步方式
                                     data : {'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
@@ -583,7 +583,7 @@
             if(result){
                 var id = new String(idType.id).replace("delete-","");
                 $.ajax({
-                    url : "${ctx}/console/app/file/delete",
+                    url : "${ctx}/console/app/file/play/delete",
                     type : 'post',
                     async: false,//使用false同步的方式,true为异步方式
                     data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
@@ -632,7 +632,7 @@
         var count = 0;
         var name = $('#name').val();
         $.ajax({
-            url : "${ctx}/console/app/file/list",
+            url : "${ctx}/console/app/file/play/list",
             type : 'post',
             async: false,//使用false同步的方式,true为异步方式
             data : {'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
@@ -653,7 +653,7 @@
     }
     var fileTotalSoze = function(){
         $.ajax({
-            url : "${ctx}/console/app/file/total",
+            url : "${ctx}/console/app/file/play/total",
             type : 'post',
             async: false,//使用false同步的方式,true为异步方式
             data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
@@ -680,7 +680,7 @@
     {
         var name = $('#name').val();
         $.ajax({
-            url : "${ctx}/console/app/file/list",
+            url : "${ctx}/console/app/file/play/list",
             type : 'post',
             async: false,//使用false同步的方式,true为异步方式
             data : {'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
@@ -754,7 +754,7 @@
     }
     function startListener(){
         $.ajax({
-            url : "${ctx}/console/app/file/status",
+            url : "${ctx}/console/app/file/play/status",
             type : 'post',
             async: false,//使用false同步的方式,true为异步方式
             data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象

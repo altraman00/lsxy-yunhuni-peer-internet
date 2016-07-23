@@ -19,16 +19,8 @@ public class Billing extends IdEntity {
     private Integer voiceRemain;          //剩余语音流量（分钟）
     private Integer smsRemain;            //语音短信余量（条）
     private Integer conferenceRemain;     //会议剩余量（分钟）
-    private Long fileTotalSize;//存储总容量
     private Long fileRemainSize;//剩余存储容量，单位byte
 
-    @Column(name = "file_total_size")
-    public Long getFileTotalSize() {
-        return fileTotalSize;
-    }
-    public void setFileTotalSize(Long fileTotalSize) {
-        this.fileTotalSize = fileTotalSize;
-    }
     @Column(name = "file_remain_size")
     public Long getFileRemainSize() {
         return fileRemainSize;

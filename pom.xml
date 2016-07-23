@@ -112,8 +112,11 @@
                 <artifactId>service-yunhuni</artifactId>
                 <version>1.0.2-SNAPSHOT</version>
             </dependency>
-
-
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.9.7</version>
+            </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-oss</artifactId>
