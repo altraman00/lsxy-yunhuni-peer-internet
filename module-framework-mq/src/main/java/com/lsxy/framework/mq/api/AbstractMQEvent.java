@@ -1,4 +1,4 @@
-package com.lsxy.framework.mq;
+package com.lsxy.framework.mq.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -23,9 +24,24 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
  *
  */
 public abstract class AbstractMQEvent implements MQEvent,MessageCreator,Serializable {
-	
-	private String id = UUIDGenerator.uuid();
-	
+
+	private String id;
+
+	private  long timestamp;
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@Override
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	/**
 	 * 
 	 */
@@ -78,26 +94,7 @@ public abstract class AbstractMQEvent implements MQEvent,MessageCreator,Serializ
 		}
 		return result;
 	}
-	
-	/**
-	 * 对象从base64反向构建
-	 * @param base64
-	 * @return
-	 */
-	public static AbstractMQEvent buildFromBase64(String base64){
-		byte[] bytes = Base64.decodeBase64(base64);
-		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-		AbstractMQEvent event = null;
-		try {
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			Object obj = ois.readObject();
-			event = (AbstractMQEvent) obj;
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return event;
-	}
-	
+
 	/**
 	 * 输出消息体
 	 */
@@ -115,5 +112,6 @@ public abstract class AbstractMQEvent implements MQEvent,MessageCreator,Serializ
 	public String toJson() {
 		return JSONUtil2.objectToJson(this,false);
 	}
+
 
 }
