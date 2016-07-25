@@ -97,7 +97,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse findById(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/get/id={1}";
+        String uri = restPrefixUrl + "/rest/app/get/{1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**

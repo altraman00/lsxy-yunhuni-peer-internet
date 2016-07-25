@@ -209,31 +209,41 @@ public abstract class AbstractService<T> implements BaseService<T> {
      * from LoginLog ll where ll.personId='' order by ll.dt desc
      */
     public Page findByCustom(String jpql,boolean excludeDeleted,int pageNo,int pageSize,Object ... params){
-        if(logger.isDebugEnabled()){
-            logger.debug("findByCustom:"+jpql);
-        }
-        if(excludeDeleted)
-            jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
-        pageNo--;
-        String countJpql = " select count(*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
-        Query query = this.em.createQuery(countJpql);
-        for (int i = 0; i < params.length; i++) {
-            Object object = params[i];
-            query.setParameter(i+1, object);
-        }
-        Object obj = query.getSingleResult();
-        long totalCount = (Long) obj;
 
-        query = this.em.createQuery(jpql);
+        long totalCount = countByCustom(jpql, excludeDeleted,params);
+        pageNo--;
+        List list = getPageList(jpql,excludeDeleted, pageNo, pageSize, params);
+        Page page = new Page((pageNo)*pageSize+1,totalCount,pageSize,list);
+        return page;
+    }
+
+    /**
+     * 获取分页里面的数据,排除删除的数据
+     * @return
+     */
+    public List getPageList(String jpql,int pageNo, int pageSize, Object... params) {
+        return getPageList(jpql,true,pageNo,pageSize,params);
+    }
+
+    /**
+     * 获取分页里面的数据 注：传进来的 pageNo 要先减去 1
+     * @return
+     */
+    public List getPageList(String jpql, boolean excludeDeleted,int pageNo, int pageSize, Object... params) {
+        if(logger.isDebugEnabled()){
+            logger.debug("findPageList:"+jpql);
+        }
+        if(excludeDeleted){
+            jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
+        }
+        Query query = this.em.createQuery(jpql);
         for (int i = 0; i < params.length; i++) {
             Object object = params[i];
             query.setParameter(i+1, object);
         }
         query.setMaxResults(pageSize);
         query.setFirstResult(pageNo*pageSize);
-        List list = query.getResultList();
-        Page page = new Page((pageNo)*pageSize+1,totalCount,pageSize,list);
-        return page;
+        return query.getResultList();
     }
 
     /**
@@ -255,12 +265,12 @@ public abstract class AbstractService<T> implements BaseService<T> {
      */
     public long countByCustom(String jpql,boolean excludeDeleted,Object ... params){
         if(logger.isDebugEnabled()){
-            logger.debug("findByCustom:"+jpql);
+            logger.debug("countByCustom:"+jpql);
         }
         if(excludeDeleted){
             jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
         }
-        String countJpql = " select count(*) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
+        String countJpql = " select count(1) " + HqlUtil.removeOrders(HqlUtil.removeSelect(jpql));
         Query query = this.em.createQuery(countJpql);
         for (int i = 0; i < params.length; i++) {
             Object object = params[i];

@@ -43,7 +43,7 @@ public class RegisterController {
      */
     @RequestMapping(value = "/info_check" , method = RequestMethod.POST)
     @ResponseBody
-    public Map infoCheck(String userName, String mobile,String email){
+    public Map infoCheck(String userName,  String mobile, String email){
         Map<String,Object> result = new HashMap<>();
         result.put("flag",true);
         try {
@@ -62,7 +62,7 @@ public class RegisterController {
      */
     @RequestMapping(value = "/register",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
-    public ModelAndView register(HttpServletRequest request, String userName,  String mobile, String email){
+    public ModelAndView register(HttpServletRequest request, String userName, String mobile,String email){
         Map<String,String> model = new HashMap<>();
         String erInfo = "erInfo";
         String erPage = "register/fail";
@@ -102,21 +102,24 @@ public class RegisterController {
      */
     @RequestMapping(value = "/mail_active",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
-    public ModelAndView mailActive(String uid,String username,String code){
+    public ModelAndView mailActive(String uid,String code){
         Map<String,String> model = new HashMap<>();
         String returnView;
         //检查邮件是否有效
         String cUid = cacheManager.get(code);
-        if(StringUtils.isNotBlank(uid)&&uid.equals(cUid)){
-            Integer accountStatus = getAccountStatus(uid);
-            if(accountStatus != null){
-                if(Account.STATUS_NOT_ACTIVE == accountStatus){
+        Account account = getAccount(uid);
+        if(account == null){
+            model.put("erInfo","参数异常");
+            returnView = "register/active_fail";
+        }else{
+            if(uid.equals(cUid)){
+                if(Account.STATUS_NOT_ACTIVE == account.getStatus()){
                     //没有激活,前往激活页面
                     model.put("uid",uid);
-                    model.put("username",username);
+                    model.put("username",account.getUserName());
                     model.put("code",code);
                     returnView = "register/active";
-                }else if(Account.STATUS_NORMAL == accountStatus){
+                }else if(Account.STATUS_NORMAL == account.getStatus()){
                     //已经激活
                     model.put("info","账户已经激活");
                     returnView = "register/active_result";
@@ -125,18 +128,14 @@ public class RegisterController {
                     returnView = "register/active_fail";
                 }
             }else{
-                model.put("erInfo","参数异常");
-                returnView = "register/active_fail";
-            }
-        }else{
-            //检查用户是否激活
-            Integer accountStatus = getAccountStatus(uid);
-            if(accountStatus != null && accountStatus == 2){
-                model.put("info","账户已经激活");
-                returnView = "register/active_result";
-            }else{
-                model.put("erInfo","参数异常或邮件已过期");
-                returnView = "register/active_fail";
+                //检查用户是否激活
+                if(account.getStatus() == Account.STATUS_NORMAL){
+                    model.put("info","账户已经激活");
+                    returnView = "register/active_result";
+                }else{
+                    model.put("erInfo","参数异常或邮件已过期");
+                    returnView = "register/active_fail";
+                }
             }
         }
         return new ModelAndView(returnView,model);
@@ -220,10 +219,10 @@ public class RegisterController {
      * 获取账号状态
      * @return
      */
-    private Integer getAccountStatus(String accountId){
+    private Account getAccount(String accountId){
         //此处调用获取账号状态的RestApi接口
-        String createAccountUrl = PortalConstants.REST_PREFIX_URL + "/reg/account_status?accountId={1}";
-        RestResponse<Integer> response = RestRequest.buildRequest().get(createAccountUrl,Integer.class,accountId);
+        String createAccountUrl = PortalConstants.REST_PREFIX_URL + "/reg/account/{1}";
+        RestResponse<Account> response = RestRequest.buildRequest().get(createAccountUrl,Account.class,accountId);
         return response.getData();
     }
 

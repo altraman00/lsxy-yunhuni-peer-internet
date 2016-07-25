@@ -69,7 +69,7 @@
                                                 </li>
                                                 <li>
                                                     <div class="aside-li-a">
-                                                        <a href="./cost_invoice_record.html">发票申请</a>
+                                                        <a href="${ctx}/console/cost/invoice_apply/page">发票申请</a>
                                                     </div>
                                                 </li>
                                             </ul>
@@ -92,7 +92,7 @@
                                 </div>
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="row">
-                                        <form role="form" action="./index.html" method="post" class="register-form"
+                                        <form role="form" action="" method="post" class="register-form"
                                               id="costInvoiceForm">
 
                                             <div class="form-group">
@@ -172,6 +172,7 @@
         </section>
     </section>
 </section>
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 </body>
 

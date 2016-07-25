@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 充值控制器
@@ -132,13 +136,8 @@ public class RechargeController extends AbstractPortalController {
      * @return
      */
     @RequestMapping(value = "/list")
-    public ModelAndView list(HttpServletRequest request,Integer  pageNo, Integer pageSize,String startTime,String endTime) throws Exception {
-        if(pageNo == null){
-            pageNo = 1;
-        }
-        if(pageSize == null){
-            pageSize = 20;
-        }
+    public ModelAndView list(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer  pageNo,@RequestParam(defaultValue = "20")  Integer pageSize,
+                             String startTime, String endTime) throws Exception {
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
         Page page = getRechargePage(pageNo, pageSize, startTime, endTime, token);

@@ -10,4 +10,11 @@ import java.io.Serializable;
  * Created by zhangxb on 2016/7/6.
  */
 public interface ConsumeMonthDao extends BaseDaoInterface<ConsumeMonth,Serializable> {
+    /**
+     * 获取用户开始消费的第一个月统计数据
+     * @param tenantId
+     * @return
+     */
+    ConsumeMonth findFirst1ByTenantIdOrderByDtAsc(String tenantId);
+
 }
