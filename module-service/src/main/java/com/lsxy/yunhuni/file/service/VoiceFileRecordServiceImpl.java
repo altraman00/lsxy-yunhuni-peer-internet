@@ -1,0 +1,67 @@
+package com.lsxy.yunhuni.file.service;
+
+import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
+import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
+import com.lsxy.yunhuni.file.dao.VoiceFileRecordDao;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 录音文件
+ * Created by zhangxb on 2016/7/21.
+ */
+@Service
+public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord> implements VoiceFileRecordService{
+    @Autowired
+    private VoiceFileRecordDao voiceFileRecordDao;
+    @Override
+    public BaseDaoInterface<VoiceFileRecord, Serializable> getDao() {
+        return voiceFileRecordDao;
+    }
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize,String appId,String tenantId) {
+        String hql = " from VoiceFileRecord obj where obj.app.id=?1 and obj.tenant.id=?2 ";
+        Page<VoiceFileRecord> page = this.pageList(hql,pageNo,pageSize,appId,tenantId);
+        return page;
+    }
+
+    @Override
+    public Map sumAndCount(String appId, String tenantId,Date startTime,Date endTime) {
+        String sql = "select sum(size) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? ";
+        Map map = null;
+        if(startTime!=null&&endTime!=null){
+            sql = "select sum(size) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? and create_time<=? and create_time>=?";
+            map = jdbcTemplate.queryForMap(sql,appId,tenantId,startTime,endTime);
+        }else{
+            map = jdbcTemplate.queryForMap(sql,appId,tenantId);
+        }
+        return map;
+    }
+
+    @Override
+    public int batchUpdateStatus(String appid, String tenantId, Date startTime, Date endTime) {
+        String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set deleted=1 where  deleted=0 and app_id=? and tenant_id=? and create_time<=? and create_time>=?";
+        int result = jdbcTemplate.update(sql,appid,tenantId,startTime,endTime);
+        return result;
+    }
+
+    @Override
+    public List<VoiceFileRecord> list(String appid, String tenantId, Date startTime, Date endTime) {
+        String hql = " from VoiceFileRecord obj where obj.app.id=?1 and obj.tenant.id=?2 and obj.createTime<=?3 and obj.createTime>=?4";
+        List<VoiceFileRecord> list = this.list(hql,appid,tenantId,startTime,endTime);
+        return list;
+    }
+}
