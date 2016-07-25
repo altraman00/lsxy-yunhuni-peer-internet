@@ -297,7 +297,7 @@
 
 <!---批量删除--->
 <div class="modal-box application-detail-box" id="modalthree" style="display:none ">
-    <div class="title">批量删除<a class="close_a modalCancel" data-id="three"></a></div>
+    <div class="title">批量删除<a class="close_a modalCancel cancelthree" data-id="three"></a></div>
     <div class="content">
         <p class="text-center mt-20">批量删除录音文件 <span class="tips-error moadltipsthree text-center"></span></p>
 
@@ -320,7 +320,7 @@
         </div>
     </div>
     <div class="footer">
-        <a class="cancel modalCancel" data-id="three">返回</a>
+        <a class="cancel modalCancel cancelthree" data-id="three">返回</a>
         <a class="sure modalSureThree" data-id="three">确认</a>
     </div>
 </div>
@@ -490,6 +490,14 @@
             });
         }
     });
+    $('.cancelthree').click(function(){
+        batchclear($(this).attr('data-id'));
+    })
+    function batchclear(id){
+        $('#scrolldiv'+id).html('');
+        $('#datestart'+id).val('');
+        $('#dateend'+id).val('');
+    }
 
     /**
      * 批量删除处理
@@ -499,25 +507,30 @@
         var starttime = $('#datestart'+id).val();
         var endtime = $('#dateend'+id).val();
         endtime+=" 23:59:59";
-        var r=confirm("确认删除所选文件")
-        if (r==true){
-            $.ajax({
-                url : "${ctx}/console/app/file/record/batch_delete",
-                type : 'post',
-                async: false,//使用false同步的方式,true为异步方式
-                data : {'id':id,'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                dataType: "json",
-                success : function(data){
-                    if(data.flag){
-                        showtoast("批量删除成功");
-                    }else{
-                        showtoast("批量删除失败");
+        bootbox.confirm("确认删除所选文件", function(result) {
+            if(result){
+                $.ajax({
+                    url : "${ctx}/console/app/file/record/batch_delete",
+                    type : 'post',
+                    async: false,//使用false同步的方式,true为异步方式
+                    data : {'id':id,'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            showtoast("批量删除成功");
+                        }else{
+                            showtoast("批量删除失败");
+                        }
                     }
-                }
-            });
-        }else{
-            hideModal(id)
-        }
+                });
+                upvoice();
+                $('#voice-'+id).remove();
+                hideModal(id);
+            }else{
+                hideModal(id);
+            }
+            batchclear(id);
+        });
     });
 
     /**

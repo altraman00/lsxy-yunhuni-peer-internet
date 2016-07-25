@@ -135,7 +135,7 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
     private RestResponse batchDeleteVoiceFileRecord(HttpServletRequest request,String appId,String startTime,String endTime){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/batch/delete?appId={1}&startTime={2}&endTime={3}";
-        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFileRecord.class,appId,startTime,endTime);
+        return RestRequest.buildSecurityRequest(token).get(uri, Integer.class,appId,startTime,endTime);
     }
 
     /**
