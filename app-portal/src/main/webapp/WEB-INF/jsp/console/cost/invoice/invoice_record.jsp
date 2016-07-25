@@ -325,9 +325,6 @@
         $('#invoice-url').html('');
 
         $('#ininvoicetime').html("").attr('data-start',"").attr('data-end',"");
-        $('#invoice-price').html("").attr("");
-        $('#invoice-point').html("");
-        $('#invoice-url').html("");
 
         $('#sendinvoice').attr('disabled',true);
     }
