@@ -40,10 +40,10 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public Map sumAndCount(String appId, String tenantId,Date startTime,Date endTime) {
-        String sql = "select sum(size) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? ";
+        String sql = "select COALESCE(sum(size),0) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? ";
         Map map = null;
         if(startTime!=null&&endTime!=null){
-            sql = "select sum(size) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? and create_time<=? and create_time>=?";
+            sql = "select COALESCE(sum(size),0) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? and create_time<=? and create_time>=?";
             map = jdbcTemplate.queryForMap(sql,appId,tenantId,startTime,endTime);
         }else{
             map = jdbcTemplate.queryForMap(sql,appId,tenantId);
