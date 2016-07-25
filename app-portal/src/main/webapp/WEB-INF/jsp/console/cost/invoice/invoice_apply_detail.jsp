@@ -142,7 +142,7 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">银行帐号：</lable>
+                                                    <lable class="col-md-3 text-right ">银行账户：</lable>
                                                     <lable class="col-md-9 line34 ">${apply.bankAccount}</lable>
                                                 </div>
 
