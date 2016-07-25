@@ -98,7 +98,7 @@
                                             <input type="hidden" name="submission_token" value="${submission_token}" />
                                             <input type="hidden" name="id" value="${apply.id}"/>
                                             <div class="form-group">
-                                                <span class=" text-label"><strong>开票信息:</strong><a id="invoice-url">(查看详情)</a></span>
+                                                <span class=" text-label"><strong>开票信息:</strong><a id="invoice-url">(消费详情)</a></span>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">开具发票金额：</lable>
@@ -212,7 +212,7 @@
                     &times;
                 </button>
                 <h4 class="modal-title" id="myModalLabel">
-                    开票详情
+                    消费详情
                 </h4>
             </div>
             <div class="modal-body">
