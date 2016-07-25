@@ -181,7 +181,7 @@ public class InvoiceApplyController extends AbstractPortalController {
      * @return
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
-    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
+    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView save(HttpServletRequest request){
         String token = this.getSecurityToken(request);
         Map<String,Object> paramsMap = WebUtils.getRequestParams(request);
