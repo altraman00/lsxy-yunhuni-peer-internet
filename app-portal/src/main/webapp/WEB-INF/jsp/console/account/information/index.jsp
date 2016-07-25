@@ -81,7 +81,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">主要业务：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="business" placeholder="" value="${account.business}  "
+                                                <input type="text" name="business" placeholder="" value="${account.business}"
                                                        class="form-control input-form notEmpty"/>
                                             </div>
                                         </div>
@@ -160,7 +160,6 @@
         $('#personalAuthForm').bootstrapValidator('validate');
         var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
         if(result==true){
-            $('#validateBtn').attr('disabled','disabled');
             //提交表单
             $.ajax({
                 url : "${ctx}/console/account/update",
@@ -173,7 +172,6 @@
                 },
                 fail:function(){
                     showtoast('网络异常，请稍后重试');
-                    $('#validateBtn').removeAttr('disabled');
                 }
             });
         }

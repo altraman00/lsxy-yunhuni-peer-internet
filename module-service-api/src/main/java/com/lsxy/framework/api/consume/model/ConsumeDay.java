@@ -24,6 +24,16 @@ public class ConsumeDay extends IdEntity{
     private String appId;//所属应用,
     private String tenantId;//所属租户
 
+    public ConsumeDay() {
+    }
+
+    public ConsumeDay(Date dt,BigDecimal amongAmount, Integer amongSessionConut,String tenantId) {
+        this.dt = dt;
+        this.amongAmount = amongAmount;
+        this.amongSessionConut = amongSessionConut;
+        this.tenantId = tenantId;
+    }
+
     @Column(name = "day")
     public Integer getDay() {
         return day;

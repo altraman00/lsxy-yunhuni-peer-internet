@@ -14,6 +14,11 @@ import java.util.Date;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_resources_rent")
 public class ResourcesRent extends IdEntity {
+    public static final String RESTYPE_TELENUM = "1";
+    public static final int RENT_STATUS_USING = 1;      //正在使用
+    public static final int RENT_STATUS_UNUSED = 2;     //没在使用，但号码归属于租户
+    public static final int RENT_STATUS_RELEASE = 3;    //被释放，号码不属于租户
+
     private Tenant tenant;//tenant_id所属租户
     private App app;//app_id 关联应用
     private ResourceTelenum resourceTelenum;//res_id资源对象（号码）
@@ -23,6 +28,20 @@ public class ResourcesRent extends IdEntity {
     private Date rentDt;//rent_dt 租用时间,
     private Date rentExpire;//rent_expire到期时间,
     private Integer rentStatus;//rent_status租用状态,
+
+    public ResourcesRent() {
+    }
+
+    public ResourcesRent(Tenant tenant, App app, ResourceTelenum resourceTelenum, String resName, String resType, Date rentDt, Date rentExpire, Integer rentStatus) {
+        this.tenant = tenant;
+        this.app = app;
+        this.resourceTelenum = resourceTelenum;
+        this.resName = resName;
+        this.resType = resType;
+        this.rentDt = rentDt;
+        this.rentExpire = rentExpire;
+        this.rentStatus = rentStatus;
+    }
 
     @Column(name = "res_type")
     public String getResType() {

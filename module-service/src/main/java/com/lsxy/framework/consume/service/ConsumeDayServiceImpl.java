@@ -8,11 +8,14 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.consume.dao.ConsumeDayDao;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -56,5 +59,36 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
             list = this.findByCustomWithParams(hql, tenant.getId(),appId,startTime);
         }
         return list;
+    }
+
+    @Override
+    public Long countByTime(String userName, String appId, String startTime, String endTime) {
+        Tenant tenant = tenantService.findTenantByUserName(userName);
+        String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
+        Date start = DateUtils.parseDate(startTime,"yyyy-MM");
+        Date end = DateUtils.parseDate(nextMonth,"yyyy-MM");
+        String hql;
+        if(StringUtils.isBlank(appId)){
+            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.dt>=?2 and obj.dt<?3";
+        }else{
+            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and obj.dt>=?2 and obj.dt<?3";
+        }
+        long count = this.countByCustom(hql, tenant.getId(), start, end);
+        return count;
+    }
+
+    @Override
+    public List<ConsumeDay> pageListByTime(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
+        Tenant tenant = tenantService.findTenantByUserName(userName);
+        String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
+        Date start = DateUtils.parseDate(startTime,"yyyy-MM");
+        Date end = DateUtils.parseDate(nextMonth,"yyyy-MM");
+        String hql;
+        if(StringUtils.isBlank(appId)){
+            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.dt>=?2 and obj.dt<?3";
+        }else{
+            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and obj.dt>=?2 and obj.dt<?3";
+        }
+        return getPageList(hql, pageNo -1, pageSize,tenant.getId(), start, end);
     }
 }

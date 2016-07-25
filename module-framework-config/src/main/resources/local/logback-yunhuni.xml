@@ -41,10 +41,10 @@
         </triggeringPolicy>
     </appender>
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
-    <logger name="org.springframework.security" level="DEBUG" additivity="true" />
+    <logger name="org.springframework.security" level="INFO" additivity="true" />
     <logger name="org.hibernate" level="INFO" additivity="true" />
-    <logger name="redis.clients" level="DEBUG" additivity="true" />
-    <logger name="org.springframework.data" level="DEBUG" additivity="true" />
+    <logger name="redis.clients" level="INFO" additivity="true" />
+    <logger name="org.springframework.data" level="INFO" additivity="true" />
 
 
 

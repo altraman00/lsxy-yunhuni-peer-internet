@@ -6,6 +6,7 @@
         <artifactId>yunhuni</artifactId>
         <groupId>com.lsxy</groupId>
         <version>1.0.2-SNAPSHOT</version>
+        <relativePath>../</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -27,11 +28,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>com.aliyun.openservices</groupId>
             <artifactId>ons-client</artifactId>
             <version>1.1.8</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>org.reflections</groupId>
@@ -42,12 +43,10 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-cache</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-core</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
         </dependency>
 
         <!-- http://mvnrepository.com/artifact/javax.jms/jms-api -->
@@ -65,6 +64,27 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jms</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.aliyun.openservices/ons-jms
+        <dependency>
+            <groupId>com.aliyun.openservices</groupId>
+            <artifactId>ons-jms</artifactId>
+            <version>1.2.2</version>
+        </dependency> -->
+        <dependency>
+            <groupId>com.aliyun.openservices</groupId>
+            <artifactId>ons-client</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-config</artifactId>
         </dependency>
 
     </dependencies>

@@ -8,10 +8,15 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.consume.dao.ConsumeMonthDao;
 import com.lsxy.framework.core.utils.Page;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,5 +59,53 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
             list = this.findByCustomWithParams(hql, tenant.getId(),appId,startTime);
         }
         return list;
+    }
+
+    @Override
+    public String getStartMonthByTenantId(String tenantId) {
+        String start = null;
+        ConsumeMonth consumeMonth = consumeMonthDao.findFirst1ByTenantIdOrderByDtAsc(tenantId);
+        if(consumeMonth != null){
+            start = new SimpleDateFormat("yyyy-MM").format(consumeMonth.getDt());
+        }
+        return start;
+    }
+
+    @Override
+    public BigDecimal sumAmountByTime(String tenantId, String start, String end){
+        BigDecimal amount;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+            Date startTime;
+            Date endTime = null;
+            String hql;
+            if(StringUtils.isNotBlank(start)){
+                startTime = format.parse(start);
+            }else{
+                throw new IllegalArgumentException("参数异常");
+            }
+            if(StringUtils.isNotBlank(end)){
+                endTime = format.parse(end);
+            }
+            if(endTime != null){
+                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where obj.tenantId = ?1 and obj.dt between ?2 and ?3";
+            }else{
+                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where obj.tenantId = ?1 and obj.dt >= ?2";
+            }
+            Query query = this.getEm().createQuery(hql);
+            query.setParameter(1, tenantId);
+            query.setParameter(2, startTime);
+            if(endTime != null){
+                query.setParameter(3, endTime);
+            }
+            Object obj = query.getSingleResult();
+            amount = (BigDecimal) obj;
+        }catch (Exception e){
+            throw new IllegalArgumentException("参数异常");
+        }
+        if(amount == null){
+            amount = new BigDecimal(0);
+        }
+        return amount;
     }
 }
