@@ -119,17 +119,28 @@
                                                                    value='${start}' id="datestart"/>到
                                                             <input type="text" class="datepicker form-control" name="end"
                                                                    data-date-end-date="0m" value=''  id="dateend"/>
-                                                            <a class="btn btn-primary query">查询</a>
+                                                            <%--<a class="btn btn-primary query">查询</a>--%>
                                                             <span class="tips-error querytips"></span>
                                                         </div>
-                                                        <div class="row invoiceapply" style="display: none">
+                                                        <div class="row invoiceapply">
                                                             发票类型：
-                                                            <!--<a class="invoice-type" href="cost_invoice.html" data-type="0">您还未填写发票信息，请先填写完成</a>-->
-                                                            <!--<span class="invoice-type" href="cost_invoice.html"
+                                                            <c:choose>
+                                                                <c:when test='${invoiceType eq "1"}'>
+                                                                    <span class="invoice-type"  data-type="1">个人增值税普通发票</span>
+                                                                </c:when>
+                                                                <c:when test='${invoiceType eq "2"}'>
+                                                                    <span class="invoice-type"  data-type="2">企业增值税普通票</span>
+                                                                </c:when>
+                                                                <c:when test='${invoiceType eq "3"}'>
+                                                                    <span class="invoice-type"  data-type="3">企业增值税专用票</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <a class="invoice-type" href="cost_invoice.html" data-type="0">您还未填写发票信息，请先填写完成</a>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                            <!--<span class="invoice-type"
                                                                   data-type="2">企业增值税普通票</span>-->
-                                                        <span class="invoice-type" href="cost_invoice.html"
-                                                              data-type="1">个人增值税普通发票</span>
-                                                            <!--<span class="invoice-type" href="cost_invoice.html" data-type="3">企业增值税专用票</span>-->
+                                                            <!--<span class="invoice-type" data-type="3">企业增值税专用票</span>-->
                                                         </div>
                                                         <div class="row invoiceapply"  >
                                                             <div>开票时间：
@@ -144,7 +155,7 @@
                                                                 <a id="invoice-url" ></a>
                                                                 <button class="btn btn-primary float-right" id="sendinvoice"
                                                                         type="submit"
-                                                                        disabled>开发发票
+                                                                        disabled>开具发票
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -306,9 +317,23 @@
 
 <script>
 
-
-    $('.query').click(function () {
+    function clearData(){
         $('.querytips').html('');
+        //清空数据
+        $('#invoice-price').html('0.').attr('data-money', '0.00');
+        $('#invoice-point').html('00');
+        $('#invoice-url').html('');
+
+        $('#ininvoicetime').html("").attr('data-start',"").attr('data-end',"");
+        $('#invoice-price').html("").attr("");
+        $('#invoice-point').html("");
+        $('#invoice-url').html("");
+
+        $('#sendinvoice').attr('disabled',true);
+    }
+
+    $('#dateend').change(function () {
+        clearData()
         //获取时间
         var starttime = $('#datestart').val();
         var endtime = $('#dateend').val();
@@ -317,10 +342,6 @@
             $('.querytips').html(tips);
             return false;
         }
-        //清空数据
-        $('#invoice-price').html('0.').attr('data-money', '0.00');
-        $('#invoice-point').html('00');
-        $('#invoice-url').html('');
 
         //显示时间
         $('#ininvoicetime').html(starttime + ' 至 ' + endtime).attr('data-start',starttime).attr('data-end',endtime);
