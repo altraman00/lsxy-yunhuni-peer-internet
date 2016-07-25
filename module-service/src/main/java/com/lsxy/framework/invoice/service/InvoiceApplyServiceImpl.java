@@ -15,6 +15,9 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.invoice.dao.InvoiceApplyDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -95,6 +98,14 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         return apply;
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #apply.id", beforeInvocation = true)
+            },
+            put = {
+                    @CachePut(value = "entity", key = "'entity_' + #apply.id",unless = "#apply == null")
+            }
+    )
     @Override
     public InvoiceApply update(InvoiceApply apply, String userName) {
         InvoiceApply oldApply = this.findById(apply.getId());
