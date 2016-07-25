@@ -96,9 +96,7 @@
                                     </div>
                                 </div>
                                 <div class="row ">
-                                    <div class="col-md-1 remove-padding width-140">
-                                        服务器白名单：
-                                    </div>
+                                    <div class="col-md-1 remove-padding width-130">服务器白名单：</div>
                                     <div class="col-md-10 ">
                                         <p>${app.whiteList}</p>
                                     </div>
@@ -537,9 +535,30 @@
      * 文件上传地址
      */
     $('.modalSureFour').click(function(){
+        var id = $(this).attr('data-id');
+        //验证文件格式
+        var file = $('#singlefile');
+
+        if(file[0].files.length==0){
+            showtoast("请上传文件");
+        }
+
+        var allowtype =  ["WAV"];
+        for(var i=0 ; i<file[0].files.length ;i++ ){
+            var names =  getFiletype(file[0].files[i].name);
+            if ($.inArray(names,allowtype) == -1)
+            {
+                showtoast("上传失败，只支持 .wav 格式的文件");
+                return false;
+            }
+            if(file[0].files[i].size> 5* 1024 * 1024){
+                showtoast("上传失败，单条语音最大支持 5M");
+                return false;
+            }
+        }
         $('#uploadLength').show();
         $('#uploadMianForm').submit();
-        //var id = $(this).attr('data-id');
+
         //hideModal(id)
     });
 
