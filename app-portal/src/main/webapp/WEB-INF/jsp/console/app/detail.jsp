@@ -446,6 +446,7 @@
         if(tips){
             $('.moadltips'+id).html(tips); return false;
         }
+        endtime+=" 23:59:59";
         var html  = "";
         //异步查询文件信息
         $.ajax({
@@ -497,6 +498,7 @@
         var id = $(this).attr('data-id');
         var starttime = $('#datestart'+id).val();
         var endtime = $('#dateend'+id).val();
+        endtime+=" 23:59:59";
         var r=confirm("确认删除所选文件")
         if (r==true){
             $.ajax({

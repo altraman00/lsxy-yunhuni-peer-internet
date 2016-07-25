@@ -52,7 +52,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
 
     @Override
-    public int batchUpdateStatus(String appid, String tenantId, Date startTime, Date endTime) {
+    public int batchDelete(String appid, String tenantId, Date startTime, Date endTime) {
         String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set deleted=1 where  deleted=0 and app_id=? and tenant_id=? and create_time<=? and create_time>=?";
         int result = jdbcTemplate.update(sql,appid,tenantId,endTime,startTime);
         return result;
