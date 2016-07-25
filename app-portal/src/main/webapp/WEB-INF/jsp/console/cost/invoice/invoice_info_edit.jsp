@@ -105,7 +105,7 @@
                                                 <div class="invoice_select col-md-6 ">
                                                     <input type="radio" name="type" class="invoice_radio" value="1"
                                                            <c:if test="${invoiceInfo == null || invoiceInfo.type == 1}">checked="checked"</c:if>
-                                                           data-val="1"/>人增值税普通发票
+                                                           data-val="1"/>个人增值税普通发票
                                                     <input type="radio" name="type" class="invoice_radio" value="2"
                                                            <c:if test="${invoiceInfo.type == 2}">checked="checked"</c:if>
                                                            data-val="2">
