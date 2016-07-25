@@ -216,7 +216,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      * @return
      */
     private String getFileKey(String tenantId,String appId,String ymd,String type){
-        String result = "play_voice/"+tenantId+"/"+appId+"/"+ymd+"/"+ UUIDGenerator.uuid()+type;
+        String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd+"/"+ UUIDGenerator.uuid()+type;
         return result;
     }
     /**
