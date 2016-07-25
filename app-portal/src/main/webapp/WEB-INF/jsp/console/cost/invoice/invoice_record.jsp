@@ -253,7 +253,7 @@
                     &times;
                 </button>
                 <h4 class="modal-title" id="myModalLabel">
-                    开票详情
+                    消费详情
                 </h4>
             </div>
             <div class="modal-body">
@@ -376,7 +376,7 @@
 
         $('#invoice-price').html(priceInt + '.').attr('data-money', price.toFixed(2));
         $('#invoice-point').html(priceFloat);
-        $('#invoice-url').html('查看详情');
+        $('#invoice-url').html('消费详情');
 
         var con = condition();
         if (con) {
