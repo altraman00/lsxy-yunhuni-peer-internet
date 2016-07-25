@@ -40,11 +40,11 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public Map sumAndCount(String appId, String tenantId,Date startTime,Date endTime) {
-        String sql = "select sum(size) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? ";
+        String sql = "select COALESCE(sum(size),0) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? ";
         Map map = null;
         if(startTime!=null&&endTime!=null){
-            sql = "select sum(size) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? and create_time<=? and create_time>=?";
-            map = jdbcTemplate.queryForMap(sql,appId,tenantId,startTime,endTime);
+            sql = "select COALESCE(sum(size),0) as size,count(1) as total from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and  app_id=? and tenant_id=? and create_time<=? and create_time>=?";
+            map = jdbcTemplate.queryForMap(sql,appId,tenantId,endTime,startTime);
         }else{
             map = jdbcTemplate.queryForMap(sql,appId,tenantId);
         }
@@ -52,16 +52,16 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
 
     @Override
-    public int batchUpdateStatus(String appid, String tenantId, Date startTime, Date endTime) {
+    public int batchDelete(String appid, String tenantId, Date startTime, Date endTime) {
         String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set deleted=1 where  deleted=0 and app_id=? and tenant_id=? and create_time<=? and create_time>=?";
-        int result = jdbcTemplate.update(sql,appid,tenantId,startTime,endTime);
+        int result = jdbcTemplate.update(sql,appid,tenantId,endTime,startTime);
         return result;
     }
 
     @Override
     public List<VoiceFileRecord> list(String appid, String tenantId, Date startTime, Date endTime) {
         String hql = " from VoiceFileRecord obj where obj.app.id=?1 and obj.tenant.id=?2 and obj.createTime<=?3 and obj.createTime>=?4";
-        List<VoiceFileRecord> list = this.list(hql,appid,tenantId,startTime,endTime);
+        List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
         return list;
     }
 }

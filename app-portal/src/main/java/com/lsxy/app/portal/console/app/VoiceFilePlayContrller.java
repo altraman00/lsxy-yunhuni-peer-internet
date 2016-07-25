@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 放音文件处理
@@ -52,11 +54,12 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         return map;
     }
     /**
-     * 获取分页数据
+     * 根据当前页，每页记录数，应用ｉｄ，放音文件的名字（模糊查询）进行查询放音文件的分页信息
      * @param request
-     * @param pageNo
-     * @param pageSize
-     * @param appId
+     * @param pageNo　当前页
+     * @param pageSize　每页记录数
+     * @param appId　应用的ｉｄ
+     * @param name　放音文件的名字
      * @return
      */
     @RequestMapping("/list")
@@ -66,6 +69,13 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         map.put("list",pageListVoiceFilePlay(request,pageNo,pageSize,appId,name).getData());
         return map;
     }
+    /**
+     * 根据放音文件的ｉｄ修改放音文件的备注
+     * @param request
+     * @param id　放音文件ｉｄ
+     * @param remark 备注
+     * @return
+     */
     @RequestMapping("/modify")
     @ResponseBody
     public Map modify(HttpServletRequest request, String id,String remark){
@@ -75,8 +85,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         return map;
     }
     /**
-     * 修改放音文件rest
+     * 根据放音文件的ｉｄ修改放音文件的备注
      * @param request
+     * @param id　放音文件ｉｄ
+     * @param remark 备注
      * @return
      */
     private RestResponse modifyVoiceFilePlay(HttpServletRequest request,String id,String remark){
@@ -85,9 +97,9 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,id,remark);
     }
     /**
-     * 删除放音文件
+     * 根据放音文件的ｉｄ删除放音文件
      * @param request
-     * @param id
+     * @param id　放音文件ｉｄ
      * @return
      */
     @RequestMapping("/delete")
@@ -98,9 +110,11 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         map.put("flag",restResponse.isSuccess());
         return map;
     }
+
     /**
-     * 删除放音文件rest
+     * 根据放音文件的ｉｄ删除放音文件
      * @param request
+     * @param id　放音文件ｉｄ
      * @return
      */
     private RestResponse deleteVoiceFilePlay(HttpServletRequest request,String id){
@@ -108,12 +122,14 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/delete?id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,id);
     }
+
     /**
-     * 查询放音文件
+     * 根据当前页，每页记录数，应用ｉｄ，放音文件的名字（模糊查询）进行查询放音文件的分页信息
      * @param request
-     * @param pageNo
-     * @param pageSize
-     * @param appId
+     * @param pageNo　当前页
+     * @param pageSize　每页记录数
+     * @param appId　应用的ｉｄ
+     * @param name　放音文件的名字
      * @return
      */
     private RestResponse pageListVoiceFilePlay(HttpServletRequest request, Integer pageNo, Integer pageSize, String appId,String name){
@@ -122,7 +138,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).getPage(uri,VoiceFilePlay.class,pageNo,pageSize,name,appId);
     }
     /**
-     * 获取账务表
+     * 获取用户的账务表信息
      * @param request
      * @return
      */
@@ -149,8 +165,9 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                 for (int i=0;i< multipartfiles.length;i++) {
                     MultipartFile file  = multipartfiles[i];
                     String name = file.getOriginalFilename();//文件名
+                    String type = name.substring(name.lastIndexOf("."),name.length());
                     long size = file.getSize();
-                    String fileKey = getFileKey(tenantId,appId,ymd);
+                    String fileKey = getFileKey(tenantId,appId,ymd,type);
                     boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name,repository,fileKey);
                     if(flag){//文件保存成功，将对象保存数据库
                         RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
@@ -174,9 +191,14 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         }
         oss.setFlag(true);
     }
+
     /**
-     * 删除放音文件rest
+     * 创建上传文件记录
      * @param request
+     * @param name 文件名字
+     * @param size 文件大小
+     * @param fileKey 文件ＯＳＳ地址
+     * @param appId　应用ｉｄ
      * @return
      */
     private RestResponse createVoiceFilePlay(HttpServletRequest request,String name,long size,String fileKey,String appId){
@@ -184,14 +206,17 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/create?name={1}&size={2}&fileKey={3}&appId={4}";
         return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,name,size,fileKey,appId);
     }
+
     /**
-     * 获取在Oss中的标识
-     * @param appId  应用id
+     * 获取在Oss中的标识 生成规则play_voice/tenant_id/app_id/yyyyMMdd/uuid
+     * @param tenantId 租户id
+     * @param appId 应用id
+     * @param ymd 时间yyyyMMdd类型
+     * @param type 文件类型
      * @return
      */
-    private String getFileKey(String tenantId,String appId,String ymd){
-        //生成规则play_voice/tenant_id/app_id/yyyyMMdd/uuid
-        String result = "play_voice/"+tenantId+"/"+appId+"/"+ymd+"/"+ UUIDGenerator.uuid();
+    private String getFileKey(String tenantId,String appId,String ymd,String type){
+        String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd+"/"+ UUIDGenerator.uuid()+type;
         return result;
     }
     /**

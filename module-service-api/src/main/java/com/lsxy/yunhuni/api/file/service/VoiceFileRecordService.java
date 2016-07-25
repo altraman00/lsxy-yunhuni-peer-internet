@@ -36,7 +36,7 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @param endTime
      * @return
      */
-    public int batchUpdateStatus(String appid, String tenantId, Date startTime,Date endTime);
+    public int batchDelete(String appid, String tenantId, Date startTime,Date endTime);
 
     /**
      * 获取数据
