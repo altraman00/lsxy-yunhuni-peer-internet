@@ -171,18 +171,17 @@ public class CertUtil {
 	private static X509Certificate initCert(String path) {
 		X509Certificate encryptCertTemp = null;
 		CertificateFactory cf = null;
-		FileInputStream in = null;
+		InputStream in = null;
 		try {
 			cf = CertificateFactory.getInstance("X.509", "BC");
-			in = new FileInputStream(path);
+            in = CertUtil.class.getClassLoader().getResourceAsStream(path);
+//            in = new FileInputStream(path);
 			encryptCertTemp = (X509Certificate) cf.generateCertificate(in);
 			// 打印证书加载信息,供测试阶段调试
 			logger.info("[" + path + "][CertId="
 					+ encryptCertTemp.getSerialNumber().toString() + "]");
 		} catch (CertificateException e) {
 			logger.error("InitCert Error", e);
-		} catch (FileNotFoundException e) {
-			logger.error("InitCert Error File Not Found", e);
 		} catch (NoSuchProviderException e) {
 			logger.error("LoadVerifyCert Error No BC Provider", e);
 		} finally {
@@ -197,13 +196,16 @@ public class CertUtil {
 		return encryptCertTemp;
 	}
 
+
+
 	/**
 	 * 从指定目录下加载验证签名证书
 	 * 
 	 */
 	private static void initValidateCertFromDir() {
 		certMap.clear();
-		String dir = SDKConfig.getConfig().getValidateCertDir();
+//        String dir = SDKConfig.getConfig().getValidateCertDir();
+        String dir = CertUtil.class.getClassLoader().getResource(SDKConfig.getConfig().getValidateCertDir()).getFile();
 		logger.info("加载验证签名证书目录==>" + dir);
 		if (isEmpty(dir)) {
 			logger.info("ERROR: acpsdk.validateCert.dir is empty");
@@ -518,7 +520,7 @@ public class CertUtil {
 	public static KeyStore getKeyInfo(String pfxkeyfile, String keypwd,
 			String type) throws IOException {
 		logger.info("加载签名证书==>" + pfxkeyfile);
-		FileInputStream fis = null;
+		InputStream fis = null;
 		try {
 			if (Security.getProvider("BC") == null) {
 				logger.info("add BC provider");
@@ -541,7 +543,8 @@ public class CertUtil {
 			}
 			logger.info("Load RSA CertPath=[" + pfxkeyfile + "],Pwd=["
 					+ keypwd + "]");
-			fis = new FileInputStream(pfxkeyfile);
+//			fis = new FileInputStream(pfxkeyfile);
+            fis = CertUtil.class.getClassLoader().getResourceAsStream(pfxkeyfile);
 			char[] nPassword = null;
 			nPassword = null == keypwd || "".equals(keypwd.trim()) ? null
 					: keypwd.toCharArray();
