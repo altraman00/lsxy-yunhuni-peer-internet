@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest.cost;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.consume.service.ConsumeMonthService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
+import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -41,13 +42,18 @@ public class InvoiceApplyController extends AbstractRestController {
      */
     @RequestMapping("/start_info")
     public RestResponse getStart(){
+        String userName = this.getCurrentAccountUserName();
         Map<String,Object> result = new HashMap<>();
-        Tenant tenant = tenantService.findTenantByUserName(this.getCurrentAccountUserName());
+        Tenant tenant = tenantService.findTenantByUserName(userName);
         //从申请历史中获取开始时间
         String start = invoiceApplyService.getStart(tenant.getId());
         if(StringUtils.isBlank(start)){
             //从开始消费的月统计中获取开始时间
             start = consumeMonthService.getStartMonthByTenantId(tenant.getId());
+        }
+        InvoiceInfo invoiceInfo = invoiceInfoService.getByUserName(userName);
+        if(invoiceInfo != null){
+            result.put("invoiceType",invoiceInfo.getType());
         }
         if(StringUtils.isBlank(start)){
             //用户没有任何消费

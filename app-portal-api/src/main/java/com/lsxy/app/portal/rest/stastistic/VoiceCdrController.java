@@ -37,9 +37,9 @@ public class VoiceCdrController extends AbstractRestController {
     }
 
     /**
-     * 统计租户消费情况
-     * @param type 类型
-     * @param time 时间
+     * 根据查询类型，应用id，统计当前日期的消费额度或者验证码条数
+     * @param type 类型 会话类型1.语音呼叫 2.双向回拨 3.会议 4.IVR定制服务  5.语音验证码 6.录音
+     * @param time 时间格式 yyyy-MM-dd
      * @param appId 应用id
      * @return
      */
