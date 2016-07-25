@@ -98,7 +98,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">发票类型：</lable>
                                                 <lable class="col-md-6  line34">
-                                                    <c:if test="${invoiceInfo.type == 1}">人增值税普通发票</c:if>
+                                                    <c:if test="${invoiceInfo.type == 1}">个人增值税普通发票</c:if>
                                                     <c:if test="${invoiceInfo.type == 2}">企业增值税普通票</c:if>
                                                     <c:if test="${invoiceInfo.type == 3}">企业增值税专用票</c:if>
                                                 </lable>
