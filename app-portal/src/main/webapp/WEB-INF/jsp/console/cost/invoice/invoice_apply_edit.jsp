@@ -113,7 +113,7 @@
                                                 <input type="hidden" name="end" value="<fmt:formatDate value="${apply.end}" pattern="yyyy-MM"/>">
                                             </div>
                                             <div class="form-group">
-                                                <span class="hr text-label"><strong>发票信息:</strong> </span>
+                                                <span class="hr text-label"><strong>发票信息:</strong> &nbsp;<span class="grey">(临时修改不改变已保存的邮寄信息)</span></span>
                                             </div>
 
 
