@@ -49,16 +49,16 @@ public class VoiceFileRecordController extends AbstractRestController {
     }
 
     /**
-     * 批量删除
-     * @param appId
-     * @param startTime
-     * @param endTime
+     * 根据应用id，删除在开始时间和结束时间区间内的录音文件
+     * @param appId 应用id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
      * @return
      */
     @RequestMapping("/batch/delete")
-    public RestResponse deleteAll(String appId,Date startTime,Date endTime){
+    public RestResponse batchDelete(String appId,Date startTime,Date endTime){
         Tenant tenant = getCurrentAccount().getTenant();
-        int result = voiceFileRecordService.batchUpdateStatus(appId,tenant.getId(),startTime,endTime);
+        int result = voiceFileRecordService.batchDelete(appId,tenant.getId(),startTime,endTime);
         if(result>0){
             List<VoiceFileRecord> list = voiceFileRecordService.list(appId,tenant.getId(),startTime,endTime);
             //开始删除文件
@@ -98,12 +98,14 @@ public class VoiceFileRecordController extends AbstractRestController {
     }
 
     /**
-     * 统计方法
-     * @param appId
+     * 根据应用id和开始时间，结束时间统计区间内文件数量total和文件总大小size
+     * @param appId 应用id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
      * @return
      */
     @RequestMapping("/sum")
-    public RestResponse sum(String appId,Date startTime,Date endTime){
+    public RestResponse sumAndCount(String appId,Date startTime,Date endTime){
         Tenant tenant = getCurrentAccount().getTenant();
         Map map = voiceFileRecordService.sumAndCount(appId,tenant.getId(),startTime,endTime);
         return RestResponse.success(map);
