@@ -328,8 +328,12 @@
 
         $('#sendinvoice').attr('disabled',true);
     }
-
+    var onchangeFlag = false;
     $('#dateend').change(function () {
+        if(!onchangeFlag){
+            onchangeFlag = true;
+            return false;
+        }
         clearData()
         //获取时间
         var starttime = $('#datestart').val();
