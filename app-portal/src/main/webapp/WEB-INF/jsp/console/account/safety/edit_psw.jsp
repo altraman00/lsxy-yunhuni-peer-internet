@@ -73,19 +73,19 @@
                                           id="personalAuthForm">
                                         <div class="form-group">
                                             <div class="col-md-4 remove-padding moretips">
-                                                <input type="password" name="oldPassword" placeholder="原密码"
+                                                <input type="password" name="oldPassword" placeholder="原密码" id="oldPassword" onkeyup="pwsKey2()"
                                                        class="form-control input-form password" />
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="col-md-4 remove-padding moretips ">
-                                                <input type="password" name="newPassword" placeholder="新密码"
+                                                <input type="password" name="newPassword" onkeydown="pwsKey()" id="newPassword" placeholder="新密码"
                                                        class="form-control input-form newpassword" />
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="col-md-4 remove-padding moretips">
-                                                <input type="password" name="" placeholder="确认新的密码"
+                                                <input type="password" name="" placeholder="确认新的密码" id="qrnewPassword"
                                                        class="form-control input-form repassword" />
                                             </div>
                                         </div>
@@ -116,9 +116,25 @@
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/personal/password.js'></script>
 <script type="text/javascript">
+    function pwsKey(){
+        var t2 = $('#qrnewPassword').val();
+        if(t2!='') {
+            $('#qrnewPassword').val('');
+        }
+    }
+    function pwsKey2(){
+        var t0 = $('#oldPassword').val();
+        var t1 = $('#newPassword').val();
+        if(t1!=''&&t1==t0){
+            showtoast('新密码不能与原密码相同');
+            return false;
+        }
+        return true;
+    }
     $('#validateBtn').click(function(){
         var result = $('#personalAuthForm').data('bootstrapValidator').isValid();
-        if(result==true){
+        var flag = pwsKey2();
+        if(result==true&&flag==true){
             $('#validateBtn').attr('disabled','disabled');
             //提交表单
             $.ajax({
