@@ -77,7 +77,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form limit20"/>
+                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form "/>
                                             </div>
                                         </div>
 
