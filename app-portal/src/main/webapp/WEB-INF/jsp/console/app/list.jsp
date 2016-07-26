@@ -480,7 +480,7 @@
     //应用下线
     function offline(id){
         bootbox.setLocale("zh_CN");
-        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result){
+        bootbox.confirm("应用下线后，选择的功能服务将终止，IVR号码关联将解除，应用上线后需要重新选择绑定（应用下线不影响IVR号码的月租费的收取）", function(result){
             if(result){
                 $.ajax({
                     url : ctx + "/console/app_action/offline",
