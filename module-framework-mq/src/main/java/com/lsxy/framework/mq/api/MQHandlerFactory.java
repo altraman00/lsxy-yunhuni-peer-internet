@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class MQHandlerFactory {
 
 	
 	//初始化的handlers  <MQEventClassName,Handler>
-	private Map<String,Class<? extends MQMessageHandler>> handlersMap =
+	private Map<String,Set<Class<? extends MQMessageHandler>>> handlersMap =
 			new HashMap<>();
 	
 	/** 
@@ -70,7 +71,12 @@ public class MQHandlerFactory {
 			String eventClassName = getEventClassName(handlerClass);
 			logger.debug("[GEH]"+handlerClass+" for " + eventClassName);
 			//一开始初始化的时候，handler映射表中对应类名的处理handler设置为空，只需要知道有这个处理类就可以了
-			this.handlersMap.put(eventClassName, handlerClass);
+			Set<Class<? extends MQMessageHandler>> handlesSet = this.handlersMap.get(eventClassName);
+			if(handlesSet == null){
+				handlesSet = new HashSet<>();
+			}
+			handlesSet.add(handlerClass);
+			this.handlersMap.put(eventClassName,handlesSet);
 		}
 	}
 	/**
@@ -97,7 +103,7 @@ public class MQHandlerFactory {
 	 * @param class1
 	 * @return
 	 */
-	private Class getHandlerClass(Class class1) {
+	private Set<Class<? extends MQMessageHandler>> getHandlerClass(Class class1) {
 		return this.handlersMap.get(class1.getName());
 	}
 	
@@ -106,14 +112,10 @@ public class MQHandlerFactory {
 	 * @param event 触发的事件
 	 * @return
 	 */
-	public MQMessageHandler getHandler(MQEvent event){
+	public Set<Class<? extends MQMessageHandler>> getHandler(MQEvent event){
 		MQMessageHandler result = null;
-		Class handlerClass = this.getHandlerClass(event.getClass());
-		if(handlerClass != null){
-			result = (MQMessageHandler) applicationContext.getBean(handlerClass);
-		}
-		return result;
-		
+		Set<Class<? extends MQMessageHandler>> handlerClass = this.getHandlerClass(event.getClass());
+		return handlerClass;
 	}
 	
 }
