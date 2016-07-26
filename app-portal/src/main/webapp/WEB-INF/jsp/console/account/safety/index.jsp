@@ -153,20 +153,20 @@
                                                    data-target="#emailModal">修改</a>
                                             </div>
                                         </div>
-                                        <div class="row  personal-box">
-                                            <div class="col-md-1 account-icon "><i class="personal-protect-icon"></i>
-                                            </div>
-                                            <div class="col-md-9 ">
-                                                    <span class="help-block "><a href="#">密码保护</a><br/>
-                                                        <small class="help-small">设置3个容易记住且最不容易被他人获取的问题及答案，可用于密码找回</small>
-                                                    </span>
-                                            </div>
-                                            <div class="col-md-2 right">
-                                                <c:if test="${ safetyVo.isPrivate==1}" ><span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span></c:if>
-                                                <c:if test="${ safetyVo.isPrivate==-1}" ><span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span></c:if>
-                                                <a href="" class="personal-edit" >修改</a>
-                                            </div>
-                                        </div>
+                                        <%--<div class="row  personal-box">--%>
+                                            <%--<div class="col-md-1 account-icon "><i class="personal-protect-icon"></i>--%>
+                                            <%--</div>--%>
+                                            <%--<div class="col-md-9 ">--%>
+                                                    <%--<span class="help-block "><a href="#">密码保护</a><br/>--%>
+                                                        <%--<small class="help-small">设置3个容易记住且最不容易被他人获取的问题及答案，可用于密码找回</small>--%>
+                                                    <%--</span>--%>
+                                            <%--</div>--%>
+                                            <%--<div class="col-md-2 right">--%>
+                                                <%--<c:if test="${ safetyVo.isPrivate==1}" ><span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span></c:if>--%>
+                                                <%--<c:if test="${ safetyVo.isPrivate==-1}" ><span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span></c:if>--%>
+                                                <%--<a href="" class="personal-edit" >修改</a>--%>
+                                            <%--</div>--%>
+                                        <%--</div>--%>
                                     </div>
                                 </div>
                             </section>
