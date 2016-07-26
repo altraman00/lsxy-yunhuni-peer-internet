@@ -29,6 +29,7 @@ import static com.lsxy.framework.web.rest.RestResponse.failed;
 @RestController
 @RequestMapping("/reg")
 public class RegisterController {
+    public static final String MAIL_ACTIVE_PREFIX = "mail_active_";
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     @Autowired
     private RedisCacheService cacheManager;
@@ -120,7 +121,7 @@ public class RegisterController {
                 if(logger.isDebugEnabled()){
                     logger.debug("发邮件，key：{},accountId:{}，userName:{}",uuid,account.getId(),account.getUserName());
                 }
-                cacheManager.set(uuid,account.getId(),72 * 60 * 60);
+                cacheManager.set(MAIL_ACTIVE_PREFIX + account.getId() ,uuid,72 * 60 * 60);
             }else{
                 response = failed("0000","注册用户失败，系统出错！");
             }
