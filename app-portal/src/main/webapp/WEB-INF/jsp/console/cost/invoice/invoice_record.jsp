@@ -117,7 +117,7 @@
                                                             <!--默认第一条消费记录的时间-->
                                                             <input type="text" class="form-control" readonly="readonly" name="start"
                                                                    value='${start}' id="datestart"/>到
-                                                            <input type="text" class="datepicker form-control" name="end"
+                                                            <input type="text" class="datepicker form-control" name="end" readonly="readonly"
                                                                    data-date-end-date="0m" value=''  id="dateend"/>
                                                             <%--<a class="btn btn-primary query">查询</a>--%>
                                                             <span class="tips-error querytips"></span>
@@ -325,14 +325,16 @@
         $('#invoice-url').html('');
 
         $('#ininvoicetime').html("").attr('data-start',"").attr('data-end',"");
-        $('#invoice-price').html("").attr("");
-        $('#invoice-point').html("");
-        $('#invoice-url').html("");
 
         $('#sendinvoice').attr('disabled',true);
     }
 
+    var onclangeFlag = false;
     $('#dateend').change(function () {
+        if(!onclangeFlag){
+            onclangeFlag = true;
+            return false;
+        }
         clearData()
         //获取时间
         var starttime = $('#datestart').val();

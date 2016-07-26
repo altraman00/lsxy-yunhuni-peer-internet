@@ -9,6 +9,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +110,12 @@ public class RegisterController {
                 params.put("code",uuid);
                 params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
                 mailService.send("账号激活",account.getEmail(),"01-portal-notify-account-activate.vm",params);
+                //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
+                String testEmail = SystemConfig.getProperty("global.mail.tester.email");
+                if(StringUtils.isNotBlank(testEmail)){
+                    mailService.send("账号激活",testEmail,"01-portal-notify-account-activate.vm",params);
+                }
+                //↑↑↑↑↑测试环境专用，往测试人员发邮件--end-->
 
                 if(logger.isDebugEnabled()){
                     logger.debug("发邮件，key：{},accountId:{}，userName:{}",uuid,account.getId(),account.getUserName());
