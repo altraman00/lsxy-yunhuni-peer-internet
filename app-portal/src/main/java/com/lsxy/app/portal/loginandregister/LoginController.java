@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.loginandregister;
 
-import com.lsxy.app.portal.comm.MapBean;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,11 +21,7 @@ public class LoginController {
         String xRequestedWith = request.getHeader("X-Requested-With");
         //处理ajax异常的时候返回登陆页面
         if (StringUtils.isNotBlank(xRequestedWith) && "XMLHttpRequest".equals(xRequestedWith)) {
-            MapBean map=new MapBean();
-            map.setCode("0010");
-            map.setMsg("登录超时");
-            map.setData("/login");
-            String result = JSONUtil.objectToJson(map);
+            String result = JSONUtil.objectToJson(RestResponse.failed("0010","登录超时"));
             try {
                 response.getWriter().write(result);
             }catch (Exception e){}

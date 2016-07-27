@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.console.telenum;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.comm.MapBean;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -66,17 +65,9 @@ public class RentTelnumController extends AbstractPortalController {
      */
     @RequestMapping("/release" )
     @ResponseBody
-    public MapBean release(HttpServletRequest request,String id){
-        MapBean map = new MapBean();
+    public RestResponse release(HttpServletRequest request,String id){
         RestResponse restResponse = releaseREST(request,id);
-        if(restResponse.isSuccess()){
-            map.setCode("0000");
-            map.setMsg("释放号码成功");
-        }else{
-            map.setCode(restResponse.getErrorCode());
-            map.setMsg(restResponse.getErrorMsg());
-        }
-        return map;
+        return restResponse;
     }
     /**
      * 根据id释放手机号码
