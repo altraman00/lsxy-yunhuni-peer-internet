@@ -100,8 +100,7 @@
                                                 </c:if>
                                             </td>
                                             <td>
-                                                <c:if test="${result.app!=null}"><a  onclick="release('${result.id}')">释放</a></c:if>
-                                                <c:if test="${result.rentExpire.time<time.time}"><a  onclick="release('${result.id}')">释放</a></c:if>
+                                                <c:if test="${result.app==null}"><a  onclick="release('${result.id}')">释放</a></c:if>
                                             </td>
                                         </>
                                     </c:forEach>
