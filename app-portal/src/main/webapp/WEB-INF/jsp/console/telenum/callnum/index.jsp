@@ -126,7 +126,7 @@
 <script type="text/javascript">
 function release(id){
     bootbox.setLocale("zh_CN");
-    bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
+    bootbox.confirm("您是否需要释放当前号码，如需再次使用需要重新缴纳资源租用费", function(result) {
         if(result){
             var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
             ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){
