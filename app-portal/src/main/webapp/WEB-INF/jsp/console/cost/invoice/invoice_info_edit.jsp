@@ -164,6 +164,13 @@
                                                                    class="form-control input-form notEmpty"/>
                                                         </div>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
+                                                        <div class="col-md-4">
+                                                            <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
+                                                            <img src="${resPrefixUrl }/images/index/l6.png" alt="" id="imgPrev" width="100" height="80" class="recordimg" />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <!--企业专用票end-->
                                                 <div class="form-group">
@@ -216,8 +223,46 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
 <script>
 
+function bfSubmit(){
+    var flag = false;
+    var type = $("input[name='type']:checked").val();
+    ajaxsync(ctx + "/console/account/auth/is_real_auth",null,function(result){
+        if(result.data == 1){
+            if(type == result.data){
+                flag = true;
+            }else{
+                showtoast('个人实名认证的用户不能设置企业发票信息');
+            }
+        }else if(result.data == 2){
+            flag = true;
+        }else{
+            showtoast('请先进行实名认证');
+        }
+    },"get");
 
+    if(flag){
+        $('.invoice-type').each(function(){
+            var e = $(this).attr('data-val');
+            if(type != e) {
+                $(this).hide().find("input").val("");
+            }
+        });
+    }
+    return flag;
+}
 
+function showImage(){
+    // 获取文件路径
+    var path = document.getElementById('uploadfile').value;
+    // 显示文件路径
+    //document.getElementById('imgName').innerHTML = path;
+    // 创建 img
+    var img = document.createElement('img');
+    // 载入图像
+    img.src = path;
+    // 插入图像到页面中
+    document.getElementById('imgPrev').appendChild(img);
+}
 </script>
 </body>
 
