@@ -71,11 +71,12 @@
                                         <th>状态</th>
                                         <th>关联应用</th>
                                         <th>有效期</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
-                                        <tr>
+                                        <tr id="app-${result.id}">
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.resourceTelenum.telNumber}</td>
                                             <td>
@@ -97,9 +98,11 @@
                                                 <c:if test="${result.rentExpire.time>time.time}">
                                                     <fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/>
                                                 </c:if>
-
                                             </td>
-                                        </tr>
+                                            <td>
+                                                <a  onclick="release('${result.id}')">释放</a>
+                                            </td>
+                                        </>
                                     </c:forEach>
                                     </tbody>
                                 </table>
@@ -114,15 +117,21 @@
         </section>
     </section>
 </section>
-
-
-
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
 <script type="text/javascript">
-
+function release(id){
+    var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
+    ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){
+        showtoast(data.msg);
+        if(data.code=='0000'){
+            $('#app-'+id).remove();
+        }
+    },"post");
+}
 </script>
 </body>
 </html>
