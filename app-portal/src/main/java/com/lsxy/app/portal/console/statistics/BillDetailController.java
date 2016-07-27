@@ -154,7 +154,7 @@ public class BillDetailController extends AbstractPortalController {
     private RestResponse sum(HttpServletRequest request,Integer type,String time,String appId){
         String token = getSecurityToken(request);
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/sum?type={1}&time={2}&appId={3}";
-        return RestRequest.buildSecurityRequest(token).get(uri, BigDecimal.class,type,time,appId);
+        return RestRequest.buildSecurityRequest(token).get(uri, Map.class,type,time,appId);
     }
     /**
      * 获取页面分页数据

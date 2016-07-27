@@ -107,7 +107,7 @@
                                             <thead>
                                             <tr>
                                                 <c:if test="${sum==null}"><c:set var="sum" value="0"></c:set> </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum}" pattern="0.00"></fmt:formatNumber> 元</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum.cost}" pattern="0.00"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
