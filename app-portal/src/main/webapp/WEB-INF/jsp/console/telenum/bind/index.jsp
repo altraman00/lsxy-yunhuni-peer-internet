@@ -56,7 +56,7 @@
                             </div>
                             <section class=" w-f application_create">
                                 <div class="wrapper header">
-                                    <span class="border-left">&nbsp;测试号绑定</span>
+                                    <span class="border-left">&nbsp;测试号码绑定</span>
                                     <a class="border-right">如何使用测试号码绑定</a>
                                 </div>
 
