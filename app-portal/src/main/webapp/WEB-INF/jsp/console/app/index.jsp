@@ -55,7 +55,7 @@
                             <div class="wrapper header">
                                 <span class="border-left">&nbsp;
                                     <c:if test="${app.id==null}">创建应用</c:if>
-                                    <c:if test="${app.id!=null}">修改应用</c:if>
+                                    <c:if test="${app.id!=null}">编辑应用</c:if>
                                 </span></div>
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
