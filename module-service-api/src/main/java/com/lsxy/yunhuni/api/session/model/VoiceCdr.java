@@ -39,6 +39,25 @@ public class VoiceCdr extends IdEntity {
     private String unit;//计量单位
     private Integer costType;//1.扣量2.扣费
     private Integer joinType;//0创建1邀请加入，2呼入加入
+    private Integer ivrType;//ivr类型1:呼入2呼出
+    private String handupSide;//挂断方
+    @Column(name = "ivr_type")
+    public Integer getIvrType() {
+        return ivrType;
+    }
+
+    public void setIvrType(Integer ivrType) {
+        this.ivrType = ivrType;
+    }
+    @Column(name = "handup_side")
+    public String getHandupSide() {
+        return handupSide;
+    }
+
+    public void setHandupSide(String handupSide) {
+        this.handupSide = handupSide;
+    }
+
     @Column( name = "join_type")
     public Integer getJoinType() {
         return joinType;
