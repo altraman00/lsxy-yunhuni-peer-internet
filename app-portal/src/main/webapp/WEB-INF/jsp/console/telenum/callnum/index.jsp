@@ -100,7 +100,8 @@
                                                 </c:if>
                                             </td>
                                             <td>
-                                                <a  onclick="release('${result.id}')">释放</a>
+                                                <c:if test="${result.app!=null}"><a  onclick="release('${result.id}')">释放</a></c:if>
+                                                <c:if test="${result.rentExpire.time<time.time}"><a  onclick="release('${result.id}')">释放</a></c:if>
                                             </td>
                                         </>
                                     </c:forEach>
@@ -124,13 +125,20 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
 <script type="text/javascript">
 function release(id){
-    var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
-    ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){
-        showtoast(data.msg);
-        if(data.code=='0000'){
-            $('#app-'+id).remove();
+    bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
+        if(result){
+            var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
+            ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){
+                showtoast(data.msg);
+                if(data.code=='0000'){
+                    $('#app-'+id).remove();
+                }
+            },"post");
+        }else{
+            showtoast("取消");
         }
-    },"post");
+    });
+
 }
 </script>
 </body>
