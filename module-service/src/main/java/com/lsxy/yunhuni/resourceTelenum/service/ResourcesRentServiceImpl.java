@@ -35,7 +35,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize) throws MatchMutiEntitiesException {
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 ";
+        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentExpire<>3 ";
         Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
     }
