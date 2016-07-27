@@ -48,6 +48,10 @@ public class SafetyController extends AbstractRestController {
     @RequestMapping("/save_mobile")
     public RestResponse saveMobile( String mobile) {
         Account account = getCurrentAccount();
+        boolean flag = accountService.checkMobile(mobile);
+        if(flag){
+            return RestResponse.failed("1001","该手机号码已被使用");
+        }
         account.setMobile(mobile);
         account = accountService.save(account);
         return RestResponse.success(account);
