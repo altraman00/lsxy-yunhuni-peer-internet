@@ -3,6 +3,7 @@ package com.lsxy.framework.api.events;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 
 /**
+ * 用户注册，创建用户成功后的事件
  * Created by liups on 2016/7/26.
  */
 public class RegisterSuccessEvent extends AbstractMQEvent {

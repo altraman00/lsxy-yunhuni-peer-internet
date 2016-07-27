@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 用户注册，创建用户成功后的事件处理
  * Created by liups on 2016/7/26.
  */
 @Component
@@ -39,7 +40,7 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
         try {
             String accountId = message.getAccountId();
             Account account = accountService.findById(accountId);
-            //TODO 发送激活邮件
+            // 发送激活邮件
             String uuid = UUIDGenerator.uuid();
             Map<String,String> params = new HashMap<>();
             params.put("host", SystemConfig.getProperty("portal.system.root.url"));
@@ -58,6 +59,7 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
             if(logger.isDebugEnabled()){
                 logger.debug("发邮件，key：{},accountId:{}，userName:{}",uuid,account.getId(),account.getUserName());
             }
+            //将邮件的校验信息存到redis里，前缀为account_mactive_
             cacheManager.set("account_mactive_" + account.getId() ,uuid,72 * 60 * 60);
         } catch (MailConfigNotEnabledException e) {
             e.printStackTrace();

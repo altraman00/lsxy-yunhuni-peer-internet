@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 重置密码邮箱校验通过事件处理
  * Created by liups on 2016/7/27.
  */
 @Component
@@ -36,15 +37,16 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
         try {
             //存到redis里key为reset_pwd_{uuid}，value为邮箱
             String email = message.getEmail();
-            //发送邮件（参数是一个UUID），并将其存到数据库（redis?）
+            //发送邮件（参数是一个reset_pwd_{uuid}），并将其存到数据库（redis?）
             String key = "reset_pwd_" + UUIDGenerator.uuid();
-            //TODO MQ事件，发送邮件
+            //发送邮件
             Map<String,String> params = new HashMap<>();
             params.put("host", SystemConfig.getProperty("portal.system.root.url"));
             params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
             params.put("key",key);
             params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
             mailService.send("重置密码",email,"02-portal-notify-reset-password.vm",params);
+            //将参数和对应的邮箱存取redis里
             cacheManager.set(key,email,72 * 60 * 60);
             if(logger.isDebugEnabled()){
                 logger.debug("邮件重置密码：code:{},email:{}",key,email);

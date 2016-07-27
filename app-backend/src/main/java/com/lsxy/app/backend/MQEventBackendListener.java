@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
 /**
+ * 队列消息监听器
  * Created by liups on 2016/7/26.
  */
 @Component
