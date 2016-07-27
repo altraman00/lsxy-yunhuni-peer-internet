@@ -1,5 +1,6 @@
 package com.lsxy.app.portal;
 
+import com.lsxy.framework.api.events.RegisterSuccessEvent;
 import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
@@ -8,6 +9,7 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mail.MailService;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -29,16 +31,13 @@ import static com.lsxy.framework.web.rest.RestResponse.failed;
 @RestController
 @RequestMapping("/reg")
 public class RegisterController {
-    public static final String MAIL_ACTIVE_PREFIX = "mail_active_";
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
-    @Autowired
-    private RedisCacheService cacheManager;
 
     @Autowired
     private AccountService accountService;
 
     @Autowired
-    MailService mailService;
+    private MQService mqService;
     /**
      * 用户注册信息检查
      * @param userName 用户名
@@ -101,27 +100,9 @@ public class RegisterController {
         if(result == AccountService.REG_CHECK_PASS){
             Account account = accountService.createAccount(userName,mobile,email);
             if(account != null){
+                RegisterSuccessEvent event = new RegisterSuccessEvent(account.getId());
+                mqService.publish(event);
                 response = RestResponse.success(account);
-                //TODO 发送激活邮件
-                String uuid = UUIDGenerator.uuid();
-                Map<String,String> params = new HashMap<>();
-                params.put("host", SystemConfig.getProperty("portal.system.root.url"));
-                params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
-                params.put("uid",account.getId());
-                params.put("code",uuid);
-                params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
-                mailService.send("账号激活",account.getEmail(),"01-portal-notify-account-activate.vm",params);
-                //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
-                String testEmail = SystemConfig.getProperty("global.mail.tester.email");
-                if(StringUtils.isNotBlank(testEmail)){
-                    mailService.send("账号激活",testEmail,"01-portal-notify-account-activate.vm",params);
-                }
-                //↑↑↑↑↑测试环境专用，往测试人员发邮件--end-->
-
-                if(logger.isDebugEnabled()){
-                    logger.debug("发邮件，key：{},accountId:{}，userName:{}",uuid,account.getId(),account.getUserName());
-                }
-                cacheManager.set(MAIL_ACTIVE_PREFIX + account.getId() ,uuid,72 * 60 * 60);
             }else{
                 response = failed("0000","注册用户失败，系统出错！");
             }
