@@ -34,6 +34,7 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
     @Override
     public void handleMessage(ResetPwdVerifySuccessEvent message) throws JMSException {
         try {
+            //存到redis里key为reset_pwd_{uuid}，value为邮箱
             String email = message.getEmail();
             //发送邮件（参数是一个UUID），并将其存到数据库（redis?）
             String key = "reset_pwd_" + UUIDGenerator.uuid();

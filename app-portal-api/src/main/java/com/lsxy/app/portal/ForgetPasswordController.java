@@ -60,7 +60,7 @@ public class ForgetPasswordController {
     }
 
     /**
-     * 忘记密码-发送邮件,存到redis里key为uuid，value为邮箱
+     * 忘记密码-发送邮件
      * @param email
      * @return
      */
