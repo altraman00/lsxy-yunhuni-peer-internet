@@ -64,7 +64,9 @@
                                         <c:if test="${app.id!=null}">
                                             <input type="hidden" name="id" value="${app.id}">
                                             <input type="hidden" name="status" value="${app.status}">
-                                            <p class="app-tips ">编辑应用的选择服务项目需要下线应用，才能编辑</p>
+                                            <c:if test="${app.status==1}">
+                                                <p class="app-tips ">编辑应用的选择服务项目需要下线应用，才能编辑</p>
+                                            </c:if>
                                         </c:if>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
