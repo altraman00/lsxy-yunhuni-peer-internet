@@ -64,15 +64,17 @@
                                         <c:if test="${app.id!=null}">
                                             <input type="hidden" name="id" value="${app.id}">
                                             <input type="hidden" name="status" value="${app.status}">
+                                            <c:if test="${app.status==1}">
+                                                <p class="app-tips ">编辑应用的选择服务项目需要下线应用，才能编辑</p>
+                                            </c:if>
                                         </c:if>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
                                             <div class="col-md-4">
                                                 <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
                                             </div>
-                                            <span class="span-required">*</span>
+                                            <span class="span-required">*</span>20字符内，符合应用审核<a href="">规范要求</a>
                                         </div>
-                                        <p class="tips">20字符以内，符合<a href="">应用审核规范</a></p>
 
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
@@ -152,11 +154,12 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <div class="col-md-9">
+                                            <div class="col-md-4 remove-padding">
                                                 <a id="validateBtn" class="validateBtnNormal btn btn-primary  btn-form">
                                                     <c:if test="${app.id==null}">创建</c:if>
                                                     <c:if test="${app.id!=null}">修改</c:if>
                                                 </a>
+                                                <c:if test="${app.id!=null}"><a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
                                             </div>
                                         </div>
                                     </form:form>
@@ -176,6 +179,9 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/application/create.js'></script>
 
 <script>
+    $('#validateBtn2').click(function(){
+        window.location.href="${ctx}/console/app/detail?id=${app.id}";
+    });
     $('#validateBtn').click(function(){
         $('#application_create').bootstrapValidator('validate');
         var result = $('#application_create').data('bootstrapValidator').isValid();
@@ -206,6 +212,7 @@
         }
 
     });
+
 </script>
 
 </body>

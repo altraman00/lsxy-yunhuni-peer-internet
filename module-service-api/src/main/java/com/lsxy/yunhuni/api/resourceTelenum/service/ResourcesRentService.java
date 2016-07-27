@@ -16,7 +16,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param tenantId 租户id
      * @return
      */
-    Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize) throws MatchMutiEntitiesException;
+    Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize)  ;
 
     /**
      * 根据ID获取租用关系
