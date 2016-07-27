@@ -35,17 +35,17 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a ">
+                                            <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/callback">语音回拨</a>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a">
+                                            <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/metting">会议服务</a>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">IVR定制服务</a>
                                             </div>
                                         </li>
@@ -72,7 +72,7 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>-->
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;IVR定制服务</span>
+                            <span class="border-left">&nbsp;会议服务</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
@@ -88,7 +88,7 @@
                                     </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form:form action="${ctx}/console/statistics/billdetail/ivr" method="post" id="mainForm">
+                                    <form:form action="${ctx}/console/statistics/billdetail/metting" method="post" id="mainForm">
                                         <div class="row statistics_row" >
                                             <input type="hidden" id="appId" name="appId" value="">
                                             <div class="col-md-1">
@@ -103,17 +103,16 @@
                                         </div>
                                     </form:form>
                                     <div >
-
-                                        <table class="table table-striped cost-table-history ">
+                                        <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <c:if test="${sum==null}"><c:set var="sum" value="0"></c:set> </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum}" pattern="0.00"></fmt:formatNumber> 元</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum.cost}" pattern="0.00"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
+                                                <th>会议标识ID</th>
                                                 <th>呼叫时间</th>
-                                                <th>主叫</th>
-                                                <th>被叫</th>
+                                                <th>参与者</th>
+                                                <th>参与类型</th>
                                                 <th>时长（秒）</th>
                                                 <th>消费金额（元）</th>
                                             </tr>
@@ -121,9 +120,18 @@
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
+                                                    <td>${result.sessionId}</td>
                                                     <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
-                                                    <td>${result.fromNum}</td>
-                                                    <td>${result.toNum}</td>
+                                                    <td>
+                                                        <c:if test="${result.joinType == 0}">${result.fromNum}</c:if>
+                                                        <c:if test="${result.joinType == 1}">${result.toNum}</c:if>
+                                                        <c:if test="${result.joinType == 2}">${result.fromNum}</c:if>
+                                                    </td>
+                                                    <td>
+                                                        <c:if test="${result.joinType == 0}">创建</c:if>
+                                                        <c:if test="${result.joinType == 1}">邀请加入</c:if>
+                                                        <c:if test="${result.joinType == 2}">呼入加入</c:if>
+                                                    </td>
                                                     <td>${result.callTimeLong}</td>
                                                     <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
                                                 </tr>
@@ -131,7 +139,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/ivr"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/metting"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>

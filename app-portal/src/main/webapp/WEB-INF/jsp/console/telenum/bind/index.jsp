@@ -56,7 +56,7 @@
                             </div>
                             <section class=" w-f application_create">
                                 <div class="wrapper header">
-                                    <span class="border-left">&nbsp;号码绑定</span>
+                                    <span class="border-left">&nbsp;测试号码绑定</span>
                                     <a class="border-right">如何使用测试号码绑定</a>
                                 </div>
 
@@ -117,14 +117,14 @@
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg"></div>
 <div id="mobilebox" class="modal-box" style="display:none ;">
-    <div class="title">验证手机号<a class="close_a modalCancel"></a></div>
+    <div class="title">验证手机号<a class="close_a modalCancel cancelclear"></a></div>
     <div class="content">
         <div class="margintop30"></div>
         <div class="input ">
             手机号：<span id="modalmobile" ></span>
         </div>
         <div class="input">
-            <input class="code form-control modalCode" type="text" name="mobile" placeholder="验证码" />
+            <input class="code form-control modalCode" type="text" name="mobile" id="mobileV" placeholder="验证码" />
             <button class="code-button" id="send-code" >发送验证码</button>
         </div>
         <div class="input in-block" id="second-codeblock"></div>
@@ -134,7 +134,7 @@
 
     </div>
     <div class="footer">
-        <a class="cancel modalCancel">返回</a>
+        <a class="cancel modalCancel cancelclear">返回</a>
         <a class="sure" onclick="sureCode()">确认</a>
     </div>
 </div>
@@ -143,6 +143,9 @@
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/number/band.js'></script>
 <script >
+    $(".cancelclear").click(function(){
+        $("#mobileV").val('');
+    })
     /**
      * 发送验证码
      */

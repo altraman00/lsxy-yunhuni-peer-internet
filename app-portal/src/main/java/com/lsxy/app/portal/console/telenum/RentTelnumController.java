@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 /**
  * 呼入号码管理
@@ -37,6 +38,7 @@ public class RentTelnumController extends AbstractPortalController {
         RestResponse<Page<ResourcesRent>> restResponse = pageList(request,pageNo,pageSize);
         Page<ResourcesRent> pageObj= restResponse.getData();
         mav.addObject("pageObj",pageObj);
+        mav.addObject("time",new Date());
         mav.setViewName("/console/telenum/callnum/index");
         return mav;
     }

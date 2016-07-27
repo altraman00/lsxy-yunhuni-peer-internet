@@ -55,11 +55,11 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;充值订单记录</span>
+                            <span class="border-left">&nbsp;呼入号码</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <section>
-                                <p class="number_info">呼入号码作为应用使用IVR功能的拨入号使用，测试阶段可使用统一的测试呼入号码测试IVR功能，应用上线后可租用固定独立的呼入号码实现交互功能</p>
+                                <p class="number_info">呼入号码作为应用使用IVR功能的拨入号使用，测试阶段可使用统一的测试呼入号码测试IVR功能，应用上线后可租用固定独立的呼入号码实现交互功能<br>余额不足以支付每月扣除的100元月租费时，相关联的号码将过期<br>下线应用后呼入号码自动与应用解除关联<br>超过有效期7天的号码自动移除</p>
                             </section>
 
                             <section class="panel panel-default pos-rlt clearfix ">
@@ -79,11 +79,26 @@
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.resourceTelenum.telNumber}</td>
                                             <td>
-                                                <c:if test="${result.rentStatus==0}">欠费</c:if>
-                                                <c:if test="${result.rentStatus==1}">正常</c:if>
+                                                <c:if test="${result.rentExpire.time<time.time}">
+                                                    <div style="color: red" >过期</div>
+                                                </c:if>
+                                                <c:if test="${result.rentExpire.time>time.time}">正常</c:if>
                                             </td>
-                                            <td><a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a></td>
-                                            <td><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></td>
+                                            <td>
+                                                <c:if test="${result.app==null}">无</c:if>
+                                                <c:if test="${result.app!=null}">
+                                                    <a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${result.rentExpire.time<time.time}">
+                                                    <div style="color: red" ><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></div>
+                                                </c:if>
+                                                <c:if test="${result.rentExpire.time>time.time}">
+                                                    <fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/>
+                                                </c:if>
+
+                                            </td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>

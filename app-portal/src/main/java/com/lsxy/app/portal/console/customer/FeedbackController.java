@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.customer;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.MapBean;
 import com.lsxy.framework.api.customer.model.Feedback;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,12 +46,11 @@ public class FeedbackController  extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/edit")
-    public ModelAndView edit(HttpServletRequest request,String content){
-        ModelAndView mav = new ModelAndView();
+    @ResponseBody
+    public MapBean edit(HttpServletRequest request, String content){
         RestResponse<Feedback> restResponse = save(request,content,"0");
-        mav.addObject("msg","感谢你的反馈意见！");
-        mav.setViewName("/console/customer/index");
-        return mav;
+        MapBean map = new MapBean("0000","感谢你的反馈意见！");
+        return map;
     }
 
     /**

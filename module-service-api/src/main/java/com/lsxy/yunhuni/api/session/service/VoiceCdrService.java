@@ -5,6 +5,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * 通话记录
@@ -23,5 +24,5 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      * @param appId 应用id
      * @return
      */
-    public BigDecimal sumCost(Integer type, String tenantId, String time, String appId);
+    public Map sumCost(Integer type, String tenantId, String time, String appId);
 }

@@ -55,7 +55,7 @@
                             <div class="wrapper header">
                                 <span class="border-left">&nbsp;
                                     <c:if test="${app.id==null}">创建应用</c:if>
-                                    <c:if test="${app.id!=null}">修改应用</c:if>
+                                    <c:if test="${app.id!=null}">编辑应用</c:if>
                                 </span></div>
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
@@ -77,7 +77,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form limit20"/>
+                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form "/>
                                             </div>
                                         </div>
 
