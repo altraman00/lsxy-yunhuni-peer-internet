@@ -5,7 +5,6 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
@@ -35,7 +34,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentExpire<>3 ";
+        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 ";
         Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
     }
