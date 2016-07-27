@@ -147,14 +147,14 @@
 
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label" name="authType">证件类型：</lable>
-                                                <div class="radio-form col-md-4 ">
+                                                <div class="radio-form col-md-8 ">
                                                     <input type="radio" name="san" checked value="0"> 三证合一（一照一码）
                                                     <input type="radio" name="san" value="1"> 三证合一
                                                     <input type="radio" name="san" value="2"> 三证分离
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label">统一社会信用代码：</lable>
+                                                <lable class="col-md-3 text-right extend_label lineheight-24">统一社会信用代码：</lable>
                                                 <div class="col-md-4">
                                                     <input type="text" name="type01Prop02" placeholder="" class="form-control input-form notEmpty"  />
                                                 </div>

@@ -13,6 +13,7 @@ public class UploadEntity {
     private long uploadTotalSize=0;
     //读取上传总量
     private long readTotalSize=0;
+    private boolean flag = false;//全部上传保存流程走完为true
     //当前上传文件号
     private int currentUploadFileNum=0;
     //成功读取上传文件数
@@ -31,6 +32,14 @@ public class UploadEntity {
     private boolean cancel=false;
     //上传base目录
     private String baseDir="";
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
 
     public String getBaseDir() {
         return baseDir;

@@ -64,11 +64,19 @@
                             </section>
                             <section class="panel panel-default pos-rlt clearfix appliaction-detail">
                                 <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
+                                    <div class="col-md-1 remove-padding width-">
                                         应用名称：
                                     </div>
                                     <div class="col-md-10 ">
                                         <p>${app.name}</p>
+                                    </div>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-md-1 remove-padding width-130">
+                                        应用描述：
+                                    </div>
+                                    <div class="col-md-10 ">
+                                        <p>${app.description}</p>
                                     </div>
                                 </div>
                                 <div class="row ">
@@ -87,7 +95,12 @@
                                         <p>${app.industry}</p>
                                     </div>
                                 </div>
-
+                                <div class="row ">
+                                    <div class="col-md-1 remove-padding width-130">服务器白名单：</div>
+                                    <div class="col-md-10 ">
+                                        <p>${app.whiteList}</p>
+                                    </div>
+                                </div>
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-130">
                                         APPID：
@@ -163,10 +176,9 @@
                                             2、每个帐号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
                                         </p>
                                         <div class="form-group">
-                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" /></div>
-                                            <div class="col-md-1"><button class="btn btn-primary">查询</button></div>
-                                            <div class="col-md-3 sizebox ">
-                                                共计500M，已占用100M
+                                            <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
+                                            <div class="col-md-1"><button class="btn btn-primary" type="button" onclick="upplay()">查询</button></div>
+                                            <div class="col-md-8 sizebox  remove-padding " id="voiceFilePlay">
                                             </div>
                                         </div>
 
@@ -176,8 +188,8 @@
                                                 <th width="20%">标题</th>
                                                 <th width="10%">状态</th>
                                                 <th width="10%">大小</th>
-                                                <th width="45%">备注</th>
-                                                <th width="10%">操作</th>
+                                                <th width="35%">备注</th>
+                                                <th width="20%">操作</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -194,8 +206,7 @@
                                             2、可配置录音文件存储周期，超过7天按相应的存储资费计费，10元/天。
                                         </p>
                                         <div class="form-group">
-                                            <div class="col-md-3 remove-padding line32 font14">
-                                                录音文件总计占用：100M
+                                            <div class="col-md-3 remove-padding line32 font14" id="voiceFileRecord">
                                             </div>
                                             <div class="col-md-9 text-right">
                                                 <a class="btn modalShow right" data-id="three">批量删除</a> <a class="btn modalShow right" data-id="two" >批量下载</a>
@@ -229,8 +240,8 @@
             </section>
             <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
         </section>
+        </section>
     </section>
-</section>
 
 
 
@@ -273,11 +284,6 @@
             </div>
 
             <div class="row scrolldiv" id="scrolldivtwo">
-                <p>--扫描文件</p>
-                <p>--共计  200  个文件   200M</p>
-                <p>--开始压缩打包</p>
-                <p>--压缩打包完成 20160601-20160603-001.zip</p>
-                <p>--压缩包生成完成：<a href="#" target="_blank">点击下载</a></p>
             </div>
         </div>
     </div>
@@ -289,7 +295,7 @@
 
 <!---批量删除--->
 <div class="modal-box application-detail-box" id="modalthree" style="display:none ">
-    <div class="title">批量删除<a class="close_a modalCancel" data-id="three"></a></div>
+    <div class="title">批量删除<a class="close_a modalCancel cancelthree" data-id="three"></a></div>
     <div class="content">
         <p class="text-center mt-20">批量删除录音文件 <span class="tips-error moadltipsthree text-center"></span></p>
 
@@ -312,39 +318,45 @@
         </div>
     </div>
     <div class="footer">
-        <a class="cancel modalCancel" data-id="three">返回</a>
+        <a class="cancel modalCancel cancelthree" data-id="three">返回</a>
         <a class="sure modalSureThree" data-id="three">确认</a>
     </div>
 </div>
 
 <!---上传文件--->
-<div class="modal-box application-detail-box" id="modalfour" style="display:none ">
-    <div class="title">文件上传<a class="close_a modalCancel" data-id="four"></a></div>
+<div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
+    <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four"></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
-        <form action="" method="post" id="">
+        <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();" target="hidden_frame">
             <div class="input-box ">
                 <div class="row  mt-10">
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-primary singlefile" >单文件上传</button>
+                    <input type="hidden" name="appId" value="${app.id}">
+                    <div class="col-md-2">
+                        文件 :
                     </div>
-                    <input type="file" value="" class="input-text form-control"  id="singlefile" style="display: none" />
+                    <div class="col-md-10">
+                        <input type="file" value="" class="input-text form-control" name="file" id="singlefile" multiple="multiple" />
+                        <div class="progress h10 mt-10">
+                            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"  aria-valuemin="0" aria-valuemax="100" style="width: 0%" id="uploadLength">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row text-left mt-10">
-                    <div class="col-md-12">
-                        <button type="button" class="btn btn-primary batchfile">批量上传</button>
-                    </div>
-                    <input type="file" value="" class="input-text form-control" id="batchfile" style="display: none" multiple="multiple" />
                     <p>允许一次选择20个文件，并且建议在网络环境好的情况下使用，以防止上传错误文件</p>
                 </div>
             </div>
-        </form>
+            <iframe name='hidden_frame' id="hidden_frame" style='display:none'></iframe>
+            <input type="reset" id="resetForm" hidden/>
+        </form:form>
     </div>
     <div class="footer">
-        <a class="cancel modalCancel" data-id="four">返回</a>
+        <a class="cancel modalCancel-app-up" data-id="four">返回</a>
         <a class="sure modalSureFour" data-id="four">确认</a>
     </div>
 </div>
+
 
 
 <div class="tips-toast"></div>
@@ -356,6 +368,14 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 
 <script>
+    $('.modalCancel-app-up').click(function(){
+        clearTimeout(timer);
+        $('#resetForm').click();
+        $('#uploadLength').attr("style","width:"+0+"%");
+        var id = $(this).attr('data-id');
+        $('#modal'+id).fadeOut();
+        $('#show-bg').fadeOut();
+    });
     /**
      *绑定测试电话号码
      */
@@ -416,7 +436,6 @@
         var id = $(this).attr('data-id');
         $('#scrolldiv'+id).html('');
         $('.moadltips'+id).html('');
-        //异步查询文件信息
 
         //获取时间
         var starttime = $('#datestart'+id).val();
@@ -425,27 +444,91 @@
         if(tips){
             $('.moadltips'+id).html(tips); return false;
         }
-
-        //添加加载文件信息
-        var html  = '  <p>--共计  200  个文件   200M</p>';
-        html+='<p>--统计完成</p>';
-        $('#scrolldiv'+id).append(html);
+        endtime+=" 23:59:59";
+        var html  = "";
+        //异步查询文件信息
+        $.ajax({
+            url : "${ctx}/console/app/file/record/sum",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(data){
+                //添加加载文件信息
+                html  = '  <p>--共计  '+data.total+'  个文件   '+resultFileSize(data.size )+'</p>';
+                html+='<p>--统计完成</p>';
+                $('#scrolldiv'+id).append(html);
+            }
+        });
+        //two 表示的是批量下载
+        if(id=='two'){
+            html +='<p>--开始压缩打包</p>';
+            $('#scrolldiv'+id).append(html);
+            $.ajax({
+                url : "${ctx}/console/app/file/record/zip",
+                type : 'post',
+                async: false,//使用false同步的方式,true为异步方式
+                data : {'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                dataType: "json",
+                success : function(data){
+                    if(data.flag){
+                        var fileName = new String(data.fileName);
+                        var index = fileName.lastIndexOf("/");
+                        var name = fileName.substring(index,fileName.length);
+                        //添加加载文件信息
+                        html  = '<p>--压缩打包完成 '+name+'</p>';
+                        html+='<p>--压缩包生成完成：<a href="#" target="_blank">点击下载</a></p>';
+                        $('#scrolldiv'+id).append(html);
+                    }else{
+                        html  = '<p>--压缩打包失败</p>';
+                        html+='<p>--请稍后重试</p>';
+                        $('#scrolldiv'+id).append(html);
+                    }
+                }
+            });
+        }
     });
+    $('.cancelthree').click(function(){
+        batchclear($(this).attr('data-id'));
+    })
+    function batchclear(id){
+        $('#scrolldiv'+id).html('');
+        $('#datestart'+id).val('');
+        $('#dateend'+id).val('');
+    }
 
     /**
      * 批量删除处理
      */
     $('.modalSureThree').click(function(){
         var id = $(this).attr('data-id');
-        var r=confirm("确认删除所选文件")
-        if (r==true)
-        {
-            //提交表单确认删除
-        }
-        else
-        {
-            hideModal(id)
-        }
+        var starttime = $('#datestart'+id).val();
+        var endtime = $('#dateend'+id).val();
+        endtime+=" 23:59:59";
+        bootbox.confirm("确认删除所选文件", function(result) {
+            if(result){
+                $.ajax({
+                    url : "${ctx}/console/app/file/record/batch_delete",
+                    type : 'post',
+                    async: false,//使用false同步的方式,true为异步方式
+                    data : {'id':id,'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            showtoast("批量删除成功");
+                        }else{
+                            showtoast("批量删除失败");
+                        }
+                    }
+                });
+                upvoice();
+                $('#voice-'+id).remove();
+                hideModal(id);
+            }else{
+                hideModal(id);
+            }
+            batchclear(id);
+        });
     });
 
     /**
@@ -453,7 +536,30 @@
      */
     $('.modalSureFour').click(function(){
         var id = $(this).attr('data-id');
-        hideModal(id)
+        //验证文件格式
+        var file = $('#singlefile');
+
+        if(file[0].files.length==0){
+            showtoast("请上传文件");
+        }
+
+        var allowtype =  ["WAV"];
+        for(var i=0 ; i<file[0].files.length ;i++ ){
+            var names =  getFiletype(file[0].files[i].name);
+            if ($.inArray(names,allowtype) == -1)
+            {
+                showtoast("上传失败，只支持 .wav 格式的文件");
+                return false;
+            }
+            if(file[0].files[i].size> 5* 1024 * 1024){
+                showtoast("上传失败，单条语音最大支持 5M");
+                return false;
+            }
+        }
+        $('#uploadLength').show();
+        $('#uploadMianForm').submit();
+
+        //hideModal(id)
     });
 
     /**
@@ -472,10 +578,10 @@
 
 
     /**
-     *
+     *生成修改备注文件
      *
      * */
-    function editremark(id,type){
+    function editremark(thisT,type){
         $('#editmark-tips').html('');
         bootbox.setLocale("zh_CN");
         bootbox.dialog({
@@ -500,13 +606,27 @@
                                 if(!remark){
                                     $('#editmark-tips').html('请填写备注内容'); return false;
                                 }
+                                var id = new String(thisT.id).replace('remark-b-','');
                                 //异步请求修改数据
-
-                                //成功执行
-                                if(type=='1'){
-                                    $('#remark-b-'+id).html('修改备注');
-                                }
-                                $('#remark-a-'+id).html(remark);
+                                $.ajax({
+                                    url : "${ctx}/console/app/file/play/modify",
+                                    type : 'post',
+                                    async: false,//使用false同步的方式,true为异步方式
+                                    data : {'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                                    dataType: "json",
+                                    success : function(data){
+                                        if(data.flag){
+                                            showtoast("修改成功");
+                                            //成功执行
+                                            if(type=='1'){
+                                                $('#remark-b-'+id).html('修改备注');
+                                            }
+                                            $('#remark-a-'+id).html(remark);
+                                        }else{
+                                            showtoast("修改失败");
+                                        }
+                                    }
+                                });
                             }
                         }
                     }
@@ -520,11 +640,27 @@
     /**
      * 删除操作
      */
-    function delvoice(id){
+    function delvoice(idType){
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
-                $('#voice-'+id).remove();
+                var id = new String(idType.id).replace("voice-record-","");
+                $.ajax({
+                    url : "${ctx}/console/app/file/record/delete",
+                    type : 'post',
+                    async: false,//使用false同步的方式,true为异步方式
+                    data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            showtoast("删除成功");
+                            recordFileTotalSize();
+                            $('#voice-'+id).remove();
+                        }else{
+                            showtoast("删除失败");
+                        }
+                    }
+                });
             }
         });
     }
@@ -533,44 +669,69 @@
     /**
      * 删除操作
      */
-    function delplay(id){
+    function delplay(idType){
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
-                showtoast('删除成功');
-                $('#play-'+id).remove();
+                var id = new String(idType.id).replace("delete-","");
+                $.ajax({
+                    url : "${ctx}/console/app/file/play/delete",
+                    type : 'post',
+                    async: false,//使用false同步的方式,true为异步方式
+                    data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(data){
+                        if(data.flag){
+                            showtoast("删除成功");
+                            fileTotalSoze();
+                            $('#play-'+id).remove();
+                        }else{
+                            showtoast("删除失败");
+                        }
+                    }
+                });
             }
         });
     }
-
-
-
     /**
-     *触发录音文件分页
+     * 查询录音文件占存储空间的大小
      */
-    function upvoice(){
-        //获取数据总数
-        var count = 55;
-        //每页显示数量
-        var listRow = 3;
-        //显示多少个分页按钮
-        var showPageCount = 5;
-        //指定id，创建分页标签
-        var pageId = 'voicepage';
-        //searchTable 为方法名
-        var page = new Page(count,listRow,showPageCount,pageId,voiceTable);
-        page.show();
-    }
+    var recordFileTotalSize = function(){
+        $.ajax({
+            url : "${ctx}/console/app/file/record/sum",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData) {
+                $('#voiceFileRecord').html("录音文件总计占用："+resultFileSize(resultData.size));
+            }
+        });
+    };
 
 
 
-
+    //默认加载放音文件分页
+    $(function () {
+        upplay();
+    });
     /**
      *触发放音文件分页
      */
     function upplay(){
         //获取数据总数
-        var count = 55;
+        var count = 0;
+        var name = $('#name').val();
+        $.ajax({
+            url : "${ctx}/console/app/file/play/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                count=resultData.list.totalCount;
+            }
+        });
         //每页显示数量
         var listRow = 3;
         //显示多少个分页按钮
@@ -581,8 +742,28 @@
         var page = new Page(count,listRow,showPageCount,pageId,playTable);
         page.show();
     }
-
-
+    var fileTotalSoze = function(){
+        $.ajax({
+            url : "${ctx}/console/app/file/play/total",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData) {
+                $('#voiceFilePlay').html("共计" + resultFileSize(resultData.fileTotalSize) + ",已占用" + resultFileSize(resultData.fileRemainSize)+ "");
+            }
+        });
+    };
+    var resultFileSize = function(temp){
+        if(temp>(1024*1024)){
+            temp = (temp/1024/1024).toFixed(2)+"M";
+        }else if(temp>1024){
+            temp = (temp/1024).toFixed(2)+"K";
+        }else{
+            temp = temp+"b";
+        }
+        return temp;
+    }
     /**
      * 分页回调方法
      * @param nowPage 当前页数
@@ -590,33 +771,68 @@
      * */
     var playTable = function(nowPage,listRows)
     {
-
-        var data = [
-            ['1','1.wav','-1','1M','备注2'],
-            ['2','12.wav','0','1M','备注3'],
-            ['3','13.wav','1','1M','备注3']
-        ];
-        //-1 0 1
-        var html ='';
-        //数据列表
-        for(var i = 0 ; i<data.length; i++){
-            html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-            if(data[i][2]==-1){
-                html+='<td class="nosuccess">审核不通过</td>';
-            }else if(data[i][2]==1){
-                html+='<td class="success">已审核</td>';
-            }else{
-                html+='<td>待审核</td>';
+        var name = $('#name').val();
+        $.ajax({
+            url : "${ctx}/console/app/file/play/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                var data =[];
+                for(var j=0;j<resultData.list.result.length;j++){
+                    var tempFile = resultData.list.result[j];
+                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark];
+                    data[j]=temp;
+                }
+                var html ='';
+                //数据列表
+                for(var i = 0 ; i<data.length; i++){
+                    html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                    if(data[i][2]==-1){
+                        html+='<td class="nosuccess">审核不通过</td>';
+                    }else if(data[i][2]==1){
+                        html+='<td class="success">已审核</td>';
+                    }else{
+                        html+='<td>待审核</td>';
+                    }
+                    html+='<td>'+data[i][3]+'</td>';
+                    html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
+                    html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+                }
+                $('#playtable').find(".playtr").remove();
+                $('#playtable').append(html);
             }
-            html+='<td>'+data[i][3]+'</td>';
-            html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-            html+='<td class="operation"> <a onclick="delplay('+data[i][0]+')" >删除</a> <span ></span> <a onclick="editremark('+data[i][0]+')" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
-        }
-        $('#playtable').find(".playtr").remove();
-        $('#playtable').append(html);
+        });
     }
 
-
+    /**
+     *触发录音文件分页
+     */
+    function upvoice(){
+        recordFileTotalSize();
+        //获取数据总数
+        var count = 0;
+        $.ajax({
+            url : "${ctx}/console/app/file/record/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : { 'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                count=resultData.list.totalCount;
+            }
+        });
+        //每页显示数量
+        var listRow = 3;
+        //显示多少个分页按钮
+        var showPageCount = 5;
+        //指定id，创建分页标签
+        var pageId = 'voicepage';
+        //searchTable 为方法名
+        var page = new Page(count,listRow,showPageCount,pageId,voiceTable);
+        page.show();
+    }
     /**
      * 分页回调方法
      * @param nowPage 当前页数
@@ -624,21 +840,30 @@
      * */
     var voiceTable = function(nowPage,listRows)
     {
-        var data = [
-            ['1','20160606122333-[sessionid]','1M','123'],
-            ['2','20160606122333-[sessionid]','1M','12'],
-            ['3','20160606122333-[sessionid]','1M','123'],
-            ['4','20160606122333-[sessionid]','1M','123']
-        ];
-        var html ='';
-        for(var i = 0 ; i<data.length; i++){
-            html +='<tr class="voicetr" id="voice-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-            html+='<td>'+data[i][2]+'</td>';
-            html+='<td>'+data[i][3]+'</td>';
-            html+='<td class="operation"><a >下载</a> <span ></span><a onclick="delvoice('+data[i][0]+')" >删除</a></td></tr>';
-        }
-        $('#voicetable').find(".voicetr").remove();
-        $('#voicetable').append(html);
+        $.ajax({
+            url : "${ctx}/console/app/file/record/list",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                var data =[];
+                for(var j=0;j<resultData.list.result.length;j++){
+                    var tempFile = resultData.list.result[j];
+                    var temp = [tempFile.id,tempFile.name,resultFileSize(tempFile.size),tempFile.duration];
+                    data[j]=temp;
+                }
+                var html ='';
+                for(var i = 0 ; i<data.length; i++){
+                    html +='<tr class="voicetr" id="voice-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                    html+='<td>'+data[i][2]+'</td>';
+                    html+='<td>'+data[i][3]+'</td>';
+                    html+='<td class="operation"><a >下载</a> <span ></span><a onclick="delvoice(this)" id="voice-record-'+data[i][0]+'" >删除</a></td></tr>';
+                }
+                $('#voicetable').find(".voicetr").remove();
+                $('#voicetable').append(html);
+            }
+        });
     }
 
     $('#myTab li').click(function(){
@@ -650,10 +875,38 @@
             upplay();
         }
     });
+    var timer = "";
+    function startUpload(){
+        timer = window.setTimeout(startListener,1000);
+        return true;
+    }
+    function startListener(){
+        $.ajax({
+            url : "${ctx}/console/app/file/play/status",
+            type : 'post',
+            async: false,//使用false同步的方式,true为异步方式
+            data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+            dataType: "json",
+            success : function(resultData){
+                $('#uploadLength').attr("style","width:"+resultData.percentComplete+"%");
+                if(resultData.flag){
+                    clearTimeout(timer);
+                    showtoast('上传成功');
+                    fileTotalSoze();
+                    upplay();
+                    var id = $('.modalSureFour').attr('data-id');
+                    hideModal(id);
+                    //清除内容
+                    $('#resetForm').click();
+                    $('#uploadLength').attr("style","width:"+0+"%");
+                }else{
+                    startUpload();
+                }
 
-
-
-
+            }
+        });
+    }
+    fileTotalSoze();
 </script>
 
 </body>
