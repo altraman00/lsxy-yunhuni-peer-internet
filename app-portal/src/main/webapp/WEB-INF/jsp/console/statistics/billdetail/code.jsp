@@ -106,7 +106,6 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <c:if test="${sum==null}"><c:set var="sum" value="0"></c:set> </c:if>
                                                 <th colspan="6"><span class="p-money">总条数：${fn:length(pageObj.result)}条</span></th>
                                             </tr>
                                             <tr>

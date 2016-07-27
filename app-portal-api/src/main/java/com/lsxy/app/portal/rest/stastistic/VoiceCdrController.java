@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * 通话记录
@@ -45,7 +46,7 @@ public class VoiceCdrController extends AbstractRestController {
      */
     @RequestMapping("/sum")
     public RestResponse sumCdr(Integer type,String time,String appId){
-        BigDecimal sum = voiceCdrService.sumCost(type,getCurrentAccount().getTenant().getId(),time,appId);
-        return RestResponse.success(sum);
+        Map map = voiceCdrService.sumCost(type,getCurrentAccount().getTenant().getId(),time,appId);
+        return RestResponse.success(map);
     }
 }
