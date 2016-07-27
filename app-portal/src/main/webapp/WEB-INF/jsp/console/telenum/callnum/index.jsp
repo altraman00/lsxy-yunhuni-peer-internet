@@ -130,6 +130,7 @@ function release(id){
             var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
             ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){
                 showtoast(data.msg);
+                alert(JSON.stringify(data));
                 if(data.code=='0000'){
                     $('#app-'+id).remove();
                 }
@@ -138,7 +139,6 @@ function release(id){
             showtoast("取消");
         }
     });
-
 }
 </script>
 </body>
