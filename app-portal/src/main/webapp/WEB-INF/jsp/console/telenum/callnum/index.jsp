@@ -125,6 +125,7 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
 <script type="text/javascript">
 function release(id){
+    bootbox.setLocale("zh_CN");
     bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
         if(result){
             var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
