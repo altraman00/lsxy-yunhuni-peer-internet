@@ -70,7 +70,7 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
                                             </div>
-                                            <span class="span-required">*</span>
+                                            <span class="span-required">*</span>20字符内，符合应用审核<a href="">规范要求</a>
                                         </div>
                                         <p class="tips">20字符以内，符合<a href="">应用审核规范</a></p>
 
