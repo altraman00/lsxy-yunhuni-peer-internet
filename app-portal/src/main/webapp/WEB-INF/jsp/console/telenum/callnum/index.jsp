@@ -79,11 +79,26 @@
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.resourceTelenum.telNumber}</td>
                                             <td>
-                                                <c:if test="${result.rentStatus==0}">欠费</c:if>
-                                                <c:if test="${result.rentStatus==1}">正常</c:if>
+                                                <c:if test="${result.rentExpire.time<time.time}">
+                                                    <div style="color: red" >过期</div>
+                                                </c:if>
+                                                <c:if test="${result.rentExpire.time>time.time}">正常</c:if>
                                             </td>
-                                            <td><a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a></td>
-                                            <td><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></td>
+                                            <td>
+                                                <c:if test="${result.app==null}">无</c:if>
+                                                <c:if test="${result.app!=null}">
+                                                    <a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${result.rentExpire.time<time.time}">
+                                                    <div style="color: red" ><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></div>
+                                                </c:if>
+                                                <c:if test="${result.rentExpire.time>time.time}">
+                                                    <fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/>
+                                                </c:if>
+
+                                            </td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
@@ -106,5 +121,8 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
+<script type="text/javascript">
+
+</script>
 </body>
 </html>
