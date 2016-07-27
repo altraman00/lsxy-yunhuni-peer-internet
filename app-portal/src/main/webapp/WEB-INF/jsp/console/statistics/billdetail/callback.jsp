@@ -30,12 +30,12 @@
                                 <nav class="hidden-xs">
                                     <ul class="nav">
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a ">
                                                 <a href="${ctx}/console/statistics/billdetail/call">语音呼叫</a>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a">
+                                            <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/callback">语音回拨</a>
                                             </div>
                                         </li>
@@ -72,12 +72,11 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>-->
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;语音呼叫</span>
+                            <span class="border-left">&nbsp;语音回拨</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
                             <section class="panel panel-default pos-rlt clearfix ">
-
                                 <ul id="myTab" class="nav nav-tabs" name="appId">
                                     <c:forEach items="${appList}" var="app" varStatus="s">
                                         <li
@@ -89,14 +88,14 @@
                                     </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form:form action="${ctx}/console/statistics/billdetail/call" method="post" id="mainForm">
+                                    <form:form action="${ctx}/console/statistics/billdetail/callback" method="post" id="mainForm">
                                         <div class="row statistics_row" >
                                             <input type="hidden" id="appId" name="appId" value="">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" name="time" class="form-control currentDay " value="${time}" />
+                                                <input type="text" name="time" class="form-control currentDay "  value="${time}"  />
                                             </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
@@ -108,7 +107,7 @@
                                             <thead>
                                             <tr>
                                                 <c:if test="${sum==null}"><c:set var="sum" value="0"></c:set> </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum}" pattern="0.00"></fmt:formatNumber> 元</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum.cost}" pattern="0.00"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
@@ -131,7 +130,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/call"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
@@ -143,7 +142,6 @@
         </section>
     </section>
 </section>
-
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>

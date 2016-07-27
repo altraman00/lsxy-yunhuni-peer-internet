@@ -35,7 +35,7 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a ">
                                                 <a href="${ctx}/console/statistics/billdetail/callback">语音回拨</a>
                                             </div>
                                         </li>
@@ -50,7 +50,7 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a">
+                                            <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>
@@ -72,7 +72,7 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>-->
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;语音回拨</span>
+                            <span class="border-left">&nbsp;语音验证码</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
@@ -88,33 +88,31 @@
                                     </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form:form action="${ctx}/console/statistics/billdetail/callback" method="post" id="mainForm">
-                                        <div class="row statistics_row" >
-                                            <input type="hidden" id="appId" name="appId" value="">
+                                <form:form action="${ctx}/console/statistics/billdetail/code" method="post" id="mainForm">
+                                     <div class="row statistics_row" >
+                                         <input type="hidden" id="appId" name="appId" value="">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
                                             <div class="col-md-2">
-                                                <input type="text" name="time" class="form-control currentDay "  value="${time}"  />
+                                                <input type="text" name="time" class="form-control currentDay " value="${time}" />
                                             </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
                                             </div>
                                         </div>
                                     </form:form>
-                                    <div>
+                                    <div >
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <c:if test="${sum==null}"><c:set var="sum" value="0"></c:set> </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum}" pattern="0.00"></fmt:formatNumber> 元</span></th>
+                                                <th colspan="6"><span class="p-money">总条数：${fn:length(pageObj.result)}条</span></th>
                                             </tr>
                                             <tr>
-                                                <th>呼叫时间</th>
+                                                <th>发送时间</th>
                                                 <th>主叫</th>
                                                 <th>被叫</th>
-                                                <th>时长（秒）</th>
-                                                <th>消费金额（元）</th>
+                                                <th>挂机时间</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -123,14 +121,13 @@
                                                     <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
-                                                    <td>${result.callTimeLong}</td>
-                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
+                                                    <td><fmt:formatDate value="${result.callEndDt}" pattern="yyyy-MM-dd"></fmt:formatDate></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/code"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
