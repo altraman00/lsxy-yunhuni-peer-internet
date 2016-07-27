@@ -5,9 +5,6 @@ package com.lsxy.app.portal.comm;
  * Created by zhangxb on 2016/7/26.
  */
 public class MapBean  {
-    public static final String SUCCESS = "0000";
-    public static final String FAIL = "1111";
-    public static final String TIME_OUT = "0010";
     //代号 0000成功，1111失败 ,0010登陆超时
     private String code;
     //消息

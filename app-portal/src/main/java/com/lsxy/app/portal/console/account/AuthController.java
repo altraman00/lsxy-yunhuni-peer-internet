@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.lsxy.framework.web.rest.RestResponse.failed;
+
 /**
  * Created by zhangxb on 2016/6/24.
  * 实名认证
@@ -100,15 +102,15 @@ public class AuthController extends AbstractPortalController {
      */
     @RequestMapping(value = "/is_real_auth",method = RequestMethod.GET)
     @ResponseBody
-    public MapBean isRealAuth(HttpServletRequest request){
+    public RestResponse isRealAuth(HttpServletRequest request){
         RestResponse response = findAuthStatus(request);
-        MapBean result;
+        RestResponse result;
         if(response.isSuccess() && response.getData() != null){
             Map data = (Map) response.getData();
             int authStatus  = Integer.valueOf((data.get("status")+""));
-            result = new MapBean(MapBean.SUCCESS,null,authStatus);
+            result = RestResponse.success(authStatus);
         }else{
-            result = new MapBean(MapBean.FAIL,"无法获取用户认证信息",null);
+            result = RestResponse.failed("1111","无法获取用户认证信息");
         }
         return result;
     }
