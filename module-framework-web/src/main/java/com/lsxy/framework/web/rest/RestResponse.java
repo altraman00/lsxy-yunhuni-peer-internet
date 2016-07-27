@@ -1,6 +1,5 @@
 package com.lsxy.framework.web.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.core.utils.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +57,13 @@ public class RestResponse<T> {
         this.errorMsg = errorMsg;
     }
 
-
+    /**
+     * 提供成功的静态方法，方便使用
+     * @return
+     */
+    public static RestResponse success(){
+        return success(null);
+    }
     /**
      * 提供成功的静态方法，方便使用
      * @param data 希望作为返回值输出的结果对象

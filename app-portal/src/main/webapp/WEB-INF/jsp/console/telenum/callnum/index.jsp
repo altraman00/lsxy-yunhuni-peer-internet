@@ -129,9 +129,11 @@ function release(id){
         if(result){
             var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
             ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){
-                showtoast(data.msg);
-                if(data.code=='0000'){
+                if(data.success){
+                    showtoast("释放成功");
                     $('#app-'+id).remove();
+                }else{
+                    showtoast(data.errorMsg);
                 }
             },"post");
         }else{

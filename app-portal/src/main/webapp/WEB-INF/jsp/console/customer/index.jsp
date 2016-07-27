@@ -74,16 +74,16 @@
         $('#customForm').bootstrapValidator('validate');
         var result = $('#customForm').data('bootstrapValidator').isValid();
         if(result){
-            ajaxsync("${ctx}/console/customer/edit",getFormJson("#customForm"),resultF,"post");
+            ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
+                if(data.success){
+                    $('#text1').val('');
+                    showtoast("删除成功");
+                }else{
+                    showtoast(data.errorMsg);
+                }
+            },"post");
         }
     });
-    function resultF(re){
-        if(re.code=='0000'){
-            $('#text1').val('');
-        }
-        showtoast(re.msg);
-
-    }
 </script>
 </body>
 </html>
