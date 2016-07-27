@@ -152,11 +152,12 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <div class="col-md-9">
+                                            <div class="col-md-4 remove-padding">
                                                 <a id="validateBtn" class="validateBtnNormal btn btn-primary  btn-form">
                                                     <c:if test="${app.id==null}">创建</c:if>
                                                     <c:if test="${app.id!=null}">修改</c:if>
                                                 </a>
+                                                <c:if test="${app.id!=null}"><a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
                                             </div>
                                         </div>
                                     </form:form>
@@ -176,6 +177,9 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/application/create.js'></script>
 
 <script>
+    $('#validateBtn2').click(function(){
+        window.location.href="${ctx}/console/app/detail?id=${app.id}";
+    });
     $('#validateBtn').click(function(){
         $('#application_create').bootstrapValidator('validate');
         var result = $('#application_create').data('bootstrapValidator').isValid();
@@ -206,6 +210,7 @@
         }
 
     });
+
 </script>
 
 </body>
