@@ -94,7 +94,7 @@ public class SafetyController extends AbstractRestController {
             return  RestResponse.failed("1002","该手机号码已被使用");
         }
         boolean flag = accountService.checkMobile(mobile);
-        if(!flag){
+        if(flag){
             return RestResponse.failed("1001","该手机号码已被使用");
         }
         account.setMobile(mobile);
