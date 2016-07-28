@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.console.account;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -138,35 +137,7 @@ public class SafetyController extends AbstractPortalController {
      */
     @RequestMapping(value="/edit_mobile" ,method = RequestMethod.POST)
     @ResponseBody
-    public Map editMobile(String mobile ,HttpServletRequest request ){
-        HashMap hs = new HashMap();
-        RestResponse<Account> restResponse = saveMobile(request,mobile);
-        Account account = restResponse.getData();
-        String status = IS_FALSE;
-        if(mobile.equals(account.getMobile())){
-            status = IS_TRUE;
-        }
-        if(IS_TRUE.equals(status)) {
-            SafetyVo safetyVo = new SafetyVo(account);
-            request.getSession().setAttribute("safetyVo",safetyVo);
-            //将手机验证码删除
-            MobileCodeUtils.removeMobileCodeChecker(request);
-            hs.put("sucess", RESULT_SUCESS);
-            hs.put("msg", "新手机绑定成功！");
-        }else{
-            hs.put("sucess", RESULT_FIAL);
-            hs.put("msg", "新手机绑定失败！");
-        }
-
-        return hs;
-    }
-
-    /**
-     *  保存手机号码的方法
-     * @param mobile 手机号码
-     * @return
-     */
-    private RestResponse<Account> saveMobile(HttpServletRequest request,String mobile) {
+    public RestResponse editMobile(String mobile ,HttpServletRequest request ){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +  "/rest/account/safety/save_mobile?mobile={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
