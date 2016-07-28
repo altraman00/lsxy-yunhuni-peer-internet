@@ -167,9 +167,11 @@
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
                                                         <div class="col-md-4">
-                                                            <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${invoiceInfo.qualificationUrl}">
+                                                            <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${invoiceInfo.qualificationUrl}"
+                                                                   data-url="${empty invoiceInfo.qualificationUrl? (resPrefixUrl + '/images/index/l6.png'): (ctx + '/console/oss/img/'+ invoiceInfo.qualificationUrl)}">
                                                             <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
-                                                            <img src="${resPrefixUrl }/images/index/l6.png" alt="" id="imgPre" width="100" height="80" class="recordimg" />
+                                                            <img src="${empty invoiceInfo.qualificationUrl? (resPrefixUrl + '/images/index/l6.png'): (ctx + '/console/oss/img/'+ invoiceInfo.qualificationUrl)}"
+                                                                 alt="" id="imgPre" width="100" height="80" class="recordimg" />
                                                         </div>
                                                     </div>
                                                 </div>
