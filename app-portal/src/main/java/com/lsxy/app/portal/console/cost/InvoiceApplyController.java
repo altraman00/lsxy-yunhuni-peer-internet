@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.comm.MapBean;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.consume.model.ConsumeDay;
@@ -99,24 +98,20 @@ public class InvoiceApplyController extends AbstractPortalController {
      */
     @RequestMapping(value = "/apply_info",method = RequestMethod.GET)
     @ResponseBody
-    public Map applyInfo(HttpServletRequest request,String start,String end){
-        Map result = new HashMap();
+    public RestResponse applyInfo(HttpServletRequest request,String start,String end){
+        RestResponse result;
         if(StringUtils.isBlank(start) ){
-            result.put("flag",false);
-            result.put("msg","暂无可开发票！");
+            result = RestResponse.failed("0000","暂无可开发票！");
         }else if(StringUtils.isBlank(end)){
-            result.put("flag",false);
-            result.put("msg","请选择结束时间！");
+            result = RestResponse.failed("0000","请选择结束时间！");
         }else{
             String token = this.getSecurityToken(request);
             RestResponse<BigDecimal> response = applyAmount(token, start, end);
             if(response.isSuccess()){
                 double amount = response.getData().doubleValue();
-                result.put("flag",true);
-                result.put("applyAmount",amount);
+                result = RestResponse.success(amount);
             }else{
-                result.put("flag",false);
-                result.put("msg","请选择结束时间！");
+                result = RestResponse.failed("0000",response.getErrorMsg());
             }
         }
         return result;
@@ -191,12 +186,12 @@ public class InvoiceApplyController extends AbstractPortalController {
         Map<String,Object> paramsMap = WebUtils.getRequestParams(request);
         String token = this.getSecurityToken(request);
         String type = (String) paramsMap.get("type");
-        String authStatus = findAuthStatus(token);
-        if("1".equals(authStatus)){
+        Integer authStatus = findAuthStatus(token);
+        if(1 == authStatus){
             if(!authStatus.equals(type)){
                 throw new RuntimeException("个人实名认证的用户不能进行企业发票申请");
             }
-        }else if(!"2".equals(authStatus)){
+        }else if(2 != authStatus){
             throw new RuntimeException("用户未进行实名认证");
         }
         Account account = this.getCurrentAccount(request);
@@ -223,13 +218,13 @@ public class InvoiceApplyController extends AbstractPortalController {
      * 获取后台状态的rest请求方法
      * @return
      */
-    private String findAuthStatus(String token){
+    private Integer findAuthStatus(String token){
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/account/auth/find_auth_status";
         Map map = new HashMap();
         RestResponse<HashMap> response = RestRequest.buildSecurityRequest(token).post(uri, map, HashMap.class);
         if(response.isSuccess() && response.getData() != null){
             Map data = response.getData();
-            return (String) data.get("status");
+            return (Integer) data.get("status");
         }else{
             throw new RuntimeException("无法获取用户认证信息");
         }
@@ -293,12 +288,10 @@ public class InvoiceApplyController extends AbstractPortalController {
      */
     @RequestMapping(value = "/count_day_consume" ,method = RequestMethod.GET)
     @ResponseBody
-    public Map countDayConsume(HttpServletRequest request,String start,String end){
-        Map result = new HashMap();
+    public RestResponse countDayConsume(HttpServletRequest request,String start,String end){
         String token = this.getSecurityToken(request);
         Long count = this.countDayConsumeRest(token,start,end);
-        result.put("flag",true);
-        result.put("count",count);
+        RestResponse result = RestResponse.success(count);
         return result;
     }
 
@@ -321,13 +314,10 @@ public class InvoiceApplyController extends AbstractPortalController {
      */
     @RequestMapping(value = "/list_day_consume",method = RequestMethod.GET)
     @ResponseBody
-    public Map listDayConsume(HttpServletRequest request,String start,String end,Integer pageNo,Integer pageSize){
-        Map model = new HashMap();
+    public RestResponse listDayConsume(HttpServletRequest request,String start,String end,Integer pageNo,Integer pageSize){
         String token = this.getSecurityToken(request);
         List result = this.listDayConsumeRest(token,start,end,pageNo,pageSize);
-        model.put("flag",true);
-        model.put("result",result);
-        return model;
+        return RestResponse.success(result);
     }
 
     /**

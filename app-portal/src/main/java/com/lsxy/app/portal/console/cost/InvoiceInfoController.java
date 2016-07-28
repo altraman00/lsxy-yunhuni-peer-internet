@@ -6,10 +6,10 @@ import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +59,11 @@ public class InvoiceInfoController extends AbstractPortalController {
     public ModelAndView edit(HttpServletRequest request, InvoiceInfo invoiceInfo, MultipartFile uploadfile){
         Account account = this.getCurrentAccount(request);
         String imgUrl = UploadFile(account.getTenant().getId(), uploadfile);
-        invoiceInfo.setQualificationUrl(imgUrl);
+        if(StringUtils.isNotBlank(imgUrl)){
+            invoiceInfo.setQualificationUrl(imgUrl);
+        }else{
+            invoiceInfo.setQualificationUrl("");
+        }
         String returView;
         Map<String,Object> model = new HashMap<>();
         String token = this.getSecurityToken(request);

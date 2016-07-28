@@ -2,7 +2,6 @@ package com.lsxy.app.portal.console.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.comm.MapBean;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.config.SystemConfig;
@@ -22,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.lsxy.framework.web.rest.RestResponse.failed;
 
 /**
  * Created by zhangxb on 2016/6/24.

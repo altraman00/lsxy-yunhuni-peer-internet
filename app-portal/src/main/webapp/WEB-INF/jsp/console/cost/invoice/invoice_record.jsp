@@ -95,6 +95,7 @@
                                                 <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)，共三种个人增值税普通发票与企业增值税普通发票的发票抬头修改后可直接保存，企业增值税专用票则需要用户进行企业认证后才能开具</p>
                                                 <p>*官方活动赠送金额不计算在开票金额内</p>
                                                 <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细</p>
+                                                <p>*因账务结算原因，每月25号期前提交的开票申请当月受理，之后申请延期至下月受理</p>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -135,7 +136,7 @@
                                                                     <span class="invoice-type"  data-type="3">企业增值税专用票</span>
                                                                 </c:when>
                                                                 <c:otherwise>
-                                                                    <a class="invoice-type" href="cost_invoice.html" data-type="0">您还未填写发票信息，请先填写完成</a>
+                                                                    <a class="invoice-type" href="${ctx}/console/cost/invoice_info" data-type="0">您还未填写发票信息，请先填写完成</a>
                                                                 </c:otherwise>
                                                             </c:choose>
                                                             <!--<span class="invoice-type"
@@ -350,25 +351,17 @@
         //异步获取开局发票金额
         var price = 0.00;
         var flag = false;
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/apply_info",
-            data:{start:starttime,end:endtime},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    price = data.applyAmount;
-                    flag = true;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        //ajax
+        ajaxsync(ctx + "/console/cost/invoice_apply/apply_info",{start:starttime,end:endtime},function(response){
+            if(response.success){
+                price = response.data;
+                flag = true;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
+
         if(!flag){
             return;
         }
@@ -398,25 +391,16 @@
         $('#cost-detail-money').html(money);
         //获取数据总数
         var count = 11;
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/count_day_consume",
-            data:{start:starttime,end:endtime},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    flag = true;
-                    count = data.count;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        ajaxsync(ctx + "/console/cost/invoice_apply/count_day_consume",{start:starttime,end:endtime},function(response){
+            if(response.success){
+                flag = true;
+                count = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
+
         if(!flag){
             return;
         }
@@ -444,24 +428,15 @@
         var starttime = $('#ininvoicetime').attr('data-start');
         var endtime   = $('#ininvoicetime').attr('data-end');
         var result = [];
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/list_day_consume",
-            data:{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    result = data.result;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        ajaxsync(ctx + "/console/cost/invoice_apply/list_day_consume",{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},function(response){
+            if(response.success){
+                result = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
+
 
         var html ='';
         //数据列表
@@ -481,24 +456,15 @@
         var title = obj.innerHTML;
         if(title=='展开'){
             //ajax
-            $.ajax({
-                url : ctx + "/console/cost/bill_day/list",
-                data:{day:id},
-                type : 'get',
-                async: false,//使用同步的方式,true为异步方式
-                timeout:2*60*1000,
-                dataType: "json",
-                success : function(data){
-                    if(data.flag){
-                        result = data.result;
-                    }else{
-                        showtoast(data.msg?data.msg:'数据异常');
-                    }
-                },
-                error:function(){
-                    showtoast('网络异常，请稍后重试');
+
+            //ajax
+            ajaxsync(ctx + "/console/cost/bill_day/list",{day:id},function(response){
+                if(response.success){
+                    result = response.data;
+                }else{
+                    showtoast(response.errorMsg?response.errorMsg:'数据异常');
                 }
-            });
+            },"get");
 
             var html ='';
             for(var i=0 ; i<result.length; i++){

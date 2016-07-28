@@ -34,17 +34,14 @@ public class BillDayController extends AbstractPortalController {
      */
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ResponseBody
-    public Map list(HttpServletRequest request, String appId, String day){
-        Map<String,Object> model = new HashMap<>();
+    public RestResponse list(HttpServletRequest request, String appId, String day){
         if(StringUtils.isBlank(day)){
             Date preDate = DateUtils.getPreDate(new Date());
             day = DateUtils.getDate(preDate, "yyyy-MM-dd");
         }
         String token = this.getSecurityToken(request);
         List<BillDay> billDays = getBillDayRest(token, appId, day);
-        model.put("flag",true);
-        model.put("result",billDays);
-        return model;
+        return RestResponse.success(billDays);
     }
 
     /**
