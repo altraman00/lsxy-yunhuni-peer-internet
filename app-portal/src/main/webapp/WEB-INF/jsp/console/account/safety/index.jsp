@@ -255,7 +255,7 @@
     function sendEmailCode(){
         var email = $('#email').val();
         var param = {'email':email,parameterName:token};
-        ajaxsync(ctx+"/console/account/safety/modify/email",param,function(result){
+        ajaxsync(ctx+"/console/account/safety/send_email",param,function(result){
           if(result.success){
               showmsg('已发送成功<span style="color:orange;font-size:20px">12小时</span>内有效','moadltips3');
               return true;

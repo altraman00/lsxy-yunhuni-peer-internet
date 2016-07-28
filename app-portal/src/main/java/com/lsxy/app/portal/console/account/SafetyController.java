@@ -2,11 +2,13 @@ package com.lsxy.app.portal.console.account;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +27,8 @@ import java.util.Map;
 @RequestMapping("/console/account/safety")
 public class SafetyController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(SafetyController.class);
-
+    @Autowired
+    private RedisCacheService cacheManager;
     private static final String IS_ERROR = "-2";//表示密码错误
     private static final String IS_FALSE = "-1";//表示失败
     private static final String IS_TRUE = "1";//表示成功
@@ -117,18 +120,13 @@ public class SafetyController extends AbstractPortalController {
         }
         return hs;
     }
-    @RequestMapping(value="/modify/email")
+    @RequestMapping(value="/send_email")
     @ResponseBody
-    public RestResponse modifyEmail(HttpServletRequest request,String email ){
+    public RestResponse sendEmail(HttpServletRequest request,String email ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/account/safety/validation_email?email={1}";
-        RestResponse valEmail = RestRequest.buildSecurityRequest(token).get(uri,  String.class,email);
-        if(valEmail.isSuccess()){
-            //发送邮件
-            return RestResponse.success();
-        }else{
-            return valEmail;
-        }
+        String uri = restPrefixUrl +   "/rest/account/safety/send_email?email={1}";
+        RestResponse restResponse = RestRequest.buildSecurityRequest(token).get(uri,  String.class,email);
+        return restResponse;
     }
 
     /**
