@@ -315,7 +315,6 @@
                 //开始绑定手机号码
                 param = {'mobile':mobile,parameterName:token};
                 ajaxsync(ctx+"/console/account/safety/edit_mobile",param,function(result){
-                    alert(JSON.stringify(result));
                     if(result.success){
                         $('#mobileOld').html("您已经绑定了手机 "+mobile.substring(0,3)+"****"+mobile.substring(7,11));
                         $('.cancel').click();
