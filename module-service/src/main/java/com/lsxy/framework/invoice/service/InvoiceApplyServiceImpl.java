@@ -58,7 +58,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
 
     @Override
     public Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize) {
-        String hql = "from InvoiceApply obj where obj.tenant.id = ?1 order by obj.createTime";
+        String hql = "from InvoiceApply obj where obj.tenant.id = ?1 order by obj.createTime desc";
         return this.pageList(hql, pageNo, pageSize, tenantId);
     }
 
