@@ -99,17 +99,17 @@ public class AuthController extends AbstractPortalController {
      */
     @RequestMapping(value = "/is_real_auth",method = RequestMethod.GET)
     @ResponseBody
-    public Boolean isRealAuth(HttpServletRequest request){
+    public RestResponse isRealAuth(HttpServletRequest request){
         RestResponse response = findAuthStatus(request);
-        boolean flag = false;
+        RestResponse result;
         if(response.isSuccess() && response.getData() != null){
-            Map result = (Map) response.getData();
-            int authStatus  = Integer.valueOf((result.get("status")+""));
-            if (AUTH_ONESELF_SUCESS == authStatus || AUTH_COMPANY_SUCESS == authStatus) {
-                flag = true;
-            }
+            Map data = (Map) response.getData();
+            int authStatus  = Integer.valueOf((data.get("status")+""));
+            result = RestResponse.success(authStatus);
+        }else{
+            result = RestResponse.failed("1111","无法获取用户认证信息");
         }
-        return flag;
+        return result;
     }
 
     /**

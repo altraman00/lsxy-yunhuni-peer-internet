@@ -37,6 +37,7 @@ public class InvoiceApply extends IdEntity {
     private String receiveMobile;  //手机号
     private String expressCom;  //快递公司
     private String expressNo;  //快递单号
+    private String qualificationUrl; //资格证书URL （图片）
 
     @Column(name = "amount")
     public BigDecimal getAmount() {
@@ -208,5 +209,14 @@ public class InvoiceApply extends IdEntity {
 
     public void setExpressNo(String expressNo) {
         this.expressNo = expressNo;
+    }
+
+    @Column(name = "qualification_url")
+    public String getQualificationUrl() {
+        return qualificationUrl;
+    }
+
+    public void setQualificationUrl(String qualificationUrl) {
+        this.qualificationUrl = qualificationUrl;
     }
 }

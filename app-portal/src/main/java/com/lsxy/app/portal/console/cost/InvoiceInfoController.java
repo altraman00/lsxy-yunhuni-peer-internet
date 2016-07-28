@@ -5,14 +5,24 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +33,9 @@ import java.util.Map;
 @Controller
 @RequestMapping("/console/cost/invoice_info")
 public class InvoiceInfoController extends AbstractPortalController {
+    @Autowired
+    private OSSService ossService;
+
     @RequestMapping(value = "",method = RequestMethod.GET)
     public ModelAndView get(HttpServletRequest request){
         String returView;
@@ -52,7 +65,12 @@ public class InvoiceInfoController extends AbstractPortalController {
 
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
-    public ModelAndView edit(HttpServletRequest request,InvoiceInfo invoiceInfo){
+    public ModelAndView edit(HttpServletRequest request, InvoiceInfo invoiceInfo, MultipartFile uploadfile) throws IOException {
+        Account account = this.getCurrentAccount(request);
+        String imgUrl = uploadFile(account.getTenant().getId(), uploadfile);
+        if(StringUtils.isNotBlank(imgUrl)){
+            invoiceInfo.setQualificationUrl(imgUrl);
+        }
         String returView;
         Map<String,Object> model = new HashMap<>();
         String token = this.getSecurityToken(request);
@@ -76,5 +94,27 @@ public class InvoiceInfoController extends AbstractPortalController {
         RestResponse<InvoiceInfo> response = RestRequest.buildSecurityRequest(token).get(url, InvoiceInfo.class);
         return response.getData();
     }
+
+    /**
+     * 上传文件方法
+     */
+    private String uploadFile(String tenantId, MultipartFile file) throws IOException {
+        String name = file.getOriginalFilename();//文件名
+        if(StringUtils.isNotBlank(name)){
+            String type = name.substring(name.lastIndexOf("."),name.length());
+            String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
+            String fileKey = "tenant_res/"+tenantId+"/invoice/"+ymd+"/"+ UUIDGenerator.uuid()+type;
+            long size = file.getSize();
+            boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name, SystemConfig.getProperty("global.oss.aliyun.bucket"),fileKey);
+            if(flag){
+                return fileKey;
+            }else{
+                throw new RuntimeException("上传文件失败");
+            }
+        }else{
+            return null;
+        }
+    }
+
 
 }
