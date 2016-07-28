@@ -26,7 +26,7 @@ public class ModifyEmailController {
     @Autowired
     private RedisCacheService cacheManager;
 
-    @RequestMapping(value = "/reset_password",method = RequestMethod.POST)
+    @RequestMapping(value = "/email",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView resetPassword(HttpServletRequest request,String id,String code){
         String key = "account_modify_email_"+id;
