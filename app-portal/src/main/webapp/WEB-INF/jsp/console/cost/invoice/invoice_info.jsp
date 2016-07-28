@@ -137,7 +137,8 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
                                                     <div class="col-md-9 line34">
-                                                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" id="imgPrev" width="100" height="80" class="recordimg" />
+                                                        <c:set var="defaultImgUrl" value="${(empty invoiceInfo.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(invoiceInfo.qualificationUrl))}" />
+                                                        <img src="${defaultImgUrl}" alt="" id="imgPrev" width="100" height="80" class="recordimg" />
                                                     </div>
                                                 </div>
                                             </c:if>

@@ -67,7 +67,7 @@ public class InvoiceInfoController extends AbstractPortalController {
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView edit(HttpServletRequest request, InvoiceInfo invoiceInfo, MultipartFile uploadfile) throws IOException {
         Account account = this.getCurrentAccount(request);
-        String imgUrl = UploadFile(account.getTenant().getId(), uploadfile);
+        String imgUrl = uploadFile(account.getTenant().getId(), uploadfile);
         if(StringUtils.isNotBlank(imgUrl)){
             invoiceInfo.setQualificationUrl(imgUrl);
         }
@@ -98,7 +98,7 @@ public class InvoiceInfoController extends AbstractPortalController {
     /**
      * 上传文件方法
      */
-    private String UploadFile(String tenantId,MultipartFile file) throws IOException {
+    private String uploadFile(String tenantId, MultipartFile file) throws IOException {
         String name = file.getOriginalFilename();//文件名
         if(StringUtils.isNotBlank(name)){
             String type = name.substring(name.lastIndexOf("."),name.length());

@@ -172,9 +172,10 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${apply.qualificationUrl}" data-url="${resPrefixUrl }/images/index/l6.png">
+                                                        <c:set var="defaultImgUrl" value="${(empty apply.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(apply.qualificationUrl))}" />
+                                                        <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${apply.qualificationUrl}" data-url="${defaultImgUrl}">
                                                         <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
-                                                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" id="imgPre" width="100" height="80" class="recordimg" />
+                                                        <img src="${defaultImgUrl}" alt="" id="imgPre" width="100" height="80" class="recordimg" />
                                                     </div>
                                                 </div>
                                             </c:if>

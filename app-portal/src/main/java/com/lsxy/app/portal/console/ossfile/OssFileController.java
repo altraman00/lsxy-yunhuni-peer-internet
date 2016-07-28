@@ -22,8 +22,8 @@ public class OssFileController extends AbstractPortalController {
     @Autowired
     private OSSService ossService;
 
-    @RequestMapping("/img/{uri}")
-    public void getImg(HttpServletResponse response, @PathVariable String uri){
+    @RequestMapping("/img")
+    public void getImg(HttpServletResponse response, String uri){
         response.setContentType("image/jpeg"); //必须设置ContentType为image/jpeg
         InputStream in = null;
         ServletOutputStream out = null;
