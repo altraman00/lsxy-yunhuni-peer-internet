@@ -14,16 +14,16 @@
     <!--bootstrap.css-->
     <link href="${resPrefixUrl}/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css"/>
     <!--index.css-->
-    <link href="${resPrefixUrl}stylesheets/register.css" rel="stylesheet" type="text/css"/>
+    <link href="${resPrefixUrl}/stylesheets/register.css" rel="stylesheet" type="text/css"/>
     <!--vaildator.css-->
-    <link rel="stylesheet" href="${resPrefixUrl}bower_components/bootstrapvalidator/dist/css/bootstrapValidator.css">
+    <link rel="stylesheet" href="${resPrefixUrl}/bower_components/bootstrapvalidator/dist/css/bootstrapValidator.css">
 </head>
 <body class="register-bg">
 <!--  container -->
 
 <div class="register-header">
     <div class="box">
-        <img class="logo" src="${resPrefixUrl}images/index/logo_top.png"/>
+        <img class="logo" src="${resPrefixUrl}/images/index/logo_top.png"/>
         <div class="text">
             如果有云呼你账号，<a href="${host}/login">立即登录</a>
         </div>
