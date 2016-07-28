@@ -57,4 +57,5 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
             return false;
         }
     }
+
 }
