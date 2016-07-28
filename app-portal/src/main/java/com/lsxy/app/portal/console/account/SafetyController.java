@@ -1,8 +1,6 @@
 package com.lsxy.app.portal.console.account;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.comm.MapBean;
-import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -139,25 +137,7 @@ public class SafetyController extends AbstractPortalController {
      */
     @RequestMapping(value="/edit_mobile" ,method = RequestMethod.POST)
     @ResponseBody
-    public MapBean editMobile(String mobile ,HttpServletRequest request ){
-        MapBean hs = new MapBean();
-        RestResponse<Account> restResponse = saveMobile(request,mobile);
-        if(restResponse.isSuccess()){
-            hs.setCode("0000");
-            hs.setMsg("新手机号码绑定成功！");
-        }else{
-            hs.setCode(restResponse.getErrorCode());
-            hs.setCode(restResponse.getErrorMsg());
-        }
-        return hs;
-    }
-
-    /**
-     *  保存手机号码的方法
-     * @param mobile 手机号码
-     * @return
-     */
-    private RestResponse<Account> saveMobile(HttpServletRequest request,String mobile) {
+    public RestResponse editMobile(String mobile ,HttpServletRequest request ){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +  "/rest/account/safety/save_mobile?mobile={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
