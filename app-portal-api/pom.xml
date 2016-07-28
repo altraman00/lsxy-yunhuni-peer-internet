@@ -50,6 +50,11 @@
             <artifactId>module-framework-cache</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-mq</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
@@ -71,11 +76,7 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>com.aliyun.openservices</groupId>
-            <artifactId>ons-jms</artifactId>
-            <version>1.2.2</version>
-        </dependency>
+
     </dependencies>
 
     <build>

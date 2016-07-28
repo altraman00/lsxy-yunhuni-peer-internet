@@ -1,22 +1,16 @@
 package com.lsxy.framework.mq.api;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Date;
+import com.lsxy.framework.core.utils.JSONUtil2;
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.jms.core.MessageCreator;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-
-import org.apache.commons.codec.binary.Base64;
-import org.springframework.jms.core.MessageCreator;
-
-import com.lsxy.framework.core.utils.JSONUtil2;
-import com.lsxy.framework.core.utils.UUIDGenerator;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * mq消息对象

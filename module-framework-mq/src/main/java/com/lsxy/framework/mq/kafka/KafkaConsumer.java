@@ -1,9 +1,7 @@
 package com.lsxy.framework.mq.kafka;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.mq.api.AbstractMQConsumer;
-import com.lsxy.framework.mq.api.MQEvent;
-import com.lsxy.framework.mq.api.MQMessageHandler;
+import com.lsxy.framework.mq.api.*;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -11,6 +9,8 @@ import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +20,11 @@ import java.util.concurrent.Executors;
 public class KafkaConsumer extends AbstractMQConsumer {
 	private static final Log logger = LogFactory.getLog(KafkaConsumer.class);
 
+	@Autowired
+	private MessageHandlerExcutorTask messageHandlerExcutorTask;
+
+	@Autowired
+	private ApplicationContext applicationContext;
 	
 	private ConsumerConnector consumerConnector;
 	private ExecutorService threadPools = null;
@@ -66,7 +71,7 @@ public class KafkaConsumer extends AbstractMQConsumer {
 		Set<String> topicStreams = consumerMap.keySet();
 		threadPools = Executors.newFixedThreadPool(thread_number_per_topic * topicMap.size());
 		final KafkaConsumer consumer = this;
-		
+		final MQHandlerFactory handlerFactory = this.getMqHandlerFactory();
 		for (String topicStream : topicStreams) {
 			List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topicStream);
 			// create list of 4 threads to consume from each of the partitions
@@ -81,13 +86,12 @@ public class KafkaConsumer extends AbstractMQConsumer {
 								MQEvent event = consumer.parseMessage(msg);
 								if (event != null) {
 									logger.debug("parse msg to MQEvent object and id is :"	+ event.getId());
-									MQMessageHandler handler = getMqHandlerFactory().getHandler(event);
-									if (handler != null) {
-										logger.debug("found a handler for the event:" + event.getId() + "--" + handler.getClass().getName());
-										handler.handleMessage(event);
-									} else {
-										logger.debug("have not defined a handler for the event:" + event.getEventName());
+									Set<Class<? extends MQMessageHandler>> handlers = handlerFactory.getHandler(event);
+									for (Class hc: handlers) {
+										MQMessageHandler handler = (MQMessageHandler) applicationContext.getBean(hc);
+										messageHandlerExcutorTask.doTask(handler,event);
 									}
+
 								}
 							} catch (Exception ex) {
 								ex.printStackTrace();

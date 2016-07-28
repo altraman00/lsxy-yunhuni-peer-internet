@@ -1,5 +1,6 @@
 package com.lsxy.app.portal;
 
+import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
@@ -8,6 +9,7 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mail.MailService;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +32,10 @@ public class ForgetPasswordController {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private RedisCacheService cacheManager;
+
 
     @Autowired
-    MailService mailService;
+    private MQService mqService;
 
     /**
      * 忘记密码-检查邮箱是否存在
@@ -59,26 +60,13 @@ public class ForgetPasswordController {
     }
 
     /**
-     * 忘记密码-发送邮件,存到redis里key为uuid，value为邮箱
+     * 忘记密码-发送邮件
      * @param email
      * @return
      */
     @RequestMapping("/send_email")
     public RestResponse sendEmail(String email) throws MailConfigNotEnabledException, MailContentNullException {
-        //发送邮件（参数是一个UUID），并将其存到数据库（redis?）
-        String uuid = UUIDGenerator.uuid();
-
-        //TODO MQ事件，发送邮件
-        Map<String,String> params = new HashMap<>();
-        params.put("host", SystemConfig.getProperty("portal.system.root.url"));
-        params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
-        params.put("key",uuid);
-        params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
-        mailService.send("重置密码",email,"02-portal-notify-reset-password.vm",params);
-        cacheManager.set(uuid,email,72 * 60 * 60);
-        if(logger.isDebugEnabled()){
-            logger.debug("邮件重置密码：code:{},email:{}",uuid,email);
-        }
+        mqService.publish(new ResetPwdVerifySuccessEvent(email));
         return RestResponse.success(null);
     }
 
