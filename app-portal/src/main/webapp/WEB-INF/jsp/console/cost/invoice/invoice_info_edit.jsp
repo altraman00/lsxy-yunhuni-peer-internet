@@ -92,7 +92,7 @@
                                 </div>
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="row">
-                                        <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form"
+                                        <form:form role="form" action="${ctx}/console/cost/invoice_info/save" method="post" class="register-form" enctype="multipart/form-data"
                                                    id="invoiceForm">
                                             <!-- 防止表单重复提交要加这个隐藏变量 -->
                                             <input type="hidden" name="submission_token" value="${submission_token}" />
@@ -164,6 +164,14 @@
                                                                    class="form-control input-form notEmpty"/>
                                                         </div>
                                                     </div>
+                                                    <div class="form-group">
+                                                        <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
+                                                        <div class="col-md-4">
+                                                            <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${invoiceInfo.qualificationUrl}">
+                                                            <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
+                                                            <img src="${resPrefixUrl }/images/index/l6.png" alt="" id="imgPre" width="100" height="80" class="recordimg" />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <!--企业专用票end-->
                                                 <div class="form-group">
@@ -216,6 +224,38 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
 <script>
 
+function bfSubmit(){
+    var flag = false;
+    var type = $("input[name='type']:checked").val();
+    ajaxsync(ctx + "/console/account/auth/is_real_auth",null,function(response){
+        if(response.success){
+            if(response.data == 1){
+                if(type == response.data){
+                    flag = true;
+                }else{
+                    showtoast('个人实名认证的用户不能设置企业发票信息');
+                }
+            }else if(response.data == 2){
+                flag = true;
+            }else{
+                showtoast('请先进行实名认证');
+            }
+        }else{
+            showtoast(response.errorMsg?response.errorMsg:'数据异常');
+        }
+
+    },"get");
+
+    if(flag){
+        $('.invoice-type').each(function(){
+            var e = $(this).attr('data-val');
+            if(type != e) {
+                $(this).hide().find("input").val("");
+            }
+        });
+    }
+    return flag;
+}
 
 
 </script>

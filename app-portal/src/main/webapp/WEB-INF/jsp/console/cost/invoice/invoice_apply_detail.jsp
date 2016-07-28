@@ -159,6 +159,12 @@
                                                     <lable class="col-md-3 text-right ">企业电话：</lable>
                                                     <lable class="col-md-9 line34 ">${apply.phone}</lable>
                                                 </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
+                                                    <div class="col-md-9 line34 ">
+                                                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" id="imgPrev" width="100" height="80" class="recordimg" />
+                                                    </div>
+                                                </div>
                                             </c:if>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">收取地址：</lable>

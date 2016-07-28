@@ -6,15 +6,18 @@ import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.consume.model.ConsumeDay;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -95,24 +98,20 @@ public class InvoiceApplyController extends AbstractPortalController {
      */
     @RequestMapping(value = "/apply_info",method = RequestMethod.GET)
     @ResponseBody
-    public Map applyInfo(HttpServletRequest request,String start,String end){
-        Map result = new HashMap();
+    public RestResponse applyInfo(HttpServletRequest request,String start,String end){
+        RestResponse result;
         if(StringUtils.isBlank(start) ){
-            result.put("flag",false);
-            result.put("msg","暂无可开发票！");
+            result = RestResponse.failed("0000","暂无可开发票！");
         }else if(StringUtils.isBlank(end)){
-            result.put("flag",false);
-            result.put("msg","请选择结束时间！");
+            result = RestResponse.failed("0000","请选择结束时间！");
         }else{
             String token = this.getSecurityToken(request);
             RestResponse<BigDecimal> response = applyAmount(token, start, end);
             if(response.isSuccess()){
                 double amount = response.getData().doubleValue();
-                result.put("flag",true);
-                result.put("applyAmount",amount);
+                result = RestResponse.success(amount);
             }else{
-                result.put("flag",false);
-                result.put("msg","请选择结束时间！");
+                result = RestResponse.failed("0000",response.getErrorMsg());
             }
         }
         return result;
@@ -182,9 +181,24 @@ public class InvoiceApplyController extends AbstractPortalController {
      */
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
-    public ModelAndView save(HttpServletRequest request){
-        String token = this.getSecurityToken(request);
+    public ModelAndView save(HttpServletRequest request, MultipartFile uploadfile){
+
         Map<String,Object> paramsMap = WebUtils.getRequestParams(request);
+        String token = this.getSecurityToken(request);
+        String type = (String) paramsMap.get("type");
+        Integer authStatus = findAuthStatus(token);
+        if(1 == authStatus){
+            if(!authStatus.equals(type)){
+                throw new RuntimeException("个人实名认证的用户不能进行企业发票申请");
+            }
+        }else if(2 != authStatus){
+            throw new RuntimeException("用户未进行实名认证");
+        }
+        Account account = this.getCurrentAccount(request);
+        String imgUrl = UploadFile(account.getTenant().getId(), uploadfile);
+        if(StringUtils.isNotBlank(imgUrl)){
+            paramsMap.put("qualificationUrl",imgUrl);
+        }
         this.save(token,paramsMap);
         return new ModelAndView("redirect:/console/cost/invoice_apply/page");
     }
@@ -198,6 +212,22 @@ public class InvoiceApplyController extends AbstractPortalController {
     private RestResponse save(String token,Map map){
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_apply/save";
         return RestRequest.buildSecurityRequest(token).post(url, map,InvoiceApply.class);
+    }
+
+    /**
+     * 获取后台状态的rest请求方法
+     * @return
+     */
+    private Integer findAuthStatus(String token){
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/account/auth/find_auth_status";
+        Map map = new HashMap();
+        RestResponse<HashMap> response = RestRequest.buildSecurityRequest(token).post(uri, map, HashMap.class);
+        if(response.isSuccess() && response.getData() != null){
+            Map data = response.getData();
+            return (Integer) data.get("status");
+        }else{
+            throw new RuntimeException("无法获取用户认证信息");
+        }
     }
 
     /**
@@ -258,12 +288,10 @@ public class InvoiceApplyController extends AbstractPortalController {
      */
     @RequestMapping(value = "/count_day_consume" ,method = RequestMethod.GET)
     @ResponseBody
-    public Map countDayConsume(HttpServletRequest request,String start,String end){
-        Map result = new HashMap();
+    public RestResponse countDayConsume(HttpServletRequest request,String start,String end){
         String token = this.getSecurityToken(request);
         Long count = this.countDayConsumeRest(token,start,end);
-        result.put("flag",true);
-        result.put("count",count);
+        RestResponse result = RestResponse.success(count);
         return result;
     }
 
@@ -286,13 +314,10 @@ public class InvoiceApplyController extends AbstractPortalController {
      */
     @RequestMapping(value = "/list_day_consume",method = RequestMethod.GET)
     @ResponseBody
-    public Map listDayConsume(HttpServletRequest request,String start,String end,Integer pageNo,Integer pageSize){
-        Map model = new HashMap();
+    public RestResponse listDayConsume(HttpServletRequest request,String start,String end,Integer pageNo,Integer pageSize){
         String token = this.getSecurityToken(request);
         List result = this.listDayConsumeRest(token,start,end,pageNo,pageSize);
-        model.put("flag",true);
-        model.put("result",result);
-        return model;
+        return RestResponse.success(result);
     }
 
     /**
@@ -303,6 +328,14 @@ public class InvoiceApplyController extends AbstractPortalController {
     private List listDayConsumeRest(String token, String start, String end,Integer pageNo,Integer pageSize) {
         String url = PortalConstants.REST_PREFIX_URL + "/rest/consume_day/list_by_time?startTime={1}&endTime={2}&pageNo={3}&pageSize={4}";
         return RestRequest.buildSecurityRequest(token).getList(url,ConsumeDay.class,start,end,pageNo,pageSize).getData();
+    }
+
+    /**
+     * 上传文件方法
+     */
+    private String UploadFile(String tenantId,MultipartFile file){
+        //TODO 上传图片文件
+        return UUIDGenerator.uuid();
     }
 
 }

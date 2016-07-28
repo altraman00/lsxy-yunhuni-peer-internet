@@ -88,12 +88,24 @@
                             </div>
                             <section class=" w-f cost_invoice">
                                 <div class="wrapper header">
+                                    <span class="border-left">&nbsp;发票说明</span>
+                                </div>
+                                <div class="col-md-12 ">
+                                    <div class="number_info">
+                                        <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)，共三种个人增值税普通发票与企业增值税普通发票的发票抬头修改后可直接保存，企业增值税专用票则需要用户进行企业认证后才能开具</p>
+                                        <p>*官方活动赠送金额不计算在开票金额内</p>
+                                        <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细</p>
+                                        <p>*因账务结算原因，每月25号期前提交的开票申请当月受理，之后申请延期至下月受理</p>
+                                    </div>
+                                </div>
+
+                                <div class="wrapper header">
                                     <span class="border-left">&nbsp;开票申请</span>
                                 </div>
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="row">
-                                        <form:form role="form" action="${ctx}/console/cost/invoice_apply/save" method="post" class="invoice-form"
-                                              id="costInvoiceForm">
+                                        <form:form role="form" action="${ctx}/console/cost/invoice_apply/save" method="post" class="invoice-form" enctype="multipart/form-data"
+                                              id="invoiceForm">
                                             <!-- 防止表单重复提交要加这个隐藏变量 -->
                                             <input type="hidden" name="submission_token" value="${submission_token}" />
                                             <input type="hidden" name="id" value="${apply.id}"/>
@@ -130,7 +142,7 @@
                                                         企业增值税专用票
                                                     </c:if>
                                                 </lable>
-                                                <input type="hidden" name="type" value="${apply.type}">
+                                                <input id="type" type="hidden" name="type" value="${apply.type}">
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">发票抬头：</lable>
@@ -157,6 +169,14 @@
                                                     <lable class="col-md-3 text-right ">企业电话：</lable>
                                                     <lable class="col-md-4"><input name="phone" placeholder="请填写企业电话" value="${apply.phone}" class="form-control input-form notEmpty" data-bv-field="notEmpty"/></lable>
                                                 </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${apply.qualificationUrl}">
+                                                        <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
+                                                        <img src="${resPrefixUrl }/images/index/l6.png" alt="" id="imgPre" width="100" height="80" class="recordimg" />
+                                                    </div>
+                                                </div>
                                             </c:if>
                                             <div class="form-group">
                                                 <span class="hr text-label"><strong>邮寄信息:</strong> &nbsp;<span class="grey">(临时修改不改变已保存的邮寄信息)</span></span>
@@ -177,13 +197,13 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">手机号码：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="receiveMobile" placeholder="请填写手机号码" value="${apply.receiveMobile}" class="form-control input-form notEmpty" data-bv-field="notEmpty" />
+                                                    <input type="text" name="receiveMobile" placeholder="请填写手机号码" value="${apply.receiveMobile}" class="form-control input-form mobile" data-bv-field="notEmpty" />
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
                                                 <div class="col-md-3 text-right">
-                                                    <button class="btn btn-primary  btn-form ">提交申请</button>
+                                                    <button class="btn btn-primary  btn-form " id="validateBtn">提交申请</button>
                                                 </div>
                                                 <div class="col-md-4 ">
                                                     <a href="${ctx}/console/cost/invoice_apply/page" class=" btn btn-default  btn-form">取消</a>
@@ -285,25 +305,16 @@
         $('#cost-detail-money').html(money);
         //获取数据总数
         var count = 11;
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/count_day_consume",
-            data:{start:starttime,end:endtime},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    flag = true;
-                    count = data.count;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        ajaxsync(ctx + "/console/cost/invoice_apply/count_day_consume",{start:starttime,end:endtime},function(response){
+            if(response.success){
+                flag = true;
+                count = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
+
         if(!flag){
             return;
         }
@@ -331,24 +342,14 @@
         var starttime = $('#ininvoicetime').attr('data-start');
         var endtime   = $('#ininvoicetime').attr('data-end');
         var result = [];
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/list_day_consume",
-            data:{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    result = data.result;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        ajaxsync(ctx + "/console/cost/invoice_apply/list_day_consume",{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},function(response){
+            if(response.success){
+                result = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
 
         var html ='';
         //数据列表
@@ -368,24 +369,13 @@
         var title = obj.innerHTML;
         if(title=='展开'){
             //ajax
-            $.ajax({
-                url : ctx + "/console/cost/bill_day/list",
-                data:{day:id},
-                type : 'get',
-                async: false,//使用同步的方式,true为异步方式
-                timeout:2*60*1000,
-                dataType: "json",
-                success : function(data){
-                    if(data.flag){
-                        result = data.result;
-                    }else{
-                        showtoast(data.msg?data.msg:'数据异常');
-                    }
-                },
-                error:function(){
-                    showtoast('网络异常，请稍后重试');
+            ajaxsync(ctx + "/console/cost/bill_day/list",{day:id},function(response){
+                if(response.success){
+                    result = response.data;
+                }else{
+                    showtoast(response.errorMsg?response.errorMsg:'数据异常');
                 }
-            });
+            },"get");
 
             var html ='';
             for(var i=0 ; i<result.length; i++){
@@ -414,7 +404,43 @@
         $('.modal-loadding').hide();
     }
 
+//    function showImage()
+//    {
+//        // 获取文件路径
+//        var path = document.getElementById('uploadfile').value;
+//        // 显示文件路径
+//        //document.getElementById('imgName').innerHTML = path;
+//        // 创建 img
+//        var img = document.createElement('img');
+//        // 载入图像
+//        img.src = path;
+//        // 插入图像到页面中
+//        document.getElementById('imgPrev').appendChild(img);
+//    }
 
+    function bfSubmit(){
+        var flag = false;
+        var type = $("#type").val();
+        ajaxsync(ctx + "/console/account/auth/is_real_auth",null,function(response){
+            if(response.success){
+                if(response.data == 1){
+                    if(type == response.data){
+                        flag = true;
+                    }else{
+                        showtoast('个人实名认证的用户不能进行企业发票申请');
+                    }
+                }else if(response.data == 2){
+                    flag = true;
+                }else{
+                    showtoast('请先进行实名认证');
+                }
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
+        return flag;
+    }
 </script>
 
 
