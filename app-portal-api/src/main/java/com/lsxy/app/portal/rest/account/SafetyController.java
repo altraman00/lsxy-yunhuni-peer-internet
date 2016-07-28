@@ -39,6 +39,44 @@ public class SafetyController extends AbstractRestController {
         }
         return RestResponse.failed("1001","密码错误");
     }
+    /**
+     * 验证邮箱是否可用
+     * @param email 邮件
+     * @return
+     */
+    @RequestMapping("/validation_email")
+    public RestResponse validationEmail(String email)   {
+        Account account = getCurrentAccount();
+        if(email.equals(account.getEmail())){
+            return  RestResponse.failed("1003","该邮件已被使用");
+        }
+        boolean flag = accountService.checkEmail(email);
+        if(flag){
+            return RestResponse.failed("1004","该邮件已被使用");
+        }
+        return RestResponse.success();
+    }
+
+    /**
+     * 修改邮箱
+     * @param id 用户id
+     * @param email 邮件号码
+     * @return
+     */
+    @RequestMapping("/modify/email")
+    public RestResponse modifyEmail(String id,String email)   {
+        Account account = accountService.findById(id);
+        if(email.equals(account.getEmail())){
+            return  RestResponse.failed("1003","该邮件已被使用");
+        }
+        boolean flag = accountService.checkEmail(email);
+        if(flag){
+            return RestResponse.failed("1004","该邮件已被使用");
+        }
+        account.setEmail(email);
+        accountService.save(account);
+        return RestResponse.success();
+    }
 
     /**
      * 修改绑定手机号码

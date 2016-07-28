@@ -117,6 +117,19 @@ public class SafetyController extends AbstractPortalController {
         }
         return hs;
     }
+    @RequestMapping(value="/modify/email")
+    @ResponseBody
+    public RestResponse modifyEmail(HttpServletRequest request,String email ){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/account/safety/validation_email?email={1}";
+        RestResponse valEmail = RestRequest.buildSecurityRequest(token).get(uri,  String.class,email);
+        if(valEmail.isSuccess()){
+            //发送邮件
+            return RestResponse.success();
+        }else{
+            return valEmail;
+        }
+    }
 
     /**
      * 验证密码的rest方法
