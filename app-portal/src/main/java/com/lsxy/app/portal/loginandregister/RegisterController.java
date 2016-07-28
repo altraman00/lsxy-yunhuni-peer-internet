@@ -28,6 +28,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/reg")
 public class RegisterController {
+    public static final String ACCOUNT_MACTIVE_PREFIX = "account_mactive_";
 
     @Autowired
     private RedisCacheService cacheManager;
@@ -106,13 +107,13 @@ public class RegisterController {
         Map<String,String> model = new HashMap<>();
         String returnView;
         //检查邮件是否有效
-        String cUid = cacheManager.get(code);
+        String cCode = cacheManager.get(ACCOUNT_MACTIVE_PREFIX + uid);
         Account account = getAccount(uid);
         if(account == null){
             model.put("erInfo","参数异常");
             returnView = "register/active_fail";
         }else{
-            if(uid.equals(cUid)){
+            if(code.equals(cCode)){
                 if(Account.STATUS_NOT_ACTIVE == account.getStatus()){
                     //没有激活,前往激活页面
                     model.put("uid",uid);
@@ -147,15 +148,15 @@ public class RegisterController {
         String returnUrl;
         Map<String,String> model = new HashMap<>();
         //判断用户激活条件是否合格
-        String cUid = cacheManager.get(code);
-        if(StringUtils.isNotBlank(uid)&&uid.equals(cUid)){
+        String cCode = cacheManager.get(ACCOUNT_MACTIVE_PREFIX + uid);
+        if(StringUtils.isNotBlank(code)&&code.equals(cCode)){
             try {
                 //激活账号
                 activeAccount(uid,password);
                 model.put("info","账户已经激活");
                 returnUrl = "register/active_result";
                 //激活后删除redis里的邮件标识
-                cacheManager.del(code);
+                cacheManager.del(ACCOUNT_MACTIVE_PREFIX + uid);
             } catch (RegisterException e) {
                 model.put("erInfo",e.getMessage());
                 returnUrl = "register/active_fail";

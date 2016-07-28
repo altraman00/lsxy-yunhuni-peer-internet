@@ -31,6 +31,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-config</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-mq</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

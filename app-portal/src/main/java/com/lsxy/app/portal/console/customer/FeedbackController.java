@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.console.customer;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.app.portal.comm.MapBean;
 import com.lsxy.framework.api.customer.model.Feedback;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -47,10 +46,9 @@ public class FeedbackController  extends AbstractPortalController {
      */
     @RequestMapping("/edit")
     @ResponseBody
-    public MapBean edit(HttpServletRequest request, String content){
+    public RestResponse edit(HttpServletRequest request, String content){
         RestResponse<Feedback> restResponse = save(request,content,"0");
-        MapBean map = new MapBean("0000","感谢你的反馈意见！");
-        return map;
+        return RestResponse.success();
     }
 
     /**

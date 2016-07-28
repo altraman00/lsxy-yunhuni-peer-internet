@@ -30,7 +30,7 @@ public class UserRestToken {
     public static UserRestToken newToken(){
         String token = UUIDGenerator.uuid();
         UserRestToken urt = new UserRestToken();
-        urt.setToken(token);
+        urt.setToken("token_" + token);
         return urt;
     }
 

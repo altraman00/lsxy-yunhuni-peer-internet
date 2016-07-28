@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,5 +55,29 @@ public class RentTelnumController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
         return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,pageNo,pageSize);
+    }
+
+    /**
+     * 根据id释放手机号码
+     * @param request
+     * @param id 租户号码id
+     * @return
+     */
+    @RequestMapping("/release" )
+    @ResponseBody
+    public RestResponse release(HttpServletRequest request,String id){
+        RestResponse restResponse = releaseREST(request,id);
+        return restResponse;
+    }
+    /**
+     * 根据id释放手机号码
+     * @param request
+     * @param id 租户号码id
+     * @return
+     */
+    private RestResponse releaseREST(HttpServletRequest request,String id){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/res_rent/release?id={1}";
+        return  RestRequest.buildSecurityRequest(token).get(uri, ResourcesRent.class,id);
     }
 }
