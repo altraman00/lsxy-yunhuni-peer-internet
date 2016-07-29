@@ -47,8 +47,8 @@ public class SafetyController extends AbstractRestController {
      * @param email 邮件
      * @return
      */
-    @RequestMapping("/send_email")
-    public RestResponse sendEmail(String email)   {
+    @RequestMapping("/modify_email_bind")
+    public RestResponse modifyEmailBind(String email)   {
         Account account = getCurrentAccount();
         if(email.equals(account.getEmail())){
             return  RestResponse.failed("1003","该邮件已被使用");

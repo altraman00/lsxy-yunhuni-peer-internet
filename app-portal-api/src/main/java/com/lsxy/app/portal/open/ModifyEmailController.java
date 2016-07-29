@@ -1,4 +1,4 @@
-package com.lsxy.app.portal;
+package com.lsxy.app.portal.open;
 
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by zhangxb on 2016/7/29.
  */
 @RestController
-@RequestMapping("/modify")
+@RequestMapping("/modify_email_bind/")
 public class ModifyEmailController  {
     @Autowired
     private AccountService accountService;
@@ -24,7 +24,7 @@ public class ModifyEmailController  {
      * @param email 邮件号码
      * @return
      */
-    @RequestMapping("/email")
+    @RequestMapping("")
     public RestResponse modifyEmail(String id, String email)   {
         Account account = accountService.findById(id);
         if(email.equals(account.getEmail())){

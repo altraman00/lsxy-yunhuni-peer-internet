@@ -130,11 +130,11 @@ public class SafetyController extends AbstractPortalController {
         }
         return hs;
     }
-    @RequestMapping(value="/send_email")
+    @RequestMapping(value="/modify_email_bind")
     @ResponseBody
-    public RestResponse sendEmail(HttpServletRequest request,String email ){
+    public RestResponse modifyEmailBind(HttpServletRequest request,String email ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/account/safety/send_email?email={1}";
+        String uri = restPrefixUrl +   "/rest/account/safety/modify_email_bind?email={1}";
         RestResponse restResponse = RestRequest.buildSecurityRequest(token).get(uri,  String.class,email);
         return restResponse;
     }

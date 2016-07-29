@@ -249,7 +249,7 @@
     function sendEmailCode(){
         var email = $('#email').val();
         var param = {'email':email,parameterName:token};
-        ajaxsync(ctx+"/console/account/safety/send_email",param,function(result){
+        ajaxsync(ctx+"/console/account/safety/modify_email_bind",param,function(result){
           if(result.success){
               showmsg('已发送成功<span style="color:orange;font-size:20px">12小时</span>内有效','moadltips3');
               return true;
@@ -264,7 +264,7 @@
         $('#email').val("");
         $('#mobile').val("");
         $('#yzm1').val("");
-        $('#moadltips1').val("");
+        $('#moadltips1').html("");
         $('#second-code').val("");
     });
     var isVc = false;//是否需要图形验证码
