@@ -21,6 +21,7 @@ public class SafetyVo implements Serializable {
     private String mobile;// 手机号码
     private String isMobile;//是否绑定手机
     private String isEmail;//是否绑定邮箱
+    private String email;//邮箱
     private String isPrivate;//是否设置密保
     private String isPsw;//是否设置密码
     private static final String IS_TRUE = "1";//已设置
@@ -50,6 +51,7 @@ public class SafetyVo implements Serializable {
         this.isMobile = isTrue(account.getMobile());
         this.mobile = this.isMobile==IS_TRUE?account.getMobile().substring(0,3)+"****"+account.getMobile().substring(7,11):"";
         this.isEmail = isTrue(account.getEmail());
+        this.email = this.isEmail==IS_TRUE?account.getEmail():null;
         this.isPsw = IS_TRUE;
     }
 
@@ -63,6 +65,14 @@ public class SafetyVo implements Serializable {
         this.isMobile = isMobile;
         this.isEmail = isEmail;
         this.isPsw = isPsw;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getIsMobile() {
