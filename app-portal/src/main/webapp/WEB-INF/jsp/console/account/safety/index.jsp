@@ -236,6 +236,7 @@
         $('#password').val("");
         $('#mobile').val("");
         $('#yzm1').val("");
+        $('.moadltips1').val("");
         $('#second-code').val("");
     });
     var isVc = false;//是否需要图形验证码
