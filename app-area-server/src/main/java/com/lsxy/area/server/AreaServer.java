@@ -22,41 +22,43 @@ public class AreaServer {
     private static final Logger logger = LoggerFactory.getLogger(AreaServer.class);
 
 
-    @PostConstruct
-    public void start() throws InterruptedException {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("开始启动区域管理服务器....");
-        }
-        int port = 8888;
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup);
-            b.channel(NioServerSocketChannel.class);
-            b.childHandler(new HelloServerInitializer());
-
-            // 服务器绑定端口监听
-            ChannelFuture f = b.bind(port).sync();
-            // 监听服务器关闭监听
-//            f.channel().closeFuture().sync();
-            while(true){
-                TimeUnit.SECONDS.sleep(1);
-                logger.debug("hahahahaha");
-
-            }
-
-
-            // 可以简写为
-            /* b.bind(portNumber).sync().channel().closeFuture().sync(); */
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+//
+//    @PostConstruct
+//    public void start() throws InterruptedException {
+//
 //        if (logger.isDebugEnabled()) {
-//            logger.debug("区域管理服务器启动成功,绑定端口:{}", port);
+//            logger.debug("开始启动区域管理服务器....");
 //        }
-
-    }
+//        int port = 8888;
+//        EventLoopGroup bossGroup = new NioEventLoopGroup();
+//        EventLoopGroup workerGroup = new NioEventLoopGroup();
+//        try {
+//            ServerBootstrap b = new ServerBootstrap();
+//            b.group(bossGroup, workerGroup);
+//            b.channel(NioServerSocketChannel.class);
+//            b.childHandler(new HelloServerInitializer());
+//
+//            // 服务器绑定端口监听
+//            ChannelFuture f = b.bind(port).sync();
+//            // 监听服务器关闭监听
+////            f.channel().closeFuture().sync();
+//            while(true){
+//                TimeUnit.SECONDS.sleep(1);
+//                logger.debug("hahahahaha");
+//
+//            }
+//
+//
+//            // 可以简写为
+//            /* b.bind(portNumber).sync().channel().closeFuture().sync(); */
+//        } finally {
+//            bossGroup.shutdownGracefully();
+//            workerGroup.shutdownGracefully();
+//        }
+////        if (logger.isDebugEnabled()) {
+////            logger.debug("区域管理服务器启动成功,绑定端口:{}", port);
+////        }
+//
+//    }
 }

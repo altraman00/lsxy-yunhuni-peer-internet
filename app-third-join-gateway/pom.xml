@@ -12,7 +12,7 @@
 
     <artifactId>app-third-join-gateway</artifactId>
     <properties>
-        <start-class>com.lsxy.third.gateway.com.lsxy.area.server.MainClass</start-class>
+        <start-class>com.lsxy.third.gateway.com.lsxy.area.server.com.lsxy.framework.rpc.test.MainClass</start-class>
         <java.version>1.8</java.version>
     </properties>
 

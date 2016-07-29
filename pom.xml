@@ -56,62 +56,67 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-core</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-third</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-sms</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-cache</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-web</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-mq</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-config</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-service-api</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-service</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-mail</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>service-framework</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>service-yunhuni</artifactId>
-                <version>1.0.2-SNAPSHOT</version>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-rpc</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -211,7 +216,11 @@
                 <version>2.0.13</version>
             </dependency>
 
-
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.1.4.Final</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <distributionManagement>
