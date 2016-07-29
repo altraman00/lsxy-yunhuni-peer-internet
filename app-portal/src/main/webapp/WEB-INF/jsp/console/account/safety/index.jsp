@@ -78,14 +78,7 @@
                                                         </c:if>
                                                     </div>
                                                 </div>
-                                                <div class="row">
-                                                    <div class="col-md-1 remove-padding width-130">
-                                                        账号ID：
-                                                    </div>
-                                                    <div class="col-md-10 ">
-                                                        <span>${safetyVo.userId}</span>
-                                                    </div>
-                                                </div>
+
                                                 <div class="row">
                                                     <div class="col-md-1 remove-padding width-130">
                                                         注册时间：
@@ -185,7 +178,7 @@
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg"></div>
 <div id="mobilebox" class="modal-box" style="display: none;">
-    <div class="addmobile1" style="display: ">
+    <div class="addmobile1" style="">
         <div class="title">操作确认<a class="close_a modalCancel cancelclear"></a></div>
         <div class="content" >
             <div class="tips-box">
