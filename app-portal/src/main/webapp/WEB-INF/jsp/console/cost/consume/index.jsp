@@ -99,9 +99,9 @@
                                                     <a class="current_month">本月</a>
                                                     <a class="last_month">上月</a>
                                                     从
-                                                    <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" />
+                                                    <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" readonly="readonly"/>
                                                     到
-                                                    <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" />
+                                                    <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" readonly="readonly"/>
                                                     <button class="btn btn-primary query" type="button" id="findform" >查询</button>
                                                     <span class="tips-error" ></span>
                                                 </div>
