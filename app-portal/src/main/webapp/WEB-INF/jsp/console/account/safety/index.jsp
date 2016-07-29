@@ -135,22 +135,22 @@
 
                                                 <c:if test="${ safetyVo.isMobile==1}" ><span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span>  </c:if>
                                             <c:if test="${ safetyVo.isMobile==-1}" > <span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span>  </c:if>
-                                                <a class="personal-edit showMobilebox">修改</a>
+                                                <a class="personal-edit showMobilebox" data-type="2">修改</a>
                                             </div>
                                         </div>
                                         <div class="row dotted-line personal-box ">
                                             <div class="col-md-1 account-icon "><i class="personal-email-icon"></i>
                                             </div>
                                             <div class="col-md-9 ">
-                                                    <span class="help-block"><a href="#">邮箱绑定</a><br/>
-                                                        <small class="help-small">您可以绑定邮箱地址，绑定邮箱地址后，可使用邮箱地址登陆，并可接受来自云呼你相关邮件通知</small>
+                                                    <span class="help-block"><a href="#">邮箱绑定</a> <c:if test="${ safetyVo.isEmail==0}" ><i class="fa fa-exclamation-triangle"></i>变更邮箱[${modifyEmail}]的过程中，只有新邮箱被重新认证才能启用，未验证之前请使用旧邮箱登录</span></c:if><br/>
+                                                        <c:if test="${ safetyVo.isEmail!=-1}" ><small class="help-small">您已经绑定了邮箱  ${ safetyVo.email}</small></c:if>
+                                                        <c:if test="${ safetyVo.isEmail==-1}" ><small class="help-small">您可以绑定邮箱地址，绑定邮箱地址后，可使用邮箱地址登陆，并可接受来自云呼你相关邮件通知</small></c:if>
                                                     </span>
                                             </div>
                                             <div class="col-md-2 right">
-                                                <c:if test="${ safetyVo.isEmail==1}" ><span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span> </c:if>
-                                                    <c:if test="${ safetyVo.isEmail==-1}" ><span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span> </c:if>
-                                                <a href="" class="personal-edit" data-toggle="modal"
-                                                   data-target="#emailModal">修改</a>
+                                                <c:if test="${ safetyVo.isEmail!=-1}" ><span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span> </c:if>
+                                                <c:if test="${ safetyVo.isEmail==-1}" ><span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span> </c:if>
+                                                <a  class="personal-edit showMobilebox" data-type="3">修改</a>
                                             </div>
                                         </div>
                                         <%--<div class="row  personal-box">--%>
@@ -197,6 +197,7 @@
             <div class="input">
                 <div class="tips-error moadltips1" id="moadltips1" style="display: none">密码有误</div>
             </div>
+            <input type="hidden" value="3" id="modaltype" />
         </div>
         <div class="footer">
             <a  class="cancel modalCancel cancelclear">返回</a>
@@ -214,17 +215,37 @@
             </div>
             <div class="input">
                 <input class="code form-control modalCode " type="text" name="" id="yzm1"placeholder="验证码" />
-                <button class="code-button" id="send-code" >发送验证码</button>
+                <button class="code-button" id="send-code"data-type="2" >发送验证码</button>
             </div>
             <div class="in-block" id="second-codeblock" ></div>
             <p class="tips-error moadltips2 text-center" style="display: none">请先填写手机号码</p>
-
         </div>
         <div class="footer">
             <a class="cancel modalCancel cancelclear">返回</a>
             <a class="sure modalSuer2 ">确认</a>
         </div>
     </div>
+    <div class="addmobile3" style="display:none ">
+        <div class="title">重新邮箱地址<a class="close_a modalCancel cancelclear"></a></div>
+        <div class="content">
+            <div class="margintop30"></div>
+            <div class="input ">
+                <input class=" form-control modalEmail" type="text" name="" id="email"  placeholder="输入新的邮箱地址"  />
+            </div>
+            <div class="input">
+                <a  id="send-code-email" data-type="3">发送邮箱验证链接</a>
+            </div>
+            <div class="in-block" id="second-codeblock-email" ></div>
+
+            <p class="tips-error moadltips3 text-center" style="display: none">请输入正确的邮箱地址</p>
+
+        </div>
+        <div class="footer">
+            <a class="cancel modalCancel cancelclear">返回</a>
+            <a class="sure modalSuer3">确认</a>
+        </div>
+    </div>
+
 </div>
 
 <div class="tips-toast"></div>
@@ -232,8 +253,22 @@
 <script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
 <!--must-->
 <script>
+    function sendEmailCode(){
+        var email = $('#email').val();
+        var param = {'email':email,parameterName:token};
+        ajaxsync(ctx+"/console/account/safety/modify_email_bind",param,function(result){
+          if(result.success){
+              showmsg('已发送成功<span style="color:orange;font-size:20px">12小时</span>内有效','moadltips3');
+              return true;
+          }else{
+              showmsg(result.errorMsg,'moadltips3'); return false;
+          }
+        });
+    }
+
     $(".cancelclear").click(function(){
         $('#password').val("");
+        $('#email').val("");
         $('#mobile').val("");
         $('#yzm1').val("");
         $('#moadltips1').val("");
@@ -285,13 +320,14 @@
         if(psw.length<6 || psw.length>18){
             showmsg('密码必须大于6，小于18个字符','moadltips1');return;
         }
+        var type = $('#modaltype').val();
         //验证密码
         var param = {'oldPws':psw,parameterName:token};
         ajaxsync(ctx+"/console/account/safety/validation_psw",param,function(data){
             if(data.sucess==2) {
                 showmsg(data.msg,'moadltips2');
                 $('.addmobile1').hide();
-                $('.addmobile2').show();
+                $('.addmobile'+type).show();
             }else{
                 showmsg(data.msg,'moadltips1');
             }
@@ -333,7 +369,10 @@
     function changeImgCode(){
         $("#imgValidateCode").prop("src",  '${ctx}'+"/vc/get?dt="+new Date());
     }
-
+    $('.modalSuer3').click(function(){
+        window.location.href=ctx+"/console/account/safety/index";
+        $('.cancel').click();
+    });
 </script>
 
 
