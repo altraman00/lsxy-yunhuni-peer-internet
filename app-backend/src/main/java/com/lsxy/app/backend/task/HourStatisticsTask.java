@@ -25,5 +25,19 @@ public class HourStatisticsTask {
 
         //租户 应用 运营商 地区 业务类型 会话时长增量/总量 会话数量接通个数增量/总量 会话数量未接通个数增量/总量 会话数量总和增量/总量
     }
-
+    private  void api(){
+        logger.info("开始api指标小时统计----");
+    }
+    private void consume(){
+        logger.info("开始消费指标小时统计----");
+    }
+    private void app(){
+        logger.info("开始应用指标小时统计----");
+    }
+    private void recharge(){
+        logger.info("开始充值指标小时统计----");
+    }
+    private void session(){
+        logger.info("开始会话指标小时统计----");
+    }
 }
