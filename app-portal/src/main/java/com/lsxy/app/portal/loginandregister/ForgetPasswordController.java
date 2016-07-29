@@ -43,6 +43,13 @@ public class ForgetPasswordController {
         return new ModelAndView("forget/index");
     }
 
+    @RequestMapping(value = "/check_mail",method = RequestMethod.GET)
+    @ResponseBody
+    public RestResponse checkEmail(String email){
+        Boolean b = emailCheck(email);
+        return RestResponse.success(b);
+    }
+
     @RequestMapping(value = "/send_mail",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView sendMail(String email){
