@@ -142,13 +142,14 @@
                                             <div class="col-md-1 account-icon "><i class="personal-email-icon"></i>
                                             </div>
                                             <div class="col-md-9 ">
-                                                    <span class="help-block"><a href="#">邮箱绑定</a><br/>
-                                                        <small class="help-small">您可以绑定邮箱地址，绑定邮箱地址后，可使用邮箱地址登陆，并可接受来自云呼你相关邮件通知</small>
+                                                    <span class="help-block"><a href="#">邮箱绑定</a> <c:if test="${ safetyVo.isEmail==0}" ><i class="fa fa-exclamation-triangle"></i>变更邮箱[${modifyEmail}]的过程中，只有新邮箱被重新认证才能启用，未验证之前请使用旧邮箱登录</span></c:if><br/>
+                                                        <c:if test="${ safetyVo.isEmail!=-1}" ><small class="help-small">您已经绑定了邮箱  ${ safetyVo.email}</small></c:if>
+                                                        <c:if test="${ safetyVo.isEmail==-1}" ><small class="help-small">您可以绑定邮箱地址，绑定邮箱地址后，可使用邮箱地址登陆，并可接受来自云呼你相关邮件通知</small></c:if>
                                                     </span>
                                             </div>
                                             <div class="col-md-2 right">
-                                                <c:if test="${ safetyVo.isEmail==1}" ><span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span> </c:if>
-                                                    <c:if test="${ safetyVo.isEmail==-1}" ><span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span> </c:if>
+                                                <c:if test="${ safetyVo.isEmail!=-1}" ><span><img src="${resPrefixUrl }/images/index/ok_green.png"/>已设置</span> </c:if>
+                                                <c:if test="${ safetyVo.isEmail==-1}" ><span class="tips-color"><img src="${resPrefixUrl }/images/index/tip.png"/> 未设置</span> </c:if>
                                                 <a  class="personal-edit showMobilebox" data-type="3">修改</a>
                                             </div>
                                         </div>
@@ -368,6 +369,7 @@
         $("#imgValidateCode").prop("src",  '${ctx}'+"/vc/get?dt="+new Date());
     }
     $('.modalSuer3').click(function(){
+        window.location.href=ctx+"/console/account/safety/index";
         $('.cancel').click();
     });
 </script>

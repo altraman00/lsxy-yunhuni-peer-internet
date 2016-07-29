@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.loginandregister;
 
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -34,8 +33,8 @@ public class ModifyEmailController {
             Map map = JSONUtil.parseObject(re);
             if(code.equals(map.get("code"))){//验证成功，进行邮箱修改
                 String email = (String)map.get("email");
-                String url = PortalConstants.REST_PREFIX_URL + "/rest/account/safety/modify/email?id={1}&email={2}";
-                RestResponse restResponse = RestRequest.buildRequest().get(url,null,id,email);
+                String url = PortalConstants.REST_PREFIX_URL + "/modify/email?id={1}&email={2}";
+                RestResponse restResponse = RestRequest.buildRequest().get(url,String.class,id,email);
                 if(restResponse.isSuccess()){//修改成功
                     mav.setViewName("/register/active_result");
                 }else{//修改失败
@@ -43,18 +42,18 @@ public class ModifyEmailController {
                     mav.addObject("erInfo",restResponse.getErrorMsg());
                     mav.setViewName("/register/active_fail");
                 }
+                cacheManager.del(key);
             }else{
                 mav.addObject("errorCode",-1);
                 mav.addObject("erInfo","该链接已失效");
                 mav.setViewName("/register/active_fail");
             }
         }else{
-            mav.addObject("errorCode","该链接已失效");
-            mav.addObject("erInfo","");
+            mav.addObject("errorCode",-1);
+            mav.addObject("erInfo","该链接已失效");
             mav.setViewName("/register/active_fail");
         }
-        cacheManager.del(key);
-        return null;
+        return mav;
     }
 
 }
