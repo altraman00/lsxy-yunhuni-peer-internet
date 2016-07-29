@@ -7,6 +7,7 @@ import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.security.SecurityUser;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.oss.OSSService;
@@ -66,8 +67,8 @@ public class InvoiceInfoController extends AbstractPortalController {
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView edit(HttpServletRequest request, InvoiceInfo invoiceInfo, MultipartFile uploadfile) throws IOException {
-        Account account = this.getCurrentAccount(request);
-        String imgUrl = uploadFile(account.getTenant().getId(), uploadfile);
+        SecurityUser user = this.getCurrentUser(request);
+        String imgUrl = uploadFile(user.getTenantId(), uploadfile);
         if(StringUtils.isNotBlank(imgUrl)){
             invoiceInfo.setQualificationUrl(imgUrl);
         }
