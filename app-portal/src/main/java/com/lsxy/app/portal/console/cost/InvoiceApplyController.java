@@ -8,6 +8,7 @@ import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.security.SecurityUser;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
@@ -200,8 +201,8 @@ public class InvoiceApplyController extends AbstractPortalController {
         }else if(2 != authStatus){
             throw new RuntimeException("用户未进行实名认证");
         }
-        Account account = this.getCurrentAccount(request);
-        String imgUrl = UploadFile(account.getTenant().getId(), uploadfile);
+        SecurityUser user = this.getCurrentUser(request);
+        String imgUrl = UploadFile(user.getTenantId(), uploadfile);
         if(StringUtils.isNotBlank(imgUrl)){
             paramsMap.put("qualificationUrl",imgUrl);
         }
