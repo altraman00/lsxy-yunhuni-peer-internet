@@ -1,4 +1,4 @@
-package com.lsxy.app.portal;
+package com.lsxy.app.portal.open;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.sms.exceptions.CheckCodeNotFoundException;
@@ -10,7 +10,6 @@ import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

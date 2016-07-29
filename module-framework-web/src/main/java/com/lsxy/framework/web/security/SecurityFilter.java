@@ -73,7 +73,7 @@ public abstract class SecurityFilter implements Filter {
 						}else{
 							throw new RuntimeException("Token丢失！");
 						}
-						SecurityUser su = sur.loadSecurityUser(token,username);
+						SecurityUser su = sur.loadSecurityUser(token);
 						request.getSession().setAttribute("currentUser", su);
 //						isAnonymous = false;
 					}else{
