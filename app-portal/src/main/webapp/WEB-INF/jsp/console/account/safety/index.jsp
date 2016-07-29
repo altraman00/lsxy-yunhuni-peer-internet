@@ -264,7 +264,7 @@
         $('#email').val("");
         $('#mobile').val("");
         $('#yzm1').val("");
-        $('#moadltips1').val("");
+        $('#moadltips1').html("");
         $('#second-code').val("");
     });
     var isVc = false;//是否需要图形验证码
