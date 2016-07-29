@@ -5,6 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by zhangxb on 2016/7/29.
  */
@@ -17,8 +21,20 @@ public class HourApiStatisticsTask {
         //租户 应用 运营商 地区 业务类型 api调用次数
         //tenant_id app_id operator_id area_id type
         //select tenant_id app_id operator_id area_id type from api group by  having time
+        String[] orderbys = {"tenant_id", "app_id", "operator_id", "area_id", "type"};
+        List<String> list = new ArrayList();
+        for(int i=0; i<orderbys.length; i++){
+            for(int j=i;j<orderbys.length;j++){
+                if(i<j){
+                    list.add(orderbys[i]+","+orderbys[j]);
+                }
+            }
+        }
+        logger.info(list.toString());
+
 
     }
+    public void t
     private  void api(){
         logger.info("开始api指标小时统计----");
         //租户 应用 运营商 地区 业务类型 api调用次数
