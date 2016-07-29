@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.account;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -140,7 +141,11 @@ public class SafetyController extends AbstractPortalController {
     public RestResponse editMobile(String mobile ,HttpServletRequest request ){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +  "/rest/account/safety/save_mobile?mobile={1}";
-        return  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
+        RestResponse restResponse =  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
+        if(restResponse.isSuccess()) {
+            MobileCodeUtils.removeMobileCodeChecker(request);
+        }
+        return restResponse;
     }
 
 }
