@@ -5,7 +5,7 @@ package com.lsxy.yunhuni.api.recharge.enums;
  * Created by liups on 2016/7/1.
  */
 public enum RechargeType {
-    ZHIFUBAO("支付宝"),YINLIAN("银联");
+    ALIPAY("支付宝"),UNIONPAY("银联");
     private String name;
     RechargeType(String name){
         this.name = name;
