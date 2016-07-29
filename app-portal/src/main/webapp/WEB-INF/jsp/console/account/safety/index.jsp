@@ -195,7 +195,7 @@
                 <input class=" form-control password" type="password" name="" id="password" placeholder="请输入当前登录用户密码   " />
             </div>
             <div class="input">
-                <div class="tips-error moadltips1" style="display: none">密码有误</div>
+                <div class="tips-error moadltips1" id="moadltips1" style="display: none">密码有误</div>
             </div>
             <input type="hidden" value="3" id="modaltype" />
         </div>
@@ -271,6 +271,7 @@
         $('#email').val("");
         $('#mobile').val("");
         $('#yzm1').val("");
+        $('#moadltips1').val("");
         $('#second-code').val("");
     });
     var isVc = false;//是否需要图形验证码

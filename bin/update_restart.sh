@@ -1,4 +1,17 @@
 #!/bin/bash
+###
+# 初次部署时需要强制安装
+#     /opt/yunhuni-peer-internet/bin/update_restart.sh -A {app-name} -P development -S -I -L
+#CI配置去掉 -I -L 参数
+#    /opt/yunhuni-peer-internet/bin/update_restart.sh -A {app-name} -P development -S
+#参数:
+#-S 代表SPRINGBOOT应用  如果是-T 则是Tomcat应用  目前除了portal,其他模块均是SPRINGBOOT
+#-I  代表需要强制安装,如果不带该参数,会根据git pull的结构来决定是否需要install
+#-L 代表执行tail 输出日志信息 配置到CI的时候不要带这个参数
+#-P 代表执行环境 可设置为local development production
+#-A 代表应用模块名称,对应到程序主目录下的模块目录名
+#
+###
 #update and restrt
 #git reset --hard
 #git pull
