@@ -186,34 +186,34 @@
 <div class="shadow-bg" id="show-bg"></div>
 <div id="mobilebox" class="modal-box" style="display: none;">
     <div class="addmobile1" style="display: ">
-        <div class="title">操作确认<a class="close_a modalCancel"></a></div>
+        <div class="title">操作确认<a class="close_a modalCancel cancelclear"></a></div>
         <div class="content" >
             <div class="tips-box">
                 确认是本账号操作，请再次输入用户名密码
             </div>
             <div class="input">
-                <input class=" form-control password" type="password" name="" placeholder="请输入当前登录用户密码   " />
+                <input class=" form-control password" type="password" name="" id="password" placeholder="请输入当前登录用户密码   " />
             </div>
             <div class="input">
-                <div class="tips-error moadltips1" style="display: none">密码有误</div>
+                <div class="tips-error moadltips1" id="moadltips1" style="display: none">密码有误</div>
             </div>
         </div>
         <div class="footer">
-            <a  class="cancel modalCancel">返回</a>
+            <a  class="cancel modalCancel cancelclear">返回</a>
             <a  class="sure modalSuer1">确认</a>
         </div>
     </div>
 
 
     <div class="addmobile2" style="display: none">
-        <div class="title">重新绑定手机号<a class="close_a modalCancel"></a></div>
+        <div class="title">重新绑定手机号<a class="close_a modalCancel cancelclear"></a></div>
         <div class="content">
             <div class="margintop30"></div>
             <div class="input ">
                 <input class=" form-control modalMobile " type="text" id="mobile" placeholder="输入手机号码" maxlength="11" />
             </div>
             <div class="input">
-                <input class="code form-control modalCode " type="text" name="" placeholder="验证码" />
+                <input class="code form-control modalCode " type="text" name="" id="yzm1"placeholder="验证码" />
                 <button class="code-button" id="send-code" >发送验证码</button>
             </div>
             <div class="in-block" id="second-codeblock" ></div>
@@ -221,7 +221,7 @@
 
         </div>
         <div class="footer">
-            <a class="cancel modalCancel ">返回</a>
+            <a class="cancel modalCancel cancelclear">返回</a>
             <a class="sure modalSuer2 ">确认</a>
         </div>
     </div>
@@ -232,6 +232,13 @@
 <script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
 <!--must-->
 <script>
+    $(".cancelclear").click(function(){
+        $('#password').val("");
+        $('#mobile').val("");
+        $('#yzm1').val("");
+        $('#moadltips1').val("");
+        $('#second-code').val("");
+    });
     var isVc = false;//是否需要图形验证码
     var sendCodeResult=false;
     function sendCode(){
@@ -248,36 +255,27 @@
             vCode = $("#second-code").val();
         }
         var mobile = $('#mobile').val();
-        $.ajax({
-            url : "${ctx}/mc/send",
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            data : {'mobile':mobile,'validateCode':vCode,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(result){
-                if(result.flag){
-                    showmsg('发送短信验证码成功','moadltips2');
-                    $('#second-codeblock').html('');
-                    sendResult = true;
-                }else if(result.vc){
-                    sendResult = false;
-                    //发送不成功，且要输入图形验证码
-                    showmsg(result.err,'moadltips2');
-                    isVc = true;
-                    //启动二次校验
-                    var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
-                    html += '&nbsp;&nbsp;<a class="code-img"><img src="${ctx}/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"  id="imgValidateCode" ></a></div>';
-                    $('#second-codeblock').html(html);
+        var param = {'mobile':mobile,'validateCode':vCode,parameterName:token};
+        ajaxsync(ctx+"/mc/send",param,function(result){
+            if(result.flag){
+                showmsg('发送短信验证码成功','moadltips2');
+                $('#second-codeblock').html('');
+                sendResult = true;
+            }else if(result.vc){
+                sendResult = false;
+                //发送不成功，且要输入图形验证码
+                showmsg(result.err,'moadltips2');
+                isVc = true;
+                //启动二次校验
+                var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
+                html += '&nbsp;&nbsp;<a class="code-img"><img src="${ctx}/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"  id="imgValidateCode" ></a></div>';
+                $('#second-codeblock').html(html);
 
-                }else{
-                    sendResult = false;
-                    showmsg(result.err,'moadltips2');
-                }
-            },
-            fail:function(){
-                showmsg("网络异常，请稍后重试",'moadltips2');
+            }else{
+                sendResult = false;
+                showmsg(result.err,'moadltips2');
             }
-        });
+        },"get");
         sendCodeResult =  sendResult;
         return sendResult;
     }
@@ -288,25 +286,16 @@
             showmsg('密码必须大于6，小于18个字符','moadltips1');return;
         }
         //验证密码
-        $.ajax({
-            url : "${ctx}/console/account/safety/validation_psw",
-            type : 'post',
-            async: false,//使用同步的方式,true为异步方式
-            data : {'oldPws':psw,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
-                if(data.sucess==2) {
-                    showmsg(data.msg,'moadltips2');
-                    $('.addmobile1').hide();
-                    $('.addmobile2').show();
-                }else{
-                    showmsg(data.msg,'moadltips1');
-                }
-            },
-            fail:function(){
-                showmsg('密码验证失败，请重试','moadltips1');
+        var param = {'oldPws':psw,parameterName:token};
+        ajaxsync(ctx+"/console/account/safety/validation_psw",param,function(data){
+            if(data.sucess==2) {
+                showmsg(data.msg,'moadltips2');
+                $('.addmobile1').hide();
+                $('.addmobile2').show();
+            }else{
+                showmsg(data.msg,'moadltips1');
             }
-        });
+        })
     });
 
     $('.modalSuer2').click(function(){
@@ -321,42 +310,24 @@
             showmsg('请输入四位数的验证码','moadltips2'); return false;
         }
         var mobile = $('#mobile').val();
-        $.ajax({
-            url : "${ctx}/mc/check",
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            data : {'mc':code,"mobile":mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    //开始绑定手机号码
-                    $.ajax({
-                        url : "${ctx}/console/account/safety/edit_mobile",
-                        type : 'post',
-                        async: false,//使用同步的方式,true为异步方式
-                        data : {'mobile':mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                        dataType: "json",
-                        success : function(result){
-                            if(result.sucess==2) {
-                                $('#mobileOld').html("您已经绑定了手机 "+mobile.substring(0,3)+"****"+mobile.substring(7,11));
-                                $('.cancel').click();
-                                showtoast(result.msg);
-                            }else{
-                                showmsg('修改手机号码失败','moadltips2');
-                            }
-                        },
-                        fail:function(){
-                            showmsg('网络异常，请稍后重试','moadltips2');
-                        }
-                    });
-                }else{
-                    showmsg(data.err,'moadltips2');
-                }
-            },
-            fail:function(){
-                showmsg('网络异常，请稍后重试','moadltips2');
+        var param = {'mc':code,"mobile":mobile};
+        ajaxsync(ctx+"/mc/check",param,function(data){
+            if(data.flag){
+                //开始绑定手机号码
+                param = {'mobile':mobile,parameterName:token};
+                ajaxsync(ctx+"/console/account/safety/edit_mobile",param,function(result){
+                    if(result.success){
+                        $('#mobileOld').html("您已经绑定了手机 "+mobile.substring(0,3)+"****"+mobile.substring(7,11));
+                        $('.cancel').click();
+                        showtoast("新手机绑定成功！");
+                    }else{
+                        showmsg(result.errorMsg,'moadltips2');
+                    }
+                })
+            }else{
+                showmsg(data.err,'moadltips2');
             }
-        });
+        },"get");
     });
 
     function changeImgCode(){

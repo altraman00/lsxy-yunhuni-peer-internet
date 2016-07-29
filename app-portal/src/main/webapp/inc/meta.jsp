@@ -30,6 +30,8 @@
 	var todayDt = new Date(${currentTime});
 	var ctx = "${ctx}";
 	var resPrefixUrl = "${resPrefixUrl}";
+	var parameterName = "${_csrf.parameterName}";
+	var token = "${_csrf.token}";
 </script>
 
 
