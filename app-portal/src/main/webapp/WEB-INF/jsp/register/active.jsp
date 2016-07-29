@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <lable class="col-lg-2 text-right">登陆密码</lable>
+                        <lable class="col-lg-2 text-right">登录密码</lable>
                         <div class="col-lg-9">
                             <input type="password" name="password" placeholder="请输入密码" class="form-control input-form" id="form-password" maxlength="18"  />
                             <div class="tips">
