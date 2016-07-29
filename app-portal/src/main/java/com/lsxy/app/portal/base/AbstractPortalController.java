@@ -3,6 +3,8 @@ package com.lsxy.app.portal.base;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.exceptions.TokenMissingException;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.core.security.SecurityUser;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,17 +28,17 @@ public abstract class AbstractPortalController {
      * @return
      */
     @ExceptionHandler(Exception.class)
-    public ModelAndView exp(HttpServletRequest request,Exception ex) {
+    public ModelAndView exp(HttpServletRequest request,HttpServletResponse response,Exception ex) {
         ex.printStackTrace();
         ModelAndView mav;
         //Ajax请求带有X-Requested-With:XMLHttpRequest
         String xRequestedWith = request.getHeader("X-Requested-With");
         if (StringUtils.isNotBlank(xRequestedWith) && "XMLHttpRequest".equals(xRequestedWith)) {
-            // ajax请求
-            Map<String,Object> model = new HashMap<>();
-            model.put("flag",false);
-            model.put("msg",ex.getMessage());
-            mav = new ModelAndView("ajax_error",model);
+            String result = JSONUtil.objectToJson(RestResponse.failed("0000",ex.getMessage()));
+            try {
+                response.getWriter().write(result);
+            }catch (Exception e){}
+            return null;
         }else{
             mav = new ModelAndView("error_page");
         }
@@ -70,5 +73,14 @@ public abstract class AbstractPortalController {
         RestResponse<Account> restResponse = RestRequest.buildSecurityRequest(token).get(uri, Account.class);
         Account account = restResponse.getData();
         return account;
+    }
+
+    /**
+     * 获取当前用户（SecurityUser）
+     * @param request
+     * @return
+     */
+    public SecurityUser getCurrentUser(HttpServletRequest request){
+        return (SecurityUser) request.getSession().getAttribute("currentUser");
     }
 }

@@ -155,7 +155,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/upload")
     public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ){
-        String tenantId = getCurrentAccount(request).getTenant().getId();
+        String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
         UploadEntity oss = new UploadEntity();
         try {

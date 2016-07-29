@@ -1,4 +1,4 @@
-package com.lsxy.app.portal;
+package com.lsxy.app.portal.open;
 
 import com.lsxy.app.portal.exceptions.APIErrors;
 import com.lsxy.app.portal.utils.PortalRestResponse;

@@ -293,19 +293,9 @@
     function isRealAuth(){
         var realAuth = null;
         //获取用户实名认证状态
-        $.ajax({
-            url : ctx + "/console/account/auth/is_real_auth",
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                realAuth = data;
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
-            }
-        });
+        ajaxsync(ctx + "/console/account/auth/is_real_auth",null,function(result){
+            realAuth = (result.data == 1 || result.data == 2);
+        },"get");
         return realAuth;
     }
 

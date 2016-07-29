@@ -55,7 +55,12 @@
                             <p class="tips">注册后，邮箱地址收到账号激活邮件</p>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group reader">
+                        <div class="col-lg-9 col-lg-offset-3">
+                            <input type="checkbox"  id="registerRead"> 点击阅读<a>注册协议</a> <span class="tips-error" id="registerReadMsg" hidden>请先阅读注册协议</span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
                         <div class="col-lg-9 col-lg-offset-3">
                             <a id="validateBtn"  class="btn btn-primary  btn-form">注册</a>
                         </div>
