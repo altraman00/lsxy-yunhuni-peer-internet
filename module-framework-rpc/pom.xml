@@ -11,5 +11,27 @@
 
     <artifactId>module-framework-rpc</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>
