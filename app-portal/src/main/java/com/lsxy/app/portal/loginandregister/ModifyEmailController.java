@@ -36,6 +36,7 @@ public class ModifyEmailController {
                 String url = PortalConstants.REST_PREFIX_URL + "/modify/email?id={1}&email={2}";
                 RestResponse restResponse = RestRequest.buildRequest().get(url,String.class,id,email);
                 if(restResponse.isSuccess()){//修改成功
+                    mav.addObject("info","邮箱已经激活");
                     mav.setViewName("/register/active_result");
                 }else{//修改失败
                     mav.addObject("errorCode",restResponse.getErrorCode());
