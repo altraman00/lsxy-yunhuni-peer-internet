@@ -7,6 +7,7 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -264,8 +265,14 @@ public class RechargeController extends AbstractPortalController {
             //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
             params.put(name, valueStr);
         }
+        if(logger.isDebugEnabled()){
+            logger.debug("开始校验阿里返回参数:{}", JSONUtil.mapToJson(params));
+        }
         //计算得出通知验证结果
         boolean verify_result = AlipayNotify.verify(params);
+        if(logger.isDebugEnabled()){
+            logger.debug("阿里远程校验结果:{}", verify_result);
+        }
         if(verify_result){
             //验证成功
             if(tradeStatus.equals("TRADE_FINISHED") || tradeStatus.equals("TRADE_SUCCESS")){
