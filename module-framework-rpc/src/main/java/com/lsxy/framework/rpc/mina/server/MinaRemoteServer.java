@@ -1,10 +1,9 @@
 package com.lsxy.framework.rpc.mina.server;
 
 import com.lsxy.framework.rpc.api.*;
-import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
-import com.lsxy.framework.rpc.api.server.IoSessionContext;
+import com.lsxy.framework.rpc.api.server.SessionContext;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
-import com.lsxy.framework.rpc.codec.RPCCodecFactory;
+import com.lsxy.framework.rpc.mina.codec.RPCCodecFactory;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.framework.rpc.help.Log4jFilter;
 import com.lsxy.framework.rpc.help.SSLContextFactory;
@@ -13,7 +12,6 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.rpc.mina.AbstractMinaHandler;
 import com.lsxy.framework.rpc.mina.MinaCondition;
 import org.apache.mina.core.session.IdleStatus;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LogLevel;
 import org.apache.mina.filter.ssl.SslFilter;
@@ -21,6 +19,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -39,13 +38,13 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
     @Autowired
 	private AbstractMinaHandler channelServerMinaHandler;
 
-	private IoSessionContext sessionContext;
+	private SessionContext sessionContext;
 	
 	private RPCCaller rpcCaller;
 
+	//服务端口号
+	private Integer serverPort;
 
-
-	
 	public MinaRemoteServer(){
 		acceptor = new NioSocketAcceptor();
 		acceptor.getSessionConfig().setReadBufferSize(10000);
@@ -53,8 +52,7 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 		acceptor.getSessionConfig().setReceiveBufferSize(1000000);
 		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 1);
 		
-		sessionContext = new IoSessionContext();
-//		channelServerMinaHandler = new MinaServerHandler(this,serviceHandler);
+		sessionContext = new SessionContext();
 		rpcCaller = new RPCCaller();
 	}
 	
@@ -64,21 +62,13 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 	}
 
 
-
-	public void setRpcCaller(RPCCaller rpcCaller) {
-		this.rpcCaller = rpcCaller;
-	}
-
-
 	/**
 	 * 绑定端口，开始提供服务
 	 * @throws IOException
 	 * @throws GeneralSecurityException 
 	 */
 	public void bind() throws IOException, GeneralSecurityException{
-		String port = SystemConfig.getProperty("channel.server.port", "9999");
-		int intPort = Integer.parseInt(port);
-		acceptor.setDefaultLocalAddress(new InetSocketAddress(intPort));
+		acceptor.setDefaultLocalAddress(new InetSocketAddress(serverPort));
 		
 		acceptor.setHandler(channelServerMinaHandler);
 		String showLog = SystemConfig.getProperty("channel.server.minalog","false");
@@ -94,7 +84,7 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 		}
 		acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new RPCCodecFactory()));
 		acceptor.bind();
-		logger.info("渠道管理器在端口"+port+"提供服务");
+		logger.info("渠道管理器在端口"+serverPort+"提供服务");
 	}
 	
 	/**
@@ -109,11 +99,11 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 		this.channelServerMinaHandler = channelServerHandler;
 	}
 
-	public IoSessionContext getSessionContext() {
+	public SessionContext getSessionContext() {
 		return sessionContext;
 	}
 
-	public void setSessionContext(IoSessionContext sessionContext) {
+	public void setSessionContext(SessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 
@@ -137,4 +127,9 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
             throw new RemoteServerStartException(e);
         }
     }
+
+	@Override
+	public void setServerPort(Integer port) {
+		this.serverPort = port;
+	}
 }

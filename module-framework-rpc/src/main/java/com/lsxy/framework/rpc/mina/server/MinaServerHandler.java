@@ -3,10 +3,8 @@ package com.lsxy.framework.rpc.mina.server;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.*;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
-import com.lsxy.framework.rpc.api.server.IoSessionContext;
+import com.lsxy.framework.rpc.api.server.SessionContext;
 import com.lsxy.framework.rpc.mina.AbstractMinaHandler;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -38,7 +36,7 @@ public class MinaServerHandler extends AbstractMinaHandler {
 
 	public void exceptionCaught(IoSession session, Throwable cause)
 			throws Exception {
-		IoSessionContext sessionContext = this.remoteServer.getSessionContext();
+		SessionContext sessionContext = this.remoteServer.getSessionContext();
 		logger.debug("exceptionCaught:"+cause.getMessage());
 		if(cause instanceof IOException){
 			InetSocketAddress addr = (InetSocketAddress) session.getRemoteAddress();
@@ -92,7 +90,7 @@ public class MinaServerHandler extends AbstractMinaHandler {
 	public void sessionClosed(IoSession session) throws Exception {
 		logger.debug("SESSION关闭:"+session);
 		String nodeAgentId = (String) session.getAttribute("channelClientId");
-		IoSessionContext sessionContext = this.remoteServer.getSessionContext();
+		SessionContext sessionContext = this.remoteServer.getSessionContext();
 		if(StringUtil.isNotEmpty(nodeAgentId)){
 			sessionContext.removeSession(nodeAgentId);
 			InetSocketAddress addr = (InetSocketAddress) session.getRemoteAddress();

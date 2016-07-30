@@ -1,4 +1,4 @@
-package com.lsxy.framework.rpc.codec;
+package com.lsxy.framework.rpc.mina.codec;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import org.apache.mina.core.buffer.IoBuffer;

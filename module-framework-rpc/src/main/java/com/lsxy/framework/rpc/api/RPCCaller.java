@@ -1,10 +1,10 @@
 package com.lsxy.framework.rpc.api;
 
-import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
-import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.rpc.mina.AbstractMinaHandler;
+import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
+import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.core.session.IoSession;
@@ -117,13 +117,13 @@ public class RPCCaller {
 	 * @param rqListener
 	 * @throws RequestWriteException
 	 */
-	public void invoke(IoSession session,RPCRequest request,RequestListener rqListener) throws RequestWriteException{
-		AbstractMinaHandler clientHandle = (AbstractMinaHandler) session.getHandler();
+	public void invoke(Session session, RPCRequest request, RequestListener rqListener) throws RequestWriteException{
+		RPCHandler handler = session.getRPCHandle();
 		String sessionid =UUIDGenerator.uuid();
 		request.setSessionid(sessionid);
 		
 		rqListener.setRequest(request);
-		clientHandle.addRequestListener(rqListener);
+		handler.addRequestListener(rqListener);
 		
 		logger.debug(">>*"+request);
 		session.write(request);

@@ -1,32 +1,29 @@
-package com.lsxy.area.server;
+package com.lsxy.area.agent;
 
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.framework.web.web.AbstractSpringBootStarter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Created by tandy on 16/7/19.
+ * Created by tandy on 16/7/30.
  */
 @SpringBootApplication
 @ComponentScan
 @Import(FrameworkRPCConfig.class)
-public class MainClass extends AbstractSpringBootStarter{
-
-    private static final Logger logger = LoggerFactory.getLogger(MainClass.class);
-    @Override
-    public String systemId() {
-        return "area-server";
-    }
+@EnableScheduling
+public class MainClass  extends AbstractSpringBootStarter {
 
     public static void main(String[] args) throws RemoteServerStartException {
-        ApplicationContext applicationContext = SpringApplication.run(MainClass.class);
+        SpringApplication.run(MainClass.class);
+    }
 
+    @Override
+    public String systemId() {
+        return "area-agent";
     }
 }

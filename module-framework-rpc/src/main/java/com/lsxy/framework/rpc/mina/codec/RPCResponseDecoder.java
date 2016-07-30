@@ -1,25 +1,23 @@
-package com.lsxy.framework.rpc.codec;
+package com.lsxy.framework.rpc.mina.codec;
 
 import java.io.ByteArrayOutputStream;
 
+import com.lsxy.framework.rpc.api.RPCResponse;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.apache.mina.filter.codec.demux.MessageDecoder;
 import org.apache.mina.filter.codec.demux.MessageDecoderResult;
 
-import com.lsxy.framework.rpc.api.RPCRequest;
-
-
 /**
- * 请求对象解码器，循环查询两个\r\n之后，读取BL和BC之后，方能确定是一个Request对象
+ * 响应对象解码器
  * @author tantyuo
  *
  */
-public class RPCRequestDecoder implements MessageDecoder {
-	private int count = 0;//记录回车换行的计数器，每次确定一个请求对象之后，该计数器清零
+public class RPCResponseDecoder implements MessageDecoder {
+
+	private int count = 0;
 	
-//	private Log logger = LogFactory.getLog(RPCRequestDecoder.class);
 	@Override
 	public MessageDecoderResult decodable(IoSession session, IoBuffer in) {
 		MessageDecoderResult result = null;
@@ -31,39 +29,31 @@ public class RPCRequestDecoder implements MessageDecoder {
 			byte[] header = new byte[2];
 			in.get(header);
 			String sHeader = new String(header);
-			if(!sHeader.equals("RQ"))
+			if(!sHeader.equals("RP"))
 				return MessageDecoderResult.NOT_OK;
 				
 			while(in.remaining()>2){
 				byte b1 = in.get();
 				byte b2 = in.get();
-//				logger.info("字符："+(char)b1+":"+b1);
-//				logger.info("字符："+(char)b2+":"+b2);
 				//如果有两个回车换行，就判断 BL
 				if(b1==13 && b2==10){
 					count ++;  
-					if(count==2){
-						break;
-					}
+					break;
 				}
-				
 				in.position(in.position()-1);
 			}
-//			logger.info("计算count:"+count);
 			
-			if(count<2){
-//				logger.info("缺少数据1");
+			if(count<1){
 				result = MessageDecoderResult.NEED_DATA;
 			}else{
+				count = 0;
 				int r = in.remaining();
 				if(r<4){
-//					logger.info("缺少数据2");
 					result = MessageDecoderResult.NEED_DATA;
 				}else{
-//					logger.info("开始获取BODY");
 					int bl = in.getInt();
-//					logger.info("BODY LENGTH:"+bl);
 					int r2 = in.remaining();
+
 					if(r2<bl){
 						in.capacity(in.capacity()+bl);
 						result = MessageDecoderResult.NEED_DATA;
@@ -72,7 +62,6 @@ public class RPCRequestDecoder implements MessageDecoder {
 					}
 				}
 			}
-			count = 0;
 		}
 		return result;
 	}
@@ -80,36 +69,35 @@ public class RPCRequestDecoder implements MessageDecoder {
 	@Override
 	public MessageDecoderResult decode(IoSession session, IoBuffer in,
 			ProtocolDecoderOutput out) throws Exception {
-		RPCRequest request = new RPCRequest();
+		RPCResponse response = new RPCResponse();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		byte[] sessionid = new byte[32];
 		in.get(sessionid);
-		request.setSessionid(new String(sessionid));
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		int j = 0;
-		while(in.remaining()>2 && j<2){
+		response.setSessionid(new String(sessionid));
+		while(in.remaining()>2){
 			byte b1 = in.get();
 			byte b2 = in.get();
-			baos.write(b1);
+			
 			//如果有两个回车换行，就判断 BL
 			if(b1==13 && b2==10){
-				j++;
+				break;
 			}
-			if(j<2)
-				in.position(in.position()-1);
+			
+			baos.write(b1);
+			in.position(in.position()-1);
 		}
-		String header = baos.toString("UTF-8").trim();
+		
+		String header = baos.toString("UTF-8");
 		String headerArray[] = header.split("\r\n");
-		request.setName(headerArray[0].substring(3));
-		request.setParam(headerArray[1].substring(3));
+		response.setMessage(headerArray[0].substring(3));
 		baos.close();
 		int bl = in.getInt();
 		if(bl>0){
 			byte body[] = new byte[bl];
 			in.get(body);
-			request.setBody(body);
+			response.setBody(body);
 		}
-		out.write(request);
+		out.write(response);
 		return MessageDecoderResult.OK;
 	}
 
@@ -119,4 +107,8 @@ public class RPCRequestDecoder implements MessageDecoder {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public static void main(String[] args) {
+	}
+
 }

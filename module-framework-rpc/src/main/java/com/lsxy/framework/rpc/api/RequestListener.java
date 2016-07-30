@@ -12,7 +12,7 @@ public abstract class RequestListener {
 //	}
 	/**
 	 * 获取到响应
-	 * @param request
+	 * @param response
 	 */
 	public abstract void recivedResponse(RPCResponse response) throws Exception;
 	

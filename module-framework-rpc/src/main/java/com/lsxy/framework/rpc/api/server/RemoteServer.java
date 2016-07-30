@@ -11,4 +11,6 @@ public interface RemoteServer {
      * 启动服务
      */
     public void startServer() throws RemoteServerStartException;
+
+    void setServerPort(Integer port);
 }
