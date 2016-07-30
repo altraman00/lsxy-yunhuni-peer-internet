@@ -87,10 +87,16 @@ public class RechargeController extends AbstractRestController {
     @RequestMapping("/pay_success")
     public RestResponse paySuccess(ThirdPayRecord payRecord) throws Exception {
         Recharge recharge =  rechargeService.paySuccess(payRecord.getOrderId(), payRecord.getTotalFee());
+        if(logger.isDebugEnabled()){
+            logger.debug("处理订单完成！");
+        }
         if(recharge != null){
             try {
                 payRecord.setRecharge(recharge);
                 thirdPayRecordService.save(payRecord);
+                if(logger.isDebugEnabled()){
+                    logger.debug("插入充值记录完成，充值记录第三方交易号：{}",payRecord.getTradeNo());
+                }
             } catch (DataIntegrityViolationException e) {
                 logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
             }
