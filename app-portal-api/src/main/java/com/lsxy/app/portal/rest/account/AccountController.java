@@ -53,15 +53,4 @@ public class AccountController extends AbstractRestController {
         return RestResponse.success(oldAccount);
     }
 
-    /**
-     * 组装当前SecurityUser
-     * @return
-     */
-    @RequestMapping(path="/user/{username}",method = RequestMethod.GET)
-    public RestResponse login(@PathVariable String username){
-        Account account = accountService.findAccountByUserName(username);
-        SecurityUser user = new SecurityUser(account.getId(),account.getUserName(),account.getTenant().getTenantUid(),account.getTenant().getId());
-        return RestResponse.success(user);
-    }
-
 }
