@@ -33,7 +33,7 @@
                 <!--</section>-->
             <!--</section>-->
         </li>
-        <li class="dropdown a-color"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="thumb-sm avatar pull-left"> <img src="${resPrefixUrl }/images/avatar.jpg"> </span>渠道商<b class="caret"></b> </a>
+        <li class="dropdown a-color"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="thumb-sm avatar pull-left"> <img src="${resPrefixUrl }/images/avatar.jpg"> </span>${currentUser.userName}<b class="caret"></b> </a>
             <ul class="dropdown-menu animated fadeInRight">
                 <span class="arrow top"></span>
                 <li> <a href="${ctx}/console/account/safety/index">设置</a> </li>
