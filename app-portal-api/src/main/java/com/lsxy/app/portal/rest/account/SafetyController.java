@@ -51,11 +51,11 @@ public class SafetyController extends AbstractRestController {
     public RestResponse modifyEmailBind(String email)   {
         Account account = getCurrentAccount();
         if(email.equals(account.getEmail())){
-            return  RestResponse.failed("1003","该邮件已被使用");
+            return  RestResponse.failed("1003","该邮件地址已被使用");
         }
         boolean flag = accountService.checkEmail(email);
         if(flag){
-            return RestResponse.failed("1004","该邮件已被使用");
+            return RestResponse.failed("1004","该邮件地址已被使用");
         }
         mqService.publish(new ModifyEmailSuccessEvent(account.getId(),email));
         return RestResponse.success();
