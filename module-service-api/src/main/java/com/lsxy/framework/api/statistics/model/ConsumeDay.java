@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.consume.model;
+package com.lsxy.framework.api.statistics.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 
@@ -9,27 +9,38 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 消费月统计
+ * 消费日统计
  * Created by zhangxb on 2016/7/6.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_consume_month")
-public class ConsumeMonth extends IdEntity {
+@Table(schema="db_lsxy_base",name = "tb_base_consume_day")
+public class ConsumeDay extends IdEntity{
     private Date dt;//统计时间
-    private Integer month;//统计月 区间1-12
-    private BigDecimal amongAmount;//本月消费统计 decimal(20,4) DEFAULT NULL,
-    private BigDecimal sumAmount;//累计消费金额,
-    private Integer amongSessionConut;//本月会话数统计
-    private Integer sumSessionCount;//累计会话统计
+    private Integer day;//统计日 区间1-31
+    private BigDecimal amongAmount;//消费统计 decimal(20,4) DEFAULT NULL,
+    private BigDecimal sumAmount;//消费金额,
+    private Integer amongSessionConut;//会话数统计
+    private Integer sumSessionCount;//会话统计
     private String appId;//所属应用,
     private String tenantId;//所属租户
-    @Column(name = "month")
-    public Integer getMonth() {
-        return month;
+
+    public ConsumeDay() {
     }
 
-    public void setMonth(Integer month) {
-        this.month = month;
+    public ConsumeDay(Date dt,BigDecimal amongAmount, Integer amongSessionConut,String tenantId) {
+        this.dt = dt;
+        this.amongAmount = amongAmount;
+        this.amongSessionConut = amongSessionConut;
+        this.tenantId = tenantId;
+    }
+
+    @Column(name = "day")
+    public Integer getDay() {
+        return day;
+    }
+
+    public void setDay(Integer day) {
+        this.day = day;
     }
 
     @Column(name = "sum_amount")
@@ -57,7 +68,7 @@ public class ConsumeMonth extends IdEntity {
         this.amongAmount = amongAmount;
     }
     @Column(name = "among_session_count")
-    public Integer getAmongSessionConut() {
+    public int getAmongSessionConut() {
         return amongSessionConut;
     }
 
@@ -72,6 +83,7 @@ public class ConsumeMonth extends IdEntity {
     public void setSumSessionCount(Integer sumSessionCount) {
         this.sumSessionCount = sumSessionCount;
     }
+
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;

@@ -1,10 +1,10 @@
-package com.lsxy.framework.consume.service;
+package com.lsxy.framework.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.consume.model.ConsumeHour;
-import com.lsxy.framework.api.consume.service.ConsumeHourService;
+import com.lsxy.framework.api.statistics.model.ConsumeHour;
+import com.lsxy.framework.api.statistics.service.ConsumeHourService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.consume.dao.ConsumeHourDao;
+import com.lsxy.framework.statistics.dao.ConsumeHourDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

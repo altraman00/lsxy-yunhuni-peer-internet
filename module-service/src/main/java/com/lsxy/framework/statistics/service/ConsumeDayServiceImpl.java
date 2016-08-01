@@ -1,13 +1,13 @@
-package com.lsxy.framework.consume.service;
+package com.lsxy.framework.statistics.service;
 
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.consume.model.ConsumeDay;
-import com.lsxy.framework.api.consume.service.ConsumeDayService;
+import com.lsxy.framework.api.statistics.model.ConsumeDay;
+import com.lsxy.framework.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.consume.dao.ConsumeDayDao;
+import com.lsxy.framework.statistics.dao.ConsumeDayDao;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
