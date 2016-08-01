@@ -62,13 +62,4 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         }
     }
 
-    public static void main(String[] args) {
-        String str = "234234@A";
-        String regEx="^[0-9]*$|[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(str);
-        boolean b = m.find();
-        System.out.println(b);
-    }
-
 }
