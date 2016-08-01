@@ -1,4 +1,4 @@
-package com.lsxy.framework.rpc.netty.client;
+package com.lsxy.area.server.demo;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -6,10 +6,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 /**
  * Created by tandy on 16/8/1.
  */
-public class HelloClientHandler extends SimpleChannelInboundHandler<String> {
+public class HelloClientHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("Server say : " + msg);
     }
 
