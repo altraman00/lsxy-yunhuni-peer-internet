@@ -77,7 +77,7 @@
             ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
                 if(data.success){
                     $('#text1').val('');
-                    showtoast("删除成功");
+                    showtoast("提交成功");
                 }else{
                     showtoast(data.errorMsg);
                 }
