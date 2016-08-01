@@ -1,8 +1,10 @@
 package com.lsxy.framework.rpc.mina.server;
 
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.mina.MinaCondition;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -14,6 +16,7 @@ import java.util.Map;
  *
  */
 @Component
+@Conditional(MinaCondition.class)
 public class MinaServerSessionContext {
 	public static final Log logger = LogFactory.getLog(MinaServerSessionContext.class);
 	//<clientid,session>
