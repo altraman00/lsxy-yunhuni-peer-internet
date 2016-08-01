@@ -1,7 +1,7 @@
-package com.lsxy.framework.api.consume.service;
+package com.lsxy.framework.api.statistics.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.framework.api.consume.model.ConsumeMonth;
+import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.core.utils.Page;
 
 import java.math.BigDecimal;

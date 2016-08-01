@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.consume.model;
+package com.lsxy.framework.api.statistics.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 
@@ -9,38 +9,28 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 消费日统计
+ * 消费小时统计
  * Created by zhangxb on 2016/7/6.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_consume_day")
-public class ConsumeDay extends IdEntity{
+@Table(schema="db_lsxy_base",name = "tb_base_consume_hour")
+public class ConsumeHour extends IdEntity {
     private Date dt;//统计时间
-    private Integer day;//统计日 区间1-31
-    private BigDecimal amongAmount;//消费统计 decimal(20,4) DEFAULT NULL,
-    private BigDecimal sumAmount;//消费金额,
-    private Integer amongSessionConut;//会话数统计
-    private Integer sumSessionCount;//会话统计
+    private Integer hour;//统计小时 区间0-23
+    private BigDecimal amongAmount;//本小时消费统计 decimal(20,4) DEFAULT NULL,
+    private BigDecimal sumAmount;//累计消费金额,
+    private Integer amongSessionConut;//本小时会话数统计
+    private Integer sumSessionCount;//累计会话统计
     private String appId;//所属应用,
     private String tenantId;//所属租户
 
-    public ConsumeDay() {
+    @Column(name = "hour")
+    public Integer getHour() {
+        return hour;
     }
 
-    public ConsumeDay(Date dt,BigDecimal amongAmount, Integer amongSessionConut,String tenantId) {
-        this.dt = dt;
-        this.amongAmount = amongAmount;
-        this.amongSessionConut = amongSessionConut;
-        this.tenantId = tenantId;
-    }
-
-    @Column(name = "day")
-    public Integer getDay() {
-        return day;
-    }
-
-    public void setDay(Integer day) {
-        this.day = day;
+    public void setHour(Integer hour) {
+        this.hour = hour;
     }
 
     @Column(name = "sum_amount")
@@ -72,18 +62,17 @@ public class ConsumeDay extends IdEntity{
         return amongSessionConut;
     }
 
-    public void setAmongSessionConut(Integer amongSessionConut) {
+    public void setAmongSessionConut(int amongSessionConut) {
         this.amongSessionConut = amongSessionConut;
     }
     @Column(name = "sum_session_count")
-    public Integer getSumSessionCount() {
+    public int getSumSessionCount() {
         return sumSessionCount;
     }
 
-    public void setSumSessionCount(Integer sumSessionCount) {
+    public void setSumSessionCount(int sumSessionCount) {
         this.sumSessionCount = sumSessionCount;
     }
-
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
