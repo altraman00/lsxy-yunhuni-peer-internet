@@ -284,15 +284,15 @@
         }
         var mobile = $('#mobile').val();
         var param = {'mobile':mobile,'validateCode':vCode,parameterName:token};
-        ajaxsync(ctx+"/mc/send",param,function(result){
-            if(result.flag){
+        ajaxsync(ctx+"/mc/send",param,function(response){
+            if(response.data.flag){
                 showmsg('发送短信验证码成功','moadltips2');
                 $('#second-codeblock').html('');
                 sendResult = true;
-            }else if(result.vc){
+            }else if(response.data.vc){
                 sendResult = false;
                 //发送不成功，且要输入图形验证码
-                showmsg(result.err,'moadltips2');
+                showmsg(response.data.err,'moadltips2');
                 isVc = true;
                 //启动二次校验
                 var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
@@ -301,7 +301,7 @@
 
             }else{
                 sendResult = false;
-                showmsg(result.err,'moadltips2');
+                showmsg(response.data.err,'moadltips2');
             }
         },"get");
         sendCodeResult =  sendResult;
@@ -340,8 +340,8 @@
         }
         var mobile = $('#mobile').val();
         var param = {'mc':code,"mobile":mobile};
-        ajaxsync(ctx+"/mc/check",param,function(data){
-            if(data.flag){
+        ajaxsync(ctx+"/mc/check",param,function(response){
+            if(response.data.flag){
                 //开始绑定手机号码
                 param = {'mobile':mobile,parameterName:token};
                 ajaxsync(ctx+"/console/account/safety/edit_mobile",param,function(result){
@@ -354,7 +354,7 @@
                     }
                 })
             }else{
-                showmsg(data.err,'moadltips2');
+                showmsg(response.data.err,'moadltips2');
             }
         },"get");
     });
