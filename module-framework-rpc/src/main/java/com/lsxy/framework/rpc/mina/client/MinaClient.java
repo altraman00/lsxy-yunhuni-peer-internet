@@ -7,14 +7,13 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.client.ClientBindCallback;
-import com.lsxy.framework.rpc.api.client.ClientHandler;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
 import com.lsxy.framework.rpc.help.Log4jFilter;
 import com.lsxy.framework.rpc.help.MyLog4jFilter;
 import com.lsxy.framework.rpc.help.SSLContextFactory;
-import com.lsxy.framework.rpc.mina.MinaSession;
+import com.lsxy.framework.rpc.mina.server.MinaServerSession;
 import com.lsxy.framework.rpc.mina.codec.RPCCodecFactory;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoConnector;
@@ -39,6 +38,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.slf4j.MDC.remove;
+
 
 /**
  * 节点代理主动连接节点管理器
@@ -62,14 +63,17 @@ public class MinaClient implements Client{
 	@Autowired
 	private RPCCaller rpcCaller;
 
+    @Autowired
+    private MinaClientHandler handler;
 
-	@Autowired
-	private AbstractServiceHandler handler;
+    @Autowired
+    private ClientSessionContext sessionContext;
+
 
 	private ExecutorService executorService;
 
-	//服务器连接回话集合 <serverUrl,Session>
-	private final Map<String,Session> sessions = new HashMap<>();
+    public MinaClient(){
+    }
 
 	/**
 	 * 连接关闭
@@ -137,7 +141,7 @@ public class MinaClient implements Client{
 
             int port = Integer.parseInt(serverUrl.substring(serverUrl.indexOf(":") + 1));
             String clientId = this.clientId;
-            Session session = null;
+            MinaClientSession session = null;
             IoSession ioSession = null;
             try {
                 IoConnector connect = new NioSocketConnector();
@@ -164,9 +168,8 @@ public class MinaClient implements Client{
                     logger.info("启用SSL安全连接");
                 }
 
-                ClientHandler ch = new ClientHandler(rpcCaller, handler);
                 connect.getFilterChain().addLast("codec", new ProtocolCodecFilter(new RPCCodecFactory()));
-                connect.setHandler(ch);
+                connect.setHandler(handler);
 
                 logger.info("正在尝试连接节点管理器" + host + ":" + port + "....");
                 SocketAddress sa = new InetSocketAddress(host, port);
@@ -174,20 +177,22 @@ public class MinaClient implements Client{
                 ioSession = future.getSession();
                 RPCRequest request = new RPCRequest();
                 request.setName(ServiceConstants.CH_MN_CONNECT);
-                request.setParam("channelClientId=" + clientId);
+                request.setParam("clientId=" + clientId);
                 RPCResponse response = rpcCaller.invokeWithReturn(ioSession, request);
                 if (response.isOk()) {
-                    logger.info("连接节点管理器【" + host + ":" + port + "】成功。。");
-                    if (bindCallback != null)
+                    if (bindCallback != null) {
                         bindCallback.doCallback(ioSession);
+                    }
+                    //连接成功构建正式的session对象,将serverUrl作为Sessionid
+                    ioSession.setAttribute("sessionid",serverUrl);
+                    session = new MinaClientSession(serverUrl,ioSession,handler);
+                    logger.info("连接节点管理器【{}:{}】成功,sessionid 是  {}",host,port,session.getId());
                 } else {
                     String msg = new String(response.getBody(), "utf-8");
                     logger.info(msg);
                     ioSession.close(true);
                 }
-                if (ioSession != null) {
-                    session = new MinaSession(ioSession, ch);
-                }
+
             } catch (Exception ex) {
                 if (ioSession != null)
                     ioSession.close(true);
@@ -199,7 +204,8 @@ public class MinaClient implements Client{
                 if(logger.isDebugEnabled()){
                     logger.debug("bind success and got session id is :{}" , session.getId() );
                 }
-                sessions.put(serverUrl, session);
+
+                sessionContext.putSession(session);
             }
             return session;
         }
@@ -213,13 +219,13 @@ public class MinaClient implements Client{
                     e.printStackTrace();
                 }
 
-				Session session = sessions.get(serverUrl);
+				Session session = sessionContext.getSession(serverUrl);
 				if(session != null ){
 				    //如果有效,继续,否则清理掉
 				    if(session.isValid()){
 				        continue;
                     }else{
-                        sessions.remove(serverUrl);
+                        sessionContext.remove(serverUrl);
                     }
 				}else{
 

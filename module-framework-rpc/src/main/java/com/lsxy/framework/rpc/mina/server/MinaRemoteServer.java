@@ -1,7 +1,6 @@
 package com.lsxy.framework.rpc.mina.server;
 
 import com.lsxy.framework.rpc.api.*;
-import com.lsxy.framework.rpc.api.server.SessionContext;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
 import com.lsxy.framework.rpc.mina.codec.RPCCodecFactory;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
@@ -19,7 +18,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -36,10 +34,12 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 	private NioSocketAcceptor acceptor;
 
     @Autowired
-	private AbstractMinaHandler channelServerMinaHandler;
+	private MinaServerHandler channelServerMinaHandler;
 
-	private SessionContext sessionContext;
-	
+	@Autowired
+	private MinaServerSessionContext sessionContext;
+
+	@Autowired
 	private RPCCaller rpcCaller;
 
 	//服务端口号
@@ -52,8 +52,6 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 		acceptor.getSessionConfig().setReceiveBufferSize(1000000);
 		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 1);
 		
-		sessionContext = new SessionContext();
-		rpcCaller = new RPCCaller();
 	}
 	
 	
@@ -99,11 +97,11 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 		this.channelServerMinaHandler = channelServerHandler;
 	}
 
-	public SessionContext getSessionContext() {
+	public MinaServerSessionContext getSessionContext() {
 		return sessionContext;
 	}
 
-	public void setSessionContext(SessionContext sessionContext) {
+	public void setSessionContext(MinaServerSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 

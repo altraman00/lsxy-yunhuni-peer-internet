@@ -9,9 +9,9 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 public interface Session {
     public RPCHandler getRPCHandle();
 
-    void write(RPCRequest request);
+    void write(Object object);
 
-    Long getId();
+    String getId();
 
     boolean isValid();
 }

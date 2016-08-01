@@ -4,6 +4,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
+import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class AreaClient {
     public AbstractServiceHandler getServiceHandler(){
         return new AbstractServiceHandler() {
             @Override
-            public RPCResponse handleService(RPCRequest request, IoSession session) {
+            public RPCResponse handleService(RPCRequest request, Session session) {
                 if(logger.isDebugEnabled()){
                     logger.debug("处理响应");
                 }

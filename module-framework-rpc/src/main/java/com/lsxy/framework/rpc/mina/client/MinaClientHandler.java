@@ -1,17 +1,22 @@
-package com.lsxy.framework.rpc.api.client;
+package com.lsxy.framework.rpc.mina.client;
 
 import java.io.IOException;
 
+import com.lsxy.framework.rpc.api.client.AbstractClientHandler;
+import com.lsxy.framework.rpc.api.client.Client;
+import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.mina.server.MinaServerSessionContext;
 import org.apache.mina.core.session.IoSession;
 
 import com.lsxy.framework.rpc.mina.AbstractMinaHandler;
-import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.RequestListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -19,37 +24,35 @@ import org.slf4j.LoggerFactory;
  * @author Administrator
  *
  */
-public class ClientHandler extends AbstractMinaHandler {
+@Component
+public class MinaClientHandler extends AbstractMinaHandler {
 
-	private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(MinaClientHandler.class);
+
 	//请求对象
+	@Autowired
 	private RPCCaller rpcCaller;
+
 	//命令处理句柄
-	private AbstractServiceHandler nodeAgentClientServiceHandler;
-	
-	public ClientHandler(RPCCaller rpcCaller, AbstractServiceHandler nodeAgentClientServiceHandler) {
-		this.rpcCaller = rpcCaller;
-		this.nodeAgentClientServiceHandler = nodeAgentClientServiceHandler;
-	}
+	@Autowired(required = false)
+	private AbstractClientHandler nodeAgentClientServiceHandler;
 
-	public RPCCaller getRpcCaller() {
-		return rpcCaller;
-	}
+	@Autowired
+	private ClientSessionContext sessionContext;
 
-	public void setRpcCaller(RPCCaller rpcCaller) {
-		this.rpcCaller = rpcCaller;
-	}
-	
 	@Override
-	public void messageReceived(IoSession session, Object message)
+	public void messageReceived(IoSession iosession, Object message)
 			throws Exception {
+		Session session = sessionContext.getSession((String) iosession.getAttribute("sessionid"));
 		if(message instanceof RPCRequest){
 			RPCRequest request = (RPCRequest) message;
 			logger.debug("<<[CH]"+request);
-			RPCResponse response = nodeAgentClientServiceHandler.handleService(request,session);
-			if(response!=null){
-				logger.debug(">>[NM]"+response);
-				session.write(response);
+			if(nodeAgentClientServiceHandler != null){
+				RPCResponse response = nodeAgentClientServiceHandler.handleService(request,session);
+				if(response!=null){
+					logger.debug(">>[NM]"+response);
+					session.write(response);
+				}
 			}
 		}
 		if(message instanceof RPCResponse){

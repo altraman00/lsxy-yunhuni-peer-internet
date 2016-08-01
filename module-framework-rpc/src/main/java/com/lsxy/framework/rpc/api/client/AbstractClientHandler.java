@@ -1,11 +1,8 @@
-package com.lsxy.framework.rpc.api.server;
+package com.lsxy.framework.rpc.api.client;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
-
-import com.lsxy.framework.rpc.mina.server.MinaRemoteServer;
-import org.apache.mina.core.session.IoSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lsxy.framework.rpc.api.server.Session;
 
 
 /**
@@ -13,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author tandy
  *
  */
-public abstract  class AbstractServiceHandler {
+public abstract  class AbstractClientHandler {
 
 	/**
 	 *处理请求

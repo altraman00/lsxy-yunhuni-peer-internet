@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 /**
  * Created by tandy on 16/7/29.
  */
-@Component
-public class TestChannelServiceHandler extends AbstractServiceHandler {
-    @Override
-    public RPCResponse handleService(RPCRequest request, IoSession session) {
-        return null;
-    }
-}
+//@Component
+//public class TestChannelServiceHandler extends AbstractServiceHandler {
+//    @Override
+//    public RPCResponse handleService(RPCRequest request, IoSession session) {
+//        return null;
+//    }
+//}

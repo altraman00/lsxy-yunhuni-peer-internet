@@ -5,6 +5,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
+import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -42,7 +43,7 @@ public class AreaServer {
     public AbstractServiceHandler getServiceHandler(){
         return new AbstractServiceHandler() {
             @Override
-            public RPCResponse handleService(RPCRequest request, IoSession session) {
+            public RPCResponse handleService(RPCRequest request, Session session) {
                 if(logger.isDebugEnabled()){
                     logger.debug("处理响应");
                 }
