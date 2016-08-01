@@ -85,7 +85,7 @@ public class AppOnlineActionController extends AbstractPortalController {
                 result.put("result",data);
             }else{
                 result.put("flag",false);
-                result.put("msg","数据异常");
+                result.put("msg",StringUtils.isNotBlank(response.getErrorMsg())?response.getErrorMsg():"数据异常");
             }
         }else{
             result.put("flag",false);

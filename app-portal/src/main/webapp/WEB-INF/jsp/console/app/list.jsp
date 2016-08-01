@@ -166,7 +166,7 @@
                     </div>
                     <div class="input text-center">
                         <div class="defulatTips" id="creatIVR" ></div>
-                        <a onclick="nolike()" class="font14">不喜欢 换一个?</a>
+                        <a onclick="nolike()" class="font14" id="noLike">不喜欢 换一个?</a>
                     </div>
                     <div class="hideIVR">
                     </div>
@@ -416,6 +416,8 @@
                 //赋值第一个
             }
             $('#creatIVR').html(ivr[0]);
+        }else{
+            $("#noLike").replaceWith('<div class="tips-error text-center" >IVR号码池异常，请联系客服</div>');
         }
         ivrnumber = 1;
         return result;
