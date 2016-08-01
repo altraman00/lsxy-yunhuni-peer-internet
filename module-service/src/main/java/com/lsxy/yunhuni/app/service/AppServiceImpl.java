@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static sun.plugin.cache.FileVersion.regEx;
 
 /**
  * Created by liups on 2016/6/29.
@@ -56,6 +60,15 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         }else{
             return false;
         }
+    }
+
+    public static void main(String[] args) {
+        String str = "234234@A";
+        String regEx="^[0-9]*$|[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        boolean b = m.find();
+        System.out.println(b);
     }
 
 }
