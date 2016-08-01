@@ -34,7 +34,6 @@ public class HourApiStatisticsTask {
 
 
     }
-    public void t
     private  void api(){
         logger.info("开始api指标小时统计----");
         //租户 应用 运营商 地区 业务类型 api调用次数
