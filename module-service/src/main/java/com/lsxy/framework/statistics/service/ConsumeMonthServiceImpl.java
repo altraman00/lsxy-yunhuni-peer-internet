@@ -1,12 +1,12 @@
-package com.lsxy.framework.consume.service;
+package com.lsxy.framework.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.consume.model.ConsumeMonth;
-import com.lsxy.framework.api.consume.service.ConsumeMonthService;
+import com.lsxy.framework.api.statistics.model.ConsumeMonth;
+import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.consume.dao.ConsumeMonthDao;
+import com.lsxy.framework.statistics.dao.ConsumeMonthDao;
 import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

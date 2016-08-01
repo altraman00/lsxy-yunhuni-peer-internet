@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.rest.cost;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.consume.service.ConsumeMonthService;
+import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;

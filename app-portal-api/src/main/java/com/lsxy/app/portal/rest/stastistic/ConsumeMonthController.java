@@ -1,8 +1,8 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.consume.model.ConsumeMonth;
-import com.lsxy.framework.api.consume.service.ConsumeMonthService;
+import com.lsxy.framework.api.statistics.model.ConsumeMonth;
+import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.lsxy.framework.invoice.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.consume.service.ConsumeMonthService;
+import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
