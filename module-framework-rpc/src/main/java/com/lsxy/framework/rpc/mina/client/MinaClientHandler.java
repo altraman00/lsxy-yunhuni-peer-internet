@@ -3,9 +3,8 @@ package com.lsxy.framework.rpc.mina.client;
 import java.io.IOException;
 
 import com.lsxy.framework.rpc.api.client.AbstractClientHandler;
-import com.lsxy.framework.rpc.api.client.Client;
+import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.mina.server.MinaServerSessionContext;
 import org.apache.mina.core.session.IoSession;
 
 import com.lsxy.framework.rpc.mina.AbstractMinaHandler;

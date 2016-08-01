@@ -1,5 +1,6 @@
-package com.lsxy.area.server;
+package com.lsxy.framework.rpc.netty.server;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -12,6 +13,10 @@ import io.netty.handler.codec.string.StringEncoder;
  * Created by Tandy on 2016/7/20.
  */
 public class HelloServerInitializer extends ChannelInitializer<SocketChannel> {
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+    }
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {

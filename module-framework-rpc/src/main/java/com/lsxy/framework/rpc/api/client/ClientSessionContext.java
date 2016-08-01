@@ -1,6 +1,7 @@
-package com.lsxy.framework.rpc.mina.client;
+package com.lsxy.framework.rpc.api.client;
 
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.mina.client.MinaClientSession;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
