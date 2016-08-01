@@ -25,6 +25,7 @@ public class SafetyController extends AbstractRestController {
     private AccountService accountService;
     @Autowired
     private MQService mqService;
+
     /**
      * 验证密码是否正确
      * @param password 待验证密码
