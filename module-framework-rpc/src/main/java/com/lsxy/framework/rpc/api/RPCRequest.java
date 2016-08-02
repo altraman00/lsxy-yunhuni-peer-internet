@@ -1,10 +1,12 @@
 package com.lsxy.framework.rpc.api;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import com.lsxy.framework.core.utils.DateUtils;
 import org.apache.commons.lang.StringUtils;
 
 
@@ -13,27 +15,15 @@ import org.apache.commons.lang.StringUtils;
  * @author Administrator
  *
  */
-public class RPCRequest {
-	private String sessionid;	//session id
+public class RPCRequest extends  RPCMessage{
+
 	private String name;		//RQ
 	private String param;		//PM
-	private byte[] body;		//BC
+
 	
 	private Map<String,String> paramMap;		//参数解析后放入map中以方便调用
 	
 	
-	public String getSessionid() {
-		return sessionid;
-	}
-	public void setSessionid(String sessionid) {
-		this.sessionid = sessionid;
-	}
-	public byte[] getBody() {
-		return body;
-	}
-	public void setBody(byte[] body) {
-		this.body = body;
-	}
 	public String getParam() {
 		return param;
 	}
@@ -48,21 +38,17 @@ public class RPCRequest {
 	}
 	@Override
 	public String toString() {
-		String sBody = null;
-		if(this.body == null)
-			sBody = "";
-		else
-			try {
-				sBody = new String(this.body,"utf-8");
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		return "R["+this.sessionid+"]["+this.name+"]>>PM:" + this.param+">>SESSIONID:"+this.sessionid + ">>BODY:"+sBody;
+		String sBody = "";
+		if(this.getBody() != null) {
+			Object bodyObjet = this.getBodyAsObject();
+			if(bodyObjet != null)
+				sBody = bodyObjet.toString();
+		}
+		return "R["+this.getSessionid()+"]["+ DateUtils.formatDate(new Date(this.getTimestamp()),"yyyy-MM-dd HH:mm:ss")+"]["+this.name+"]>>PM:" + this.param+">>SESSIONID:"+this.getSessionid() + ">>BODY:"+sBody;
 	}
 	
 	/**
 	 * 解析
-	 * @param param
 	 */
 	public void _parseParam() {
 		paramMap = new HashMap<String,String>();
