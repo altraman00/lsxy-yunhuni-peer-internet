@@ -187,7 +187,8 @@
 
             <div class="contentModal" style="display: none" data-action="3">
                 <div class="input text-center mt-0">
-                    <p>您需要支付：<span class="money" id="payAmount">1100.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：<span id="balance">1100.00</span> 元 &nbsp;&nbsp;&nbsp; <span class="nomoney" style="display: none">!!余额不足</span>&nbsp;&nbsp;&nbsp;<a href="${ctx}/console/cost/recharge" target="_blank">充值</a> </p>
+                    <p>您需要支付：<span class="money" id="payAmount">1100.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：<span id="balance">1100.00</span> 元 &nbsp;&nbsp;&nbsp; <span class="nomoney" style="display: none">!!余额不足</span>
+                        &nbsp;&nbsp;&nbsp;<a href="${ctx}/console/cost/recharge" target="_blank">充值</a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" id="refreshBalance">刷新余额</a> </p>
                 </div>
                 <div class="input text-center mb-0 mt-0">
                     <div class="defulatTips">IVR号码：<span id="selectIvr"></span></div>
@@ -491,6 +492,8 @@
                 $("#balance").html(response.data.balance.toFixed(2));
                 if(response.data.action.amount > response.data.balance){
                     $(".nomoney").show();
+                }else{
+                    $(".nomoney").hide();
                 }
                 if(response.data.action.amount == 0){
                     $("#payMoneyInfo").hide();
@@ -576,6 +579,24 @@
     $("#ownIvr").change(function(){
         $('#creatIVR').html($(this).val());
     })
+
+    $("#refreshBalance").click(function(){
+        ajaxsync(ctx + "/console/app_action/balance",null,function(response){
+            if(response.success){
+                var payAmount = $("#payAmount").html();
+                var balance = response.data;
+                if(Number(payAmount) > balance){
+                    $(".nomoney").show();
+                }else{
+                    $(".nomoney").hide();
+                }
+                $("#balance").html(balance.toFixed(2));
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+    })
+
 </script>
 
 </body>

@@ -255,4 +255,22 @@ public class AppOnlineActionController extends AbstractPortalController {
         return flag;
     }
 
+    /**
+     * 获取余额
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/balance",method = RequestMethod.GET)
+    @ResponseBody
+    public RestResponse getBalance(HttpServletRequest request){
+        RestResponse result;
+        RestResponse<Billing> response = getBilling(this.getSecurityToken(request));
+        if(response.isSuccess()&&response.getData() != null){
+            result = RestResponse.success(response.getData().getBalance());
+        }else{
+            result = RestResponse.failed("0000","数据异常");
+        }
+        return result;
+    }
+
 }
