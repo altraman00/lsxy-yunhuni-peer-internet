@@ -16,7 +16,7 @@ import java.util.Date;
 public class AppMonth extends IdEntity {
     private String tenantId;//所属租户
     private Date dt;//统计时间
-    private Integer hour;//统计小时范围0-23
+    private Integer month;//统计小时范围0-23
     private Long sumOnLine;//总上线个数
     private Long sumLine;//总未上线个数
     private Long sum_app_num;//总应用个数
@@ -36,14 +36,15 @@ public class AppMonth extends IdEntity {
     public void setDt(Date dt) {
         this.dt = dt;
     }
-    @Column(name = "hour")
-    public Integer getHour() {
-        return hour;
+    @Column(name = "month")
+    public Integer getMonth() {
+        return month;
     }
 
-    public void setHour(Integer hour) {
-        this.hour = hour;
+    public void setMonth(Integer month) {
+        this.month = month;
     }
+
     @Column(name = "sum_on_line")
     public Long getSumOnLine() {
         return sumOnLine;
