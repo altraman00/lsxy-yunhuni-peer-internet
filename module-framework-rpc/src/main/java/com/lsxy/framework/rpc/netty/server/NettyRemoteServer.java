@@ -1,18 +1,19 @@
 package com.lsxy.framework.rpc.netty.server;
 
+import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
+import com.lsxy.framework.rpc.netty.NettyCondition;
+import com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder;
+import com.lsxy.framework.rpc.netty.codec.RPCMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
  * Netty Remote Server
  */
 @Component
+@Conditional(NettyCondition.class)
 public class NettyRemoteServer implements RemoteServer {
 
     public static final Logger logger = LoggerFactory.getLogger(NettyRemoteServer.class);
@@ -76,11 +78,11 @@ public class NettyRemoteServer implements RemoteServer {
 //                    channel.pipeline().addLast("stringDecoder", new StringDecoder(CharsetUtil.UTF_8));
 
                     ChannelPipeline pipeline = channel.pipeline();
-                    pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
-                    pipeline.addLast("decoder", new StringDecoder());
-                    pipeline.addLast("encoder", new StringEncoder());
 
-                    channel.pipeline().addLast(handler);
+                    pipeline.addLast("decoder",new RPCMessageDecoder());
+                    pipeline.addLast("encoder",new RPCMessageEncoder());
+
+                    channel.pipeline().addLast(handler.getIoHandler());
 
 
                     if(logger.isDebugEnabled()){
@@ -118,9 +120,9 @@ public class NettyRemoteServer implements RemoteServer {
         this.port = port;
     }
 
-    public void start() throws InterruptedException {
-
-
-
+    @Override
+    public AbstractServerRPCHandler getHandler() {
+        return this.handler;
     }
+
 }

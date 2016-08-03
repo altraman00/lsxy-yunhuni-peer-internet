@@ -1,15 +1,16 @@
-package com.lsxy.area.server.demo003;
+package com.lsxy.framework.rpc.netty.demo004;
 
+import com.lsxy.framework.rpc.api.RPCMessage;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * Created by tandy on 16/8/1.
  */
-public class HelloClientHandler extends SimpleChannelInboundHandler<Object> {
+public class HelloClientHandler extends SimpleChannelInboundHandler<RPCMessage> {
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, RPCMessage msg) throws Exception {
         System.out.println("Server say : " + msg);
     }
 

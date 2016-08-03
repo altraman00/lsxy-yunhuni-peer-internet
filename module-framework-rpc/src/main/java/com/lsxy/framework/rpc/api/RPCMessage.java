@@ -52,6 +52,20 @@ public class RPCMessage {
         this.setBody(serializeObject(obj));
     }
 
+    /**
+     * 获取字符串形式的body
+     * @return
+     */
+    public String getBodyAsString(){
+        String sBody = "";
+        if(this.getBody() != null && this.getBody().length > 0) {
+            Object bodyObjet = this.getBodyAsObject();
+            if(bodyObjet != null)
+                sBody = bodyObjet.toString();
+        }
+        return sBody;
+    }
+
 
     /**
      * 获取body作为一个object对象

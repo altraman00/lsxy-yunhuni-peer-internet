@@ -1,4 +1,4 @@
-package com.lsxy.area.server.demo002;
+package com.lsxy.framework.rpc.netty.demo002;
 
 /**
  * Created by tandy on 16/8/1.

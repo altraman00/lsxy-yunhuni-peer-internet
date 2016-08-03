@@ -1,4 +1,4 @@
-package com.lsxy.area.server.demo004;
+package com.lsxy.framework.rpc.netty.codec;
 
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -9,10 +9,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static com.lsxy.framework.cache.FrameworkCacheConfig.logger;
 
 /**
  * Created by tandy on 16/8/2.
@@ -43,6 +44,7 @@ import static com.lsxy.framework.cache.FrameworkCacheConfig.logger;
  *
  */
 public class RPCMessageDecoder extends ByteToMessageDecoder{
+    private static final Logger logger = LoggerFactory.getLogger(RPCMessageDecoder.class);
     private static final int PART_SESSIONID=0;
     private static final int PART_HEADER = 1;
     private static final int PART_BODY=2;
@@ -190,7 +192,8 @@ public class RPCMessageDecoder extends ByteToMessageDecoder{
                 String headPices[]  = header.split("\r\n");
                 RPCRequest request = (RPCRequest) message;
                 request.setName(headPices[0]);
-                request.setParam(headPices[1]);
+                //从第3位开始,去掉PM:
+                request.setParam(headPices[1].substring(3));
             }else{
                 RPCResponse response = (RPCResponse) message;
                 response.setMessage(header);
@@ -220,7 +223,7 @@ public class RPCMessageDecoder extends ByteToMessageDecoder{
         //解析SESSIONID部分  需要满足43位的条件,否则不合规则
         if(in.readableBytes() < 32 + 8 +3){
             if(logger.isDebugEnabled()){
-                logger.debug("不够SESSIONID 部分需要的 43位,需要更多数据  vs {}" ,in.readableBytes());
+                logger.debug("not en 43位字节,需要更多数据  vs {}" ,in.readableBytes());
             }
             return;
         }else{
@@ -238,10 +241,7 @@ public class RPCMessageDecoder extends ByteToMessageDecoder{
             sessionPartByteBuffer.clear();
 
             if(logger.isDebugEnabled()){
-                logger.debug("TIMESTAMP IS :" + timestamp);
-            }
-
-            if(logger.isDebugEnabled()){
+                logger.debug("timestamp is :" + timestamp);
                 logger.debug("decode message 's method is [{}]",rpcMethod);
             }
 

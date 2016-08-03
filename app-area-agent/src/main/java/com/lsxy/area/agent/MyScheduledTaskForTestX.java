@@ -5,6 +5,7 @@ import com.lsxy.framework.rpc.api.server.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,14 +14,19 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class MyScheduledTaskForTest {
+public class MyScheduledTaskForTestX {
+
+    public MyScheduledTaskForTestX(){
+    }
 
     @Autowired
     private Client client;
 
-    private static final Logger logger = LoggerFactory.getLogger(MyScheduledTaskForTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(MyScheduledTaskForTestX.class);
     @Scheduled(fixedDelay=5000)
     public void doTest(){
+
+        System.out.println("--------------");
 
         if(logger.isDebugEnabled()){
             logger.debug("测试测试");

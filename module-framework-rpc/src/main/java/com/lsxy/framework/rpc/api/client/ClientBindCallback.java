@@ -1,6 +1,6 @@
 package com.lsxy.framework.rpc.api.client;
 
-import org.apache.mina.core.session.IoSession;
+import com.lsxy.framework.rpc.api.server.Session;
 
 
 
@@ -11,5 +11,5 @@ import org.apache.mina.core.session.IoSession;
  *
  */
 public interface ClientBindCallback {
-	public void doCallback(IoSession session) throws Exception;
+	public void doCallback(Session session) throws Exception;
 }

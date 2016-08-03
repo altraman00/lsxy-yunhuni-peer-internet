@@ -38,12 +38,7 @@ public class RPCRequest extends  RPCMessage{
 	}
 	@Override
 	public String toString() {
-		String sBody = "";
-		if(this.getBody() != null) {
-			Object bodyObjet = this.getBodyAsObject();
-			if(bodyObjet != null)
-				sBody = bodyObjet.toString();
-		}
+		String sBody = this.getBodyAsString();
 		return "R["+this.getSessionid()+"]["+ DateUtils.formatDate(new Date(this.getTimestamp()),"yyyy-MM-dd HH:mm:ss")+"]["+this.name+"]>>PM:" + this.param+">>SESSIONID:"+this.getSessionid() + ">>BODY:"+sBody;
 	}
 	

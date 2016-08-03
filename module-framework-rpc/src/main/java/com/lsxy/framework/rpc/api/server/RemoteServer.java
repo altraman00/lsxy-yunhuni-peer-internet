@@ -1,5 +1,6 @@
 package com.lsxy.framework.rpc.api.server;
 
+import com.lsxy.framework.rpc.api.RPCHandler;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 
 /**
@@ -13,4 +14,6 @@ public interface RemoteServer {
     public void startServer() throws RemoteServerStartException;
 
     void setServerPort(Integer port);
+
+    public AbstractServerRPCHandler getHandler();
 }

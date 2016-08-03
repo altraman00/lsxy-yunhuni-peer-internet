@@ -1,17 +1,14 @@
 package com.lsxy.framework.rpc.mina.client;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.rpc.api.RPCRequest;
-import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
-import com.lsxy.framework.rpc.api.client.ClientBindCallback;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
 import com.lsxy.framework.rpc.help.Log4jFilter;
 import com.lsxy.framework.rpc.help.MyLog4jFilter;
 import com.lsxy.framework.rpc.help.SSLContextFactory;
+import com.lsxy.framework.rpc.mina.MinaCondition;
 import com.lsxy.framework.rpc.mina.codec.RPCCodecFactory;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoConnector;
@@ -23,14 +20,13 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -39,11 +35,9 @@ import java.util.concurrent.Executors;
  *
  */
 @Component
+@Conditional(MinaCondition.class)
 public class MinaClient extends AbstractClient {
 	private static final Logger logger = LoggerFactory.getLogger(MinaClient.class);
-
-	@Autowired(required = false)
-	private ClientBindCallback bindCallback;
 
     @Autowired
     private MinaClientHandler handler;
@@ -51,8 +45,7 @@ public class MinaClient extends AbstractClient {
     @Autowired
     private ClientSessionContext sessionContext;
 
-
-
+    private String serverUrl;
 
     public MinaClient(){
     }
@@ -73,13 +66,15 @@ public class MinaClient extends AbstractClient {
      * @throws IOException
      * @throws GeneralSecurityException
      */
-    public Session doBind(String serverUrl) {
-        String host = serverUrl.substring(0, serverUrl.indexOf(":"));
+    @Override
+    public Session doBind(String serverUrl) throws ClientBindException {
 
-        int port = Integer.parseInt(serverUrl.substring(serverUrl.indexOf(":") + 1));
-        String clientId = this.getClientId();
+        this.serverUrl = serverUrl;
+
+        String host = getHost();
+        int port = this.getPort();
+
         MinaClientSession session = null;
-        IoSession ioSession = null;
         try {
             IoConnector connect = new NioSocketConnector();
             connect.setConnectTimeoutMillis(3000);
@@ -106,46 +101,39 @@ public class MinaClient extends AbstractClient {
             }
 
             connect.getFilterChain().addLast("codec", new ProtocolCodecFilter(new RPCCodecFactory()));
-            connect.setHandler(handler);
+            connect.setHandler(handler.getIoHandler());
 
             logger.info("正在尝试连接节点管理器" + host + ":" + port + "....");
             SocketAddress sa = new InetSocketAddress(host, port);
             ConnectFuture future = connect.connect(sa).awaitUninterruptibly();
-            ioSession = future.getSession();
-            RPCRequest request = new RPCRequest();
-            request.setName(ServiceConstants.CH_MN_CONNECT);
-            request.setParam("clientId=" + clientId);
-            RPCResponse response = getRpcCaller().invokeWithReturn(ioSession, request);
-            if (response.isOk()) {
-                if (bindCallback != null) {
-                    bindCallback.doCallback(ioSession);
-                }
-                //连接成功构建正式的session对象,将serverUrl作为Sessionid
-                ioSession.setAttribute("sessionid",serverUrl);
-                session = new MinaClientSession(serverUrl,ioSession,handler);
-                logger.info("连接节点管理器【{}:{}】成功,sessionid 是  {}",host,port,session.getId());
-            } else {
-                String msg = new String(response.getBody(), "utf-8");
-                logger.info(msg);
-                ioSession.close(true);
-            }
+            IoSession ioSession = future.getSession();
+
+            session = new MinaClientSession(ioSession,handler,serverUrl);
+
+            //发送连接命令
+            doConnect(session);
 
         } catch (Exception ex) {
-            if (ioSession != null)
-                ioSession.close(true);
+            ex.printStackTrace();
+            if (session != null)
+                session.close(true);
             logger.info("连接" + host + ":" + port + "失败，请确认节点代理服务是否开启，10秒后再次尝试。。。。");
+            throw new ClientBindException(ex);
         }
 
-        //连接成功后,将session丢到环境里面去
-        if(session != null) {
-            if(logger.isDebugEnabled()){
-                logger.debug("bind success and got session id is :{}" , session.getId() );
-            }
-
-            sessionContext.putSession(session);
-        }
         return session;
     }
+
+    private int getPort() {
+        assert this.serverUrl!=null;
+        return Integer.parseInt(serverUrl.substring(serverUrl.indexOf(":") + 1));
+    }
+
+    private String getHost() {
+        assert this.serverUrl!=null;
+        return serverUrl.substring(0, serverUrl.indexOf(":"));
+    }
+
 
 
 

@@ -1,4 +1,4 @@
-package com.lsxy.area.server.demo003;
+package com.lsxy.framework.rpc.netty.demo003;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

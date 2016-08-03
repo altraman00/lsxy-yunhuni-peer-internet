@@ -103,7 +103,7 @@ public class RPCCaller {
 	 * @param session
 	 * @throws RequestWriteException
 	 */
-	public void invoke(IoSession session,RPCRequest request) throws RequestWriteException{
+	public void invoke(IoSession session, RPCRequest request) throws RequestWriteException{
 		String sessionid = UUIDGenerator.uuid();
 		request.setSessionid(sessionid);
 		logger.debug(">>*"+request);
@@ -186,7 +186,7 @@ public class RPCCaller {
 	 * @throws RequestTimeOutException
 	 */
 	@SuppressWarnings("static-access")
-	public RPCResponse invokeWithReturn(IoSession session, RPCRequest request)
+	public RPCResponse invokeWithReturn(Session session, RPCRequest request)
 			throws InterruptedException, RequestTimeOutException {
 		RPCResponse response = null;
 		String sessionid = UUIDGenerator.uuid();

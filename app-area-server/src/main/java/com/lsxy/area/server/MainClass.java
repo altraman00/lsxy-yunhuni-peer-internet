@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Created by tandy on 16/7/19.
@@ -17,16 +18,16 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @ComponentScan
 @Import(FrameworkRPCConfig.class)
+@EnableScheduling
 public class MainClass extends AbstractSpringBootStarter{
 
-    private static final Logger logger = LoggerFactory.getLogger(MainClass.class);
     @Override
     public String systemId() {
         return "area-server";
     }
 
     public static void main(String[] args) throws RemoteServerStartException {
-        ApplicationContext applicationContext = SpringApplication.run(MainClass.class);
+        SpringApplication.run(MainClass.class);
 
     }
 }

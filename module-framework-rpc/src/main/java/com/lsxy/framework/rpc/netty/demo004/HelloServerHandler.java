@@ -1,4 +1,4 @@
-package com.lsxy.area.server.demo004;
+package com.lsxy.framework.rpc.netty.demo004;
 
 import com.lsxy.framework.rpc.api.RPCMessage;
 import io.netty.channel.ChannelHandlerContext;

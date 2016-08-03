@@ -58,7 +58,7 @@ public class ClientComponent extends Thread {
 //	}
 //
 //
-//	public String getHost() {
+//	public String getRemoteAddress() {
 //		return host;
 //	}
 //

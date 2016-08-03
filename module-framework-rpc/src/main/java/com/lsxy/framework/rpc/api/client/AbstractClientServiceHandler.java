@@ -10,7 +10,7 @@ import com.lsxy.framework.rpc.api.server.Session;
  * @author tandy
  *
  */
-public abstract  class AbstractClientHandler {
+public abstract  class AbstractClientServiceHandler {
 
 	/**
 	 *处理请求

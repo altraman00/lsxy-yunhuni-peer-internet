@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
 //     * 如果随机端口号,解析端口号的范围配置,在指定范围内生成端口号
 //     * @return
 //     */
-//    public int getServerPort(){
+//    public int getPort(){
 //        if(MODE_FIX.equals(providerMode)){
 //            Assert.notNull(fixPort,"固定端口号参数未设置  global.rpc.server.port => 9999");
 //            return fixPort;

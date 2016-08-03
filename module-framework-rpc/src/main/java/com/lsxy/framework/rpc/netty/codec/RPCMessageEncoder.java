@@ -1,4 +1,4 @@
-package com.lsxy.area.server.demo004;
+package com.lsxy.framework.rpc.netty.codec;
 
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.RPCRequest;

@@ -1,19 +1,13 @@
-package com.lsxy.area.server.demo004;
+package com.lsxy.framework.rpc.netty.demo004;
 
-import io.netty.buffer.ByteBuf;
+import com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder;
+import com.lsxy.framework.rpc.netty.codec.RPCMessageEncoder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Created by Tandy on 2016/7/20.

@@ -1,4 +1,4 @@
-package com.lsxy.area.server.demo003;
+package com.lsxy.framework.rpc.netty.demo004;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

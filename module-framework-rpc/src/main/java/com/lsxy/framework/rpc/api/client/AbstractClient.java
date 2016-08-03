@@ -1,8 +1,12 @@
 package com.lsxy.framework.rpc.api.client;
 
 import com.lsxy.framework.rpc.api.RPCCaller;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
+import com.lsxy.framework.rpc.exceptions.ClientConnecException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,8 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractClient implements Client{
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractClient.class);
+    
     //服务器连接url 多个
     private String serverUrls[];
 
@@ -29,22 +35,40 @@ public abstract class AbstractClient implements Client{
     @Autowired
     private ClientSessionContext sessionContext;
 
+    @Autowired(required = false)
+    private ClientBindCallback bindCallback;
+
+
     private ExecutorService executorService;
 
 
     @Override
-    public void bind() throws ClientBindException {
+    public void bind() {
         executorService = Executors.newFixedThreadPool(serverUrls.length);
         for (String serverUrl:serverUrls) {
             ServerDeamonTask task = new ServerDeamonTask(serverUrl,this.clientId);
             //刚刚开始就执行一次绑定
-            this.doBind(serverUrl);
+            try {
+                Session session = this.doBind(serverUrl);
+
+                //连接成功后,将session丢到环境里面去
+                if(session != null) {
+                    if(logger.isDebugEnabled()){
+                        logger.debug("bind success and got session id is :{}" , session.getId() );
+                    }
+
+                    sessionContext.putSession(session);
+                }
+
+            } catch (ClientBindException e) {
+                e.printStackTrace();
+            }
             executorService.submit(task);
         }
     }
 
 
-    protected abstract Session doBind(String serverUrl) ;
+    protected abstract Session doBind(String serverUrl) throws ClientBindException;
 
     /**
      * 设置服务器连接url
@@ -93,6 +117,10 @@ public abstract class AbstractClient implements Client{
     }
 
 
+    /**
+     * 客户端连接监控线程
+     * 每一个连接会有一个线程进行监控,如果断开,会尝试重复连接,直到连接上为止
+     */
     class ServerDeamonTask implements Runnable{
         private final Logger logger = LoggerFactory.getLogger(ServerDeamonTask.class);
         private String serverUrl;
@@ -125,10 +153,40 @@ public abstract class AbstractClient implements Client{
                         logger.debug("尝试连接:"+this.serverUrl);
                     }
 
-                    doBind(this.serverUrl);
+                    try {
+                        doBind(this.serverUrl);
+                    } catch (ClientBindException e) {
+                        if(logger.isDebugEnabled()){
+                            logger.debug("客户端连接失败:" + e.getMessage());
+                        }
+                        e.printStackTrace();
+                    }
                 }
 
             }
+        }
+    }
+
+
+    protected void doConnect(Session session) throws ClientConnecException {
+        try {
+            RPCRequest request = new RPCRequest();
+            request.setName(ServiceConstants.CH_MN_CONNECT);
+            request.setParam("sessionid=" + session.getId());
+            RPCResponse response = getRpcCaller().invokeWithReturn(session, request);
+            if (response.isOk()) {
+                if (bindCallback != null) {
+                    bindCallback.doCallback(session);
+                }
+                //连接成功构建正式的session对象,将serverUrl作为Sessionid
+                logger.info("连接节点管理器【{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
+            } else {
+                String msg = new String(response.getBody(), "utf-8");
+                logger.info(msg);
+                session.close(true);
+            }
+        }catch (Exception ex){
+            throw new ClientConnecException(ex);
         }
     }
 }

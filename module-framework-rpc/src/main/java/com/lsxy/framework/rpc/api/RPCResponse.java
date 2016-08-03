@@ -25,21 +25,6 @@ public class RPCResponse extends RPCMessage{
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	/**
-	 * 获取字符串形式的body
-	 * @return
-	 */
-	public String getBodyAsString(){
-		String s = null;
-		if(this.getBody()!=null){
-			try {
-				s = new String(this.getBody(),"UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		}
-		return s;
-	}
 
 
 
@@ -60,21 +45,13 @@ public class RPCResponse extends RPCMessage{
 	public static RPCResponse buildResponse(RPCRequest request){
 		RPCResponse response = new RPCResponse();
 		response.setSessionid(request.getSessionid());
+		response.setTimestamp(request.getTimestamp());
 		return response;
 	}
 
 	@Override
 	public String toString() {
-		String sBody = null;
-		if(this.getBody() == null)
-			sBody = "";
-		else
-			try {
-				sBody = new String(this.getBody(),"utf-8");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		String sBody = this.getBodyAsString();
 		return "P["+this.getSessionid()+"]>>RP:" +this.message + ">>BODY:"+sBody;
 	}
 	

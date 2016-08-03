@@ -1,15 +1,16 @@
 package com.lsxy.framework.rpc.mina.server;
 
-import com.lsxy.framework.rpc.api.*;
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.rpc.api.RPCCaller;
+import com.lsxy.framework.rpc.api.RPCHandler;
+import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
+import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
-import com.lsxy.framework.rpc.mina.codec.RPCCodecFactory;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.framework.rpc.help.Log4jFilter;
 import com.lsxy.framework.rpc.help.SSLContextFactory;
-import com.lsxy.framework.config.SystemConfig;
-
-import com.lsxy.framework.rpc.mina.AbstractMinaHandler;
 import com.lsxy.framework.rpc.mina.MinaCondition;
+import com.lsxy.framework.rpc.mina.codec.RPCCodecFactory;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LogLevel;
@@ -34,10 +35,10 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 	private NioSocketAcceptor acceptor;
 
     @Autowired
-	private MinaServerHandler channelServerMinaHandler;
+	private MinaServerHandler handler;
 
 	@Autowired
-	private MinaServerSessionContext sessionContext;
+	private ServerSessionContext sessionContext;
 
 	@Autowired
 	private RPCCaller rpcCaller;
@@ -68,7 +69,7 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 	public void bind() throws IOException, GeneralSecurityException{
 		acceptor.setDefaultLocalAddress(new InetSocketAddress(serverPort));
 		
-		acceptor.setHandler(channelServerMinaHandler);
+		acceptor.setHandler(handler.getIoHandler());
 		String showLog = SystemConfig.getProperty("channel.server.minalog","false");
 		if(showLog.equals("true")){
 			Log4jFilter lf = new Log4jFilter(logger); 
@@ -93,17 +94,12 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 		acceptor.unbind();
 	}
 
-	public void setChannelServerHandler(MinaServerHandler channelServerHandler) {
-		this.channelServerMinaHandler = channelServerHandler;
-	}
 
-	public MinaServerSessionContext getSessionContext() {
+
+	public ServerSessionContext getSessionContext() {
 		return sessionContext;
 	}
 
-	public void setSessionContext(MinaServerSessionContext sessionContext) {
-		this.sessionContext = sessionContext;
-	}
 
 
 //	public static void main(String[] args) throws IOException, GeneralSecurityException {
@@ -129,5 +125,10 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
 	@Override
 	public void setServerPort(Integer port) {
 		this.serverPort = port;
+	}
+
+	@Override
+	public AbstractServerRPCHandler getHandler() {
+		return this.handler;
 	}
 }
