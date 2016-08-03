@@ -23,7 +23,7 @@ public class AppHourStatisticsTask {
     private static final Logger logger = LoggerFactory.getLogger(AppHourStatisticsTask.class);
     @Autowired
     AppHourService appHourService;
-    @Scheduled(cron="0/10 0 * * * ?")
+    @Scheduled(cron="* * 0/10 * * ?")
     public void app(){
         long startTime = System.currentTimeMillis();
         logger.info("应用指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
@@ -34,8 +34,14 @@ public class AppHourStatisticsTask {
         cale.setTime(date);
         int hour24 = cale.get(Calendar.HOUR_OF_DAY);
         Date date1 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
-        appHourService.hourStatistics(date1,hour24);
-        long endTime = System.currentTimeMillis();
-        logger.info("应用指标小时统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
+        try{
+            appHourService.hourStatistics(date1,hour24);
+            long endTime = System.currentTimeMillis();
+            logger.info("应用指标小时统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
+        }catch (Exception e){
+            long endTime = System.currentTimeMillis();
+            logger.error("应用指标小时统计任务异常结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
+            logger.error("失败原因",e);
+        }
     }
 }
