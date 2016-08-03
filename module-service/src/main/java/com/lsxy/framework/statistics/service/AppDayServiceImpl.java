@@ -1,12 +1,12 @@
 package com.lsxy.framework.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.statistics.model.AppDay;
 import com.lsxy.framework.api.statistics.model.AppHour;
-import com.lsxy.framework.api.statistics.service.AppHourService;
+import com.lsxy.framework.api.statistics.service.AppDayService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.statistics.dao.AppHourDao;
-import org.apache.tools.ant.util.DateUtils;
+import com.lsxy.framework.statistics.dao.AppDayDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -17,25 +17,24 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 消费小时统计serviceimpl
  * Created by zhangxb on 2016/7/6.
  */
 @Service
-public class AppHourServiceImpl extends AbstractService<AppHour> implements AppHourService {
+public class AppDayServiceImpl extends AbstractService<AppDay> implements AppDayService {
     @Autowired
-    AppHourDao appHourDao;
+    AppDayDao appDayDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Override
-    public BaseDaoInterface<AppHour, Serializable> getDao() {
-        return appHourDao;
+    public BaseDaoInterface<AppDay, Serializable> getDao() {
+        return appDayDao;
     }
 
     @Override
-    public void hourStatistics(Date date, int hour,String[] select) throws  SQLException{
+    public void dayStatistics(Date date, int day,String[] select) throws  SQLException{
         String selects = "";
         String groupbys = "";
         String wheres = "";
@@ -48,8 +47,8 @@ public class AppHourServiceImpl extends AbstractService<AppHour> implements AppH
             selects += select[i] + " , ";
             wheres += select[i]+"=a."+select[i] +" and ";
         }
-        String sql =" insert into db_lsxy_base.tb_base_app_hour("+selects+"dt,hour,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version) ";
-        sql +=" select "+selects+" ? as dt,? as hour, ";
+        String sql =" insert into db_lsxy_base.tb_base_app_day("+selects+"dt,day,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version) ";
+        sql +=" select "+selects+" ? as dt,? as day, ";
         sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+wheres+" status=1) as sum_on_line, ";
         sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+wheres+" status=2) as sum_line, ";
         sql +=" COUNT(1) as sum_app_num ,";
@@ -58,9 +57,9 @@ public class AppHourServiceImpl extends AbstractService<AppHour> implements AppH
             groupbys = " group by "+groupbys;
         }
         sql +=" from db_lsxy_bi_yunhuni.tb_bi_app a "+groupbys;
-        update(date, hour, sql);
+        update(date, day, sql);
     }
-
+    
     private void update(final Date date, final int day, String sql) throws  SQLException{
         jdbcTemplate.update(sql,new PreparedStatementSetter(){
             @Override
@@ -78,4 +77,6 @@ public class AppHourServiceImpl extends AbstractService<AppHour> implements AppH
             }
         });
     }
+
+
 }
