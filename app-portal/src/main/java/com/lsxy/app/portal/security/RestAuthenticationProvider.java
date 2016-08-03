@@ -46,7 +46,15 @@ public class RestAuthenticationProvider implements AuthenticationProvider, Initi
         String username = (authentication.getPrincipal() == null) ? "NONE_PROVIDED"
                 : authentication.getName();
         Object password = authentication.getCredentials();
-        String token = restApiLogin(username, password);
+        //RestApi登录
+        String url = PortalConstants.REST_PREFIX_URL + "/login?username={1}&password={2}";
+        String token;
+        RestResponse<UserRestToken> response = RestRequest.buildRequest().get(url,UserRestToken.class,username,password);
+        if(response.isSuccess()){
+            token = response.getData().getToken();
+        }else{
+            throw new BadCredentialsException(response.getErrorMsg());
+        }
         if (StringUtils.isEmpty(token)) {
             //这个类不要return null,以异常的形式处理结果
             throw new BadCredentialsException("密码错误,或账号被锁定");
@@ -73,22 +81,6 @@ public class RestAuthenticationProvider implements AuthenticationProvider, Initi
         return authorities;
     }
 
-    private String restApiLogin(String username,Object password){
-        //此处调用restApi进行登录，并对反回登录的token
-        String token = null;
-        String url = PortalConstants.REST_PREFIX_URL + "/login";
-        Map<String,Object> formParams = new HashMap<>();
-        formParams.put("username",username);
-        formParams.put("password",password);
-        RestResponse<UserRestToken> response = RestRequest.buildRequest().post(url,formParams,UserRestToken.class);
-        if(response != null){
-            UserRestToken data = response.getData();
-            if(data != null){
-                token = data.getToken();
-            }
-        }
-        return token;
-    }
 
     @Override
     public boolean supports(Class<?> authentication) {

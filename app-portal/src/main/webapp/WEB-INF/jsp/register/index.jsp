@@ -125,11 +125,11 @@
         }
         var mobile = $("#form-mobile").val();
         $.get(ctx + "/mc/check", {"mc":mobileCode,"mobile":mobile},
-            function(data){
-                if(data.flag){
+            function(response){
+                if(response.data.flag){
                     document.getElementById('defaultForm').submit();
                 }else{
-                    tipsmsg(data.err,"mobileCodeTips");
+                    tipsmsg(response.data.err,"mobileCodeTips");
                 }
         });
 
@@ -158,14 +158,14 @@
             data: {"mobile":mobile,validateCode:vCode},   //id
             async: false,
             dataType: "json",
-            success: function(result) {
-                if(result.flag){
+            success: function(response) {
+                if(response.data.flag){
                     //发送成功
                     sendResult = true;
-                }else if(result.vc){
+                }else if(response.data.vc){
                     sendResult = false;
                     //发送不成功，且要输入图形验证码
-                    tipsmsg(result.err,'mobileCodeTips');
+                    tipsmsg(response.data.err,'mobileCodeTips');
                     isVc = true;
 
                     //启动二次校验
@@ -176,7 +176,7 @@
 
                 }else{
                     sendResult = false;
-                    tipsmsg(result.err,'mobileCodeTips');
+                    tipsmsg(response.data.err,'mobileCodeTips');
                 }
             }
         });
