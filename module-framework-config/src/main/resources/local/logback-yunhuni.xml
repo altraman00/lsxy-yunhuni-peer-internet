@@ -92,11 +92,6 @@
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <MaxFileSize>10MB</MaxFileSize>
         </triggeringPolicy>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印debug日志 -->
-            <level>DEBUG</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
     </appender>
     <!-- 按照每天生成日志文件 -->
     <appender name="ROLLINGFILE_ERROR"  class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -135,7 +130,5 @@
     <logger name="com.lsxy" additivity="true">
         <level value="DEBUG" />
         <appender-ref ref="ROLLINGFILE"/>
-        <appender-ref ref="ROLLINGFILE_DEBUG"/>
-        <appender-ref ref="ROLLINGFILE_ERROR"/>
     </logger>
 </included>

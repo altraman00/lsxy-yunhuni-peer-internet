@@ -133,7 +133,5 @@
     <logger name="com.lsxy" additivity="true">
         <level value="DEBUG" />
         <appender-ref ref="ROLLINGFILE"/>
-        <appender-ref ref="ROLLINGFILE_DEBUG"/>
-        <appender-ref ref="ROLLINGFILE_ERROR"/>
     </logger>
 </included>
