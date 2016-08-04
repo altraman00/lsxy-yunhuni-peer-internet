@@ -24,7 +24,12 @@
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
     </appender>
-
+    <appender name="DEBUG_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.debug</file>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
     <!-- 按照每天生成日志文件 -->
     <appender name="ROLLINGFILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -50,5 +55,8 @@
     <root level="INFO">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
+    </root>
+    <root level="DEBUG">
+        <appender-ref ref="DEBUG_FILE" />
     </root>
 </included>
