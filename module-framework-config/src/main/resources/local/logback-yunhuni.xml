@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <included>
-    <property name="LOG_HOME" value="~/yunhuni/logs" />
+    <property name="LOG_HOME" value="${user.home}/yunhuni/logs" />
 
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
     <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
@@ -15,11 +15,6 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印debug日志 -->
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -127,8 +122,9 @@
         <appender-ref ref="STDOUT" />
     </root>
 
-    <logger name="com.lsxy" additivity="true">
+    <logger name="com.lsxy" additivity="false">
         <level value="DEBUG" />
         <appender-ref ref="ROLLINGFILE"/>
+        <appender-ref ref="ROLLINGFILE_DEBUG"/>
     </logger>
 </included>

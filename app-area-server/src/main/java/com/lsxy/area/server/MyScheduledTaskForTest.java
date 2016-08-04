@@ -17,7 +17,7 @@ import java.util.Collection;
  * Created by tandy on 16/7/30.
  */
 
-@Component("scheduledTask001")
+//@Component("scheduledTask001")
 public class MyScheduledTaskForTest {
 
     @Autowired
@@ -26,7 +26,7 @@ public class MyScheduledTaskForTest {
     private static final Logger logger = LoggerFactory.getLogger(MyScheduledTaskForTest.class);
 
     private long last = 0;
-    @Scheduled(fixedDelay=1000)
+//    @Scheduled(fixedDelay=1000)
     public void doGetProcessCount(){
         long thistime = server.getHandler().getProcessRequestCount();
         logger.info("-----累计次数:{}",thistime);
