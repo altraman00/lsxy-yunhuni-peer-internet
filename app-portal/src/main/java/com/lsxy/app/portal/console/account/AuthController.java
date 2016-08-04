@@ -159,13 +159,15 @@ public class AuthController extends AbstractPortalController {
     public ModelAndView edit(HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles){
 
 
-        //对上次文件进行处理
+        //对上传文件进行处理
         if (null != multipartfiles && multipartfiles.length > 0) {
-            if(Integer.valueOf(type)==0){
+            if(Integer.valueOf(type)==0){//个人
                 authVo.setIdPhoto(UploadFile(multipartfiles[0]));
-            }else if(Integer.valueOf(type)==1){
+            }else if(Integer.valueOf(type)==1){//公司认证
                 authVo.setType01Prop01(UploadFile(multipartfiles[1]));
-                authVo.setType03Prop02(UploadFile(multipartfiles[2]));
+                authVo.setType02Prop03(UploadFile(multipartfiles[2]));
+                authVo.setType03Prop02(UploadFile(multipartfiles[3]));
+                authVo.setType03Prop04(UploadFile(multipartfiles[4]));
             }
         }
 
