@@ -25,8 +25,7 @@ public class RechargeMonthStatisticsTask {
     /**
      * 每月1号2：00：00触发执行
      */
-    //@Scheduled(cron="0 0 2 1 * ? ")
-    @Scheduled(cron="0/10 * * * * ?")
+    @Scheduled(cron="0 0 2 1 * ? ")
     public void month(){
         long startTime = System.currentTimeMillis();
         logger.info("订单记录指标月统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
