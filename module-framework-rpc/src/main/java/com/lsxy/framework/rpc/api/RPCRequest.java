@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.apache.commons.lang.StringUtils;
 
 
@@ -89,9 +90,24 @@ public class RPCRequest extends  RPCMessage{
 		}
 		return paramMap;
 	}
-	
-	
-	
-	
 
+
+	/**
+	 * 创建新的请求对象,必须指定请求命令名称和请求参数
+	 *
+	 * @param name
+	 * 		@see ServiceConstants 请求名称
+	 * @param params
+	 * 		参数使用url参数方案  param01=001&param002=002
+     * @return
+	 * 			返回请求对象
+     */
+	public static RPCRequest newRequest(String name,String params) {
+		RPCRequest request = new RPCRequest();
+		request.setSessionid(UUIDGenerator.uuid());
+		request.setTimestamp(new Date().getTime());
+		request.setName(name);
+		request.setParam(params);
+		return request;
+	}
 }

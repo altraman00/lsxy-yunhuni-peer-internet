@@ -23,6 +23,9 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
     @Autowired(required =false)
     private AbstractClientServiceHandler serviceHandler;
 
+    @Autowired
+    private ClientSessionContext sessionContext;
+
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -53,14 +56,20 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
     protected void process(Object ctxObject, RPCMessage message) {
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
-             RPCResponse response = serviceHandler.handleService(request, getSessionInTheContextObject(ctxObject));
-            logger.debug("<<{}",request);
-            if(response != null){
-                if(logger.isDebugEnabled()){
-                    logger.debug(">>{}",response);
+            if(serviceHandler != null){
+                 RPCResponse response = serviceHandler.handleService(request, getSessionInTheContextObject(ctxObject));
+                logger.debug("<<{}",request);
+                if(response != null){
+                    if(logger.isDebugEnabled()){
+                        logger.debug(">>{}",response);
+                    }
+                    Session session = getSessionInTheContextObject(ctxObject);
+                    session.write(response);
                 }
-                Session session = getSessionInTheContextObject(ctxObject);
-                session.write(response);
+            }else{
+                if(logger.isDebugEnabled()){
+                    logger.debug("not found service handler bean defined in springcontext,drop request:{}" ,request);
+                }
             }
         }else if(message instanceof  RPCResponse){
             RPCResponse response = (RPCResponse) message;
@@ -73,6 +82,7 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
         }
     }
 
-
-
+    public ClientSessionContext getSessionContext() {
+        return sessionContext;
+    }
 }

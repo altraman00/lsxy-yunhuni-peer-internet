@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Created by tandy on 16/8/1.
  */
@@ -27,6 +29,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     private SimpleChannelInboundHandler<RPCMessage> ioHandler = new IOHandle();
 
     private AttributeKey<String> SESSION_ID = AttributeKey.valueOf("sessionid");
+
 
     @Override
     public Session getSessionInTheContextObject(Object ctxObject) {

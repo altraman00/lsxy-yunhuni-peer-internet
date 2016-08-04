@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tandy on 16/8/1.
@@ -38,9 +39,10 @@ public abstract class AbstractClient implements Client{
     @Autowired(required = false)
     private ClientBindCallback bindCallback;
 
+    //有效会话选择器
+    private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
 
     private ExecutorService executorService;
-
 
     @Override
     public void bind() {
@@ -89,32 +91,67 @@ public abstract class AbstractClient implements Client{
         this.clientId = clientId;
     }
 
-
     @Override
     public Session getAvalibleSession() {
-
-        return null;
+        int idx = 0;    //索引  默认为0
+        int times = 1;  //遍历次数,一次
+        int j = 0;      //当前遍历次数
+        Session session = null;
+        while(j<times && this.sessionContext.size()>0) {
+            int i = this.sessionSelectCounter.addAndGet(1);
+            //如果总计数器达到整型最大值,重置0
+            if (i >= (Integer.MAX_VALUE - 1)) {
+                this.sessionSelectCounter.set(0);
+            }
+            int size = this.sessionContext.size();
+            idx = i % size;
+            //遍历到最后一个表示到了一轮
+            if(idx == (size -1)){
+                j++;
+            }
+            session = this.sessionContext.getSessionByIndex(idx);
+            if(session.isValid()){
+                return session;
+            }else{
+                continue;
+            }
+        }
+        return session;
     }
 
-    public String[] getServerUrls() {
-        return serverUrls;
+    public static void main(String[] args) {
+        int size = 20;
+        int j = 0;
+        int count = 0;
+        while(true && j < 2){
+            int idx = count ++ % size;
+            System.out.println(idx);
+            if(idx == (size-1)){
+                j ++;
+            }
+        }
+
     }
 
-    public void setServerUrls(String[] serverUrls) {
-        this.serverUrls = serverUrls;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
+//    public String[] getServerUrls() {
+//        return serverUrls;
+//    }
+//
+//    public void setServerUrls(String[] serverUrls) {
+//        this.serverUrls = serverUrls;
+//    }
+//
+//    public String getClientId() {
+//        return clientId;
+//    }
 
     public RPCCaller getRpcCaller() {
         return rpcCaller;
     }
 
-    public void setRpcCaller(RPCCaller rpcCaller) {
-        this.rpcCaller = rpcCaller;
-    }
+//    public void setRpcCaller(RPCCaller rpcCaller) {
+//        this.rpcCaller = rpcCaller;
+//    }
 
 
     /**
@@ -159,7 +196,6 @@ public abstract class AbstractClient implements Client{
                         if(logger.isDebugEnabled()){
                             logger.debug("客户端连接失败:" + e.getMessage());
                         }
-                        e.printStackTrace();
                     }
                 }
 

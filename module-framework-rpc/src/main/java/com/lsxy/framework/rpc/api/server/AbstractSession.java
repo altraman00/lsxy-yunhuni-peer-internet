@@ -1,5 +1,6 @@
 package com.lsxy.framework.rpc.api.server;
 
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCHandler;
 
 /**
@@ -42,8 +43,6 @@ public abstract class AbstractSession implements  Session {
     }
 
     @Override
-    public boolean isValid() {
-        return false;
-    }
+    public abstract  boolean isValid();
 
 }

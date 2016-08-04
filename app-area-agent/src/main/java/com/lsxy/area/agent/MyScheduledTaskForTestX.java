@@ -1,5 +1,6 @@
 package com.lsxy.area.agent;
 
+import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.server.Session;
 import org.slf4j.Logger;
@@ -23,14 +24,14 @@ public class MyScheduledTaskForTestX {
     private Client client;
 
     private static final Logger logger = LoggerFactory.getLogger(MyScheduledTaskForTestX.class);
-    @Scheduled(fixedDelay=5000)
+    @Scheduled(fixedDelay=10)
     public void doTest(){
-
-        System.out.println("--------------");
-
         if(logger.isDebugEnabled()){
-            logger.debug("测试测试");
         }
         Session session = client.getAvalibleSession();
+        if(session != null){
+            RPCRequest request = RPCRequest.newRequest("REQUEST","VALUE0=001");
+            session.write(request);
+        }
     }
 }

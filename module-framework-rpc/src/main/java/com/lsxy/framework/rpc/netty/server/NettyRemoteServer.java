@@ -10,11 +10,14 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Tandy on 2016/8/1.
@@ -69,9 +72,12 @@ public class NettyRemoteServer implements RemoteServer {
                     channel.closeFuture().addListener(new ChannelFutureListener() {
                         @Override
                         public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                            String sessionid = (String) channelFuture.channel().attr(AttributeKey.valueOf("sessionid")).get();
+                            assert sessionid!=null;
                             if(logger.isDebugEnabled()){
-                                logger.debug("断开啦!!!!!!!!!!!!");
+                                logger.debug("会话断开,清理会话[{}]",sessionid);
                             }
+                            handler.getSessionContext().remove(sessionid);
                         }
                     });
 //                    channel.pipeline().addLast("frameDecoder", new DelimiterBasedFrameDecoder(1024,Delimiters.lineDelimiter()));
@@ -101,7 +107,7 @@ public class NettyRemoteServer implements RemoteServer {
             }
 
             // 阻塞住,知道被通知结束
-            f.channel().closeFuture().sync();
+//            f.channel().closeFuture().sync();
 
             // 可以简写为
             /* b.bind(portNumber).sync().channel().closeFuture().sync(); */
@@ -109,8 +115,8 @@ public class NettyRemoteServer implements RemoteServer {
             ex.printStackTrace();
             throw new RemoteServerStartException(ex);
         } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+//            bossGroup.shutdownGracefully();
+//            workerGroup.shutdownGracefully();
         }
 
     }

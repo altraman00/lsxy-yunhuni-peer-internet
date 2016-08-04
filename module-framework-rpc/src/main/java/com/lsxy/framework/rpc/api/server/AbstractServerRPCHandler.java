@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by tandy on 16/8/3.
@@ -28,6 +29,17 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
 
     public ServerSessionContext getSessionContext() {
         return sessionContext;
+    }
+
+    private AtomicLong processRequestCount = new AtomicLong(0);
+
+
+    /**
+     * 查询处理次数
+     * @return
+     */
+    public long getProcessRequestCount(){
+        return processRequestCount.longValue();
     }
 
     /**
@@ -66,6 +78,9 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
                 Session session = getSessionInTheContextObject(ctxObject);
                 session.write(response);
             }
+
+            processRequestCount.incrementAndGet();
+
         }else if(message instanceof  RPCResponse){
 
         }else{

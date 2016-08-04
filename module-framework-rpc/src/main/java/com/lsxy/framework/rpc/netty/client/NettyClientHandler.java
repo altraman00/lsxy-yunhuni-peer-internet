@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.netty.NettyCondition;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,12 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
 
     @Override
     public Session getSessionInTheContextObject(Object ctxObject) {
-        return null;
+        ChannelHandlerContext ctx = (ChannelHandlerContext) ctxObject;
+        String sessionid = (String) ctx.channel().attr(AttributeKey.valueOf("sessionid")).get();
+        assert sessionid != null;
+        Session session = getSessionContext().getSession(sessionid);
+        assert session != null;
+        return session;
     }
 
 

@@ -93,7 +93,4 @@ public class NettyClient extends AbstractClient{
         return serverUrl.substring(0, serverUrl.indexOf(":"));
     }
 
-    public static void main(String[] args) throws Exception {
-
-    }
 }

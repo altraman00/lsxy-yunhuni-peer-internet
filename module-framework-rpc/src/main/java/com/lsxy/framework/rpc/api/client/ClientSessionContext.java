@@ -3,10 +3,12 @@ package com.lsxy.framework.rpc.api.client;
 import com.lsxy.framework.rpc.api.SessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.mina.client.MinaClientSession;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -16,7 +18,7 @@ import java.util.Map;
 public class ClientSessionContext implements SessionContext{
 
     //clientId-serverUrl 作为session
-    private Map<String,Session> sessions = new HashMap<>();
+    private ListOrderedMap sessions = new ListOrderedMap();
 
     /**
      * 放入session对象到环境中
@@ -25,6 +27,25 @@ public class ClientSessionContext implements SessionContext{
     public void putSession(Session session){
         sessions.put(session.getId(),session);
         sessions.put(session.getServerUrl(),session);
+
+    }
+
+    /**
+     * 根据索引获取会话,获取指定的第几个会话对象
+     * @param idx
+     * @return
+     */
+    public Session getSessionByIndex(int idx){
+        return (Session) sessions.getValue(idx);
+
+    }
+
+    /**
+     * 获取多少个会话个数
+     * @return
+     */
+    public int size(){
+        return sessions.size();
     }
 
 
@@ -34,7 +55,7 @@ public class ClientSessionContext implements SessionContext{
      * @return
      */
     public Session getSession(String sessionid) {
-        return sessions.get(sessionid);
+        return (Session) sessions.get(sessionid);
     }
 
     /**
@@ -45,7 +66,7 @@ public class ClientSessionContext implements SessionContext{
      * @return
      */
     public Session getSessionByServerUrl(String serverUrl){
-        return sessions.get(serverUrl);
+        return (Session) sessions.get(serverUrl);
     }
 
     /**
@@ -62,4 +83,5 @@ public class ClientSessionContext implements SessionContext{
     public Collection<Session> sessions() {
         return sessions.values();
     }
+
 }
