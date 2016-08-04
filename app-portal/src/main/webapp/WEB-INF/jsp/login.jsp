@@ -116,7 +116,7 @@
 	function beforeSubmit(){
 		//监听【记住我】事件
 		if($('#rememberMe:checked').length>0){//设置cookie
-			$.cookie('yunhuni_username', $('#username').val());
+			$.cookie('yunhuni_username', $('#username').val(), {expires: 30});
 		}else{//清除cookie
 			$.removeCookie('yunhuni_username');
 		}
