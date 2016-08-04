@@ -61,18 +61,41 @@
                                     <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" alt="...">
                                     <div class="caption fr">
                                         <h5>实名认证完成!</h5>
-                                        <ul>
-                                            <li>认证途径：云呼你平台认证</li>
-                                            <li>认证账号：${userName}</li>
-                                            <c:if test="${status == 1}">
+                                        <c:if test="${status == 1}">
+                                            <ul>
+                                                <li>认证类型：个人认证</li>
                                                 <li>真实姓名：${name}</li>
-                                            </c:if>
-                                            <c:if test="${status == 2}">
-                                                <li>企业名称：${name}</li>
-                                            </c:if>
-                                            <li>认证时间：${time}</li>
-                                        </ul>
+                                                <li>证件类型：
+                                                    <c:if test="${idType == '0'}">身份证</c:if>
+                                                    <c:if test="${idType == '1'}">护照</c:if>
+                                                </li>
+                                                <li>证件号码：${idNumber}</li>
+                                                <li>认证时间：${time}</li>
+                                            </ul>
+                                        </c:if>
+                                        <c:if test="${status == 2}">
+                                            <ul>
+                                                <li>认证类型：企业认证</li>
+                                                <li>公司名称：${name}</li>
+                                                <li>公司地址：${addr}</li>
+                                                <li>所属行业：${industry}</li>
+                                                <li>申请人：${proposer}</li>
+                                                <li>证件类型：
+                                                    <c:if test="${authType == '0'}">三证合一（一照一码）</c:if>
+                                                    <c:if test="${authType == '1'}">三证合一</c:if>
+                                                    <c:if test="${authType == '2'}">三证分离</c:if>
+                                                </li>
+                                                <li>认证时间：${time}</li>
+                                            </ul>
+                                        </c:if>
                                     </div>
+                                    <c:if test="${status == 1}">
+                                        <div class="fl">
+                                            <a href="/console/account/auth/index?upgrade=true" class="btn btn-primary btn-form">
+                                                升级企业认证
+                                            </a>&nbsp;&nbsp;个人认证完成后，还可进行企业认证
+                                        </div>
+                                    </c:if>
                                 </div>
                             </div>
                         </section>

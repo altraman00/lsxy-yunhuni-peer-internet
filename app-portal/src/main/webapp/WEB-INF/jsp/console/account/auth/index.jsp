@@ -6,11 +6,10 @@
 <!-- header -->
 <head>
     <%@include file="/inc/meta.jsp" %>
-
 </head>
 <body>
 <section class="vbox">
-<%@include file="/inc/headerNav.jsp"%>
+    <%@include file="/inc/headerNav.jsp"%>
 <section class='aside-section'>
     <section class="hbox stretch">
         <!-- .aside -->
@@ -64,8 +63,16 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用行业：</lable>
                                             <div class="auth_select col-md-4 ">
-                                                <input type="radio" name="type" value="0" checked='checked' /> 个人
-                                                <input type="radio" name="type" value="1"> 公司
+                                                <c:choose>
+                                                    <c:when test="${upgrade == true}">
+                                                        <input type="radio" name="type" value="0"  disabled/> 个人
+                                                        <input type="radio" name="type" value="1" checked='checked'> 公司
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input type="radio" name="type" value="0" checked='checked' /> 个人
+                                                        <input type="radio" name="type" value="1"> 公司
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
                                         </div>
                                         <div class='personal'>
@@ -150,11 +157,11 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label" name="authType">证件类型：</lable>
+                                                <lable class="col-md-3 text-right extend_label">证件类型：</lable>
                                                 <div class="radio-form col-md-8">
-                                                    <input class="card_select_0" type="radio" name="san" checked value="0"> 三证合一（一照一码）
-                                                    <input class="card_select_1" type="radio" name="san" value="1"> 三证合一
-                                                    <input class="card_select_2" type="radio" name="san" value="2"> 三证分离
+                                                    <input class="card_select_0" type="radio" name="authType" checked value="0"> 三证合一（一照一码）
+                                                    <input class="card_select_1" type="radio" name="authType" value="1"> 三证合一
+                                                    <input class="card_select_2" type="radio" name="authType" value="2"> 三证分离
                                                 </div>
                                             </div>
                                             <div class="form-group card_type01">
@@ -255,5 +262,16 @@
     var msg = '${msg}';
     if(msg==''){}else{showtoast(msg);}
 </script>
+<c:if test="${upgrade == true}">
+    <script>
+        $(function(){
+            $('.company').css('display', 'block')
+            $('.personal').css('display', 'none')
+            $('.card_type01').css('display', 'block')
+            $('.card_type02').css('display', 'none')
+            $('.card_type03').css('display', 'none')
+        });
+    </script>
+</c:if>
 </body>
 </html>

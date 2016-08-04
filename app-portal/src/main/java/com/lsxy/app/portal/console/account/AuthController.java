@@ -5,6 +5,7 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -55,12 +56,11 @@ public class AuthController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/index" )
-    public ModelAndView index(HttpServletRequest request){
+    public ModelAndView index(@RequestParam(value = "upgrade",required = false) String upgrade,HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
         //TODO 获取实名认证的状态
         String userName = "user001";
         //调resr接口
-
         RestResponse<HashMap> restResponse = findAuthStatus(request);
         HashMap hs = restResponse.getData();
         if(hs==null){//未实名认证
@@ -68,33 +68,37 @@ public class AuthController extends AbstractPortalController {
             mav.setViewName("/console/account/auth/index");
         }else {
             int authStatus  = Integer.valueOf((hs.get("status")+""));
-            if(AUTH_NO==authStatus) {
+            if(AUTH_NO==authStatus) {//未认证
                 mav.setViewName("/console/account/auth/index");
-            }else if (AUTH_WAIT ==authStatus ) {
+            }else if (AUTH_WAIT ==authStatus ) {//审核中
                 //审核中
                 mav.setViewName("/console/account/auth/wait");
-            } else if (AUTH_ONESELF_SUCESS == authStatus) {
-                // 个人实名认证
-                mav.addAllObjects(hs);
-                mav.setViewName("/console/account/auth/sucess");
             } else if (AUTH_COMPANY_SUCESS == authStatus) {
                 // 企业实名认证
                 mav.addAllObjects(hs);
                 mav.setViewName("/console/account/auth/sucess");
-            } else if (AUTH_ONESELF_FAIL == authStatus) {
-                //TODO 个人实名认证失败
-                mav.addObject("msg","身份证与名称不符合，请重新提交资料认证");
-                mav.setViewName("/console/account/auth/fail");
+            } else if (AUTH_ONESELF_SUCESS == authStatus) {
+                if(StringUtil.isNotEmpty(upgrade)){
+                    mav.addObject("upgrade",true);//个人认证  升级到企业认证
+                    mav.setViewName("/console/account/auth/index");
+                }else{
+                    // 个人实名认证
+                    mav.addAllObjects(hs);
+                    mav.setViewName("/console/account/auth/sucess");
+                }
             } else if (AUTH_COMPANY_FAIL == authStatus) {
                 //TODO 企业实名认证失败
                 mav.addObject("msg","上传资料不符合要求，请重新提交资料认证");
+                mav.setViewName("/console/account/auth/fail");
+            } else if (AUTH_ONESELF_FAIL == authStatus) {
+                //TODO 个人实名认证失败
+                mav.addObject("msg","身份证与名称不符合，请重新提交资料认证");
                 mav.setViewName("/console/account/auth/fail");
             }else{
                 // 未实名认证
                 mav.setViewName("/console/account/auth/index");
             }
         }
-
         return mav;
     }
 
