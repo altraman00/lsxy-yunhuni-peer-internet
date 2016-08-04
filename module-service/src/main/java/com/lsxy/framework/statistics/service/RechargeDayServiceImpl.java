@@ -47,30 +47,26 @@ public class RechargeDayServiceImpl extends AbstractService<RechargeDay> impleme
                 " IFNULL(sum(sum_num),0) as sum_num, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
         sql += " from db_lsxy_base.tb_base_recharge_hour a where tenant_id is not null and a.dt>=? and a.dt<=? " +groupbys;
-        update(date1, day1,date2,day2, sql);
-    }
-    
-    private void update(final Date date1, final int day1,final Date date2, final int day2, String sql) throws  SQLException{
+        //拼装条件
+        Timestamp sqlDate1 = new Timestamp(date1.getTime());
+        long times = new Date().getTime();
+        Timestamp initDate = new Timestamp(times);
+        Date date3 = DateUtils.parseDate(DateUtils.formatDate(date1,"yyyy-MM-dd")+ " 23:59:59","yyyy-MM-dd HH:mm:ss");
+        Timestamp sqlDate3 = new Timestamp(date3.getTime());
+        Object[] obj = new Object[]{
+                sqlDate1,day1,initDate,initDate,1,times,0,sqlDate1,sqlDate3
+        };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){
             @Override
             public void setValues(PreparedStatement ps) throws SQLException {
-                Timestamp sqlDate1 = new Timestamp(date1.getTime());//进行日期的转换
-                ps.setObject(1,sqlDate1);
-                ps.setInt(2,day1);
-                long times = new Date().getTime();
-                Timestamp initDate = new Timestamp(times);
-                ps.setObject(3,initDate);
-                ps.setObject(4,initDate);
-                ps.setObject(5,1);
-                ps.setObject(6,times);
-                ps.setObject(7,0);
-                ps.setObject(8,sqlDate1);
-                Date date3 = DateUtils.parseDate(DateUtils.formatDate(date1,"yyyy-MM-dd")+ " 23:59:59","yyyy-MM-dd HH:mm:ss");
-                Timestamp sqlDate3 = new Timestamp(date3.getTime());
-                ps.setObject(9,sqlDate3);
+                for(int i=0;i<obj.length;i++){
+                    ps.setObject(i+1,obj[i]);
+                }
             }
         });
     }
+    
+
 
 
 }

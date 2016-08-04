@@ -48,26 +48,23 @@ public class AppDayServiceImpl extends AbstractService<AppDay> implements AppDay
         sql +=" COUNT(1) as sum_app_num ,";
         sql +=" ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
         sql +=" from db_lsxy_bi_yunhuni.tb_bi_app a "+groupbys;
-        update(date, day, sql);
-    }
-    
-    private void update(final Date date, final int day, String sql) throws  SQLException{
+        //拼装需要的参数
+        Timestamp sqlDate = new Timestamp(date.getTime());
+        long times = new Date().getTime();
+        Timestamp initDate = new Timestamp(times);
+        Object[] obj = new Object[]{
+                sqlDate,day,initDate,initDate,1,times,0
+        };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){
             @Override
             public void setValues(PreparedStatement ps) throws SQLException {
-                Timestamp sqlDate = new Timestamp(date.getTime());//进行日期的转换
-                ps.setObject(1,sqlDate);
-                ps.setInt(2,day);
-                long times = new Date().getTime();
-                Timestamp initDate = new Timestamp(times);
-                ps.setObject(3,initDate);
-                ps.setObject(4,initDate);
-                ps.setObject(5,1);
-                ps.setObject(6,times);
-                ps.setObject(7,0);
+                for(int i=0;i<obj.length;i++){
+                    ps.setObject(i+1,obj[i]);
+                }
             }
         });
     }
+
 
 
 }

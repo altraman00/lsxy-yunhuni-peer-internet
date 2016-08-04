@@ -48,31 +48,25 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
         sql += " from db_lsxy_base.tb_base_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt>=? and a.dt<=? "+groupbys;
 
-         update(date1, month1,date2,month2, sql);
-    }
-
-    private void update(final Date date1, final int month1,final Date date2, final int month2, String sql) throws  SQLException{
+        Timestamp sqlDate1 = new Timestamp(date1.getTime());
+        long times = new Date().getTime();
+        Timestamp initDate = new Timestamp(times);
+        Date date3 = DateUtils.parseDate(DateUtils.getMonthLastTime(date1),"yyyy-MM-dd HH:mm:ss");
+        Timestamp sqlDate3 = new Timestamp(date3.getTime());
+        //sql对于参数
+        Object[] obj = new Object[]{sqlDate1,month1,
+                new Timestamp(date2.getTime()),month2,
+                initDate,initDate,1,times,0,
+                sqlDate1,sqlDate3
+        };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){
             @Override
             public void setValues(PreparedStatement ps) throws SQLException {
-                Timestamp sqlDate1 = new Timestamp(date1.getTime());//进行日期的转换
-                ps.setObject(1,sqlDate1);//统计时间
-                ps.setInt(2,month1);//统计
-                Timestamp sqlDate2 = new Timestamp(date2.getTime());//进行日期的转换
-                ps.setObject(3,sqlDate2);
-                ps.setObject(4,month2);
-                long times = new Date().getTime();
-                Timestamp initDate = new Timestamp(times);
-                ps.setObject(5,initDate);
-                ps.setObject(6,initDate);
-                ps.setObject(7,1);
-                ps.setObject(8,times);
-                ps.setObject(9,0);
-                ps.setObject(10,sqlDate1);
-                Date date3 = DateUtils.parseDate(DateUtils.getMonthLastTime(date1),"yyyy-MM-dd HH:mm:ss");
-                Timestamp sqlDate3 = new Timestamp(date3.getTime());
-                ps.setObject(11,sqlDate3);
+                for(int i=0;i<obj.length;i++){
+                    ps.setObject(i+1,obj[i]);
+                }
             }
         });
     }
+
 }
