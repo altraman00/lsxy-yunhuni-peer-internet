@@ -18,10 +18,11 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Component
-public class MyScheduledTaskForTestX {
+public class MyScheduledTaskForTestX implements Runnable{
 
     public MyScheduledTaskForTestX(){
     }
+
 
     @Autowired
     private Client client;
@@ -42,17 +43,24 @@ public class MyScheduledTaskForTestX {
 
     @PostConstruct
     public void doTest() throws InterruptedException {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始测试");
-        }
+        Thread t = new Thread(this);
+        logger.info("启动测试进程");
+        t.start();
+    }
+
+    @Override
+    public void run() {
+            logger.info("开始测试");
         Session session = null;
         while(true){
             session = client.getAvalibleSession();
             if(session == null || !session.isValid()){
-                if(logger.isDebugEnabled()){
-                    logger.debug("没有有效的session,等着吧");
+                    logger.info("没有有效的session,等着吧");
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                TimeUnit.SECONDS.sleep(1);
             }else{
                 break;
             }
