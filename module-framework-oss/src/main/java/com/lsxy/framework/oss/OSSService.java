@@ -1,10 +1,10 @@
 package com.lsxy.framework.oss;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Created by Tandy on 2016/7/14.
@@ -67,4 +67,13 @@ public interface OSSService {
      */
     public void deleteObject(String repository,String path) throws UnsupportedOperationException;
 
+  /**
+   * 上传表单提交的文件
+   * @param tenantId
+   * @param folder
+   * @param file
+   * @return
+   * @throws IOException
+   */
+    public String uploadFile(String tenantId,String folder, MultipartFile file) throws IOException;
 }

@@ -2,7 +2,13 @@ package com.lsxy.framework.oss.ali;
 
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.*;
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.oss.OSSService;
+import java.io.IOException;
+import java.util.Date;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Created by Tandy on 2016/7/14.
@@ -115,4 +122,22 @@ public class OSSServiceImpl implements OSSService{
     }
 
 
+    public String uploadFile(String tenantId,String folder, MultipartFile file) throws IOException {
+        String name = file.getOriginalFilename();//文件名
+        if(StringUtils.isNotBlank(name)){
+            String type = name.substring(name.lastIndexOf("."),name.length());
+            String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
+            String fileKey = "tenant_res/"+tenantId+"/"+folder+"/"+ymd+"/"+ UUIDGenerator.uuid()+type;
+            long size = file.getSize();
+            boolean flag = this.uploadFileStream(file.getInputStream(),size,name, SystemConfig
+                .getProperty("global.oss.aliyun.bucket"),fileKey);
+            if(flag){
+                return fileKey;
+            }else{
+                throw new RuntimeException("上传文件失败");
+            }
+        }else{
+            return null;
+        }
+    }
 }
