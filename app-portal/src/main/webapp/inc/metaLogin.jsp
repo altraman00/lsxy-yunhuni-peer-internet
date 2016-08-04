@@ -20,9 +20,9 @@
 	String devModel = SystemConfig.getProperty("system.developModel","true");
 
 	SecurityUser currentUser = (SecurityUser)request.getSession().getAttribute("currentUser");
-	String _tenantName = null;
+	String userName = null;
 	if(currentUser != null){
-		_tenantName = currentUser.getTenantName();
+		userName = currentUser.getUserName();
 	}
 %>
 <script language="Javascript"  type="text/javascript">

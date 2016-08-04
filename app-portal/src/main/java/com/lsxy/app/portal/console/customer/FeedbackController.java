@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,12 +45,10 @@ public class FeedbackController  extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/edit")
-    public ModelAndView edit(HttpServletRequest request,String content){
-        ModelAndView mav = new ModelAndView();
+    @ResponseBody
+    public RestResponse edit(HttpServletRequest request, String content){
         RestResponse<Feedback> restResponse = save(request,content,"0");
-        mav.addObject("msg","感谢你的反馈意见！");
-        mav.setViewName("/console/customer/index");
-        return mav;
+        return RestResponse.success();
     }
 
     /**

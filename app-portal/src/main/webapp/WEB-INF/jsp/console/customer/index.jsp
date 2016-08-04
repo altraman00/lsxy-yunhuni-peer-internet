@@ -6,7 +6,15 @@
 <!-- header -->
 <head>
     <%@include file="/inc/meta.jsp" %>
-
+    <style>
+        textarea {
+            resize: none;
+        }
+        #text1::-webkit-input-placeholder::after {
+            display:block;
+            content:"\A";
+        }
+    </style>
 </head>
 <body>
 <section class="vbox">
@@ -31,19 +39,20 @@
                                 <div class="row">
                                     <form:form role="form" action="${ctx}/console/customer/edit" method="post" class="register-form" id="customForm" >
                                         <p class="number_info ">
-                                            非常感谢您提供宝贵的意见和建议，我们将全力为您提供最优质的服务
+                                            非常感谢您提供宝贵的意见和建议，我们将全力为您提供最优质的服务，如有任何疑问，可联系我们的客服人员，客服号码：020-85654875
                                         </p>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">反馈意见：</lable>
                                         </div>
                                         <div class="form-group height-220" >
                                             <div class="col-md-5 remove-padding" >
-                                                <textarea name="content" id="" cols="30" rows="10" class="form-control input-form customcontent"></textarea>
+                                                <textarea name="content" id="text1" cols="30" rows="10" class="form-control input-form customcontent"
+                                                          placeholder="&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;500字以内"></textarea>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="col-md-3 text-left remove-padding">
-                                                <button type="submit" class=" btn btn-primary  btn-form">提交</button>
+                                                <button type="button" id="validateBtn" class=" btn btn-primary  btn-form">提交</button>
                                             </div>
                                         </div>
                                     </form:form>
@@ -57,16 +66,24 @@
     </section>
 </section>
 </section>
-<script src="${resPrefixUrl }/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
-<script src="${resPrefixUrl }/js/charts/flot/jquery.flot.min.js" cache="false"></script>
-<script src="${resPrefixUrl }/js/bootbox.min.js"></script>
-<script src="${resPrefixUrl }/js/charts/flot/demo.js" cache="false"></script>
-<script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
-<script type="text/javascript" src='${resPrefixUrl }/js/custom/index.js'></script>
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
+<script type="text/javascript" src='${resPrefixUrl }/js/custom/index.js'></script>
 <script type="text/javascript">
-    var msg = '${msg}';
-    if(msg==''){}else{alert(msg);}
+    $('#validateBtn').click(function(){
+        $('#customForm').bootstrapValidator('validate');
+        var result = $('#customForm').data('bootstrapValidator').isValid();
+        if(result){
+            ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
+                if(data.success){
+                    $('#text1').val('');
+                    showtoast("删除成功");
+                }else{
+                    showtoast(data.errorMsg);
+                }
+            },"post");
+        }
+    });
 </script>
 </body>
 </html>

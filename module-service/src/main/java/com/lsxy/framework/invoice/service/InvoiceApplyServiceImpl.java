@@ -15,6 +15,9 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.invoice.dao.InvoiceApplyDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -55,7 +58,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
 
     @Override
     public Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize) {
-        String hql = "from InvoiceApply obj where obj.tenant.id = ?1 order by obj.createTime";
+        String hql = "from InvoiceApply obj where obj.tenant.id = ?1 order by obj.createTime desc";
         return this.pageList(hql, pageNo, pageSize, tenantId);
     }
 
@@ -94,27 +97,5 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         this.save(apply);
         return apply;
     }
-
-    @Override
-    public InvoiceApply update(InvoiceApply apply, String userName) {
-        InvoiceApply oldApply = this.findById(apply.getId());
-        if(oldApply.getStatus() != InvoiceApply.STATUS_EXCEPTION){
-            throw new RuntimeException("只有异常的发票申请才能修改");
-        }
-        if(!apply.getStart().equals(oldApply.getStart()) || !apply.getEnd().equals(oldApply.getEnd()) || !apply.getType().equals(oldApply.getType())){
-            throw new RuntimeException("数据异常");
-        }
-        try {
-            EntityUtils.copyProperties(oldApply,apply);
-            oldApply.setStatus(InvoiceApply.STATUS_SUBMIT);
-            oldApply.setApplyTime(new Date());
-            oldApply.setRemark(null);
-            this.save(oldApply);
-        } catch (Exception e) {
-            throw new RuntimeException("数据异常",e);
-        }
-        return oldApply;
-    }
-
 
 }

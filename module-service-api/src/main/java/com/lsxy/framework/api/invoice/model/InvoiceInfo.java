@@ -27,7 +27,7 @@ public class InvoiceInfo extends IdEntity{
     private String receiveAddress;  //收取地址
     private String receivePeople;  //收件人
     private String receiveMobile;  //手机号
-
+    private String qualificationUrl; //资格证书URL （图片）
 
     @OneToOne
     @JoinColumn(name = "tenant_id")
@@ -127,5 +127,14 @@ public class InvoiceInfo extends IdEntity{
 
     public void setReceiveMobile(String receiveMobile) {
         this.receiveMobile = receiveMobile;
+    }
+
+    @Column(name = "qualification_url")
+    public String getQualificationUrl() {
+        return qualificationUrl;
+    }
+
+    public void setQualificationUrl(String qualificationUrl) {
+        this.qualificationUrl = qualificationUrl;
     }
 }

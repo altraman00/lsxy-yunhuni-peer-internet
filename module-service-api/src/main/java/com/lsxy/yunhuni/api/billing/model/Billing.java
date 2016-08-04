@@ -19,6 +19,15 @@ public class Billing extends IdEntity {
     private Integer voiceRemain;          //剩余语音流量（分钟）
     private Integer smsRemain;            //语音短信余量（条）
     private Integer conferenceRemain;     //会议剩余量（分钟）
+    private Long fileRemainSize;//剩余存储容量，单位byte
+
+    @Column(name = "file_remain_size")
+    public Long getFileRemainSize() {
+        return fileRemainSize;
+    }
+    public void setFileRemainSize(Long fileRemainSize) {
+        this.fileRemainSize = fileRemainSize;
+    }
     @OneToOne
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {

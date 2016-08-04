@@ -88,7 +88,7 @@
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
                                                 <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.isIvrService==1?1:0}')" >申请上线</a></c:if>
-                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}')">下线</a></span></c:if>
+                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}','${result.isIvrService}')">下线</a></span></c:if>
                                             </td>
 
                                         </tr>
@@ -293,19 +293,9 @@
     function isRealAuth(){
         var realAuth = null;
         //获取用户实名认证状态
-        $.ajax({
-            url : ctx + "/console/account/auth/is_real_auth",
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                realAuth = data;
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
-            }
-        });
+        ajaxsync(ctx + "/console/account/auth/is_real_auth",null,function(result){
+            realAuth = (result.data == 1 || result.data == 2);
+        },"get");
         return realAuth;
     }
 
@@ -478,9 +468,13 @@
 
 
     //应用下线
-    function offline(id){
+    function offline(id,type){
         bootbox.setLocale("zh_CN");
-        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result){
+        var h1="下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响";
+        if(type==1){
+            h1 = "应用下线后，选择的功能服务将终止，IVR号码关联将解除，应用上线后需要重新选择绑定（应用下线不影响IVR号码的月租费的收取）";
+        }
+        bootbox.confirm(h1, function(result){
             if(result){
                 $.ajax({
                     url : ctx + "/console/app_action/offline",

@@ -55,11 +55,11 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;充值订单记录</span>
+                            <span class="border-left">&nbsp;呼入号码</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <section>
-                                <p class="number_info">呼入号码作为应用使用IVR功能的拨入号使用，测试阶段可使用统一的测试呼入号码测试IVR功能，应用上线后可租用固定独立的呼入号码实现交互功能</p>
+                                <p class="number_info">呼入号码作为应用使用IVR功能的拨入号使用，测试阶段可使用统一的测试呼入号码测试IVR功能，应用上线后可租用固定独立的呼入号码实现交互功能<br>余额不足以支付每月扣除的100元月租费时，相关联的号码将过期<br>下线应用后呼入号码自动与应用解除关联<br>超过有效期7天的号码自动移除</p>
                             </section>
 
                             <section class="panel panel-default pos-rlt clearfix ">
@@ -71,20 +71,38 @@
                                         <th>状态</th>
                                         <th>关联应用</th>
                                         <th>有效期</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
-                                        <tr>
+                                        <tr id="app-${result.id}">
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.resourceTelenum.telNumber}</td>
                                             <td>
-                                                <c:if test="${result.rentStatus==0}">欠费</c:if>
-                                                <c:if test="${result.rentStatus==1}">正常</c:if>
+                                                <c:if test="${result.rentExpire.time<time.time}">
+                                                    <div style="color: red" >过期</div>
+                                                </c:if>
+                                                <c:if test="${result.rentExpire.time>time.time}">正常</c:if>
                                             </td>
-                                            <td><a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a></td>
-                                            <td><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></td>
-                                        </tr>
+                                            <td>
+                                                <c:if test="${result.app==null}">无</c:if>
+                                                <c:if test="${result.app!=null}">
+                                                    <a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${result.rentExpire.time<time.time}">
+                                                    <div style="color: red" ><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></div>
+                                                </c:if>
+                                                <c:if test="${result.rentExpire.time>time.time}">
+                                                    <fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${result.app==null}"><a  onclick="release('${result.id}')">释放</a></c:if>
+                                            </td>
+                                        </>
                                     </c:forEach>
                                     </tbody>
                                 </table>
@@ -99,12 +117,31 @@
         </section>
     </section>
 </section>
-
-
-
+<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/order.js'> </script>
+<script type="text/javascript">
+function release(id){
+    bootbox.setLocale("zh_CN");
+    bootbox.confirm("您是否需要释放当前号码，如需再次使用需要重新缴纳资源租用费", function(result) {
+        if(result){
+            var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
+            ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){
+                if(data.success){
+                    showtoast("释放成功");
+                    $('#app-'+id).remove();
+                }else{
+                    showtoast(data.errorMsg);
+                }
+            },"post");
+        }else{
+            showtoast("取消");
+        }
+    });
+
+}
+</script>
 </body>
 </html>

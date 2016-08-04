@@ -119,6 +119,16 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.7.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-oss</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
                 <version>4.2.6.RELEASE</version>

@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/7/19.
@@ -58,13 +59,13 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     }
 
     @Override
-    public BigDecimal sumCost( Integer type ,String tenantId, String time, String appId) {
-        String costType = "cost";
+    public Map sumCost( Integer type ,String tenantId, String time, String appId) {
+        String costType = " SUM(cost) as cost";
         if(CallSession.TYPE_VOICE_RECORDING==type){
-            costType = "record_size";
+            costType = " sum(record_size) as size,sum(cost) as money ";
         }
-        String sql = "select sum("+costType+") from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where deleted=0 and type=? and tenant_id=? and app_id=? ";
-        BigDecimal result = this.jdbcTemplate.queryForObject(sql,BigDecimal.class,new Object[]{type,tenantId,appId});
+        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where deleted=0 and type=? and tenant_id=? and app_id=? ";
+        Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{type,tenantId,appId});
         return result;
     }
 }

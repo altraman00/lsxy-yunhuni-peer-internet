@@ -55,7 +55,7 @@
                             <div class="wrapper header">
                                 <span class="border-left">&nbsp;
                                     <c:if test="${app.id==null}">创建应用</c:if>
-                                    <c:if test="${app.id!=null}">修改应用</c:if>
+                                    <c:if test="${app.id!=null}">编辑应用</c:if>
                                 </span></div>
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
@@ -64,20 +64,22 @@
                                         <c:if test="${app.id!=null}">
                                             <input type="hidden" name="id" value="${app.id}">
                                             <input type="hidden" name="status" value="${app.status}">
+                                            <c:if test="${app.status==1}">
+                                                <p class="app-tips ">编辑应用的选择服务项目需要下线应用，才能编辑</p>
+                                            </c:if>
                                         </c:if>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
                                             <div class="col-md-4">
                                                 <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
                                             </div>
-                                            <span class="span-required">*</span>
+                                            <span class="span-required">*</span>20字符内，符合<a href="">应用审核规范要求</a>
                                         </div>
-                                        <p class="tips">20字符以内，符合<a href="">应用审核规范</a></p>
 
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form limit20"/>
+                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form "/>
                                             </div>
                                         </div>
 
@@ -98,7 +100,7 @@
                                             <lable class="col-md-3 text-right">所属行业：</lable>
                                             <div class="col-md-4 ">
                                                 <select name="industry"  class="form-control notEmpty">
-                                                    <option value="">请选择行业</option>
+                                                    <option value="">请选择所属行业</option>
                                                     <c:set var="industry" value="${app.industry}"></c:set>
                                                     <%@ include file="/inc/industry.jsp"%>
                                                 </select>
@@ -112,7 +114,7 @@
                                             </div>
                                         </div>
                                         <p class="tips">
-                                            允许IP地址，以英文输入法分号分隔，例如，8.8.8.8; 8.8.8.8 设定白名单地址后，云呼你服务器在识别该应用请求时将只接收白名单内服务器发送的请求，能有效提升账号安全性。如未设置默认不生效
+                                            允许IP地址，以英文输入法分号分隔，例如：8.8.8.8; 8.8.8.8 设定白名单地址后，云呼你服务器在识别该应用请求时将只接收白名单内服务器发送的请求，能有效提升帐号安全性。 如未设置默认不生效
                                         </p>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
@@ -122,7 +124,7 @@
                                         </div>
 
                                         <p class="tips">
-                                            <input type="checkbox" name="isAuth" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨，回拨，互联网语音，视频通话会涉及鉴权流程，勾选但未实现会呼叫失效)
+                                            <input type="checkbox" name="isAuth" value="1" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨,回拨,互联网语音,视频通话会涉及鉴权流程，勾选但未实现会呼叫失败)
                                             <a href="">回调说明文档</a> </a>
                                         </p>
                                         <div class="form-group min-height20">
@@ -132,8 +134,8 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>基础语音服务</strong></p>
-                                                <p><input type="checkbox" name="isVoiceDirectly" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;语音外呼(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
-                                                <p><input type="checkbox" name="isVoiceCallback" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;双向回拨(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
+                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音外呼</a>(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
+                                                <p><input type="checkbox" name="isVoiceCallback" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">双向回拨</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
 
                                             </div>
                                         </div>
@@ -141,22 +143,23 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>高级语音定制服务</strong></p>
-                                                <p><input type="checkbox" name="isSessionService" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a href="">会议服务</a>(可与互联网会议、视频 会议融合参会，提供丰富的会议管理功能)</p>
-                                                <p><input type="checkbox" name="isRecording" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>录音服务</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
-                                                <p><input type="checkbox" name="isVoiceValidate" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>语音验证码</a>(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
-                                                <p><input type="checkbox" name="isIvrService" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>IVR定制服务</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
+                                                <p><input type="checkbox" name="isSessionService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a href="">会议服务</a>(可与互联网会议、视频会议融合参会，提供丰富的会议管理功能)</p>
+                                                <p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>录音服务</a>(提供通话录音、录音存储管理等功能)</p>
+                                                <p><input type="checkbox" name="isVoiceValidate" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>语音验证码</a>(通过电话直呼到用户手机并语音播报验证码)</p>
+                                                <p><input type="checkbox" name="isIvrService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>IVR定制服务</a>(即互动式语音应答可以根据用户输入的内容播放有关的信息)</p>
                                                 <div class="tips ml-36">
-                                                    <p class="app-tips ">IVR定制服务开启后，该应用将产生100元/月的功能费，上线时开始收取，多个应用开启并上线会叠加收费</p>
+                                                    <p class="app-tips ">开启后，该应用将产生1000的号码租用费以及100元/月的功能费，上线时开始收取，多个应用开启并上线会叠加收费</p>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="form-group">
-                                            <div class="col-md-9">
+                                            <div class="col-md-4 remove-padding">
                                                 <a id="validateBtn" class="validateBtnNormal btn btn-primary  btn-form">
                                                     <c:if test="${app.id==null}">创建</c:if>
                                                     <c:if test="${app.id!=null}">修改</c:if>
                                                 </a>
+                                                <c:if test="${app.id!=null}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s<a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
                                             </div>
                                         </div>
                                     </form:form>
@@ -176,6 +179,9 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/application/create.js'></script>
 
 <script>
+    $('#validateBtn2').click(function(){
+        window.location.href="${ctx}/console/app/detail?id=${app.id}";
+    });
     $('#validateBtn').click(function(){
         $('#application_create').bootstrapValidator('validate');
         var result = $('#application_create').data('bootstrapValidator').isValid();
@@ -206,6 +212,7 @@
         }
 
     });
+
 </script>
 
 </body>

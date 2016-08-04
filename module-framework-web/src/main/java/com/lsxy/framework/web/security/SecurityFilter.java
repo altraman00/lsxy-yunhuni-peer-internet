@@ -66,7 +66,14 @@ public abstract class SecurityFilter implements Filter {
 				if(StringUtil.isNotEmpty(username)){
 					SecurityUserRepository sur = getSecurityUserRepository();
 					if(sur != null){
-						SecurityUser su = sur.loadSecurityUser(username);
+						String token = null;
+						Object obj = request.getSession().getAttribute(SystemConfig.getProperty("global.rest.api.security.header","X-YUNHUNI-API-TOKEN"));
+						if(obj != null && obj instanceof String){
+							token = (String) obj;
+						}else{
+							throw new RuntimeException("Token丢失！");
+						}
+						SecurityUser su = sur.loadSecurityUser(token);
 						request.getSession().setAttribute("currentUser", su);
 //						isAnonymous = false;
 					}else{

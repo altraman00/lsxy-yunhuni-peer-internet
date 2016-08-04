@@ -3,11 +3,15 @@ package com.lsxy.app.portal.console.account;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +30,8 @@ import java.util.Map;
 @RequestMapping("/console/account/safety")
 public class SafetyController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(SafetyController.class);
-
+    @Autowired
+    private RedisCacheService cacheManager;
     private static final String IS_ERROR = "-2";//表示密码错误
     private static final String IS_FALSE = "-1";//表示失败
     private static final String IS_TRUE = "1";//表示成功
@@ -42,8 +47,15 @@ public class SafetyController extends AbstractPortalController {
     @RequestMapping("/index" )
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        SafetyVo safetyVo = new SafetyVo(getCurrentAccount(request));
-        request.getSession().setAttribute("safetyVo",safetyVo);
+        Account accoutn  =getCurrentAccount(request);
+        SafetyVo safetyVo = new SafetyVo(accoutn);
+        String key = "account_modify_email_"+accoutn.getId();
+        String re = cacheManager.get(key);
+        if(!StringUtils.isEmpty(re)){
+            Map map = JSONUtil.parseObject(re);
+            mav.addObject("modifyEmail",map.get("email"));
+            safetyVo.setIsEmail("0");
+        }
         mav.addObject("safetyVo",safetyVo);
         mav.setViewName("/console/account/safety/index");
         return mav;
@@ -118,6 +130,14 @@ public class SafetyController extends AbstractPortalController {
         }
         return hs;
     }
+    @RequestMapping(value="/modify_email_bind")
+    @ResponseBody
+    public RestResponse modifyEmailBind(HttpServletRequest request,String email ){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/account/safety/modify_email_bind?email={1}";
+        RestResponse restResponse = RestRequest.buildSecurityRequest(token).get(uri,  String.class,email);
+        return restResponse;
+    }
 
     /**
      * 验证密码的rest方法
@@ -138,38 +158,14 @@ public class SafetyController extends AbstractPortalController {
      */
     @RequestMapping(value="/edit_mobile" ,method = RequestMethod.POST)
     @ResponseBody
-    public Map editMobile(String mobile ,HttpServletRequest request ){
-        HashMap hs = new HashMap();
-        RestResponse<Account> restResponse = saveMobile(request,mobile);
-        Account account = restResponse.getData();
-        String status = IS_FALSE;
-        if(mobile.equals(account.getMobile())){
-            status = IS_TRUE;
-        }
-        if(IS_TRUE.equals(status)) {
-            SafetyVo safetyVo = new SafetyVo(account);
-            request.getSession().setAttribute("safetyVo",safetyVo);
-            //将手机验证码删除
-            MobileCodeUtils.removeMobileCodeChecker(request);
-            hs.put("sucess", RESULT_SUCESS);
-            hs.put("msg", "新手机绑定成功！");
-        }else{
-            hs.put("sucess", RESULT_FIAL);
-            hs.put("msg", "新手机绑定失败！");
-        }
-
-        return hs;
-    }
-
-    /**
-     *  保存手机号码的方法
-     * @param mobile 手机号码
-     * @return
-     */
-    private RestResponse<Account> saveMobile(HttpServletRequest request,String mobile) {
+    public RestResponse editMobile(String mobile ,HttpServletRequest request ){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +  "/rest/account/safety/save_mobile?mobile={1}";
-        return  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
+        RestResponse restResponse =  RestRequest.buildSecurityRequest(token).get(uri,Account.class,mobile);
+        if(restResponse.isSuccess()) {
+            MobileCodeUtils.removeMobileCodeChecker(request);
+        }
+        return restResponse;
     }
 
 }
