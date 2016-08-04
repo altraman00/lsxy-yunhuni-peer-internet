@@ -57,8 +57,8 @@
                         <section class=" w-f personal-auth">
                             <div class="wrapper header">
                                 <span class="border-left">&nbsp;实名认证</span>
-                                <div class="auth authsuccess thumbnail">
-                                    <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" alt="...">
+                                <div class="auth authsuccess thumbnail" style="height: 220px;">
+                                    <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" width="160px">
                                     <div class="caption fr">
                                         <h5>实名认证完成!</h5>
                                         <c:if test="${status == 1}">
@@ -90,7 +90,7 @@
                                         </c:if>
                                     </div>
                                     <c:if test="${status == 1}">
-                                        <div class="fl">
+                                        <div class="fl" style="margin-top: 30px;">
                                             <a href="/console/account/auth/index?upgrade=true" class="btn btn-primary btn-form">
                                                 升级企业认证
                                             </a>&nbsp;&nbsp;个人认证完成后，还可进行企业认证

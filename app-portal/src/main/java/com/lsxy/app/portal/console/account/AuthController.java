@@ -59,16 +59,17 @@ public class AuthController extends AbstractPortalController {
     public ModelAndView index(@RequestParam(value = "upgrade",required = false) String upgrade,HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
         //TODO 获取实名认证的状态
-        String userName = "user001";
         //调resr接口
         RestResponse<HashMap> restResponse = findAuthStatus(request);
         HashMap hs = restResponse.getData();
         if(hs==null){//未实名认证
+            logger.info("未实名认证");
             // 未实名认证
             mav.setViewName("/console/account/auth/index");
         }else {
             int authStatus  = Integer.valueOf((hs.get("status")+""));
             if(AUTH_NO==authStatus) {//未认证
+                logger.info("未实名认证:{}",authStatus);
                 mav.setViewName("/console/account/auth/index");
             }else if (AUTH_WAIT ==authStatus ) {//审核中
                 //审核中
@@ -79,6 +80,7 @@ public class AuthController extends AbstractPortalController {
                 mav.setViewName("/console/account/auth/sucess");
             } else if (AUTH_ONESELF_SUCESS == authStatus) {
                 if(StringUtil.isNotEmpty(upgrade)){
+                    logger.info("个人认证  升级到企业认证:{}",upgrade);
                     mav.addObject("upgrade",true);//个人认证  升级到企业认证
                     mav.setViewName("/console/account/auth/index");
                 }else{
