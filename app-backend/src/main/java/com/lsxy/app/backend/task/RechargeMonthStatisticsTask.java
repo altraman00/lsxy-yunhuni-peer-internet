@@ -25,7 +25,8 @@ public class RechargeMonthStatisticsTask {
     /**
      * 每月1号2：00：00触发执行
      */
-    @Scheduled(cron="0 0 2 1 * ? ")
+    //@Scheduled(cron="0 0 2 1 * ? ")
+    @Scheduled(cron="0/10 * * * * ?")
     public void month(){
         long startTime = System.currentTimeMillis();
         logger.info("订单记录指标月统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
@@ -45,6 +46,9 @@ public class RechargeMonthStatisticsTask {
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
         try{
             logger.info("参数date1={}，month1={}，date2={}，month2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),month1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),month2);
+            logger.info("子任务：月统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "");
+            rechargeMonthService.monthStatistics(date1,month1,date2,month2,new String[]{});
+            logger.info("子任务：月统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "tenant_id");
             rechargeMonthService.monthStatistics(date1,month1,date2,month2,new String[]{"tenant_id"});
             long endTime = System.currentTimeMillis();
             logger.info("订单记录指标月统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");

@@ -16,7 +16,7 @@ import java.util.Date;
 public class AppMonth extends IdEntity {
     private String tenantId;//所属租户
     private Date dt;//统计时间
-    private Integer month;//统计小时范围0-23
+    private Integer month;//统计月份1-12
     private Long sumOnLine;//总上线个数
     private Long sumLine;//总未上线个数
     private Long sum_app_num;//总应用个数

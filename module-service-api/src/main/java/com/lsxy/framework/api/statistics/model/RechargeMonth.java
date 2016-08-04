@@ -16,7 +16,7 @@ import java.util.Date;
 public class RechargeMonth extends IdEntity {
     private String tenantId;//所属租户
     private Date dt;//统计时间
-    private Integer month;//统计日期范围1-31
+    private Integer month;//统计月份1-12
     private Long among_amount;//该时间充值金额
     private Long sum_amount;//总充值金额
     private Long sum_num;//总充值次数

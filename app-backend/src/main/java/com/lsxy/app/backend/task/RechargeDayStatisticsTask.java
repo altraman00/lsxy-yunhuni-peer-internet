@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -24,7 +25,7 @@ public class RechargeDayStatisticsTask {
     /**
      * 每天02：00：00触发执行
      */
-    //@Scheduled(cron="0 0 2 * * ?")
+    @Scheduled(cron="0 0 2 * * ?")
     public void days(){
         long startTime = System.currentTimeMillis();
         logger.info("订单记录指标日统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
@@ -45,6 +46,9 @@ public class RechargeDayStatisticsTask {
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
         try{
             logger.info("参数date1={}，day1={}，date2={}，day2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),day1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),day2);
+            logger.info("子任务：日统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "");
+            rechargeDayService.dayStatistics(date1,day1,date2,day2,new String[]{});
+            logger.info("子任务：日统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "tenant_id");
             rechargeDayService.dayStatistics(date1,day1,date2,day2,new String[]{"tenant_id"});
             long endTime = System.currentTimeMillis();
             logger.info("订单记录指标日统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
