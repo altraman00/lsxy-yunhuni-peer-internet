@@ -46,9 +46,6 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
                 " count(1) as among_api, " +
                 " count(1)+IFNULL((select sum_api from db_lsxy_base.tb_base_api_call_month h where "+wheres+" h.dt = ? and h.month=? ),0) as  sum_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        if(StringUtil.isNotEmpty(groupbys)){
-            groupbys = " group by "+groupbys;
-        }
         sql += " from db_lsxy_base.tb_base_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt>=? and a.dt<=? "+groupbys;
 
          update(date1, month1,date2,month2, sql);

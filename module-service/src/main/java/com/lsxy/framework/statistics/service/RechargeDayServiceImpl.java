@@ -40,7 +40,6 @@ public class RechargeDayServiceImpl extends AbstractService<RechargeDay> impleme
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
-        String wheres = map.get("wheres");
         String sql = "insert into db_lsxy_base.tb_base_recharge_day("+selects+"dt,day,among_amount,sum_amount,sum_num,create_time,last_time,deleted,sortno,version)" +
                 " select "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
