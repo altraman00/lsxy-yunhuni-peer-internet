@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by zhangxb on 2016/8/1.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_recharge_hour")
+@Table(schema="db_lsxy_base",name = "tb_base_recharge_month")
 public class RechargeMonth extends IdEntity {
     private String tenantId;//所属租户
     private Date dt;//统计时间
