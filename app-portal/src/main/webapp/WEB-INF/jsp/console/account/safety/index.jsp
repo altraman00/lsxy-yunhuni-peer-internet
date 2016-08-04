@@ -103,7 +103,7 @@
                                             </div>
                                             <div class="col-md-9 ">
                                                     <span class="help-block"><a href="#">登录密码</a><br/>
-                                                        <small class="help-small">安全性高的密码可以使账号更安全，设置一个包含字母符号或数字中至少两项且长度超过6位的密码</small>
+                                                        <small class="help-small">安全性高的密码可以使账号更安全，设置一个由字母符号或数字组成的密码</small>
                                                     </span>
                                             </div>
                                             <div class="col-md-2 right">
