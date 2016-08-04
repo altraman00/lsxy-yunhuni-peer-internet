@@ -5,8 +5,8 @@ import com.lsxy.framework.api.statistics.model.RechargeMonth;
 import com.lsxy.framework.api.statistics.service.RechargeMonthService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.statistics.dao.RechargeMonthDao;
+import com.lsxy.utils.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -16,8 +16,8 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 订单统计serviceimpl
@@ -36,27 +36,16 @@ public class RechargeMonthServiceImpl extends AbstractService<RechargeMonth> imp
 
     @Override
     public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select) throws  SQLException{
-        String selects = "";
-        String groupbys = "";
-        String wheres = "";
-        for(int i=0;i<select.length;i++){
-            if(i==select.length-1){
-                groupbys += select[i] ;
-            }else {
-                groupbys += select[i] + " , ";
-            }
-            selects += select[i] + " , ";
-            wheres += select[i]+"=a."+select[i] +" and ";
-        }
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+        String selects = map.get("selects");
+        String groupbys = map.get("groupbys");
+        String wheres = map.get("wheres");
         String sql = "insert into db_lsxy_base.tb_base_recharge_month("+selects+"dt,month,among_amount,sum_amount,sum_num,create_time,last_time,deleted,sortno,version)" +
                 " select "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " IFNULL(sum(sum_amount),0) as  sum_amount, " +
                 " IFNULL(sum(sum_num),0) as sum_num, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        if(StringUtil.isNotEmpty(groupbys)){
-            groupbys = " group by "+groupbys;
-        }
         sql += " from db_lsxy_base.tb_base_recharge_day a where tenant_id is not null and a.dt>=? and a.dt<=? " +groupbys;
         update(date1, month1,date2,month2, sql);
     }

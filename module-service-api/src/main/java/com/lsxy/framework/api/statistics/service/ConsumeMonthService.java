@@ -5,6 +5,8 @@ import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.core.utils.Page;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,4 +48,14 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      * @return
      */
     BigDecimal sumAmountByTime(String tenantId, String start, String end);
+    /**
+     * 根据当前时间，进行统计
+     * @param date1 时间yyyy-MM-dd
+     * @param day1 第几天 1-31
+     * @param date2 前一天的时间 yyyy-MM-dd
+     * @param day2 前一天是第几天 1-31
+     * @param select 组合groupby条件
+     */
+    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+
 }

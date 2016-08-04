@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -17,8 +18,8 @@ public class RechargeHour extends IdEntity {
     private String tenantId;//所属租户
     private Date dt;//统计时间
     private Integer hour;//统计日期范围1-31
-    private Long among_amount;//该时间充值金额
-    private Long sum_amount;//总充值金额
+    private BigDecimal among_amount;//该时间充值金额
+    private BigDecimal sum_amount;//总充值金额
     private Long sum_num;//总充值次数
     @Column(name = "tenant_id")
     public String getTenantId() {
@@ -46,19 +47,19 @@ public class RechargeHour extends IdEntity {
         this.hour = hour;
     }
     @Column(name = "among_amount")
-    public Long getAmong_amount() {
+    public BigDecimal getAmong_amount() {
         return among_amount;
     }
 
-    public void setAmong_amount(Long among_amount) {
+    public void setAmong_amount(BigDecimal among_amount) {
         this.among_amount = among_amount;
     }
     @Column(name = "sum_amount")
-    public Long getSum_amount() {
+    public BigDecimal getSum_amount() {
         return sum_amount;
     }
 
-    public void setSum_amount(Long sum_amount) {
+    public void setSum_amount(BigDecimal sum_amount) {
         this.sum_amount = sum_amount;
     }
     @Column(name = "sum_num")

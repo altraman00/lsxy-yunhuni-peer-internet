@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Date;
 
 /**
  * 消费小时统计serviceimpl
@@ -21,5 +23,10 @@ public class ConsumeHourServiceImpl extends AbstractService<ConsumeHour> impleme
     @Override
     public BaseDaoInterface<ConsumeHour, Serializable> getDao() {
         return consumeHourDao;
+    }
+
+    @Override
+    public void hourStatistics(Date date1, int hour1, Date date2, int hour2, String[] select) throws SQLException {
+
     }
 }

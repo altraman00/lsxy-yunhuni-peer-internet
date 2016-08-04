@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -90,5 +91,10 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
             hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and obj.dt>=?2 and obj.dt<?3";
         }
         return getPageList(hql, pageNo -1, pageSize,tenant.getId(), start, end);
+    }
+
+    @Override
+    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException {
+
     }
 }

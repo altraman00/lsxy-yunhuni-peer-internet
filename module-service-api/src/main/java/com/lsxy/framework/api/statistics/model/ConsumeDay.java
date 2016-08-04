@@ -18,22 +18,19 @@ public class ConsumeDay extends IdEntity{
     private Date dt;//统计时间
     private Integer day;//统计日 区间1-31
     private BigDecimal amongAmount;//消费统计 decimal(20,4) DEFAULT NULL,
-    private BigDecimal sumAmount;//消费金额,
-    private Integer amongSessionConut;//会话数统计
-    private Integer sumSessionCount;//会话统计
+    private BigDecimal sumAmount;//消费金额
     private String appId;//所属应用,
     private String tenantId;//所属租户
-
+    private String type;//消费类型
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
     public ConsumeDay() {
     }
-
-    public ConsumeDay(Date dt,BigDecimal amongAmount, Integer amongSessionConut,String tenantId) {
-        this.dt = dt;
-        this.amongAmount = amongAmount;
-        this.amongSessionConut = amongSessionConut;
-        this.tenantId = tenantId;
-    }
-
     @Column(name = "day")
     public Integer getDay() {
         return day;
@@ -66,22 +63,6 @@ public class ConsumeDay extends IdEntity{
 
     public void setAmongAmount(BigDecimal amongAmount) {
         this.amongAmount = amongAmount;
-    }
-    @Column(name = "among_session_count")
-    public int getAmongSessionConut() {
-        return amongSessionConut;
-    }
-
-    public void setAmongSessionConut(Integer amongSessionConut) {
-        this.amongSessionConut = amongSessionConut;
-    }
-    @Column(name = "sum_session_count")
-    public Integer getSumSessionCount() {
-        return sumSessionCount;
-    }
-
-    public void setSumSessionCount(Integer sumSessionCount) {
-        this.sumSessionCount = sumSessionCount;
     }
 
     @Column(name = "tenant_id")

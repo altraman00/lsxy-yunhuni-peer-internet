@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -107,5 +108,10 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
             amount = new BigDecimal(0);
         }
         return amount;
+    }
+
+    @Override
+    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException {
+        
     }
 }

@@ -7,6 +7,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.statistics.dao.RechargeHourDao;
+import com.lsxy.utils.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -17,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 订单统计serviceimpl
@@ -35,27 +37,16 @@ public class RechargeHourServiceImpl extends AbstractService<RechargeHour> imple
 
     @Override
     public void hourStatistics(Date date1, int hour1,Date date2,int hour2,String[] select) throws  SQLException{
-        String selects = "";
-        String groupbys = "";
-        String wheres = "";
-        for(int i=0;i<select.length;i++){
-            if(i==select.length-1){
-                groupbys += select[i] ;
-            }else {
-                groupbys += select[i] + " , ";
-            }
-            selects += select[i] + " , ";
-            wheres += select[i]+"=a."+select[i] +" and ";
-        }
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+        String selects = map.get("selects");
+        String groupbys = map.get("groupbys");
+        String wheres = map.get("wheres");
         String sql = " insert into db_lsxy_base.tb_base_recharge_hour("+selects+"dt,hour,among_amount,sum_amount,sum_num,create_time,last_time,deleted,sortno,version ) " +
                 " select "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(amount),0) as among_amount," +
                 " IFNULL(sum(amount)+IFNULL((select sum_amount from db_lsxy_base.tb_base_recharge_hour h where "+wheres+" h.dt = ? and h.hour=? ),0),0) as  sum_amount," +
                 " COUNT(1) as sum_num, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        if(StringUtil.isNotEmpty(groupbys)){
-            groupbys = " group by "+groupbys;
-        }
         sql +=  " from db_lsxy_base.tb_base_recharge a where status='PAID' and last_time>=? and last_time<=? "+groupbys;
         update(date1, hour1,date2,hour2, sql);
     }

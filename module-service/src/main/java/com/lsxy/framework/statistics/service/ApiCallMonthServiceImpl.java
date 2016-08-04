@@ -7,6 +7,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.statistics.dao.ApiCallMonthDao;
+import com.lsxy.utils.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -17,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * api调用月统计serviceimpl
@@ -35,18 +37,10 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
 
     @Override
     public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select) throws  SQLException{
-        String selects = "";
-        String groupbys = "";
-        String wheres = "";
-        for(int i=0;i<select.length;i++){
-            if(i==select.length-1){
-                groupbys += select[i] ;
-            }else {
-                groupbys += select[i] + " , ";
-            }
-            selects += select[i] + " , ";
-            wheres += select[i]+"=a."+select[i] +" and ";
-        }
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+        String selects = map.get("selects");
+        String groupbys = map.get("groupbys");
+        String wheres = map.get("wheres");
         String sql = " insert into db_lsxy_base.tb_base_api_call_month("+selects+"dt,month,among_api,sum_api,create_time,last_time,deleted,sortno,version ) " +
                 " select "+selects+" ? as dt,? as month, "+
                 " count(1) as among_api, " +
