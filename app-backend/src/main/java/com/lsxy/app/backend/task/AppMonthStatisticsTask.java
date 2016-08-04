@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * App定时统计任务
+ * App定时统计任务-月统计
  * Created by zhangxb on 2016/7/29.
  */
 @Component

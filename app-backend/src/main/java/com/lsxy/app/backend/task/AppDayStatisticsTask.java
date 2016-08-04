@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * App定时统计任务
+ * App定时统计任务-日统计
  * Created by zhangxb on 2016/7/29.
  */
 @Component
@@ -35,15 +35,15 @@ public class AppDayStatisticsTask {
         cale.setTime(date);
         cale.set(Calendar.DATE, cale.get(Calendar.DATE) - 1);
         date = cale.getTime();
-        int dates = cale.get(Calendar.DATE);
+        int day = cale.get(Calendar.DATE);
         Date date1 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
         try{
             logger.info("子任务：日统计租户全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //日统计租户全局
-            appDayService.dayStatistics(date1,dates,new String[]{});
+            appDayService.dayStatistics(date1,day,new String[]{});
             logger.info("子任务：日统计运营全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //日统计运营全局
-            appDayService.dayStatistics(date1,dates,new String[]{"tenant_id"});
+            appDayService.dayStatistics(date1,day,new String[]{"tenant_id"});
             long endTime = System.currentTimeMillis();
             logger.info("应用指标日统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
         }catch (Exception e){

@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * App定时统计任务
+ * App定时统计任务-小时统计
  * Created by zhangxb on 2016/7/29.
  */
 @Component
@@ -33,7 +33,6 @@ public class AppHourStatisticsTask {
         Date date=new Date();
         Calendar cale = Calendar.getInstance();
         cale.set(Calendar.HOUR_OF_DAY, cale.get(Calendar.HOUR_OF_DAY) - 1);
-        date = cale.getTime();
         cale.setTime(date);
         int hour24 = cale.get(Calendar.HOUR_OF_DAY);
         Date date1 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
