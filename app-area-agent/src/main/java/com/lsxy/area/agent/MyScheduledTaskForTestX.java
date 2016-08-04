@@ -24,7 +24,7 @@ public class MyScheduledTaskForTestX {
     private Client client;
 
     private static final Logger logger = LoggerFactory.getLogger(MyScheduledTaskForTestX.class);
-    @Scheduled(fixedDelay=10)
+    @Scheduled(fixedDelay=1)
     public void doTest(){
         if(logger.isDebugEnabled()){
         }
