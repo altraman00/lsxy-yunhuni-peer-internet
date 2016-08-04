@@ -17,6 +17,7 @@ public class RealnameCorp extends IdEntity {
     private String  name;// 企业名称
     private String  addr;// 企业地址
     private String  industry;// 所属行业
+    private String proposer;//申请人
     private String  contacts1;// 联系人1
     private String  contacts2;// 联系人2
     private String  authType;// 认证类型
@@ -90,6 +91,10 @@ public class RealnameCorp extends IdEntity {
     public void setIndustry(String industry) {
         this.industry = industry;
     }
+
+    @Column(name = "proposer")
+    public String getProposer(){ return proposer;}
+    public void setProposer(String proposer) { this.proposer = proposer;}
 
     @Column(name = "contacts1")
     public String getContacts1() {

@@ -122,7 +122,6 @@
                                                 <lable class="col-md-3 text-right">公司名称：</lable>
                                                 <div class="col-md-4 ">
                                                     <input type="text" name="corpName" data-fv-notempty="true" placeholder="" class="form-control input-form notEmpty" id="form-username" />
-                                                    <p class="tips">与所使用认证的证件一致的姓名名称</p>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -139,7 +138,12 @@
                                                     </select>
                                                 </div>
                                             </div>
-
+                                            <div class="form-group">
+                                                <lable class="col-md-3 text-right">申请人：</lable>
+                                                <div class="col-md-4 ">
+                                                    <input type="text" name="proposer" placeholder="" class="form-control input-form" id="form-proposer" />
+                                                </div>
+                                            </div>
                                             <div class="noticeInfo form-group">
                                                 <p class="text-success"> 请提供真实有效的营业执照和组织机构代码证，或三证合一的的营业执照（营业执照，组织机构代码证，税务登记证合为一个证件）一证一码的营业执照照片/扫描件（目前进行企业认证，请进入买家中心操作） </p>
 
@@ -147,51 +151,86 @@
 
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label" name="authType">证件类型：</lable>
-                                                <div class="radio-form col-md-8 ">
-                                                    <input type="radio" name="san" checked value="0"> 三证合一（一照一码）
-                                                    <input type="radio" name="san" value="1"> 三证合一
-                                                    <input type="radio" name="san" value="2"> 三证分离
+                                                <div class="radio-form col-md-8">
+                                                    <input class="card_select_0" type="radio" name="san" checked value="0"> 三证合一（一照一码）
+                                                    <input class="card_select_1" type="radio" name="san" value="1"> 三证合一
+                                                    <input class="card_select_2" type="radio" name="san" value="2"> 三证分离
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label lineheight-24">统一社会信用代码：</lable>
-                                                <div class="col-md-4">
-                                                    <input type="text" name="type01Prop02" placeholder="" class="form-control input-form notEmpty"  />
+                                            <div class="form-group card_type01">
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label lineheight-24">统一社会信用代码：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="type01Prop02" placeholder="" class="form-control input-form notEmpty"  />
+                                                        <p class="tips">18位数字或者大写英文字母</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label">营业执照：</lable>
-                                                <div class="col-md-4">
-                                                    <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
-                                                    <p class="tips">将原件或盖章的复印件扫描、拍照后上传，图片格式要求是jpg、jpeg、gif、png、bmp </p>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">营业执照：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，图片格式要求是jpg、jpeg、gif、png、bmp </p>
+                                                    </div>
                                                 </div>
-                                                <!-- <span class="btn btn&#45;default btn&#45;file"> 浏览 <input type="file"> </span> -->
                                             </div>
 
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label">注册号：</lable>
-                                                <div class="col-md-4">
-                                                    <input type="text" name="type02Prop01" placeholder="" class="form-control input-form limit15"   />
+                                            <div class="form-group card_type02">
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">注册号：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="type02Prop01" placeholder="" class="form-control input-form limit15"   />
+                                                        <p class="tips">15位数字</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">税务登记号：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="type02Prop02" placeholder="" class="form-control input-form limit15"  />
+                                                        <p class="tips">15位数字</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">营业执照：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，图片格式要求是jpg、jpeg、gif、png、bmp </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label">税务登记号：</lable>
-                                                <div class="col-md-4">
-                                                    <input type="text" name="type02Prop02" placeholder="" class="form-control input-form limit15"  />
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <lable class="col-md-3 text-right extend_label">税务登记：</lable>
-                                                <div class="col-md-4">
-                                                    <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
-                                                    <p class="tips">证件图片大小2m以内，图片格式要求是jpg、jpeg、gif、png、bmp </p>
-                                                </div>
-                                                <!-- <span class="btn btn&#45;default btn&#45;file"> 浏览 <input type="file"> </span> -->
-                                            </div>
-                                            <div class="form-group">
 
+                                            <div class="form-group card_type03">
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">税务登记号：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="type03Prop01" placeholder="" class="form-control input-form limit15"  />
+                                                        <p class="tips">15位数字</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">税务登记证：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <p class="tips">证件图片大小2m以内，图片格式要求是jpg、jpeg、gif、png、bmp </p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">营业执照号：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="text" name="type03Prop03" placeholder="" class="form-control input-form limit15"   />
+                                                        <p class="tips">15位数字</p>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right extend_label">营业执照：</lable>
+                                                    <div class="col-md-4">
+                                                        <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，图片格式要求是jpg、jpeg、gif、png、bmp </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
                                                 <div class="col-md-9">
-                                                    <button type="submit"   class="validateBtnExtend btn btn-primary  btn-form">保存</button>
+                                                    <button type="submit" class="validateBtnExtend btn btn-primary  btn-form">保存</button>
                                                 </div>
                                             </div>
                                         </div>
