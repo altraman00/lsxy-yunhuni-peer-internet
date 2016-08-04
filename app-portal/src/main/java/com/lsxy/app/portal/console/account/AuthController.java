@@ -5,10 +5,16 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,11 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/6/24.
@@ -30,6 +31,10 @@ import java.util.Map;
 @RequestMapping("/console/account/auth")
 public class AuthController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    @Autowired
+    private OSSService ossService;
+
     private  static final Integer AUTH_WAIT = 0;//个人认证等待中
     private  static final Integer  AUTH_NO= 100;//未认证
     private  static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
@@ -127,24 +132,8 @@ public class AuthController extends AbstractPortalController {
      * @param file
      * @return
      */
-    private String UploadFile(MultipartFile file){
-        String tempPath ="";
-        try{
-            //实际上传文件地址，可根据需要从配置获取
-            String svaeType = SystemConfig.getProperty("portal.realauth.resource.upload.mode");
-            String savePath ="";
-            if(UPLOAD_TYPE_FILE.equals(svaeType)){
-                //上传到文件到指定位置
-                savePath = SystemConfig.getProperty("portal.realauth.resource.upload.file.path");
-                tempPath = savePath + file.getOriginalFilename();
-                file.transferTo(new File(tempPath));
-            }else if(UPLOAD_TYPE_OSS.equals(svaeType)) {
-                //TODO OSS上创
-            }
-        }catch(Exception e){
-
-        }
-        return tempPath;
+    private String UploadFile(String tenantId,MultipartFile file) throws IOException{
+        return ossService.uploadFile(tenantId,"realname_auth",file);
     }
 
     /**
@@ -156,18 +145,19 @@ public class AuthController extends AbstractPortalController {
      * @return
      */
     @RequestMapping(value="/edit" ,method = RequestMethod.POST)
-    public ModelAndView edit(HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles){
+    public ModelAndView edit(HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles) throws IOException{
 
+        String tenantId = this.getCurrentUser(request).getTenantId();
 
         //对上传文件进行处理
         if (null != multipartfiles && multipartfiles.length > 0) {
             if(Integer.valueOf(type)==0){//个人
-                authVo.setIdPhoto(UploadFile(multipartfiles[0]));
+                authVo.setIdPhoto(UploadFile(tenantId,multipartfiles[0]));
             }else if(Integer.valueOf(type)==1){//公司认证
-                authVo.setType01Prop01(UploadFile(multipartfiles[1]));
-                authVo.setType02Prop03(UploadFile(multipartfiles[2]));
-                authVo.setType03Prop02(UploadFile(multipartfiles[3]));
-                authVo.setType03Prop04(UploadFile(multipartfiles[4]));
+                authVo.setType01Prop01(UploadFile(tenantId,multipartfiles[1]));
+                authVo.setType02Prop03(UploadFile(tenantId,multipartfiles[2]));
+                authVo.setType03Prop02(UploadFile(tenantId,multipartfiles[3]));
+                authVo.setType03Prop04(UploadFile(tenantId,multipartfiles[4]));
             }
         }
 
