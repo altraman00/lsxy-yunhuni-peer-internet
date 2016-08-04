@@ -9,6 +9,8 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.billing.model.Billing;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.sun.xml.internal.bind.v2.TODO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,10 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 登录后的首页
@@ -102,8 +101,11 @@ public class HomeController extends AbstractPortalController {
             vo.setConferenceRemain(billing.getConferenceRemain());
         }
 
+        //TODO 获取当前线路状况
         //当前线路情况(暂时给个数字)
         vo.setLineNum(10);
+        vo.setLineAverageCallTime(6);
+        vo.setLineLinkRate(98D);
 
         //此处调用鉴权账号（凭证）RestApi
         ApiCertificate cert = getApiCertificate(token);
@@ -127,11 +129,23 @@ public class HomeController extends AbstractPortalController {
                 appStateVO.setCallOfDay((Integer) map.get("dayCount"));
                 appStateVO.setCallOfHour((Integer) map.get("hourCount"));
                 appStateVO.setCurrentCall((Integer) map.get("currentSession"));
+                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
+                    ResourcesRent rent = getIvrNumber(token,app.getId());
+                    if(rent != null){
+                        appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
+                    }
+                }
                 appStateVOs.add(appStateVO);
             }
         }
         vo.setAppStateVOs(appStateVOs);
         return vo;
+    }
+
+    private ResourcesRent getIvrNumber(String token, String appId) {
+        String url = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/by_app/{1}";
+        return RestRequest.buildSecurityRequest(token).get(url, ResourcesRent.class,appId).getData();
     }
 
     /**

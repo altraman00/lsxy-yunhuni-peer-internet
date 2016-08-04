@@ -15,6 +15,10 @@ public class HomeVO {
 
     private Integer lineNum ;               //当前线路数量
 
+    private Integer lineAverageCallTime;    //平均通话时长(分钟)
+
+    private Double lineLinkRate;            //接通率
+
     private Integer voiceRemain;           //语音剩余量（分钟）
 
     private Integer smsRemain;             //短信剩余量（条）
@@ -25,7 +29,7 @@ public class HomeVO {
 
     private String secretKey;               //secretKey
 
-   private List<AppStateVO> appStateVOs;    //应用
+    private List<AppStateVO> appStateVOs;    //应用
 
     public Long getMessageNum() {
         return messageNum;
@@ -57,6 +61,22 @@ public class HomeVO {
 
     public void setLineNum(Integer lineNum) {
         this.lineNum = lineNum;
+    }
+
+    public Integer getLineAverageCallTime() {
+        return lineAverageCallTime;
+    }
+
+    public void setLineAverageCallTime(Integer lineAverageCallTime) {
+        this.lineAverageCallTime = lineAverageCallTime;
+    }
+
+    public Double getLineLinkRate() {
+        return lineLinkRate;
+    }
+
+    public void setLineLinkRate(Double lineLinkRate) {
+        this.lineLinkRate = lineLinkRate;
     }
 
     public Integer getVoiceRemain() {

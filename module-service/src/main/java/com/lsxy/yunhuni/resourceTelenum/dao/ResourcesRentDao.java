@@ -11,8 +11,13 @@ import java.util.List;
  * Created by zhangxb on 2016/7/1.
  */
 public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serializable> {
-
-    ResourcesRent findByAppId(String appId);
+    /**
+     * 根据AppId查找租用关系
+     * @param appId
+     * @param status
+     * @return
+     */
+    ResourcesRent findByAppIdAndRentStatus(String appId, int status);
 
     /**
      * 根据资源ID和状态获取资源租用关系
@@ -29,4 +34,5 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * @return
      */
     List<ResourcesRent> findByTenantIdAndRentStatus(String id, int status);
+
 }
