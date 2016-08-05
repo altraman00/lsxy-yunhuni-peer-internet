@@ -17,7 +17,7 @@ import java.util.Collection;
  * Created by tandy on 16/7/30.
  */
 
-//@Component("scheduledTask001")
+@Component("scheduledTask001")
 public class MyScheduledTaskForTest {
 
     @Autowired
@@ -32,5 +32,17 @@ public class MyScheduledTaskForTest {
         logger.info("-----累计次数:{}",thistime);
         logger.info("-----本周期内次数:{}",thistime-last);
         last = thistime;
+    }
+
+    @Scheduled(fixedDelay=5000)
+    public void doCall(){
+        if(logger.isDebugEnabled()){
+            logger.debug("发消息开始");
+        }
+        Collection<Session> sessions = server.getHandler().getSessionContext().sessions();
+        for (Session session:sessions) {
+            RPCRequest request = RPCRequest.newRequest("HELLO","ID=1");
+            session.write(request);
+        }
     }
 }
