@@ -110,8 +110,8 @@
                                         <c:if test="${status == 1}">
                                             <div class="fl" style="margin-top: 30px;">
                                                 <a href="/console/account/auth/index?upgrade=true" class="btn btn-primary btn-form">
-                                                    升级企业认证
-                                                </a>&nbsp;&nbsp;个人认证完成后，还可进行企业认证
+                                                    升级公司认证
+                                                </a>&nbsp;&nbsp;个人认证完成后，还可进行公司认证
                                             </div>
                                         </c:if>
                                     </div>
