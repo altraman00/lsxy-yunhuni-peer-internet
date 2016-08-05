@@ -241,7 +241,6 @@
 
 </div>
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
 <!--must-->
