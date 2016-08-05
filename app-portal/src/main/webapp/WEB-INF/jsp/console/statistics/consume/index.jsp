@@ -184,6 +184,25 @@
         $(tipsclass).html(tips);
     }
 
+    //应用
+    $('#myTab li a').click(function(){
+        var app = $(this).attr('data-app');
+        $('#defaultapp').val(app);
+        initchart();
+    });
+
+
+    //获取当前选中应用
+    function getapp(){
+        var appname = '';
+        $('#myTab li').each(function(){
+            var res = $(this).hasClass('active');
+            if(res){
+                appname = $(this).find('a').attr('data-app');
+            }
+        });
+        return appname;
+    }
     //对比
     $('.compassbtn').click(function(){
         var id = $(this).attr('data-id');
@@ -198,11 +217,6 @@
             $(this).html('对比');
             initchart();
         }
-    });
-
-    //应用
-    $('.myselectapp').change(function(){
-        initchart();
     });
 
 
@@ -246,7 +260,7 @@
         var type = $('input[name="stime"]:checked').val();
         var type1 = 'day';
         if(type=='year'){type1='month'}
-        var app = $('.myselectapp').val();
+        var app = $('#defaultapp').val();
         var starttime = initialStartTime(type);
         var endtime = initialEndTime(type);
         $.ajax({
@@ -356,7 +370,7 @@
         var type = $('input[name="stime"]:checked').val();
         var type1 = 'day';
         if(type=='year'){type1='month'}
-        var app = $('.myselectapp').val();
+        var app = $('#defaultapp').val();
         var starttime = initialStartTime(type);
         var endtime = initialEndTime(type);
         $.ajax({
