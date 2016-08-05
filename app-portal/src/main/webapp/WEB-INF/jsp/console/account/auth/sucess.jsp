@@ -66,7 +66,7 @@
                                             <h2>公司实名认证完成</h2>
                                         </c:if>
                                     </div>
-                                    <div class="auth authsuccess thumbnail" style="margin-top:0px;height: 220px;">
+                                    <div class="auth authsuccess thumbnail" style="margin-top:0px;height: 230px;">
                                         <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" width="190px">
                                         <div class="caption fr">
                                             <c:if test="${status == 1}">
@@ -104,6 +104,7 @@
                                                         <li>税务登记号：${type03Prop01}</li>
                                                         <li>营业执照号：${type03Prop03}</li>
                                                     </c:if>
+                                                    <li>认证时间：${time}</li>
                                                 </ul>
                                             </c:if>
                                         </div>
