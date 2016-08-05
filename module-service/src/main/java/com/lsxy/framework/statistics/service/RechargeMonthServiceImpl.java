@@ -53,7 +53,7 @@ public class RechargeMonthServiceImpl extends AbstractService<RechargeMonth> imp
         Date date3 = DateUtils.parseDate(DateUtils.getMonthLastTime(date1),"yyyy-MM-dd HH:mm:ss");
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
-                sqlDate1,month1,initDate,initDate,1,times,0,sqlDate1,sqlDate3
+                sqlDate1,month1,initDate,initDate,0,times,0,sqlDate1,sqlDate3
         };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){
             @Override

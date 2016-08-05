@@ -56,7 +56,7 @@ public class ConsumeHourServiceImpl extends AbstractService<ConsumeHour> impleme
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
                 sqlDate1,hour1,sqlDate2,hour2,
-                initDate,initDate,1,times,0,
+                initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){

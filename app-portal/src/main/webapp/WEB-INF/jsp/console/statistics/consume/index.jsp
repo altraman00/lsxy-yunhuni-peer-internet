@@ -53,8 +53,8 @@
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <ul id="myTab" class="nav nav-tabs">
-                                    <input type="hidden" value="0" id="defaultapp"/>
-                                    <li class="active"><a  data-toggle="tab" data-app="0">全部应用</a></li>
+                                    <input type="hidden" value="-1" id="defaultapp"/>
+                                    <li class="active"><a  data-toggle="tab" data-app="-1">全部应用</a></li>
                                     <c:forEach items="${appList}" var="app">
                                         <li ><a  data-toggle="tab" data-app="${app.id}">${app.name}</a></li>
                                     </c:forEach>

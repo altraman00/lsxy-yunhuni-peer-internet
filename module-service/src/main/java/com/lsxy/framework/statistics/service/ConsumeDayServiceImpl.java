@@ -43,30 +43,16 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     }
 
     @Override
-    public Page<ConsumeDay> pageList(String userName, String appId, String startTime, String endTime,Integer pageNo,Integer pageSize) {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
-        Page<ConsumeDay> page = null;
-        if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeDay obj where obj.tenantId=?1 and ( DATE_FORMAT(obj.dt,'%Y-%m')=?2 or DATE_FORMAT(obj.dt,'%Y-%m')=?3 ) ORDER BY obj.dt,obj.day";
-            page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
-        }else{
-            String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and ( DATE_FORMAT(obj.dt,'%Y-%m')=?3  or DATE_FORMAT(obj.dt,'%Y-%m')=?4 ) ORDER BY obj.dt,obj.day";
-            page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),appId,endTime,startTime);
-        }
+    public Page<ConsumeDay> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize) {
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt>=?1 and obj.dt<=?2 ) ORDER BY obj.dt,obj.day";
+        Page<ConsumeDay>   page =  this.pageList(hql,pageNo,pageSize,startTime,endTime);
         return page;
     }
 
     @Override
-    public List<ConsumeDay> list(String userName, String appId, String startTime) {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
-        List<ConsumeDay> list = null;
-        if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeDay obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y-%m')=?2 ORDER BY obj.day";
-            list = this.findByCustomWithParams(hql, tenant.getId(),startTime);
-        }else{
-            String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and DATE_FORMAT(obj.dt,'%Y-%m')=?3 ORDER BY obj.day";
-            list = this.findByCustomWithParams(hql, tenant.getId(),appId,startTime);
-        }
+    public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
+        String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and type=?3 and obj.dt>=?4 and obj.dt<=?5 ORDER BY obj.day";
+        List<ConsumeDay>  list = this.list(hql,tenantId,appId,type,startTime,endTime);
         return list;
     }
 
@@ -123,7 +109,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
                 sqlDate1,day1,
-                initDate,initDate,1,times,0,
+                initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){

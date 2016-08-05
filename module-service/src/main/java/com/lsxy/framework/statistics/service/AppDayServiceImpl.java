@@ -53,7 +53,7 @@ public class AppDayServiceImpl extends AbstractService<AppDay> implements AppDay
         long times = new Date().getTime();
         Timestamp initDate = new Timestamp(times);
         Object[] obj = new Object[]{
-                sqlDate,day,initDate,initDate,1,times,0
+                sqlDate,day,initDate,initDate,0,times,0
         };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){
             @Override

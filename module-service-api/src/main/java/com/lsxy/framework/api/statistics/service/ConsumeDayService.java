@@ -14,23 +14,28 @@ import java.util.List;
  */
 public interface ConsumeDayService extends BaseService<ConsumeDay> {
     /**
-     * 获取用户区间内的分页数据
-     * @param userName 用户名
+     * 获取分页数据
+     * @param tenantId 对于租户
      * @param appId 应用id
-     * @param startTime 开始时间
+     * @param type 消费类型
+     * @param startTime 时间
      * @param endTime 结束时间
+     * @param pageNo 第几页
+     * @param pageSize 每页记录数
      * @return
      */
-    public Page<ConsumeDay> pageList(String userName, String appId, String startTime, String endTime,Integer pageNo,Integer pageSize);
+    public Page<ConsumeDay> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize);
 
     /**
      * 获取用户某时间的列表数据
-     * @param userName 用户名
+     * @param tenantId 对于租户
      * @param appId 应用id
+     * @param type 消费类型
      * @param startTime 时间
+     * @param endTime 结束时间
      * @return
      */
-    public List<ConsumeDay> list(String userName, String appId, String startTime);
+    public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime);
 
     /**
      * 获取一定时间的统计数据的总数 时间为月份 yyyy-MM

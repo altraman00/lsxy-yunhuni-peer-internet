@@ -52,7 +52,7 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
         //sql对于参数
         Object[] obj = new Object[]{sqlDate1,day1,
                 new Timestamp(date2.getTime()),day2,
-                initDate,initDate,1,times,0,
+                initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){

@@ -84,7 +84,7 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
                 sqlDate1,day1,
-                initDate,initDate,1,times,0,
+                initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){

@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 消费统计
@@ -67,7 +64,8 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/page_list")
     @ResponseBody
-    public List pageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public List pageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,
+                         @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
         List list = ((Page)getPageList( request, consumeStatisticsVo, pageNo, pageSize).getData()).getResult();
         return list;
     }
@@ -164,11 +162,14 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     private RestResponse getPageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/consume_"+consumeStatisticsVo.getType()+"/page?appId={1}&startTime={2}&endTime={3}&pageNo={4}&pageSize={5}";
+        String uri = restPrefixUrl + "/rest/consume_"+consumeStatisticsVo.getType()+"/page?tenantId={1}&appId={2}&type={3}&startTime={4}&endTime={5}&pageNo={6}&pageSize={7}";
         Class clazz = ConsumeMonth.class;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(consumeStatisticsVo.getType())){
             clazz = ConsumeDay.class;
         }
-        return RestRequest.buildSecurityRequest(token).getPage(uri,clazz ,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
+        String appId = "-1".equals(consumeStatisticsVo.getAppId())?null:consumeStatisticsVo.getAppId();
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        return RestRequest.buildSecurityRequest(token).getPage(uri,clazz ,tenantId,appId,
+                null,consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
     }
 }

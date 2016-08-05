@@ -49,7 +49,7 @@ public class AppHourServiceImpl extends AbstractService<AppHour> implements AppH
         long times = new Date().getTime();
         Timestamp initDate = new Timestamp(times);
         Object[] obj = new Object[]{
-                sqlDate,hour,initDate,initDate,1,times,0
+                sqlDate,hour,initDate,initDate,0,times,0
         };
         jdbcTemplate.update(sql,new PreparedStatementSetter(){
             @Override
