@@ -35,14 +35,14 @@ public class MyScheduledTaskForTest {
         last = thistime;
     }
 
-    @Scheduled(fixedDelay=5000)
+    @Scheduled(fixedDelay=100)
     public void doCall(){
         if(logger.isDebugEnabled()){
             logger.debug("发消息开始");
         }
         Collection<Session> sessions = server.getHandler().getSessionContext().sessions();
         for (Session session:sessions) {
-            RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL,"ID=1");
+            RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL,"ID=1&param01=sss&param02=bbbb&pama03=cccc");
             session.write(request);
         }
     }
