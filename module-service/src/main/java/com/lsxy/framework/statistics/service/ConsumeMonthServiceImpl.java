@@ -3,7 +3,6 @@ package com.lsxy.framework.statistics.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
-import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -44,30 +43,16 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         return consumeMonthDao;
     }
     @Override
-    public Page<ConsumeMonth> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
-        Page<ConsumeMonth> page = null;
-        if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and ( DATE_FORMAT(obj.dt,'%Y')=?2 or DATE_FORMAT(obj.dt,'%Y')=?3 ) ORDER BY obj.dt,obj.month";
-            page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
-        }else{
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and obj.appId=?2 and ( DATE_FORMAT(obj.dt,'%Y')=?3  or DATE_FORMAT(obj.dt,'%Y')=?4 )ORDER BY obj.dt,obj.month";
-            page = this.pageList(hql,pageNo,pageSize,tenant.getId(),appId,endTime,startTime);
-        }
+    public Page<ConsumeMonth> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize) {
+        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt,obj.month";
+        Page<ConsumeMonth>   page = this.pageList(hql,pageNo,pageSize,startTime,endTime);
         return page;
     }
 
     @Override
-    public List<ConsumeMonth> list(String userName, String appId, String startTime) {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
-        List<ConsumeMonth> list = null;
-        if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y')=?2 ORDER BY obj.month";
-            list = this.findByCustomWithParams(hql, tenant.getId(),startTime);
-        }else{
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and obj.appId=?2 and DATE_FORMAT(obj.dt,'%Y')=?3 ORDER BY obj.month";
-            list = this.findByCustomWithParams(hql, tenant.getId(),appId,startTime);
-        }
+    public List<ConsumeMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
+        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.month";
+        List<ConsumeMonth>list = this.findByCustomWithParams(hql,startTime,endTime);
         return list;
     }
 
@@ -98,15 +83,14 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
                 endTime = format.parse(end);
             }
             if(endTime != null){
-                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where obj.tenantId = ?1 and obj.dt between ?2 and ?3";
+                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,null, null)+" obj.dt between ?1 and ?2";
             }else{
-                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where obj.tenantId = ?1 and obj.dt >= ?2";
+                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,null, null)+" obj.dt >= ?1";
             }
             Query query = this.getEm().createQuery(hql);
-            query.setParameter(1, tenantId);
-            query.setParameter(2, startTime);
+            query.setParameter(1, startTime);
             if(endTime != null){
-                query.setParameter(3, endTime);
+                query.setParameter(2, endTime);
             }
             Object obj = query.getSingleResult();
             amount = (BigDecimal) obj;

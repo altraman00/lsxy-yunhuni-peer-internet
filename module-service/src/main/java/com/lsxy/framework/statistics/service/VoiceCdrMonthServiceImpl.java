@@ -35,27 +35,12 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     public BaseDaoInterface<VoiceCdrMonth, Serializable> getDao() {
         return voiceCdrMonthDao;
     }
-
     @Override
-    public Page<VoiceCdrMonth> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
-        return null;
+    public List<VoiceCdrMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
+        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.month";
+        List<VoiceCdrMonth>list = this.findByCustomWithParams(hql,startTime,endTime);
+        return list;
     }
-
-    @Override
-    public List<VoiceCdrMonth> list(String userName, String appId, String startTime) {
-        return null;
-    }
-
-    @Override
-    public String getStartMonthByTenantId(String tenantId) {
-        return null;
-    }
-
-    @Override
-    public Long sumAmountByTime(String tenantId, String start, String end) {
-        return null;
-    }
-
     @Override
     public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select) throws  SQLException{
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select);

@@ -34,8 +34,13 @@ public class ConsumeDayController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/list")
-    public RestResponse list(String tenantId, String appId, String type, Date startTime, Date endTime ){
-        List<ConsumeDay> list =  consumeDayService.list(tenantId,  appId,  type,  startTime,  endTime );
+    public RestResponse list(String tenantId, String appId, String type, String startTime, String endTime ){
+        Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+        if(StringUtils.isEmpty(endTime)){
+            endTime = startTime;
+        }
+        Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        List<ConsumeDay> list =  consumeDayService.list(tenantId,  appId,  type,  date1,  date2 );
         return RestResponse.success(list);
     }
 

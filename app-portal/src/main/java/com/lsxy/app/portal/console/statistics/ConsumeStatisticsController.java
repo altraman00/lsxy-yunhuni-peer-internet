@@ -107,8 +107,10 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     private Map getConsumeDayList(HttpServletRequest request,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/consume_day/list?appId={1}&startTime={2}";
-        RestResponse<List<ConsumeDay>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeDay.class,appId,startTime);
+        appId = "-1".equals(appId)?null:appId;
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        String uri = restPrefixUrl +   "/rest/consume_day/list?tenantId={1}&appId={2}&startTime={3}";
+        RestResponse<List<ConsumeDay>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeDay.class,tenantId,appId,startTime);
         List<ConsumeDay> list =  restResponse.getData();
         Map map = new HashMap();
         map.put("name",DateUtils.formatDate(DateUtils.parseDate(startTime,"yyyy-MM"),"MM月"));
@@ -125,8 +127,10 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     private Map getConsumeMonthList(HttpServletRequest request,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/consume_month/list?appId={1}&startTime={2}";
-        RestResponse<List<ConsumeMonth>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeMonth.class,appId,startTime);
+        appId = "-1".equals(appId)?null:appId;
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        String uri = restPrefixUrl +   "/rest/consume_month/list?tenantId={1}&appId={2}&startTime={3}";
+        RestResponse<List<ConsumeMonth>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeMonth.class,tenantId,appId,startTime);
         List<ConsumeMonth> list =  restResponse.getData();
         Map map = new HashMap();
         map.put("name",startTime+"年");

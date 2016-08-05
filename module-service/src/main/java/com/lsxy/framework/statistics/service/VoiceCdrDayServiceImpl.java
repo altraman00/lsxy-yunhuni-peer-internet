@@ -37,23 +37,10 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public Page<VoiceCdrDay> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
-        return null;
-    }
-
-    @Override
-    public List<VoiceCdrDay> list(String userName, String appId, String startTime) {
-        return null;
-    }
-
-    @Override
-    public Long countByTime(String userName, String appId, String startTime, String endTime) {
-        return null;
-    }
-
-    @Override
-    public List<VoiceCdrDay> pageListByTime(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
-        return null;
+    public List<VoiceCdrDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
+        String hql = "from VoiceCdrDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";
+        List<VoiceCdrDay>  list = this.list(hql,startTime,endTime);
+        return list;
     }
 
     @Override

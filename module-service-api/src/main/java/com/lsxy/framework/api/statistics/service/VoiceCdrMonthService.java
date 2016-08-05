@@ -14,47 +14,15 @@ import java.util.List;
  */
 public interface VoiceCdrMonthService extends BaseService<VoiceCdrMonth> {
     /**
-     * 获取用户区间内的分页数据
-     * @param userName 用户名
+     * 获取用户某时间的列表数据
+     * @param tenantId 对于租户
      * @param appId 应用id
-     * @param startTime 开始时间
+     * @param type 消费类型
+     * @param startTime 时间
      * @param endTime 结束时间
      * @return
      */
-    public Page<VoiceCdrMonth> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize);
-
-    /**
-     * 获取用户某时间的列表数据
-     * @param userName 用户名
-     * @param appId 应用id
-     * @param startTime 时间
-     * @return
-     */
-    public List<VoiceCdrMonth> list(String userName, String appId, String startTime);
-
-    /**
-     * 获取用户开始消费的第一个月
-     * @param tenantId
-     * @return
-     */
-    String getStartMonthByTenantId(String tenantId);
-
-    /**
-     * 根据开始月查询用户的所有消费额
-     * @param tenantId
-     * @param start 开始时间，不允许为空
-     * @param end 结束时间，允许为空
-     * @return
-     */
-    Long sumAmountByTime(String tenantId, String start, String end);
-    /**
-     * 根据当前时间，进行统计
-     * @param date1 时间yyyy-MM-dd
-     * @param month1 第几天 1-31
-     * @param date2 前一天的时间 yyyy-MM-dd
-     * @param month2 前一天是第几天 1-31
-     * @param select 组合groupby条件
-     */
+    public List<VoiceCdrMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime);
     /**
      * 根据当前时间，进行统计
      * @param date1 时间yyyy-MM-dd

@@ -7,11 +7,10 @@ import com.lsxy.framework.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.statistics.dao.ConsumeDayDao;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.statistics.dao.ConsumeDayDao;
 import com.lsxy.utils.StatisticsUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -51,8 +50,8 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
 
     @Override
     public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and type=?3 and obj.dt>=?4 and obj.dt<=?5 ORDER BY obj.day";
-        List<ConsumeDay>  list = this.list(hql,tenantId,appId,type,startTime,endTime);
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";
+        List<ConsumeDay>  list = this.list(hql,startTime,endTime);
         return list;
     }
 
@@ -62,13 +61,8 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
         Date start = DateUtils.parseDate(startTime,"yyyy-MM");
         Date end = DateUtils.parseDate(nextMonth,"yyyy-MM");
-        String hql;
-        if(StringUtils.isBlank(appId)){
-            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.dt>=?2 and obj.dt<?3";
-        }else{
-            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and obj.dt>=?2 and obj.dt<?3";
-        }
-        long count = this.countByCustom(hql, tenant.getId(), start, end);
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenant.getId(),appId, null)+" obj.dt>=?1 and obj.dt<?2";
+        long count = this.countByCustom(hql, start, end);
         return count;
     }
 
@@ -78,13 +72,8 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
         Date start = DateUtils.parseDate(startTime,"yyyy-MM");
         Date end = DateUtils.parseDate(nextMonth,"yyyy-MM");
-        String hql;
-        if(StringUtils.isBlank(appId)){
-            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.dt>=?2 and obj.dt<?3";
-        }else{
-            hql = "from ConsumeDay obj where obj.tenantId=?1 and obj.appId=?2 and obj.dt>=?2 and obj.dt<?3";
-        }
-        return getPageList(hql, pageNo -1, pageSize,tenant.getId(), start, end);
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenant.getId(),appId, null)+" obj.dt>=?1 and obj.dt<?2";
+        return getPageList(hql, pageNo -1, pageSize, start, end);
     }
 
     @Override

@@ -15,23 +15,28 @@ import java.util.List;
  */
 public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
     /**
-     * 获取用户区间内的分页数据
-     * @param userName 用户名
+     * 获取分页数据
+     * @param tenantId 对于租户
      * @param appId 应用id
-     * @param startTime 开始时间
+     * @param type 消费类型
+     * @param startTime 时间
      * @param endTime 结束时间
+     * @param pageNo 第几页
+     * @param pageSize 每页记录数
      * @return
      */
-    public Page<ConsumeMonth> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize);
+    public Page<ConsumeMonth> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize);
 
     /**
      * 获取用户某时间的列表数据
-     * @param userName 用户名
+     * @param tenantId 对于租户
      * @param appId 应用id
+     * @param type 消费类型
      * @param startTime 时间
+     * @param endTime 结束时间
      * @return
      */
-    public List<ConsumeMonth> list(String userName, String appId, String startTime);
+    public List<ConsumeMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime);
 
     /**
      * 获取用户开始消费的第一个月

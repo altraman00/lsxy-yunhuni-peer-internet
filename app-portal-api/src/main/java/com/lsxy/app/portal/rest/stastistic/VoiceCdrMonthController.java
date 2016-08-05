@@ -2,7 +2,9 @@ package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
+import com.lsxy.framework.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
+import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -15,14 +17,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 消费月统计
+ * 通话记录(session)月统计
  * Created by zhangxb on 2016/7/6.
  */
-@RequestMapping("/rest/consume_month")
+@RequestMapping("/rest/voice_cdr_month")
 @RestController
-public class ConsumeMonthController extends AbstractRestController {
+public class VoiceCdrMonthController extends AbstractRestController {
     @Autowired
-    ConsumeMonthService consumeMonthService;
+    VoiceCdrMonthService voiceCdrMonthService;
     /**
      * 根据时间和应用获取列表数据
      * @param appId 应用id
@@ -36,27 +38,9 @@ public class ConsumeMonthController extends AbstractRestController {
             endTime = startTime;
         }
         Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        List<ConsumeMonth> list =  consumeMonthService.list(tenantId,appId,type,date1,date2);
+        List<VoiceCdrMonth> list =  voiceCdrMonthService.list(tenantId,appId,type,date1,date2);
         return RestResponse.success(list);
     }
 
-    /**
-     * 获取分页数据
-     * @param appId 应用id
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @param pageNo 第几页
-     * @param pageSize 每页记录数
-     * @return
-     */
-    @RequestMapping("/page")
-    public RestResponse pageList(String tenantId, String appId,String type,String startTime, String endTime,Integer pageNo,Integer pageSize){
-        Date date1 = DateUtils.parseDate(startTime,"yyyy");
-        if(StringUtils.isEmpty(endTime)){
-            endTime = startTime;
-        }
-        Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        Page<ConsumeMonth> page =  consumeMonthService.pageList(tenantId,appId,type,date1,date2,pageNo,pageSize);
-        return RestResponse.success(page);
-    }
+
 }

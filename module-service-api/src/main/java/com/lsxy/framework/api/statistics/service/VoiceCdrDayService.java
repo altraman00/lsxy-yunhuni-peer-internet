@@ -14,46 +14,15 @@ import java.util.List;
  */
 public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
     /**
-     * 获取用户区间内的分页数据
-     * @param userName 用户名
+     * 获取用户某时间的列表数据
+     * @param tenantId 对于租户
      * @param appId 应用id
-     * @param startTime 开始时间
+     * @param type 消费类型
+     * @param startTime 时间
      * @param endTime 结束时间
      * @return
      */
-    public Page<VoiceCdrDay> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize);
-
-    /**
-     * 获取用户某时间的列表数据
-     * @param userName 用户名
-     * @param appId 应用id
-     * @param startTime 时间
-     * @return
-     */
-    public List<VoiceCdrDay> list(String userName, String appId, String startTime);
-
-    /**
-     * 获取一定时间的统计数据的总数 时间为月份 yyyy-MM
-     * @param userName
-     * @param appId 应用ID，可为空
-     * @param startTime 开始时间，不可为空
-     * @param endTime 结果时间，不可为空
-     * @return
-     */
-    Long countByTime(String userName, String appId, String startTime, String endTime);
-
-    /**
-     * 获取一定时间的统计数据 时间为月份 yyyy-MM
-     * @param userName
-     * @param appId 应用ID，可为空
-     * @param startTime 开始时间，不可为空
-     * @param endTime 结果时间，不可为空
-     * @param pageNo
-     * @param pageSize
-     * @return
-     */
-    List<VoiceCdrDay> pageListByTime(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize);
-    /**
+    public List<VoiceCdrDay> list(String tenantId, String appId,String type,Date startTime, Date endTime); /**
      * 根据当前时间，进行统计
      * @param date1 时间yyyy-MM-dd
      * @param day1 第几天 1-31
