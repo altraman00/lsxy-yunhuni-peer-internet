@@ -54,6 +54,11 @@ public class AuthController extends AbstractRestController {
                 map.put("industry",realnameCorp.getIndustry());
                 map.put("proposer",realnameCorp.getProposer());
                 map.put("authType",realnameCorp.getAuthType());
+                map.put("type01Prop02",realnameCorp.getType01Prop02());
+                map.put("type02Prop01",realnameCorp.getType02Prop01());
+                map.put("type02Prop02",realnameCorp.getType02Prop02());
+                map.put("type03Prop01",realnameCorp.getType03Prop01());
+                map.put("type03Prop03",realnameCorp.getType03Prop03());
                 map.put("time", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
