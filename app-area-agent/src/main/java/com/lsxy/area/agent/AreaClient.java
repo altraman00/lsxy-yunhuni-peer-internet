@@ -1,18 +1,12 @@
 package com.lsxy.area.agent;
 
-import com.lsxy.framework.rpc.api.RPCRequest;
-import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.client.AbstractClientServiceHandler;
 import com.lsxy.framework.rpc.api.client.Client;
-import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
-import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -37,22 +31,22 @@ public class AreaClient {
     @Autowired
     private Client client;
 
-    @Bean
-    public AbstractClientServiceHandler getServiceHandler(){
-        return new AbstractClientServiceHandler() {
-            @Override
-            public RPCResponse handleService(RPCRequest request, Session session) {
-                if(logger.isDebugEnabled()){
-                    logger.debug("处理响应");
-                }
-                RPCResponse response = RPCResponse.buildResponse(request);
-                response.setMessage("hahauhuha");
-                return response;
-            }
-        };
-    }
+//    @Bean
+//    public AbstractClientServiceHandler getServiceHandler(){
+//        return new AbstractClientServiceHandler() {
+//            @Override
+//            public RPCResponse handleService(RPCRequest request, Session session) {
+//                if(logger.isDebugEnabled()){
+//                    logger.debug("处理响应");
+//                }
+//                RPCResponse response = RPCResponse.buildResponse(request);
+//                response.setMessage("hahauhuha");
+//                return response;
+//            }
+//        };
+//    }
 
-//    @PostConstruct
+    @PostConstruct
     public void start() throws ClientBindException {
         if(logger.isDebugEnabled()){
             logger.debug("客户端启动:  {}  {}" , serverUrl,clientId);

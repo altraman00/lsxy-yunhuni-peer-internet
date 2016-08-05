@@ -62,7 +62,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
-            params.put("to_uri", "192.168.2.100:5062");
+            params.put("to_uri", "192.168.10.62:5060");
             params.put("max_answer_seconds", (int) (50 * Math.random()));
             params.put("max_ring_seconds", (int) (10 * Math.random()));
 
@@ -72,26 +72,26 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
                     logger.debug("呼出 返回值：(result={})", result);
                     String callId = (String) result;
                     Map<String, Object> params = new HashMap<>();
-                    try {
-                        cticlient.operateResource((byte) 0, 0, callId, "sys.call.drop", params, new RpcResultListener() {
-                            @Override
-                            protected void onResult(Object result) {
-                                logger.debug("挂机 返回值：(result={})", result);
-                            }
-
-                            @Override
-                            protected void onError(RpcError error) {
-                                logger.debug("挂机 错误:{}", error);
-                            }
-
-                            @Override
-                            protected void onTimeout() {
-                                logger.debug("挂机 超时");
-                            }
-                        });
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        cticlient.operateResource((byte) 0, 0, callId, "sys.call.drop", params, new RpcResultListener() {
+//                            @Override
+//                            protected void onResult(Object result) {
+//                                logger.debug("挂机 返回值：(result={})", result);
+//                            }
+//
+//                            @Override
+//                            protected void onError(RpcError error) {
+//                                logger.debug("挂机 错误:{}", error);
+//                            }
+//
+//                            @Override
+//                            protected void onTimeout() {
+//                                logger.debug("挂机 超时");
+//                            }
+//                        });
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
                 }
 
                 @Override
