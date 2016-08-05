@@ -25,6 +25,8 @@ public class AreaClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AreaClient.class);
 
+    private IoSession session;
+
     @Value("${area.agent.server.url}")
     private String serverUrl;
 

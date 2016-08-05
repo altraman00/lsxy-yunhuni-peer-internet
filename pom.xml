@@ -40,6 +40,33 @@
 
     </modules>
     <packaging>pom</packaging>
+    <repositories>
+        <repository>
+            <id>lsxy-repo</id>
+            <name>lsxy-repo</name>
+            <url>http://nexus.liushuixingyun.com/nexus/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>lsxy-repo</id>
+            <name>lsxy-repo</name>
+            <url>http://nexus.liushuixingyun.com/nexus/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
