@@ -1,9 +1,9 @@
 package com.lsxy.area.agent.cti;
 
 import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.app.area.cti.commander.Commander;
 import com.lsxy.app.area.cti.commander.RpcEventListener;
 import com.lsxy.app.area.cti.commander.RpcRequest;
+import com.lsxy.app.area.cti.commander.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +40,12 @@ public class CTIClient implements RpcEventListener{
         if(logger.isDebugEnabled()){
             logger.debug("开始启动CTI客户端,初始化UnitID:{}",localUnitID);
         }
-        Commander.initiate(localUnitID);
 
+        Unit.initiate(localUnitID);
         try {
             Set<CTIClientConfigFactory.CTIClientConfig>  configs = ctiClientConfigFactory.getConfigs();
             for (CTIClientConfigFactory.CTIClientConfig config:configs ) {
-                Client client = Commander.createClient(config.clientId, config.ctiHost, this);
+                Client client = Unit.createClient(config.clientId, config.ctiHost, this);
                 if(logger.isDebugEnabled()){
                     logger.debug("client id {} create invoke complete, connect to {}" , config.clientId,config.ctiHost);
                 }
