@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * 订单记录日统计
- * Created by zhangxb on 2016/8/1.
+ * Created by zhangxb on 2016/8/5.
  */
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_recharge_day")
