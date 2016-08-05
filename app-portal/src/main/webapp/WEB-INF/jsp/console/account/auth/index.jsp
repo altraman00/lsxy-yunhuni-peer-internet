@@ -59,7 +59,7 @@
                             </div>
                             <div class="row m-l-none m-r-none bg-light lter">
                                 <div class="row">
-                                    <form:form role="form" action="${ctx}/console/account/auth/edit?${_csrf.parameterName}=${_csrf.token}" enctype="multipart/form-data"  method="post" class="register-form" id="personalAuthForm" >
+                                    <form:form role="form" action="${ctx}/console/account/auth/edit?${_csrf.parameterName}=${_csrf.token}&upgrade=${upgrade}" enctype="multipart/form-data"  method="post" class="register-form" id="personalAuthForm" >
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用行业：</lable>
                                             <div class="auth_select col-md-4 ">
