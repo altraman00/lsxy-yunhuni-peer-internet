@@ -25,6 +25,10 @@ public class HomeVO {
 
     private Integer conferenceRemain;         //会议剩余量（分钟）
 
+    private Long fileTotalSize;                //总容量
+
+    private Long fileUsedSize;                //已使用容量
+
     private String restApi;                  //restApi
 
     private String secretKey;               //secretKey
@@ -101,6 +105,22 @@ public class HomeVO {
 
     public void setConferenceRemain(Integer conferenceRemain) {
         this.conferenceRemain = conferenceRemain;
+    }
+
+    public Long getFileTotalSize() {
+        return fileTotalSize;
+    }
+
+    public void setFileTotalSize(Long fileTotalSize) {
+        this.fileTotalSize = fileTotalSize;
+    }
+
+    public Long getFileUsedSize() {
+        return fileUsedSize;
+    }
+
+    public void setFileUsedSize(Long fileUsedSize) {
+        this.fileUsedSize = fileUsedSize;
     }
 
     public String getRestApi() {

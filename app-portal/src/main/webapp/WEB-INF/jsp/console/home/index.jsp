@@ -93,6 +93,10 @@
                                                 <img  src="${resPrefixUrl}/images/index/message.png" alt="">
                                                 短信剩余:  <small class="account-number-small">${homeVO.smsRemain}</small> 条
                                               </span>
+                                              <span class="">
+                                                <img  src="${resPrefixUrl}/images/index/message.png" alt="">
+                                                存储用量：<small class="account-number-small">${homeVO.fileUsedSize}M/${homeVO.fileTotalSize}M</small>
+                                              </span>
                                             </div>
                                             <div class="box-footer">
                                                 <a href="#" class="btn btn-default fr" >购买流量包</a>

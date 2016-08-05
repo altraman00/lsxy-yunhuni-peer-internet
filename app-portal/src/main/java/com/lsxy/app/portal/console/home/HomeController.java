@@ -10,7 +10,6 @@ import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -87,6 +86,7 @@ public class HomeController extends AbstractPortalController {
         //获取账务
         Billing billing = billingResponse.getData();
         if(billing != null){
+            //TODO 从redis里取出套餐剩余数据
             //余额正数部分
             vo.setBalanceInt(billing.getBalance().intValue()+"");
             //余额小数部分
@@ -99,13 +99,18 @@ public class HomeController extends AbstractPortalController {
             vo.setSmsRemain(billing.getSmsRemain());
             //会议剩余量
             vo.setConferenceRemain(billing.getConferenceRemain());
+
+            Long fileTotalSize = Long.parseLong(SystemConfig.getProperty("portal.voiceflieplay.maxsize"));
+            Long fileRemainSize = billing.getFileRemainSize()/(1024 * 1024);
+            vo.setFileUsedSize(fileTotalSize - fileRemainSize);
+            vo.setFileTotalSize(fileTotalSize);
         }
 
-        //TODO 获取当前线路状况
+        //TODO 获取当前线路状况，从redis里取
         //当前线路情况(暂时给个数字)
         vo.setLineNum(10);
         vo.setLineAverageCallTime(6);
-        vo.setLineLinkRate(98D);
+        vo.setLineLinkRate(98.00D);
 
         //此处调用鉴权账号（凭证）RestApi
         ApiCertificate cert = getApiCertificate(token);

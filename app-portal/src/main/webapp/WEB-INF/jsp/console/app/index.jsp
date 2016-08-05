@@ -73,9 +73,7 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
                                             </div>
-                                            <div class="col-md-4 text-right">
-                                                <span class="span-required">*</span>20字符内，符合<a href="">应用审核规范要求</a>
-                                            </div>
+                                            <span class="span-required">*</span>20字符内，符合<a href="">应用审核规范要求</a>
                                         </div>
 
                                         <div class="form-group">
@@ -123,9 +121,7 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form"/>
                                             </div>
-                                            <div class="col-md-4 text-right">
-                                                &nbsp;&nbsp;<a href="">回调说明文档</a>
-                                            </div>
+                                            <a href="">回调说明文档</a>
                                         </div>
 
                                         <p class="tips">
