@@ -273,5 +273,6 @@
         });
     </script>
 </c:if>
+<div class="tips-toast"></div>
 </body>
 </html>
