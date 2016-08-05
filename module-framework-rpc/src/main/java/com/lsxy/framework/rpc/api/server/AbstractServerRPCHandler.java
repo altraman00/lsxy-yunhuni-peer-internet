@@ -23,7 +23,7 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
     protected Map<String,RequestListener> requestListeners = new HashMap<String,RequestListener>();
 
 
-    @Autowired
+    @Autowired(required = false)
     private AbstractServiceHandler serviceHandler;
 
 
