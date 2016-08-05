@@ -264,7 +264,7 @@
         var starttime = initialStartTime(type);
         var endtime = initialEndTime(type);
         var params = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime, csrfParameterName:csrfToken};
-        ajaxsubmit(ctx+"/console/statistics/consume/list",params,new function(result){
+        ajaxsubmit(ctx+"/console/statistics/consume/list",params,function(result){
             var resultData = result.data;
             tdata = new Array();
             var count = 0;
@@ -366,7 +366,7 @@
         var starttime = initialStartTime(type);
         var endtime = initialEndTime(type);
         var param = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken};
-        ajaxsync(ctx+"/console/statistics/consume/page_list",param,new function(result){
+        ajaxsync(ctx+"/console/statistics/consume/page_list",param,function(result){
             var resultData = result.data;
             var data =[];
             for(var i=0;i<resultData.length;i++){

@@ -169,7 +169,7 @@
         var starttime = initialStartTime(type);
         //异步查询 返回json 数据
         var param ={'type':type1,'appId':app,'startTime':starttime, csrfParameterName:csrfToken};
-        ajaxsync(ctx+"/console/statistics/session/list",param,new function(result){
+        ajaxsync(ctx+"/console/statistics/session/list",param,function(result){
             var resultData = result.data;
             xdAll = JSON.stringify(resultData[0]);
             Array.prototype.max = function(){
