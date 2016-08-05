@@ -151,7 +151,7 @@ public class AuthController extends AbstractPortalController {
      * @return
      */
     @RequestMapping(value="/edit" ,method = RequestMethod.POST)
-    public ModelAndView edit(HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles) throws IOException{
+    public ModelAndView edit(@RequestParam(value = "upgrade",required = false) String upgrade,HttpServletRequest request,AuthVo authVo,String type, @RequestParam("file") MultipartFile[] multipartfiles) throws IOException{
 
         String tenantId = this.getCurrentUser(request).getTenantId();
 
@@ -187,7 +187,13 @@ public class AuthController extends AbstractPortalController {
             mav = new ModelAndView("redirect:/console/account/auth/index");
         }else{
             mav.addObject("msg","操作失败，请稍后重试");
-            mav.setViewName("/console/account/auth/index");
+            if(StringUtil.isNotEmpty(upgrade)){
+                logger.info("个人认证  升级到企业认证:{}",upgrade);
+                mav.addObject("upgrade",true);//个人认证  升级到企业认证
+                mav.setViewName("/console/account/auth/index");
+            }else{
+                mav.setViewName("/console/account/auth/index");
+            }
         }
         return mav;
     }
