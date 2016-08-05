@@ -355,18 +355,15 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     public App offline(String appId) {
         App app = appService.findById(appId);
         if(app!= null && app.getStatus() == App.STATUS_ONLINE){
-            AppOnlineAction action = null;
             List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
             if(actionList != null && actionList.size() > 0){
-                action = actionList.get(0);
-            }
-            if(action != null){
                 //将上一步设为已完成
                 for(AppOnlineAction a:actionList){
                     a.setStatus(AppOnlineAction.STATUS_DONE);
                     this.save(a);
                 }
             }
+
             //生成新的动作
             AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
             this.save(newAction);
@@ -385,6 +382,17 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             return app;
         }else{
             throw new RuntimeException("数据错误");
+        }
+    }
+
+    @Override
+    public void resetAppOnlineAction(String appId) {
+        List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+        if(actionList != null && actionList.size() > 0){
+            for(AppOnlineAction action : actionList){
+                action.setStatus(AppOnlineAction.STATUS_DONE);
+                this.save(action);
+            }
         }
     }
 

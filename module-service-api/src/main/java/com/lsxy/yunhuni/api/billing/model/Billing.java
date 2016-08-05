@@ -20,6 +20,7 @@ public class Billing extends IdEntity {
     private Integer smsRemain;            //语音短信余量（条）
     private Integer conferenceRemain;     //会议剩余量（分钟）
     private Long fileRemainSize;//剩余存储容量，单位byte
+    private Long fileTotalSize;//总容量，单位byte
 
     @Column(name = "file_remain_size")
     public Long getFileRemainSize() {
@@ -72,5 +73,13 @@ public class Billing extends IdEntity {
 
     public void setConferenceRemain(Integer conferenceRemain) {
         this.conferenceRemain = conferenceRemain;
+    }
+
+    public Long getFileTotalSize() {
+        return fileTotalSize;
+    }
+
+    public void setFileTotalSize(Long fileTotalSize) {
+        this.fileTotalSize = fileTotalSize;
     }
 }

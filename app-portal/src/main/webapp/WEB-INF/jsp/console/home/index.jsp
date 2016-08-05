@@ -44,16 +44,37 @@
                                     </div>
                                     <div class="col-md-4 padder-v fix-padding">
                                         <div class='wrapperBox'>
-                                            <span class="h5 block m-t-xs">
-                                              <strong>线路状况</strong>
-                                            </span>
-                                            <span>
-                                              当前
-                                              <small class="text-muted text-uc account-number">${homeVO.lineNum}</small>
-                                              线
-                                            </span>
+                                            <div class="row">
+                                                <div class="col-md-4 remove-padding">
+                                                 <span class="h5 block m-t-xs">
+                                                   <strong>线路状况</strong>
+                                                 </span>
+                                                 <span>
+                                                  当前
+                                                  <small class="text-muted text-uc account-number">${homeVO.lineNum}</small>
+                                                     线
+                                                 </span>
+                                                </div>
+                                                <div class="col-md-4 remove-padding">
+                                                 <span class="h5 block m-t-xs">
+                                                   <strong>平均通话时长</strong>
+                                                 </span>
+                                                <span>
+                                                  <small class="text-muted text-uc account-number">${homeVO.lineAverageCallTime}</small>分钟
+                                                 </span>
+                                                </div>
+                                                <div class="col-md-4 remove-padding">
+                                                 <span class="h5 block m-t-xs">
+                                                   <strong>接通率</strong>
+                                                 </span>
+                                                <span>
+                                                  <small class="text-muted text-uc account-number">${homeVO.lineLinkRate}</small>%
+                                                 </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+
                                     <div class="col-md-4 padder-v fix-padding">
                                         <div class='wrapperBox'>
                                             <span class="h5 block m-t-xs">
@@ -72,9 +93,13 @@
                                                 <img  src="${resPrefixUrl}/images/index/message.png" alt="">
                                                 短信剩余:  <small class="account-number-small">${homeVO.smsRemain}</small> 条
                                               </span>
+                                              <span class="w-half">
+                                                <img  src="${resPrefixUrl}/images/index/status_1.png" alt="">
+                                                存储用量：<small class="account-number-small">${homeVO.fileUsedSize}M/${homeVO.fileTotalSize}M</small>
+                                              </span>
                                             </div>
                                             <div class="box-footer">
-                                                <button class="btn btn-default fr" >购买流量包</button>
+                                                <a href="#" class="btn btn-default fr" >购买流量包</a>
                                             </div>
                                         </div>
                                     </div>
@@ -129,13 +154,22 @@
                                                 </header>
                                                 <div class="panel-body clearfix border-top-none">
                                                     <div class="app-status-right dropdown fl">
-                                          <span class="app-icon pull-left m-r-sm">
-                                            <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/></span>
-                                          <span class="h5 block m-t-xs text-muted">APPID :
-                                            <span>${app.id}</span>
-                                            <small class="text-success">已上线</small>
-                                          </span>
-                                                        <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                        <span class="app-icon pull-left m-r-sm">
+                                                            <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/>
+                                                        </span>
+                                                        <span class="h5 block m-t-xs text-muted">APPID :
+                                                            <span>${app.id}</span>
+                                                            <small class="text-success">已上线</small>
+                                                        </span>
+                                                        <c:if test="${not empty app.ivr}">
+                                                            <span class="h5 block m-t-xs text-muted">IVR呼入号码：
+                                                                <span>${app.ivr}</span>
+                                                                <c:if test="${app.ivrExpire}">
+                                                                    <a><i class="fa fa-exclamation-triangle tips-warning"></i> <small class="text-danger ">号码已过期，请及时续费</small></a>
+                                                                </c:if>
+                                                            </span>
+                                                        </c:if>
+                                                        <small class="text-muted m-t-xs yhn-description">${app.description}</small>
                                                     </div>
                                                     <div class="app-status-left fr">
                                                         <ul class="app-status-list">
@@ -143,7 +177,7 @@
                                                             <li><img src="${resPrefixUrl}/images/index/status_2.png" alt=""> 1天内呼叫量: <span class="number">${app.callOfDay}</span> </li>
                                                             <li><img src="${resPrefixUrl}/images/index/status_3.png" alt=""> 当前呼叫并发: <span class="number">${app.currentCall}</span> </li>
                                                         </ul>
-                                                        <a href="" class="fr">详情</a>
+                                                        <a href="${ctx}/console/app/detail?id=${app.id}" class="fr">详情</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -157,13 +191,15 @@
                                                 </header>
                                                 <div class="panel-body clearfix border-top-none">
                                                     <div class="app-status-center dropdown fl">
-                                          <span class="app-icon pull-left m-r-sm">
-                                            <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/></span>
-                                          <span class="h5 block m-t-xs text-muted">APPID :
-                                            <span>${app.id}</span>
-                                            <small class="text-danger">未上线</small>
-                                          </span>
-                                                        <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                        <span class="app-icon pull-left m-r-sm">
+                                                            <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/>
+                                                        </span>
+                                                        <span class="h5 block m-t-xs text-muted">APPID :
+                                                            <span>${app.id}</span>
+                                                            <small class="text-danger">未上线</small>
+                                                        </span>
+                                                        <small class="text-muted m-t-xs yhn-description">${app.description}</small>
+                                                        <a href="${ctx}/console/app/detail?id=${app.id}" class="fr">详情</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -191,20 +227,14 @@
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确定重新生成secretKey么", function(result) {
             if(result){
-                $.ajax({
-                    type: "get",
-                    url: ctx + "/console/home/change_sk",
-                    async: false,
-                    dataType: "json",
-                    success: function(data) {
-                        if(data.secretKey != null){
-                            $("#secretKey").html(data.secretKey);
-                        }else{
-                            //errorCode errorMsg
-                            $(".tips-key").html("生成失败：" + data.errorMsg)
-                        }
+                ajaxsync(ctx + "/console/home/change_sk",null,function(response){
+                    if(response.data != null){
+                        $("#secretKey").html(response.data);
+                    }else{
+                        //errorCode errorMsg
+                        $(".tips-key").html("生成失败!" + response.errorMsg)
                     }
-                });
+                },"get");
             }
         });
         return false

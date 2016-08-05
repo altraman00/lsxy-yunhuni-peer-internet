@@ -1,5 +1,7 @@
 package com.lsxy.app.portal.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -16,6 +18,7 @@ import java.util.UUID;
  */
 
 public class AvoidDuplicateSubmissionInterceptor extends HandlerInterceptorAdapter {
+    private static final Logger logger = LoggerFactory.getLogger(AvoidDuplicateSubmissionInterceptor.class);
     private static String SUBMISSION_TOKEN = "submission_token";
 
     @Override
@@ -30,6 +33,9 @@ public class AvoidDuplicateSubmissionInterceptor extends HandlerInterceptorAdapt
                 boolean needRemoveSession = annotation.needRemoveToken();
                 if (needRemoveSession) {
                     if (isRepeatSubmit(request)) {
+                        if(logger.isDebugEnabled()){
+                            logger.debug("检验重复提交token失败！");
+                        }
                         return false;
                     }
                     request.getSession(false).removeAttribute(SUBMISSION_TOKEN);

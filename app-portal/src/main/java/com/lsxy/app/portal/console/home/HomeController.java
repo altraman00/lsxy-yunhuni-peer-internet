@@ -9,6 +9,7 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.billing.model.Billing;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -20,10 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 登录后的首页
@@ -53,24 +51,12 @@ public class HomeController extends AbstractPortalController {
      */
     @RequestMapping(value = "/change_sk",method = RequestMethod.GET)
     @ResponseBody
-    public Map changeSecretKey(HttpServletRequest request){
-        Map<String,Object> result = new HashMap<>();
+    public RestResponse changeSecretKey(HttpServletRequest request){
         String token = getSecurityToken(request);
         //调用restApi改变secretKey
         String url = PortalConstants.REST_PREFIX_URL + "/rest/api_cert/change_sk";
         RestResponse<String> response = RestRequest.buildSecurityRequest(token).get(url,String.class);
-        if(response.isSuccess()){
-            String secretKey = response.getData();
-            if(!StringUtils.isEmpty(secretKey)){
-                //成功返回新的secretKey
-                result.put("secretKey",secretKey);
-            }
-        }else{
-            //失败返回失败信息
-            result.put("errorCode",response.getErrorCode());
-            result.put("errorMsg",response.getErrorMsg());
-        }
-        return result;
+        return response;
     }
 
 
@@ -88,6 +74,7 @@ public class HomeController extends AbstractPortalController {
         //获取账务
         Billing billing = billingResponse.getData();
         if(billing != null){
+            //TODO 从redis里取出套餐剩余数据
             //余额正数部分
             vo.setBalanceInt(billing.getBalance().intValue()+"");
             //余额小数部分
@@ -100,10 +87,18 @@ public class HomeController extends AbstractPortalController {
             vo.setSmsRemain(billing.getSmsRemain());
             //会议剩余量
             vo.setConferenceRemain(billing.getConferenceRemain());
+
+            Long fileTotalSize = billing.getFileTotalSize()/(1024 * 1024);
+            Long fileRemainSize = billing.getFileRemainSize()/(1024 * 1024);
+            vo.setFileUsedSize(fileTotalSize - fileRemainSize);
+            vo.setFileTotalSize(fileTotalSize);
         }
 
+        //TODO 获取当前线路状况，从redis里取
         //当前线路情况(暂时给个数字)
         vo.setLineNum(10);
+        vo.setLineAverageCallTime(6);
+        vo.setLineLinkRate(98.00D);
 
         //此处调用鉴权账号（凭证）RestApi
         ApiCertificate cert = getApiCertificate(token);
@@ -127,11 +122,23 @@ public class HomeController extends AbstractPortalController {
                 appStateVO.setCallOfDay((Integer) map.get("dayCount"));
                 appStateVO.setCallOfHour((Integer) map.get("hourCount"));
                 appStateVO.setCurrentCall((Integer) map.get("currentSession"));
+                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
+                    ResourcesRent rent = getIvrNumber(token,app.getId());
+                    if(rent != null){
+                        appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
+                    }
+                }
                 appStateVOs.add(appStateVO);
             }
         }
         vo.setAppStateVOs(appStateVOs);
         return vo;
+    }
+
+    private ResourcesRent getIvrNumber(String token, String appId) {
+        String url = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/by_app/{1}";
+        return RestRequest.buildSecurityRequest(token).get(url, ResourcesRent.class,appId).getData();
     }
 
     /**

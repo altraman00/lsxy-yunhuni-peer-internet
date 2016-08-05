@@ -32,6 +32,7 @@ public class InvoiceInfoController extends AbstractPortalController {
     private OSSService ossService;
 
     @RequestMapping(value = "",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView get(HttpServletRequest request){
         String returView;
         Map<String,Object> model = new HashMap<>();
