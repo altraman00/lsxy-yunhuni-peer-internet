@@ -169,7 +169,7 @@
                                                                 </c:if>
                                                             </span>
                                                         </c:if>
-                                                        <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                        <small class="text-muted m-t-xs yhn-description">${app.description}</small>
                                                     </div>
                                                     <div class="app-status-left fr">
                                                         <ul class="app-status-list">
@@ -198,7 +198,7 @@
                                                             <span>${app.id}</span>
                                                             <small class="text-danger">未上线</small>
                                                         </span>
-                                                        <small class="text-muted m-t-xs text-uc yhn-description">${app.description}</small>
+                                                        <small class="text-muted m-t-xs yhn-description">${app.description}</small>
                                                         <a href="${ctx}/console/app/detail?id=${app.id}" class="fr">详情</a>
                                                     </div>
                                                 </div>
