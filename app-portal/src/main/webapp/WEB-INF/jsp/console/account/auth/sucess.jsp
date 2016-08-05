@@ -67,7 +67,7 @@
                                         </c:if>
                                     </div>
                                     <div class="auth authsuccess thumbnail" style="margin-top:0px;">
-                                        <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" width="160px">
+                                        <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" width="190px">
                                         <div class="caption fr">
                                             <c:if test="${status == 1}">
                                                 <ul>
