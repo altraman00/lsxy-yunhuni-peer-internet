@@ -93,8 +93,8 @@
                                                 <img  src="${resPrefixUrl}/images/index/message.png" alt="">
                                                 短信剩余:  <small class="account-number-small">${homeVO.smsRemain}</small> 条
                                               </span>
-                                              <span class="">
-                                                <img  src="${resPrefixUrl}/images/index/message.png" alt="">
+                                              <span class="w-half">
+                                                <img  src="${resPrefixUrl}/images/index/status_1.png" alt="">
                                                 存储用量：<small class="account-number-small">${homeVO.fileUsedSize}M/${homeVO.fileTotalSize}M</small>
                                               </span>
                                             </div>
@@ -227,20 +227,14 @@
         bootbox.setLocale("zh_CN");
         bootbox.confirm("确定重新生成secretKey么", function(result) {
             if(result){
-                $.ajax({
-                    type: "get",
-                    url: ctx + "/console/home/change_sk",
-                    async: false,
-                    dataType: "json",
-                    success: function(data) {
-                        if(data.secretKey != null){
-                            $("#secretKey").html(data.secretKey);
-                        }else{
-                            //errorCode errorMsg
-                            $(".tips-key").html("生成失败：" + data.errorMsg)
-                        }
+                ajaxsync(ctx + "/console/home/change_sk",null,function(response){
+                    if(response.data != null){
+                        $("#secretKey").html(response.data);
+                    }else{
+                        //errorCode errorMsg
+                        $(".tips-key").html("生成失败!" + response.errorMsg)
                     }
-                });
+                },"get");
             }
         });
         return false

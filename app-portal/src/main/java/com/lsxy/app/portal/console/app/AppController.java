@@ -130,12 +130,13 @@ public class AppController extends AbstractPortalController {
      */
     @RequestMapping("/create")
     @ResponseBody
-    public Map create(HttpServletRequest request, App app){
+    public RestResponse create(HttpServletRequest request, App app){
         app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
         createApp(request,app);
-        Map map = new HashMap();
-        map.put("msg","新建应用成功");
-        return map;
+        return RestResponse.success();
+//        Map map = new HashMap();
+//        map.put("msg","新建应用成功");
+//        return map;
     }
 
     /**
@@ -145,11 +146,12 @@ public class AppController extends AbstractPortalController {
      */
     @RequestMapping("/update")
     @ResponseBody
-    public Map update(HttpServletRequest request, App app){
+    public RestResponse update(HttpServletRequest request, App app){
         updateApp(request,app);
-        Map map = new HashMap();
-        map.put("msg","应用修改成功");
-        return map;
+        return RestResponse.success();
+//        Map map = new HashMap();
+//        map.put("msg","应用修改成功");
+//        return map;
     }
     /**
      * 新建应用

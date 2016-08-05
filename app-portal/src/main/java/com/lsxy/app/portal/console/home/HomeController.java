@@ -51,24 +51,12 @@ public class HomeController extends AbstractPortalController {
      */
     @RequestMapping(value = "/change_sk",method = RequestMethod.GET)
     @ResponseBody
-    public Map changeSecretKey(HttpServletRequest request){
-        Map<String,Object> result = new HashMap<>();
+    public RestResponse changeSecretKey(HttpServletRequest request){
         String token = getSecurityToken(request);
         //调用restApi改变secretKey
         String url = PortalConstants.REST_PREFIX_URL + "/rest/api_cert/change_sk";
         RestResponse<String> response = RestRequest.buildSecurityRequest(token).get(url,String.class);
-        if(response.isSuccess()){
-            String secretKey = response.getData();
-            if(!StringUtils.isEmpty(secretKey)){
-                //成功返回新的secretKey
-                result.put("secretKey",secretKey);
-            }
-        }else{
-            //失败返回失败信息
-            result.put("errorCode",response.getErrorCode());
-            result.put("errorMsg",response.getErrorMsg());
-        }
-        return result;
+        return response;
     }
 
 
@@ -100,7 +88,7 @@ public class HomeController extends AbstractPortalController {
             //会议剩余量
             vo.setConferenceRemain(billing.getConferenceRemain());
 
-            Long fileTotalSize = Long.parseLong(SystemConfig.getProperty("portal.voiceflieplay.maxsize"));
+            Long fileTotalSize = billing.getFileTotalSize()/(1024 * 1024);
             Long fileRemainSize = billing.getFileRemainSize()/(1024 * 1024);
             vo.setFileUsedSize(fileTotalSize - fileRemainSize);
             vo.setFileTotalSize(fileTotalSize);

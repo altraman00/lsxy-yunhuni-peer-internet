@@ -159,7 +159,7 @@
                                                     <c:if test="${app.id==null}">创建</c:if>
                                                     <c:if test="${app.id!=null}">修改</c:if>
                                                 </a>
-                                                <c:if test="${app.id!=null}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s<a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
+                                                <c:if test="${app.id!=null}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
                                             </div>
                                         </div>
                                     </form:form>
@@ -189,26 +189,24 @@
             $('#validateBtn').attr('disabled','disabled');
             var tempType = $('#validateBtn').html().trim()=='创建'?"create":"update";
             //提交表单
-            $.ajax({
-                url : "${ctx}/console/app/"+tempType,
-                type : 'post',
-                async: false,//使用同步的方式,true为异步方式
-                data :getFormJson("#application_create"),
-                dataType: "json",
-                success : function(data){
+            ajaxsync(ctx + "/console/app/"+tempType,getFormJson("#application_create"),function(response){
+                if(response.success){
                     var url = "";
                     if($('#validateBtn').html().trim()=='创建'){
                         url="${ctx}/console/app/list";
+                        showtoast("新建应用成功",url);
                     }else{
                         url="${ctx}/console/app/detail?id=${app.id}";
+                        showtoast("应用修改成功",url);
                     }
-                    showtoast(data.msg,url);
-                },
-                fail:function(){
-                    showtoast('网络异常，请稍后重试');
+                }else{
+                    showtoast(response.errorMsg);
                     $('#validateBtn').removeAttr('disabled');
                 }
+            },"post").fail(function(){
+                $('#validateBtn').removeAttr('disabled');
             });
+
         }
 
     });

@@ -5,6 +5,7 @@ import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.console.test.upload.UploadEntity;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -25,6 +26,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static javafx.scene.input.KeyCode.T;
+
 /**
  * 放音文件处理
  * Created by zhangxb on 2016/7/21.
@@ -34,7 +37,6 @@ import java.util.Map;
 public class VoiceFilePlayContrller extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayContrller.class);
     private  String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
-    private String maxSize = SystemConfig.getProperty("portal.voiceflieplay.maxsize");
     @Autowired
     private OSSService ossService;
 
@@ -45,13 +47,19 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/total")
     @ResponseBody
-    public Map fileTotalSize(HttpServletRequest request){
+    public RestResponse fileTotalSize(HttpServletRequest request){
         Map map = new HashMap();
-        Long fileTotalSize = Long.parseLong(maxSize)*1024*1024;
-        Billing billing = (Billing)getBilling(request).getData();
-        map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());
-        map.put("fileTotalSize",fileTotalSize);
-        return map;
+        RestResponse response = getBilling(request);
+        if(response.isSuccess()){
+            Billing billing = (Billing)getBilling(request).getData();
+            Long fileTotalSize = billing.getFileTotalSize();
+            //TODO 从redis 中取出剩余空间
+            map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());
+            map.put("fileTotalSize",fileTotalSize);
+            return RestResponse.success(map);
+        }else{
+            return response;
+        }
     }
     /**
      * 根据当前页，每页记录数，应用ｉｄ，放音文件的名字（模糊查询）进行查询放音文件的分页信息
@@ -64,10 +72,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public Map VoiceFilePlay(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize, String appId,String name){
-        Map map = new HashMap();
-        map.put("list",pageListVoiceFilePlay(request,pageNo,pageSize,appId,name).getData());
-        return map;
+    public RestResponse VoiceFilePlay(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize, String appId,String name){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/plist?pageNo={1}&pageSize={2}&name={3}&appId={4}";
+        return RestRequest.buildSecurityRequest(token).getPage(uri,VoiceFilePlay.class,pageNo,pageSize,name,appId);
     }
     /**
      * 根据放音文件的ｉｄ修改放音文件的备注
@@ -78,24 +86,17 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/modify")
     @ResponseBody
-    public Map modify(HttpServletRequest request, String id,String remark){
-        RestResponse restResponse = modifyVoiceFilePlay(request,id,remark);
-        Map map = new HashMap();
-        map.put("flag",restResponse.isSuccess());
-        return map;
-    }
-    /**
-     * 根据放音文件的ｉｄ修改放音文件的备注
-     * @param request
-     * @param id　放音文件ｉｄ
-     * @param remark 备注
-     * @return
-     */
-    private RestResponse modifyVoiceFilePlay(HttpServletRequest request,String id,String remark){
+    public RestResponse modify(HttpServletRequest request, String id,String remark){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/modify?id={1}&remark={2}";
-        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,id,remark);
+        RestResponse<VoiceFilePlay> response = RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class, id, remark);
+        if(response.isSuccess()){
+            return RestResponse.success();
+        }else{
+            return response;
+        }
     }
+
     /**
      * 根据放音文件的ｉｄ删除放音文件
      * @param request
@@ -104,39 +105,17 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/delete")
     @ResponseBody
-    public Map delete(HttpServletRequest request, String id){
-        RestResponse restResponse = deleteVoiceFilePlay(request,id);
-        Map map = new HashMap();
-        map.put("flag",restResponse.isSuccess());
-        return map;
-    }
-
-    /**
-     * 根据放音文件的ｉｄ删除放音文件
-     * @param request
-     * @param id　放音文件ｉｄ
-     * @return
-     */
-    private RestResponse deleteVoiceFilePlay(HttpServletRequest request,String id){
+    public RestResponse delete(HttpServletRequest request, String id){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/delete?id={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class,id);
+        RestResponse<VoiceFilePlay> response = RestRequest.buildSecurityRequest(token).get(uri, VoiceFilePlay.class, id);
+        if(response.isSuccess()){
+            return RestResponse.success();
+        }else{
+            return response;
+        }
     }
 
-    /**
-     * 根据当前页，每页记录数，应用ｉｄ，放音文件的名字（模糊查询）进行查询放音文件的分页信息
-     * @param request
-     * @param pageNo　当前页
-     * @param pageSize　每页记录数
-     * @param appId　应用的ｉｄ
-     * @param name　放音文件的名字
-     * @return
-     */
-    private RestResponse pageListVoiceFilePlay(HttpServletRequest request, Integer pageNo, Integer pageSize, String appId,String name){
-        String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/plist?pageNo={1}&pageSize={2}&name={3}&appId={4}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri,VoiceFilePlay.class,pageNo,pageSize,name,appId);
-    }
     /**
      * 获取用户的账务表信息
      * @param request
@@ -225,7 +204,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/status"  )
     @ResponseBody
-    public Map  status(HttpServletRequest request ){
+    public RestResponse  status(HttpServletRequest request ){
         UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("ossUpload");
         Map map = new HashMap();
         if(fuploadStatus==null){
@@ -242,6 +221,6 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                  map.put("percentComplete",percentComplete);
              }
         }
-        return map;
+        return RestResponse.success(map);
     }
 }
