@@ -248,7 +248,7 @@
 <script>
     function sendEmailCode(){
         var email = $('#email').val();
-        var param = {'email':email,parameterName:token};
+        var param = {'email':email,csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/account/safety/modify_email_bind",param,function(result){
           if(result.success){
               showmsg('已发送成功<span style="color:orange;font-size:20px">12小时</span>内有效','moadltips3');
@@ -283,7 +283,7 @@
             vCode = $("#second-code").val();
         }
         var mobile = $('#mobile').val();
-        var param = {'mobile':mobile,'validateCode':vCode,parameterName:token};
+        var param = {'mobile':mobile,'validateCode':vCode,csrfParameterName:csrfToken};
         ajaxsync(ctx+"/mc/send",param,function(response){
             if(response.data.flag){
                 showmsg('发送短信验证码成功','moadltips2');
@@ -315,7 +315,7 @@
         }
         var type = $('#modaltype').val();
         //验证密码
-        var param = {'oldPws':psw,parameterName:token};
+        var param = {'oldPws':psw,csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/account/safety/validation_psw",param,function(data){
             if(data.sucess==2) {
                 showmsg(data.msg,'moadltips2');
@@ -343,7 +343,7 @@
         ajaxsync(ctx+"/mc/check",param,function(response){
             if(response.data.flag){
                 //开始绑定手机号码
-                param = {'mobile':mobile,parameterName:token};
+                param = {'mobile':mobile,csrfParameterName:csrfToken};
                 ajaxsync(ctx+"/console/account/safety/edit_mobile",param,function(result){
                     if(result.success){
                         $('#mobileOld').html("您已经绑定了手机 "+mobile.substring(0,3)+"****"+mobile.substring(7,11));
