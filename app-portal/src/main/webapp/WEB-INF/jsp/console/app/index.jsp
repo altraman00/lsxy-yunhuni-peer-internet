@@ -79,7 +79,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form " maxlength="300" />
+                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form limit300"/>
                                             </div>
                                         </div>
 
@@ -110,7 +110,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">服务器白名单：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="whiteList" value="${app.whiteList}" placeholder="" class="form-control input-form " maxlength="200" />
+                                                <input type="text" name="whiteList" value="${app.whiteList}" placeholder="" class="form-control input-form limit300"/>
                                             </div>
                                         </div>
                                         <p class="tips">
@@ -119,7 +119,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form" maxlength="300"/>
+                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form limit300"/>
                                             </div>
                                             <a href="">回调说明文档</a>
                                         </div>
