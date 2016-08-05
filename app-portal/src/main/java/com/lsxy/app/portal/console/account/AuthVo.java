@@ -18,6 +18,7 @@ public class AuthVo implements Serializable {
     private String corpName;//企业名称
     private String addr;//企业地址
     private String industry;//所属行业
+    private String proposer;//申请人
 
     private String  authType;// 认证类型
     private String  type01Prop01;// [一照一码]营业执照照片
@@ -177,5 +178,13 @@ public class AuthVo implements Serializable {
 
     public void setType03Prop04(String type03Prop04) {
         this.type03Prop04 = type03Prop04;
+    }
+
+    public String getProposer() {
+        return proposer;
+    }
+
+    public void setProposer(String proposer) {
+        this.proposer = proposer;
     }
 }
