@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * 订单统计serviceimpl
+ * 订单小时统计serviceimpl
  * Created hangxb on 2016/7/6.
  */
 @Service

@@ -51,11 +51,11 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
     /**
      * 根据当前时间，进行统计
      * @param date1 时间yyyy-MM-dd
-     * @param day1 第几天 1-31
+     * @param month1 第几天 1-31
      * @param date2 前一天的时间 yyyy-MM-dd
-     * @param day2 前一天是第几天 1-31
+     * @param month2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select) throws SQLException;
 
 }

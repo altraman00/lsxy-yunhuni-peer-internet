@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * 订单统计serviceimpl
+ * 订单月统计serviceimpl
  * Created by zhangxb on 2016/7/6.
  */
 @Service
