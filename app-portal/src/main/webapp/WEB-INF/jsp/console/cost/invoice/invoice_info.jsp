@@ -88,6 +88,17 @@
                             </div>
                             <section class=" w-f cost_invoice">
                                 <div class="wrapper header">
+                                    <span class="border-left">&nbsp;发票说明</span>
+                                </div>
+                                <div class="col-md-12 ">
+                                    <div class="number_info">
+                                        <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)共三种，个人增值税普通发票的发票抬头修改后可直接保存，企业增值税普通发票和企业增值税专用票则需要用户进行企业认证后才能开具</p>
+                                        <p>*官方活动赠送金额不计算在开票金额内</p>
+                                        <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细确认</p>
+                                        <p>*因账务结算原因，每月25号期前提交的开票申请当月受理，之后申请延期至下月受理</p>
+                                    </div>
+                                </div>
+                                <div class="wrapper header">
                                     <span class="border-left">&nbsp;发票信息</span>
                                 </div>
                                 <div class="row m-l-none m-r-none bg-light lter">
@@ -98,7 +109,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">发票类型：</lable>
                                                 <lable class="col-md-6  line34">
-                                                    <c:if test="${invoiceInfo.type == 1}">人增值税普通发票</c:if>
+                                                    <c:if test="${invoiceInfo.type == 1}">个人增值税普通发票</c:if>
                                                     <c:if test="${invoiceInfo.type == 2}">企业增值税普通票</c:if>
                                                     <c:if test="${invoiceInfo.type == 3}">企业增值税专用票</c:if>
                                                 </lable>
@@ -116,13 +127,13 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <lable class="col-md-3 text-right ">银行账号：</lable>
-                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.bank}</lable>
+                                                    <lable class="col-md-3 text-right ">银行账户：</lable>
+                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.bankAccount}</lable>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">开户行：</lable>
-                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.bankAccount}</lable>
+                                                    <lable class="col-md-9 line34 "> ${invoiceInfo.bank}</lable>
                                                 </div>
 
                                                 <div class="form-group">
@@ -133,6 +144,13 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">企业电话：</lable>
                                                     <lable class="col-md-9 line34 "> ${invoiceInfo.phone}</lable>
+                                                </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
+                                                    <div class="col-md-9 line34">
+                                                        <c:set var="defaultImgUrl" value="${(empty invoiceInfo.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(invoiceInfo.qualificationUrl))}" />
+                                                        <img src="${defaultImgUrl}" alt="" id="imgPrev" width="100" height="80" class="recordimg" />
+                                                    </div>
                                                 </div>
                                             </c:if>
                                             <!--企业增值税专用显示-->

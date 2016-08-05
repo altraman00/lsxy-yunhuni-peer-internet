@@ -15,39 +15,20 @@ public class SecurityUser implements Serializable{
 	/**
 	 * 自定义Authentication对象，使得Subject除了携带用户的登录名外还可以携带更多信息.
 	 */
-	private String name;
 	private String id;
-	private String type;
-	private String tenantUn;
-	private String tenantName;
-	private String number;
 	private String userName;
+	private String tid; //租户自增长ID，并不是租户的ID
+	private String tenantId; //租户ID
 
-	public String getNumber() {
-		return number;
+	public SecurityUser() {
 	}
 
-	public void setNumber(String number) {
-		this.number = number;
+	public SecurityUser(String id, String userName, String tid, String tenantId) {
+		this.id = id;
+		this.userName = userName;
+		this.tid = tid;
+		this.tenantId = tenantId;
 	}
-
-
-	public String getTenantName() {
-		return tenantName;
-	}
-
-	public String getTenantUn() {
-		return tenantUn;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public String getId() {
 		return id;
 	}
@@ -56,20 +37,13 @@ public class SecurityUser implements Serializable{
 		return userName;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public String getTid() {
+		return tid;
 	}
 
-
-
-	public SecurityUser(String id, String userName, String name, String tenantUn,String tenantName) {
-		this.userName = userName;
-		this.name = name;
-		this.id = id;
-		this.tenantUn = tenantUn;
-		this.tenantName = tenantName;
+	public String getTenantId() {
+		return tenantId;
 	}
-	
 
 
 	/**
@@ -79,8 +53,5 @@ public class SecurityUser implements Serializable{
 		return JSONUtil2.objectToJson(this);
 	}
 
-	public String getName() {
-		return name;
-	}
 
 }

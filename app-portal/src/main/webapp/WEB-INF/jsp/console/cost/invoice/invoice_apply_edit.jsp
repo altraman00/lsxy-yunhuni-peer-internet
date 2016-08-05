@@ -88,30 +88,44 @@
                             </div>
                             <section class=" w-f cost_invoice">
                                 <div class="wrapper header">
+                                    <span class="border-left">&nbsp;发票说明</span>
+                                </div>
+                                <div class="col-md-12 ">
+                                    <div class="number_info">
+                                        <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)共三种，个人增值税普通发票的发票抬头修改后可直接保存，企业增值税普通发票和企业增值税专用票则需要用户进行企业认证后才能开具</p>
+                                        <p>*官方活动赠送金额不计算在开票金额内</p>
+                                        <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细确认</p>
+                                        <p>*因账务结算原因，每月25号期前提交的开票申请当月受理，之后申请延期至下月受理</p>
+                                    </div>
+                                </div>
+
+                                <div class="wrapper header">
                                     <span class="border-left">&nbsp;开票申请</span>
                                 </div>
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="row">
-                                        <form:form role="form" action="${ctx}/console/cost/invoice_apply/save" method="post" class="invoice-form"
-                                              id="costInvoiceForm">
+                                        <form:form role="form" action="${ctx}/console/cost/invoice_apply/save" method="post" class="invoice-form" enctype="multipart/form-data"
+                                              id="invoiceForm">
                                             <!-- 防止表单重复提交要加这个隐藏变量 -->
                                             <input type="hidden" name="submission_token" value="${submission_token}" />
                                             <input type="hidden" name="id" value="${apply.id}"/>
                                             <div class="form-group">
-                                                <span class=" text-label"><strong>开票信息:</strong></span>
+                                                <span class=" text-label"><strong>开票信息:</strong><a id="invoice-url">(消费详情)</a></span>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">开具发票金额：</lable>
-                                                <lable class="col-md-9 line34"><fmt:formatNumber value="${ apply.amount}" pattern="#0.00" />元</lable>
+                                                <lable class="col-md-9 line34"><span id="invoice-price" data-money="<fmt:formatNumber value="${ apply.amount}" pattern="#0.00" />"><fmt:formatNumber value="${ apply.amount}" pattern="#0.00" />元</span></lable>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">开票时间：</lable>
-                                                <lable class="col-md-9 line34"><fmt:formatDate value="${apply.start}" pattern="yyyy-MM"/> 至 <fmt:formatDate value="${apply.end}" pattern="yyyy-MM"/></lable>
+                                                <lable class="col-md-9 line34"><span id="ininvoicetime" data-start="<fmt:formatDate value="${apply.start}" pattern="yyyy-MM"/>" data-end="<fmt:formatDate value="${apply.end}" pattern="yyyy-MM"/>" >
+                                                    <fmt:formatDate value="${apply.start}" pattern="yyyy-MM"/> 至 <fmt:formatDate value="${apply.end}" pattern="yyyy-MM"/>
+                                                </span></lable>
                                                 <input type="hidden" name="start" value="<fmt:formatDate value="${apply.start}" pattern="yyyy-MM"/>">
                                                 <input type="hidden" name="end" value="<fmt:formatDate value="${apply.end}" pattern="yyyy-MM"/>">
                                             </div>
                                             <div class="form-group">
-                                                <span class="hr text-label"><strong>发票信息:</strong> <a id="invoice-url">(查看详情)</a></span>
+                                                <span class="hr text-label"><strong>发票信息:</strong> &nbsp;<span class="grey">(临时修改不改变已保存的邮寄信息)</span></span>
                                             </div>
 
 
@@ -128,7 +142,7 @@
                                                         企业增值税专用票
                                                     </c:if>
                                                 </lable>
-                                                <input type="hidden" name="type" value="${apply.type}">
+                                                <input id="type" type="hidden" name="type" value="${apply.type}">
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">发票抬头：</lable>
@@ -155,6 +169,15 @@
                                                     <lable class="col-md-3 text-right ">企业电话：</lable>
                                                     <lable class="col-md-4"><input name="phone" placeholder="请填写企业电话" value="${apply.phone}" class="form-control input-form notEmpty" data-bv-field="notEmpty"/></lable>
                                                 </div>
+                                                <div class="form-group">
+                                                    <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
+                                                    <div class="col-md-4">
+                                                        <c:set var="defaultImgUrl" value="${(empty apply.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(apply.qualificationUrl))}" />
+                                                        <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${apply.qualificationUrl}" data-url="${defaultImgUrl}">
+                                                        <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
+                                                        <img src="${defaultImgUrl}" alt="" id="imgPre" width="100" height="80" class="recordimg" />
+                                                    </div>
+                                                </div>
                                             </c:if>
                                             <div class="form-group">
                                                 <span class="hr text-label"><strong>邮寄信息:</strong> &nbsp;<span class="grey">(临时修改不改变已保存的邮寄信息)</span></span>
@@ -175,13 +198,13 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">手机号码：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="receiveMobile" placeholder="请填写手机号码" value="${apply.receiveMobile}" class="form-control input-form notEmpty" data-bv-field="notEmpty" />
+                                                    <input type="text" name="receiveMobile" placeholder="请填写手机号码" value="${apply.receiveMobile}" class="form-control input-form mobile" data-bv-field="notEmpty" />
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
                                                 <div class="col-md-3 text-right">
-                                                    <button class="btn btn-primary  btn-form ">提交申请</button>
+                                                    <button class="btn btn-primary  btn-form " id="validateBtn">提交申请</button>
                                                 </div>
                                                 <div class="col-md-4 ">
                                                     <a href="${ctx}/console/cost/invoice_apply/page" class=" btn btn-default  btn-form">取消</a>
@@ -210,7 +233,7 @@
                     &times;
                 </button>
                 <h4 class="modal-title" id="myModalLabel">
-                    开票详情
+                    消费详情
                 </h4>
             </div>
             <div class="modal-body">
@@ -267,23 +290,35 @@
 <div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
+<script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 <!--syncpage-->
 <script>
 
     $('#invoice-url').click(function(){
-        //列表加载数据
-        var html ='';
+        var flag = false;
         //标题时间段
-        var starttime = $('#datestart').val();
-        var endtime   = $('#dateend').val();
-        var money =  100;
+        var starttime = $('#ininvoicetime').attr('data-start');
+        var endtime   = $('#ininvoicetime').attr('data-end');
+        var money =  $('#invoice-price').attr('data-money');
         //时间
         $('#cost-detail-time').html(starttime+' 至 '+ endtime);
         //消费金额
-        $('#cost-detail-money').html(100);
-
+        $('#cost-detail-money').html(money);
         //获取数据总数
         var count = 11;
+
+        ajaxsync(ctx + "/console/cost/invoice_apply/count_day_consume",{start:starttime,end:endtime},function(response){
+            if(response.success){
+                flag = true;
+                count = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
+        if(!flag){
+            return;
+        }
         //每页显示数量
         var listRow = 3;
         //显示多少个分页按钮
@@ -304,57 +339,57 @@
      * @param nowPage 当前页数
      * @param listRows 每页显示多少条数据
      * */
-    var searchTable = function(nowPage,listRows)
-    {
+    var searchTable = function(nowPage,listRows){
+        var starttime = $('#ininvoicetime').attr('data-start');
+        var endtime   = $('#ininvoicetime').attr('data-end');
+        var result = [];
 
-        var data = [
-            ['2016-06-07', '1000.00'],
-            ['2016-06-06', '1000.00'],
-            ['2016-06-05', '1000.00']
-        ];
+        ajaxsync(ctx + "/console/cost/invoice_apply/list_day_consume",{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},function(response){
+            if(response.success){
+                result = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
         var html ='';
         //数据列表
-
-        for(var i = 0 ; i<data.length; i++){
-            html +='<div class="row c-title"><div class="col-md-3">'+data[i][0]+'</div><div class="col-md-6">'+data[i][1]+'</div><div class="col-md-3"><a onclick="showModalDetail(this)"  data-id="collapse-'+i+'">展开</a><span data-toggle="collapse" href="#collapse-'+i+'" id="collapse-'+i+'-show" ></span></div></div><div id="collapse-'+i+'" class="content accordion-body collapse" style="height: 0px; "><div class="accordion-inner"><div class="row" id="collapse-'+i+'-content"></div></div></div>';
+        for(var i = 0 ; i<result.length; i++){
+            var tempDate = new Date(result[i].dt);
+            var tempDataStr = tempDate.getFullYear()+"-"+(tempDate.getMonth()+1)+"-"+tempDate.getDate();
+            html +='<div class="row c-title"><div class="col-md-3">'+ tempDataStr +'</div><div class="col-md-6">'+result[i].amongAmount.toFixed(2)+'</div><div class="col-md-3"><a onclick="showModalDetail(this)"  data-id="'+tempDataStr+'">展开</a><span data-toggle="collapse" href="#collapse-'+tempDataStr+'" id="collapse-'+tempDataStr+'-show" ></span></div></div><div id="collapse-'+tempDataStr+'" class="content accordion-body collapse" style="height: 0px; "><div class="accordion-inner"><div class="row" id="collapse-'+tempDataStr+'-content"></div></div></div>';
         }
         $('#modal-content').html('');
         $('#modal-content').html(html);
     }
 
-
     function showModalDetail(obj){
+        //组装数据
+        var result = [];
         var id = obj.getAttribute('data-id');
         var title = obj.innerHTML;
         if(title=='展开'){
             //ajax
+            ajaxsync(ctx + "/console/cost/bill_day/list",{day:id},function(response){
+                if(response.success){
+                    result = response.data;
+                }else{
+                    showtoast(response.errorMsg?response.errorMsg:'数据异常');
+                }
+            },"get");
 
-            //组装数据
-            var d = [
-                { title : '单项外呼', price :'120元' },
-                { title : '双向呼叫', price :'120元' },
-                { title : '电话会议', price :'120元' },
-                { title : '电话接入IVR', price :'120元' },
-                { title : 'IVR外呼放音', price :'120元' },
-                { title : '短信', price :'120元' },
-                { title : '电话通知', price :'120元' },
-                { title : '通话录音', price :'120元' },
-                { title : 'IVR功能费', price :'120元' },
-                { title : 'IVR号码租用费', price :'120元' },
-                { title : '录音文件存储', price :'120元' }
-            ];
             var html ='';
-            for(var i=0 ; i<d.length; i++){
-                html+='<div class="col-md-6"><span class="col-md-6">'+d[i]['title']+'：</span><div class="col-md-6">'+d[i]['price']+'</div></div>';
+            for(var i=0 ; i<result.length; i++){
+                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amount.toFixed(2)+'</div></div>';
             }
 
-            document.getElementById(id+'-content').innerHTML=html;
+            document.getElementById('collapse-'+id+'-content').innerHTML=html;
             //显示
-            document.getElementById(id+'-show').click();
+            document.getElementById('collapse-'+id+'-show').click();
             obj.innerHTML='收起';
         }else{
 
-            document.getElementById(id+'-show').click();
+            document.getElementById('collapse-'+id+'-show').click();
             obj.innerHTML='展开';
         }
     }
@@ -370,7 +405,43 @@
         $('.modal-loadding').hide();
     }
 
+//    function showImage()
+//    {
+//        // 获取文件路径
+//        var path = document.getElementById('uploadfile').value;
+//        // 显示文件路径
+//        //document.getElementById('imgName').innerHTML = path;
+//        // 创建 img
+//        var img = document.createElement('img');
+//        // 载入图像
+//        img.src = path;
+//        // 插入图像到页面中
+//        document.getElementById('imgPrev').appendChild(img);
+//    }
 
+    function bfSubmit(){
+        var flag = false;
+        var type = $("#type").val();
+        ajaxsync(ctx + "/console/account/auth/is_real_auth",null,function(response){
+            if(response.success){
+                if(response.data == 1){
+                    if(type == response.data){
+                        flag = true;
+                    }else{
+                        showtoast('个人实名认证的用户不能进行企业发票申请');
+                    }
+                }else if(response.data == 2){
+                    flag = true;
+                }else{
+                    showtoast('请先进行实名认证');
+                }
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
+            }
+        },"get");
+
+        return flag;
+    }
 </script>
 
 

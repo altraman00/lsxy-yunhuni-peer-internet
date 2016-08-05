@@ -1,14 +1,9 @@
-package com.lsxy.app.portal;
+package com.lsxy.app.portal.open;
 
 import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.tenant.service.AccountService;
-import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
-import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
@@ -16,9 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 忘记密码
