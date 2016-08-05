@@ -190,10 +190,8 @@ public class AuthController extends AbstractPortalController {
             if(StringUtil.isNotEmpty(upgrade)){
                 logger.info("个人认证  升级到企业认证:{}",upgrade);
                 mav.addObject("upgrade",true);//个人认证  升级到企业认证
-                mav.setViewName("/console/account/auth/index");
-            }else{
-                mav.setViewName("/console/account/auth/index");
             }
+            mav.setViewName("/console/account/auth/index");
         }
         return mav;
     }

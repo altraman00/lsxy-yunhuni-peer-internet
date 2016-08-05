@@ -260,7 +260,9 @@
         form.submit();
     }
     var msg = '${msg}';
-    if(msg==''){}else{showtoast(msg);}
+    if(msg){
+        showtoast(msg);
+    }
 </script>
 <c:if test="${upgrade == true}">
     <script>
