@@ -164,7 +164,7 @@
                                                     <input class="card_select_2" type="radio" name="authType" value="2"> 三证分离
                                                 </div>
                                             </div>
-                                            <div class="form-group card_type01">
+                                            <div class="card_type01">
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label lineheight-24">统一社会信用代码：</lable>
                                                     <div class="col-md-4">
@@ -180,8 +180,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div class="form-group card_type02">
+                                            <div class="card_type02">
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">注册号：</lable>
                                                     <div class="col-md-4">
@@ -204,8 +203,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div class="form-group card_type03">
+                                            <div class="card_type03">
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">税务登记号：</lable>
                                                     <div class="col-md-4">
