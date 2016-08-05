@@ -159,7 +159,7 @@
                                                     <c:if test="${app.id==null}">创建</c:if>
                                                     <c:if test="${app.id!=null}">修改</c:if>
                                                 </a>
-                                                <c:if test="${app.id!=null}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s<a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
+                                                <c:if test="${app.id!=null}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
                                             </div>
                                         </div>
                                     </form:form>
