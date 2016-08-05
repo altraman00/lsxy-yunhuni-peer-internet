@@ -13,7 +13,7 @@ public class ConsumeStatisticsVo {
     private String type = TYPE_MONTH;//类型统计类型 month day
     private String startTime = DateUtils.formatDate(new Date(),"yyyy-MM");//时间
     private String endTime = "";//比较时间
-    private String appId = "0";//应用编号
+    private String appId = "-1";//应用编号
 
     public ConsumeStatisticsVo() {
     }

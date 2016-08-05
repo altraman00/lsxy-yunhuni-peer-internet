@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 消费统计
@@ -67,9 +64,10 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/page_list")
     @ResponseBody
-    public List pageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,
+                         @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
         List list = ((Page)getPageList( request, consumeStatisticsVo, pageNo, pageSize).getData()).getResult();
-        return list;
+        return RestResponse.success(list);
     }
 
     /**
@@ -80,7 +78,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public List list(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo){
+    public RestResponse list(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo){
         List list = new ArrayList();
         if(ConsumeStatisticsVo.TYPE_DAY.equals(consumeStatisticsVo.getType())){//日统计比较
             Map map1 = getConsumeDayList(request,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime());
@@ -97,7 +95,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
                 list.add(map2);
             }
         }
-        return list;
+        return RestResponse.success(list);
     }
 
     /**
@@ -109,8 +107,10 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     private Map getConsumeDayList(HttpServletRequest request,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/consume_day/list?appId={1}&startTime={2}";
-        RestResponse<List<ConsumeDay>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeDay.class,appId,startTime);
+        appId = "-1".equals(appId)?null:appId;
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        String uri = restPrefixUrl +   "/rest/consume_day/list?tenantId={1}&appId={2}&startTime={3}";
+        RestResponse<List<ConsumeDay>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeDay.class,tenantId,appId,startTime);
         List<ConsumeDay> list =  restResponse.getData();
         Map map = new HashMap();
         map.put("name",DateUtils.formatDate(DateUtils.parseDate(startTime,"yyyy-MM"),"MM月"));
@@ -127,8 +127,10 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     private Map getConsumeMonthList(HttpServletRequest request,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/consume_month/list?appId={1}&startTime={2}";
-        RestResponse<List<ConsumeMonth>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeMonth.class,appId,startTime);
+        appId = "-1".equals(appId)?null:appId;
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        String uri = restPrefixUrl +   "/rest/consume_month/list?tenantId={1}&appId={2}&startTime={3}";
+        RestResponse<List<ConsumeMonth>> restResponse =  RestRequest.buildSecurityRequest(token).getList(uri, ConsumeMonth.class,tenantId,appId,startTime);
         List<ConsumeMonth> list =  restResponse.getData();
         Map map = new HashMap();
         map.put("name",startTime+"年");
@@ -146,9 +148,9 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[i]=((ConsumeMonth)obj).getSumAmount().doubleValue();
+                list1[i]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof ConsumeDay){
-                list1[i]=((ConsumeDay)obj).getSumAmount().doubleValue();
+                list1[i]=((ConsumeDay)obj).getAmongAmount().doubleValue();
             }
         }
         return list1;
@@ -164,11 +166,14 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     private RestResponse getPageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/consume_"+consumeStatisticsVo.getType()+"/page?appId={1}&startTime={2}&endTime={3}&pageNo={4}&pageSize={5}";
+        String uri = restPrefixUrl + "/rest/consume_"+consumeStatisticsVo.getType()+"/page?tenantId={1}&appId={2}&type={3}&startTime={4}&endTime={5}&pageNo={6}&pageSize={7}";
         Class clazz = ConsumeMonth.class;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(consumeStatisticsVo.getType())){
             clazz = ConsumeDay.class;
         }
-        return RestRequest.buildSecurityRequest(token).getPage(uri,clazz ,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
+        String appId = "-1".equals(consumeStatisticsVo.getAppId())?null:consumeStatisticsVo.getAppId();
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        return RestRequest.buildSecurityRequest(token).getPage(uri,clazz ,tenantId,appId,
+                null,consumeStatisticsVo.getStartTime(),consumeStatisticsVo.getEndTime(),pageNo,pageSize);
     }
 }

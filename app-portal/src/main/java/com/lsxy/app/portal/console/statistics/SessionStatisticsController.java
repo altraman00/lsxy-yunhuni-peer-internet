@@ -3,6 +3,8 @@ package com.lsxy.app.portal.console.statistics;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.api.statistics.model.ConsumeDay;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
+import com.lsxy.framework.api.statistics.model.VoiceCdrDay;
+import com.lsxy.framework.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -29,8 +31,6 @@ import java.util.List;
 public class SessionStatisticsController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(SessionStatisticsController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
-    private static final int SESSION = 1; //会话统计
-    private static final int CONSUME = 2; //消费统计
     /**
      * 消费统计首页
      * @param request
@@ -67,14 +67,33 @@ public class SessionStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public List list(HttpServletRequest request,String type,String startTime,String appId){
+    public RestResponse list(HttpServletRequest request,String type,String startTime,String appId){
         List list = new ArrayList();
-        List tempList = getList(request,type,appId,startTime);
-        list.add(getArrays(tempList,CONSUME));
-        list.add(getArrays(tempList,SESSION));
-        return list;
+        List tempConsumeList = getConsumeList(request,type,appId,startTime);
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
+        list.add(getArrays(tempConsumeList));
+        list.add(getArrays(tempVoiceCdrList));
+        return RestResponse.success(list);
     }
-
+    /**
+     * 获取通话记录（session）的List
+     * @param request
+     * @param appId 应用id
+     * @param startTime 开始时间
+     * @param type 统计类型
+     * @return
+     */
+    private List getVoiceCdrList(HttpServletRequest request,String type,String appId,String startTime){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/voice_cdr_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
+        Class clazz = VoiceCdrDay.class;
+        if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
+            clazz = VoiceCdrMonth.class;
+        }
+        appId = "-1".equals(appId)?null:appId;
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        return (List)RestRequest.buildSecurityRequest(token).getList(uri, clazz,tenantId,appId,startTime).getData();
+    }
     /**
      * 获取消费List
      * @param request
@@ -83,37 +102,34 @@ public class SessionStatisticsController extends AbstractPortalController {
      * @param type 统计类型
      * @return
      */
-    private List getList(HttpServletRequest request,String type,String appId,String startTime){
+    private List getConsumeList(HttpServletRequest request,String type,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/consume_"+type+"/list?appId={1}&startTime={2}";
+        String uri = restPrefixUrl +   "/rest/consume_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
         Class clazz = ConsumeDay.class;
         if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
             clazz = ConsumeMonth.class;
         }
-        return (List)RestRequest.buildSecurityRequest(token).getList(uri, clazz,appId,startTime).getData();
+        appId = "-1".equals(appId)?null:appId;
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        return (List)RestRequest.buildSecurityRequest(token).getList(uri, clazz,tenantId,appId,startTime).getData();
     }
     /**
      * 获取列表数据
      * @param list 待处理的list
-     * @param type 统计类型
      * @return
      */
-    private double[] getArrays(List list,int type) {
-        double[] list1 = new double[list.size()];
+    private Object[] getArrays(List list) {
+        Object[] list1 = new Object[list.size()];
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                if(SESSION==type){
-                    list1[i]=((ConsumeMonth)obj).getSumSessionCount();
-                }else if(CONSUME==type){
-                    list1[i]=((ConsumeMonth)obj).getSumAmount().doubleValue();
-                }
+                list1[i]=((ConsumeMonth)obj).getSumAmount().doubleValue();
+            }else if(obj instanceof VoiceCdrMonth){
+                list1[i]=((VoiceCdrMonth)obj).getAmongCall();
             }else if(obj instanceof ConsumeDay){
-                if(SESSION==type){
-                    list1[i]=((ConsumeDay)obj).getSumSessionCount();
-                }else if(CONSUME==type){
-                    list1[i]=((ConsumeDay)obj).getSumAmount().doubleValue();
-                }
+                list1[i]=((ConsumeDay)obj).getSumAmount().doubleValue();
+            }else if(obj instanceof VoiceCdrDay){
+                list1[i]=((VoiceCdrDay)obj).getAmongCall();
             }
         }
         return list1;

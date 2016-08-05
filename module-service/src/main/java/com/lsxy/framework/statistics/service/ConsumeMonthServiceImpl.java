@@ -3,21 +3,28 @@ package com.lsxy.framework.statistics.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
-import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.statistics.dao.ConsumeMonthDao;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.statistics.dao.ConsumeMonthDao;
+import com.lsxy.utils.StatisticsUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消费月统计serviceimpl
@@ -29,35 +36,23 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
     ConsumeMonthDao consumeMonthDao;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<ConsumeMonth, Serializable> getDao() {
         return consumeMonthDao;
     }
     @Override
-    public Page<ConsumeMonth> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
-        Page<ConsumeMonth> page = null;
-        if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and ( DATE_FORMAT(obj.dt,'%Y')=?2 or DATE_FORMAT(obj.dt,'%Y')=?3 ) ORDER BY obj.dt,obj.month";
-            page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
-        }else{
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and obj.appId=?2 and ( DATE_FORMAT(obj.dt,'%Y')=?3  or DATE_FORMAT(obj.dt,'%Y')=?4 )ORDER BY obj.dt,obj.month";
-            page = this.pageList(hql,pageNo,pageSize,tenant.getId(),appId,endTime,startTime);
-        }
+    public Page<ConsumeMonth> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize) {
+        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt,obj.month";
+        Page<ConsumeMonth>   page = this.pageList(hql,pageNo,pageSize,startTime,endTime);
         return page;
     }
 
     @Override
-    public List<ConsumeMonth> list(String userName, String appId, String startTime) {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
-        List<ConsumeMonth> list = null;
-        if("0".equals(appId)){//表示查询全部
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and DATE_FORMAT(obj.dt,'%Y')=?2 ORDER BY obj.month";
-            list = this.findByCustomWithParams(hql, tenant.getId(),startTime);
-        }else{
-            String hql = "from ConsumeMonth obj where obj.tenantId=?1 and obj.appId=?2 and DATE_FORMAT(obj.dt,'%Y')=?3 ORDER BY obj.month";
-            list = this.findByCustomWithParams(hql, tenant.getId(),appId,startTime);
-        }
+    public List<ConsumeMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
+        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.month";
+        List<ConsumeMonth>list = this.findByCustomWithParams(hql,startTime,endTime);
         return list;
     }
 
@@ -88,15 +83,14 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
                 endTime = format.parse(end);
             }
             if(endTime != null){
-                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where obj.tenantId = ?1 and obj.dt between ?2 and ?3";
+                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,null, null)+" obj.dt between ?1 and ?2";
             }else{
-                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where obj.tenantId = ?1 and obj.dt >= ?2";
+                hql = "select sum(obj.amongAmount) from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,null, null)+" obj.dt >= ?1";
             }
             Query query = this.getEm().createQuery(hql);
-            query.setParameter(1, tenantId);
-            query.setParameter(2, startTime);
+            query.setParameter(1, startTime);
             if(endTime != null){
-                query.setParameter(3, endTime);
+                query.setParameter(2, endTime);
             }
             Object obj = query.getSingleResult();
             amount = (BigDecimal) obj;
@@ -107,5 +101,40 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
             amount = new BigDecimal(0);
         }
         return amount;
+    }
+
+    @Override
+    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select) throws SQLException {
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+        String selects = map.get("selects");
+        String groupbys = map.get("groupbys");
+        String wheres = map.get("wheres");
+        //拼装sql
+        String sql = "insert into db_lsxy_base.tb_base_consume_month("+selects+" dt,month,among_amount,sum_amount,create_time,last_time,deleted,sortno,version )" +
+                " SELECT "+selects+" ? as dt,? as month, "+
+                " IFNULL(sum(among_amount),0) as among_amount, " +
+                " IFNULL(sum(sum_amount),0) as  sum_amount, " +
+                " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
+                " from db_lsxy_base.tb_base_consume_day a where tenant_id is not null and app_id is not null and type is not null and dt>=? and dt<=? "+groupbys;
+        //拼装参数
+        Timestamp sqlDate1 = new Timestamp(date1.getTime());
+        long times = new Date().getTime();
+        Timestamp initDate = new Timestamp(times);
+        Timestamp sqlDate2 = new Timestamp(date2.getTime());
+        Date date3 = DateUtils.parseDate(DateUtils.getMonthLastTime(date1),"yyyy-MM-dd HH:mm:ss");
+        Timestamp sqlDate3 = new Timestamp(date3.getTime());
+        Object[] obj = new Object[]{
+                sqlDate1,month1,
+                initDate,initDate,0,times,0,
+                sqlDate1,sqlDate3
+        };
+        jdbcTemplate.update(sql,new PreparedStatementSetter(){
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+                for(int i=0;i<obj.length;i++){
+                    ps.setObject(i+1,obj[i]);
+                }
+            }
+        });
     }
 }

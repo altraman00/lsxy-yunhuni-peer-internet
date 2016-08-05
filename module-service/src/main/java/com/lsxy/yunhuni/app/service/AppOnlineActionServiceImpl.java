@@ -385,4 +385,15 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }
     }
 
+    @Override
+    public void resetAppOnlineAction(String appId) {
+        List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
+        if(actionList != null && actionList.size() > 0){
+            for(AppOnlineAction action : actionList){
+                action.setStatus(AppOnlineAction.STATUS_DONE);
+                this.save(action);
+            }
+        }
+    }
+
 }
