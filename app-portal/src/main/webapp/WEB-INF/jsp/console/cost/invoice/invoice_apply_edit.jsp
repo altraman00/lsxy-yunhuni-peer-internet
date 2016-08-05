@@ -174,7 +174,7 @@
                                                     <div class="col-md-4">
                                                         <c:set var="defaultImgUrl" value="${(empty apply.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(apply.qualificationUrl))}" />
                                                         <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${apply.qualificationUrl}" data-url="${defaultImgUrl}">
-                                                        <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
+                                                        <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。
                                                         <img src="${defaultImgUrl}" alt="" id="imgPre" width="100" height="80" class="recordimg" />
                                                     </div>
                                                 </div>
