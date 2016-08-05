@@ -28,6 +28,12 @@
         <groupId>com.lsxy</groupId>
         <artifactId>module-framework-web</artifactId>
     </dependency>
+
+    <dependency>
+        <groupId>com.lsxy</groupId>
+        <artifactId>app-area-agent-cti</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
 </dependencies>
 
 </project>

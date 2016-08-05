@@ -63,7 +63,7 @@ public abstract class AbstractClient implements Client{
                 }
 
             } catch (ClientBindException e) {
-                e.printStackTrace();
+                logger.error("客户端连接失败:{}   {}",serverUrl,e.getMessage());
             }
             executorService.submit(task);
         }
@@ -185,17 +185,11 @@ public abstract class AbstractClient implements Client{
                         sessionContext.remove(serverUrl);
                     }
                 }else{
-
-                    if(logger.isDebugEnabled()){
-                        logger.debug("尝试连接:"+this.serverUrl);
-                    }
-
+                    logger.info("尝试连接:"+this.serverUrl);
                     try {
                         doBind(this.serverUrl);
                     } catch (ClientBindException e) {
-                        if(logger.isDebugEnabled()){
-                            logger.debug("客户端连接失败:" + e.getMessage());
-                        }
+                        logger.error("客户端连接失败:{}    {}", serverUrl,  e.getMessage());
                     }
                 }
 

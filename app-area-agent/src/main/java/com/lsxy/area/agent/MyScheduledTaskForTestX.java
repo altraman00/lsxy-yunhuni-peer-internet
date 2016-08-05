@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * Created by tandy on 16/7/30.
  */
 
-@Component
+//@Component
 public class MyScheduledTaskForTestX implements Runnable{
 
     public MyScheduledTaskForTestX(){

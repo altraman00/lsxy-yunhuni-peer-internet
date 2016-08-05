@@ -66,6 +66,7 @@ public class NettyClient extends AbstractClient{
 
             // Start the client.
             ChannelFuture f = b.connect(host, port).sync(); // (5)
+
             session = new NettyClientSession(f.channel(),handler,serverUrl);
 
             f.channel().attr(SESSION_ID).set(session.getId());
