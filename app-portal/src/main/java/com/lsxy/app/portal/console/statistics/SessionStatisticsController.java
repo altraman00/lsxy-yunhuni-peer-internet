@@ -67,13 +67,13 @@ public class SessionStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public List list(HttpServletRequest request,String type,String startTime,String appId){
+    public RestResponse list(HttpServletRequest request,String type,String startTime,String appId){
         List list = new ArrayList();
         List tempConsumeList = getConsumeList(request,type,appId,startTime);
         List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
         list.add(getArrays(tempConsumeList));
         list.add(getArrays(tempVoiceCdrList));
-        return list;
+        return RestResponse.success(list);
     }
     /**
      * 获取通话记录（session）的List

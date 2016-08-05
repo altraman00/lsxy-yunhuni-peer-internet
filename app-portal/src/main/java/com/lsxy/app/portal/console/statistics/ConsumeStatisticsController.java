@@ -64,10 +64,10 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/page_list")
     @ResponseBody
-    public List pageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,
+    public RestResponse pageList(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo,
                          @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
         List list = ((Page)getPageList( request, consumeStatisticsVo, pageNo, pageSize).getData()).getResult();
-        return list;
+        return RestResponse.success(list);
     }
 
     /**
@@ -78,7 +78,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      */
     @RequestMapping("/list")
     @ResponseBody
-    public List list(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo){
+    public RestResponse list(HttpServletRequest request,ConsumeStatisticsVo consumeStatisticsVo){
         List list = new ArrayList();
         if(ConsumeStatisticsVo.TYPE_DAY.equals(consumeStatisticsVo.getType())){//日统计比较
             Map map1 = getConsumeDayList(request,consumeStatisticsVo.getAppId(),consumeStatisticsVo.getStartTime());
@@ -95,7 +95,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
                 list.add(map2);
             }
         }
-        return list;
+        return RestResponse.success(list);
     }
 
     /**

@@ -263,28 +263,20 @@
         var app = $('#defaultapp').val();
         var starttime = initialStartTime(type);
         var endtime = initialEndTime(type);
-        $.ajax({
-            url : "${ctx}/console/statistics/consume/list",
-            type : 'post',
-            async: true,//使用false同步的方式,true为异步方式
-            data : {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime, '${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
-                resultData = data;
-                tdata = new Array();
-                var count = 0;
-                for(var i=0;i<resultData.length;i++){
-                    tdata[i]=resultData[i].name;
-                    count+=resultData[i].data.length;
-                }
-                seriesjson=JSON.stringify(resultData);
-                seriesjson = eval('('+seriesjson+')');
-                typeAll=type;
-                charts(tdata,seriesjson,typeAll);
-                updatetable(count);
-            },
-            fail:function(){
+        var params = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime, csrfParameterName:csrfToken};
+        ajaxsubmit(ctx+"/console/statistics/consume/list",params,new function(result){
+            var resultData = result.data;
+            tdata = new Array();
+            var count = 0;
+            for(var i=0;i<resultData.length;i++){
+                tdata[i]=resultData[i].name;
+                count+=resultData[i].data.length;
             }
+            seriesjson=JSON.stringify(resultData);
+            seriesjson = eval('('+seriesjson+')');
+            typeAll=type;
+            charts(tdata,seriesjson,typeAll);
+            updatetable(count);
         });
     }
 
@@ -373,34 +365,25 @@
         var app = $('#defaultapp').val();
         var starttime = initialStartTime(type);
         var endtime = initialEndTime(type);
-        $.ajax({
-            url : "${ctx}/console/statistics/consume/page_list",
-            type : 'post',
-            async: true,//使用false同步的方式,true为异步方式
-            data : {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData){
-                var data =[];
-                for(var i=0;i<resultData.length;i++){
-                    var tempData = new Date(resultData[i].dt);
-                    var tempDataStr = tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate();
-                    if(type=='year'){tempDataStr =  tempData.getFullYear()+"-"+(tempData.getMonth()+1);}
-                    var temp = [tempDataStr,resultData[i].sumAmount];
-                    data[i]=temp;
-                }
-                //var seriesjson=JSON.stringify(resultData);
-                //seriesjson = eval('('+seriesjson+')');
-                i++;
-                var html ='';
-                //数据列表
-                for(var i = 0 ; i<data.length; i++){
-                    html +='<tr><td>'+data[i][0]+'</td><td>'+data[i][1]+'</td></tr>';
-                }
-                $('#tableModal').find("tr").remove();
-                $('#tableModal').append(html);
-            },
-            fail:function(){
+        var param = {'type':type1,'appId':app,'startTime':starttime,'endTime':endtime,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken};
+        ajaxsync(ctx+"/console/statistics/consume/page_list",param,new function(result){
+            var resultData = result.data;
+            var data =[];
+            for(var i=0;i<resultData.length;i++){
+                var tempData = new Date(resultData[i].dt);
+                var tempDataStr = tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate();
+                if(type=='year'){tempDataStr =  tempData.getFullYear()+"-"+(tempData.getMonth()+1);}
+                var temp = [tempDataStr,resultData[i].sumAmount];
+                data[i]=temp;
             }
+            i++;
+            var html ='';
+            //数据列表
+            for(var i = 0 ; i<data.length; i++){
+                html +='<tr><td>'+data[i][0]+'</td><td>'+data[i][1]+'</td></tr>';
+            }
+            $('#tableModal').find("tr").remove();
+            $('#tableModal').append(html);
         });
     }
 
