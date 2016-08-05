@@ -5,6 +5,7 @@ import com.lsxy.framework.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.statistics.dao.VoiceCdrMonthDao;
 import com.lsxy.utils.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +34,26 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     @Override
     public BaseDaoInterface<VoiceCdrMonth, Serializable> getDao() {
         return voiceCdrMonthDao;
+    }
+
+    @Override
+    public Page<VoiceCdrMonth> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
+        return null;
+    }
+
+    @Override
+    public List<VoiceCdrMonth> list(String userName, String appId, String startTime) {
+        return null;
+    }
+
+    @Override
+    public String getStartMonthByTenantId(String tenantId) {
+        return null;
+    }
+
+    @Override
+    public Long sumAmountByTime(String tenantId, String start, String end) {
+        return null;
     }
 
     @Override

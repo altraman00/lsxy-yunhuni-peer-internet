@@ -104,13 +104,13 @@ public class SessionStatisticsController extends AbstractPortalController {
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
                 if(SESSION==type){
-                    list1[i]=((ConsumeMonth)obj).getSumSessionCount();
+                    //list1[i]=((ConsumeMonth)obj).getSumSessionCount();
                 }else if(CONSUME==type){
                     list1[i]=((ConsumeMonth)obj).getSumAmount().doubleValue();
                 }
             }else if(obj instanceof ConsumeDay){
                 if(SESSION==type){
-                    list1[i]=((ConsumeDay)obj).getSumSessionCount();
+                   // list1[i]=((ConsumeDay)obj).getSumSessionCount();
                 }else if(CONSUME==type){
                     list1[i]=((ConsumeDay)obj).getSumAmount().doubleValue();
                 }

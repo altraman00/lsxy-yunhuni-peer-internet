@@ -2,15 +2,57 @@ package com.lsxy.framework.api.statistics.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.statistics.model.VoiceCdrDay;
+import com.lsxy.framework.core.utils.Page;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 通话记录统计（session统计）日统计service
  * Created by zhangxb on 2016/8/1.
  */
 public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
+    /**
+     * 获取用户区间内的分页数据
+     * @param userName 用户名
+     * @param appId 应用id
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    public Page<VoiceCdrDay> pageList(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize);
+
+    /**
+     * 获取用户某时间的列表数据
+     * @param userName 用户名
+     * @param appId 应用id
+     * @param startTime 时间
+     * @return
+     */
+    public List<VoiceCdrDay> list(String userName, String appId, String startTime);
+
+    /**
+     * 获取一定时间的统计数据的总数 时间为月份 yyyy-MM
+     * @param userName
+     * @param appId 应用ID，可为空
+     * @param startTime 开始时间，不可为空
+     * @param endTime 结果时间，不可为空
+     * @return
+     */
+    Long countByTime(String userName, String appId, String startTime, String endTime);
+
+    /**
+     * 获取一定时间的统计数据 时间为月份 yyyy-MM
+     * @param userName
+     * @param appId 应用ID，可为空
+     * @param startTime 开始时间，不可为空
+     * @param endTime 结果时间，不可为空
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    List<VoiceCdrDay> pageListByTime(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize);
     /**
      * 根据当前时间，进行统计
      * @param date1 时间yyyy-MM-dd
