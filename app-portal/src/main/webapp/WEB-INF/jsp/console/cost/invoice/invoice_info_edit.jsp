@@ -133,7 +133,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">发票抬头：</lable>
                                                     <div class="col-md-4 ">
-                                                        <input type="text" data-fv-notempty="true" placeholder=""  name="title"  value="${invoiceInfo.title}"
+                                                        <input type="text" data-fv-notempty="true" placeholder=""  name="title"  value="${invoiceInfo.title}" maxlength="50"
                                                                class="form-control input-form notEmpty"/>
                                                     </div>
                                                 </div>
@@ -142,7 +142,7 @@
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">纳税人识别号：</lable>
                                                         <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}"
+                                                            <input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}" maxlength="32"
                                                                    class="form-control input-form notEmpty"/>
                                                         </div>
                                                     </div>
@@ -150,28 +150,28 @@
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">银行账户：</lable>
                                                         <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="bankAccount"  value="${invoiceInfo.bankAccount}"
+                                                            <input type="text" placeholder="" name="bankAccount"  value="${invoiceInfo.bankAccount}" maxlength="32"
                                                                    class="form-control input-form notEmpty"/>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">开户行：</lable>
                                                         <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="bank"  value="${invoiceInfo.bank}"
+                                                            <input type="text" placeholder="" name="bank"  value="${invoiceInfo.bank}" maxlength="32"
                                                                    class="form-control input-form notEmpty"/>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">注册地址：</lable>
                                                         <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="regAddress"  value="${invoiceInfo.regAddress}"
+                                                            <input type="text" placeholder="" name="regAddress"  value="${invoiceInfo.regAddress}" maxlength="100"
                                                                    class="form-control input-form notEmpty"/>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">企业电话：</lable>
                                                         <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="phone"  value="${invoiceInfo.phone}"
+                                                            <input type="text" placeholder="" name="phone"  value="${invoiceInfo.phone}" maxlength="32"
                                                                    class="form-control input-form notEmpty"/>
                                                         </div>
                                                     </div>
@@ -193,14 +193,14 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">收取地址：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="receiveAddress" value="${invoiceInfo.receiveAddress}"
+                                                        <input type="text" placeholder="" name="receiveAddress" value="${invoiceInfo.receiveAddress}" maxlength="100"
                                                                class="form-control input-form notEmpty"/>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">收件人：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="text" placeholder="" name="receivePeople"  value="${invoiceInfo.receivePeople}"
+                                                        <input type="text" placeholder="" name="receivePeople"  value="${invoiceInfo.receivePeople}" maxlength="32"
                                                                class="form-control input-form notEmpty"/>
                                                     </div>
                                                 </div>
