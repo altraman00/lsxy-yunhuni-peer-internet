@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct;
  * Created by tandy on 16/7/30.
  * 区域客户端
  */
-//@Component
+@Component
 public class AreaClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AreaClient.class);
