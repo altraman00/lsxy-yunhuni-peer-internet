@@ -146,28 +146,28 @@
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">发票抬头：</lable>
-                                                <lable class="col-md-4"><input name="title" placeholder="请填写发票抬头" value="${apply.title}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="50" /></lable>
+                                                <lable class="col-md-4"><input name="title" placeholder="请填写发票抬头" value="${apply.title}" class="form-control input-form limit50" data-bv-field="notEmpty"/></lable>
                                             </div>
                                             <c:if test="${apply.type == 3}">
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">纳税人识别号：</lable>
-                                                    <lable class="col-md-4"> <input name="taxpayerNum" placeholder="请填写纳税人识别号" value="${apply.taxpayerNum}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="32" /></lable>
+                                                    <lable class="col-md-4"> <input name="taxpayerNum" placeholder="请填写纳税人识别号" value="${apply.taxpayerNum}" class="form-control input-form limit32" data-bv-field="notEmpty"/></lable>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">银行账户：</lable>
-                                                    <lable class="col-md-4"> <input name="bankAccount" placeholder="请填写银行账户" value="${apply.bankAccount}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="32" /></lable>
+                                                    <lable class="col-md-4"> <input name="bankAccount" placeholder="请填写银行账户" value="${apply.bankAccount}" class="form-control input-form limit32" data-bv-field="notEmpty"/></lable>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">开户行：</lable>
-                                                    <lable class="col-md-4"><input name="bank" placeholder="请填写开户行" value="${apply.bank}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="32"/></lable>
+                                                    <lable class="col-md-4"><input name="bank" placeholder="请填写开户行" value="${apply.bank}" class="form-control input-form limit32" data-bv-field="notEmpty"/></lable>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">注册地址：</lable>
-                                                    <lable class="col-md-4"><input name="regAddress" placeholder="请填写注册地址" value="${apply.regAddress}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="100" /></lable>
+                                                    <lable class="col-md-4"><input name="regAddress" placeholder="请填写注册地址" value="${apply.regAddress}" class="form-control input-form limit100" data-bv-field="notEmpty"/></lable>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">企业电话：</lable>
-                                                    <lable class="col-md-4"><input name="phone" placeholder="请填写企业电话" value="${apply.phone}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="32" /></lable>
+                                                    <lable class="col-md-4"><input name="phone" placeholder="请填写企业电话" value="${apply.phone}" class="form-control input-form limit32" data-bv-field="notEmpty"/></lable>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
@@ -186,13 +186,13 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">收取地址：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="receiveAddress" placeholder="请填写收取地址" value="${apply.receiveAddress}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="100" />
+                                                    <input type="text" name="receiveAddress" placeholder="请填写收取地址" value="${apply.receiveAddress}" class="form-control input-form limit100" data-bv-field="notEmpty" />
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right ">收件人：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="receivePeople" placeholder="请填写收件人" value="${apply.receivePeople}" class="form-control input-form notEmpty" data-bv-field="notEmpty" maxlength="32"/>
+                                                    <input type="text" name="receivePeople" placeholder="请填写收件人" value="${apply.receivePeople}" class="form-control input-form limit32" data-bv-field="notEmpty" />
                                                 </div>
                                             </div>
                                             <div class="form-group">
