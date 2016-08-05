@@ -2,7 +2,9 @@ package com.lsxy.utils;
 
 import com.lsxy.framework.core.utils.StringUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,5 +71,24 @@ public class StatisticsUtils {
             }
         }
         return sql;
+    }
+
+    /**
+     * 根据groups生成全部不重复的组合
+     * @param groups
+     * @return
+     */
+    public static List<String[]> getGroupBys(String[] groups){
+        //TODO 待实现
+        List<String[]> list = new ArrayList();
+        list.add(new String[]{});
+        list.add(new String[]{"tenant_id"});
+        list.add(new String[]{"app_id"});
+        list.add(new String[]{"type"});
+        list.add(new String[]{"tenant_id","app_id"});
+        list.add(new String[]{"tenant_id","type"});
+        list.add(new String[]{"app_id","type"});
+        list.add(new String[]{"tenant_id","app_id","type"});
+        return list;
     }
 }
