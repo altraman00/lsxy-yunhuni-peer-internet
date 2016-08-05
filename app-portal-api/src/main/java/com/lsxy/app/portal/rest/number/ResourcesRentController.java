@@ -9,6 +9,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,6 +54,11 @@ public class ResourcesRentController extends AbstractRestController{
         resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
         resourceTelenumService.save(resourceTelenum);
         return RestResponse.success(resourcesRent);
+    }
+    @RequestMapping("/by_app/{appId}")
+    public RestResponse getByAppId(@PathVariable String appId){
+        ResourcesRent rent = resourcesRentService.findByAppId(appId);
+        return RestResponse.success(rent);
     }
 
 

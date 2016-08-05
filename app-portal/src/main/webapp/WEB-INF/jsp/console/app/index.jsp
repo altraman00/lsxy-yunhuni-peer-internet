@@ -79,7 +79,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form "/>
+                                                <input type="text" name="description" value="${app.description}" placeholder="" class="form-control input-form limit300"/>
                                             </div>
                                         </div>
 
@@ -110,7 +110,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">服务器白名单：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="whiteList" value="${app.whiteList}" placeholder="" class="form-control input-form "/>
+                                                <input type="text" name="whiteList" value="${app.whiteList}" placeholder="" class="form-control input-form limit300"/>
                                             </div>
                                         </div>
                                         <p class="tips">
@@ -119,13 +119,13 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form"/>
+                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form limit300"/>
                                             </div>
+                                            <a href="">回调说明文档</a>
                                         </div>
 
                                         <p class="tips">
                                             <input type="checkbox" name="isAuth" value="1" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨,回拨,互联网语音,视频通话会涉及鉴权流程，勾选但未实现会呼叫失败)
-                                            <a href="">回调说明文档</a> </a>
                                         </p>
                                         <div class="form-group min-height20">
                                             <span class="hr text-label" ><strong>选择服务:</strong></span>
@@ -134,8 +134,8 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>基础语音服务</strong></p>
-                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音外呼</a>(嵌入CRM、OA、呼叫中心等产品中发起通话)</p>
-                                                <p><input type="checkbox" name="isVoiceCallback" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">双向回拨</a>(以不同的通话方式实现茂名通话功能，保护双方号码隐私)</p>
+                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音呼叫</a>（嵌入CRM、OA、呼叫中心等产品中发起通话）</p>
+                                                <p><input type="checkbox" name="isVoiceCallback" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音回拨</a>（以不同的通话方式实现匿名通话功能,保护双方号码隐私）</p>
 
                                             </div>
                                         </div>
@@ -143,10 +143,10 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>高级语音定制服务</strong></p>
-                                                <p><input type="checkbox" name="isSessionService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a href="">会议服务</a>(可与互联网会议、视频会议融合参会，提供丰富的会议管理功能)</p>
-                                                <p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>录音服务</a>(提供通话录音、录音存储管理等功能)</p>
-                                                <p><input type="checkbox" name="isVoiceValidate" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>语音验证码</a>(通过电话直呼到用户手机并语音播报验证码)</p>
-                                                <p><input type="checkbox" name="isIvrService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a>IVR定制服务</a>(即互动式语音应答可以根据用户输入的内容播放有关的信息)</p>
+                                                <p><input type="checkbox" name="isSessionService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a href="">语音会议</a>（可与互联网会议、视频会议融合参会，提供丰富的会议管理功能）</p>
+                                                <p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a  href="">通话录音</a>（提供通话录音、录音存储管理等功能）</p>
+                                                <p><input type="checkbox" name="isVoiceValidate" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a  href="">语音验证码</a>（通过电话直呼到用户手机并语音播报验证码）</p>
+                                                <p><input type="checkbox" name="isIvrService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a  href="">自定义IVR</a>（即互动式语音应答可以根据用户输入的内容播放有关的信息）</p>
                                                 <div class="tips ml-36">
                                                     <p class="app-tips ">开启后，该应用将产生1000的号码租用费以及100元/月的功能费，上线时开始收取，多个应用开启并上线会叠加收费</p>
                                                 </div>
@@ -159,7 +159,7 @@
                                                     <c:if test="${app.id==null}">创建</c:if>
                                                     <c:if test="${app.id!=null}">修改</c:if>
                                                 </a>
-                                                <c:if test="${app.id!=null}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;s<a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
+                                                <c:if test="${app.id!=null}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id="validateBtn2"  class="btn btn-primary  btn-form">取消</a></c:if>
                                             </div>
                                         </div>
                                     </form:form>
@@ -189,26 +189,24 @@
             $('#validateBtn').attr('disabled','disabled');
             var tempType = $('#validateBtn').html().trim()=='创建'?"create":"update";
             //提交表单
-            $.ajax({
-                url : "${ctx}/console/app/"+tempType,
-                type : 'post',
-                async: false,//使用同步的方式,true为异步方式
-                data :getFormJson("#application_create"),
-                dataType: "json",
-                success : function(data){
+            ajaxsync(ctx + "/console/app/"+tempType,getFormJson("#application_create"),function(response){
+                if(response.success){
                     var url = "";
                     if($('#validateBtn').html().trim()=='创建'){
                         url="${ctx}/console/app/list";
+                        showtoast("新建应用成功",url);
                     }else{
                         url="${ctx}/console/app/detail?id=${app.id}";
+                        showtoast("应用修改成功",url);
                     }
-                    showtoast(data.msg,url);
-                },
-                fail:function(){
-                    showtoast('网络异常，请稍后重试');
+                }else{
+                    showtoast(response.errorMsg);
                     $('#validateBtn').removeAttr('disabled');
                 }
+            },"post").fail(function(){
+                $('#validateBtn').removeAttr('disabled');
             });
+
         }
 
     });

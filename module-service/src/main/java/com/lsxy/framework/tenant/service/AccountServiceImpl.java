@@ -1,12 +1,14 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.exceptions.AccountNotFoundException;
 import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -75,13 +77,15 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
     @Override
-    public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException {
+    public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException,AccountNotFoundException {
         String hql = "from Account obj where (obj.userName=?1 or obj.email=?2 or obj.mobile=?3) and obj.status=?4";
         Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName,Account.STATUS_NORMAL);
         if(account != null) {
             if(!account.getPassword().equals(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()))){
                  account = null;
             }
+        }else{
+            throw new AccountNotFoundException("找不到账号");
         }
         return account;
     }
@@ -187,12 +191,15 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
     //帐务数据创建
     private void createBilling(Tenant tenant) {
+        long defaultSize = Long.parseLong(SystemConfig.getProperty("portal.voiceflieplay.maxsize"))*1024*1024;
         Billing billing = new Billing();
         billing.setTenant(tenant);
         billing.setBalance(new BigDecimal(0.00));
         billing.setSmsRemain(0);
         billing.setVoiceRemain(0);
         billing.setConferenceRemain(0);
+        billing.setFileTotalSize(defaultSize);
+        billing.setFileRemainSize(defaultSize);
         billingService.save(billing);
     }
 
