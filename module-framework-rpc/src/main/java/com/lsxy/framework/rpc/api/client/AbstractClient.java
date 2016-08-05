@@ -200,9 +200,8 @@ public abstract class AbstractClient implements Client{
 
     protected void doConnect(Session session) throws ClientConnecException {
         try {
-            RPCRequest request = new RPCRequest();
-            request.setName(ServiceConstants.CH_MN_CONNECT);
-            request.setParam("sessionid=" + session.getId());
+            String param = "sessionid=" + session.getId();
+            RPCRequest request = RPCRequest.newRequest(ServiceConstants.CH_MN_CONNECT,param);
             RPCResponse response = getRpcCaller().invokeWithReturn(session, request);
             if (response.isOk()) {
                 if (bindCallback != null) {
