@@ -168,36 +168,29 @@
             }
             vCode = $("#second-code").val();
         }
-        $.ajax({
-            url : "${ctx}/mc/send",
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            data : {'mobile':mobile,'validateCode':vCode,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(result){
-                if(result.flag){
-                    showmsg('发送短信验证码成功','msgcode');
-                    $('#second-codeblock').html('');
-                    sendResult = true;
-                }else if(result.vc){
-                    sendResult = false;
-                    //发送不成功，且要输入图形验证码
-                    showmsg(result.err,'msgcode');
-                    isVc = true;
-                    //启动二次校验
-                    var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
-                    html += '&nbsp;&nbsp;<a class="code-img"><img src="${ctx}/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"  id="imgValidateCode" ></a></div>';
-                    $('#second-codeblock').html(html);
 
-                }else{
-                    sendResult = false;
-                    showmsg(result.err,'msgcode');
-                }
-            },
-            fail:function(){
-                showmsg("网络异常，请稍后重试",'msgcode');
+
+        ajaxsync(ctx+"/mc/send",{'mobile':mobile,'validateCode':vCode,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            if(response.data.flag){
+                showmsg('发送短信验证码成功','msgcode');
+                $('#second-codeblock').html('');
+                sendResult = true;
+            }else if(response.data.vc){
+                sendResult = false;
+                //发送不成功，且要输入图形验证码
+                showmsg(response.data.err,'msgcode');
+                isVc = true;
+                //启动二次校验
+                var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
+                html += '&nbsp;&nbsp;<a class="code-img"><img src="${ctx}/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"  id="imgValidateCode" ></a></div>';
+                $('#second-codeblock').html(html);
+
+            }else{
+                sendResult = false;
+                showmsg(response.data.err,'msgcode');
             }
-        });
+        },"get");
+
         sendCodeResult =  sendResult;
         return sendResult;
     }
@@ -215,59 +208,50 @@
             showmsg('请输入四位数的验证码','msgcode'); return false;
         }
         var mobile = $('#modalmobile').html();
-        $.ajax({
-            url : "${ctx}/mc/check",
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            data : {'mc':code,"mobile":mobile,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    //开始绑定手机号码
-                    var id =  $('#modalmobile').attr('data-id');
-                    var pro = $('#voild-'+id).prop('disabled');
-                    var number = $('#modalmobile').html();
-                    var type = "save";
-                    if(pro){
-                        type = "disbind";
-                    }
-                    $.ajax({
-                        url : "${ctx}/console/telenum/bind/"+type,
-                        type : 'post',
-                        async: false,//使用同步的方式,true为异步方式
-                        data : {'number':number,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                        dataType: "json",
-                        success : function(result){
-                            if(result.sucess==2) {
-                                if(pro){
-                                    //解除绑定
-                                    $('#voild-'+id).val('');
-                                    $('#voild-'+id).removeAttr('disabled');
-                                    $('#btn-'+id).html('验证');
-                                }else{
-                                    //验证成功
-                                    $('#voild-'+id).attr('disabled',"true");
-                                    $('#btn-'+id).html('解除绑定');
-                                }
-                                $('.modalCancel').click();
-                                showtoast(result.msg);
-                            }else{
-                                showmsg(result.msg,'msgcode');
-                            }
-                        },
-                        fail:function(){
-                            showmsg('网络异常，请稍后重试','msgcode');
-                        }
 
-                    });
-                }else{
-                    showmsg(data.err,'msgcode');
+        ajaxsync(ctx+"/mc/check",{'mc':code,"mobile":mobile},function(response){
+            if(response.data.flag){
+                //开始绑定手机号码
+                var id =  $('#modalmobile').attr('data-id');
+                var pro = $('#voild-'+id).prop('disabled');
+                var number = $('#modalmobile').html();
+                var type = "save";
+                if(pro){
+                    type = "disbind";
                 }
-            },
-            fail:function(){
-                showmsg('网络异常，请稍后重试','msgcode');
+                $.ajax({
+                    url : "${ctx}/console/telenum/bind/"+type,
+                    type : 'post',
+                    async: false,//使用同步的方式,true为异步方式
+                    data : {'number':number,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
+                    dataType: "json",
+                    success : function(result){
+                        if(result.sucess==2) {
+                            if(pro){
+                                //解除绑定
+                                $('#voild-'+id).val('');
+                                $('#voild-'+id).removeAttr('disabled');
+                                $('#btn-'+id).html('验证');
+                            }else{
+                                //验证成功
+                                $('#voild-'+id).attr('disabled',"true");
+                                $('#btn-'+id).html('解除绑定');
+                            }
+                            $('.modalCancel').click();
+                            showtoast(result.msg);
+                        }else{
+                            showmsg(result.msg,'msgcode');
+                        }
+                    },
+                    fail:function(){
+                        showmsg('网络异常，请稍后重试','msgcode');
+                    }
+
+                });
+            }else{
+                showmsg(response.data.err,'msgcode');
             }
-        });
+        },"get");
 
         return;
         if(pro){

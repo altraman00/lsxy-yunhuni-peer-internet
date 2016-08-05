@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.tenant.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.exceptions.AccountNotFoundException;
 import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
@@ -17,7 +18,7 @@ public interface AccountService extends BaseService<Account> {
      * @param password 用户密码  使用passwordutils.springpasswordencode方法并使用username作为盐值进行加密的密码
      * @return
      */
-    Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException;
+    Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException,AccountNotFoundException;
 
     /**
      * 根据登陆用户名查询账号信息
