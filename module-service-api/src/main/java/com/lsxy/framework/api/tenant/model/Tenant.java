@@ -18,8 +18,11 @@ import javax.persistence.Table;
 public class Tenant extends IdEntity {
 	public static final Integer AUTH_WAIT = 0;//等待审核
 	public static final Integer AUTH_NO = 100;//未认证
-	public static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
-	public static final Integer AUTH_ONESELF_SUCESS = 1;//个人认证成功
+	public static final Integer AUTH_UPGRADE_WAIT = 3;//个人升级企业等待
+	public static final Integer AUTH_UPGRADE_SUCCESS = 4;//个人升级企业成功
+	public static final Integer AUTH_UPGRADE_FAIL = 5;//个人升级企业失败
+	public static final Integer AUTH_COMPANY_SUCCESS = 2;//企业认证成功
+	public static final Integer AUTH_ONESELF_SUCCESS = 1;//个人认证成功
 	public static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
 	public static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
 	private static final long serialVersionUID = 1L;

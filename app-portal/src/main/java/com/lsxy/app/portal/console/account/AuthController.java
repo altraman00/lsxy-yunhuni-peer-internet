@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.oss.OSSService;
@@ -35,20 +36,9 @@ public class AuthController extends AbstractPortalController {
 
     @Autowired
     private OSSService ossService;
-
-    private  static final Integer AUTH_WAIT = 0;//个人认证等待中
-    private  static final Integer  AUTH_NO= 100;//未认证
-    private  static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
-    private  static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
-    private  static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
-    private  static final Integer AUTH_ONESELF_SUCESS = 1;//个人认证成功
-    private static final String UPLOAD_TYPE_FILE = "file";//文件上传类型之file
-    private static final String UPLOAD_TYPE_OSS = "oss";//文件上传类型之oss
     private static final Integer AUTH_COMPANY=1;//认证类型-企业认证
     private static final Integer AUTH_ONESELF=0;//认证类型-个人认证
-    private static final String IS_FALSE = "-1";//表示失败
-    private static final String IS_TRUE = "1";//表示成功
-    private static final String IS_AUTH = "0";//表示已实名认证
+
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 实名认证首页
@@ -68,17 +58,17 @@ public class AuthController extends AbstractPortalController {
             mav.setViewName("/console/account/auth/index");
         }else {
             int authStatus  = Integer.valueOf((hs.get("status")+""));
-            if(AUTH_NO==authStatus) {//未认证
+            if(Tenant.AUTH_NO==authStatus) {//未认证
                 logger.info("未实名认证:{}",authStatus);
                 mav.setViewName("/console/account/auth/index");
-            }else if (AUTH_WAIT ==authStatus ) {//审核中
+            }else if (Tenant.AUTH_WAIT ==authStatus ) {//审核中
                 //审核中
                 mav.setViewName("/console/account/auth/wait");
-            } else if (AUTH_COMPANY_SUCESS == authStatus) {
+            } else if (Tenant.AUTH_COMPANY_SUCCESS == authStatus) {
                 // 企业实名认证
                 mav.addAllObjects(hs);
                 mav.setViewName("/console/account/auth/sucess");
-            } else if (AUTH_ONESELF_SUCESS == authStatus) {
+            } else if (Tenant.AUTH_ONESELF_SUCCESS == authStatus) {
                 if(StringUtil.isNotEmpty(upgrade)){
                     logger.info("个人认证  升级到企业认证:{}",upgrade);
                     mav.addObject("upgrade",true);//个人认证  升级到企业认证
@@ -88,11 +78,11 @@ public class AuthController extends AbstractPortalController {
                     mav.addAllObjects(hs);
                     mav.setViewName("/console/account/auth/sucess");
                 }
-            } else if (AUTH_COMPANY_FAIL == authStatus) {
+            } else if (Tenant.AUTH_COMPANY_FAIL == authStatus) {
                 //TODO 企业实名认证失败
                 mav.addObject("msg","上传资料不符合要求，请重新提交资料认证");
                 mav.setViewName("/console/account/auth/fail");
-            } else if (AUTH_ONESELF_FAIL == authStatus) {
+            } else if (Tenant.AUTH_ONESELF_FAIL == authStatus) {
                 //TODO 个人实名认证失败
                 mav.addObject("msg","身份证与名称不符合，请重新提交资料认证");
                 mav.setViewName("/console/account/auth/fail");
@@ -166,24 +156,14 @@ public class AuthController extends AbstractPortalController {
                 authVo.setType03Prop04(UploadFile(tenantId,multipartfiles[4]));
             }
         }
-
-        String  status = IS_TRUE;//默认操作成功
+        RestResponse restResponse =null;
         if(Integer.valueOf(type)==AUTH_ONESELF){
-            RestResponse<RealnamePrivate> restResponse = savePrivateAuth(request,authVo);
-            RealnamePrivate realnamePrivate = restResponse.getData();
-            if (realnamePrivate == null) {
-                status = IS_FALSE;
-            }
-
+            restResponse = savePrivateAuth(request,authVo);
         }else if(Integer.valueOf(type)==AUTH_COMPANY){
-            RestResponse<RealnameCorp> restResponse = saveCorpAuth(request,authVo);
-            RealnameCorp realnameCorp = restResponse.getData();
-            if (realnameCorp == null) {
-                status = IS_FALSE;
-            }
+            restResponse = saveCorpAuth(request,authVo);
         }
         ModelAndView mav = new ModelAndView();
-        if(IS_TRUE.equals(status)){
+        if(restResponse.isSuccess()){
             mav = new ModelAndView("redirect:/console/account/auth/index");
         }else{
             mav.addObject("msg","操作失败，请稍后重试");
@@ -206,7 +186,7 @@ public class AuthController extends AbstractPortalController {
         String uri = restPrefixUrl +  "/rest/account/auth/save_private_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
-        map.put("status",AUTH_WAIT);//状态
+        map.put("status",Tenant.AUTH_WAIT);//状态
         map.put("name",authVo.getPrivateName());//姓名
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnamePrivate.class);
     }
@@ -221,7 +201,7 @@ public class AuthController extends AbstractPortalController {
         String uri = restPrefixUrl + "/rest/account/auth/save_corp_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
-        map.put("status",AUTH_WAIT);//状态
+        map.put("status",Tenant.AUTH_WAIT);//状态
         map.put("name",authVo.getCorpName());//企业名称
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnameCorp.class);
     }
