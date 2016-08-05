@@ -30,7 +30,7 @@
                                 <nav class="hidden-xs">
                                     <ul class="nav">
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a ">
                                                 <a href="${ctx}/console/statistics/billdetail/call">语音呼叫</a>
                                             </div>
                                         </li>
@@ -50,7 +50,7 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a">
+                                            <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
                                             </div>
                                         </li>
