@@ -51,21 +51,15 @@
                             <span class="border-left">&nbsp;消费统计</span>
                         </div>
                         <section class="scrollable wrapper w-f">
-                            <section class="panel panel-default yunhuni-personal">
-                                <div class="row m-l-none m-r-none bg-light lter">
-                                    <div class="col-md-2 col-md-offset-9 padder-v fix-padding">
-                                        <select   class="form-control myselectapp">
-                                            <option value="0">全部应用</option>
-                                            <c:forEach items="${appList}" var="app">
-                                                <option value="${app.id}">${app.name}</option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                </div>
+                            <section class="panel panel-default pos-rlt clearfix ">
+                                <ul id="myTab" class="nav nav-tabs">
+                                    <input type="hidden" value="0" id="defaultapp"/>
+                                    <li class="active"><a  data-toggle="tab" data-app="0">全部应用</a></li>
+                                    <c:forEach items="${appList}" var="app">
+                                        <li ><a  data-toggle="tab" data-app="${app.id}">${app.name}</a></li>
+                                    </c:forEach>
+                                </ul>
                             </section>
-
-
-
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <div class="row">
                                     <div class="col-md-12">
@@ -106,8 +100,6 @@
                                     </div>
                                 </div>
                             </section>
-
-
 
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <div class="form-group">
