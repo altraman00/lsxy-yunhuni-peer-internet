@@ -148,7 +148,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">申请人：</lable>
                                                 <div class="col-md-4 ">
-                                                    <input type="text" name="proposer" placeholder="" class="form-control input-form" id="form-proposer" />
+                                                    <input type="text" name="proposer" placeholder="" class="form-control input-form notEmpty" id="form-proposer" />
                                                 </div>
                                             </div>
                                             <div class="noticeInfo form-group">
@@ -168,14 +168,14 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label lineheight-24">统一社会信用代码：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="text" name="type01Prop02" placeholder="" class="form-control input-form notEmpty"  />
+                                                        <input type="text" name="type01Prop02" placeholder="" class="form-control input-form limit18"  />
                                                         <p class="tips">18位数字或者大写英文字母</p>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
                                                         <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
@@ -199,7 +199,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
                                                         <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
@@ -230,7 +230,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
                                                         <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
