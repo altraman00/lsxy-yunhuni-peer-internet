@@ -50,6 +50,10 @@ public class AuthController extends AbstractRestController {
             RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_COMPANY_SUCESS);
             if(realnameCorp!=null) {
                 map.put("name", realnameCorp.getName());
+                map.put("addr",realnameCorp.getAddr());
+                map.put("industry",realnameCorp.getIndustry());
+                map.put("proposer",realnameCorp.getProposer());
+                map.put("authType",realnameCorp.getAuthType());
                 map.put("time", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
@@ -58,6 +62,8 @@ public class AuthController extends AbstractRestController {
             RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCESS);
             if(realnamePrivate!=null) {
                 map.put("name", realnamePrivate.getName());
+                map.put("idType",realnamePrivate.getIdType());
+                map.put("idNumber",realnamePrivate.getIdNumber());
                 map.put("time", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);

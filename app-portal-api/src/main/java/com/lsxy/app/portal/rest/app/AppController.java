@@ -69,9 +69,14 @@ public class AppController extends AbstractRestController {
      */
     @RequestMapping("/delete")
     public RestResponse delete(String id) throws InvocationTargetException, IllegalAccessException {
-        App resultApp = appService.findById(id);
-        appService.delete(resultApp);
-        return RestResponse.success(resultApp);
+        boolean flag = appService.isAppBelongToUser(getCurrentAccountUserName(), id);
+        if(flag){
+            App resultApp = appService.findById(id);
+            appService.delete(resultApp);
+            return RestResponse.success();
+        }else{
+            return RestResponse.failed("0000","应用不属于用户");
+        }
     }
     /**
      * 新建应用
