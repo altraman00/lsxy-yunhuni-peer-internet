@@ -46,6 +46,9 @@ while getopts "A:P:STIL" opt; do
     L)
       TAIL_LOG=true;
       ;;
+    H)
+      YUNHUNI_HOME="$OPTARG"
+      ;;
     \?)
       echo "Invalid option: -$OPTARG"   
       ;;
