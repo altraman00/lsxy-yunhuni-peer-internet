@@ -7,6 +7,7 @@ import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,8 @@ public class AppController extends AbstractRestController {
     private AppService appService;
     @Autowired
     private TenantService tenantService;
+    @Autowired
+    AppOnlineActionService appOnlineActionService;
     /**
      * 查找当前用户的应用
      * @throws Exception
@@ -99,9 +102,16 @@ public class AppController extends AbstractRestController {
     @RequestMapping("/update")
     public RestResponse update(App app ) throws InvocationTargetException, IllegalAccessException {
         String userName = getCurrentAccountUserName();
-        App resultApp = appService.findById(app.getId());
-        EntityUtils.copyProperties(resultApp,app);
-        resultApp = appService.save(resultApp);
-        return RestResponse.success(resultApp);
+        boolean flag = appService.isAppBelongToUser(userName, app.getId());
+        if(flag){
+            App resultApp = appService.findById(app.getId());
+            EntityUtils.copyProperties(resultApp,app);
+            resultApp = appService.save(resultApp);
+            //应用修改后，将其上线步骤清空
+            appOnlineActionService.resetAppOnlineAction(app.getId());
+            return RestResponse.success(resultApp);
+        }else{
+            return RestResponse.failed("0000","应用不属于用户");
+        }
     }
 }

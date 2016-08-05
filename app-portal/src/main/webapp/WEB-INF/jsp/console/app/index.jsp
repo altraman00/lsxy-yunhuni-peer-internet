@@ -73,9 +73,7 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
                                             </div>
-                                            <div class="col-md-4 text-right">
-                                                <span class="span-required">*</span>20字符内，符合<a href="">应用审核规范要求</a>
-                                            </div>
+                                            <span class="span-required">*</span>20字符内，符合<a href="">应用审核规范要求</a>
                                         </div>
 
                                         <div class="form-group">
@@ -123,9 +121,7 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form"/>
                                             </div>
-                                            <div class="col-md-4 text-right">
-                                                &nbsp;&nbsp;<a href="">回调说明文档</a>
-                                            </div>
+                                            <a href="">回调说明文档</a>
                                         </div>
 
                                         <p class="tips">
@@ -193,26 +189,24 @@
             $('#validateBtn').attr('disabled','disabled');
             var tempType = $('#validateBtn').html().trim()=='创建'?"create":"update";
             //提交表单
-            $.ajax({
-                url : "${ctx}/console/app/"+tempType,
-                type : 'post',
-                async: false,//使用同步的方式,true为异步方式
-                data :getFormJson("#application_create"),
-                dataType: "json",
-                success : function(data){
+            ajaxsync(ctx + "/console/app/"+tempType,getFormJson("#application_create"),function(response){
+                if(response.success){
                     var url = "";
                     if($('#validateBtn').html().trim()=='创建'){
                         url="${ctx}/console/app/list";
+                        showtoast("新建应用成功",url);
                     }else{
                         url="${ctx}/console/app/detail?id=${app.id}";
+                        showtoast("应用修改成功",url);
                     }
-                    showtoast(data.msg,url);
-                },
-                fail:function(){
-                    showtoast('网络异常，请稍后重试');
+                }else{
+                    showtoast(response.errorMsg);
                     $('#validateBtn').removeAttr('disabled');
                 }
+            },"post").fail(function(){
+                $('#validateBtn').removeAttr('disabled');
             });
+
         }
 
     });

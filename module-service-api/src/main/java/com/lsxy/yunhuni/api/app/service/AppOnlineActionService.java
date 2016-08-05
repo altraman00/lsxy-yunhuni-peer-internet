@@ -2,7 +2,6 @@ package com.lsxy.yunhuni.api.app.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
@@ -65,4 +64,10 @@ public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
      * @return
      */
     App offline(String appId);
+
+    /**
+     * 重置应用上线步骤
+     * @param appId
+     */
+    void resetAppOnlineAction(String appId);
 }
