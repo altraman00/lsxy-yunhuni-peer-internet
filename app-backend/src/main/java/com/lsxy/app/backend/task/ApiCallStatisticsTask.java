@@ -4,6 +4,7 @@ import com.lsxy.framework.api.statistics.service.ApiCallDayService;
 import com.lsxy.framework.api.statistics.service.ApiCallHourService;
 import com.lsxy.framework.api.statistics.service.ApiCallMonthService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.utils.StatisticsUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +46,7 @@ public class ApiCallStatisticsTask {
         date = cale.getTime();
         int hour2 = cale.get(Calendar.HOUR_OF_DAY);
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
-        List<String[]> list = new ArrayList();
-        list.add(new String[]{});
-        list.add(new String[]{"tenant_id"});
-        list.add(new String[]{"app_id"});
-        list.add(new String[]{"type"});
-        list.add(new String[]{"tenant_id","app_id"});
-        list.add(new String[]{"tenant_id","type"});
-        list.add(new String[]{"app_id","type"});
-        list.add(new String[]{"tenant_id","app_id","type"});
+        List<String[]> list = StatisticsUtils.getGroupBys(new String[]{"tenant_id","app_id","type"});
         try{
             logger.info("参数date1={}，hour1={}，date2={}，hour2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),hour1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),hour2);
             for(int i=0;i<list.size();i++){
@@ -91,15 +84,7 @@ public class ApiCallStatisticsTask {
         date = cale.getTime();
         int day2 = cale.get(Calendar.DATE);
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
-        List<String[]> list = new ArrayList();
-        list.add(new String[]{});
-        list.add(new String[]{"tenant_id"});
-        list.add(new String[]{"app_id"});
-        list.add(new String[]{"type"});
-        list.add(new String[]{"tenant_id","app_id"});
-        list.add(new String[]{"tenant_id","type"});
-        list.add(new String[]{"app_id","type"});
-        list.add(new String[]{"tenant_id","app_id","type"});
+        List<String[]> list = StatisticsUtils.getGroupBys(new String[]{"tenant_id","app_id","type"});
         try{
             logger.info("参数date1={}，hour1={}，date2={}，hour2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),day1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),day2);
             for(int i=0;i<list.size();i++){
@@ -134,15 +119,7 @@ public class ApiCallStatisticsTask {
         date = cale.getTime();
         int month2 = (cale.get(Calendar.MONTH)) + 1;
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
-        List<String[]> list = new ArrayList();
-        list.add(new String[]{});
-        list.add(new String[]{"tenant_id"});
-        list.add(new String[]{"app_id"});
-        list.add(new String[]{"type"});
-        list.add(new String[]{"tenant_id","app_id"});
-        list.add(new String[]{"tenant_id","type"});
-        list.add(new String[]{"app_id","type"});
-        list.add(new String[]{"tenant_id","app_id","type"});
+        List<String[]> list = StatisticsUtils.getGroupBys(new String[]{"tenant_id","app_id","type"});
         try{
             logger.info("参数date1={}，hour1={}，date2={}，hour2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),month1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),month2);
             for(int i=0;i<list.size();i++){
