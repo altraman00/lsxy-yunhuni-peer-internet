@@ -2,6 +2,7 @@ package com.lsxy.area.agent;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.client.AbstractClientServiceHandler;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.Session;
@@ -37,8 +38,8 @@ public class AreaClient {
     private Client client;
 
     @Bean
-    public AbstractServiceHandler getServiceHandler(){
-        return new AbstractServiceHandler() {
+    public AbstractClientServiceHandler getServiceHandler(){
+        return new AbstractClientServiceHandler() {
             @Override
             public RPCResponse handleService(RPCRequest request, Session session) {
                 if(logger.isDebugEnabled()){

@@ -97,7 +97,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     @Override
     protected RPCResponse process_CH_MN_CONNECT(Object contextObject, RPCRequest request) {
         ChannelHandlerContext ctx = (ChannelHandlerContext) contextObject;
-        String sessionid = request.getParameter("sessionid");
+        String sessionid = (String) request.getParameter("sessionid");
         Session session = new NettyServerSession(sessionid,ctx.channel(),this);
         getSessionContext().putSession(session);
         ctx.channel().attr(SESSION_ID).setIfAbsent(sessionid);

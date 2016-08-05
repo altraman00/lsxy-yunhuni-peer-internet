@@ -2,6 +2,7 @@ package com.lsxy.area.server;
 
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
 import com.lsxy.framework.rpc.api.server.Session;
@@ -41,7 +42,7 @@ public class MyScheduledTaskForTest {
         }
         Collection<Session> sessions = server.getHandler().getSessionContext().sessions();
         for (Session session:sessions) {
-            RPCRequest request = RPCRequest.newRequest("HELLO","ID=1");
+            RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL,"ID=1");
             session.write(request);
         }
     }

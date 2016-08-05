@@ -21,7 +21,5 @@ public abstract  class AbstractClientServiceHandler {
 	 */
 	public abstract RPCResponse handleService(RPCRequest request, Session session);
 
-	
-	
-	
+
 }

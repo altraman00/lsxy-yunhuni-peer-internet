@@ -56,8 +56,6 @@ public class CTIClient implements RpcEventListener{
             logger.error("CTI客户端启动失败:{}",ex.getMessage());
             ex.printStackTrace();
         }
-
-
     }
 
     @Override

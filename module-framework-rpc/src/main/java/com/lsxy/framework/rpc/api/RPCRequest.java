@@ -22,7 +22,7 @@ public class RPCRequest extends  RPCMessage{
 	private String param;		//PM
 
 	
-	private Map<String,String> paramMap;		//参数解析后放入map中以方便调用
+	private Map<String,Object> paramMap;		//参数解析后放入map中以方便调用
 	
 	
 	public String getParam() {
@@ -47,7 +47,7 @@ public class RPCRequest extends  RPCMessage{
 	 * 解析
 	 */
 	public void _parseParam() {
-		paramMap = new HashMap<String,String>();
+		paramMap = new HashMap<>();
 		StringTokenizer st1 = new StringTokenizer(param, "&");
 		while (st1.hasMoreTokens()) {
 			StringTokenizer st2 = new StringTokenizer(st1.nextToken(), "=");
@@ -64,7 +64,7 @@ public class RPCRequest extends  RPCMessage{
 	 * @param name
 	 * @return
 	 */
-	public String getParameter(String name){
+	public Object getParameter(String name){
 		if(paramMap==null){
 			_parseParam();
 		}
@@ -76,14 +76,14 @@ public class RPCRequest extends  RPCMessage{
 	 * @param defaultValue
 	 * @return
 	 */
-	public String getParameter(String name,String defaultValue){
-		String ret = getParameter(name);
-		if(StringUtils.isEmpty(ret)){
+	public Object getParameter(String name,Object defaultValue){
+		Object ret = getParameter(name);
+		if(ret == null){
 			ret = defaultValue;
 		}
 		return ret;
 	}
-	public Map<String, String> getParamMap() {
+	public Map<String,Object > getParamMap() {
 		if (this.paramMap == null && this.param != null)
 		{
 			this._parseParam();
