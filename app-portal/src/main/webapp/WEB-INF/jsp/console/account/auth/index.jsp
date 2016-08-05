@@ -176,7 +176,7 @@
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
                                                         <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
-                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的PNG、JPG或GIF。</p>
+                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -200,7 +200,7 @@
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
                                                         <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
-                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的PNG、JPG或GIF。</p>
+                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -217,7 +217,7 @@
                                                     <lable class="col-md-3 text-right extend_label">税务登记证：</lable>
                                                     <div class="col-md-4">
                                                         <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
-                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的PNG、JPG或GIF。</p>
+                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -231,7 +231,7 @@
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
                                                         <input type="file"placeholder="" name="file" class="form-control input-form limitImageFile"   />
-                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的PNG、JPG或GIF。</p>
+                                                        <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
                                             </div>
