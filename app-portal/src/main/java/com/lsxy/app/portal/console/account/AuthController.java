@@ -50,7 +50,7 @@ public class AuthController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         //TODO 获取实名认证的状态
         //调resr接口
-        RestResponse<HashMap> restResponse = findAuthStatus(request);
+        RestResponse<HashMap> restResponse = findAuthInfo(request);
         HashMap hs = restResponse.getData();
         if(hs==null){//未实名认证
             logger.info("未实名认证");
@@ -112,7 +112,15 @@ public class AuthController extends AbstractPortalController {
         }
         return result;
     }
-
+    /**
+     * 获取实名认证信息的rest请求方法
+     * @return
+     */
+    private RestResponse findAuthInfo(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl + "/rest/account/auth/find_auth_info";
+        return  RestRequest.buildSecurityRequest(token).get(uri,HashMap.class);
+    }
     /**
      * 获取后台状态的rest请求方法
      * @return
@@ -120,8 +128,7 @@ public class AuthController extends AbstractPortalController {
     private RestResponse findAuthStatus(HttpServletRequest request){
         String token = getSecurityToken(request);
         String uri = restPrefixUrl + "/rest/account/auth/find_auth_status";
-        Map map = new HashMap();
-        return  RestRequest.buildSecurityRequest(token).post(uri,map, HashMap.class);
+        return  RestRequest.buildSecurityRequest(token).get(uri,HashMap.class);
     }
     /**
      * 上次文件方法
