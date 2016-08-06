@@ -54,7 +54,7 @@ public class AuthController extends AbstractPortalController {
                 resultUrl = "/console/account/auth/index";
             }
         }
-        if(authStatus==Tenant.AUTH_ONESELF_SUCCESS) {
+        if(authStatus==Tenant.AUTH_ONESELF_SUCCESS||authStatus==Tenant.AUTH_UPGRADE_FAIL) {
             if (StringUtil.isNotEmpty(type)&&"upgrade".equals(type)) {//个人认证  升级到企业认证
                 mav.addObject("upgrade", true);//个人认证  升级到企业认证
                 resultUrl = "/console/account/auth/index";
@@ -167,7 +167,7 @@ public class AuthController extends AbstractPortalController {
         String uri = restPrefixUrl +  "/rest/account/auth/save_private_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
-        map.put("status",Tenant.AUTH_WAIT);//状态
+        map.put("status",Tenant.AUTH_ONESELF_WAIT);//状态
         map.put("name",authVo.getPrivateName());//姓名
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnamePrivate.class);
     }
