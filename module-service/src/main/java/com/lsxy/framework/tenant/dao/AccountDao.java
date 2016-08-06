@@ -4,8 +4,12 @@ package com.lsxy.framework.tenant.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Account;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by Tandy on 2016/6/24.
@@ -58,4 +62,12 @@ public interface AccountDao extends BaseDaoInterface<Account, Serializable> {
      * @return
      */
     Account findByMobileAndStatus(String mobile,int status);
+
+    /**
+     * 清除过期的注册账号
+     * @param expireTime 在这个时间以前的，未被激活的账号会被设为过期
+     */
+    @Modifying(clearAutomatically = true)
+    @Query("update Account a set a.status=:expireStatus where a.status=:notActivityStatus and a.createTime < :expireTime")
+    void cleanExpireRegisterAccount(@Param("expireStatus")int expireStatus,@Param("notActivityStatus")int notActivityStatus, @Param("expireTime") Date expireTime);
 }
