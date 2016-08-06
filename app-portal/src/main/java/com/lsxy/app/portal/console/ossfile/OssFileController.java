@@ -5,7 +5,6 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.oss.OSSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.ServletOutputStream;
@@ -24,7 +23,8 @@ public class OssFileController extends AbstractPortalController {
 
     @RequestMapping("/img")
     public void getImg(HttpServletResponse response, String uri){
-        response.setContentType("image/jpeg"); //必须设置ContentType为image/jpeg
+        String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
+        response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
         InputStream in = null;
         ServletOutputStream out = null;
         try {
