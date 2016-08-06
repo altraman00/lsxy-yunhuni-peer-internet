@@ -24,7 +24,7 @@
 <div class="register_container">
     <div class="row box">
         <div class="col-md-5 text-center">
-            <img src="${resPrefixUrl }/images/register/reg_img.jpg" width="100%" />
+            <img src="${resPrefixUrl }/images/register/reg_img.jpg" />
         </div>
         <div class="col-md-7 register-box">
             <div class="row">

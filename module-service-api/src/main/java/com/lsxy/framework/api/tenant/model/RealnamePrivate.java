@@ -11,14 +11,13 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_realname_private")
 public class RealnamePrivate extends IdEntity {
-    private static final long serialVersionUID = 1L;
 
     private Tenant tenant;//所属租户
     private String name;//姓名
     private String idNumber;//'身份证号
     private String idPhoto;//身份证照片
     private String idType;//认证证件类型
-    private Integer status;//实名认证状态
+    private Integer status;//实名认证状态 0等待 1成功 -1失败
     public RealnamePrivate() {
     }
 
@@ -27,10 +26,6 @@ public class RealnamePrivate extends IdEntity {
         this.idNumber = idNumber;
         this.idPhoto = idPhoto;
         this.idType = idType;
-    }
-
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
     }
 
     @ManyToOne

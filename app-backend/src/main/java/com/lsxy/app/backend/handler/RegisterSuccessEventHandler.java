@@ -60,7 +60,8 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
                 logger.debug("发邮件，key：{},accountId:{}，userName:{}",uuid,account.getId(),account.getUserName());
             }
             //将邮件的校验信息存到redis里，前缀为account_mactive_
-            cacheManager.set("account_mactive_" + account.getId() ,uuid,72 * 60 * 60);
+            long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
+            cacheManager.set("account_mactive_" + account.getId() ,uuid,expireTime * 60 * 60);
         } catch (MailConfigNotEnabledException e) {
             e.printStackTrace();
         } catch (MailContentNullException e) {

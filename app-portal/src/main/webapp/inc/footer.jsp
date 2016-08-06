@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
-
+<div class="tips-toast"></div>
 <script src="${resPrefixUrl }/js/app.v2.js"></script> <!-- Bootstrap --> <!-- App -->
 <script src="${resPrefixUrl }/js/charts/flot/jquery.flot.min.js" cache="false"></script>
 <script src="${resPrefixUrl }/js/bootbox.min.js"></script>

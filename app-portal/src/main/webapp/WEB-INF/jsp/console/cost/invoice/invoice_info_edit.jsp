@@ -231,7 +231,6 @@
     </section>
 </section>
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
 <script>

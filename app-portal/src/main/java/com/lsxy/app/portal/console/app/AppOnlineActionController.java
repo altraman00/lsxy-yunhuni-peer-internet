@@ -248,7 +248,7 @@ public class AppOnlineActionController extends AbstractPortalController {
         if(response.isSuccess() && response.getData() != null){
             Map result = (Map) response.getData();
             int authStatus  = Integer.valueOf((result.get("status")+""));
-            if (Tenant.AUTH_ONESELF_SUCESS == authStatus || Tenant.AUTH_COMPANY_SUCESS == authStatus) {
+            if (Tenant.AUTH_ONESELF_SUCCESS == authStatus || Tenant.AUTH_COMPANY_SUCCESS == authStatus) {
                 flag = true;
             }
         }
