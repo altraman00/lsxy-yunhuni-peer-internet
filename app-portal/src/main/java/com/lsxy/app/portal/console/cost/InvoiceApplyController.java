@@ -341,21 +341,7 @@ public class InvoiceApplyController extends AbstractPortalController {
      * 上传文件方法
      */
     private String UploadFile(String tenantId,MultipartFile file) throws IOException {
-        String name = file.getOriginalFilename();//文件名
-        if(StringUtils.isNotBlank(name)){
-            String type = name.substring(name.lastIndexOf("."),name.length());
-            String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
-            String fileKey = "tenant_res/"+tenantId+"/invoice/"+ymd+"/"+ UUIDGenerator.uuid()+type;
-            long size = file.getSize();
-            boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name, SystemConfig.getProperty("global.oss.aliyun.bucket"),fileKey);
-            if(flag){
-                return fileKey;
-            }else{
-                throw new RuntimeException("上传文件失败");
-            }
-        }else{
-            return null;
-        }
+        return ossService.uploadFile(tenantId,"invoice",file);
     }
 
 }
