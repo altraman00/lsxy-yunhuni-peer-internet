@@ -54,7 +54,7 @@ public class AuthController extends AbstractPortalController {
                 resultUrl = "/console/account/auth/index";
             }
         }
-        if(authStatus==Tenant.AUTH_ONESELF_SUCCESS) {
+        if(authStatus==Tenant.AUTH_ONESELF_SUCCESS||authStatus==Tenant.AUTH_UPGRADE_FAIL) {
             if (StringUtil.isNotEmpty(type)&&"upgrade".equals(type)) {//个人认证  升级到企业认证
                 mav.addObject("upgrade", true);//个人认证  升级到企业认证
                 resultUrl = "/console/account/auth/index";

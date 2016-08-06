@@ -147,6 +147,7 @@ public class AuthController extends AbstractRestController {
         }else if(statusT==Tenant.AUTH_UPGRADE_FAIL){
             statusT=Tenant.AUTH_COMPANY_FAIL;
         }
+        realnameCorp.setStatus(statusT);
         realnameCorp.setTenant(tenant);
         //保存到数据库
         realnameCorp = realnameCorpService.save(realnameCorp);
