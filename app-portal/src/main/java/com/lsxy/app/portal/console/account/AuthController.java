@@ -167,7 +167,7 @@ public class AuthController extends AbstractPortalController {
         String uri = restPrefixUrl +  "/rest/account/auth/save_private_auth";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(authVo, Map.class);
-        map.put("status",Tenant.AUTH_WAIT);//状态
+        map.put("status",Tenant.AUTH_ONESELF_WAIT);//状态
         map.put("name",authVo.getPrivateName());//姓名
         return  RestRequest.buildSecurityRequest(token).post(uri,map, RealnamePrivate.class);
     }

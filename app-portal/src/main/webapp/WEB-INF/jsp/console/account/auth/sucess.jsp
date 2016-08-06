@@ -107,8 +107,9 @@
                                     </div>
                                 </div>
                                 </c:if>
-                                <c:if test="${status==0||status==3}">
-                                    <c:if test="${status==3}"><h2>公司实名认证审核中</h2></c:if>
+                                <c:if test="${status==6||status==0||status==3}">
+                                    <c:if test="${status==0||status==3}"><h2>公司实名认证审核中</h2></c:if>
+                                    <c:if test="${status==6}"><h2>个人实名认证审核中</h2></c:if>
                                     <div class="authfail thumbnail">
                                         <img src="${resPrefixUrl }/images/personal/audit.png" alt="...">
                                         <div class="caption">
@@ -119,7 +120,8 @@
                                     </div>
                                 </c:if>
                                 <c:if test="${status==-1||status==-2||status==5}">
-                                    <c:if test="${status==5}"><h2>公司实名认证失败</h2></c:if>
+                                    <c:if test="${status==-1}"><h2>个人实名认证失败</h2></c:if>
+                                    <c:if test="${status==5||status==-2}"><h2>公司实名认证失败</h2></c:if>
                                     <div class="authfail thumbnail">
                                         <img src="${resPrefixUrl }/images/personal/smiling_face.png" alt="...">
                                         <div class="caption">
