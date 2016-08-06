@@ -16,6 +16,8 @@ import javax.persistence.Table;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_tenant")
 public class Tenant extends IdEntity {
+	public static final Integer AUTH_COMPANY=1;//认证类型-企业认证
+	public static final Integer AUTH_ONESELF=0;//认证类型-个人认证
 	public static final Integer AUTH_WAIT = 0;//等待审核
 	public static final Integer AUTH_NO = 100;//未认证
 	public static final Integer AUTH_UPGRADE_WAIT = 3;//个人升级企业等待
