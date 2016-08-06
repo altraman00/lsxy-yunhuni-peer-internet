@@ -60,7 +60,7 @@ public class AppStatisticsTask {
     /**
      * 每天02：00：00触发执行
      */
-    @Scheduled(cron="0 0 2 * * ?")
+    @Scheduled(cron="0 0 1 * * ?")
     public void days(){
         long startTime = System.currentTimeMillis();
         logger.info("应用指标日统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
