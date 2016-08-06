@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.consume.model;
+package com.lsxy.framework.api.statistics.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 
@@ -19,10 +19,16 @@ public class ConsumeMonth extends IdEntity {
     private Integer month;//统计月 区间1-12
     private BigDecimal amongAmount;//本月消费统计 decimal(20,4) DEFAULT NULL,
     private BigDecimal sumAmount;//累计消费金额,
-    private Integer amongSessionConut;//本月会话数统计
-    private Integer sumSessionCount;//累计会话统计
     private String appId;//所属应用,
     private String tenantId;//所属租户
+    private String type;//消费类型
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
     @Column(name = "month")
     public Integer getMonth() {
         return month;
@@ -55,22 +61,6 @@ public class ConsumeMonth extends IdEntity {
 
     public void setAmongAmount(BigDecimal amongAmount) {
         this.amongAmount = amongAmount;
-    }
-    @Column(name = "among_session_count")
-    public Integer getAmongSessionConut() {
-        return amongSessionConut;
-    }
-
-    public void setAmongSessionConut(Integer amongSessionConut) {
-        this.amongSessionConut = amongSessionConut;
-    }
-    @Column(name = "sum_session_count")
-    public Integer getSumSessionCount() {
-        return sumSessionCount;
-    }
-
-    public void setSumSessionCount(Integer sumSessionCount) {
-        this.sumSessionCount = sumSessionCount;
     }
     @Column(name = "tenant_id")
     public String getTenantId() {

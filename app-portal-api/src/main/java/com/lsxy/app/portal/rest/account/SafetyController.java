@@ -93,7 +93,7 @@ public class SafetyController extends AbstractRestController {
     public RestResponse modifyPwd(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
-        if(!StringUtils.isNotEmpty(oldPassword)){
+        if(StringUtils.isNotEmpty(oldPassword)){
             // 密码加密
             oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
             newPassword = PasswordUtil.springSecurityPasswordEncode(newPassword,userName);
