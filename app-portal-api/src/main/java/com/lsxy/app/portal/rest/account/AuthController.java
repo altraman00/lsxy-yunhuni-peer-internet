@@ -116,7 +116,12 @@ public class AuthController extends AbstractRestController {
         //获取租户对象
         Account acount  = accountService.findAccountByUserName(userName);
         Tenant tenant = acount.getTenant();
-        tenant.setIsRealAuth(Integer.valueOf(status));
+        Integer statusT = Integer.valueOf(status);
+        tenant.setIsRealAuth(statusT);
+        if(statusT==Tenant.AUTH_ONESELF_WAIT){
+            statusT=Tenant.AUTH_WAIT;
+        }
+        realnamePrivate.setStatus(statusT);
         realnamePrivate.setTenant(tenant);
         //保存到数据库
         realnamePrivate = realnaePrivateService.save(realnamePrivate);
