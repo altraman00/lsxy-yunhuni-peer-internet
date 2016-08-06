@@ -69,7 +69,7 @@ public class AuthController extends AbstractRestController {
         Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         map.put("userName",userName);
         map.put("status",tenant.getIsRealAuth());
-        if(Tenant.AUTH_COMPANY_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
+        if(Tenant.AUTH_COMPANY_SUCCESS==tenant.getIsRealAuth()){
             RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_COMPANY_SUCCESS);
             if(realnameCorp!=null) {
                 map.put("realnameCorp",realnameCorp);
@@ -77,7 +77,7 @@ public class AuthController extends AbstractRestController {
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
-        }else if(Tenant.AUTH_ONESELF_SUCCESS==tenant.getIsRealAuth()){
+        }else if(Tenant.AUTH_ONESELF_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
             RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCCESS);
             if(realnamePrivate!=null) {
                 map.put("realnamePrivate",realnamePrivate);
