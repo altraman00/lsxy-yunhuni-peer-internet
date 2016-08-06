@@ -69,39 +69,39 @@
                                         <c:if test="${status == 1}">
                                             <ul>
                                                 <li>认证类型：个人认证</li>
-                                                <li>真实姓名：${name}</li>
+                                                <li>真实姓名：${realnamePrivate.name}</li>
                                                 <li>证件类型：
-                                                    <c:if test="${idType == '0'}">身份证</c:if>
-                                                    <c:if test="${idType == '1'}">护照</c:if>
+                                                    <c:if test="${realnamePrivate.idType == '0'}">身份证</c:if>
+                                                    <c:if test="${realnamePrivate.idType == '1'}">护照</c:if>
                                                 </li>
-                                                <li>证件号码：${idNumber}</li>
-                                                <li>认证时间：${time}</li>
+                                                <li>证件号码：${realnamePrivate.idNumber}</li>
+                                                <li>认证时间：${createTime1}</li>
                                             </ul>
                                         </c:if>
                                         <c:if test="${status == 2}">
                                             <ul>
                                                 <li>认证类型：公司认证</li>
-                                                <li>公司名称：${name}</li>
-                                                <li>办公地址：${addr}</li>
-                                                <li>所属行业：${industry}</li>
-                                                <li>申请人：${proposer}</li>
+                                                <li>公司名称：${realnameCorp.name}</li>
+                                                <li>办公地址：${realnameCorp.addr}</li>
+                                                <li>所属行业：${realnameCorp.industry}</li>
+                                                <li>申请人：${realnameCorp.proposer}</li>
                                                 <li>证件类型：
-                                                    <c:if test="${authType == '0'}">三证合一（一照一码）</c:if>
-                                                    <c:if test="${authType == '1'}">三证合一</c:if>
-                                                    <c:if test="${authType == '2'}">三证分离</c:if>
+                                                    <c:if test="${realnameCorp.authType == '0'}">三证合一（一照一码）</c:if>
+                                                    <c:if test="${realnameCorp.authType == '1'}">三证合一</c:if>
+                                                    <c:if test="${realnameCorp.authType == '2'}">三证分离</c:if>
                                                 </li>
-                                                <c:if test="${authType == '0'}">
-                                                    <li>统一社会信用代码：${type01Prop02}</li>
+                                                <c:if test="${realnameCorp.authType == '0'}">
+                                                    <li>统一社会信用代码：${realnameCorp.type01Prop02}</li>
                                                 </c:if>
-                                                <c:if test="${authType == '1'}">
-                                                    <li>注册号：${type02Prop01}</li>
-                                                    <li>税务登记号：${type02Prop02}</li>
+                                                <c:if test="${realnameCorp.authType == '1'}">
+                                                    <li>注册号：${realnameCorp.type02Prop01}</li>
+                                                    <li>税务登记号：${realnameCorp.type02Prop02}</li>
                                                 </c:if>
-                                                <c:if test="${authType == '2'}">
-                                                    <li>税务登记号：${type03Prop01}</li>
-                                                    <li>营业执照号：${type03Prop03}</li>
+                                                <c:if test="${realnameCorp.authType == '2'}">
+                                                    <li>税务登记号：${realnameCorp.type03Prop01}</li>
+                                                    <li>营业执照号：${realnameCorp.type03Prop03}</li>
                                                 </c:if>
-                                                <li>认证时间：${time}</li>
+                                                <li>认证时间：${createTime2} </li>
                                             </ul>
                                         </c:if>
                                     </div>

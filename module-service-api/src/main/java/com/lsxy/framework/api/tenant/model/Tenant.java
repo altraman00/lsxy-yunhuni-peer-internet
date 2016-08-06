@@ -60,30 +60,4 @@ public class Tenant extends IdEntity {
 	public void setRegisterUserId(String registerUserId) {
 		this.registerUserId = registerUserId;
 	}
-
-	/**
-	 * 判断当前租户是否认证成功（只要一种认证成功即可）
-	 * @return
-     */
-	public boolean isRealAuth(){
-		boolean flag = false;
-		if(isRealAuth==AUTH_UPGRADE_WAIT|| isRealAuth==AUTH_UPGRADE_SUCCESS || isRealAuth==AUTH_UPGRADE_FAIL|| isRealAuth==AUTH_COMPANY_SUCCESS|| isRealAuth==AUTH_ONESELF_SUCCESS){
-			flag = true;
-		}
-		return flag;
-	}
-	/**
-	 * 获取认证状态
-	 * 个人认证升级企业认证成功，返回企业认证成功 2
-     * 个人认证升级等待或者失败，返回个人认证成功 1
-	 */
-	public Integer getRealAuthStatus() {
-		Integer stauts = isRealAuth;
-		if (isRealAuth == AUTH_UPGRADE_SUCCESS  ) {
-			stauts = AUTH_COMPANY_SUCCESS;
-		}else if(isRealAuth == AUTH_UPGRADE_WAIT || isRealAuth == AUTH_UPGRADE_FAIL ){
-			stauts = AUTH_ONESELF_SUCCESS;
-		}
-		return stauts;
-	}
 }

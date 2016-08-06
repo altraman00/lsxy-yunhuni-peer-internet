@@ -10,6 +10,7 @@ import com.lsxy.framework.api.tenant.service.RealnameCorpService;
 import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,10 +41,20 @@ public class AuthController extends AbstractRestController {
      */
     @RequestMapping("/find_auth_status")
     public RestResponse findAuthStatus(){
-       Tenant tenant = getCurrentAccount().getTenant();
+       Integer isRealAuth = getCurrentAccount().getTenant().getIsRealAuth();
        Map map = new HashMap();
-       map.put("flag",tenant.isRealAuth());
-       map.put("status",tenant.getRealAuthStatus());
+        boolean flag = false;
+        if(isRealAuth==Tenant.AUTH_UPGRADE_WAIT|| isRealAuth==Tenant.AUTH_UPGRADE_SUCCESS || isRealAuth==Tenant.AUTH_UPGRADE_FAIL|| isRealAuth==Tenant.AUTH_COMPANY_SUCCESS|| isRealAuth==Tenant.AUTH_ONESELF_SUCCESS){
+            flag = true;
+        }
+        Integer stauts = isRealAuth;
+        if (isRealAuth == Tenant.AUTH_UPGRADE_SUCCESS  ) {
+            stauts = Tenant.AUTH_COMPANY_SUCCESS;
+        }else if(isRealAuth == Tenant.AUTH_UPGRADE_WAIT || isRealAuth == Tenant.AUTH_UPGRADE_FAIL ){
+            stauts = Tenant.AUTH_ONESELF_SUCCESS;
+        }
+       map.put("flag",flag);
+       map.put("status",stauts);
        return RestResponse.success(map);
     }
     /**
@@ -62,6 +73,7 @@ public class AuthController extends AbstractRestController {
             RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_COMPANY_SUCCESS);
             if(realnameCorp!=null) {
                 map.put("realnameCorp",realnameCorp);
+                map.put("creatTime2", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
@@ -69,6 +81,7 @@ public class AuthController extends AbstractRestController {
             RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCCESS);
             if(realnamePrivate!=null) {
                 map.put("realnamePrivate",realnamePrivate);
+                map.put("creatTime1", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
@@ -76,12 +89,14 @@ public class AuthController extends AbstractRestController {
             RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_COMPANY_SUCCESS);
             if(realnameCorp!=null) {
                 map.put("realnameCorp",realnameCorp);
+                map.put("creatTime2", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
             RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCCESS);
             if(realnamePrivate!=null) {
                 map.put("realnamePrivate",realnamePrivate);
+                map.put("creatTime1", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_UPGRADE_FAIL);
             }
