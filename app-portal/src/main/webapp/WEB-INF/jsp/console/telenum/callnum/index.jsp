@@ -140,7 +140,6 @@ function release(id){
             showtoast("取消");
         }
     });
-
 }
 </script>
 </body>

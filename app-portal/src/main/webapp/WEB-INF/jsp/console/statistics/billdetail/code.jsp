@@ -40,12 +40,12 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/metting">语音会议</a>
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a">
+                                            <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>

@@ -65,7 +65,7 @@ public class ModifyEmailSuccessEventHandler implements MQMessageHandler<ModifyEm
             map.put("email",message.getEmail());
             map.put("code",uuid);
             String re = JSONUtil.mapToJson(map);
-            cacheManager.set("account_modify_email_" + account.getId() ,re,12 * 60 * 60);
+            cacheManager.set("account_modify_email_" + account.getId() ,re, 12*60*60);
         } catch (MailConfigNotEnabledException e) {
             e.printStackTrace();
         } catch (MailContentNullException e) {

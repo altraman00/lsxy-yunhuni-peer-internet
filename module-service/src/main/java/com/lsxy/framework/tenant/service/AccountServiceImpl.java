@@ -115,7 +115,8 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         /*
             检查注册重复信息时，各项信息不能和已经激活的用户相同，同一信息若没激活，在注册的72小内也不能重复注册
          */
-        Date limitTime = new Date(System.currentTimeMillis() - 72 * 60 * 60 * 1000);
+        long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
+        Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
 
         //验证用户名是否能注册
         String userNameHql = "from Account obj where (obj.userName=?1 and obj.status=?2) or (obj.userName=?3 and obj.status=?4 and obj.createTime > ?5)";
@@ -231,6 +232,13 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         this.save(account);
     }
 
+    @Override
+    public void cleanExpireRegisterAccount() {
+        long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
+        Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
+        accountDao.cleanExpireRegisterAccount(Account.STATUS_EXPIRE,Account.STATUS_NOT_ACTIVE,limitTime);
+    }
+
     /**
      * 检查激活信息是否可用，各个信息在数据库中是否有重复（已激活的账号），执行激活前调用
      * @param userName 用户名
@@ -253,5 +261,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         }
         return true;
     }
+
+
 
 }

@@ -25,6 +25,7 @@ public class SafetyController extends AbstractRestController {
     private AccountService accountService;
     @Autowired
     private MQService mqService;
+
     /**
      * 验证密码是否正确
      * @param password 待验证密码
@@ -93,7 +94,7 @@ public class SafetyController extends AbstractRestController {
     public RestResponse modifyPwd(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
-        if(!StringUtils.isNotEmpty(oldPassword)){
+        if(StringUtils.isNotEmpty(oldPassword)){
             // 密码加密
             oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
             newPassword = PasswordUtil.springSecurityPasswordEncode(newPassword,userName);

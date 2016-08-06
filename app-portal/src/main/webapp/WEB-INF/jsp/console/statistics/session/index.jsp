@@ -27,8 +27,8 @@
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <ul id="myTab" class="nav nav-tabs">
-                                    <input type="hidden" value="0" id="defaultapp"/>
-                                    <li class="active"><a  data-toggle="tab" data-app="0">全部应用</a></li>
+                                    <input type="hidden" value="-1" id="defaultapp"/>
+                                    <li class="active"><a  data-toggle="tab" data-app="-1">全部应用</a></li>
                                     <c:forEach items="${appList}" var="app">
                                         <li ><a  data-toggle="tab" data-app="${app.id}">${app.name}</a></li>
                                     </c:forEach>
@@ -168,25 +168,17 @@
         var app = $('#defaultapp').val();
         var starttime = initialStartTime(type);
         //异步查询 返回json 数据
-        $.ajax({
-            url : "${ctx}/console/statistics/session/list",
-            type : 'post',
-            async: true,//使用false同步的方式,true为异步方式
-            data : {'type':type1,'appId':app,'startTime':starttime, '${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
-                resultData = data;
-                xdAll = JSON.stringify(resultData[0]);
-                Array.prototype.max = function(){
-                    return Math.max.apply({},this)
-                }
-                xdAll = eval('('+xdAll+')');
-                ydAll = JSON.stringify(resultData[1]);
-                ydAll = eval('('+ydAll+')');
-                charts(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
-            },
-            fail:function(){
+        var param ={'type':type1,'appId':app,'startTime':starttime, csrfParameterName:csrfToken};
+        ajaxsync(ctx+"/console/statistics/session/list",param,function(result){
+            var resultData = result.data;
+            xdAll = JSON.stringify(resultData[0]);
+            Array.prototype.max = function(){
+                return Math.max.apply({},this)
             }
+            xdAll = eval('('+xdAll+')');
+            ydAll = JSON.stringify(resultData[1]);
+            ydAll = eval('('+ydAll+')');
+            charts(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
         });
     }
 

@@ -85,4 +85,9 @@ public interface AccountService extends BaseService<Account> {
      * @param password 密码
      */
     void resetPwdByMobile(String mobile, String password);
+
+    /**
+     * 清除过期的注册账号（用于定时任务）
+     */
+    void cleanExpireRegisterAccount();
 }
