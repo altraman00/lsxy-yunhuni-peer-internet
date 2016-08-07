@@ -15,7 +15,9 @@ public abstract class AbstractSpringBootStarter implements EmbeddedServletContai
     }
     @Override
     public void customize(ConfigurableEmbeddedServletContainer container) {
+
         container.setPort(Integer.parseInt(SystemConfig.getProperty(systemId() + ".http.port","8080")));
+        System.setProperty("systemId",systemId());
     }
 
     /**

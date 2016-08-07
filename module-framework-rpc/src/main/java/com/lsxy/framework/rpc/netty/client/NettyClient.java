@@ -22,6 +22,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +31,8 @@ import org.springframework.stereotype.Component;
  * Netty Client
  */
 @Component
-@Conditional(NettyCondition.class)
+//@Conditional(NettyCondition.class)
+@ConditionalOnProperty(prefix = "global.rpc.provider", value = "netty", matchIfMissing = false)
 public class NettyClient extends AbstractClient{
 
     @Autowired
@@ -65,7 +67,7 @@ public class NettyClient extends AbstractClient{
             });
 
             // Start the client.
-            ChannelFuture f = b.connect(host, port).sync(); // (5)
+            ChannelFuture f = b.connect(host, port).sync();
 
             session = new NettyClientSession(f.channel(),handler,serverUrl);
 
