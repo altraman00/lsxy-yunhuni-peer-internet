@@ -30,8 +30,8 @@ public class ActMQService extends AbstractMQService {
         if(jmsTemplate != null){
             if(event instanceof AbstractMQEvent){
                 if (logger.isDebugEnabled()){
-                    logger.debug("发布事件："+event.getEventName());
-                    logger.debug("事件内容：{}" + event);
+                    logger.debug("发布事件：{}" , event.getEventName());
+                    logger.debug("事件内容：{}" , event);
                 }
                 Destination dest = new ActiveMQTopic(event.getTopicName());
                 jmsTemplate.send(dest,(AbstractMQEvent)event);

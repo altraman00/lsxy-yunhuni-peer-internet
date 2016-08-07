@@ -3,7 +3,6 @@
     <contextName>area-server</contextName>
     <property name="APP_NAME" value="area-server" />
     <include resource="logback-yunhuni.xml"/>
-    <logger name="org.springframework.web" level="DEBUG" additivity="true" />
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
 
 </configuration>

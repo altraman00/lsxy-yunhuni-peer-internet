@@ -19,8 +19,8 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 /**
  * Created by Tandy on 2016/6/7.
  */
-@EnableWebSecurity
-@Configuration
+//@EnableWebSecurity
+//@Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
 
