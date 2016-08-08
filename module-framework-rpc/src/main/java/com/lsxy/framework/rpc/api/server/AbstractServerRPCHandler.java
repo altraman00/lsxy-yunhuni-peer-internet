@@ -69,16 +69,27 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
             RPCResponse response = null;
+            if(logger.isDebugEnabled()){
+                logger.debug("消息统一处理入口:{}",message);
+            }
             if(request.getName().equals(ServiceConstants.CH_MN_CONNECT)){
                 response = process_CH_MN_CONNECT(ctxObject,request);
             }else{
-                response = serviceHandler.handleService(request, getSessionInTheContextObject(ctxObject));
+                if(serviceHandler != null){
+                    if(logger.isDebugEnabled()){
+                        logger.debug("serviceHandler is :{}" + serviceHandler.getClass().getName());
+                    }
+                    response = serviceHandler.handleService(request, getSessionInTheContextObject(ctxObject));
+                }else{
+                    if(logger.isDebugEnabled()){
+                        logger.debug("未找到服务器端ServiceHandler Bean对象,丢弃请求:{}",request);
+                    }
+                }
             }
             if(response != null){
                 Session session = getSessionInTheContextObject(ctxObject);
                 session.write(response);
             }
-
             processRequestCount.incrementAndGet();
 
         }else if(message instanceof  RPCResponse){
