@@ -344,6 +344,14 @@
         if (tips) {
             $('.querytips').html(tips);
             return false;
+        }else{
+            //1号7点前不能申请上一个月的发票（因为还没统计出来）
+            var sdate = endtime.split('-');
+            var endDate = new Date(sdate[0],sdate[1]);//此处月份不用减1
+            if(new Date().getTime() - endDate.getTime() < 7 * 60 * 60 * 1000){
+                $('.querytips').html("当月1号7点前不能申请上一个月的发票");
+                return false;
+            }
         }
 
         //显示时间
