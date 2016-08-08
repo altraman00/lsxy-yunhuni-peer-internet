@@ -3,16 +3,13 @@ package com.lsxy.app.portal.console.cost;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
-import com.lsxy.framework.api.statistics.model.ConsumeDay;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
-import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.api.statistics.model.ConsumeDay;
 import com.lsxy.framework.core.security.SecurityUser;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -192,6 +189,14 @@ public class InvoiceApplyController extends AbstractPortalController {
 
         Map<String,Object> paramsMap = WebUtils.getRequestParams(request);
         String token = this.getSecurityToken(request);
+        //当月1号7点前不能申请上一个月的发票
+        String end = (String) paramsMap.get("end");
+        String nextMonth = DateUtils.getNextMonth(end, "yyyy-MM");
+        Date date = DateUtils.parseDate(nextMonth, "yyyy-MM");
+        if(System.currentTimeMillis() - date.getTime() < 7 * 60 * 60 * 1000){
+            throw new RuntimeException("当月1号7点前不能申请上一个月的发票");
+        }
+
         String type = (String) paramsMap.get("type");
         Integer authStatus = findAuthStatus(token);
         if(1 == authStatus){
@@ -341,21 +346,7 @@ public class InvoiceApplyController extends AbstractPortalController {
      * 上传文件方法
      */
     private String UploadFile(String tenantId,MultipartFile file) throws IOException {
-        String name = file.getOriginalFilename();//文件名
-        if(StringUtils.isNotBlank(name)){
-            String type = name.substring(name.lastIndexOf("."),name.length());
-            String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
-            String fileKey = "tenant_res/"+tenantId+"/invoice/"+ymd+"/"+ UUIDGenerator.uuid()+type;
-            long size = file.getSize();
-            boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name, SystemConfig.getProperty("global.oss.aliyun.bucket"),fileKey);
-            if(flag){
-                return fileKey;
-            }else{
-                throw new RuntimeException("上传文件失败");
-            }
-        }else{
-            return null;
-        }
+        return ossService.uploadFile(tenantId,"invoice",file);
     }
 
 }
