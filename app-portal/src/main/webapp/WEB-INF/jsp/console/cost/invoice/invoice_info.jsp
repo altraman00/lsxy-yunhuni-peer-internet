@@ -190,7 +190,6 @@
         </section>
     </section>
 </section>
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 </body>
 

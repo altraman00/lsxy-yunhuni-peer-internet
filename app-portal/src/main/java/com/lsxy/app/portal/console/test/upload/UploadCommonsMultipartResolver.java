@@ -21,11 +21,6 @@ public class UploadCommonsMultipartResolver extends CommonsMultipartResolver {
     protected FileUpload newFileUpload(FileItemFactory fileItemFactory) {
         ServletFileUpload upload = new ServletFileUpload(fileItemFactory);
         upload.setSizeMax(-1);
-        if (request != null) {
-            HttpSession session = request.getSession();
-            UploadListener uploadProgressListener = new UploadListener(session);
-            upload.setProgressListener(uploadProgressListener);
-        }
         return upload;
     }
 
