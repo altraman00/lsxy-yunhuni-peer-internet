@@ -7,4 +7,5 @@
     <logger name="io.netty" level="DEBUG" additivity="false" />
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
 
+    <logger name="c.l.f.rpc.netty.codec" level="INFO" additivity="false"/>
 </configuration>
