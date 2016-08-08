@@ -46,7 +46,42 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             response = this.process_MN_CH_SYS_CALL(request);
         }
 
+        if(request.getName().equals(ServiceConstants.MN_CH_CTI_API)){
+            response = this.process_MN_CH_CTI_API(request);
+        }
+
         return response;
+    }
+
+    private RPCResponse process_MN_CH_CTI_API(RPCRequest request) {
+        if(logger.isDebugEnabled()){
+            logger.debug("响应CTI API");
+        }
+        Client cticlient = cticlientContext.getAvalibleClient();
+        String resId = (String) request.getParameter("res_id");
+        String method = (String) request.getParameter("method");
+        Map<String, Object> params = new HashMap<>();
+        if(method.equals("sys.call.answer")){
+            params.put("max_answer_seconds",RandomUtils.nextInt(10,60));
+            if(logger.isDebugEnabled()){
+                logger.debug("处理应答参数:{}",params);
+            }
+        }else if(method.equals("sys.call.drop")){
+            params.put("cause",603);
+            if(logger.isDebugEnabled()){
+                logger.debug("处理挂机动作的参数:{}",params);
+            }
+        }
+        try {
+            if(logger.isDebugEnabled()){
+                logger.debug("开始操作资源:{}",resId);
+            }
+            cticlient.operateResource(0,1,resId,method,params,null);
+        } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private RPCResponse process_MN_CH_SYS_CALL(RPCRequest request) {
