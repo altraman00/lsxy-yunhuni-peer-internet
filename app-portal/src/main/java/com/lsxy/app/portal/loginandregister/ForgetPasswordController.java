@@ -8,7 +8,6 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.alipay.config.AlipayConfig.key;
 
 /**
  * Created by liups on 2016/6/24.
@@ -44,6 +41,13 @@ public class ForgetPasswordController {
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView registerPage(){
         return new ModelAndView("forget/index");
+    }
+
+    @RequestMapping(value = "/check_mail",method = RequestMethod.GET)
+    @ResponseBody
+    public RestResponse checkEmail(String email){
+        Boolean b = emailCheck(email);
+        return RestResponse.success(b);
     }
 
     @RequestMapping(value = "/send_mail",method = RequestMethod.POST)

@@ -26,7 +26,12 @@
         <div class="col-md-12 text-center">
             <img src="${resPrefixUrl }/images/register/sign-error-icon.png"/>
             <p class="p">激活失败：${erInfo}</p>
-            <p><a href="${ctx}/reg/index">点击重新注册</a></p>
+            <c:if test="${errorCode!=null}">
+                <p><a href="${ctx }/login">点击重新登录</a></p>
+            </c:if>
+            <c:if test="${errorCode==null}">
+                <p><a href="${ctx}/reg/index">点击重新注册</a></p>
+            </c:if>
         </div>
     </div>
 </div>

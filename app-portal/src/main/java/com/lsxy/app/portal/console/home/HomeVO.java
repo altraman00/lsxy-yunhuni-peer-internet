@@ -15,17 +15,27 @@ public class HomeVO {
 
     private Integer lineNum ;               //当前线路数量
 
+    private Integer lineAverageCallTime;    //平均通话时长(分钟)
+
+    private Double lineLinkRate;            //接通率
+
     private Integer voiceRemain;           //语音剩余量（分钟）
 
     private Integer smsRemain;             //短信剩余量（条）
 
     private Integer conferenceRemain;         //会议剩余量（分钟）
 
+    private Long fileTotalSize;                //总容量
+
+    private Long fileUsedSize;                //已使用容量
+
     private String restApi;                  //restApi
+
+    private String certId;                  //鉴权账号
 
     private String secretKey;               //secretKey
 
-   private List<AppStateVO> appStateVOs;    //应用
+    private List<AppStateVO> appStateVOs;    //应用
 
     public Long getMessageNum() {
         return messageNum;
@@ -59,6 +69,22 @@ public class HomeVO {
         this.lineNum = lineNum;
     }
 
+    public Integer getLineAverageCallTime() {
+        return lineAverageCallTime;
+    }
+
+    public void setLineAverageCallTime(Integer lineAverageCallTime) {
+        this.lineAverageCallTime = lineAverageCallTime;
+    }
+
+    public Double getLineLinkRate() {
+        return lineLinkRate;
+    }
+
+    public void setLineLinkRate(Double lineLinkRate) {
+        this.lineLinkRate = lineLinkRate;
+    }
+
     public Integer getVoiceRemain() {
         return voiceRemain;
     }
@@ -83,12 +109,36 @@ public class HomeVO {
         this.conferenceRemain = conferenceRemain;
     }
 
+    public Long getFileTotalSize() {
+        return fileTotalSize;
+    }
+
+    public void setFileTotalSize(Long fileTotalSize) {
+        this.fileTotalSize = fileTotalSize;
+    }
+
+    public Long getFileUsedSize() {
+        return fileUsedSize;
+    }
+
+    public void setFileUsedSize(Long fileUsedSize) {
+        this.fileUsedSize = fileUsedSize;
+    }
+
     public String getRestApi() {
         return restApi;
     }
 
     public void setRestApi(String restApi) {
         this.restApi = restApi;
+    }
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
     }
 
     public String getSecretKey() {

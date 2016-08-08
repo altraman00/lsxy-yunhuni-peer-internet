@@ -47,11 +47,12 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <input class="form-control" name="email" id="email" placeholder="输入邮箱地址 ,找回密码"  />
+                                <small class="help-block tips-error" id="emailTips"></small>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary  btn-form ">发送重置密码的邮件</button>
+                                <button type="button" class="btn btn-primary  btn-form " id="emailBtn">发送重置密码的邮件</button>
                             </div>
                         </div>
                     </div>
@@ -115,11 +116,11 @@
         var mobileCode = $("#code").val();
         var mobile = $("#mobile").val();
         $.get(ctx + "/mc/check", {"mc":mobileCode,"mobile":mobile},
-                function(data){
-                    if(data.flag){
+                function(response){
+                    if(response.data.flag){
                         document.getElementById('mobileForm').submit();
                     }else{
-                        tipsmsg(data.err,"mobileCodeTips");
+                        tipsmsg(response.data.err,"mobileCodeTips");
                     }
                 });
     }
@@ -153,11 +154,11 @@
                     data: {"mobile":mobile,validateCode:vCode},   //id
                     async: false,
                     dataType: "json",
-                    success: function(result) {
-                        if(result.flag){
+                    success: function(response) {
+                        if(response.data.flag){
                             //发送成功
                             sendResult = true;
-                        }else if(result.vc){
+                        }else if(response.data.vc){
                             sendResult = false;
                             //发送不成功，且要输入图形验证码
                             isVc = true;
@@ -170,10 +171,10 @@
 
                             $('#second-codeblock').html(html);
 
-                            tipsmsg(result.err,'secondcodeTips');
+                            tipsmsg(response.data.err,'secondcodeTips');
                         }else{
                             sendResult = false;
-                            tipsmsg(result.err,'mobileCodeTips');
+                            tipsmsg(response.data.err,'mobileCodeTips');
                         }
                     }
                 });
@@ -213,6 +214,38 @@
     function changeImgCode(){
         $("#imgValidateCode").prop("src",ctx + "/vc/get?dt="+(new Date().getTime()));
     }
+
+
+    $('#emailBtn').click(function(){
+        $('#emailForm').bootstrapValidator('validate');
+        var check = $('#emailForm').data('bootstrapValidator').isValid();
+        // 邮箱验证是否通过
+        if(check){
+            var flag = false;
+            var email = $("#email").val();
+
+            $.ajax({
+                type: "get",
+                url: ctx + "/forget/check_mail",
+                data: {email:email},
+                async: false,
+                dataType: "json",
+                success: function(response) {
+                    if(response.success){
+                        if(response.data){
+                            flag = true;
+                        }else{
+                            tipsmsg("无效的邮箱地址","emailTips");
+                        }
+                    }
+                }
+            });
+            if(flag){
+                $('#emailForm').get(0).submit();
+            }
+        }
+    });
+
 </script>
 </body>
 </html>

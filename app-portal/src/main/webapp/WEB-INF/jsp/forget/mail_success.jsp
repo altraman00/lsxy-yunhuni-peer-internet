@@ -30,6 +30,7 @@
             <div class="email-box">
                 <img src="${resPrefixUrl }/images/index/mail.png"/>
                 <p class="p">您的初始化密码安全链接已发送至邮箱地址：</p>
+                <p class="p">${email}</p>
                 <p><a class="btn_actemail"  data-email="${email}" >去邮箱收取邮件</a></p>
             </div>
         </div>

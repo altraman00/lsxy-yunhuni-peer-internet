@@ -5,14 +5,20 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
+import com.lsxy.framework.core.security.SecurityUser;
+import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +29,11 @@ import java.util.Map;
 @Controller
 @RequestMapping("/console/cost/invoice_info")
 public class InvoiceInfoController extends AbstractPortalController {
+    @Autowired
+    private OSSService ossService;
+
     @RequestMapping(value = "",method = RequestMethod.GET)
+    @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView get(HttpServletRequest request){
         String returView;
         Map<String,Object> model = new HashMap<>();
@@ -52,7 +62,12 @@ public class InvoiceInfoController extends AbstractPortalController {
 
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
-    public ModelAndView edit(HttpServletRequest request,InvoiceInfo invoiceInfo){
+    public ModelAndView edit(HttpServletRequest request, InvoiceInfo invoiceInfo, MultipartFile uploadfile) throws IOException {
+        SecurityUser user = this.getCurrentUser(request);
+        String imgUrl = uploadFile(user.getTenantId(), uploadfile);
+        if(StringUtils.isNotBlank(imgUrl)){
+            invoiceInfo.setQualificationUrl(imgUrl);
+        }
         String returView;
         Map<String,Object> model = new HashMap<>();
         String token = this.getSecurityToken(request);
@@ -75,6 +90,13 @@ public class InvoiceInfoController extends AbstractPortalController {
         String url = PortalConstants.REST_PREFIX_URL + "/rest/invoice_info/get";
         RestResponse<InvoiceInfo> response = RestRequest.buildSecurityRequest(token).get(url, InvoiceInfo.class);
         return response.getData();
+    }
+
+    /**
+     * 上传文件方法
+     */
+    private String uploadFile(String tenantId, MultipartFile file) throws IOException {
+        return ossService.uploadFile(tenantId,"invoice",file);
     }
 
 }

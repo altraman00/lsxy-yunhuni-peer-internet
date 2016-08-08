@@ -32,11 +32,4 @@ public interface InvoiceApplyService extends BaseService<InvoiceApply> {
      */
     InvoiceApply create(InvoiceApply apply, String userName);
 
-    /**
-     * 修改更新（只有当状态为异常时才能调用此方法）
-     * @param apply
-     * @param userName
-     * @return
-     */
-    InvoiceApply update(InvoiceApply apply, String userName);
 }

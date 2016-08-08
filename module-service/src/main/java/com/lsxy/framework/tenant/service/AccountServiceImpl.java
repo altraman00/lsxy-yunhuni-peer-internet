@@ -1,12 +1,14 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.exceptions.AccountNotFoundException;
 import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -75,13 +77,15 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
     @Override
-    public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException {
+    public Account findPersonByLoginNameAndPassword(String userLoginName, String password) throws MatchMutiEntitiesException,AccountNotFoundException {
         String hql = "from Account obj where (obj.userName=?1 or obj.email=?2 or obj.mobile=?3) and obj.status=?4";
         Account account = this.findUnique(hql, userLoginName,userLoginName,userLoginName,Account.STATUS_NORMAL);
         if(account != null) {
             if(!account.getPassword().equals(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()))){
                  account = null;
             }
+        }else{
+            throw new AccountNotFoundException("找不到账号");
         }
         return account;
     }
@@ -111,7 +115,8 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         /*
             检查注册重复信息时，各项信息不能和已经激活的用户相同，同一信息若没激活，在注册的72小内也不能重复注册
          */
-        Date limitTime = new Date(System.currentTimeMillis() - 72 * 60 * 60 * 1000);
+        long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
+        Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
 
         //验证用户名是否能注册
         String userNameHql = "from Account obj where (obj.userName=?1 and obj.status=?2) or (obj.userName=?3 and obj.status=?4 and obj.createTime > ?5)";
@@ -187,12 +192,15 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
     //帐务数据创建
     private void createBilling(Tenant tenant) {
+        long defaultSize = Long.parseLong(SystemConfig.getProperty("portal.voiceflieplay.maxsize"))*1024*1024;
         Billing billing = new Billing();
         billing.setTenant(tenant);
         billing.setBalance(new BigDecimal(0.00));
         billing.setSmsRemain(0);
         billing.setVoiceRemain(0);
         billing.setConferenceRemain(0);
+        billing.setFileTotalSize(defaultSize);
+        billing.setFileRemainSize(defaultSize);
         billingService.save(billing);
     }
 
@@ -224,6 +232,13 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         this.save(account);
     }
 
+    @Override
+    public void cleanExpireRegisterAccount() {
+        long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
+        Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
+        accountDao.cleanExpireRegisterAccount(Account.STATUS_EXPIRE,Account.STATUS_NOT_ACTIVE,limitTime);
+    }
+
     /**
      * 检查激活信息是否可用，各个信息在数据库中是否有重复（已激活的账号），执行激活前调用
      * @param userName 用户名
@@ -246,5 +261,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         }
         return true;
     }
+
+
 
 }

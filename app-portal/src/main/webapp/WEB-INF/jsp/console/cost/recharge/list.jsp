@@ -91,13 +91,14 @@
                                         <div class="col-md-12 padder-v fix-padding">
                                             <div class='wrapperBox cost_month cost_month_select'>
                                                 <div class="panel-body clearfix border-top-none personal-base">
-                                                    <form action="${ctx}/console/cost/recharge/list" method="get">
+                                                    <form id="queryForm" action="${ctx}/console/cost/recharge/list" method="get">
                                                         <div class="row">
                                                             从
-                                                            <input type="text" class="datepicker currentMonth form-control" name="startTime" value='${startTime}' data-date-end-date="0m" />
+                                                            <input type="text" class="datepicker currentMonth form-control" name="startTime" value='${startTime}' data-date-end-date="0m" readonly="readonly"/>
                                                             到
-                                                            <input type="text" class="datepicker lastMonth form-control" name="endTime" value='${endTime}' data-date-end-date="0m" />
-                                                            <button class="btn btn-primary query">查询</button>
+                                                            <input type="text" class="datepicker lastMonth form-control" name="endTime" value='${endTime}' data-date-end-date="0m" readonly="readonly"/>
+                                                            <a class="btn btn-primary query" id="queryBtn">查询</a>
+                                                            <span class="tips-error" ></span>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -159,6 +160,34 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src="${resPrefixUrl }/js/cost/order.js"></script><!--must-->
+
+<script>
+    $(".currentMonth,.lastMonth").change(function(){
+            compareTime();
+    });
+
+    $('#queryBtn').click(function(){
+        if(compareTime()){
+            document.getElementById('queryForm').submit();
+        }
+    });
+
+    function compareTime(){
+        $('.tips-error').html("");
+        var flag = true;
+        var starttime = $('.currentMonth').val();
+        var lastMonth = $('.lastMonth').val();
+        if(starttime != "" && lastMonth != ""){
+            flag = starttime <= lastMonth;
+            if(!flag){
+                $('.tips-error').html("时间范围填写有误");
+            }
+        }
+        return flag;
+    }
+
+</script>
+
 </body>
 </html>
 

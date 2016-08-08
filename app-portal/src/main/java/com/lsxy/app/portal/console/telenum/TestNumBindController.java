@@ -100,11 +100,13 @@ public class TestNumBindController extends AbstractPortalController{
      */
     @RequestMapping("/update_app_number")
     @ResponseBody
-    public Map updateAppNumber(HttpServletRequest request,String numbers, String appId){
-        updateAppNumberRest(request,numbers,appId);
-        Map hs = new HashMap();
-        hs.put("msg","应用绑定号码更新成功");
-        return hs;
+    public RestResponse updateAppNumber(HttpServletRequest request,String numbers, String appId){
+        RestResponse response = updateAppNumberRest(request, numbers, appId);
+        if(response.isSuccess()){
+            return RestResponse.success();
+        }else{
+            return response;
+        }
     }
     /**
      * 测试手机绑定号码

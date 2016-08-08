@@ -16,6 +16,10 @@ public class AppStateVO {
 
     private Integer currentCall;   //当前呼叫并发
 
+    private String ivr;             //ivr号吗
+
+    private Boolean ivrExpire;        //ivr号码过期时间
+
     private String description;
 
     public String getId() {
@@ -64,6 +68,22 @@ public class AppStateVO {
 
     public void setCurrentCall(Integer currentCall) {
         this.currentCall = currentCall;
+    }
+
+    public String getIvr() {
+        return ivr;
+    }
+
+    public void setIvr(String ivr) {
+        this.ivr = ivr;
+    }
+
+    public Boolean getIvrExpire() {
+        return ivrExpire;
+    }
+
+    public void setIvrExpire(Boolean ivrExpire) {
+        this.ivrExpire = ivrExpire;
     }
 
     public String getDescription() {

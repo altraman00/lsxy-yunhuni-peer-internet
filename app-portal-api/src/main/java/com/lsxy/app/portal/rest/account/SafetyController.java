@@ -1,10 +1,12 @@
 package com.lsxy.app.portal.rest.account;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.events.ModifyEmailSuccessEvent;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.PasswordUtil;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SafetyController extends AbstractRestController {
     @Autowired
     private AccountService accountService;
-
+    @Autowired
+    private MQService mqService;
     /**
      * 验证密码是否正确
      * @param password 待验证密码
@@ -39,6 +42,26 @@ public class SafetyController extends AbstractRestController {
         }
         return RestResponse.failed("1001","密码错误");
     }
+    /**
+     * 修改邮件-发送邮件
+     * @param email 邮件
+     * @return
+     */
+    @RequestMapping("/modify_email_bind")
+    public RestResponse modifyEmailBind(String email)   {
+        Account account = getCurrentAccount();
+        if(email.equals(account.getEmail())){
+            return  RestResponse.failed("1003","该邮件地址已被使用");
+        }
+        boolean flag = accountService.checkEmail(email);
+        if(flag){
+            return RestResponse.failed("1004","该邮件地址已被使用");
+        }
+        mqService.publish(new ModifyEmailSuccessEvent(account.getId(),email));
+        return RestResponse.success();
+    }
+
+
 
     /**
      * 修改绑定手机号码
@@ -48,6 +71,13 @@ public class SafetyController extends AbstractRestController {
     @RequestMapping("/save_mobile")
     public RestResponse saveMobile( String mobile) {
         Account account = getCurrentAccount();
+        if(mobile.equals(account.getMobile())){
+            return  RestResponse.failed("1002","该手机号码已被使用");
+        }
+        boolean flag = accountService.checkMobile(mobile);
+        if(flag){
+            return RestResponse.failed("1001","该手机号码已被使用");
+        }
         account.setMobile(mobile);
         account = accountService.save(account);
         return RestResponse.success(account);
@@ -63,7 +93,7 @@ public class SafetyController extends AbstractRestController {
     public RestResponse modifyPwd(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
-        if(!StringUtils.isNotEmpty(oldPassword)){
+        if(StringUtils.isNotEmpty(oldPassword)){
             // 密码加密
             oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
             newPassword = PasswordUtil.springSecurityPasswordEncode(newPassword,userName);

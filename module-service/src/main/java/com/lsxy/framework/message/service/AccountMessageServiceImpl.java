@@ -35,8 +35,8 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     @Override
     public Page<AccountMessage> pageListByAccountId(String userName,Integer pageNo,Integer pageSize) {
         Account  account = accountService.findAccountByUserName(userName);
-        String hql = "from AccountMessage obj where obj.account.id="+account.getId()+" and obj.status <>-1 order by status asc,create_time desc";
-        Page<AccountMessage> page =  this.pageList(hql,pageNo,pageSize);
+        String hql = "from AccountMessage obj where obj.account.id=?1 and obj.status <>-1 order by status asc,create_time desc";
+        Page<AccountMessage> page =  this.pageList(hql,pageNo,pageSize,account.getId());
         return page;
     }
 

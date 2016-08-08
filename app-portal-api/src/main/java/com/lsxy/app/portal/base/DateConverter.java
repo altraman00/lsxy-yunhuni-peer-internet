@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -29,7 +28,7 @@ public class DateConverter implements Converter<String, Date> {
                 try {
                     date = DateUtils.parseDate(s);
                 }catch (Exception e1){
-                    logger.error("日期转换失败，转换参数{1}，错误信息{2}",s,e1);
+                    logger.error("日期转换失败，转换参数{}，错误信息{}",s,e1);
                 }
             }
         }

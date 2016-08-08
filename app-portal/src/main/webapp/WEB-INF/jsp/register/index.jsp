@@ -24,7 +24,7 @@
 <div class="register_container">
     <div class="row box">
         <div class="col-md-5 text-center">
-            <img src="${resPrefixUrl }/images/register/reg_img.jpg" width="100%" />
+            <img src="${resPrefixUrl }/images/register/reg_img.jpg" />
         </div>
         <div class="col-md-7 register-box">
             <div class="row">
@@ -55,7 +55,12 @@
                             <p class="tips">注册后，邮箱地址收到账号激活邮件</p>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group reader">
+                        <div class="col-lg-9 col-lg-offset-3">
+                            <input type="checkbox"  id="registerRead"> 点击阅读<a>注册协议</a> <span class="tips-error" id="registerReadMsg" hidden>请先阅读注册协议</span>
+                        </div>
+                    </div>
+                    <div class="form-group ">
                         <div class="col-lg-9 col-lg-offset-3">
                             <a id="validateBtn"  class="btn btn-primary  btn-form">注册</a>
                         </div>
@@ -120,11 +125,11 @@
         }
         var mobile = $("#form-mobile").val();
         $.get(ctx + "/mc/check", {"mc":mobileCode,"mobile":mobile},
-            function(data){
-                if(data.flag){
+            function(response){
+                if(response.data.flag){
                     document.getElementById('defaultForm').submit();
                 }else{
-                    tipsmsg(data.err,"mobileCodeTips");
+                    tipsmsg(response.data.err,"mobileCodeTips");
                 }
         });
 
@@ -153,14 +158,14 @@
             data: {"mobile":mobile,validateCode:vCode},   //id
             async: false,
             dataType: "json",
-            success: function(result) {
-                if(result.flag){
+            success: function(response) {
+                if(response.data.flag){
                     //发送成功
                     sendResult = true;
-                }else if(result.vc){
+                }else if(response.data.vc){
                     sendResult = false;
                     //发送不成功，且要输入图形验证码
-                    tipsmsg(result.err,'mobileCodeTips');
+                    tipsmsg(response.data.err,'mobileCodeTips');
                     isVc = true;
 
                     //启动二次校验
@@ -171,7 +176,7 @@
 
                 }else{
                     sendResult = false;
-                    tipsmsg(result.err,'mobileCodeTips');
+                    tipsmsg(response.data.err,'mobileCodeTips');
                 }
             }
         });

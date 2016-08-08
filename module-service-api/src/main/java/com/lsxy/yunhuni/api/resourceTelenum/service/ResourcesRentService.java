@@ -16,7 +16,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param tenantId 租户id
      * @return
      */
-    Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize) throws MatchMutiEntitiesException;
+    Page<ResourcesRent> pageListByTenantId(String tenantId,int pageNo, int pageSize)  ;
 
     /**
      * 根据ID获取租用关系
@@ -25,7 +25,23 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     ResourcesRent findByAppId(String appId);
 
+    /**
+     * 根据号码和租用状态查询租用关系
+     * @param id
+     * @param status
+     * @return
+     */
     ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
 
+    /**
+     * 根据租户查询拥有的但没在使用状态的号码
+     * @param tenant
+     * @return
+     */
     String[] findOwnUnusedNum(Tenant tenant);
+
+    /**
+     * 清除过期号资源和租户的关系
+     */
+    void cleanExpireTelnumResourceRent();
 }

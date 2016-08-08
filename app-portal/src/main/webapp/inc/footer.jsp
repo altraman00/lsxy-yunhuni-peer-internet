@@ -53,6 +53,17 @@
 				o[this.name] = this.value || '';
 			}
 		});
+		//input checkbox单独处理
+		var t1 = document.getElementById(form.substring(1)).getElementsByTagName("input");
+		for(var i=0;i<t1.length;i++) {
+			if (t1[i].type == "checkbox") {
+				if (!(t1[i].checked)) {
+					o[t1[i].name]="0";
+				}else{
+					o[t1[i].name]="1";
+				}
+			}
+		}
 		return o;
 	}
 </script>

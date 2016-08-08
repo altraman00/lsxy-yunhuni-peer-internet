@@ -88,7 +88,7 @@
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
                                                 <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
                                                 <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.isIvrService==1?1:0}')" >申请上线</a></c:if>
-                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}')">下线</a></span></c:if>
+                                                <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}','${result.isIvrService}')">下线</a></span></c:if>
                                             </td>
 
                                         </tr>
@@ -166,7 +166,7 @@
                     </div>
                     <div class="input text-center">
                         <div class="defulatTips" id="creatIVR" ></div>
-                        <a onclick="nolike()" class="font14">不喜欢 换一个?</a>
+                        <a onclick="nolike()" class="font14" id="noLike">不喜欢 换一个?</a>
                     </div>
                     <div class="hideIVR">
                     </div>
@@ -187,7 +187,8 @@
 
             <div class="contentModal" style="display: none" data-action="3">
                 <div class="input text-center mt-0">
-                    <p>您需要支付：<span class="money" id="payAmount">1100.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：<span id="balance">1100.00</span> 元 &nbsp;&nbsp;&nbsp; <span class="nomoney" style="display: none">!!余额不足</span>&nbsp;&nbsp;&nbsp;<a href="${ctx}/console/cost/recharge" target="_blank">充值</a> </p>
+                    <p>您需要支付：<span class="money" id="payAmount">1100.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：<span id="balance">1100.00</span> 元 &nbsp;&nbsp;&nbsp; <span class="nomoney" style="display: none">!!余额不足</span>
+                        &nbsp;&nbsp;&nbsp;<a href="${ctx}/console/cost/recharge" target="_blank">充值</a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" id="refreshBalance">刷新余额</a> </p>
                 </div>
                 <div class="input text-center mb-0 mt-0">
                     <div class="defulatTips">IVR号码：<span id="selectIvr"></span></div>
@@ -293,19 +294,9 @@
     function isRealAuth(){
         var realAuth = null;
         //获取用户实名认证状态
-        $.ajax({
-            url : ctx + "/console/account/auth/is_real_auth",
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                realAuth = data;
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
-            }
-        });
+        ajaxsync(ctx + "/console/account/auth/is_real_auth",null,function(result){
+            realAuth = (result.data == 1 || result.data == 2);
+        },"get");
         return realAuth;
     }
 
@@ -321,29 +312,23 @@
         var index = 1;
         var flag = true;//是否能显示上线框
         //获取应用所处的步骤
-        $.ajax({
-            url : ctx + "/console/app_action/"+ id ,
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data && data.action != null){
-                    switch (data.action){
-                        case 11: index = 2;break;   //选号
-                        case 12: index = 3;break;   //支付
-                        case 13: index = 2;break;   //支付返回选号
-                        case 14: showtoast('应用已上线');flag = false;break;   //上线完成
-                        case 21: index = 1;break;   //下线
-                        default: index = 1;break;
-                    }
+
+        ajaxsync(ctx + "/console/app_action/"+ id,null,function(response){
+            if(response.success){
+                switch (response.data){
+                    case 11: index = 2;break;   //选号
+                    case 12: index = 3;break;   //支付
+                    case 13: index = 2;break;   //支付返回选号
+                    case 14: showtoast('应用已上线');flag = false;break;   //上线完成
+                    case 21: index = 1;break;   //下线
+                    default: index = 1;break;
                 }
-            },
-            error:function(){
+            }else{
                 flag = false;
-                showtoast('网络异常，请稍后重试');
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
             }
-        });
+        },"get");
+
         if(flag){
             //进入实名认证
             if(index == 1){
@@ -390,27 +375,18 @@
         var ivr = [];
         var ownIvr = [];
         //远端生成
-        $.ajax({
-            url : ctx + "/console/app_action/select_ivr/" + appId,
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag && data.result != null ){
-                    ivr = data.result.selectIvr;
-                    ownIvr = data.result.ownIvr;
-                    result = true;
-                }else{
-                    result = false;
-                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
-                }
-            },
-            error:function(){
+
+        ajaxsync(ctx + "/console/app_action/select_ivr/" + appId,null,function(response){
+            if(response.success && response.data != null ){
+                ivr = response.data.selectIvr;
+                ownIvr = response.data.ownIvr;
+                result = true;
+            }else{
                 result = false;
-                showtoast('网络异常，请刷新重试');
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
             }
-        });
+        },"get");
+
         if(ownIvr.length > 0){
             $("#selectOwnIvr").show();
             $("#selectNewIvr").hide();
@@ -426,6 +402,8 @@
                 //赋值第一个
             }
             $('#creatIVR').html(ivr[0]);
+        }else{
+            $("#noLike").replaceWith('<div class="tips-error text-center" >IVR号码池异常，请联系客服</div>');
         }
         ivrnumber = 1;
         return result;
@@ -454,21 +432,15 @@
         if(status==2){
             bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
                 if(result){
-                    $.ajax({
-                        url : ctx + "/console/app/delete",
-                        type : 'post',
-                        async: false,//使用同步的方式,true为异步方式
-                        timeout:2*60*1000,
-                        data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                        dataType: "json",
-                        success : function(data){
-                            showtoast(data.msg);
-                        },
-                        error:function(){
-                            showtoast('网络异常，请稍后重试');
+                    ajaxsync(ctx + "/console/app/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                        if(response.success){
+                            showtoast("删除成功！");
+                            $('#app-'+id).remove();
+                        }else{
+                            showtoast("删除失败！" + response.errorMsg);
                         }
-                    });
-                    $('#app-'+id).remove();
+                    },"post");
+
                 }else{
                     //showtoast('取消');
                 }
@@ -478,33 +450,27 @@
 
 
     //应用下线
-    function offline(id){
+    function offline(id,type){
         bootbox.setLocale("zh_CN");
-        bootbox.confirm("下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result){
+        var h1="下线应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响";
+        if(type==1){
+            h1 = "应用下线后，选择的功能服务将终止，IVR号码关联将解除，应用上线后需要重新选择绑定（应用下线不影响IVR号码的月租费的收取）";
+        }
+        bootbox.confirm(h1, function(result){
             if(result){
-                $.ajax({
-                    url : ctx + "/console/app_action/offline",
-                    type : 'post',
-                    async: false,//使用同步的方式,true为异步方式
-                    timeout:2*60*1000,
-                    data : {'appId':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                    dataType: "json",
-                    success : function(data){
-                        if(data.flag){
-                            var isIvrService = data.app.isIvrService==1?1:0;
-                            $('#trb-'+id).html('');
-                            $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
-                            $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\')">申请上线</a>');
-                            showtoast('下线成功');
-                        }else{
-                            result = false;
-                            showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
-                        }
-                    },
-                    error:function(){
-                        showtoast('网络异常，请稍后重试');
+
+                ajaxsync(ctx + "/console/app_action/offline",{'appId':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                    if(response.success){
+                        var isIvrService = response.data.isIvrService==1?1:0;
+                        $('#trb-'+id).html('');
+                        $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
+                        $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\')">申请上线</a>');
+                        showtoast('下线成功');
+                    }else{
+                        result = false;
+                        showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
                     }
-                });
+                },"post");
 
             }else{
                 showtoast('取消');
@@ -518,39 +484,31 @@
         var result = false;
         var appId = $('#modal-appid').val();
         var ivr = $('#creatIVR').html();//当为创建支付订单时（Action），ivr取值有效，当为取出原有的订单时，ivr取值用数据库中的值（在后台中处理）
-        $.ajax({
-            url : ctx + "/console/app_action/get_pay",
-            type : 'get',
-            data : {appId:appId,ivr:ivr},//这里使用json对象
-            timeout:2*60*1000,
-            async: false,//使用同步的方式,true为异步方式
-            dataType: "json",
-            success : function(data){
-                if(data.flag && data.action != null && data.balance != null){
-                    $("#selectIvr").html(data.action.telNumber);
-                    $("#payAmount").html(data.action.amount.toFixed(2));
-                    $("#balance").html(data.balance.toFixed(2));
-                    if(data.action.amount > data.balance){
-                        $(".nomoney").show();
-                    }
-                    if(data.action.amount == 0){
-                        $("#payMoneyInfo").hide();
-                        $("#payButton").text("确定上线");
-                    }else{
-                        $("#payMoneyInfo").show();
-                        $("#payButton").text("确定支付");
-                    }
-                    result = true;
+
+        ajaxsync(ctx + "/console/app_action/get_pay",{appId:appId,ivr:ivr},function(response){
+            if(response.success && response.data.action != null && response.data.balance != null){
+                $("#selectIvr").html(response.data.action.telNumber);
+                $("#payAmount").html(response.data.action.amount.toFixed(2));
+                $("#balance").html(response.data.balance.toFixed(2));
+                if(response.data.action.amount > response.data.balance){
+                    $(".nomoney").show();
                 }else{
-                    result = false;
-                    showtoast(data.msg?data.msg:'数据异常，请稍后刷新重试！');
+                    $(".nomoney").hide();
                 }
-            },
-            error:function(){
+                if(response.data.action.amount == 0){
+                    $("#payMoneyInfo").hide();
+                    $("#payButton").text("确定上线");
+                }else{
+                    $("#payMoneyInfo").show();
+                    $("#payButton").text("确定支付");
+                }
+                result = true;
+            }else{
                 result = false;
-                showtoast('网络异常，请刷新重试');
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
             }
-        });
+        },"get");
+
         return result;
     }
 
@@ -564,76 +522,51 @@
         }
         var result = false;
         var appId = $('#modal-appid').val();
-        $.ajax({
-            url : ctx + "/console/app_action/pay",
-            type : 'get',
-            data : {appId:appId},//这里使用json对象
-            timeout:2*60*1000,
-            async: false,//使用同步的方式,true为异步方式
-            dataType: "json",
-            success : function(data){
-                if(!data.flag){
-                    result = false;
-                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
-                }else{
-                    result = true;
-                }
-            },
-            error:function(){
+
+        ajaxsync(ctx + "/console/app_action/pay",{appId:appId},function(response){
+            if(!response.success){
                 result = false;
-                showtoast('网络异常，请刷新重试');
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }else{
+                result = true;
             }
-        });
+        },"get");
+
         return result;
     }
 
     function directOnline(){
         var result = false;
         var appId = $('#modal-appid').val();
-        $.ajax({
-            url : ctx + "/console/app_action/direct_online",
-            type : 'get',
-            data : {appId:appId},//这里使用json对象
-            timeout:2*60*1000,
-            async: false,//使用同步的方式,true为异步方式
-            dataType: "json",
-            success : function(data){
-                if(!data.flag){
-                    result = false;
-                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
-                }else{
-                    result = true;
-                }
-            },
-            error:function(){
+
+        ajaxsync(ctx + "/console/app_action/direct_online",{appId:appId},function(response){
+            if(!response.success){
                 result = false;
-                showtoast('网络异常，请刷新重试');
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }else{
+                result = true;
             }
-        });
+        },"get");
+
         return result;
     }
 
     //重选择事件
     function resetIVR(){
         var appId = $('#modal-appid').val();
-        $.ajax({
-            url : ctx + "/console/app_action/reset_ivr",
-            type : 'get',
-            data : {appId:appId},//这里使用json对象
-            timeout:2*60*1000,
-            async: false,//使用同步的方式,true为异步方式
-            dataType: "json",
-            success : function(data){
-                if(!data.flag){
-                    showtoast(data.msg?data.msg:'数据异常，请稍后重试！');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请刷新重试');
+        var flag = false;
+        ajaxsync(ctx + "/console/app_action/reset_ivr",{appId:appId},function(response){
+            if(!response.success){
+                flag = false;
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }else{
+                flag = true;
             }
-        })
+        },"get");
 
-        tabModalBtn(2,'creatIVR()');
+        if(flag){
+            tabModalBtn(2,'creatIVR()');
+        }
     }
 
 
@@ -646,6 +579,24 @@
     $("#ownIvr").change(function(){
         $('#creatIVR').html($(this).val());
     })
+
+    $("#refreshBalance").click(function(){
+        ajaxsync(ctx + "/console/app_action/balance",null,function(response){
+            if(response.success){
+                var payAmount = $("#payAmount").html();
+                var balance = response.data;
+                if(Number(payAmount) > balance){
+                    $(".nomoney").show();
+                }else{
+                    $(".nomoney").hide();
+                }
+                $("#balance").html(balance.toFixed(2));
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常，请稍后重试！');
+            }
+        },"get");
+    })
+
 </script>
 
 </body>

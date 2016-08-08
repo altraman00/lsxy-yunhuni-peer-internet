@@ -1,12 +1,14 @@
 package com.lsxy.app.portal.rest.cost;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.consume.service.ConsumeMonthService;
+import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
+import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,13 +44,18 @@ public class InvoiceApplyController extends AbstractRestController {
      */
     @RequestMapping("/start_info")
     public RestResponse getStart(){
+        String userName = this.getCurrentAccountUserName();
         Map<String,Object> result = new HashMap<>();
-        Tenant tenant = tenantService.findTenantByUserName(this.getCurrentAccountUserName());
+        Tenant tenant = tenantService.findTenantByUserName(userName);
         //从申请历史中获取开始时间
         String start = invoiceApplyService.getStart(tenant.getId());
         if(StringUtils.isBlank(start)){
             //从开始消费的月统计中获取开始时间
             start = consumeMonthService.getStartMonthByTenantId(tenant.getId());
+        }
+        InvoiceInfo invoiceInfo = invoiceInfoService.getByUserName(userName);
+        if(invoiceInfo != null){
+            result.put("invoiceType",invoiceInfo.getType());
         }
         if(StringUtils.isBlank(start)){
             //用户没有任何消费
@@ -94,13 +102,30 @@ public class InvoiceApplyController extends AbstractRestController {
     @RequestMapping("/save")
     public RestResponse save(InvoiceApply apply){
         String userName = this.getCurrentAccountUserName();
+        Tenant tenant = tenantService.findTenantByUserName(userName);
         InvoiceApply result;
         //新建
         if(StringUtils.isBlank(apply.getId())){
             result = invoiceApplyService.create(apply,userName);
         }else{
             //修改
-            result = invoiceApplyService.update(apply, userName);
+            InvoiceApply oldApply = invoiceApplyService.findById(apply.getId());
+            if(oldApply.getStatus() != InvoiceApply.STATUS_EXCEPTION){
+                throw new RuntimeException("只有异常的发票申请才能修改");
+            }
+            if(!apply.getStart().equals(oldApply.getStart()) || !apply.getEnd().equals(oldApply.getEnd()) || !apply.getType().equals(oldApply.getType())||
+                    !oldApply.getTenant().getId().equals(tenant.getId())){
+                throw new RuntimeException("数据异常");
+            }
+            try {
+                EntityUtils.copyProperties(oldApply,apply);
+                oldApply.setStatus(InvoiceApply.STATUS_SUBMIT);
+                oldApply.setApplyTime(new Date());
+                oldApply.setRemark(null);
+                result = invoiceApplyService.save(oldApply);
+            } catch (Exception e) {
+                throw new RuntimeException("数据异常",e);
+            }
         }
         return RestResponse.success(result);
     }

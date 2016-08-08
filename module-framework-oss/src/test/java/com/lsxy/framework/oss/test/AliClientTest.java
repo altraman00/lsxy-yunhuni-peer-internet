@@ -61,6 +61,7 @@ public class AliClientTest {
         String fileKey = "images/cc.png";
         String repository="yunhuni-development";
         String destFile = "d:/cc.png";
+
         boolean result = this.ossService.uploadFileLocal(new File(destFile),repository,fileKey);
         Assert.isTrue(result);
     }
@@ -73,5 +74,12 @@ public class AliClientTest {
         InputStream is = new FileInputStream(new File(destFile));
         boolean result = this.ossService.uploadFileStream(is,100,destFile,repository,fileKey);
         Assert.isTrue(result);
+    }
+
+    @Test
+    public void testDeleteFile(){
+        String fileKey = "images/cc22004.png";
+        String repository="yunhuni-development";
+        this.ossService.deleteObject(repository,fileKey);
     }
 }

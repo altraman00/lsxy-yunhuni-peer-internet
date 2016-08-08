@@ -27,8 +27,8 @@
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default pos-rlt clearfix ">
                                 <ul id="myTab" class="nav nav-tabs">
-                                    <input type="hidden" value="0" id="defaultapp"/>
-                                    <li class="active"><a  data-toggle="tab" data-app="0">全部应用</a></li>
+                                    <input type="hidden" value="-1" id="defaultapp"/>
+                                    <li class="active"><a  data-toggle="tab" data-app="-1">全部应用</a></li>
                                     <c:forEach items="${appList}" var="app">
                                         <li ><a  data-toggle="tab" data-app="${app.id}">${app.name}</a></li>
                                     </c:forEach>
@@ -168,32 +168,23 @@
         var app = $('#defaultapp').val();
         var starttime = initialStartTime(type);
         //异步查询 返回json 数据
-        $.ajax({
-            url : "${ctx}/console/statistics/session/list",
-            type : 'post',
-            async: true,//使用false同步的方式,true为异步方式
-            data : {'type':type1,'appId':app,'startTime':starttime, '${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
-                resultData = data;
-                xdAll = JSON.stringify(resultData[0]);
-                Array.prototype.max = function(){
-                    return Math.max.apply({},this)
-                }
-                xdAll = eval('('+xdAll+')');
-                ydAll = JSON.stringify(resultData[1]);
-                ydAll = eval('('+ydAll+')');
-                charts(xdAll,ydAll,resultData[0].max(),resultData[1].max());
-            },
-            fail:function(){
+        var param ={'type':type1,'appId':app,'startTime':starttime, csrfParameterName:csrfToken};
+        ajaxsync(ctx+"/console/statistics/session/list",param,function(result){
+            var resultData = result.data;
+            xdAll = JSON.stringify(resultData[0]);
+            Array.prototype.max = function(){
+                return Math.max.apply({},this)
             }
+            xdAll = eval('('+xdAll+')');
+            ydAll = JSON.stringify(resultData[1]);
+            ydAll = eval('('+ydAll+')');
+            charts(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
         });
     }
 
     var t = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
     var timeData  = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
     var monthData = ['1日','2日','3日','4日','5日','6日','7日','8日','9日','10日','11日','12日','13日','14日','15日','16日','17日','18日','19日','20日','21日','22日','23日','24日','25日','26日','27日','28日','29日','30日','31日'];
-
     //测试随机生成数据
     function moneyDataMonth(){
         var res = [];
@@ -245,15 +236,16 @@
      * @param tdata 标题项
      * @param tdata 标题项
      */
-    function charts(xd,yd,xdMax,xyMax){
+    function charts(xd,yd,xdMax,xyMax,type){
 //        var type = $('input[name="stime"]:checked').val();
         var Xdata = monthData;
-//
-//        if(type=='year'){
-//            Xdata = timeData;
+        var Ydata = monthData;
+        if(type=='year'){
+            Xdata = timeData;
+            Ydata = timeData;
 //            var xd = moneyDataYear();
 //            var yd = meetDataYear();
-//        }else{
+        }
 //            var xd = moneyDataMonth();
 //            var yd = meetDataMonth();
 //        }
@@ -294,15 +286,7 @@
                 {
                     type: 'category',
                     boundaryGap: true,
-                    data: (function (){
-                        var res = [];
-                        var len = 0;
-                        while (len<31) {
-                            res.push(len + 1);
-                            len++
-                        }
-                        return res;
-                    })()
+                    data: Ydata
                 }
             ],
             yAxis: [

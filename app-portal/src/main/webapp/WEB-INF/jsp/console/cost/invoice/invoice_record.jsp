@@ -92,9 +92,10 @@
                                     <div class="row m-l-none m-r-none bg-light lter">
                                         <div class="col-md-12 remove-padding">
                                             <div class="number_info">
-                                                <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)，共三种个人增值税普通发票与企业增值税普通发票的发票抬头修改后可直接保存，企业增值税专用票则需要用户进行企业认证后才能开具</p>
+                                                <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)共三种，个人增值税普通发票的发票抬头修改后可直接保存，企业增值税普通发票和企业增值税专用票则需要用户进行企业认证后才能开具</p>
                                                 <p>*官方活动赠送金额不计算在开票金额内</p>
-                                                <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细</p>
+                                                <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细确认</p>
+                                                <p>*因账务结算原因，每月25号期前提交的开票申请当月受理，之后申请延期至下月受理</p>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -116,20 +117,32 @@
                                                             选择开票时间：
                                                             <!--默认第一条消费记录的时间-->
                                                             <input type="text" class="form-control" readonly="readonly" name="start"
+                                                                   <c:if test="${empty start}">placeholder="暂无消费信息"</c:if>
                                                                    value='${start}' id="datestart"/>到
-                                                            <input type="text" class="datepicker form-control" name="end"
+                                                            <input type="text" class="datepicker form-control" name="end" readonly="readonly"
                                                                    data-date-end-date="0m" value=''  id="dateend"/>
-                                                            <a class="btn btn-primary query">查询</a>
+                                                            <%--<a class="btn btn-primary query">查询</a>--%>
                                                             <span class="tips-error querytips"></span>
                                                         </div>
-                                                        <div class="row invoiceapply" style="display: none">
+                                                        <div class="row invoiceapply">
                                                             发票类型：
-                                                            <!--<a class="invoice-type" href="cost_invoice.html" data-type="0">您还未填写发票信息，请先填写完成</a>-->
-                                                            <!--<span class="invoice-type" href="cost_invoice.html"
+                                                            <c:choose>
+                                                                <c:when test='${invoiceType eq "1"}'>
+                                                                    <span class="invoice-type"  data-type="1">个人增值税普通发票</span>
+                                                                </c:when>
+                                                                <c:when test='${invoiceType eq "2"}'>
+                                                                    <span class="invoice-type"  data-type="2">企业增值税普通票</span>
+                                                                </c:when>
+                                                                <c:when test='${invoiceType eq "3"}'>
+                                                                    <span class="invoice-type"  data-type="3">企业增值税专用票</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <a class="invoice-type" href="${ctx}/console/cost/invoice_info" data-type="0">您还未填写发票信息，请先填写完成</a>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                            <!--<span class="invoice-type"
                                                                   data-type="2">企业增值税普通票</span>-->
-                                                        <span class="invoice-type" href="cost_invoice.html"
-                                                              data-type="1">个人增值税普通发票</span>
-                                                            <!--<span class="invoice-type" href="cost_invoice.html" data-type="3">企业增值税专用票</span>-->
+                                                            <!--<span class="invoice-type" data-type="3">企业增值税专用票</span>-->
                                                         </div>
                                                         <div class="row invoiceapply"  >
                                                             <div>开票时间：
@@ -144,7 +157,7 @@
                                                                 <a id="invoice-url" ></a>
                                                                 <button class="btn btn-primary float-right" id="sendinvoice"
                                                                         type="submit"
-                                                                        disabled>开发发票
+                                                                        disabled>开具发票
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -242,7 +255,7 @@
                     &times;
                 </button>
                 <h4 class="modal-title" id="myModalLabel">
-                    开票详情
+                    消费详情
                 </h4>
             </div>
             <div class="modal-body">
@@ -306,9 +319,25 @@
 
 <script>
 
-
-    $('.query').click(function () {
+    function clearData(){
         $('.querytips').html('');
+        //清空数据
+        $('#invoice-price').html('0.').attr('data-money', '0.00');
+        $('#invoice-point').html('00');
+        $('#invoice-url').html('');
+
+        $('#ininvoicetime').html("").attr('data-start',"").attr('data-end',"");
+
+        $('#sendinvoice').attr('disabled',true);
+    }
+
+    var onclangeFlag = false;
+    $('#dateend').change(function () {
+        if(!onclangeFlag){
+            onclangeFlag = true;
+            return false;
+        }
+        clearData()
         //获取时间
         var starttime = $('#datestart').val();
         var endtime = $('#dateend').val();
@@ -316,36 +345,32 @@
         if (tips) {
             $('.querytips').html(tips);
             return false;
+        }else{
+            //1号7点前不能申请上一个月的发票（因为还没统计出来）
+            var sdate = endtime.split('-');
+            var endDate = new Date(sdate[0],sdate[1]);//此处月份不用减1
+            if(new Date().getTime() - endDate.getTime() < 7 * 60 * 60 * 1000){
+                $('.querytips').html("当月1号7点前不能申请上一个月的发票");
+                return false;
+            }
         }
-        //清空数据
-        $('#invoice-price').html('0.').attr('data-money', '0.00');
-        $('#invoice-point').html('00');
-        $('#invoice-url').html('');
 
         //显示时间
         $('#ininvoicetime').html(starttime + ' 至 ' + endtime).attr('data-start',starttime).attr('data-end',endtime);
         //异步获取开局发票金额
         var price = 0.00;
         var flag = false;
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/apply_info",
-            data:{start:starttime,end:endtime},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    price = data.applyAmount;
-                    flag = true;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        //ajax
+        ajaxsync(ctx + "/console/cost/invoice_apply/apply_info",{start:starttime,end:endtime},function(response){
+            if(response.success){
+                price = response.data;
+                flag = true;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
+
         if(!flag){
             return;
         }
@@ -355,7 +380,7 @@
 
         $('#invoice-price').html(priceInt + '.').attr('data-money', price.toFixed(2));
         $('#invoice-point').html(priceFloat);
-        $('#invoice-url').html('查看详情');
+        $('#invoice-url').html('消费详情');
 
         var con = condition();
         if (con) {
@@ -375,25 +400,16 @@
         $('#cost-detail-money').html(money);
         //获取数据总数
         var count = 11;
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/count_day_consume",
-            data:{start:starttime,end:endtime},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    flag = true;
-                    count = data.count;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        ajaxsync(ctx + "/console/cost/invoice_apply/count_day_consume",{start:starttime,end:endtime},function(response){
+            if(response.success){
+                flag = true;
+                count = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
+
         if(!flag){
             return;
         }
@@ -421,24 +437,15 @@
         var starttime = $('#ininvoicetime').attr('data-start');
         var endtime   = $('#ininvoicetime').attr('data-end');
         var result = [];
-        $.ajax({
-            url : ctx + "/console/cost/invoice_apply/list_day_consume",
-            data:{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},
-            type : 'get',
-            async: false,//使用同步的方式,true为异步方式
-            timeout:2*60*1000,
-            dataType: "json",
-            success : function(data){
-                if(data.flag){
-                    result = data.result;
-                }else{
-                    showtoast(data.msg?data.msg:'数据异常');
-                }
-            },
-            error:function(){
-                showtoast('网络异常，请稍后重试');
+
+        ajaxsync(ctx + "/console/cost/invoice_apply/list_day_consume",{start:starttime,end:endtime,pageNo:nowPage,pageSize:listRows},function(response){
+            if(response.success){
+                result = response.data;
+            }else{
+                showtoast(response.errorMsg?response.errorMsg:'数据异常');
             }
-        });
+        },"get");
+
 
         var html ='';
         //数据列表
@@ -458,24 +465,15 @@
         var title = obj.innerHTML;
         if(title=='展开'){
             //ajax
-            $.ajax({
-                url : ctx + "/console/cost/bill_day/list",
-                data:{day:id},
-                type : 'get',
-                async: false,//使用同步的方式,true为异步方式
-                timeout:2*60*1000,
-                dataType: "json",
-                success : function(data){
-                    if(data.flag){
-                        result = data.result;
-                    }else{
-                        showtoast(data.msg?data.msg:'数据异常');
-                    }
-                },
-                error:function(){
-                    showtoast('网络异常，请稍后重试');
+
+            //ajax
+            ajaxsync(ctx + "/console/cost/bill_day/list",{day:id},function(response){
+                if(response.success){
+                    result = response.data;
+                }else{
+                    showtoast(response.errorMsg?response.errorMsg:'数据异常');
                 }
-            });
+            },"get");
 
             var html ='';
             for(var i=0 ; i<result.length; i++){

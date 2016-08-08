@@ -5,18 +5,21 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQMessageHandler;
+import com.lsxy.framework.mq.api.MessageHandlerExcutorTask;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
+import java.util.Set;
 
 @SuppressWarnings({"rawtypes","unchecked"})
 
@@ -28,6 +31,10 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 	private static final Log logger = LogFactory.getLog(OnsConsumer.class);
 	private Consumer consumer;
 
+	@Autowired
+	private ApplicationContext applicationContext;
+	@Autowired
+	private MessageHandlerExcutorTask messageHandlerExcutorTask;
 	@Autowired
 	private OnsMQConfig onsMQConfig;
 
@@ -108,12 +115,10 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
 				logger.debug("parse msg to MQEvent object and id is :"	+ event.getId());
-				MQMessageHandler handler = this.getMqHandlerFactory().getHandler(event);
-				if (handler != null) {
-					logger.debug("found a handler for the event:" + event.getId() + "--" + handler.getClass().getName());
-					handler.handleMessage(event);
-				} else {
-					logger.debug("have not defined a handler for the event:" + event.getEventName());
+				Set<Class<? extends MQMessageHandler>> handlers = this.getMqHandlerFactory().getHandler(event);
+				for (Class hc: handlers) {
+					MQMessageHandler handler = (MQMessageHandler) applicationContext.getBean(hc);
+					messageHandlerExcutorTask.doTask(handler,event);
 				}
 			}
 		} catch (Exception ex) {
