@@ -16,6 +16,8 @@ public class UploadEntity {
     private boolean flag = false;//全部上传保存流程走完为true
     //当前上传文件号
     private int currentUploadFileNum=0;
+    private long pBytesRead=0;
+    private long pContentLength=0;
     //成功读取上传文件数
     private int successUploadFileCount=0;
     //状态
@@ -106,6 +108,22 @@ public class UploadEntity {
     }
     public void setUploadTotalSize(long uploadTotalSize) {
         this.uploadTotalSize = uploadTotalSize;
+    }
+
+    public long getpBytesRead() {
+        return pBytesRead;
+    }
+
+    public void setpBytesRead(long pBytesRead) {
+        this.pBytesRead = pBytesRead;
+    }
+
+    public long getpContentLength() {
+        return pContentLength;
+    }
+
+    public void setpContentLength(long pContentLength) {
+        this.pContentLength = pContentLength;
     }
 
     @Override

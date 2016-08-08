@@ -130,7 +130,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/upload")
-    public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ){
+    public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
         UploadEntity oss = new UploadEntity();
@@ -148,19 +148,19 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     if(flag){//文件保存成功，将对象保存数据库
                         RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
                         if(restResponse.isSuccess()){
-                            logger.info("文件上传成功",name);
-                            oss.setStatus(oss.getStatus()+name+"文件上传");
+                            logger.info("文件上传成功：{}",name);
+                           // oss.setStatus(oss.getStatus()+name+"文件上传成功");
                         }else{
-                            logger.info("上传成功，保存失败",name);
+                            logger.info("上传成功，保存失败：{}",name);
                             ossService.deleteObject(repository, fileKey);
-                            oss.setStatus(oss.getStatus()+name+"文件上传失败");
+                            oss.setStatus(oss.getStatus()+name+"文件上传失败；");
                         }
                     }else{
                         logger.info("上创失败",name);
-                        oss.setStatus(oss.getStatus()+name+"文件上传失败");
+                        oss.setStatus(oss.getStatus()+name+"文件上传失败；");
                     }
                     oss.setReadTotalSize(i+1);
-                    request.getSession().setAttribute("ossUpload",oss);
+                    request.getSession().setAttribute("ossUpload"+key,oss);
                 }
             }
         }catch (Exception e){
@@ -201,19 +201,27 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/status"  )
     @ResponseBody
-    public RestResponse  status(HttpServletRequest request ){
+    public RestResponse  status(HttpServletRequest request ,String key){
         UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("upload_ps");
         Map map = new HashMap();
         if(fuploadStatus==null){
             map.put("flag",false);
             map.put("percentComplete",0);
         }else{
+           long temp = (long) Math.floor(((double) fuploadStatus.getpBytesRead() /  (double)fuploadStatus.getpContentLength()) * 100.0)/10;
             //计算上传完成的百分比
-            long percentComplete = (long) Math.floor(((double) fuploadStatus.getReadTotalSize() / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
-             if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize())) {
-                 map.put("flag",true);
-                 map.put("percentComplete",percentComplete);
-                 request.getSession().removeAttribute("ossUpload");
+            long percentComplete = (long) Math.floor(((double) (fuploadStatus.getReadTotalSize()-1+temp) / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
+            if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize())) {
+                UploadEntity fuploadStatus1 = (UploadEntity) request.getSession().getAttribute("ossUpload"+key);
+                if (fuploadStatus1!=null&&((long) fuploadStatus1.getReadTotalSize() == (long) fuploadStatus1.getUploadTotalSize())) {
+                    map.put("flag",true);
+                    map.put("percentComplete",percentComplete);
+                    request.getSession().removeAttribute("upload_ps");
+                    request.getSession().removeAttribute("ossUpload"+key);
+                }else{
+                    map.put("flag",false);
+                    map.put("percentComplete",percentComplete);
+                }
              }else{
                  map.put("flag",false);
                  map.put("percentComplete",percentComplete);

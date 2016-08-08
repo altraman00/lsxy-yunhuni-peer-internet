@@ -325,6 +325,7 @@
 
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
+    <div class="modal-loadding loadding"></div>
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four"></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
@@ -341,6 +342,7 @@
                             <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"  aria-valuemin="0" aria-valuemax="100" style="width: 0%" id="uploadLength">
                             </div>
                         </div>
+
                     </div>
                 </div>
                 <div class="row text-left mt-10">
@@ -819,7 +821,11 @@
     function startListener(){
         ajaxsync(ctx + "/console/app/file/play/status",{'${_csrf.parameterName}':'${_csrf.token}'},function(response){
             $('#uploadLength').attr("style","width:"+response.data.percentComplete+"%");
+            if(response.data.percentComplete==100&&response.data.flag==false){
+                $('.modal-loadding').show();
+            }
             if(response.data.flag){
+                $('.modal-loadding').hide();
                 clearTimeout(timer);
                 showtoast('上传成功');
                 fileTotalSoze();

@@ -33,6 +33,8 @@ public class UploadListener implements ProgressListener {
         }else{//读取过程中
             fuploadStatus.setStatus("当前正在处理第" + pItems+"个文件:已经读取了 " + pBytesRead + " / " + pContentLength+ " bytes.");
             fuploadStatus.setReadTotalSize(pBytesRead);
+            fuploadStatus.setpBytesRead(pBytesRead);
+            fuploadStatus.setpContentLength(pContentLength);
             fuploadStatus.setCurrentUploadFileNum(pItems);
             fuploadStatus.setProcessRunningTime(System.currentTimeMillis());
         }
