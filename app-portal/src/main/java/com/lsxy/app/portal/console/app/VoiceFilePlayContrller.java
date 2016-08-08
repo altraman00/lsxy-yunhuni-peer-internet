@@ -133,11 +133,12 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
-        UploadEntity oss = new UploadEntity();
+        UploadEntity uploadEntity = (UploadEntity) request.getSession().getAttribute("upload_ps");
+        String msg = "";
         try {
             if (null != multipartfiles && multipartfiles.length > 0) {
                 //遍历并保存文件
-                oss.setUploadTotalSize(multipartfiles.length);
+                uploadEntity.setOssCountItems(multipartfiles.length);
                 for (int i=0;i< multipartfiles.length;i++) {
                     MultipartFile file  = multipartfiles[i];
                     String name = file.getOriginalFilename();//文件名
@@ -153,19 +154,21 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                         }else{
                             logger.info("上传成功，保存失败：{}",name);
                             ossService.deleteObject(repository, fileKey);
-                            oss.setStatus(oss.getStatus()+name+"文件上传失败；");
+                            msg+=name+"文件上传失败；";
                         }
                     }else{
                         logger.info("上创失败",name);
-                        oss.setStatus(oss.getStatus()+name+"文件上传失败；");
+                        msg+=name+"文件上传失败；";
                     }
-                    oss.setReadTotalSize(i+1);
-                    request.getSession().setAttribute("ossUpload"+key,oss);
+                    uploadEntity.setOssItems(i+1);
+                    uploadEntity.setMsg(msg);
                 }
             }
         }catch (Exception e){
+            uploadEntity.setFlag(false);
+            msg+="文件上传失败；";
         }
-        oss.setFlag(true);
+        uploadEntity.setMsg(msg);
     }
 
     /**
@@ -201,31 +204,25 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     @RequestMapping("/status"  )
     @ResponseBody
-    public RestResponse  status(HttpServletRequest request ,String key){
-        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("upload_ps");
+    public RestResponse  status(HttpServletRequest request ,String key,String sumUploadFile){
+        UploadEntity uploadEntity = (UploadEntity) request.getSession().getAttribute("upload_ps");
         Map map = new HashMap();
-        if(fuploadStatus==null){
-            map.put("flag",false);
+        if(uploadEntity==null){
+            map.put("flag",true);
             map.put("percentComplete",0);
         }else{
-           long temp = (long) Math.floor(((double) fuploadStatus.getpBytesRead() /  (double)fuploadStatus.getpContentLength()) * 100.0)/10;
+            uploadEntity.setpCountItems(Integer.valueOf(sumUploadFile+""));
+            long temp = (long) Math.floor(((double) uploadEntity.getpBytesRead() /  (double)uploadEntity.getpContentLength()) * 100.0);
             //计算上传完成的百分比
-            long percentComplete = (long) Math.floor(((double) (fuploadStatus.getReadTotalSize()-1+temp) / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
-            if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize())) {
-                UploadEntity fuploadStatus1 = (UploadEntity) request.getSession().getAttribute("ossUpload"+key);
-                if (fuploadStatus1!=null&&((long) fuploadStatus1.getReadTotalSize() == (long) fuploadStatus1.getUploadTotalSize())) {
-                    map.put("flag",true);
-                    map.put("percentComplete",percentComplete);
-                    request.getSession().removeAttribute("upload_ps");
-                    request.getSession().removeAttribute("ossUpload"+key);
-                }else{
-                    map.put("flag",false);
-                    map.put("percentComplete",percentComplete);
-                }
-             }else{
-                 map.put("flag",false);
-                 map.put("percentComplete",percentComplete);
-             }
+            long percentComplete = (long) Math.floor(((double) (uploadEntity.getpItems()-2+(double)temp/(double)100)/ (double) uploadEntity.getpCountItems()) * 100.0);
+            boolean successLong = uploadEntity.getOssItems()==uploadEntity.getOssCountItems();
+            map.put("successLong",successLong);
+            map.put("flag",uploadEntity.isFlag());
+            map.put("msg",uploadEntity.getMsg());
+            map.put("percentComplete",percentComplete);
+            if(percentComplete==100&&successLong) {
+                request.getSession().removeAttribute("upload_ps");
+            }
         }
         return RestResponse.success(map);
     }

@@ -12,33 +12,23 @@ import javax.servlet.http.HttpSession;
  */
 public class UploadListener implements ProgressListener {
     private static final Logger logger = LoggerFactory.getLogger(UploadListener.class);
-    private HttpSession session;
-    public UploadListener() {
-    }
-    public UploadListener(HttpSession _session) {
-        session=_session;
-        UploadEntity fuploadStatus = new UploadEntity();
-        session.setAttribute("upload_ps", fuploadStatus);
+    private HttpSession session ;
+    public UploadListener(HttpSession session) {
+        this.session = session;
+        UploadEntity uploadEntity = new UploadEntity();
+        session.setAttribute("upload_ps",uploadEntity);
     }
     public void update(long pBytesRead, long pContentLength, int pItems) {
-        UploadEntity fuploadStatus = (UploadEntity) session.getAttribute("upload_ps");
-        fuploadStatus.setUploadTotalSize(pContentLength);
+        UploadEntity uploadEntity = (UploadEntity) session.getAttribute("upload_ps");
+        uploadEntity.setpBytesRead(pBytesRead);
+        uploadEntity.setpContentLength(pContentLength);
+        uploadEntity.setpItems(pItems);
         //读取完成
         if (pContentLength == -1) {
-            fuploadStatus.setStatus("完成对" + pItems + "个文件的读取：读取了 " + pBytesRead + "/"  + pContentLength+ " bytes.");
-            fuploadStatus.setReadTotalSize(pBytesRead);
-            fuploadStatus.setCurrentUploadFileNum(pItems);
-            fuploadStatus.setProcessEndTime(System.currentTimeMillis());
-            fuploadStatus.setProcessRunningTime(fuploadStatus.getProcessEndTime());
+            logger.info("已经读取：完成对" + pItems + "个文件的读取：读取了 " + pBytesRead + "/"  + pContentLength+ " bytes.");
         }else{//读取过程中
-            fuploadStatus.setStatus("当前正在处理第" + pItems+"个文件:已经读取了 " + pBytesRead + " / " + pContentLength+ " bytes.");
-            fuploadStatus.setReadTotalSize(pBytesRead);
-            fuploadStatus.setpBytesRead(pBytesRead);
-            fuploadStatus.setpContentLength(pContentLength);
-            fuploadStatus.setCurrentUploadFileNum(pItems);
-            fuploadStatus.setProcessRunningTime(System.currentTimeMillis());
+            logger.info("已经读取：当前正在处理第" + pItems+"个文件:已经读取了 " + pBytesRead + " / " + pContentLength+ " bytes.");
         }
-        logger.info("已经读取：" + fuploadStatus.getStatus());
-        session.setAttribute("upload_ps", fuploadStatus);
+        session.setAttribute("upload_ps", uploadEntity);
     }
 }
