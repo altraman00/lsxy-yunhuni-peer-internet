@@ -828,10 +828,21 @@
             upplay();
         }
     });
+    /**
+     * 查询进度条
+     * @type {string}
+     */
     var timer = "";
     function startUpload(){
-        timer = window.setTimeout(startListener,1000);
-        return true;
+        var result = $('#hidden_frame').prop('contentWindow').document;
+        var temp = result.title;
+        if(!isNullStr(temp)){
+            clearTimeout(timer);
+            uploadStatus=0;
+            showtoast("操作异常，请按要求操作");
+        }else{
+            timer = window.setTimeout(startListener,1000);
+        }
     }
     function startListener(){
         ajaxsync(ctx + "/console/app/file/play/status",{csrfParameterName:csrfToken,'sumUploadFile':sumUploadFile},function(response){
