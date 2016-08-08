@@ -326,10 +326,10 @@
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
     <div class="modal-loadding loadding"></div>
-    <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four"></a></div>
+    <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" id="uploadCancelX"></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
-        <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();" target="hidden_frame">
+        <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row  mt-10">
                     <input type="hidden" name="appId" value="${app.id}">
@@ -354,8 +354,8 @@
         </form:form>
     </div>
     <div class="footer">
-        <a class="cancel modalCancel-app-up" data-id="four">返回</a>
-        <a class="sure modalSureFour" data-id="four">确认</a>
+        <a class="cancel modalCancel-app-up " data-id="four" id="uploadCancel">返回</a>
+        <a class="sure modalSureFour" data-id="four" id="uploadOk">确认</a>
     </div>
 </div>
 
@@ -363,6 +363,9 @@
 
 <div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
+<script type="text/javascript">
+    var appId = '${app.id}';
+</script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/detail.js'> </script>
@@ -377,6 +380,12 @@
         var id = $(this).attr('data-id');
         $('#modal'+id).fadeOut();
         $('#show-bg').fadeOut();
+        if(uploadStatus==2){
+            uploadStatus==0;
+            showtoast("上传文件进入后台处理中...",window.location.href=ctx+"/console/app/detail?id="+appId);
+        }else{
+            showtoast("取消成功");
+        }
     });
     /**
      *绑定测试电话号码
@@ -397,7 +406,7 @@
                 numbers =  ","+numbers;
             }
         }
-        ajaxsync(ctx + "/console/telenum/bind/update_app_number",{ 'numbers':numbers,'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/telenum/bind/update_app_number",{ 'numbers':numbers,'appId':appId,csrfParameterName:csrfToken},function(response){
             $('#testNumBind').html(testNumBindHtml);
             hideModal(id);
             showtoast("应用绑定号码更新成功");
@@ -441,7 +450,7 @@
         var html  = "";
         //异步查询文件信息
 
-        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 //添加加载文件信息
                 html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
@@ -457,7 +466,7 @@
             html +='<p>--开始压缩打包</p>';
             $('#scrolldiv'+id).append(html);
 
-            ajaxsync(ctx + "/console/app/file/record/zip",{'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            ajaxsync(ctx + "/console/app/file/record/zip",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
                 if(response.success){
                     var fileName = new String(response.data);
                     var index = fileName.lastIndexOf("/");
@@ -494,7 +503,7 @@
         endtime+=" 23:59:59";
         bootbox.confirm("确认删除所选文件", function(result) {
             if(result){
-                ajaxsync(ctx + "/console/app/file/record/batch_delete",{'id':id,'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                ajaxsync(ctx + "/console/app/file/record/batch_delete",{'id':id,'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("批量删除成功");
                     }else{
@@ -515,32 +524,38 @@
     /**
      * 文件上传地址
      */
+    var uploadStatus=0;
     $('.modalSureFour').click(function(){
+        if(uploadStatus!=0){return false};
         var id = $(this).attr('data-id');
         //验证文件格式
         var file = $('#singlefile');
-
+        var flag = true;
         if(file[0].files.length==0){
             showtoast("请上传文件");
+            flag = false;
         }
-
         var allowtype =  ["WAV"];
         for(var i=0 ; i<file[0].files.length ;i++ ){
             var names =  getFiletype(file[0].files[i].name);
             if ($.inArray(names,allowtype) == -1)
             {
                 showtoast("上传失败，只支持 .wav 格式的文件");
-                return false;
+                flag = false;
+                return flag;
             }
             if(file[0].files[i].size> 5* 1024 * 1024){
                 showtoast("上传失败，单条语音最大支持 5M");
-                return false;
+                flag = false;
+                return flag;
             }
         }
-        $('#uploadLength').show();
-        $('#uploadMianForm').submit();
-
-        //hideModal(id)
+        if(flag){
+            $('#uploadLength').show();
+            $('#uploadMianForm').submit();
+            startUpload();
+            uploadStatus=1;
+        }
     });
 
     /**
@@ -590,7 +605,7 @@
                                 var id = new String(thisT.id).replace('remark-b-','');
                                 //异步请求修改数据
 
-                                ajaxsync(ctx + "/console/app/file/play/modify",{'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                                ajaxsync(ctx + "/console/app/file/play/modify",{'id':id,'remark':remark,csrfParameterName:csrfToken},function(response){
                                     if(response.success){
                                         showtoast("修改成功");
                                         //成功执行
@@ -622,7 +637,7 @@
             if(result){
                 var id = new String(idType.id).replace("voice-record-","");
 
-                ajaxsync(ctx + "/console/app/file/record/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                ajaxsync(ctx + "/console/app/file/record/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
                         recordFileTotalSize();
@@ -645,7 +660,7 @@
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
                 var id = new String(idType.id).replace("delete-","");
-                ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
                         fileTotalSoze();
@@ -663,7 +678,7 @@
      */
     var recordFileTotalSize = function(){
 
-        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 $('#voiceFileRecord').html("录音文件总计占用："+resultFileSize(response.data.size));
             }else{
@@ -688,7 +703,7 @@
         var count = 0;
         var name = $('#name').val();
 
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
             count=response.data.totalCount;
         },"post");
 
@@ -704,7 +719,7 @@
     }
     var fileTotalSoze = function(){
 
-        ajaxsync(ctx + "/console/app/file/play/total",{'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
             $('#voiceFilePlay').html("共计" + resultFileSize(response.data.fileTotalSize) + ",已占用" + resultFileSize(response.data.fileRemainSize)+ "");
         },"post");
 
@@ -728,7 +743,7 @@
     {
         var name = $('#name').val();
 
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
             var data =[];
             for(var j=0;j<response.data.result.length;j++){
                 var tempFile = response.data.result[j];
@@ -764,7 +779,7 @@
         //获取数据总数
         var count = 0;
 
-        ajaxsync(ctx + "/console/app/file/record/list",{ 'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/list",{ 'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
             count=response.data.totalCount;
         },"post");
 
@@ -785,7 +800,7 @@
      * */
     var voiceTable = function(nowPage,listRows)
     {
-        ajaxsync(ctx + "/console/app/file/record/list",{'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/list",{'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
             var data =[];
             for(var j=0;j< response.data.result.length;j++){
                 var tempFile = response.data.result[j];
@@ -819,10 +834,11 @@
         return true;
     }
     function startListener(){
-        ajaxsync(ctx + "/console/app/file/play/status",{'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/play/status",{csrfParameterName:csrfToken},function(response){
             $('#uploadLength').attr("style","width:"+response.data.percentComplete+"%");
             if(response.data.percentComplete==100&&response.data.flag==false){
                 $('.modal-loadding').show();
+                uploadStatus=2;
             }
             if(response.data.flag){
                 $('.modal-loadding').hide();
@@ -835,6 +851,7 @@
                 //清除内容
                 $('#resetForm').click();
                 $('#uploadLength').attr("style","width:"+0+"%");
+                uploadStatus=0;
             }else{
                 startUpload();
             }
