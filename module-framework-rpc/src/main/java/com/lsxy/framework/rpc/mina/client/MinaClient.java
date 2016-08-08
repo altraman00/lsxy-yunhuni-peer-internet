@@ -20,6 +20,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,8 @@ import java.security.GeneralSecurityException;
  *
  */
 @Component
-@Conditional(MinaCondition.class)
+//@Conditional(MinaCondition.class)
+@ConditionalOnProperty(value = "global.rpc.provider", havingValue = "mina", matchIfMissing = false)
 public class MinaClient extends AbstractClient {
 	private static final Logger logger = LoggerFactory.getLogger(MinaClient.class);
 

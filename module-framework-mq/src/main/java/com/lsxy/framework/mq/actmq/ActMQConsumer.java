@@ -51,11 +51,6 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
 
     @Override
     public void init() throws JMSException {
-//        String brokerUrl = "tcp://localhost:61616";
-//        String queueName = "test_yunhuni_topic_framework_tenant";
-//        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
-//        factory.setUserName("admin");
-//        factory.setPassword("admin");
         connection = connectionFactory.createConnection();
     }
 
@@ -67,8 +62,13 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
             Destination topic = session.createTopic(topicstr);
             MessageConsumer consumer = session.createConsumer(topic);
             consumer.setMessageListener(this);
+
+            logger.info("消息订阅成功:{}",topicstr);
         }
+
         connection.start();
+
+        logger.info("消息服务器启动成功");
     }
 
     @Override

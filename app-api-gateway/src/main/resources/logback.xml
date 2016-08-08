@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
-    <contextName>yunhuni-app-api-gateway</contextName>
-    <property name="APP_NAME" value="app-api-gateway" />
+    <contextName>api-gateway</contextName>
+    <property name="APP_NAME" value="api-gateway" />
     <include resource="logback-yunhuni.xml"/>
+    <logger name="com.lsxy" level="DEBUG" additivity="true" />
 
 </configuration>

@@ -35,7 +35,7 @@ public class MyScheduledTaskForTest {
         last = thistime;
     }
 
-    @Scheduled(fixedDelay=100)
+//    @Scheduled(fixedDelay=100)
     public void doCall(){
         if(logger.isDebugEnabled()){
             logger.debug("发消息开始");

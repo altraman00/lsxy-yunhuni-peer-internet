@@ -13,12 +13,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
  * Created by Tandy on 2016/6/7.
  */
-@EnableWebSecurity
-@Configuration
+//@EnableWebSecurity
+//@Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
 
@@ -40,12 +42,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**").authenticated()
                 .and().httpBasic()
                 .and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         ;
 
         http.addFilterBefore(new SignatureAuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new BlackIpListFilter(),SignatureAuthFilter.class);
-
     }
 
     /**

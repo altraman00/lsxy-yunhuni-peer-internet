@@ -16,11 +16,6 @@
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印debug日志 -->
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -131,7 +126,7 @@
     </root>
 
     <logger name="com.lsxy" additivity="true">
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="ROLLINGFILE"/>
         <appender-ref ref="ROLLINGFILE_DEBUG"/>
         <appender-ref ref="ROLLINGFILE_ERROR"/>

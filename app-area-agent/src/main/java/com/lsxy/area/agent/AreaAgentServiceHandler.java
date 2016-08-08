@@ -66,12 +66,13 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             params.put("max_answer_seconds", (int) (50 * Math.random()));
             params.put("max_ring_seconds", (int) (10 * Math.random()));
 
+
             cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener() {
                 @Override
                 protected void onResult(Object result) {
                     logger.debug("呼出 返回值：(result={})", result);
-                    String callId = (String) result;
-                    Map<String, Object> params = new HashMap<>();
+//                    String callId = (String) result;
+//                    Map<String, Object> params = new HashMap<>();
 //                    try {
 //                        cticlient.operateResource((byte) 0, 0, callId, "sys.call.drop", params, new RpcResultListener() {
 //                            @Override
