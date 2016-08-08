@@ -8,14 +8,14 @@ import org.springframework.context.annotation.Import;
 /**
  * Created by tandy on 16/7/29.
  */
-@SpringBootApplication
-@Import(FrameworkRPCConfig.class)
-public class MainClass {
-
-    
-
-    public static void main(String[] args) {
-        SpringApplication.run(MainClass.class);
-    }
-
-}
+//@SpringBootApplication
+//@Import(FrameworkRPCConfig.class)
+//public class MainClass {
+//
+//
+//
+//    public static void main(String[] args) {
+//        SpringApplication.run(MainClass.class);
+//    }
+//
+//}
