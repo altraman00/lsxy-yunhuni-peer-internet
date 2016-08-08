@@ -62,13 +62,26 @@ public class AreaServerServiceHandler extends AbstractClientServiceHandler {
         sys.call.on_released
         */
         String method = (String) request.getParameter("method");
+        if(logger.isDebugEnabled()){
+            logger.debug("is incoming?  [{}] vs [sys.call.on_incoming]",method);
+        }
         if(method.equals("sys.call.on_incoming")){
+            if(logger.isDebugEnabled()){
+                logger.debug("收到了INCOMING.........");
+            }
             RPCRequest sendRequest = randomRequest(request);
             try {
+                if(logger.isDebugEnabled()){
+                    logger.debug("准备发送指令到CTI:{}",sendRequest);
+                }
                 rpcCaller.invoke(session,sendRequest);
             } catch (RequestWriteException e) {
                 logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
                 e.printStackTrace();
+            }
+        }else{
+            if(logger.isDebugEnabled()){
+                logger.debug("不是 INCOMING.........");
             }
         }
         return null;
