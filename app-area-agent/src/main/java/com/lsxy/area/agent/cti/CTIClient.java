@@ -61,7 +61,7 @@ public class CTIClient implements RpcEventListener{
     @Override
     public void onEvent(RpcRequest rpcRequest) {
         if(logger.isDebugEnabled()){
-            logger.debug("收到事件通知:{}",rpcRequest.getMethod());
+            logger.debug("收到事件通知:{}-{}",rpcRequest.getMethod(),rpcRequest.getParams());
         }
     }
 }
