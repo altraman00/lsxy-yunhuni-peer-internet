@@ -373,6 +373,8 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 
 <script>
+    var uploadStatus=0;
+    var sumUploadFile=0;
     $('.modalCancel-app-up').click(function(){
         clearTimeout(timer);
         $('#resetForm').click();
@@ -381,11 +383,11 @@
         $('#modal'+id).fadeOut();
         $('#show-bg').fadeOut();
         if(uploadStatus==2){
-            uploadStatus==0;
             showtoast("上传文件进入后台处理中...",window.location.href=ctx+"/console/app/detail?id="+appId);
         }else{
             showtoast("取消成功");
         }
+        uploadStatus=0;
     });
     /**
      *绑定测试电话号码
@@ -524,7 +526,6 @@
     /**
      * 文件上传地址
      */
-    var uploadStatus=0;
     $('.modalSureFour').click(function(){
         if(uploadStatus!=0){return false};
         var id = $(this).attr('data-id');
@@ -551,10 +552,11 @@
             }
         }
         if(flag){
+            sumUploadFile=file[0].files.length;
             $('#uploadLength').show();
             $('#uploadMianForm').submit();
-            startUpload();
             uploadStatus=1;
+            startUpload();
         }
     });
 
@@ -834,13 +836,16 @@
         return true;
     }
     function startListener(){
-        ajaxsync(ctx + "/console/app/file/play/status",{csrfParameterName:csrfToken},function(response){
+        ajaxsync(ctx + "/console/app/file/play/status",{csrfParameterName:csrfToken,'sumUploadFile':sumUploadFile},function(response){
             $('#uploadLength').attr("style","width:"+response.data.percentComplete+"%");
-            if(response.data.percentComplete==100&&response.data.flag==false){
+            if(response.data.percentComplete==100&&response.data.successLong==false){
                 $('.modal-loadding').show();
                 uploadStatus=2;
             }
-            if(response.data.flag){
+            if(!response.data.flag){
+                showtoast(response.data.msg);
+            }
+            if(response.data.percentComplete==100&&response.data.successLong){
                 $('.modal-loadding').hide();
                 clearTimeout(timer);
                 showtoast('上传成功');
