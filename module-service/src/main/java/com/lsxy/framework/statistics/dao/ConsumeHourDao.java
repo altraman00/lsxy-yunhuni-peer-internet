@@ -1,7 +1,7 @@
-package com.lsxy.framework.consume.dao;
+package com.lsxy.framework.statistics.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.consume.model.ConsumeHour;
+import com.lsxy.framework.api.statistics.model.ConsumeHour;
 
 import java.io.Serializable;
 

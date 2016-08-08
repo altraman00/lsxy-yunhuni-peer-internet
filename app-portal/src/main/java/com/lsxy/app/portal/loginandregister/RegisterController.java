@@ -20,6 +20,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by liups on 2016/6/20.
@@ -68,6 +70,17 @@ public class RegisterController {
         String erInfo = "erInfo";
         String erPage = "register/fail";
         String successPage = "register/success";
+        //在此再进行一次用户名的正则校验（因为有些非法用户名会导致账号异常，如手机号，邮箱）
+        if(StringUtils.isNotBlank(userName)){
+            String regEx="^[0-9]*$|[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+            Pattern p = Pattern.compile(regEx);
+            boolean m = p.matcher(userName).find();
+            if(m){
+                throw new RuntimeException("非法用户名");
+            }
+        }else{
+            throw new RuntimeException("用户名为空");
+        }
         //获取手机验证码
         MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
         if(checker != null){

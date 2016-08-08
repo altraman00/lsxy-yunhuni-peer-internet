@@ -395,21 +395,12 @@
                 numbers =  ","+numbers;
             }
         }
-        $.ajax({
-            url : "${ctx}/console/telenum/bind/update_app_number",
-            type : 'post',
-            async: false,//使用同步的方式,true为异步方式
-            data :{ 'numbers':numbers,'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},
-            dataType: "json",
-            success : function(data){
-                $('#testNumBind').html(testNumBindHtml);
-                hideModal(id);
-                showtoast(data.msg);
-            },
-            fail:function(){
-                showtoast('网络异常，请稍后重试');
-            }
-        });
+        ajaxsync(ctx + "/console/telenum/bind/update_app_number",{ 'numbers':numbers,'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            $('#testNumBind').html(testNumBindHtml);
+            hideModal(id);
+            showtoast("应用绑定号码更新成功");
+        },"post");
+
     });
 
 
@@ -447,45 +438,39 @@
         endtime+=" 23:59:59";
         var html  = "";
         //异步查询文件信息
-        $.ajax({
-            url : "${ctx}/console/app/file/record/sum",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : {'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(data){
+
+        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            if(response.success){
                 //添加加载文件信息
-                html  = '  <p>--共计  '+data.total+'  个文件   '+resultFileSize(data.size )+'</p>';
+                html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
                 html+='<p>--统计完成</p>';
                 $('#scrolldiv'+id).append(html);
+            }else{
+                showtoast(response.errorMsg);
             }
-        });
+        },"post");
+
         //two 表示的是批量下载
         if(id=='two'){
             html +='<p>--开始压缩打包</p>';
             $('#scrolldiv'+id).append(html);
-            $.ajax({
-                url : "${ctx}/console/app/file/record/zip",
-                type : 'post',
-                async: false,//使用false同步的方式,true为异步方式
-                data : {'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                dataType: "json",
-                success : function(data){
-                    if(data.flag){
-                        var fileName = new String(data.fileName);
-                        var index = fileName.lastIndexOf("/");
-                        var name = fileName.substring(index,fileName.length);
-                        //添加加载文件信息
-                        html  = '<p>--压缩打包完成 '+name+'</p>';
-                        html+='<p>--压缩包生成完成：<a href="#" target="_blank">点击下载</a></p>';
-                        $('#scrolldiv'+id).append(html);
-                    }else{
-                        html  = '<p>--压缩打包失败</p>';
-                        html+='<p>--请稍后重试</p>';
-                        $('#scrolldiv'+id).append(html);
-                    }
+
+            ajaxsync(ctx + "/console/app/file/record/zip",{'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                if(response.success){
+                    var fileName = new String(response.data);
+                    var index = fileName.lastIndexOf("/");
+                    var name = fileName.substring(index,fileName.length);
+                    //添加加载文件信息
+                    html  = '<p>--压缩打包完成 '+name+'</p>';
+                    html+='<p>--压缩包生成完成：<a href="#" target="_blank">点击下载</a></p>';
+                    $('#scrolldiv'+id).append(html);
+                }else{
+                    html  = '<p>--压缩打包失败</p>';
+                    html+='<p>--请稍后重试</p>';
+                    $('#scrolldiv'+id).append(html);
                 }
-            });
+            },"post");
+
         }
     });
     $('.cancelthree').click(function(){
@@ -507,20 +492,14 @@
         endtime+=" 23:59:59";
         bootbox.confirm("确认删除所选文件", function(result) {
             if(result){
-                $.ajax({
-                    url : "${ctx}/console/app/file/record/batch_delete",
-                    type : 'post',
-                    async: false,//使用false同步的方式,true为异步方式
-                    data : {'id':id,'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                    dataType: "json",
-                    success : function(data){
-                        if(data.flag){
-                            showtoast("批量删除成功");
-                        }else{
-                            showtoast("批量删除失败");
-                        }
+                ajaxsync(ctx + "/console/app/file/record/batch_delete",{'id':id,'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                    if(response.success){
+                        showtoast("批量删除成功");
+                    }else{
+                        showtoast("批量删除失败");
                     }
-                });
+                },"post");
+
                 upvoice();
                 $('#voice-'+id).remove();
                 hideModal(id);
@@ -608,25 +587,20 @@
                                 }
                                 var id = new String(thisT.id).replace('remark-b-','');
                                 //异步请求修改数据
-                                $.ajax({
-                                    url : "${ctx}/console/app/file/play/modify",
-                                    type : 'post',
-                                    async: false,//使用false同步的方式,true为异步方式
-                                    data : {'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                                    dataType: "json",
-                                    success : function(data){
-                                        if(data.flag){
-                                            showtoast("修改成功");
-                                            //成功执行
-                                            if(type=='1'){
-                                                $('#remark-b-'+id).html('修改备注');
-                                            }
-                                            $('#remark-a-'+id).html(remark);
-                                        }else{
-                                            showtoast("修改失败");
+
+                                ajaxsync(ctx + "/console/app/file/play/modify",{'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                                    if(response.success){
+                                        showtoast("修改成功");
+                                        //成功执行
+                                        if(type=='1'){
+                                            $('#remark-b-'+id).html('修改备注');
                                         }
+                                        $('#remark-a-'+id).html(remark);
+                                    }else{
+                                        showtoast("修改失败");
                                     }
-                                });
+                                },"post");
+
                             }
                         }
                     }
@@ -645,22 +619,17 @@
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
                 var id = new String(idType.id).replace("voice-record-","");
-                $.ajax({
-                    url : "${ctx}/console/app/file/record/delete",
-                    type : 'post',
-                    async: false,//使用false同步的方式,true为异步方式
-                    data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                    dataType: "json",
-                    success : function(data){
-                        if(data.flag){
-                            showtoast("删除成功");
-                            recordFileTotalSize();
-                            $('#voice-'+id).remove();
-                        }else{
-                            showtoast("删除失败");
-                        }
+
+                ajaxsync(ctx + "/console/app/file/record/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        recordFileTotalSize();
+                        $('#voice-'+id).remove();
+                    }else{
+                        showtoast("删除失败");
                     }
-                });
+                },"post");
+
             }
         });
     }
@@ -674,22 +643,16 @@
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
                 var id = new String(idType.id).replace("delete-","");
-                $.ajax({
-                    url : "${ctx}/console/app/file/play/delete",
-                    type : 'post',
-                    async: false,//使用false同步的方式,true为异步方式
-                    data : {'id':id,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-                    dataType: "json",
-                    success : function(data){
-                        if(data.flag){
-                            showtoast("删除成功");
-                            fileTotalSoze();
-                            $('#play-'+id).remove();
-                        }else{
-                            showtoast("删除失败");
-                        }
+                ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                    if(response.success){
+                        showtoast("删除成功");
+                        fileTotalSoze();
+                        $('#play-'+id).remove();
+                    }else{
+                        showtoast("删除失败");
                     }
-                });
+                },"post");
+
             }
         });
     }
@@ -697,16 +660,16 @@
      * 查询录音文件占存储空间的大小
      */
     var recordFileTotalSize = function(){
-        $.ajax({
-            url : "${ctx}/console/app/file/record/sum",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : {'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData) {
-                $('#voiceFileRecord').html("录音文件总计占用："+resultFileSize(resultData.size));
+
+        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            if(response.success){
+                $('#voiceFileRecord').html("录音文件总计占用："+resultFileSize(response.data.size));
+            }else{
+                showtoast(response.errorMsg);
             }
-        });
+        },"post");
+
+
     };
 
 
@@ -722,16 +685,11 @@
         //获取数据总数
         var count = 0;
         var name = $('#name').val();
-        $.ajax({
-            url : "${ctx}/console/app/file/play/list",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : {'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData){
-                count=resultData.list.totalCount;
-            }
-        });
+
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            count=response.data.totalCount;
+        },"post");
+
         //每页显示数量
         var listRow = 3;
         //显示多少个分页按钮
@@ -743,16 +701,11 @@
         page.show();
     }
     var fileTotalSoze = function(){
-        $.ajax({
-            url : "${ctx}/console/app/file/play/total",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData) {
-                $('#voiceFilePlay').html("共计" + resultFileSize(resultData.fileTotalSize) + ",已占用" + resultFileSize(resultData.fileRemainSize)+ "");
-            }
-        });
+
+        ajaxsync(ctx + "/console/app/file/play/total",{'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            $('#voiceFilePlay').html("共计" + resultFileSize(response.data.fileTotalSize) + ",已占用" + resultFileSize(response.data.fileRemainSize)+ "");
+        },"post");
+
     };
     var resultFileSize = function(temp){
         if(temp>(1024*1024)){
@@ -772,38 +725,33 @@
     var playTable = function(nowPage,listRows)
     {
         var name = $('#name').val();
-        $.ajax({
-            url : "${ctx}/console/app/file/play/list",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : {'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData){
-                var data =[];
-                for(var j=0;j<resultData.list.result.length;j++){
-                    var tempFile = resultData.list.result[j];
-                    var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark];
-                    data[j]=temp;
-                }
-                var html ='';
-                //数据列表
-                for(var i = 0 ; i<data.length; i++){
-                    html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-                    if(data[i][2]==-1){
-                        html+='<td class="nosuccess">审核不通过</td>';
-                    }else if(data[i][2]==1){
-                        html+='<td class="success">已审核</td>';
-                    }else{
-                        html+='<td>待审核</td>';
-                    }
-                    html+='<td>'+data[i][3]+'</td>';
-                    html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
-                    html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
-                }
-                $('#playtable').find(".playtr").remove();
-                $('#playtable').append(html);
+
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            var data =[];
+            for(var j=0;j<response.data.result.length;j++){
+                var tempFile = response.data.result[j];
+                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark];
+                data[j]=temp;
             }
-        });
+            var html ='';
+            //数据列表
+            for(var i = 0 ; i<data.length; i++){
+                html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                if(data[i][2]==-1){
+                    html+='<td class="nosuccess">审核不通过</td>';
+                }else if(data[i][2]==1){
+                    html+='<td class="success">已审核</td>';
+                }else{
+                    html+='<td>待审核</td>';
+                }
+                html+='<td>'+data[i][3]+'</td>';
+                html+='<td id="remark-a-'+data[i][0]+'">'+data[i][4]+'</td>';
+                html+='<td class="operation"> <a onclick="delplay(this)" id="delete-'+data[i][0]+'" >删除</a> <span ></span> <a onclick="editremark(this)" id="remark-b-'+data[i][0]+'">修改备注</a> </td></tr>';
+            }
+            $('#playtable').find(".playtr").remove();
+            $('#playtable').append(html);
+        },"post");
+
     }
 
     /**
@@ -813,16 +761,11 @@
         recordFileTotalSize();
         //获取数据总数
         var count = 0;
-        $.ajax({
-            url : "${ctx}/console/app/file/record/list",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : { 'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData){
-                count=resultData.list.totalCount;
-            }
-        });
+
+        ajaxsync(ctx + "/console/app/file/record/list",{ 'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            count=response.data.totalCount;
+        },"post");
+
         //每页显示数量
         var listRow = 3;
         //显示多少个分页按钮
@@ -840,30 +783,23 @@
      * */
     var voiceTable = function(nowPage,listRows)
     {
-        $.ajax({
-            url : "${ctx}/console/app/file/record/list",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : {'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData){
-                var data =[];
-                for(var j=0;j<resultData.list.result.length;j++){
-                    var tempFile = resultData.list.result[j];
-                    var temp = [tempFile.id,tempFile.name,resultFileSize(tempFile.size),tempFile.duration];
-                    data[j]=temp;
-                }
-                var html ='';
-                for(var i = 0 ; i<data.length; i++){
-                    html +='<tr class="voicetr" id="voice-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
-                    html+='<td>'+data[i][2]+'</td>';
-                    html+='<td>'+data[i][3]+'</td>';
-                    html+='<td class="operation"><a >下载</a> <span ></span><a onclick="delvoice(this)" id="voice-record-'+data[i][0]+'" >删除</a></td></tr>';
-                }
-                $('#voicetable').find(".voicetr").remove();
-                $('#voicetable').append(html);
+        ajaxsync(ctx + "/console/app/file/record/list",{'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            var data =[];
+            for(var j=0;j< response.data.result.length;j++){
+                var tempFile = response.data.result[j];
+                var temp = [tempFile.id,tempFile.name,resultFileSize(tempFile.size),tempFile.duration];
+                data[j]=temp;
             }
-        });
+            var html ='';
+            for(var i = 0 ; i<data.length; i++){
+                html +='<tr class="voicetr" id="voice-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                html+='<td>'+data[i][2]+'</td>';
+                html+='<td>'+data[i][3]+'</td>';
+                html+='<td class="operation"><a >下载</a> <span ></span><a onclick="delvoice(this)" id="voice-record-'+data[i][0]+'" >删除</a></td></tr>';
+            }
+            $('#voicetable').find(".voicetr").remove();
+            $('#voicetable').append(html);
+        },"post");
     }
 
     $('#myTab li').click(function(){
@@ -881,30 +817,23 @@
         return true;
     }
     function startListener(){
-        $.ajax({
-            url : "${ctx}/console/app/file/play/status",
-            type : 'post',
-            async: false,//使用false同步的方式,true为异步方式
-            data : {'${_csrf.parameterName}':'${_csrf.token}'},//这里使用json对象
-            dataType: "json",
-            success : function(resultData){
-                $('#uploadLength').attr("style","width:"+resultData.percentComplete+"%");
-                if(resultData.flag){
-                    clearTimeout(timer);
-                    showtoast('上传成功');
-                    fileTotalSoze();
-                    upplay();
-                    var id = $('.modalSureFour').attr('data-id');
-                    hideModal(id);
-                    //清除内容
-                    $('#resetForm').click();
-                    $('#uploadLength').attr("style","width:"+0+"%");
-                }else{
-                    startUpload();
-                }
-
+        ajaxsync(ctx + "/console/app/file/play/status",{'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            $('#uploadLength').attr("style","width:"+response.data.percentComplete+"%");
+            if(response.data.flag){
+                clearTimeout(timer);
+                showtoast('上传成功');
+                fileTotalSoze();
+                upplay();
+                var id = $('.modalSureFour').attr('data-id');
+                hideModal(id);
+                //清除内容
+                $('#resetForm').click();
+                $('#uploadLength').attr("style","width:"+0+"%");
+            }else{
+                startUpload();
             }
-        });
+        },"post");
+
     }
     fileTotalSoze();
 </script>

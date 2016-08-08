@@ -41,12 +41,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/statistics/billdetail/metting">会议服务</a>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/ivr">IVR定制服务</a>
+                                                <a href="${ctx}/console/statistics/billdetail/metting">语音会议</a>
                                             </div>
                                         </li>
                                         <li>
@@ -56,7 +51,12 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/recording">录音服务</a>
+                                                <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -72,7 +72,7 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>-->
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;会议服务</span>
+                            <span class="border-left">&nbsp;语音会议</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->

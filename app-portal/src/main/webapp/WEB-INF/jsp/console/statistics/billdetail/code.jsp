@@ -35,18 +35,13 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a ">
+                                            <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/callback">语音回拨</a>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/metting">会议服务</a>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/ivr">IVR定制服务</a>
+                                                <a href="${ctx}/console/statistics/billdetail/metting">语音会议</a>
                                             </div>
                                         </li>
                                         <li>
@@ -56,7 +51,12 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/recording">录音服务</a>
+                                                <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
                                             </div>
                                         </li>
                                     </ul>

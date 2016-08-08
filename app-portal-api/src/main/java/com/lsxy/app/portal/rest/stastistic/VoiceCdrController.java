@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 /**
- * 通话记录
+ * 通话记录(session)
  * Created by zhangxb on 2016/7/19.
  */
 @RequestMapping("/rest/voice_cdr")
