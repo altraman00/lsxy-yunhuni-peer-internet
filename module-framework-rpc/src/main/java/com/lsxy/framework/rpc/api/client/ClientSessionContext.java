@@ -10,12 +10,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tandy on 16/7/30.
  */
 @Component
 public class ClientSessionContext implements SessionContext{
+
+    //有效会话选择器
+    private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
 
     //clientId-serverUrl 作为session
     private ListOrderedMap sessions = new ListOrderedMap();
@@ -84,4 +88,36 @@ public class ClientSessionContext implements SessionContext{
         return sessions.values();
     }
 
+
+    /**
+     * 获取有效的会话
+     * 负载均衡算法
+     * @return
+     */
+    public Session getAvalibleSession() {
+        int idx = 0;    //索引  默认为0
+        int times = 1;  //遍历次数,一次
+        int j = 0;      //当前遍历次数
+        Session session = null;
+        while(j<times && size()>0) {
+            int i = this.sessionSelectCounter.addAndGet(1);
+            //如果总计数器达到整型最大值,重置0
+            if (i >= (Integer.MAX_VALUE - 1)) {
+                this.sessionSelectCounter.set(0);
+            }
+            int size = size();
+            idx = i % size;
+            //遍历到最后一个表示到了一轮
+            if(idx == (size -1)){
+                j++;
+            }
+            session = getSessionByIndex(idx);
+            if(session.isValid()){
+                return session;
+            }else{
+                continue;
+            }
+        }
+        return session;
+    }
 }

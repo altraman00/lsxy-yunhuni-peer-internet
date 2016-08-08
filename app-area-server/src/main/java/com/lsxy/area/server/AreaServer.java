@@ -38,21 +38,21 @@ public class AreaServer {
     private Integer port;
 
 
-
-    @Bean
-    public AbstractServiceHandler getServiceHandler(){
-        return new AbstractServiceHandler() {
-            @Override
-            public RPCResponse handleService(RPCRequest request, Session session) {
-                if(logger.isDebugEnabled()){
-                    logger.debug("处理响应");
-                }
-                RPCResponse response = RPCResponse.buildResponse(request);
-                response.setMessage(RPCResponse.STATE_OK);
-                return response;
-            }
-        };
-    }
+//
+//    @Bean
+//    public AbstractServiceHandler getServiceHandler(){
+//        return new AbstractServiceHandler() {
+//            @Override
+//            public RPCResponse handleService(RPCRequest request, Session session) {
+//                if(logger.isDebugEnabled()){
+//                    logger.debug("处理响应");
+//                }
+//                RPCResponse response = RPCResponse.buildResponse(request);
+//                response.setMessage(RPCResponse.STATE_OK);
+//                return response;
+//            }
+//        };
+//    }
 
 
 

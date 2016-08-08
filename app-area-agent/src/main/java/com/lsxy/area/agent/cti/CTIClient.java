@@ -4,6 +4,12 @@ import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.app.area.cti.commander.RpcEventListener;
 import com.lsxy.app.area.cti.commander.RpcRequest;
 import com.lsxy.app.area.cti.commander.Unit;
+import com.lsxy.framework.rpc.api.RPCCaller;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.client.ClientSessionContext;
+import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +40,11 @@ public class CTIClient implements RpcEventListener{
     @Autowired
     private CTIClientConfigFactory ctiClientConfigFactory;
 
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private ClientSessionContext sessionContext;
 
     @PostConstruct
     public void start(){
@@ -62,6 +73,17 @@ public class CTIClient implements RpcEventListener{
     public void onEvent(RpcRequest rpcRequest) {
         if(logger.isDebugEnabled()){
             logger.debug("收到事件通知:{}-{}",rpcRequest.getMethod(),rpcRequest.getParams());
+        }
+        rpcRequest.getParams().put("method",rpcRequest.getMethod());
+        //收到事件,向中心报告所有事件
+        RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
+        Session session = sessionContext.getAvalibleSession();
+        try {
+            assert rpcCaller!=null;
+            rpcCaller.invoke(session,areaRPCRequest);
+        } catch (RequestWriteException e) {
+            logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());
+            e.printStackTrace();
         }
     }
 }

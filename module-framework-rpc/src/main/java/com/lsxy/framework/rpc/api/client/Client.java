@@ -28,10 +28,4 @@ public interface Client {
      * @param clientId
      */
     void setClientId(String clientId);
-
-    /**
-     * 拿到一个有效的session并返回
-     * @return
-     */
-    Session getAvalibleSession();
 }

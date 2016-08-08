@@ -37,7 +37,7 @@ public class CTIClientContext {
 
             client = (Client) clients.getValue(0);
         }catch(Exception ex){
-            logger.error("没有找到一个有效的客户端");
+            logger.error("没有找到一个有效的CTI客户端");
         }
         return client;
     }

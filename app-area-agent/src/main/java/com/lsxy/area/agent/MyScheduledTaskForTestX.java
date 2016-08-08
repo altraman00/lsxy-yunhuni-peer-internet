@@ -2,6 +2,7 @@ package com.lsxy.area.agent;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.client.Client;
+import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class MyScheduledTaskForTestX implements Runnable{
 
 
     @Autowired
-    private Client client;
+    private ClientSessionContext sessionContext;
 
     private static final Logger logger = LoggerFactory.getLogger(MyScheduledTaskForTestX.class);
 
@@ -53,7 +54,7 @@ public class MyScheduledTaskForTestX implements Runnable{
             logger.info("开始测试");
         Session session = null;
         while(true){
-            session = client.getAvalibleSession();
+            session = sessionContext.getAvalibleSession();
             if(session == null || !session.isValid()){
                     logger.info("没有有效的session,等着吧");
                 try {

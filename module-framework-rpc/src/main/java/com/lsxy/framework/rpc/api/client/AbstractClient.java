@@ -39,9 +39,6 @@ public abstract class AbstractClient implements Client{
     @Autowired(required = false)
     private ClientBindCallback bindCallback;
 
-    //有效会话选择器
-    private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
-
     private ExecutorService executorService;
 
     @Override
@@ -91,33 +88,6 @@ public abstract class AbstractClient implements Client{
         this.clientId = clientId;
     }
 
-    @Override
-    public Session getAvalibleSession() {
-        int idx = 0;    //索引  默认为0
-        int times = 1;  //遍历次数,一次
-        int j = 0;      //当前遍历次数
-        Session session = null;
-        while(j<times && this.sessionContext.size()>0) {
-            int i = this.sessionSelectCounter.addAndGet(1);
-            //如果总计数器达到整型最大值,重置0
-            if (i >= (Integer.MAX_VALUE - 1)) {
-                this.sessionSelectCounter.set(0);
-            }
-            int size = this.sessionContext.size();
-            idx = i % size;
-            //遍历到最后一个表示到了一轮
-            if(idx == (size -1)){
-                j++;
-            }
-            session = this.sessionContext.getSessionByIndex(idx);
-            if(session.isValid()){
-                return session;
-            }else{
-                continue;
-            }
-        }
-        return session;
-    }
 
     public static void main(String[] args) {
         int size = 20;

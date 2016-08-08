@@ -10,6 +10,7 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.AbstractClientServiceHandler;
 import com.lsxy.framework.rpc.api.server.Session;
+import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +63,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
-            params.put("to_uri", "192.168.2.100:5062");
-            params.put("max_answer_seconds", (int) (50 * Math.random()));
-            params.put("max_ring_seconds", (int) (10 * Math.random()));
+            params.put("to_uri", "192.168.2.100:5060");
+            params.put("max_answer_seconds", RandomUtils.nextInt(60,120));
+            params.put("max_ring_seconds", RandomUtils.nextInt(10,30));
 
 
             cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener() {

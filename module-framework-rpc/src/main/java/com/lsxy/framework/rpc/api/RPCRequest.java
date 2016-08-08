@@ -110,4 +110,25 @@ public class RPCRequest extends  RPCMessage{
 		request.setParam(params);
 		return request;
 	}
+
+	/**
+	 * 创建新的请求对象,必须指定请求命令名称和请求参数
+	 * 请求参数以map形式传入,会最终转化为url模式
+	 * @param name
+	 * 		@see ServiceConstants 请求名称
+	 * @param params
+	 * 		参数使用url参数方案  map参数
+	 * @return
+	 * 			返回请求对象
+	 */
+	public static RPCRequest newRequest(String name,Map<String,Object> params) {
+		StringBuffer sb = new StringBuffer();
+		for (String key:params.keySet() ) {
+			sb.append(key + "=" + params.get(key) + "&");
+		}
+		if(sb.length() > 0){
+			sb.subSequence(0,sb.length()-1);
+		}
+		return newRequest(name,sb.toString());
+	}
 }
