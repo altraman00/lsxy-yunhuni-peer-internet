@@ -25,6 +25,6 @@ public class MainClass  extends AbstractSpringBootStarter{
 
     @Override
     public String systemId() {
-        return "third.join.gateway";
+        return "third.join.apigw";
     }
 }

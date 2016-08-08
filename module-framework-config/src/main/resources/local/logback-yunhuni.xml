@@ -111,20 +111,13 @@
         </filter>
     </appender>
 
-    <logger name="com.lsxy" level="DEBUG" additivity="true" />
-    <logger name="org.springframework.security" level="INFO" additivity="true" />
-    <logger name="org.hibernate" level="INFO" additivity="true" />
-    <logger name="redis.clients" level="INFO" additivity="true" />
-    <logger name="org.springframework.data" level="INFO" additivity="true" />
-
-
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 
     <logger name="com.lsxy" additivity="true">
-        <level value="DEBUG" />
+        <level value="INFO" />
         <appender-ref ref="ROLLINGFILE"/>
         <appender-ref ref="ROLLINGFILE_DEBUG"/>
     </logger>

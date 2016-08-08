@@ -1,4 +1,4 @@
-package com.lsxy.framework.mq.events.rpc;
+package com.lsxy.framework.mq.events.apigw;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 

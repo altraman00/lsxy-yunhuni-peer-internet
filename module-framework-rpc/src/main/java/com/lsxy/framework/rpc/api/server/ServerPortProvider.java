@@ -22,17 +22,17 @@ import org.springframework.util.Assert;
 //    public static final String MODE_FIX="fix";
 //
 //
-//    @Value("${global.rpc.server.port.provider}")
+//    @Value("${global.apigw.server.port.provider}")
 //    private String providerMode;
 //
 //    //随机端口号范围  9000-9999
-//    @Value("${global.rpc.server.port.range}")
+//    @Value("${global.apigw.server.port.range}")
 //    private String portRangeConfig;
 //
 //    private Integer randomRangeMin;
 //    private Integer randomRangeMax;
 //
-//    @Value("${global.rpc.server.port}")
+//    @Value("${global.apigw.server.port}")
 //    private Integer fixPort;
 //
 //    public ServerPortProvider(){
@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
 //     */
 //    public int getPort(){
 //        if(MODE_FIX.equals(providerMode)){
-//            Assert.notNull(fixPort,"固定端口号参数未设置  global.rpc.server.port => 9999");
+//            Assert.notNull(fixPort,"固定端口号参数未设置  global.apigw.server.port => 9999");
 //            return fixPort;
 //        }else{
 //            if(randomRangeMin == null || randomRangeMax == null){
@@ -67,14 +67,14 @@ import org.springframework.util.Assert;
 //    }
 //
 //    private void parsePortRange() {
-//        Assert.notNull(portRangeConfig,"随机端口号范围配置项未正确配置  global.rpc.server.port.range ==> 9000-9999");
+//        Assert.notNull(portRangeConfig,"随机端口号范围配置项未正确配置  global.apigw.server.port.range ==> 9000-9999");
 //        String[] pr = portRangeConfig.split("-");
 //        try{
 //            this.randomRangeMin = Integer.parseInt(pr[0]);
 //            this.randomRangeMax = Integer.parseInt(pr[1]);
 //        }catch (Exception e){
 //            e.printStackTrace();
-//            logger.error("随机端口号范围配置项未正确配置  global.rpc.server.port.range ==> 9000-9999",e);
+//            logger.error("随机端口号范围配置项未正确配置  global.apigw.server.port.range ==> 9000-9999",e);
 //        }
 //    }
 //}

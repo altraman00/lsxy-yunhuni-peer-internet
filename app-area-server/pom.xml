@@ -23,6 +23,10 @@
         <groupId>com.lsxy</groupId>
         <artifactId>module-framework-rpc</artifactId>
     </dependency>
+    <dependency>
+        <groupId>com.lsxy</groupId>
+        <artifactId>module-framework-mq</artifactId>
+    </dependency>
 
     <dependency>
         <groupId>com.lsxy</groupId>

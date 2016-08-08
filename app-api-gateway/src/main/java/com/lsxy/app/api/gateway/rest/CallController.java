@@ -1,25 +1,19 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.mq.api.AbstractMQEvent;
-import com.lsxy.framework.mq.api.MQEvent;
-import com.lsxy.framework.mq.api.MQEventBuilder;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.rpc.APIGatewayRequestEvent;
-import com.lsxy.framework.mq.events.rpc.APIGatewayResponseEvent;
+import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
+import com.lsxy.framework.mq.events.apigw.APIGatewayResponseEvent;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,14 +44,6 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
     public DeferredResult<RestResponse> doCall(@PathVariable String accountId, HttpServletResponse response){
         DeferredResult<RestResponse> result = new DeferredResult<RestResponse>(10000L,RestResponse.failed("240","服务器君有点忙,未能及时响应,抱歉啊!!  稍后再尝试!!"));
 
-        result.onTimeout(new Runnable() {
-            @Override
-            public void run() {
-                if(logger.isDebugEnabled()){
-                    logger.debug("超时啦。。。。。。");
-                }
-            }
-        });
         String requestId = UUIDGenerator.uuid();
         APIGatewayRequestEvent event = new APIGatewayRequestEvent(requestId);
         asyncRequestContext.register(event.getRequestId(),result);
@@ -67,19 +53,6 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
         }
         mqService.publish(event);
 
-        Thread x  = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    TimeUnit.SECONDS.sleep(5);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                APIGatewayResponseEvent responseEvent = new APIGatewayResponseEvent(requestId);
-                mqService.publish(responseEvent);
-            }
-        });
-        x.start();;
         return result;
     }
 

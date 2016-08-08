@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +34,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 //@Conditional(NettyCondition.class)
-@ConditionalOnProperty(prefix = "global.rpc.provider", value = "netty", matchIfMissing = false)
+@ConditionalOnProperty(value = "global.rpc.provider", havingValue = "netty", matchIfMissing = false)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class NettyClient extends AbstractClient{
 
     @Autowired

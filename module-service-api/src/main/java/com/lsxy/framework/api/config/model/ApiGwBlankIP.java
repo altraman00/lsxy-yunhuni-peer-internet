@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 /**
  * Created by Tandy on 2016/7/7.
- * api gateway 黑名单配置
+ * api apigw 黑名单配置
  *
  */
 @Entity

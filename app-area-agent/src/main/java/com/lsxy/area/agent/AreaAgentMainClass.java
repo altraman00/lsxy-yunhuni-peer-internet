@@ -16,10 +16,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan
 @Import(FrameworkRPCConfig.class)
 @EnableScheduling
-public class MainClass  extends AbstractSpringBootStarter {
+public class AreaAgentMainClass extends AbstractSpringBootStarter {
 
     public static void main(String[] args) throws RemoteServerStartException {
-        SpringApplication.run(MainClass.class);
+        SpringApplication.run(AreaAgentMainClass.class);
     }
 
     @Override

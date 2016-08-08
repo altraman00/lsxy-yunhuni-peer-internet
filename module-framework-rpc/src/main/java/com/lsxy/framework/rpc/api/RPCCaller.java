@@ -103,7 +103,7 @@ public class RPCCaller {
 	 * @param session
 	 * @throws RequestWriteException
 	 */
-	public void invoke(IoSession session, RPCRequest request) throws RequestWriteException{
+	public void invoke(Session session, RPCRequest request) throws RequestWriteException{
 		String sessionid = UUIDGenerator.uuid();
 		request.setSessionid(sessionid);
 		logger.debug(">>*"+request);

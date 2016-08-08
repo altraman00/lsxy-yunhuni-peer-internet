@@ -25,15 +25,6 @@ public interface SessionContext {
     public Session getSession(String sessionid);
 
     /**
-     * 根据serverUrl获取会话对象
-     * 提供给后台监控线程,不要重复连接其中一台服务器
-     * 但是断开后从重复尝试连接
-     * @param serverUrl
-     * @return
-     */
-    public Session getSessionByServerUrl(String serverUrl);
-
-    /**
      * 根据会话标识清理会话数据
      * @param sessionid
      */
