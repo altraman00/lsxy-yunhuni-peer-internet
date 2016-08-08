@@ -26,7 +26,7 @@ FORCE_INSTALL=false
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
 
-while getopts "A:P:STIL" opt; do
+while getopts "A:P:H:STIL" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
