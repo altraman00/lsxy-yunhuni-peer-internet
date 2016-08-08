@@ -202,7 +202,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     @RequestMapping("/status"  )
     @ResponseBody
     public RestResponse  status(HttpServletRequest request ){
-        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("ossUpload");
+        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("upload_ps");
         Map map = new HashMap();
         if(fuploadStatus==null){
             map.put("flag",false);
@@ -213,6 +213,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
              if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize())) {
                  map.put("flag",true);
                  map.put("percentComplete",percentComplete);
+                 request.getSession().removeAttribute("ossUpload");
              }else{
                  map.put("flag",false);
                  map.put("percentComplete",percentComplete);
