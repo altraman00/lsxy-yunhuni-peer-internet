@@ -130,7 +130,8 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/upload")
-    public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
+    @ResponseBody
+    public UploadEntity uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
         UploadEntity uploadEntity = (UploadEntity) request.getSession().getAttribute("upload_ps");
@@ -169,6 +170,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
             msg+="文件上传失败；";
         }
         uploadEntity.setMsg(msg);
+        return uploadEntity;
     }
 
     /**

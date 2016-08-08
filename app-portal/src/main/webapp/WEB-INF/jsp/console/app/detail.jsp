@@ -383,11 +383,12 @@
         $('#modal'+id).fadeOut();
         $('#show-bg').fadeOut();
         if(uploadStatus==2){
-            showtoast("上传文件进入后台处理中...",window.location.href=ctx+"/console/app/detail?id="+appId);
+            showtoast("上传文件进入后台处理中...");
         }else{
             showtoast("取消成功");
         }
         uploadStatus=0;
+        window.location.href=ctx+"/console/app/detail?id="+appId;
     });
     /**
      *绑定测试电话号码
