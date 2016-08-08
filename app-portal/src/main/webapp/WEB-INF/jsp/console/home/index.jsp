@@ -126,6 +126,9 @@
                                             <a class="tips-error tips-key"></a>
                                         </span>
                                         </p>
+                                        <p>
+                                            鉴权ID: <span >${homeVO.certId}</span>
+                                        </p>
                                     </div>
                                 </div>
                             </section>

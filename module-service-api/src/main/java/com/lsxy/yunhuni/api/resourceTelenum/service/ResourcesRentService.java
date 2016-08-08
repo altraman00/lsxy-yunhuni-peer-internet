@@ -39,4 +39,9 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     String[] findOwnUnusedNum(Tenant tenant);
+
+    /**
+     * 清除过期号资源和租户的关系
+     */
+    void cleanExpireTelnumResourceRent();
 }

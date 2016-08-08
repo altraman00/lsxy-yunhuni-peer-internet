@@ -117,6 +117,7 @@
                                                             选择开票时间：
                                                             <!--默认第一条消费记录的时间-->
                                                             <input type="text" class="form-control" readonly="readonly" name="start"
+                                                                   <c:if test="${empty start}">placeholder="暂无消费信息"</c:if>
                                                                    value='${start}' id="datestart"/>到
                                                             <input type="text" class="datepicker form-control" name="end" readonly="readonly"
                                                                    data-date-end-date="0m" value=''  id="dateend"/>
