@@ -62,7 +62,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
-            params.put("to_uri", "192.168.10.62:5060");
+            params.put("to_uri", "192.168.2.100:5062");
             params.put("max_answer_seconds", (int) (50 * Math.random()));
             params.put("max_ring_seconds", (int) (10 * Math.random()));
 
