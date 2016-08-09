@@ -56,6 +56,10 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             response = this.process_MN_CH_CTI_API(request);
         }
 
+        if(logger.isDebugEnabled()){
+            logger.debug("返回给区域管理器的对象:{}",response);
+        }
+
         return response;
     }
 
@@ -82,7 +86,11 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             if(logger.isDebugEnabled()){
                 logger.debug("开始操作资源:{}{}",method,resId);
             }
+
             cticlient.operateResource(0,1,resId,method,params,null);
+
+            /*发送请求给CTI次数计数*/
+            sc.getSendCTIRequestCount().incrementAndGet();
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
             e.printStackTrace();
@@ -122,44 +130,12 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             if(logger.isDebugEnabled()){
                 logger.debug("呼叫API调用参数:{}",params);
             }
-            cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener() {
-                @Override
-                protected void onResult(Object result) {
-                    logger.debug("呼出 返回值：(result={})", result);
-//                    String callId = (String) result;
-//                    Map<String, Object> params = new HashMap<>();
-//                    try {
-//                        cticlient.operateResource((byte) 0, 0, callId, "sys.call.drop", params, new RpcResultListener() {
-//                            @Override
-//                            protected void onResult(Object result) {
-//                                logger.debug("挂机 返回值：(result={})", result);
-//                            }
-//
-//                            @Override
-//                            protected void onError(RpcError error) {
-//                                logger.debug("挂机 错误:{}", error);
-//                            }
-//
-//                            @Override
-//                            protected void onTimeout() {
-//                                logger.debug("挂机 超时");
-//                            }
-//                        });
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-                }
 
-                @Override
-                protected void onError(RpcError rpcError) {
+            cticlient.createResource(0, 0, "sys.call", params, null);
 
-                }
+            /*给CTI发送请求计数*/
+            sc.getSendCTIRequestCount().incrementAndGet();
 
-                @Override
-                protected void onTimeout() {
-
-                }
-            });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
