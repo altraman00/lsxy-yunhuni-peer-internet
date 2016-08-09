@@ -72,11 +72,17 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         String method = (String) request.getParameter("method");
         Map<String, Object> params = new HashMap<>();
         if(method.equals("sys.call.answer")){
+            /*收到应答指令次数计数*/
+            sc.getReceivedCTIAnswerCount().incrementAndGet();
+
             params.put("max_answer_seconds",RandomUtils.nextInt(10,60));
             if(logger.isDebugEnabled()){
                 logger.debug("处理应答参数:{}",params);
             }
         }else if(method.equals("sys.call.drop")){
+            /*收到挂机指令次数计数*/
+            sc.getReceivedCTIDropCount().incrementAndGet();
+
             params.put("cause",603);
             if(logger.isDebugEnabled()){
                 logger.debug("处理挂机动作的参数:{}",params);

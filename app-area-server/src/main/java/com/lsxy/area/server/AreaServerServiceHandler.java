@@ -118,6 +118,13 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         RPCRequest requestX = null;
         if(response != null && response.isSuccess()){
             String param = response.getData();
+
+            /*接听 挂机  次数计数*/
+            if(param.indexOf("sys.call.answer")>=0){
+                sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
+            }else if(param.indexOf("sys.call.drop")>=0){
+                sc.getSendAreaNodeSysDropCount().incrementAndGet();
+            }
             requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
         }
 //        int radom = RandomUtils.nextInt(0,100);

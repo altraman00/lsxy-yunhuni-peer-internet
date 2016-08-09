@@ -35,6 +35,19 @@ public class StasticsCounter {
     //收到CTI incoming事件次数
     private AtomicInteger receivedAreaNodeInComingEventCount = new AtomicInteger(0);
 
+    //发送[接听]指令给区域的次数
+    private AtomicInteger sendAreaNodeSysAnswerCount = new AtomicInteger(0);
+
+    //发送[挂机]指令给区域的次数
+    private AtomicInteger sendAreaNodeSysDropCount = new AtomicInteger(0);
+
+    public AtomicInteger getSendAreaNodeSysAnswerCount() {
+        return sendAreaNodeSysAnswerCount;
+    }
+
+    public AtomicInteger getSendAreaNodeSysDropCount() {
+        return sendAreaNodeSysDropCount;
+    }
 
     public AtomicInteger getSendAreaNodeSysCallCount() {
         return sendAreaNodeSysCallCount;
@@ -75,6 +88,8 @@ public class StasticsCounter {
             logger.debug("发送SYS.CALL指令给区域的次数:{}",sendAreaNodeSysCallCount.get());
             logger.debug("收到CTI事件次数:{}",receivedAreaNodeCTIEventCount.get());
             logger.debug("收到CTI incoming事件次数:{}",receivedAreaNodeInComingEventCount.get());
+            logger.debug("发送[接听]指令给区域的次数:{}",sendAreaNodeSysAnswerCount.get());
+            logger.debug("发送[挂机]指令给区域的次数:{}",sendAreaNodeSysDropCount.get());
             logger.debug("=============================\r\n\r\n");
         }
     }
