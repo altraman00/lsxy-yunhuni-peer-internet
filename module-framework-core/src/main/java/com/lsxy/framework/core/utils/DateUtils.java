@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -646,6 +647,20 @@ public class DateUtils {
 		String day_end=df.format(cal.getTime());   
 		return day_end;
 	}
+
+    /**
+     * 功能说明:得到指定天开始时间,精确到时分秒(2015-01-01 00:00:00)
+     */
+    public static Date getFirstTimeOfDate(Date date){
+        //Date date=new Date(month);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR, -12);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return cal.getTime();
+    }
 	
 	/**
 	 * 功能说明:得到指定天结束时间,精确到时分秒(2015-01-01 23:59:59)
@@ -664,8 +679,22 @@ public class DateUtils {
 
 
     /**
+     * 功能说明:得到指定天结束时间,精确到时分秒(2015-01-01 23:59:59)
+     */
+    public static Date getLastTimeOfDate(Date date){
+        //Date date=new Date(month);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR, 11);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return cal.getTime();
+    }
+
+    /**
      * 取得某天所在周的第一天
-     * @param 日期
+     * @param date  某天
      * @return
      */
     public static Date getFirstDayOfWeek(Date date) {
@@ -678,7 +707,7 @@ public class DateUtils {
 
     /**
      * 取得某天所在周的最后一天
-     * @param 日期
+     * @param date  某天
      * @return
      */
     public static Date getLastDayOfWeek(Date date) {
@@ -717,9 +746,51 @@ public class DateUtils {
         return calendar.getTime();
     }
 
+    /**
+     * 根据开始时间和结束时间返回时间段内的时间集合
+     * @param beginDate
+     * @param endDate
+     * @return date[]
+     */
+    public static Date[] getDatesBetween(Date beginDate, Date endDate) {
+        if(beginDate == null){
+            throw new NullPointerException();
+        }
+        if(endDate == null){
+            throw new NullPointerException();
+        }
+        if(beginDate.after(endDate)){
+            throw new IllegalArgumentException();
+        }
+        int init_size = 31;
+        Date[] lDate = new Date[init_size];
+        Calendar cal = Calendar.getInstance();
+        //使用给定的 Date 设置此 Calendar 的时间
+        cal.setTime(beginDate);
+        lDate[0] = beginDate;//把开始时间加入集合
+        int index = 1;
+        while (true) {
+            //根据日历的规则，为给定的日历字段添加或减去指定的时间量
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            // 测试此日期是否在指定日期之后
+            if(cal.getTime().after(endDate)){
+                break;
+            }
+            if(index >= lDate.length - 1){//扩容
+                lDate = Arrays.copyOf(lDate,lDate.length + init_size);
+            }
+            lDate[index] = cal.getTime();
+            index ++ ;
+        }
+        return Arrays.copyOfRange(lDate,0,index);
+    }
+
     public static void main(String args[]) {
-    	System.out.println(getMonthLastTime(new Date()));
-    	
+    	//System.out.println(getMonthLastTime(new Date()));
+        Date[] ds = getDatesBetween(new Date(2016-1900,7-1,9),new Date());
+        for (int i =0;i<ds.length;i++){
+            System.out.println(getTime(ds[i],"yyyy-MM-dd"));
+        }
     }
 
 }

@@ -3,6 +3,8 @@ package com.lsxy.framework.api.tenant.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 
+import java.util.Date;
+
 /**
  * 租户Mananger
  * 
@@ -29,6 +31,11 @@ public interface TenantService extends BaseService<Tenant> {
      */
     int countValidTenant();
 
+    /**
+     * 获取时间范围内注册的租户数量(deleted = false)
+     * @return
+     */
+    int countValidTenantDateBetween(Date d1, Date d2);
     /**
      * 获取本日注册的租户数量(deleted = false)
      * @return
