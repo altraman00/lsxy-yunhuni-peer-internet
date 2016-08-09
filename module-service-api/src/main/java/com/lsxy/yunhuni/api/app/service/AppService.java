@@ -34,4 +34,16 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     boolean isAppBelongToUser(String userName, String appId);
+
+    /**
+     * 已上线应用数
+     * @return
+     */
+    long countOnline();
+
+    /**
+     * 应用总数
+     * @return
+     */
+    long countValid();
 }

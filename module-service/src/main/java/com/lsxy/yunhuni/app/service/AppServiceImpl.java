@@ -58,4 +58,15 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         }
     }
 
+    @Override
+    public long countOnline() {
+        return this.countByCustom("from App obj where obj.status = ?1",App.STATUS_ONLINE);
+    }
+
+    @Override
+    public long countValid() {
+        return this.countByCustom("from App obj");
+    }
+
+
 }
