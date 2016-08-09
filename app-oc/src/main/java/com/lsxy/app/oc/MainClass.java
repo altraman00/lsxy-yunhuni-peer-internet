@@ -1,6 +1,6 @@
 package com.lsxy.app.oc;
 
-import com.lsxy.app.oc.conf.SwaggerConfig;
+import com.lsxy.app.oc.config.SwaggerConfig;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
