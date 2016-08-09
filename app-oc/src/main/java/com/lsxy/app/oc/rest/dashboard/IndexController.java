@@ -1,9 +1,8 @@
 package com.lsxy.app.oc.rest.dashboard;
 
-import com.lsxy.app.oc.rest.dashboard.dto.AppStatisticDTO;
 import com.lsxy.app.oc.rest.dashboard.dto.ApplicationIndicantDTO;
 import com.lsxy.app.oc.rest.dashboard.dto.MemberIndicantDTO;
-import com.lsxy.app.oc.rest.dashboard.dto.RegMemberStatisticDTO;
+import com.lsxy.app.oc.rest.dashboard.dto.StatisticDTO;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -66,23 +65,26 @@ public class IndexController {
         return RestResponse.success(dto);
     }
 
-    @RequestMapping(value = "/member/statistic",method = RequestMethod.GET)
+    @RequestMapping(value = "/statistic",method = RequestMethod.GET)
     public RestResponse memberStatistic(
-            @RequestParam(value = "year",required = true) Integer year,
+            @RequestParam(value = "year") Integer year,
             @RequestParam(value = "month",required = false) Integer month){
+        StatisticDTO dto = new StatisticDTO();
         if(month!=null){
-            return RestResponse.success(perDayOfMonthMemberStatistic(year,month));
+            dto.setMemberCount(perDayOfMonthMemberStatistic(year,month));
+            dto.setAppCount(perDayOfMonthAppStatistic(year,month));
+        }else {
+            dto.setMemberCount(perMonthOfYearMemberStatistic(year));
+            dto.setAppCount(perMonthOfYearAppStatistic(year));
         }
-        return RestResponse.success(perMonthOfYearMemberStatistic(year));
-
+        return RestResponse.success(dto);
     }
 
     /**
      * 统计某个月的每天的注册租户数
      * @return
      */
-    private RegMemberStatisticDTO perDayOfMonthMemberStatistic(int year,int month){
-        RegMemberStatisticDTO dto = new RegMemberStatisticDTO();
+    private List<Integer> perDayOfMonthMemberStatistic(int year,int month){
         List<Integer> results = new ArrayList<Integer>();
         //先计算出某个月的所有天的开始和结束时间
         Date cdate = new Date(year-1900,month-1,1);
@@ -111,16 +113,14 @@ public class IndexController {
                 }
             }
         }
-        dto.setMemberCount(results);
-        return dto;
+        return results;
     }
 
     /**
      * 统计某年的每月的注册租户数
      * @return
      */
-    private RegMemberStatisticDTO perMonthOfYearMemberStatistic(int year){
-        RegMemberStatisticDTO dto = new RegMemberStatisticDTO();
+    private List<Integer> perMonthOfYearMemberStatistic(int year){
         List<Integer> results = new ArrayList<Integer>();
         int month_length = 12;
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
@@ -145,28 +145,14 @@ public class IndexController {
                 throw new RuntimeException(e);
             }
         }
-        dto.setMemberCount(results);
-        return dto;
+        return results;
     }
-
-    @RequestMapping(value = "/app/statistic",method = RequestMethod.GET)
-    public RestResponse appStatistic(
-            @RequestParam(value = "year",required = true) Integer year,
-            @RequestParam(value = "month",required = false) Integer month){
-        if(month!=null){
-            return RestResponse.success(perDayOfMonthAppStatistic(year,month));
-        }
-        return RestResponse.success(perMonthOfYearAppStatistic(year));
-
-    }
-
 
     /**
      * 统计某个月的每天的app数
      * @return
      */
-    private AppStatisticDTO perDayOfMonthAppStatistic(int year, int month){
-        AppStatisticDTO dto = new AppStatisticDTO();
+    private List<Integer> perDayOfMonthAppStatistic(int year, int month){
         List<Integer> results = new ArrayList<Integer>();
         //先计算出某个月的所有天的开始和结束时间
         Date cdate = new Date(year-1900,month-1,1);
@@ -195,16 +181,14 @@ public class IndexController {
                 }
             }
         }
-        dto.setAppCount(results);
-        return dto;
+        return results;
     }
 
     /**
      * 统计某年的每月的app数
      * @return
      */
-    private AppStatisticDTO perMonthOfYearAppStatistic(int year){
-        AppStatisticDTO dto = new AppStatisticDTO();
+    private List<Integer> perMonthOfYearAppStatistic(int year){
         List<Integer> results = new ArrayList<Integer>();
         int month_length = 12;
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
@@ -229,7 +213,6 @@ public class IndexController {
                 throw new RuntimeException(e);
             }
         }
-        dto.setAppCount(results);
-        return dto;
+        return results;
     }
 }
