@@ -42,7 +42,7 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
     public void handleMessage(APIGatewayRequestEvent message) throws JMSException {
 
         if(logger.isDebugEnabled()) {
-            logger.debug("我要处理APIGW请求:" + message);
+            logger.debug("处理APIGW请求:" + message);
         }
 
         //找到合适的区域代理

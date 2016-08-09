@@ -3,6 +3,7 @@ package com.lsxy.framework.rpc.netty.client;
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.client.AbstractClientRPCHandler;
 import com.lsxy.framework.rpc.api.client.AbstractClientServiceHandler;
+import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.netty.NettyCondition;
 import io.netty.channel.ChannelHandler;
@@ -23,12 +24,7 @@ import org.springframework.stereotype.Component;
 @Conditional(NettyCondition.class)
 public class NettyClientHandler extends AbstractClientRPCHandler {
 
-
     private IOHandler ioHandler = new IOHandler();
-
-    @Autowired(required = false)
-    private AbstractClientServiceHandler serviceHandler;
-
 
     @Override
     public Session getSessionInTheContextObject(Object ctxObject) {
@@ -40,7 +36,6 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
         return session;
     }
 
-
     @ChannelHandler.Sharable
     class IOHandler extends SimpleChannelInboundHandler<RPCMessage>{
 
@@ -51,6 +46,16 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
                 logger.debug("收到消息:{}" ,msg);
             }
             process(ctx,msg);
+        }
+
+        @Override
+        public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+            Session session = getSessionInTheContextObject(ctx);
+            if(session != null){
+                logger.error("服务器连接断开:[{}]-{}",session.getId(),session.getRemoteAddress());
+                getSessionContext().remove(session.getId());
+            }
+            super.channelInactive(ctx);
         }
     }
 

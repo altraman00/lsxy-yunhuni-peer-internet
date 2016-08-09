@@ -50,22 +50,6 @@ public class NettyRemoteServer implements RemoteServer {
             b.option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             b.childHandler(new ChannelInitializer() {
-                @Override
-                public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                    if(logger.isDebugEnabled()){
-                        logger.debug("连接断开了:"+ctx.channel());
-                    }
-                    super.channelInactive(ctx);
-                }
-
-
-                @Override
-                public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-                    if(logger.isDebugEnabled()){
-                        logger.debug("连接断开啦x"+ctx.channel());
-                    }
-                    super.channelUnregistered(ctx);
-                }
 
                 @Override
                 protected void initChannel(Channel channel) throws Exception {
@@ -74,14 +58,10 @@ public class NettyRemoteServer implements RemoteServer {
                         public void operationComplete(ChannelFuture channelFuture) throws Exception {
                             String sessionid = (String) channelFuture.channel().attr(AttributeKey.valueOf("sessionid")).get();
                             assert sessionid!=null;
-                            if(logger.isDebugEnabled()){
-                                logger.debug("会话断开,清理会话[{}]",sessionid);
-                            }
+                            logger.info("客户端连接断开,清理会话[{}-{}]",sessionid,channelFuture.channel());
                             handler.getSessionContext().remove(sessionid);
                         }
                     });
-//                    channel.pipeline().addLast("frameDecoder", new DelimiterBasedFrameDecoder(1024,Delimiters.lineDelimiter()));
-//                    channel.pipeline().addLast("stringDecoder", new StringDecoder(CharsetUtil.UTF_8));
 
                     ChannelPipeline pipeline = channel.pipeline();
 
@@ -90,17 +70,12 @@ public class NettyRemoteServer implements RemoteServer {
 
                     channel.pipeline().addLast(handler.getIoHandler());
 
-
-                    if(logger.isDebugEnabled()){
-                        logger.debug("有新的接入channel:" + channel);
-                    }
-
-
+                    logger.info("客户端尝试连接区域管理器:{}:" , channel);
                 }
             });
 
             // 服务器绑定端口监听
-            ChannelFuture f = b.bind(port).sync();
+            b.bind(port).sync();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("RCP服务器启动成功,绑定端口:{}", port);
@@ -112,7 +87,6 @@ public class NettyRemoteServer implements RemoteServer {
             // 可以简写为
             /* b.bind(portNumber).sync().channel().closeFuture().sync(); */
         }catch(Exception ex){
-            ex.printStackTrace();
             throw new RemoteServerStartException(ex);
         } finally {
 //            bossGroup.shutdownGracefully();

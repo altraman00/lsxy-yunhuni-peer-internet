@@ -55,7 +55,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
 
     private RPCResponse process_MN_CH_CTI_API(RPCRequest request) {
         if(logger.isDebugEnabled()){
-            logger.debug("响应CTI API");
+            logger.debug("响应CTI API:{}",request);
         }
         Client cticlient = cticlientContext.getAvalibleClient();
         String resId = (String) request.getParameter("res_id");
@@ -74,7 +74,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
         try {
             if(logger.isDebugEnabled()){
-                logger.debug("开始操作资源:{}",resId);
+                logger.debug("开始操作资源:{}{}",method,resId);
             }
             cticlient.operateResource(0,1,resId,method,params,null);
         } catch (IOException e) {

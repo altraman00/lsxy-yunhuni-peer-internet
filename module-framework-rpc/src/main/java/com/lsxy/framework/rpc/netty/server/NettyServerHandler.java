@@ -97,12 +97,16 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     @Override
     protected RPCResponse process_CH_MN_CONNECT(Object contextObject, RPCRequest request) {
         ChannelHandlerContext ctx = (ChannelHandlerContext) contextObject;
+        //TODO 需要验证连接的有效性  连接IP白名单验证
+
         String sessionid = (String) request.getParameter("sessionid");
         Session session = new NettyServerSession(sessionid,ctx.channel(),this);
         getSessionContext().putSession(session);
         ctx.channel().attr(SESSION_ID).setIfAbsent(sessionid);
         RPCResponse response = RPCResponse.buildResponse(request);
         response.setMessage(RPCResponse.STATE_OK);
+
+        logger.info("区域连接成功:{}",ctx.channel());
         return response;
     }
 

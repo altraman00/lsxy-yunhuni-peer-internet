@@ -78,9 +78,11 @@ public class ClientSessionContext implements SessionContext{
      * @param sessionid
      */
     public void remove(String sessionid) {
-        MinaClientSession session = (MinaClientSession) sessions.get(sessionid);
-        sessions.remove(sessionid);
-        sessions.remove(session.getServerUrl());
+        Session session = (Session) sessions.get(sessionid);
+        if(session != null) {
+            sessions.remove(sessionid);
+            sessions.remove(session.getServerUrl());
+        }
     }
 
     @Override
