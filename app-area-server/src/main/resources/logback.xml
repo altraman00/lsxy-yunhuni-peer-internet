@@ -5,7 +5,7 @@
     <include resource="logback-yunhuni.xml"/>
     <logger name="org.springframework.web" level="DEBUG" additivity="true" />
     <logger name="io.netty" level="INFO" additivity="false" />
-    <logger name="com.lsxy" level="INFO" additivity="true" />
+    <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.area" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.framework.rpc.api.server" level="DEBUG" additivity="true" />
 
