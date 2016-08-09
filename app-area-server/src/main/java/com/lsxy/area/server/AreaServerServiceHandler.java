@@ -126,6 +126,8 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
                 sc.getSendAreaNodeSysDropCount().incrementAndGet();
             }
             requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+        }else {
+            logger.error("请求用户接口发生异常,用户接口没有READY!!!!!!!!");
         }
 //        int radom = RandomUtils.nextInt(0,100);
 
