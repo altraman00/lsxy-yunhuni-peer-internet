@@ -5,6 +5,7 @@ import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
 import com.lsxy.framework.mq.events.apigw.APIGatewayResponseEvent;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.TimeUnit;
 
@@ -41,11 +43,13 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
 //    }
 
     @RequestMapping("/{accountId}/call")
-    public DeferredResult<RestResponse> doCall(@PathVariable String accountId, HttpServletResponse response){
+    public DeferredResult<RestResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
         DeferredResult<RestResponse> result = new DeferredResult<RestResponse>(10000L,RestResponse.failed("240","服务器君有点忙,未能及时响应,抱歉啊!!  稍后再尝试!!"));
 
         String requestId = UUIDGenerator.uuid();
-        APIGatewayRequestEvent event = new APIGatewayRequestEvent(requestId);
+
+
+        APIGatewayRequestEvent event = new APIGatewayRequestEvent(requestId,"sys.call",WebUtils.getRequestParams(request));
         asyncRequestContext.register(event.getRequestId(),result);
 
         if(logger.isDebugEnabled()){

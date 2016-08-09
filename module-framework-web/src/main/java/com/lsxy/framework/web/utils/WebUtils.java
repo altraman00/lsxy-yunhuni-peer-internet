@@ -371,4 +371,20 @@ public class WebUtils {
 
 		return result;
 	}
+
+	/**
+	 * 将map参数转换为queryString
+	 * @param params
+	 * @return
+     */
+	public static String paramsMapToQueryString(Map<String, Object> params) {
+		StringBuffer sb = new StringBuffer();
+		for (String key:params.keySet() ) {
+			sb.append(key + "=" + params.get(key) + "&");
+		}
+		if(sb.length() > 0){
+			sb.subSequence(0,sb.length()-1);
+		}
+		return sb.toString();
+	}
 }

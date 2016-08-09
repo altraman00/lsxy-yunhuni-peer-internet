@@ -88,8 +88,16 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_SYS_CALL:{}",request);
         }
-
         RPCResponse response = RPCResponse.buildResponse(request);
+
+        String to = (String) request.getParameter("to");
+        String maxAnswerSec = (String) request.getParameter("maxAnswerSec");
+
+        assert  to != null;
+        assert maxAnswerSec != null;
+
+        Integer iMaxAnswerSec = Integer.parseInt(maxAnswerSec);
+
         Client cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
@@ -98,10 +106,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
-            params.put("to_uri", "123@192.168.2.100:5062");
+            params.put("to_uri", request.getParameter("to")+"@192.168.2.100:5062");
             params.put("max_answer_seconds", RandomUtils.nextInt(60,120));
-            params.put("max_ring_seconds", RandomUtils.nextInt(10,30));
-
+            params.put("max_ring_seconds", iMaxAnswerSec);
 
             cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener() {
                 @Override
