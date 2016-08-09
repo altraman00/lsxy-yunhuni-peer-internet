@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RequestWriteException;
+import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
@@ -92,6 +93,12 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
      * @return
      */
     private RPCRequest randomRequest(RPCRequest request) {
+        if(logger.isDebugEnabled()){
+//            RestRequest restRequest = RestRequest.buildRequest();
+//
+//            restRequest.post(url,request.getParamMap())
+            logger.debug("请求远程接口参数:{}",request.getParamMap());
+        }
         int radom = RandomUtils.nextInt(0,100);
         RPCRequest requestX = null;
         String param = null;
