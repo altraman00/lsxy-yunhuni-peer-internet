@@ -23,8 +23,6 @@ public class UploadCommonsMultipartResolver extends CommonsMultipartResolver {
         String encoding = "utf-8";
         FileUpload fileUpload = prepareFileUpload(encoding);
         HttpSession session = request.getSession();
-        UploadListener uploadProgressListener = new UploadListener(session);
-        fileUpload.setProgressListener(uploadProgressListener);
         try {
             List<FileItem> fileItems = ((ServletFileUpload) fileUpload).parseRequest(request);
             return parseFileItems(fileItems, encoding);
