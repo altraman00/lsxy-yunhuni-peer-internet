@@ -1,5 +1,6 @@
 package com.lsxy.app.api.gateway.mq.handler;
 
+import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.app.api.gateway.rest.AsyncRequestContext;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.apigw.APIGatewayResponseEvent;
@@ -25,10 +26,16 @@ public class APIGatewayResponseEventHandler implements MQMessageHandler<APIGatew
     @Autowired
     private AsyncRequestContext requestContext;
 
+    @Autowired
+    private StasticsCounter sc;
+
     @Override
     public void handleMessage(APIGatewayResponseEvent message) throws JMSException {
         String requestid = message.getHttpRequestId();
         DeferredResult dr = requestContext.get(requestid);
+
+        /*响应计数器*/
+        sc.getReceivedGWResponseCount().incrementAndGet();
 
         if(logger.isDebugEnabled()){
             logger.debug("收到响应[{}],花费{}ms",message.getHttpRequestId(),System.currentTimeMillis()-message.getRequestTimestamp());

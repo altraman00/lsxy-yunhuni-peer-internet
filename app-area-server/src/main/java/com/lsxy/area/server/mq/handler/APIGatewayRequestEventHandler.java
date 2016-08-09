@@ -64,6 +64,9 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
             String params = WebUtils.paramsMapToQueryString(message.getParams());
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL,params);
             try {
+                if(logger.isDebugEnabled()){
+                    logger.debug("发送SYS_CALL指令到区域:{}",rpcrequest);
+                }
                 rpcCaller.invoke(session,rpcrequest);
                 evt.setSuccess(true);
             } catch (Exception e) {

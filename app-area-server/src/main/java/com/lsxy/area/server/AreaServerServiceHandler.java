@@ -99,21 +99,26 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 //            restRequest.post(url,request.getParamMap())
             logger.debug("请求远程接口参数:{}",request.getParamMap());
         }
-        int radom = RandomUtils.nextInt(0,100);
-        RPCRequest requestX = null;
-        String param = null;
-        if(radom % 2 == 0){
-            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
-            if(logger.isDebugEnabled()){
-                logger.debug("这个是挂断指令:{}",param);
-            }
-        }else{
-            param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds=5&user_data=1234";
-            if(logger.isDebugEnabled()){
-                logger.debug("这个是接通指令:{}",param);
-            }
+
+
+        RestResponse<String> response = RestRequest.buildRequest().post("http://www.yunhuni.cn:3000/incoming",request.getParamMap());
+        if(logger.isDebugEnabled()){
+            logger.debug("请求用户接口获取接下来的动作:{}" , response.getData());
         }
-        requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+//        int radom = RandomUtils.nextInt(0,100);
+        String param = response.getData();
+        RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+//        if(radom % 2 == 0){
+//            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
+//            if(logger.isDebugEnabled()){
+//                logger.debug("这个是挂断指令:{}",param);
+//            }
+//        }else{
+//            param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds=5&user_data=1234";
+//            if(logger.isDebugEnabled()){
+//                logger.debug("这个是接通指令:{}",param);
+//            }
+//        }
 
         return requestX;
     }

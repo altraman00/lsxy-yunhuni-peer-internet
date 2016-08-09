@@ -1,14 +1,18 @@
 package com.lsxy.app.api.gateway.rest;
 
+import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
 import com.lsxy.framework.mq.events.apigw.APIGatewayResponseEvent;
+import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +20,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,6 +33,9 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
 
     @Autowired
     private MQService mqService;
+
+    @Autowired
+    private StasticsCounter sc;
 
     @Autowired
     private AsyncRequestContext asyncRequestContext;
@@ -47,6 +55,10 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
         if(logger.isDebugEnabled()){
             WebUtils.logRequestParams(request);
         }
+
+        /*发送请求次数计数*/
+        sc.getSendGWRequestCount().incrementAndGet();
+
         DeferredResult<RestResponse> result = new DeferredResult<RestResponse>(10000L,RestResponse.failed("240","服务器君有点忙,未能及时响应,抱歉啊!!  稍后再尝试!!"));
 
         String requestId = UUIDGenerator.uuid();
@@ -85,4 +97,12 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
 //            };
 //        }
 
+
+//    public static void main(String[] args) {
+//        RestRequest restRequest = RestRequest.buildRequest();
+//        Map<String,Object> hashMap =  new HashedMap();
+//        hashMap.put("res_id","5566778");
+//        RestResponse<String> response = restRequest.post("http://www.yunhuni.cn:3000/incoming",hashMap);
+//        System.out.println(response.getData());
+//    }
 }
