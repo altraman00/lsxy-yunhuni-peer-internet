@@ -69,14 +69,20 @@ public class NettyClient extends AbstractClient{
                 }
             });
 
+            if(logger.isDebugEnabled()){
+                logger.debug("尝试连接区域服务器:{}",serverUrl);
+            }
+
             // Start the client.
             ChannelFuture f = b.connect(host, port).sync();
-            if(f.isSuccess()){
+            if(f.isSuccess() && f.channel().isActive()){
+                if(logger.isDebugEnabled()){
+                    logger.debug("客户端连接成功,准备发送注册客户端命令");
+                }
                 session = new NettyClientSession(f.channel(),handler,serverUrl);
                 f.channel().attr(SESSION_ID).set(session.getId());
                 this.doConnect(session);
             }
-
             // Wait until the connection is closed.
 //            f.channel().closeFuture().sync();
         }catch(Exception ex){
