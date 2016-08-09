@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RequestWriteException;
+import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,5 +110,4 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 
         return requestX;
     }
-
 }
