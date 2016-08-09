@@ -365,7 +365,6 @@ public class WebUtils {
 		while(params.hasMoreElements()){
 			String paramName = params.nextElement();
 			String value = request.getParameter(paramName);
-			logger.debug(paramName+":"+value);
 			result.put(paramName,value);
 		}
 

@@ -51,7 +51,6 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
 
         String requestId = UUIDGenerator.uuid();
 
-
         APIGatewayRequestEvent event = new APIGatewayRequestEvent(requestId,"sys.call",WebUtils.getRequestParams(request));
         asyncRequestContext.register(event.getRequestId(),result);
 
