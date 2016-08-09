@@ -8,8 +8,94 @@
         <version>1.0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    
+
     <artifactId>app-oc</artifactId>
 
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-sms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-mq</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-oss</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.2.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.2.2</version>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
