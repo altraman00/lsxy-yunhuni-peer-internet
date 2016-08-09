@@ -146,11 +146,12 @@ public abstract class AbstractClient implements Client{
                     Session session = sessionContext.getSession(serverUrl);
                     if(session != null && session.isValid()) continue;;
 
-                    logger.info("尝试连接区域服务器:{}" , serverUrl);
                     sessionContext.remove(serverUrl);
                     session = doBind(this.serverUrl);
-                    sessionContext.putSession(session);
-                    logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
+                    if(session != null){
+                        sessionContext.putSession(session);
+                        logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.error("客户端连接失败:{}    {}", serverUrl,  e.getMessage());
