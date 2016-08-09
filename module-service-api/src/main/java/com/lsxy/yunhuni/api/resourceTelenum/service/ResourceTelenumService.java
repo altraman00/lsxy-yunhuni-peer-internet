@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,4 +24,10 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     ResourceTelenum findByTelNumber(String telNumber);
+
+    /**
+     * 清除过期的号码资源和租户的关系
+     * @param expireTime 过期时间
+     */
+    void cleanExpireResourceTelnum(Date expireTime);
 }

@@ -2,8 +2,12 @@ package com.lsxy.yunhuni.resourceTelenum.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,4 +39,11 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      */
     List<ResourcesRent> findByTenantIdAndRentStatus(String id, int status);
 
+    /**
+     * 清除过期时间
+     * @param expireTime
+     */
+    @Modifying(clearAutomatically = true)
+    @Query("update ResourcesRent rent set rent.app=null,rent.rentStatus=3 where rent.rentExpire<:expireTime and rent.resType=1 and rent.rentStatus in (1,2)")
+    void cleanExpireTelnumResourceRent(@Param("expireTime") Date expireTime);
 }
