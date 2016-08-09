@@ -1,6 +1,5 @@
 package com.lsxy.area.server;
 
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -8,10 +7,8 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
-import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +24,9 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
     private static final Logger logger = LoggerFactory.getLogger(AreaServerServiceHandler.class);
 
     @Autowired
+    private StasticsCounter sc;
+
+    @Autowired
     private RPCCaller rpcCaller;
 
     @Autowired
@@ -38,7 +38,12 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
                 logger.debug("处理响应");
         }
 
+        sc.getReceivedAreaNodeRequestCount().incrementAndGet();
+
         if(request.getName().equals(ServiceConstants.CH_MN_CTI_EVENT)){
+            /*收到CTI事件次数*/
+            sc.getReceivedAreaNodeCTIEventCount().incrementAndGet();
+
             return process_CH_MN_CTI_EVENT(request,session);
         }
 
@@ -67,6 +72,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         }
 
         if(method.equals("sys.call.on_incoming")){
+            sc.getReceivedAreaNodeInComingEventCount().incrementAndGet();
             if(logger.isDebugEnabled()){
                 logger.debug("<<<<<<INCOMING>>>>>>>");
             }

@@ -31,9 +31,10 @@ public class StasticsCounter {
     @Scheduled(fixedDelay=5000)
     public void doOutStatistic(){
         if(logger.isDebugEnabled()){
-            logger.debug("==============统计指标================");
+            logger.debug("==============统计指标=========");
             logger.debug("共计发送请求数:{}",this.getSendGWRequestCount().get());
             logger.debug("共计收到请求回复数:{}",this.getReceivedGWResponseCount());
+            logger.debug("=============================\r\n\r\n");
         }
     }
 }

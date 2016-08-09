@@ -1,5 +1,6 @@
 package com.lsxy.area.server.mq.handler;
 
+import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQMessageHandler;
@@ -32,6 +33,9 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
     private RemoteServer remoteServer;
 
     @Autowired
+    private StasticsCounter cs;
+
+    @Autowired
     private ServerSessionContext sessionContext;
 
     @Autowired
@@ -43,6 +47,9 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
     @Override
     public void handleMessage(APIGatewayRequestEvent message) throws JMSException {
 
+        /*请求计数器*/
+        cs.getReceivedGWRequestCount().incrementAndGet();
+
         if(logger.isDebugEnabled()) {
             logger.debug("处理APIGW请求:" + message);
         }
@@ -52,27 +59,42 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
         //找到合适的区域代理
         Session session = sessionContext.getRightSession();
 
-        String method = message.getMethod();
-        if(method.equals("sys.call")){
-
-        }
-
-
         if(session != null){
-            String callid = UUIDGenerator.uuid();
-            message.getParams().put("callid",callid);
-            String params = WebUtils.paramsMapToQueryString(message.getParams());
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL,params);
-            try {
-                if(logger.isDebugEnabled()){
-                    logger.debug("发送SYS_CALL指令到区域:{}",rpcrequest);
-                }
-                rpcCaller.invoke(session,rpcrequest);
-                evt.setSuccess(true);
-            } catch (Exception e) {
-                evt.setSuccess(false);
-                logger.error("消息发送到区域失败:{}",rpcrequest);
+            RPCRequest rpcrequest = null;
+            //分解动作  sys.call
+            String method = message.getMethod();
+            if(method.equals("sys.call")){
+                String callid = UUIDGenerator.uuid();
+                message.getParams().put("callid",callid);
+                String params = WebUtils.paramsMapToQueryString(message.getParams());
+                rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL,params);
+                /*呼叫API调用次数计数*/
+                cs.getSendAreaNodeSysCallCount().incrementAndGet();
             }
+
+            if(rpcrequest != null){
+                try {
+                    if(logger.isDebugEnabled()){
+                        logger.debug("发送SYS_CALL指令到区域:{}",rpcrequest);
+                    }
+
+                    /*发送给区域的请求次数计数*/
+                    cs.getSendAreaNodeRequestCount().incrementAndGet();
+                    cs.getSendAreaNodeSysCallCount().incrementAndGet();
+
+                    rpcCaller.invoke(session,rpcrequest);
+                    evt.setSuccess(true);
+                } catch (Exception e) {
+                    evt.setSuccess(false);
+                    logger.error("消息发送到区域失败:{}",rpcrequest);
+                }
+            }else{
+                if(logger.isDebugEnabled()){
+                    logger.debug("没有处理网关请求:{}",message);
+                }
+            }
+
+
 
         }else{
             logger.error("没有找到合适的区域代理处理该请求:{}",message);
@@ -80,6 +102,9 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
             evt.setSuccess(false);
             evt.setData("没有合适的区域代理处理您的请求");
         }
+
+        /*给API网关的响应计数*/
+        cs.getSendGWResponseCount().incrementAndGet();
         mqService.publish(evt);
     }
 }
