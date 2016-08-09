@@ -141,14 +141,12 @@ public abstract class AbstractClient implements Client{
         public void run() {
             while(true){
                 try {
-                    TimeUnit.SECONDS.sleep(10);
+                    TimeUnit.SECONDS.sleep(5);
 
                     Session session = sessionContext.getSession(serverUrl);
                     if(session != null && session.isValid()) continue;;
 
-                    if(logger.isDebugEnabled()){
-                        logger.debug("尝试连接区域服务器:{}" , serverUrl);
-                    }
+                    logger.info("尝试连接区域服务器:{}" , serverUrl);
                     sessionContext.remove(serverUrl);
                     session = doBind(this.serverUrl);
                     sessionContext.putSession(session);

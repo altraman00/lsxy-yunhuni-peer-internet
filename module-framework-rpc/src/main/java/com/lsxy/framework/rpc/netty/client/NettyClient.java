@@ -71,12 +71,11 @@ public class NettyClient extends AbstractClient{
 
             // Start the client.
             ChannelFuture f = b.connect(host, port).sync();
-
-            session = new NettyClientSession(f.channel(),handler,serverUrl);
-
-            f.channel().attr(SESSION_ID).set(session.getId());
-
-            this.doConnect(session);
+            if(f.isSuccess()){
+                session = new NettyClientSession(f.channel(),handler,serverUrl);
+                f.channel().attr(SESSION_ID).set(session.getId());
+                this.doConnect(session);
+            }
 
             // Wait until the connection is closed.
 //            f.channel().closeFuture().sync();
