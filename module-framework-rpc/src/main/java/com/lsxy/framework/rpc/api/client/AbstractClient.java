@@ -154,6 +154,7 @@ public abstract class AbstractClient implements Client{
                     sessionContext.putSession(session);
                     logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     logger.error("客户端连接失败:{}    {}", serverUrl,  e.getMessage());
                 }
             }
@@ -170,8 +171,6 @@ public abstract class AbstractClient implements Client{
                 if (bindCallback != null) {
                     bindCallback.doCallback(session);
                 }
-                //连接成功构建正式的session对象,将serverUrl作为Sessionid
-                logger.info("连接节点管理器【{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
             } else {
                 String msg = new String(response.getBody(), "utf-8");
                 logger.info(msg);
