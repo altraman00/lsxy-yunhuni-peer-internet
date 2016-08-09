@@ -92,11 +92,14 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
 
         String to = (String) request.getParameter("to");
         String maxAnswerSec = (String) request.getParameter("maxAnswerSec");
+        String maxRingSec = (String) request.getParameter("maxRingSec");
 
         assert  to != null;
         assert maxAnswerSec != null;
+        assert maxRingSec!=null;
 
         Integer iMaxAnswerSec = Integer.parseInt(maxAnswerSec);
+        Integer iMaxRingSec = Integer.parseInt(maxRingSec);
 
         Client cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
@@ -107,9 +110,12 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
             params.put("to_uri", request.getParameter("to")+"@192.168.2.100:5062");
-            params.put("max_answer_seconds", RandomUtils.nextInt(60,120));
-            params.put("max_ring_seconds", iMaxAnswerSec);
+            params.put("max_answer_seconds", iMaxAnswerSec);
+            params.put("max_ring_seconds", iMaxRingSec);
 
+            if(logger.isDebugEnabled()){
+                logger.debug("呼叫API调用参数:{}",params);
+            }
             cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener() {
                 @Override
                 protected void onResult(Object result) {
