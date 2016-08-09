@@ -7,6 +7,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * 
@@ -481,6 +482,21 @@ public class DateUtils {
 		String day_end=df.format(cal.getTime());   
 		return day_end;
 	}
+
+    /**
+     * 功能说明:得到指定月份的第一天,精确到时分秒(2015-01-01 00:00:00)
+     */
+    public static Date getFirstTimeOfMonth(Date date){
+        //Date date=new Date(month);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR, -12);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return cal.getTime();
+    }
 	
 	/**
 	 * 功能说明:得到指定月份的最后一天,精确到时分秒(2015-01-31 23:59:59)
@@ -502,6 +518,26 @@ public class DateUtils {
     	String day_end=df.format(cal.getTime());   
     	//System.out.println("day_end>>>"+day_end);  
     	return day_end;
+    }
+
+    /**
+     * 功能说明:得到指定月份的最后一天,精确到时分秒(2015-01-31 23:59:59)
+     */
+    public static Date getLastTimeOfMonth(Date date){
+        //Date date=new Date(month);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        //当前月＋1，即下个月
+        cal.add(Calendar.MONTH,1);
+        //将下个月1号作为日期初始zhii
+        cal.set(Calendar.DATE,1);
+        //下个月1号减去一天，即得到当前月最后一天
+        cal.add(Calendar.DATE,-1);
+        cal.set(Calendar.HOUR, 11);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return cal.getTime();
     }
 
 	/**
@@ -625,7 +661,62 @@ public class DateUtils {
     	String day_end=df.format(cal.getTime());   
     	return day_end;
     }
-    
+
+
+    /**
+     * 取得某天所在周的第一天
+     * @param 日期
+     * @return
+     */
+    public static Date getFirstDayOfWeek(Date date) {
+        Calendar c = new GregorianCalendar();
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.setTime(date);
+        c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
+        return c.getTime();
+    }
+
+    /**
+     * 取得某天所在周的最后一天
+     * @param 日期
+     * @return
+     */
+    public static Date getLastDayOfWeek(Date date) {
+        Calendar c = new GregorianCalendar();
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.setTime(date);
+        c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek() + 6);
+        return c.getTime();
+    }
+
+    /**
+     * 设置23:59:59
+     * @param date
+     * @return
+     */
+    public static Date setEndDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        return calendar.getTime();
+    }
+
+    /**
+     * 设置00:00:00
+     * @param date
+     * @return
+     */
+    public static Date setStartDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 00);
+        calendar.set(Calendar.MINUTE, 00);
+        calendar.set(Calendar.SECOND, 00);
+        return calendar.getTime();
+    }
+
     public static void main(String args[]) {
     	System.out.println(getMonthLastTime(new Date()));
     	

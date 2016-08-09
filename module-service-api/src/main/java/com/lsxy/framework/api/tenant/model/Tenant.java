@@ -28,6 +28,7 @@ public class Tenant extends IdEntity {
 	public static final Integer AUTH_ONESELF_SUCCESS = 1;//个人认证成功
 	public static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
 	public static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
+	public static final Integer[] AUTH_STATUS = new Integer[]{1,2,3,4,5};//已认证状态集合
 	private static final long serialVersionUID = 1L;
 	//是否实名
 	private Integer isRealAuth;
