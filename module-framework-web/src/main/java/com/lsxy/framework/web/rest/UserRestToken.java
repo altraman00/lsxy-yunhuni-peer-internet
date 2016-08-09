@@ -34,5 +34,16 @@ public class UserRestToken {
         return urt;
     }
 
+    /**
+     * 构建一个新的token对象(运营中心)
+     * @return
+     */
+    public static UserRestToken newOcUserToken(){
+        String token = UUIDGenerator.uuid();
+        UserRestToken urt = new UserRestToken();
+        urt.setToken("token_oc_" + token);
+        return urt;
+    }
+
 
 }
