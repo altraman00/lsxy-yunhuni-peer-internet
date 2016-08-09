@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -59,5 +60,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         return resourceTelenumDao.findByTelNumber(telNumber);
     }
 
-
+    @Override
+    public void cleanExpireResourceTelnum(Date expireTime) {
+        resourceTelenumDao.cleanExpireResourceTelnum(expireTime);
+    }
 }

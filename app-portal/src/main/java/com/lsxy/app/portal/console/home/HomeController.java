@@ -104,6 +104,7 @@ public class HomeController extends AbstractPortalController {
         ApiCertificate cert = getApiCertificate(token);
         if(cert != null){
             vo.setRestApi(CERT_REST_PREFIX + "/" + cert.getCertId() + "/");
+            vo.setCertId(cert.getCertId());
             vo.setSecretKey(cert.getSecretKey());
         }
         List<App> appList = getApps(token);

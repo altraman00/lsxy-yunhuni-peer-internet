@@ -31,6 +31,8 @@ public class HomeVO {
 
     private String restApi;                  //restApi
 
+    private String certId;                  //鉴权账号
+
     private String secretKey;               //secretKey
 
     private List<AppStateVO> appStateVOs;    //应用
@@ -129,6 +131,14 @@ public class HomeVO {
 
     public void setRestApi(String restApi) {
         this.restApi = restApi;
+    }
+
+    public String getCertId() {
+        return certId;
+    }
+
+    public void setCertId(String certId) {
+        this.certId = certId;
     }
 
     public String getSecretKey() {
