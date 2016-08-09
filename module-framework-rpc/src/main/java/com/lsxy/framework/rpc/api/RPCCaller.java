@@ -206,7 +206,7 @@ public class RPCCaller {
 //		}
 		long currentTime = 0;
 		long s = System.currentTimeMillis();
-		long timeout = Long.parseLong(SystemConfig.getProperty("channel.server.request.timeout","60"));	//60s超时
+		long timeout = Long.parseLong(SystemConfig.getProperty("global.rpc.request..timeout","10"));	//60s超时
 		while (true) {
 			logger.debug("监听结果【"+sessionid+"】"+responseMap.keySet().size());
 			logger.debug("responseMap size:"+responseMap.size());
