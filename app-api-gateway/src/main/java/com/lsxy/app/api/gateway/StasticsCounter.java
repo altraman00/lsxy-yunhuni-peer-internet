@@ -28,7 +28,7 @@ public class StasticsCounter {
         return sendGWRequestCount;
     }
 
-    @Scheduled(fixedDelay=5000)
+    @Scheduled(fixedDelay=10000)
     public void doOutStatistic(){
         if(logger.isDebugEnabled()){
             logger.debug("==============统计指标=========");
