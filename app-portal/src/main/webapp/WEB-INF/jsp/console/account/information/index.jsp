@@ -145,7 +145,6 @@
 </section>
 </section>
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script src="${resPrefixUrl }/js/province.js"></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/personal/auth.js'></script>

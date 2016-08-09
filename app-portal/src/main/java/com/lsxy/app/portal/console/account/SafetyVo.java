@@ -42,7 +42,7 @@ public class SafetyVo implements Serializable {
         this.username = account.getUserName();
         Tenant tenant =account.getTenant();
         if(tenant!=null) {
-            this.isReal =tenant.getIsRealAuth()==1 ||tenant.getIsRealAuth()==2? IS_TRUE : IS_FALSE;
+            this.isReal =tenant.getIsRealAuth()==1 ||tenant.getIsRealAuth()==2||tenant.getIsRealAuth()==3 ||tenant.getIsRealAuth()==4 ||tenant.getIsRealAuth()==5 ? IS_TRUE : IS_FALSE;
         }else{
             this.isReal=IS_FALSE;
         }
