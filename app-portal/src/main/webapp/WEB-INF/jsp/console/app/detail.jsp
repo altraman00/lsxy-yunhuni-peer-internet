@@ -333,6 +333,7 @@
             <div class="input-box ">
                 <div class="row  mt-10">
                     <input type="hidden" name="appId" value="${app.id}">
+                    <input type="hidden" name="key" value="">
                     <div class="col-md-2">
                         文件 :
                     </div>
@@ -837,9 +838,8 @@
         var result = $('#hidden_frame').prop('contentWindow').document;
         var temp = result.title;
         if(!isNullStr(temp)){
-            clearTimeout(timer);
-            uploadStatus=0;
-            showtoast("操作异常，请按要求操作");
+            //clearTimeout(timer);
+            showtoast("操作异常，请取消后再重新操作");
         }else{
             timer = window.setTimeout(startListener,1000);
         }
