@@ -26,7 +26,6 @@ public class LoginController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-
     @Autowired
     private OcUserService ocUserService;
 
@@ -38,10 +37,10 @@ public class LoginController {
      * @return
      */
     @RequestMapping(path="/login",method = RequestMethod.POST)
-    public RestResponse login(@RequestParam String username,@RequestParam String password){
+    public RestResponse login(@RequestParam String name,@RequestParam String password){
 
         try {
-            OcUser user = ocUserService.findUserByLoginNameAndPassword(username, password);
+            OcUser user = ocUserService.findUserByLoginNameAndPassword(name, password);
             if (user != null) {
 
                 //将token放入redis 与OcUser形成映射关系
@@ -52,21 +51,18 @@ public class LoginController {
                 return PortalRestResponse.failed(APIErrors.LOGIN_ERROR_PWD_MISTAKE);
             }
         }catch (OcUserNotFoundException e){
-            logger.info("用户登录失败:{}:{} \r\n",username,password);
+            logger.info("用户登录失败:{}:{} \r\n",name,password);
             if(logger.isDebugEnabled()){
                 logger.error("用户登录失败：",e);
             }
             return PortalRestResponse.failed(APIErrors.LOGIN_ERROR_USER_NOT_FOUND);
         }catch (Exception ex){
-            logger.info("用户登录失败:{}:{} \r\n",username,password);
+            logger.info("用户登录失败:{}:{} \r\n",name,password);
             if(logger.isDebugEnabled()){
                 logger.error("用户登录失败：",ex);
             }
             return PortalRestResponse.failed(APIErrors.LOGIN_ERROR);
         }
     }
-
-
-
 
 }
