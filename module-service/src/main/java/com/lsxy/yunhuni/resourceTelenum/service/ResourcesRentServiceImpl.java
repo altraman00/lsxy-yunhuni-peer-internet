@@ -5,8 +5,10 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourcesRentDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,7 +33,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
     @Autowired
     public TenantService tenantService;
-
+    @Autowired
+    ResourceTelenumService resourceTelenumService;
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
         Tenant tenant = tenantService.findTenantByUserName(userName);
@@ -60,5 +64,13 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             }
         }
         return telNums.toArray(new String[]{});
+    }
+
+    @Override
+    public void cleanExpireTelnumResourceRent() {
+        int expire = Integer.parseInt(SystemConfig.getProperty("account.ivr.expire", "7"));
+        Date limitTime = new Date(System.currentTimeMillis() - expire * 24 * 60 * 60 * 1000);
+        resourceTelenumService.cleanExpireResourceTelnum(limitTime);
+        resourcesRentDao.cleanExpireTelnumResourceRent(limitTime);
     }
 }
