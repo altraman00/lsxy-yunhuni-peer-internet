@@ -31,7 +31,7 @@ public abstract class NettySession extends AbstractSession {
     @Override
     public void write(Object object) throws SessionWriteException {
 
-        if(this.isValid() && this.channel.isWritable()){
+        if(this.isValid()){
             if(logger.isDebugEnabled()){
                 logger.debug("[{}]>>{}",this.getId(),object);
             }
