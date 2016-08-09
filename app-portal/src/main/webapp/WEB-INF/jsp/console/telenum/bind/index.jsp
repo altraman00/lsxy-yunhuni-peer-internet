@@ -112,7 +112,6 @@
         </section>
     </section>
 </section>
-<div class="tips-toast"></div>
 
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg"></div>
@@ -139,7 +138,6 @@
     </div>
 </div>
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/number/band.js'></script>
 <script >

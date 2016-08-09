@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_realname_corp")
 public class RealnameCorp extends IdEntity {
-    private static final long serialVersionUID = 1L;
     private Tenant tenant;//所属租户
     private String  name;// 企业名称
     private String  addr;// 企业地址
@@ -30,7 +29,7 @@ public class RealnameCorp extends IdEntity {
     private String  type03Prop02;//type03_prop02 [三证分离]税务登记证照片
     private String  type03Prop03;//type03_prop03 [三证分离]营业执照号
     private String  type03Prop04;//type03_prop04 [三证分离]营业执照照片
-    private Integer status;//实名认证状态
+    private Integer status;//实名认证状态 0等待 2成功 -2失败
     public RealnameCorp() {
     }
 
@@ -55,9 +54,6 @@ public class RealnameCorp extends IdEntity {
         this.tenant = tenant;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
     @Column(name = "status")
     public Integer getStatus() {
         return status;
