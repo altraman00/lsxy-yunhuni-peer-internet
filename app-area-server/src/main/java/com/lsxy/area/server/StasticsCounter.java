@@ -64,7 +64,7 @@ public class StasticsCounter {
         return receivedAreaNodeRequestCount;
     }
 
-    @Scheduled(fixedDelay=5000)
+    @Scheduled(fixedDelay=10000)
     public void doOutStatistic(){
         if(logger.isDebugEnabled()){
             logger.debug("==============统计指标=========");
