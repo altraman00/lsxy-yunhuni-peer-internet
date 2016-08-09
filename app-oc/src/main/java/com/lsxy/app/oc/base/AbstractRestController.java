@@ -1,9 +1,9 @@
 package com.lsxy.app.oc.base;
 
-import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.oc.api.user.model.OcUser;
+import com.lsxy.oc.api.user.service.OcUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class AbstractRestController {
     @Autowired
-    AccountService accountService;
+    OcUserService ocUserService;
 
     /**
      * 对Controller层统一的异常处理
@@ -36,16 +36,16 @@ public abstract class AbstractRestController {
      * 获取当前用户账号信息
      * @return 当前用户账号信息
      */
-    protected Account getCurrentAccount(){
+    protected OcUser getCurrentUser(){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return accountService.findAccountByUserName(user.getUsername());
+        return ocUserService.findUserByLoginName(user.getUsername());
     }
 
     /**
      * 获取当前用户账号的用户名
      * @return 当前用户账号的用户名
      */
-    protected String getCurrentAccountUserName(){
+    protected String getCurrentUserName(){
         //从登录通过的凭证中取出用户
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user.getUsername();
