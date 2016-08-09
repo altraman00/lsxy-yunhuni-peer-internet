@@ -44,6 +44,9 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
 
     @RequestMapping("/{accountId}/call")
     public DeferredResult<RestResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
+        if(logger.isDebugEnabled()){
+            WebUtils.logRequestParams(request);
+        }
         DeferredResult<RestResponse> result = new DeferredResult<RestResponse>(10000L,RestResponse.failed("240","服务器君有点忙,未能及时响应,抱歉啊!!  稍后再尝试!!"));
 
         String requestId = UUIDGenerator.uuid();
