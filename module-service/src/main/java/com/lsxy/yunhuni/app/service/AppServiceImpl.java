@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -66,6 +67,17 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     @Override
     public long countValid() {
         return this.countByCustom("from App obj");
+    }
+
+    @Override
+    public int countValidDateBetween(Date d1, Date d2) {
+        if(d1 == null){
+            throw new NullPointerException();
+        }
+        if(d2 == null){
+            throw new NullPointerException();
+        }
+        return appDao.countByDeletedAndCreateTimeBetween(Boolean.FALSE,d1,d2);
     }
 
 
