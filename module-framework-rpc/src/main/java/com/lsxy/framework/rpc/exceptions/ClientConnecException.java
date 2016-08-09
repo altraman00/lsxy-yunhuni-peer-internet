@@ -7,4 +7,8 @@ public class ClientConnecException extends Exception {
     public ClientConnecException(Exception ex) {
         super(ex);
     }
+
+    public ClientConnecException(String s) {
+        super(s);
+    }
 }

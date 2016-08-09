@@ -4,6 +4,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,11 @@ public class MyScheduledTaskForTestX implements Runnable{
 
         RPCRequest request = RPCRequest.newRequest("HELLO","param01=001");
         while(true){
-            session.write(request);
+            try {
+                session.write(request);
+            } catch (SessionWriteException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

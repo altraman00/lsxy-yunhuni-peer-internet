@@ -56,10 +56,8 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
                 rpcCaller.invoke(session,rpcrequest);
                 evt.setSuccess(true);
                 evt.setData("callid is : " + callid);
-            } catch (RequestWriteException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
                 evt.setSuccess(false);
-                evt.setData("消息发送到区域失败了:"+rpcrequest);
                 logger.error("消息发送到区域失败:{}",rpcrequest);
             }
 

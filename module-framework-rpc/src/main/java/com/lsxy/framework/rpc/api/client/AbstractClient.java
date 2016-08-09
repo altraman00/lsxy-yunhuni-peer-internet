@@ -153,7 +153,7 @@ public abstract class AbstractClient implements Client{
                         logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     logger.error("客户端连接失败:{}    {}", serverUrl,  e.getMessage());
                 }
             }
@@ -161,11 +161,22 @@ public abstract class AbstractClient implements Client{
     }
 
 
+    /**
+     * 通过指定的session向服务器发送连接指令进行区域节点的注册
+     * @param session
+     * @throws ClientConnecException
+     */
     protected void doConnect(Session session) throws ClientConnecException {
         try {
+            if(session==null || !session.isValid()){
+                throw new ClientConnecException("客户端连接通道无效,无法发送区域节点注册指令:"+session.getId());
+            }
             String param = "sessionid=" + session.getId();
             RPCRequest request = RPCRequest.newRequest(ServiceConstants.CH_MN_CONNECT,param);
             RPCResponse response = getRpcCaller().invokeWithReturn(session, request);
+            if(response == null){
+                throw new ClientConnecException("区域节点注册时出现异常:"+session.getId());
+            }
             if (response.isOk()) {
                 if (bindCallback != null) {
                     bindCallback.doCallback(session);

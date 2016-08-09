@@ -81,9 +81,9 @@ public class CTIClient implements RpcEventListener{
         try {
             assert rpcCaller!=null;
             rpcCaller.invoke(session,areaRPCRequest);
-        } catch (RequestWriteException e) {
-            logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());
+        } catch (Exception e) {
             e.printStackTrace();
+            logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());
         }
     }
 }

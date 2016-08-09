@@ -45,7 +45,7 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
             if(logger.isDebugEnabled()){
                 logger.debug("收到消息:{}" ,msg);
             }
-            process(ctx,msg);
+            process(ctx, msg);
         }
 
         @Override
@@ -56,6 +56,11 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
                 getSessionContext().remove(session.getId());
             }
             super.channelInactive(ctx);
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            logger.error("出现了异常:{}",cause);
         }
     }
 

@@ -73,9 +73,9 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
                     logger.debug(">>>>>>>>发送指令到CTI:{}",sendRequest);
                 }
                 rpcCaller.invoke(session,sendRequest);
-            } catch (RequestWriteException e) {
+
+            } catch (Exception e) {
                 logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
-                e.printStackTrace();
             }
         }else{
             if(logger.isDebugEnabled()){

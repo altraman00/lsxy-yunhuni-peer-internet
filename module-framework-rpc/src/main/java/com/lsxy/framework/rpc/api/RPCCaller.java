@@ -5,6 +5,7 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import com.lsxy.framework.rpc.exceptions.RequestWriteException;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.core.session.IoSession;
@@ -103,7 +104,7 @@ public class RPCCaller {
 	 * @param session
 	 * @throws RequestWriteException
 	 */
-	public void invoke(Session session, RPCRequest request) throws RequestWriteException{
+	public void invoke(Session session, RPCRequest request) throws RequestWriteException, SessionWriteException {
 		String sessionid = UUIDGenerator.uuid();
 		request.setSessionid(sessionid);
 		logger.debug(">>*"+request);
@@ -117,7 +118,7 @@ public class RPCCaller {
 	 * @param rqListener
 	 * @throws RequestWriteException
 	 */
-	public void invoke(Session session, RPCRequest request, RequestListener rqListener) throws RequestWriteException{
+	public void invoke(Session session, RPCRequest request, RequestListener rqListener) throws RequestWriteException, SessionWriteException {
 		RPCHandler handler = session.getRPCHandle();
 		String sessionid =UUIDGenerator.uuid();
 		request.setSessionid(sessionid);
@@ -187,7 +188,7 @@ public class RPCCaller {
 	 */
 	@SuppressWarnings("static-access")
 	public RPCResponse invokeWithReturn(Session session, RPCRequest request)
-			throws InterruptedException, RequestTimeOutException {
+			throws InterruptedException, RequestTimeOutException, SessionWriteException {
 		RPCResponse response = null;
 		String sessionid = UUIDGenerator.uuid();
 		request.setSessionid(sessionid);

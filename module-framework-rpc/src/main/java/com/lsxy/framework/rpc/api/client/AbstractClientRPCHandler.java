@@ -2,6 +2,7 @@ package com.lsxy.framework.rpc.api.client;
 
 import com.lsxy.framework.rpc.api.*;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
      * @param ctxObject  环境对象,根据环境不一样 类型也不一样  iosession in mina   channelcontext in netty
      * @param message
      */
-    protected void process(Object ctxObject, RPCMessage message) {
+    protected void process(Object ctxObject, RPCMessage message) throws SessionWriteException {
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
             if(serviceHandler != null){
