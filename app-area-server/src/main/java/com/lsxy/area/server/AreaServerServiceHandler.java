@@ -1,5 +1,6 @@
 package com.lsxy.area.server;
 
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -74,7 +75,10 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
                 if(logger.isDebugEnabled()){
                     logger.debug(">>>>>>>>发送指令到CTI:{}",sendRequest);
                 }
-                rpcCaller.invoke(session,sendRequest);
+
+                if(sendRequest!=null){
+                    rpcCaller.invoke(session,sendRequest);
+                }
 
             } catch (Exception e) {
                 logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
@@ -105,9 +109,13 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         if(logger.isDebugEnabled()){
             logger.debug("请求用户接口获取接下来的动作:{}" , response.getData());
         }
+        RPCRequest requestX = null;
+        if(response != null && response.isSuccess()){
+            String param = response.getData();
+            requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+        }
 //        int radom = RandomUtils.nextInt(0,100);
-        String param = response.getData();
-        RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+
 //        if(radom % 2 == 0){
 //            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
 //            if(logger.isDebugEnabled()){
