@@ -31,6 +31,13 @@ public class StasticsCounter {
     //收到挂机指令次数
     private AtomicInteger receivedCTIDropCount = new AtomicInteger(0);
 
+    //收到INCOMING事件次数
+    private AtomicInteger receivedCTIIncomingEventCount = new AtomicInteger(0);
+
+    public AtomicInteger getReceivedCTIIncomingEventCount() {
+        return receivedCTIIncomingEventCount;
+    }
+
     public AtomicInteger getReceivedCTIAnswerCount() {
         return receivedCTIAnswerCount;
     }
@@ -66,6 +73,7 @@ public class StasticsCounter {
             logger.debug("发出CTI请求次数:{}",this.sendCTIRequestCount.get());
             logger.debug("收到应答指令次数:{}",this.receivedCTIAnswerCount.get());
             logger.debug("收到挂机指令次数:{}",this.receivedCTIDropCount.get());
+            logger.debug("收到INCOMING事件次数:{}",this.receivedCTIIncomingEventCount.get());
             logger.debug("=============================\r\n\r\n");
         }
     }

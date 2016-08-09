@@ -82,6 +82,10 @@ public class CTIClient implements RpcEventListener{
         if(logger.isDebugEnabled()){
             logger.debug("收到事件通知:{}-{}",rpcRequest.getMethod(),rpcRequest.getParams());
         }
+        if(rpcRequest.getMethod().equals("sys.call.on_incoming")){
+            sc.getReceivedCTIIncomingEventCount().incrementAndGet();
+        }
+
         rpcRequest.getParams().put("method",rpcRequest.getMethod());
         //收到事件,向中心报告所有事件
         RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
