@@ -4,6 +4,7 @@ import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.app.area.cti.commander.RpcEventListener;
 import com.lsxy.app.area.cti.commander.RpcRequest;
 import com.lsxy.app.area.cti.commander.Unit;
+import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -30,6 +31,10 @@ public class CTIClient implements RpcEventListener{
 
 
     private static final Logger logger = LoggerFactory.getLogger(CTIClient.class);
+
+
+    @Autowired
+    private StasticsCounter sc;
 
     @Value("${area.agent.client.cti.unitid}")
     private byte localUnitID;
@@ -71,6 +76,9 @@ public class CTIClient implements RpcEventListener{
 
     @Override
     public void onEvent(RpcRequest rpcRequest) {
+        /*收到CTI事件计数*/
+        sc.getReceivedCTIEventCount().incrementAndGet();
+
         if(logger.isDebugEnabled()){
             logger.debug("收到事件通知:{}-{}",rpcRequest.getMethod(),rpcRequest.getParams());
         }
@@ -80,6 +88,9 @@ public class CTIClient implements RpcEventListener{
         Session session = sessionContext.getAvalibleSession();
         try {
             assert rpcCaller!=null;
+            /*发送区域管理器请求次数计数*/
+            sc.getSendAreaServerRequestCount().incrementAndGet();
+
             rpcCaller.invoke(session,areaRPCRequest);
         } catch (Exception e) {
             e.printStackTrace();

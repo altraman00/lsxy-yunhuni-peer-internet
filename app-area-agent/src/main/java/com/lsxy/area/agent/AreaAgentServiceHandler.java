@@ -34,11 +34,17 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
     @Autowired
     private CTIClientContext cticlientContext;
 
+    @Autowired
+    private StasticsCounter sc;
+
     @Override
     public RPCResponse handleService(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){
             logger.debug("收到请求:{}",request );
         }
+
+        /*收到区域管理器请求次数计数*/
+        sc.getReceivedAreaServerRequestCount().incrementAndGet();
 
         RPCResponse response = null;
 
