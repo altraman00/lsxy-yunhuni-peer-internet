@@ -52,9 +52,6 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
      * @return
      */
     private RPCResponse process_CH_MN_CTI_EVENT(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("收到CTI事件:{}" , request);
-        }
 
         /*临时逻辑,如果收到是 incoming 事件  则概率性的挂断或接通
         sys.call.on_dial_completed
@@ -63,16 +60,17 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         */
         String method = (String) request.getParameter("method");
         if(logger.isDebugEnabled()){
-            logger.debug("is incoming?  [{}] vs [sys.call.on_incoming]",method);
+            logger.debug("收到CTI事件:{}-----{}" , method,request.getParamMap());
         }
+
         if(method.equals("sys.call.on_incoming")){
             if(logger.isDebugEnabled()){
-                logger.debug("收到了INCOMING.........");
+                logger.debug("<<<<<<INCOMING>>>>>>>");
             }
             RPCRequest sendRequest = randomRequest(request);
             try {
                 if(logger.isDebugEnabled()){
-                    logger.debug("准备发送指令到CTI:{}",sendRequest);
+                    logger.debug(">>>>>>>>发送指令到CTI:{}",sendRequest);
                 }
                 rpcCaller.invoke(session,sendRequest);
             } catch (RequestWriteException e) {
