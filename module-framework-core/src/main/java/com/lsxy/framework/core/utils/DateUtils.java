@@ -390,7 +390,31 @@ public class DateUtils {
         String result =sdf.format(calendar.getTime()).toString();
 		return  result;
 	}
-	
+
+    /**
+     * 获取某个日期的上个月
+     * @param date
+     * @return
+     */
+    public static Date  getPrevMonth(Date date){
+        Calendar   calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MONTH, -1);
+        return  calendar.getTime();
+    }
+
+    /**
+     * 获取某个日期的上周
+     * @param date
+     * @return
+     */
+    public static Date  getPrevWeek(Date date){
+        Calendar   calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.WEEK_OF_MONTH, -1);
+        return  calendar.getTime();
+    }
+
 	/**
 	 * 获取某年下一个月
 	 *@author  MrBao 
@@ -787,10 +811,13 @@ public class DateUtils {
 
     public static void main(String args[]) {
     	//System.out.println(getMonthLastTime(new Date()));
-        Date[] ds = getDatesBetween(new Date(2016-1900,7-1,9),new Date());
+        /*Date[] ds = getDatesBetween(new Date(2016-1900,7-1,9),new Date());
         for (int i =0;i<ds.length;i++){
             System.out.println(getTime(ds[i],"yyyy-MM-dd"));
-        }
+        }*/
+
+        System.out.println(getTime(getPrevMonth(new Date()),"yyyy-MM-dd"));
+        System.out.println(getTime(getPrevWeek(new Date()),"yyyy-MM-dd"));
     }
 
 }

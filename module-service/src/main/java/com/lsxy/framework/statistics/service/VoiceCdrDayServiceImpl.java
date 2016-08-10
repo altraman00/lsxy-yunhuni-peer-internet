@@ -82,11 +82,24 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
             }
         });
     }
-    
+
+    public long getAmongDurationBetween(Date d1,Date d2){
+        String hql = "from VoiceCdrDay obj where "
+                +StatisticsUtils.getSqlIsNull(null,null, null)+" obj.dt between ?1 and ?2";
+        List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (VoiceCdrDay day : ds) {
+            if(day!=null && day.getAmongDuration() !=null){
+                sum += day.getAmongDuration();
+            }
+        }
+        return sum;
+    }
 
     public long getAmongDurationByDate(Date d){
-
-        return 0;
+        Date d1 = DateUtils.getFirstTimeOfDate(d);
+        Date d2 = DateUtils.getLastTimeOfDate(d);
+        return getAmongDurationBetween(d1,d2);
     }
 
 }

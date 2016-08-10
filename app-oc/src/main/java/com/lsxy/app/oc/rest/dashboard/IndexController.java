@@ -1,8 +1,11 @@
 package com.lsxy.app.oc.rest.dashboard;
 
 import com.lsxy.app.oc.rest.dashboard.vo.ApplicationIndicantVO;
+import com.lsxy.app.oc.rest.dashboard.vo.DurationIndicantVO;
 import com.lsxy.app.oc.rest.dashboard.vo.MemberIndicantVO;
 import com.lsxy.app.oc.rest.dashboard.vo.StatisticVO;
+import com.lsxy.framework.api.statistics.service.VoiceCdrDayService;
+import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -33,6 +36,12 @@ public class IndexController {
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private VoiceCdrDayService voiceCdrDayService;
+
+    @Autowired
+    private VoiceCdrMonthService voiceCdrMonthService;
 
 
     @RequestMapping(value = "/member/indicant",method = RequestMethod.GET)
@@ -214,5 +223,65 @@ public class IndexController {
             }
         }
         return results;
+    }
+
+
+    /**
+     * 话务量指标
+     * @return
+     */
+    @RequestMapping(value = "/duration/indicant",method = RequestMethod.GET)
+    public RestResponse durationIndicant(){
+        DurationIndicantVO dto = new DurationIndicantVO();
+        dto.setpDay(getDurationIndicantOfYesterday());
+        dto.setPpDay(getDurationIndicantOfBeforeYesterday());
+        dto.setpWeek(getDurationIndicantOfBeforeWeek());
+        dto.setPpWeek(getDurationIndicantOfBefore2Week());
+        dto.setpMonth(getDurationIndicantOfBeforeMonth());
+        dto.setPpMonth(getDurationIndicantOfBefore2Month());
+        return RestResponse.success(dto);
+    }
+
+    //获取前天话务量
+    private long getDurationIndicantOfBeforeYesterday(){
+        Date toDay = new Date();
+        Date pre_pre_date = DateUtils.getPreDate(DateUtils.getPreDate(toDay));//前天
+        return voiceCdrDayService.getAmongDurationByDate(pre_pre_date);
+    }
+
+    //获取昨天话务量
+    private long getDurationIndicantOfYesterday(){
+        Date toDay = new Date();
+        Date pre_date = DateUtils.getPreDate(toDay);//昨天
+        return voiceCdrDayService.getAmongDurationByDate(pre_date);
+    }
+
+    //获取上上周的话务量
+    private long getDurationIndicantOfBefore2Week(){
+        Date toDay = new Date();
+        Date pp_week_date = DateUtils.getPrevWeek(DateUtils.getPrevWeek(toDay));
+        return voiceCdrDayService.getAmongDurationBetween(
+                        DateUtils.getFirstDayOfWeek(pp_week_date),DateUtils.getLastDayOfWeek(pp_week_date));
+    }
+    //获取上周的话务量
+    private long getDurationIndicantOfBeforeWeek(){
+        Date toDay = new Date();
+        Date p_week_date = DateUtils.getPrevWeek(toDay);
+        return voiceCdrDayService.getAmongDurationBetween(
+                DateUtils.getFirstDayOfWeek(p_week_date),DateUtils.getLastDayOfWeek(p_week_date));
+    }
+    //获取上上月的话务量
+    private long getDurationIndicantOfBefore2Month(){
+        Date toDay = new Date();
+        Date pp_month_date = DateUtils.getPrevMonth(DateUtils.getPrevMonth(toDay));
+        return voiceCdrDayService.getAmongDurationBetween(
+                DateUtils.getFirstTimeOfMonth(pp_month_date),DateUtils.getLastTimeOfMonth(pp_month_date));
+    }
+    //获取上月的话务量
+    private long getDurationIndicantOfBeforeMonth(){
+        Date toDay = new Date();
+        Date p_month_date = DateUtils.getPrevMonth(toDay);
+        return voiceCdrDayService.getAmongDurationBetween(
+                DateUtils.getFirstTimeOfMonth(p_month_date),DateUtils.getLastTimeOfMonth(p_month_date));
     }
 }

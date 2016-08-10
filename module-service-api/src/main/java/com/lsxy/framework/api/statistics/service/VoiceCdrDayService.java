@@ -33,7 +33,14 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
 
 
     /**
-     * 获取某天的总的通话时长
+     * 获取某个时间范围的总的通话时长(话务量)
+     * @param d
+     * @return
+     */
+    public long getAmongDurationBetween(Date d1,Date d2);
+
+    /**
+     * 获取某天的总的通话时长(话务量)
      * @param d
      * @return
      */

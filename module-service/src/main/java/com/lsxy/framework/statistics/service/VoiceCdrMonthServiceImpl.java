@@ -5,7 +5,6 @@ import com.lsxy.framework.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.statistics.dao.VoiceCdrMonthDao;
 import com.lsxy.utils.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +79,27 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
                 }
             }
         });
+    }
+
+    private long getAmongDurationBetween(Date d1,Date d2){
+        String hql = "from VoiceCdrMonth obj where "
+                +StatisticsUtils.getSqlIsNull(null,null, null)+" obj.dt between ?1 and ?2";
+        List<VoiceCdrMonth> ds = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (VoiceCdrMonth day : ds) {
+            if(day!=null && day.getAmongDuration() !=null){
+                sum += day.getAmongDuration();
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    public long getAmongDurationByDate(Date d) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+
+        return getAmongDurationBetween(d1,d2);
     }
 
 }
