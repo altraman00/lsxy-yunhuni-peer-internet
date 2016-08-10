@@ -411,7 +411,7 @@
                         var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
                         var result=  re.test(filename);
                         if(result){
-                            if(data.files[0].size <= (5000* 1024 * 1024)) {
+                            if(data.files[0].size <= (5* 1024 * 1024)) {
                                 $('#progress').show();
                                 $('#fileName').html(filename);
                                 $('.modalCancel-app-down').unbind("click").one("click", function () {
