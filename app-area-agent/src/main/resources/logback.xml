@@ -11,4 +11,6 @@
     <logger name="com.lsxy.framework.rpc.api.server" level="DEBUG" additivity="true" />
 
     <logger name="c.l.f.rpc.netty.codec" level="INFO" additivity="true"/>
+    <logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="false"/>
+
 </configuration>
