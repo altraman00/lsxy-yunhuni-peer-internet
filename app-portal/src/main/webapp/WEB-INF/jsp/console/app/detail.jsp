@@ -394,11 +394,15 @@
                 var Allfile = [],allFileLength = 0, errorFileArray = [];
                 $('#fileupload').fileupload({
                     url: '${ctx}/console/app/file/play/upload',
-                    maxFileSize: 5000* 1024 * 1024,
+                    maxFileSize: 5* 1024 * 1024,
                     dataType: 'json',
                     autoUpload: true,
                     acceptFileTypes: /(\.|\/)(wav)$/i,
                     add: function(e, data) {
+                        $('#progress .progress-bar').css(
+                                'width',
+                                0 + '%'
+                        );
                         $('.modalCancel-app-up').one("click",function(){
                             data.abort();
                         });
@@ -406,11 +410,16 @@
                         var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
                         var result=  re.test(filename);
                         if(result){
-                            $('#progress').show();
-                            $('#fileName').html(filename);
-                            $('.modalCancel-app-down').unbind("click").one("click",function() {
-                                data.submit();
-                            });
+                            if(data.files[0].size <= (5* 1024 * 1024)) {
+                                $('#progress').show();
+                                $('#fileName').html(filename);
+                                $('.modalCancel-app-down').unbind("click").one("click", function () {
+                                    data.submit();
+                                });
+                            }else{
+                                $('#progress').hide();
+                                showtoast("上传文件超过5M");
+                            }
                         }else{
                             $('#progress').hide();
                             showtoast("上传格式不正确");
