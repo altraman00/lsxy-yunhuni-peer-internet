@@ -2,6 +2,7 @@ package com.lsxy.framework.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
+import com.lsxy.framework.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
@@ -136,5 +137,25 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
                 }
             }
         });
+    }
+
+    private BigDecimal getAmongAmountBetween(Date d1,Date d2){
+        String hql = "from ConsumeMonth obj where "
+                +StatisticsUtils.getSqlIsNull(null,null, null)+" obj.dt between ?1 and ?2";
+        List<ConsumeMonth> ds = this.findByCustomWithParams(hql,d1,d2);
+        BigDecimal sum = new BigDecimal(0);
+        for (ConsumeMonth day : ds) {
+            if(day!=null && day.getAmongAmount() !=null){
+                sum.add(day.getAmongAmount());
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    public BigDecimal getAmongAmountByDate(Date d) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getAmongAmountBetween(d1,d2);
     }
 }
