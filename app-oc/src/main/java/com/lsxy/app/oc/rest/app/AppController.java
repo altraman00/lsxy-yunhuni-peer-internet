@@ -8,8 +8,7 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,22 +16,20 @@ import java.util.List;
  * 应用RestApp
  * Created by zhangxb on 2016/8/10.
  */
-@RequestMapping("/rest/app")
+@RequestMapping("/app")
 @RestController
 public class AppController extends AbstractRestController {
     @Autowired
     private AppService appService;
-    @Autowired
-    private TenantService tenantService;
     @Autowired
     AppOnlineActionService appOnlineActionService;
     /**
      * 查找当前用户的应用
      * @throws Exception
      */
-    @RequestMapping("/list")
-    public RestResponse listApp() throws Exception{
-        List<App> apps = appService.findAppByUserName(getCurrentAccountUserName());
+    @RequestMapping(value = "/list/{uid}",method = RequestMethod.GET)
+    public RestResponse listApp(@PathVariable String uid) throws Exception{
+        List<App> apps = appService.findAppByUserName(uid);
         return RestResponse.success(apps);
     }
 
@@ -42,10 +39,9 @@ public class AppController extends AbstractRestController {
      * @param pageSize 每页记录数
      * @return
      */
-    @RequestMapping("/plist")
-    public RestResponse pageList(Integer pageNo,Integer pageSize){
-        String userName = getCurrentAccountUserName();
-        Page<App> page = appService.pageList(userName,pageNo,pageSize);
+    @RequestMapping("/plist/{uid}")
+    public RestResponse pageList(@PathVariable String uid,@RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20" )Integer pageSize){
+        Page<App> page = appService.pageList(uid,pageNo,pageSize);
         return RestResponse.success(page);
     }
 
