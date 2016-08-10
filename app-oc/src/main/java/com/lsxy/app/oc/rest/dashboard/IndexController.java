@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -233,12 +234,20 @@ public class IndexController {
     @RequestMapping(value = "/duration/indicant",method = RequestMethod.GET)
     public RestResponse durationIndicant(){
         DurationIndicantVO dto = new DurationIndicantVO();
-        dto.setpDay(getDurationIndicantOfYesterday());
-        dto.setPpDay(getDurationIndicantOfBeforeYesterday());
-        dto.setpWeek(getDurationIndicantOfBeforeWeek());
-        dto.setPpWeek(getDurationIndicantOfBefore2Week());
-        dto.setpMonth(getDurationIndicantOfBeforeMonth());
-        dto.setPpMonth(getDurationIndicantOfBefore2Month());
+        long yesterday = getDurationIndicantOfYesterday();
+        long beforeYesterday = getDurationIndicantOfBeforeYesterday();
+        long beforeWeek = getDurationIndicantOfBeforeWeek();
+        long before2Week = getDurationIndicantOfBefore2Week();
+        long beforeMonth = getDurationIndicantOfBeforeMonth();
+        long before2Month = getDurationIndicantOfBefore2Month();
+        //分母加0.1是为了防止分母为0
+        dto.setDuration((long)Math.round(yesterday/60));//yesterday单位为秒，转为分
+        dto.setRateOfDay(new BigDecimal(((yesterday-beforeYesterday)/(beforeYesterday+0.1)) * 100)
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
+        dto.setRateOfWeek(new BigDecimal(((beforeWeek-before2Week)/(before2Week+0.1)) * 100)
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
+        dto.setRateOfMonth(new BigDecimal(((beforeMonth-before2Month)/(before2Month+0.1)) * 100)
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
         return RestResponse.success(dto);
     }
 

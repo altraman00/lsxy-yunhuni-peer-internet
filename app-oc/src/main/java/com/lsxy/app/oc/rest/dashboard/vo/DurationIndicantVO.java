@@ -9,87 +9,48 @@ import java.io.Serializable;
  */
 public class DurationIndicantVO implements Serializable{
 
-    @JsonProperty("p_day")
-    private Long pDay;
+    @JsonProperty("duration_day")
+    private Long duration;
 
-    @JsonProperty("pp_day")
-    private Long ppDay;
+    @JsonProperty("day_rate")
+    private Double rateOfDay;
 
-    @JsonProperty("p_week")
-    private Long pWeek;
+    @JsonProperty("week_rate")
+    private Double rateOfWeek;
 
-    @JsonProperty("pp_week")
-    private Long ppWeek;
+    @JsonProperty("month_rate")
+    private Double rateOfMonth;
 
-    @JsonProperty("p_month")
-    private Long pMonth;
 
-    @JsonProperty("pp_month")
-    private Long ppMonth;
-
-    public Long getpDay() {
-        if(pDay == null){
-            pDay = 0L;
-        }
-        return (long)Math.round(pDay/60);
+    public Long getDuration() {
+        return duration;
     }
 
-    public void setpDay(Long pDay) {
-        this.pDay = pDay;
+    public void setDuration(Long duration) {
+        this.duration = duration;
     }
 
-    public Long getPpDay() {
-        if(ppDay == null){
-            ppDay = 0L;
-        }
-        return (long)Math.round(ppDay/60);
+    public Double getRateOfDay() {
+        return rateOfDay;
     }
 
-    public void setPpDay(Long ppDay) {
-        this.ppDay = ppDay;
+    public void setRateOfDay(Double rateOfDay) {
+        this.rateOfDay = rateOfDay;
     }
 
-    public Long getpWeek() {
-        if(pWeek == null){
-            pWeek = 0L;
-        }
-        return (long)Math.round(pWeek/60);
+    public Double getRateOfWeek() {
+        return rateOfWeek;
     }
 
-    public void setpWeek(Long pWeek) {
-        this.pWeek = pWeek;
+    public void setRateOfWeek(Double rateOfWeek) {
+        this.rateOfWeek = rateOfWeek;
     }
 
-    public Long getPpWeek() {
-        if(ppWeek == null){
-            ppWeek = 0L;
-        }
-        return (long)Math.round(ppWeek/60);
+    public Double getRateOfMonth() {
+        return rateOfMonth;
     }
 
-    public void setPpWeek(Long ppWeek) {
-        this.ppWeek = ppWeek;
-    }
-
-    public Long getpMonth() {
-        if(pMonth == null){
-            pMonth = 0L;
-        }
-        return (long)Math.round(pMonth/60);
-    }
-
-    public void setpMonth(Long pMonth) {
-        this.pMonth = pMonth;
-    }
-
-    public Long getPpMonth() {
-        if(ppMonth == null){
-            ppMonth = 0L;
-        }
-        return (long)Math.round(ppMonth/60);
-    }
-
-    public void setPpMonth(Long ppMonth) {
-        this.ppMonth = ppMonth;
+    public void setRateOfMonth(Double rateOfMonth) {
+        this.rateOfMonth = rateOfMonth;
     }
 }
