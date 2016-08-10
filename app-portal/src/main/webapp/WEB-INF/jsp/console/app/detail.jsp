@@ -167,7 +167,7 @@
                                         </a>
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
-                                    <li class="right"><a href="#" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+                                    <li class="right" id="uploadButton" hidden><a href="#" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <div class="tab-pane fade in active" id="play">
@@ -403,7 +403,7 @@
                             data.abort();
                         });
                         var filename = data.files[0].name;
-                        var  re = /(\.|\/)(wav)$/i;
+                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
                         var result=  re.test(filename);
                         if(result){
                             $('#progress').show();
@@ -733,6 +733,7 @@
      *触发放音文件分页
      */
     function upplay(){
+        $('#uploadButton').show();
         //获取数据总数
         var count = 0;
         var name = $('#name').val();
@@ -809,6 +810,7 @@
      *触发录音文件分页
      */
     function upvoice(){
+        $('#uploadButton').hide();
         recordFileTotalSize();
         //获取数据总数
         var count = 0;
