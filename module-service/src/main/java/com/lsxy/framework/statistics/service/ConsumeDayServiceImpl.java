@@ -7,6 +7,7 @@ import com.lsxy.framework.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.statistics.dao.ConsumeDayDao;
@@ -21,9 +22,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 消费日统计serviceimpl
@@ -131,5 +130,30 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         return getAmongAmountBetween(d1,d2);
+    }
+
+    private List<Map<String, Double>> getTops(List<ConsumeDay> ds, String field){
+        if(ds == null ){
+            return null;
+        }
+        List<Map<String, Double>> tops = new ArrayList<>();
+        for (ConsumeDay d: ds) {
+            String tenantName = "";
+            Tenant t = tenantService.findById(d.getTenantId());
+            if(t!=null && t.getTenantName()!=null){
+                tenantName = t.getTenantName();
+            }
+            Map<String,Double> map = new HashMap<>();
+            map.put(tenantName, ((BigDecimal)BeanUtils.getProperty2(d,field)).doubleValue());
+            tops.add(map);
+        }
+        return tops;
+    }
+
+    @Override
+    public List<Map<String, Double>> getConsumeTop(int top) {
+        String hql = "from ConsumeDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumAmount DESC";
+        List<ConsumeDay> list = this.getTopList(hql,false,top);
+        return getTops(list,"sumAmount");
     }
 }

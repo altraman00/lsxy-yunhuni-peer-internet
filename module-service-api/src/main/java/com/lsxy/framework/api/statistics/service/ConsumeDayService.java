@@ -2,12 +2,14 @@ package com.lsxy.framework.api.statistics.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.statistics.model.ConsumeDay;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消费日统计service
@@ -83,4 +85,6 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @return
      */
     public BigDecimal getAmongAmountByDate(Date d);
+
+    public List<Map<String, Double>> getConsumeTop(int top);
 }

@@ -439,4 +439,24 @@ public class IndexController {
         }
         return results;
     }
+
+    /**
+     * 活跃会员排名
+     * @return
+     */
+    @RequestMapping(value = "/member/top",method = RequestMethod.GET)
+    public RestResponse memberTop(@RequestParam Integer top){
+        MemberTopVO dto = new MemberTopVO();
+        dto.setCallTop(voiceCdrDayService.getCallTop(top));
+        dto.setDurationTop(voiceCdrDayService.getDurationTop(top));
+        dto.setConsumeTop(consumeDayService.getConsumeTop(top));
+        //上周
+        Date toDay = new Date();
+        Date p_week_date = DateUtils.getPrevWeek(toDay);
+        Date p_week_date_start = DateUtils.getFirstDayOfWeek(p_week_date);
+        Date p_week_date_end = DateUtils.getLastDayOfWeek(p_week_date);
+        dto.setCallWeekTop(voiceCdrDayService.getCallTopByDateBetween(top,p_week_date_start,p_week_date_end));
+        dto.setDurationWeekTop(voiceCdrDayService.getDurationTopByDateBetween(top,p_week_date_start,p_week_date_end));
+        return RestResponse.success(dto);
+    }
 }
