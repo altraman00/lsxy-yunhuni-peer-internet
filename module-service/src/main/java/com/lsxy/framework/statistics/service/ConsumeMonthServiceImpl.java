@@ -2,7 +2,6 @@ package com.lsxy.framework.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
-import com.lsxy.framework.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
@@ -157,5 +156,21 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
         return getAmongAmountBetween(d1,d2);
+    }
+
+    @Override
+    public List<ConsumeMonth> getConsumeMonths(String tenantId, String appId, String month) {
+        List<ConsumeMonth> consumeMonths = null;
+        if(StringUtils.isBlank(month)){
+            throw new IllegalArgumentException("月份为空");
+        }
+        Date dt = DateUtils.parseDate(month, "yyyy-MM");
+        if(StringUtils.isBlank(appId)){
+            consumeMonths = consumeMonthDao.findByTenantIdAndDtAndAppIdIsNullAndTypeNotNull(tenantId,dt);
+        }else{
+            consumeMonths = consumeMonthDao.findByTenantIdAndDtAndAppIdAndTypeNotNull(tenantId, dt, appId);
+        }
+
+        return consumeMonths;
     }
 }

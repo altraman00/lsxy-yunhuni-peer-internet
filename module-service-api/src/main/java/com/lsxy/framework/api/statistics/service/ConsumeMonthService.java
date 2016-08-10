@@ -70,4 +70,13 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      */
     public BigDecimal getAmongAmountByDate(Date d);
 
+    /**
+     * 获取某个月的月结账单
+     * @param tenantId 租户ID
+     * @param appId 应用ID（为空""或null则表示全部应用）
+     * @param month 月份
+     * @return
+     */
+    List<ConsumeMonth> getConsumeMonths(String tenantId, String appId, String month);
+
 }
