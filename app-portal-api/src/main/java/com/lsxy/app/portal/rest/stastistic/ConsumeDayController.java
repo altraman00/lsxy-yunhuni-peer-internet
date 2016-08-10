@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest.stastistic;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.statistics.model.ConsumeDay;
 import com.lsxy.framework.api.statistics.service.ConsumeDayService;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -99,4 +100,22 @@ public class ConsumeDayController extends AbstractRestController {
         List<ConsumeDay> pageList =  consumeDayService.pageListByTime(userName,appId,startTime,endTime,pageNo ,pageSize);
         return RestResponse.success(pageList);
     }
+
+    /**
+     * 获取某一日的日结账单
+     * @param appId
+     * @param day
+     * @return
+     */
+    @RequestMapping("/get")
+    public RestResponse get(String appId, String day){
+        if(StringUtils.isBlank(day)){
+            Date preDate = DateUtils.getPreDate(new Date());
+            day = DateUtils.getDate(preDate, "yyyy-MM-dd");
+        }
+        Account account = getCurrentAccount();
+        List<ConsumeDay> consumeDays = consumeDayService.getConsumeDays(account.getTenant().getId(),appId,day);
+        return RestResponse.success(consumeDays);
+    }
+
 }

@@ -139,6 +139,22 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         });
     }
 
+    @Override
+    public List<ConsumeMonth> getConsumeMonths(String tenantId, String appId, String month) {
+        List<ConsumeMonth> consumeMonths = null;
+        if(StringUtils.isBlank(month)){
+            throw new IllegalArgumentException("月份为空");
+        }
+        Date dt = DateUtils.parseDate(month, "yyyy-MM");
+        if(StringUtils.isBlank(appId)){
+            consumeMonths = consumeMonthDao.findByTenantIdAndDtAndAppIdIsNullAndTypeNotNull(tenantId,dt);
+        }else{
+            consumeMonths = consumeMonthDao.findByTenantIdAndDtAndAppIdAndTypeNotNull(tenantId, dt, appId);
+        }
+
+        return consumeMonths;
+    }
+
     private BigDecimal getAmongAmountBetween(Date d1,Date d2){
         String hql = "from ConsumeMonth obj where "
                 +StatisticsUtils.getSqlIsNull(null,null, null)+" obj.dt between ?1 and ?2";

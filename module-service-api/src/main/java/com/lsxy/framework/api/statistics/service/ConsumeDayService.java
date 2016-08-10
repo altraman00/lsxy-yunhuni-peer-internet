@@ -87,4 +87,13 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
     public BigDecimal getAmongAmountByDate(Date d);
 
     public List<Map<String, Double>> getConsumeTop(int top);
+
+    /**
+     * 获取某一天的日结账单
+     * @param tenantId 租户ID
+     * @param appId 应用ID（为空""或null则表示全部应用）
+     * @param month 月份
+     * @return
+     */
+    List<ConsumeDay> getConsumeDays(String tenantId, String appId, String month);
 }
