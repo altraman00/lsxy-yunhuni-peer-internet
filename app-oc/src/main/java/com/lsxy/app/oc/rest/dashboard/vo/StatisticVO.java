@@ -1,4 +1,4 @@
-package com.lsxy.app.oc.rest.dashboard.dto;
+package com.lsxy.app.oc.rest.dashboard.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/8/9.
  */
-public class StatisticDTO implements Serializable {
+public class StatisticVO implements Serializable {
 
     @JsonProperty("app_count")
     private List<Integer> appCount;

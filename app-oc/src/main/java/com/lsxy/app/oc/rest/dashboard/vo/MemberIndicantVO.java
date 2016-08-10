@@ -1,4 +1,4 @@
-package com.lsxy.app.oc.rest.dashboard.dto;
+package com.lsxy.app.oc.rest.dashboard.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Created by Administrator on 2016/8/9.
  */
-public class MemberIndicantDTO implements Serializable{
+public class MemberIndicantVO implements Serializable{
 
     @JsonProperty("regist_total")
     private Integer registTotal;
@@ -45,7 +45,7 @@ public class MemberIndicantDTO implements Serializable{
     @JsonProperty("consume_month")
     private Integer consumeMonth;
 
-    public MemberIndicantDTO(){
+    public MemberIndicantVO(){
 
     }
 

@@ -1,8 +1,8 @@
 package com.lsxy.app.oc.rest.dashboard;
 
-import com.lsxy.app.oc.rest.dashboard.dto.ApplicationIndicantDTO;
-import com.lsxy.app.oc.rest.dashboard.dto.MemberIndicantDTO;
-import com.lsxy.app.oc.rest.dashboard.dto.StatisticDTO;
+import com.lsxy.app.oc.rest.dashboard.vo.ApplicationIndicantVO;
+import com.lsxy.app.oc.rest.dashboard.vo.MemberIndicantVO;
+import com.lsxy.app.oc.rest.dashboard.vo.StatisticVO;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -37,7 +37,7 @@ public class IndexController {
 
     @RequestMapping(value = "/member/indicant",method = RequestMethod.GET)
     public RestResponse member(){
-        MemberIndicantDTO dto = new MemberIndicantDTO();
+        MemberIndicantVO dto = new MemberIndicantVO();
         //注册会员总数
         dto.setRegistTotal(tenantService.countValidTenant());
         dto.setRegistTatalDay(tenantService.countValidTenantToday());
@@ -59,7 +59,7 @@ public class IndexController {
 
     @RequestMapping(value = "/app/indicant",method = RequestMethod.GET)
     public RestResponse app(){
-        ApplicationIndicantDTO dto = new ApplicationIndicantDTO();
+        ApplicationIndicantVO dto = new ApplicationIndicantVO();
         dto.setOnline(appService.countOnline());
         dto.setTotal(appService.countValid());
         return RestResponse.success(dto);
@@ -69,7 +69,7 @@ public class IndexController {
     public RestResponse memberStatistic(
             @RequestParam(value = "year") Integer year,
             @RequestParam(value = "month",required = false) Integer month){
-        StatisticDTO dto = new StatisticDTO();
+        StatisticVO dto = new StatisticVO();
         if(month!=null){
             dto.setMemberCount(perDayOfMonthMemberStatistic(year,month));
             dto.setAppCount(perDayOfMonthAppStatistic(year,month));

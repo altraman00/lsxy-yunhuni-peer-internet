@@ -1,11 +1,11 @@
-package com.lsxy.app.oc.rest.dashboard.dto;
+package com.lsxy.app.oc.rest.dashboard.vo;
 
 import java.io.Serializable;
 
 /**
  * Created by Administrator on 2016/8/9.
  */
-public class ApplicationIndicantDTO implements Serializable {
+public class ApplicationIndicantVO implements Serializable {
 
     private Long total;
 

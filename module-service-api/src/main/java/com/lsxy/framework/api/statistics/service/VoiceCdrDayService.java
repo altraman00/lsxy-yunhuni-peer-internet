@@ -2,7 +2,6 @@ package com.lsxy.framework.api.statistics.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.statistics.model.VoiceCdrDay;
-import com.lsxy.framework.core.utils.Page;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -31,4 +30,12 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @param select 组合groupby条件
      */
     public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+
+
+    /**
+     * 获取某天的总的通话时长
+     * @param d
+     * @return
+     */
+    public long getAmongDurationByDate(Date d);
 }
