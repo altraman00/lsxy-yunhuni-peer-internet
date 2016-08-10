@@ -390,6 +390,7 @@
 
         <script>
             // 上传多个文件
+            var cancelCancel=false;
             $(function(){
                 var Allfile = [],allFileLength = 0, errorFileArray = [];
                 $('#fileupload').fileupload({
@@ -403,18 +404,19 @@
                                 'width',
                                 0 + '%'
                         );
-                        $('.modalCancel-app-up').one("click",function(){
-                            data.abort();
-                        });
+//                        $('.modalCancel-app-up').one("click",function(){
+//                            data.abort();
+//                        });
                         var filename = data.files[0].name;
                         var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
                         var result=  re.test(filename);
                         if(result){
-                            if(data.files[0].size <= (5* 1024 * 1024)) {
+                            if(data.files[0].size <= (5000* 1024 * 1024)) {
                                 $('#progress').show();
                                 $('#fileName').html(filename);
                                 $('.modalCancel-app-down').unbind("click").one("click", function () {
                                     data.submit();
+                                    cancelCancel=false;
                                     $('#fileupload').attr('disabled',"disabled");
                                 });
                             }else{
@@ -428,6 +430,10 @@
                     },
                     done: function (e, data) {
                         showtoast('上传成功');
+                        $('#progress .progress-bar').css(
+                                'width',
+                                0 + '%'
+                        );
                         $('.modal-loadding').hide();
                         $('.modalCancel-app-up').click();
                         fileTotalSoze();
@@ -443,6 +449,7 @@
                             $('.modal-loadding').show();
                         }
                     },fail: function(e, data) {
+                        cancelCancel=true;
                         showtoast('上传失败');
                         $('.modal-loadding').hide();
                         $('#fileupload').removeAttr('disabled');
@@ -456,17 +463,16 @@
 
 <script>
     $('.modalCancel-app-up').click(function(){
-        $('#resetForm').click();
-        $('#fileName').html("");
-        var id = $(this).attr('data-id');
-        $('#modal'+id).fadeOut();
-        $('#show-bg').fadeOut();
-        $('#progress').hide();
-        $('#progress .progress-bar').css(
-                'width',
-                0 + '%'
-        );
-        $('#fileupload').removeAttr('disabled');
+        var v = $('#progress .progress-bar').css('width');
+        if(v=='0%'||v=='0px'||cancelCancel){
+            $('#resetForm').click();
+            $('#fileName').html("");
+            var id = $(this).attr('data-id');
+            $('#modal'+id).fadeOut();
+            $('#show-bg').fadeOut();
+            $('#progress').hide();
+            $('#fileupload').removeAttr('disabled');
+        }
     });
     /**
      *绑定测试电话号码
