@@ -80,7 +80,6 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
 
                     /*发送给区域的请求次数计数*/
                     cs.getSendAreaNodeRequestCount().incrementAndGet();
-                    cs.getSendAreaNodeSysCallCount().incrementAndGet();
 
                     rpcCaller.invoke(session,rpcrequest);
                     evt.setSuccess(true);
