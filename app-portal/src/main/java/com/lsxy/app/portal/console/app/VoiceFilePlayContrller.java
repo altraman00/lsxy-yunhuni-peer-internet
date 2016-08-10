@@ -2,7 +2,6 @@ package com.lsxy.app.portal.console.app;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.app.portal.console.test.upload.UploadEntity;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -133,12 +132,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
-        UploadEntity uploadEntity = (UploadEntity) request.getSession().getAttribute("upload_ps");
         String msg = "";
         try {
             if (null != multipartfiles && multipartfiles.length > 0) {
                 //遍历并保存文件
-                uploadEntity.setOssCountItems(multipartfiles.length);
                 for (int i=0;i< multipartfiles.length;i++) {
                     MultipartFile file  = multipartfiles[i];
                     String name = file.getOriginalFilename();//文件名
@@ -160,15 +157,11 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                         logger.info("上创失败",name);
                         msg+=name+"文件上传失败；";
                     }
-                    uploadEntity.setOssItems(i+1);
-                    uploadEntity.setMsg(msg);
                 }
             }
         }catch (Exception e){
-            uploadEntity.setFlag(false);
-            msg+="文件上传失败；";
+            logger.info("文件上传异常：{}",e);
         }
-        uploadEntity.setMsg(msg);
     }
 
     /**
@@ -197,33 +190,5 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     private String getFileKey(String tenantId,String appId,String ymd,String type){
         String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd+"/"+ UUIDGenerator.uuid()+type;
         return result;
-    }
-    /**
-     * 查看文件上传进度
-     * @param request
-     */
-    @RequestMapping("/status"  )
-    @ResponseBody
-    public RestResponse  status(HttpServletRequest request ,String key,String sumUploadFile){
-        UploadEntity uploadEntity = (UploadEntity) request.getSession().getAttribute("upload_ps");
-        Map map = new HashMap();
-        if(uploadEntity==null){
-            map.put("flag",true);
-            map.put("percentComplete",0);
-        }else{
-            uploadEntity.setpCountItems(Integer.valueOf(sumUploadFile+""));
-            long temp = (long) Math.floor(((double) uploadEntity.getpBytesRead() /  (double)uploadEntity.getpContentLength()) * 100.0);
-            //计算上传完成的百分比
-            long percentComplete = (long) Math.floor(((double) (uploadEntity.getpItems()-2+(double)temp/(double)100)/ (double) uploadEntity.getpCountItems()) * 100.0);
-            boolean successLong = uploadEntity.getOssItems()==uploadEntity.getOssCountItems();
-            map.put("successLong",successLong);
-            map.put("flag",uploadEntity.isFlag());
-            map.put("msg",uploadEntity.getMsg());
-            map.put("percentComplete",percentComplete);
-            if(percentComplete==100&&successLong) {
-                request.getSession().removeAttribute("upload_ps");
-            }
-        }
-        return RestResponse.success(map);
     }
 }
