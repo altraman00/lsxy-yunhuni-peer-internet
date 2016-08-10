@@ -23,7 +23,7 @@ public class IndexController {
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(){
-        Page<AccountMessage> list = tenantService.pageListByAccountId(userName,pageNo,pageSize);
+        Page<AccountMessage> list = null;//tenantService.pageListByAccountId(userName,pageNo,pageSize);
         return RestResponse.success(list);
     }
 }
