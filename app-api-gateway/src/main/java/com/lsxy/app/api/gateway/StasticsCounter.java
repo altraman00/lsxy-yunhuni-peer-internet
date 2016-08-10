@@ -37,4 +37,16 @@ public class StasticsCounter {
             logger.debug("=============================\r\n\r\n");
         }
     }
+
+
+    /**
+     * 重置计数器
+     */
+    public void reset() {
+        if(logger.isDebugEnabled()){
+            logger.debug("重置所有计数器");
+        }
+        receivedGWResponseCount.set(0);
+        sendGWRequestCount.set(0);
+    }
 }

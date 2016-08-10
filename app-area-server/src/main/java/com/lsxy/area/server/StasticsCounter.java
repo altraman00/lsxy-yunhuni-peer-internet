@@ -93,5 +93,19 @@ public class StasticsCounter {
             logger.debug("=============================\r\n\r\n");
         }
     }
-    
+
+    /**
+     * 重置统计计数
+     */
+    public void reset() {
+        receivedGWRequestCount.set(0);
+        sendGWResponseCount.set(0);
+        sendAreaNodeRequestCount.set(0);
+        receivedAreaNodeRequestCount.set(0);
+        sendAreaNodeSysCallCount.set(0);
+        receivedAreaNodeCTIEventCount.set(0);
+        receivedAreaNodeInComingEventCount.set(0);
+        sendAreaNodeSysAnswerCount.set(0);
+        sendAreaNodeSysDropCount.set(0);
+    }
 }

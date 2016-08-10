@@ -77,4 +77,17 @@ public class StasticsCounter {
             logger.debug("=============================\r\n\r\n");
         }
     }
+
+    /**
+     * 重置计数器
+     */
+    public void reset() {
+        receivedAreaServerRequestCount.set(0);
+        sendAreaServerRequestCount.set(0);
+        receivedCTIEventCount.set(0);
+        sendCTIRequestCount.set(0);
+        receivedCTIAnswerCount.set(0);
+        receivedCTIDropCount.set(0);
+        receivedCTIIncomingEventCount.set(0);
+    }
 }

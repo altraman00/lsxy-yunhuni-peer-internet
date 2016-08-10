@@ -55,12 +55,29 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         if(request.getName().equals(ServiceConstants.MN_CH_CTI_API)){
             response = this.process_MN_CH_CTI_API(request);
         }
+        if(request.getName().equals(ServiceConstants.MN_CH_TEST_STASTICS_RESET)){
+            response = this.process_MN_CH_TEST_STASTICS_RESET(request);
+        }
+
 
         if(logger.isDebugEnabled()){
             logger.debug("返回给区域管理器的对象:{}",response);
         }
 
         return response;
+    }
+
+    /**
+     * 测试使用  用于重置计数器
+     * @param request
+     * @return
+     */
+    private RPCResponse process_MN_CH_TEST_STASTICS_RESET(RPCRequest request) {
+        if(logger.isDebugEnabled()){
+            logger.debug("重置计数器");
+        }
+        sc.reset();
+        return null;
     }
 
     private RPCResponse process_MN_CH_CTI_API(RPCRequest request) {
