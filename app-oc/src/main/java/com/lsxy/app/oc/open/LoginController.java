@@ -42,7 +42,6 @@ public class LoginController {
         try {
             OcUser user = ocUserService.findUserByLoginNameAndPassword(name, password);
             if (user != null) {
-
                 //将token放入redis 与OcUser形成映射关系
                 UserRestToken token = UserRestToken.newOcUserToken();
                 cacheManager.set(token.getToken(),user.getUserName(),35*60);
