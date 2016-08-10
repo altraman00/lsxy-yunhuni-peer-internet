@@ -63,4 +63,13 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      */
     public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select) throws SQLException;
 
+    /**
+     * 获取某个月的月结账单
+     * @param tenantId 租户ID
+     * @param appId 应用ID（为空""或null则表示全部应用）
+     * @param month 月份
+     * @return
+     */
+    List<ConsumeMonth> getConsumeMonths(String tenantId, String appId, String month);
+
 }

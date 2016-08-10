@@ -67,4 +67,13 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param select 组合groupby条件
      */
     public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+
+    /**
+     * 获取某一天的日结账单
+     * @param tenantId 租户ID
+     * @param appId 应用ID（为空""或null则表示全部应用）
+     * @param month 月份
+     * @return
+     */
+    List<ConsumeDay> getConsumeDays(String tenantId, String appId, String month);
 }
