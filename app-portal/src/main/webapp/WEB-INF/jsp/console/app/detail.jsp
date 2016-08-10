@@ -412,13 +412,20 @@
                         var result=  re.test(filename);
                         if(result){
                             if(data.files[0].size <= (5* 1024 * 1024)) {
-                                $('#progress').show();
-                                $('#fileName').html(filename);
-                                $('.modalCancel-app-down').unbind("click").one("click", function () {
-                                    data.submit();
-                                    cancelCancel=false;
-                                    $('#fileupload').attr('disabled',"disabled");
-                                });
+                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
+                                        $('#progress').show();
+                                        $('#fileName').html(filename);
+                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
+                                            data.submit();
+                                            cancelCancel=false;
+                                            $('#fileupload').attr('disabled',"disabled");
+                                        });
+                                    }else{
+                                        $('#progress').hide();
+                                        showtoast("存储空间不足，无法上传");
+                                    }
+                                },"post");
                             }else{
                                 $('#progress').hide();
                                 showtoast("上传文件超过5M");
