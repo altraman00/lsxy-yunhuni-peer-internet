@@ -45,7 +45,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{type,tenantId,appId,date1,date2});
         sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" limit ?,?";
         pageNo--;
-        List rows = jdbcTemplate.queryForList(sql,new Object[]{type,tenantId,appId,pageNo*pageSize,pageSize,date1,date2});
+        List rows = jdbcTemplate.queryForList(sql,new Object[]{type,tenantId,appId,date1,date2,pageNo*pageSize,pageSize});
         List list = new ArrayList();
         for(int i=0;i<rows.size();i++){
             VoiceCdr voiceCdr = new VoiceCdr();
