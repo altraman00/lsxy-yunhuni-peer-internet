@@ -441,6 +441,7 @@
                                 'width',
                                 0 + '%'
                         );
+                        cancelCancel=true;
                         $('.modal-loadding').hide();
                         $('.modalCancel-app-up').click();
                         fileTotalSoze();
