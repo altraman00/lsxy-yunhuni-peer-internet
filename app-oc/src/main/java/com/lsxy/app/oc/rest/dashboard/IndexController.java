@@ -1,9 +1,8 @@
 package com.lsxy.app.oc.rest.dashboard;
 
-import com.lsxy.app.oc.rest.dashboard.vo.ApplicationIndicantVO;
-import com.lsxy.app.oc.rest.dashboard.vo.DurationIndicantVO;
-import com.lsxy.app.oc.rest.dashboard.vo.MemberIndicantVO;
-import com.lsxy.app.oc.rest.dashboard.vo.StatisticVO;
+import com.lsxy.app.oc.rest.dashboard.vo.*;
+import com.lsxy.framework.api.statistics.service.ConsumeDayService;
+import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.statistics.service.VoiceCdrDayService;
 import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -44,6 +43,11 @@ public class IndexController {
     @Autowired
     private VoiceCdrMonthService voiceCdrMonthService;
 
+    @Autowired
+    private ConsumeDayService consumeDayService;
+
+    @Autowired
+    private ConsumeMonthService consumeMonthService;
 
     @RequestMapping(value = "/member/indicant",method = RequestMethod.GET)
     public RestResponse member(){
@@ -283,14 +287,77 @@ public class IndexController {
     private long getDurationIndicantOfBefore2Month(){
         Date toDay = new Date();
         Date pp_month_date = DateUtils.getPrevMonth(DateUtils.getPrevMonth(toDay));
-        return voiceCdrDayService.getAmongDurationBetween(
-                DateUtils.getFirstTimeOfMonth(pp_month_date),DateUtils.getLastTimeOfMonth(pp_month_date));
+        return voiceCdrMonthService.getAmongDurationByDate(pp_month_date);
     }
     //获取上月的话务量
     private long getDurationIndicantOfBeforeMonth(){
         Date toDay = new Date();
         Date p_month_date = DateUtils.getPrevMonth(toDay);
-        return voiceCdrDayService.getAmongDurationBetween(
-                DateUtils.getFirstTimeOfMonth(p_month_date),DateUtils.getLastTimeOfMonth(p_month_date));
+        return voiceCdrMonthService.getAmongDurationByDate(p_month_date);
+    }
+
+    /**
+     * 消费额指标
+     * @return
+     */
+    @RequestMapping(value = "/comsume/indicant",method = RequestMethod.GET)
+    public RestResponse comsumeIndicant(){
+        ConsumeIndicantVO dto = new ConsumeIndicantVO();
+        double yesterday = getComsumeIndicantOfYesterday().doubleValue();
+        double beforeYesterday = getComsumeIndicantOfBeforeYesterday().doubleValue();
+        double beforeWeek = getComsumeIndicantOfBeforeWeek().doubleValue();
+        double before2Week = getComsumeIndicantOfBefore2Week().doubleValue();
+        double beforeMonth = getComsumeIndicantOfBeforeMonth().doubleValue();
+        double before2Month = getComsumeIndicantOfBefore2Month().doubleValue();
+        //分母加0.1是为了防止分母为0
+        dto.setConsume(yesterday);
+        dto.setRateOfDay(new BigDecimal(((yesterday-beforeYesterday)/(beforeYesterday+0.1)) * 100)
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
+        dto.setRateOfWeek(new BigDecimal(((beforeWeek-before2Week)/(before2Week+0.1)) * 100)
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
+        dto.setRateOfMonth(new BigDecimal(((beforeMonth-before2Month)/(before2Month+0.1)) * 100)
+                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
+        return RestResponse.success(dto);
+    }
+
+    //获取前天消费额
+    private BigDecimal getComsumeIndicantOfBeforeYesterday(){
+        Date toDay = new Date();
+        Date pre_pre_date = DateUtils.getPreDate(DateUtils.getPreDate(toDay));//前天
+        return consumeDayService.getAmongAmountByDate(pre_pre_date);
+    }
+
+    //获取昨天消费额
+    private BigDecimal getComsumeIndicantOfYesterday(){
+        Date toDay = new Date();
+        Date pre_date = DateUtils.getPreDate(toDay);//昨天
+        return consumeDayService.getAmongAmountByDate(pre_date);
+    }
+
+    //获取上上周的消费额
+    private BigDecimal getComsumeIndicantOfBefore2Week(){
+        Date toDay = new Date();
+        Date pp_week_date = DateUtils.getPrevWeek(DateUtils.getPrevWeek(toDay));
+        return consumeDayService.getAmongAmountBetween(
+                DateUtils.getFirstDayOfWeek(pp_week_date),DateUtils.getLastDayOfWeek(pp_week_date));
+    }
+    //获取上周的消费额
+    private BigDecimal getComsumeIndicantOfBeforeWeek(){
+        Date toDay = new Date();
+        Date p_week_date = DateUtils.getPrevWeek(toDay);
+        return consumeDayService.getAmongAmountBetween(
+                DateUtils.getFirstDayOfWeek(p_week_date),DateUtils.getLastDayOfWeek(p_week_date));
+    }
+    //获取上上月的消费额
+    private BigDecimal getComsumeIndicantOfBefore2Month(){
+        Date toDay = new Date();
+        Date pp_month_date = DateUtils.getPrevMonth(DateUtils.getPrevMonth(toDay));
+        return consumeMonthService.getAmongAmountByDate(pp_month_date);
+    }
+    //获取上月的消费额
+    private BigDecimal getComsumeIndicantOfBeforeMonth(){
+        Date toDay = new Date();
+        Date p_month_date = DateUtils.getPrevMonth(toDay);
+        return consumeMonthService.getAmongAmountByDate(p_month_date);
     }
 }

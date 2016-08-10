@@ -17,6 +17,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -109,5 +110,26 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
                 }
             }
         });
+    }
+
+    @Override
+    public BigDecimal getAmongAmountBetween(Date d1, Date d2) {
+        String hql = "from ConsumeDay obj where "
+                +StatisticsUtils.getSqlIsNull(null,null, null)+" obj.dt between ?1 and ?2";
+        List<ConsumeDay> ds = this.findByCustomWithParams(hql,d1,d2);
+        BigDecimal sum = new BigDecimal(0);
+        for (ConsumeDay day : ds) {
+            if(day!=null && day.getAmongAmount() !=null){
+                sum.add(day.getAmongAmount());
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    public BigDecimal getAmongAmountByDate(Date d) {
+        Date d1 = DateUtils.getFirstTimeOfDate(d);
+        Date d2 = DateUtils.getLastTimeOfDate(d);
+        return getAmongAmountBetween(d1,d2);
     }
 }

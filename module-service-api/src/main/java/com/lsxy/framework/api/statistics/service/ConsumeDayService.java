@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.statistics.model.ConsumeDay;
 import com.lsxy.framework.core.utils.Page;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -67,4 +68,19 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param select 组合groupby条件
      */
     public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+
+
+    /**
+     * 获取某个时间范围的总的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountBetween(Date d1, Date d2);
+
+    /**
+     * 获取某天的总的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountByDate(Date d);
 }
