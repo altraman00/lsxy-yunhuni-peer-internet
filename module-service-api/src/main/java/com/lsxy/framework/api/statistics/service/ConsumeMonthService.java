@@ -63,4 +63,11 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      */
     public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select) throws SQLException;
 
+    /**
+     * 获取某月的总的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountByDate(Date d);
+
 }
