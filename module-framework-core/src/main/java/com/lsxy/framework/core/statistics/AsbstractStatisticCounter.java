@@ -45,7 +45,7 @@ public abstract class AsbstractStatisticCounter {
     public void log(){
         List<Field> fields =  BeanUtils.getFieldsByType(this, AtomicInteger.class);
         if(logger.isDebugEnabled()){
-            logger.debug("=========="+getStatisticName()+"==========",fields.size());
+            logger.debug("=========="+getStatisticName()+"[{}]==========",fields.size());
         }else{
             return;
         }
