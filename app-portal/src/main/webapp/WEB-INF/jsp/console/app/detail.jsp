@@ -432,7 +432,6 @@
                         $('.modalCancel-app-up').click();
                         fileTotalSoze();
                         upplay();
-                        $('#fileupload').removeAttrs('disabled');
                     },
                     progressall: function (e, data) {
                         var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -444,10 +443,9 @@
                             $('.modal-loadding').show();
                         }
                     },fail: function(e, data) {
-                        JSON.stringify(data)
                         showtoast('上传失败');
                         $('.modal-loadding').hide();
-                        $('#fileupload').removeAttrs('disabled');
+                        $('#fileupload').removeAttr('disabled');
                     }
                 });
             })
@@ -468,7 +466,7 @@
                 'width',
                 0 + '%'
         );
-        $('#fileupload').removeAttrs('disabled');
+        $('#fileupload').removeAttr('disabled');
     });
     /**
      *绑定测试电话号码
