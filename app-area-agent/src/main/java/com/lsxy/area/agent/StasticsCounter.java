@@ -102,6 +102,10 @@ public class StasticsCounter {
         receivedCTIAnswerCount.set(0);
         receivedCTIDropCount.set(0);
         receivedCTIIncomingEventCount.set(0);
+        receivedCTIDialCompleteEventCount.set(0);
+        receivedCTIDialTimeOutEventCount.set(0);
+        receivedCTIDialFailedEventCount.set(0);
+        receivedCTIReleaseEventCount.set(0);
     }
 
     public AtomicInteger getReceivedCTIDialCompleteEventCount() {
