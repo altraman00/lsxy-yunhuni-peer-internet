@@ -158,4 +158,20 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         Date d2 = DateUtils.getLastTimeOfMonth(d);
         return getAmongAmountBetween(d1,d2);
     }
+
+    @Override
+    public List<ConsumeMonth> getConsumeMonths(String tenantId, String appId, String month) {
+        List<ConsumeMonth> consumeMonths = null;
+        if(StringUtils.isBlank(month)){
+            throw new IllegalArgumentException("月份为空");
+        }
+        Date dt = DateUtils.parseDate(month, "yyyy-MM");
+        if(StringUtils.isBlank(appId)){
+            consumeMonths = consumeMonthDao.findByTenantIdAndDtAndAppIdIsNullAndTypeNotNull(tenantId,dt);
+        }else{
+            consumeMonths = consumeMonthDao.findByTenantIdAndDtAndAppIdAndTypeNotNull(tenantId, dt, appId);
+        }
+
+        return consumeMonths;
+    }
 }
