@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.stastistic;
 
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
@@ -17,14 +18,13 @@ import java.util.Map;
  * 详单查询
  * Created by zhangxb on 2016/7/6.
  */
-@RequestMapping("/rest/bill_detail")
+@RequestMapping("/tenant")
 @RestController
 public class BillDetailController extends AbstractRestController {
     @Autowired
     VoiceCdrService voiceCdrService;
     /**
      * 会话详单查询
-     * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数
      * @param time 时间
@@ -32,26 +32,32 @@ public class BillDetailController extends AbstractRestController {
      * @param type 选择类型
      * @return total 总计数，page分页数
      */
-    @RequestMapping(value = "" ,method = RequestMethod.POST)
+    @RequestMapping(value = "/{uid}/session" ,method = RequestMethod.GET)
     @ResponseBody
-    public RestResponse call(HttpServletRequest request, String tenantId,Integer type,String time, String appId,
+    public RestResponse call(@PathVariable String uid,int type,String time, String appId,
                              @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize
                              ){
         Map re = new HashMap();
-        //获取分页数据
-        Page page = voiceCdrService.pageList(pageNo,pageSize,type,tenantId,time,appId);
-        re.put("page",page);
-        if(CallSession.TYPE_VOICE_VOICECODE == type){//语音验证码
-            re.put("total",page.getTotalCount());
-        }else{
-            Map map = voiceCdrService.sumCost(type,tenantId,time,appId);
-            if(CallSession.TYPE_VOICE_RECORDING == type) {//录音
-                re.put("total",map.get("size"));
+        RestResponse restResponse = null;
+        if(StringUtil.isNotEmpty(time)&&StringUtil.isNotEmpty(appId)&&type!=0){
+            //获取分页数据
+            Page page = voiceCdrService.pageList(pageNo,pageSize,type,uid,time,appId);
+            re.put("page",page);
+            if(CallSession.TYPE_VOICE_VOICECODE == type){//语音验证码
+                re.put("total",page.getTotalCount());
             }else{
-                re.put("total",map.get("cost"));
+                Map map = voiceCdrService.sumCost(type,uid,time,appId);
+                if(CallSession.TYPE_VOICE_RECORDING == type) {//录音
+                    re.put("total",map.get("size"));
+                }else{
+                    re.put("total",map.get("cost"));
+                }
             }
+            restResponse = RestResponse.success(re);
+        }else{
+            restResponse = RestResponse.failed("0","上传参数错误");
         }
-        return RestResponse.success(re);
+        return restResponse;
     }
 
 }
