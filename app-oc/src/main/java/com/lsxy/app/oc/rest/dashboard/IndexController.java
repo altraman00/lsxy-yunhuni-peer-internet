@@ -9,6 +9,7 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -49,6 +50,8 @@ public class IndexController {
     @Autowired
     private ConsumeMonthService consumeMonthService;
 
+
+    @ApiOperation(value = "租户数据")
     @RequestMapping(value = "/member/indicant",method = RequestMethod.GET)
     public RestResponse member(){
         MemberIndicantVO dto = new MemberIndicantVO();
@@ -71,6 +74,7 @@ public class IndexController {
     }
 
 
+    @ApiOperation(value = "应用数据，应用总数，在线应用数")
     @RequestMapping(value = "/app/indicant",method = RequestMethod.GET)
     public RestResponse app(){
         ApplicationIndicantVO dto = new ApplicationIndicantVO();
@@ -79,6 +83,7 @@ public class IndexController {
         return RestResponse.success(dto);
     }
 
+    @ApiOperation(value = "租户，应用，按日/月统计")
     @RequestMapping(value = "/statistic",method = RequestMethod.GET)
     public RestResponse memberStatistic(
             @RequestParam(value = "year") Integer year,
@@ -235,6 +240,7 @@ public class IndexController {
      * 话务量指标
      * @return
      */
+    @ApiOperation(value = "话务量数据")
     @RequestMapping(value = "/duration/indicant",method = RequestMethod.GET)
     public RestResponse durationIndicant(){
         DurationIndicantVO dto = new DurationIndicantVO();
@@ -300,6 +306,7 @@ public class IndexController {
      * 消费额指标
      * @return
      */
+    @ApiOperation(value = "消费额数据，指标")
     @RequestMapping(value = "/comsume/indicant",method = RequestMethod.GET)
     public RestResponse comsumeIndicant(){
         ConsumeIndicantVO dto = new ConsumeIndicantVO();
@@ -361,6 +368,13 @@ public class IndexController {
         return consumeMonthService.getAmongAmountByDate(p_month_date);
     }
 
+    /**
+     * 消费额  和话务量  某月所有天的统计
+     * @param year
+     * @param month
+     * @return
+     */
+    @ApiOperation(value = "消费额  和话务量  某月所有天的统计")
     @RequestMapping(value = "/consumeAnduration/statistic",method = RequestMethod.GET)
     public RestResponse consumeAndurationStatistic(
             @RequestParam(value = "year") Integer year,
@@ -444,6 +458,7 @@ public class IndexController {
      * 活跃会员排名
      * @return
      */
+    @ApiOperation(value = "活跃会员（租户）排名")
     @RequestMapping(value = "/member/top",method = RequestMethod.GET)
     public RestResponse memberTop(@RequestParam Integer top){
         MemberTopVO dto = new MemberTopVO();
