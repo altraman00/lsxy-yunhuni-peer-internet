@@ -83,6 +83,15 @@ public class NettyClient extends AbstractClient{
                 f.channel().attr(SESSION_ID).set(session.getId());
                 this.doConnect(session);
             }
+            f.channel().closeFuture().addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if(logger.isDebugEnabled()){
+                        logger.debug("客户端连接断开啦。。。。。注意注意!1!!!!!!");
+                    }
+
+                }
+            });
             // Wait until the connection is closed.
 //            f.channel().closeFuture().sync();
         }catch(Exception ex){

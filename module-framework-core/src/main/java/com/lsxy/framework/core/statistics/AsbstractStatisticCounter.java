@@ -24,7 +24,7 @@ public abstract class AsbstractStatisticCounter {
      */
     public void reset(){
         if(logger.isDebugEnabled()){
-            logger.debug("重置所有计数器");
+            logger.debug("重置所有["+getStatisticName()+"]计数器");
         }
         List<Field> fields =  BeanUtils.getFieldsByType(this, AtomicInteger.class);
         for (Field field:fields) {
@@ -37,7 +37,6 @@ public abstract class AsbstractStatisticCounter {
             }
         }
     }
-
 
     /**
      * 输出日志
