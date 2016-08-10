@@ -33,6 +33,14 @@ public class StasticsCounter {
 
     //收到INCOMING事件次数
     private AtomicInteger receivedCTIIncomingEventCount = new AtomicInteger(0);
+    //收到释放事件次数
+    private AtomicInteger receivedCTIReleaseEventCount= new AtomicInteger(0);
+    //收到拨号失败事件
+    private AtomicInteger receivedCTIDialFailedEventCount= new AtomicInteger(0);
+    //收到拨号超时事件
+    private AtomicInteger receivedCTIDialTimeOutEventCount= new AtomicInteger(0);
+    //收到拨号完成事件次数
+    private AtomicInteger receivedCTIDialCompleteEventCount= new AtomicInteger(0);
 
     public AtomicInteger getReceivedCTIIncomingEventCount() {
         return receivedCTIIncomingEventCount;
@@ -74,6 +82,11 @@ public class StasticsCounter {
             logger.debug("收到应答指令次数:{}",this.receivedCTIAnswerCount.get());
             logger.debug("收到挂机指令次数:{}",this.receivedCTIDropCount.get());
             logger.debug("收到INCOMING事件次数:{}",this.receivedCTIIncomingEventCount.get());
+            logger.debug("收到拨号完成事件次数:{}",this.receivedCTIDialCompleteEventCount.get());
+            logger.debug("收到拨号超时事件:{}",this.receivedCTIDialTimeOutEventCount.get());
+            logger.debug("收到拨号失败事件:{}",this.receivedCTIDialFailedEventCount.get());
+            logger.debug("收到释放事件次数:{}",this.receivedCTIReleaseEventCount.get());
+
             logger.debug("=============================\r\n\r\n");
         }
     }
@@ -89,5 +102,21 @@ public class StasticsCounter {
         receivedCTIAnswerCount.set(0);
         receivedCTIDropCount.set(0);
         receivedCTIIncomingEventCount.set(0);
+    }
+
+    public AtomicInteger getReceivedCTIDialCompleteEventCount() {
+        return receivedCTIDialCompleteEventCount;
+    }
+
+    public AtomicInteger getReceivedCTIReleaseEventCount() {
+        return receivedCTIReleaseEventCount;
+    }
+
+    public AtomicInteger getReceivedCTIDialTimeOutEventCount() {
+        return receivedCTIDialTimeOutEventCount;
+    }
+
+    public AtomicInteger getReceivedCTIDialFailedEventCount() {
+        return receivedCTIDialFailedEventCount;
     }
 }

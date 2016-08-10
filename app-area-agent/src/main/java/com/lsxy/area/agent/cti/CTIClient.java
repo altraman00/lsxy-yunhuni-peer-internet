@@ -86,6 +86,20 @@ public class CTIClient implements RpcEventListener{
             sc.getReceivedCTIIncomingEventCount().incrementAndGet();
         }
 
+        if(rpcRequest.getMethod().equals("sys.call.on_dial_completed")){
+            sc.getReceivedCTIDialCompleteEventCount().incrementAndGet();
+        }
+        if(rpcRequest.getMethod().equals("sys.call.on_released")){
+            sc.getReceivedCTIReleaseEventCount().incrementAndGet();
+        }
+        if(rpcRequest.getParams().get("error").equals("dial timeout")){
+            sc.getReceivedCTIDialTimeOutEventCount().incrementAndGet();
+        }
+        if(rpcRequest.getParams().get("error").equals("dial failed")){
+            sc.getReceivedCTIDialFailedEventCount().incrementAndGet();
+        }
+
+
         rpcRequest.getParams().put("method",rpcRequest.getMethod());
         //收到事件,向中心报告所有事件
         RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
