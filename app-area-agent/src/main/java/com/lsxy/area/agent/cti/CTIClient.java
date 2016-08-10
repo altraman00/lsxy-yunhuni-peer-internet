@@ -33,7 +33,7 @@ public class CTIClient implements RpcEventListener{
     private static final Logger logger = LoggerFactory.getLogger(CTIClient.class);
 
 
-    @Autowired
+    @Autowired(required = false)
     private StasticsCounter sc;
 
     @Value("${area.agent.client.cti.unitid}")
@@ -82,23 +82,24 @@ public class CTIClient implements RpcEventListener{
         if(logger.isDebugEnabled()){
             logger.debug("收到事件通知:{}-{}",rpcRequest.getMethod(),rpcRequest.getParams());
         }
-        if(rpcRequest.getMethod().equals("sys.call.on_incoming")){
-            sc.getReceivedCTIIncomingEventCount().incrementAndGet();
-        }
+        if(sc != null) {
+            if (rpcRequest.getMethod().equals("sys.call.on_incoming")) {
+                sc.getReceivedCTIIncomingEventCount().incrementAndGet();
+            }
 
-        if(rpcRequest.getMethod().equals("sys.call.on_dial_completed")){
-            sc.getReceivedCTIDialCompleteEventCount().incrementAndGet();
+            if (rpcRequest.getMethod().equals("sys.call.on_dial_completed")) {
+                sc.getReceivedCTIDialCompleteEventCount().incrementAndGet();
+            }
+            if (rpcRequest.getMethod().equals("sys.call.on_released")) {
+                sc.getReceivedCTIReleaseEventCount().incrementAndGet();
+            }
+            if (null != rpcRequest.getParams().get("error") && rpcRequest.getParams().get("error").equals("dial timeout")) {
+                sc.getReceivedCTIDialTimeOutEventCount().incrementAndGet();
+            }
+            if (null != rpcRequest.getParams().get("error") && rpcRequest.getParams().get("error").equals("dial failed")) {
+                sc.getReceivedCTIDialFailedEventCount().incrementAndGet();
+            }
         }
-        if(rpcRequest.getMethod().equals("sys.call.on_released")){
-            sc.getReceivedCTIReleaseEventCount().incrementAndGet();
-        }
-        if(null != rpcRequest.getParams().get("error") && rpcRequest.getParams().get("error").equals("dial timeout")){
-            sc.getReceivedCTIDialTimeOutEventCount().incrementAndGet();
-        }
-        if(null != rpcRequest.getParams().get("error") && rpcRequest.getParams().get("error").equals("dial failed")){
-            sc.getReceivedCTIDialFailedEventCount().incrementAndGet();
-        }
-
         rpcRequest.getParams().put("method",rpcRequest.getMethod());
         //收到事件,向中心报告所有事件
         RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
@@ -106,7 +107,7 @@ public class CTIClient implements RpcEventListener{
         try {
             assert rpcCaller!=null;
             /*发送区域管理器请求次数计数*/
-            sc.getSendAreaServerRequestCount().incrementAndGet();
+            if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
 
             rpcCaller.invoke(session,areaRPCRequest);
         } catch (Exception e) {

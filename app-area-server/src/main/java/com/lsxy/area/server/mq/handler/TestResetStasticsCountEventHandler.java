@@ -1,7 +1,8 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.lsxy.area.server.StasticsCounter;
-import com.lsxy.framework.mq.TestResetStasticsAccountEvent;
+import com.lsxy.framework.mq.MQStasticCounter;
+import com.lsxy.framework.mq.events.apigw.test.TestResetStasticsCountEvent;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -22,12 +23,15 @@ import java.util.Collection;
  */
 @Component
 @Profile(value={"local","development"})
-public class TestResetStasticsCountEventHandler implements MQMessageHandler<TestResetStasticsAccountEvent>  {
+public class TestResetStasticsCountEventHandler implements MQMessageHandler<TestResetStasticsCountEvent>  {
 
     private static final Logger logger = LoggerFactory.getLogger(TestResetStasticsCountEventHandler.class);
 
-    @Autowired
+    @Autowired(required = false)
     private StasticsCounter sc;
+
+    @Autowired(required = false)
+    private MQStasticCounter mqsc;
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -36,11 +40,12 @@ public class TestResetStasticsCountEventHandler implements MQMessageHandler<Test
     private ServerSessionContext sessionContext;
 
     @Override
-    public void handleMessage(TestResetStasticsAccountEvent message) throws JMSException {
+    public void handleMessage(TestResetStasticsCountEvent message) throws JMSException {
         if(logger.isDebugEnabled()){
             logger.debug("重置统计数据");
         }
-        sc.reset();
+        if(sc!=null) sc.reset();
+        if(mqsc != null) mqsc.reset();;
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_STASTICS_RESET,"");
         Collection<Session> sessions = sessionContext.sessions();
         for (Session session:sessions) {

@@ -111,7 +111,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         }
 
 
-        RestResponse<String> response = RestRequest.buildRequest().post("http://www.yunhuni.cn:3000/incoming",request.getParamMap());
+        RestResponse<String> response = RestRequest.buildRequest().post("http://101.200.73.13:3000/incoming",request.getParamMap());
         if(logger.isDebugEnabled()){
             logger.debug("请求用户接口获取接下来的动作:{}" , response.getData());
         }

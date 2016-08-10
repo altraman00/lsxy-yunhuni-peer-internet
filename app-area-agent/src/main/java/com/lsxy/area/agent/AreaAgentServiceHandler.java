@@ -34,7 +34,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
     @Autowired
     private CTIClientContext cticlientContext;
 
-    @Autowired
+    @Autowired(required = false)
     private StasticsCounter sc;
 
     @Override
@@ -76,7 +76,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         if(logger.isDebugEnabled()){
             logger.debug("重置计数器");
         }
-        sc.reset();
+        if(sc!=null) sc.reset();
         return null;
     }
 
@@ -90,7 +90,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         Map<String, Object> params = new HashMap<>();
         if(method.equals("sys.call.answer")){
             /*收到应答指令次数计数*/
-            sc.getReceivedCTIAnswerCount().incrementAndGet();
+            if(sc!=null) sc.getReceivedCTIAnswerCount().incrementAndGet();
 
             params.put("max_answer_seconds",RandomUtils.nextInt(10,60));
             if(logger.isDebugEnabled()){
@@ -98,7 +98,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             }
         }else if(method.equals("sys.call.drop")){
             /*收到挂机指令次数计数*/
-            sc.getReceivedCTIDropCount().incrementAndGet();
+            if(sc!=null) sc.getReceivedCTIDropCount().incrementAndGet();
 
             params.put("cause",603);
             if(logger.isDebugEnabled()){
@@ -113,7 +113,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             cticlient.operateResource(0,1,resId,method,params,null);
 
             /*发送请求给CTI次数计数*/
-            sc.getSendCTIRequestCount().incrementAndGet();
+            if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
             e.printStackTrace();
@@ -157,7 +157,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             cticlient.createResource(0, 0, "sys.call", params, null);
 
             /*给CTI发送请求计数*/
-            sc.getSendCTIRequestCount().incrementAndGet();
+            if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
 
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {

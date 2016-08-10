@@ -1,5 +1,6 @@
 package com.lsxy.framework.mq.actmq;
 
+import com.lsxy.framework.mq.MQStasticCounter;
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQMessageHandler;
@@ -40,6 +41,9 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
     private MessageHandlerExcutorTask messageHandlerExcutorTask;
     @Autowired
     private ConnectionFactory connectionFactory;
+
+    @Autowired(required = false)
+    private MQStasticCounter sc;
 
 
 
@@ -86,6 +90,8 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
 
     @Override
     public void onMessage(Message message) {
+        /*统计收到消息次数*/
+        if(null != sc) sc.getReceivedMQCount().incrementAndGet();
 
         if (logger.isDebugEnabled()){
             logger.debug("收到消息[原始]："+ message);

@@ -1,7 +1,6 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.lsxy.area.server.StasticsCounter;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.api.MQService;
@@ -10,10 +9,8 @@ import com.lsxy.framework.mq.events.apigw.APIGatewayResponseEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.server.RemoteServer;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +26,7 @@ import javax.jms.JMSException;
 public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewayRequestEvent> {
     private static final Logger logger = LoggerFactory.getLogger(APIGatewayRequestEventHandler.class);
 
-    @Autowired
-    private RemoteServer remoteServer;
-
-    @Autowired
+    @Autowired(required = false)
     private StasticsCounter cs;
 
     @Autowired
@@ -48,7 +42,7 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
     public void handleMessage(APIGatewayRequestEvent message) throws JMSException {
 
         /*请求计数器*/
-        cs.getReceivedGWRequestCount().incrementAndGet();
+        if(cs!=null) cs.getReceivedGWRequestCount().incrementAndGet();
 
         if(logger.isDebugEnabled()) {
             logger.debug("处理APIGW请求:" + message);
@@ -79,7 +73,7 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
                     }
 
                     /*发送给区域的请求次数计数*/
-                    cs.getSendAreaNodeRequestCount().incrementAndGet();
+                    if(cs!=null) cs.getSendAreaNodeRequestCount().incrementAndGet();
 
                     rpcCaller.invoke(session,rpcrequest);
                     evt.setSuccess(true);
@@ -92,9 +86,6 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
                     logger.debug("没有处理网关请求:{}",message);
                 }
             }
-
-
-
         }else{
             logger.error("没有找到合适的区域代理处理该请求:{}",message);
 
@@ -103,7 +94,7 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
         }
 
         /*给API网关的响应计数*/
-        cs.getSendGWResponseCount().incrementAndGet();
+        if(cs!=null) cs.getSendGWResponseCount().incrementAndGet();
         mqService.publish(evt);
     }
 }

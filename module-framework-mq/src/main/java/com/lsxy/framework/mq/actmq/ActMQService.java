@@ -1,5 +1,6 @@
 package com.lsxy.framework.mq.actmq;
 
+import com.lsxy.framework.mq.MQStasticCounter;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.AbstractMQService;
 import com.lsxy.framework.mq.api.MQEvent;
@@ -25,8 +26,13 @@ public class ActMQService extends AbstractMQService {
     @Autowired
     private JmsTemplate jmsTemplate;
 
+    @Autowired(required = false)
+    private MQStasticCounter sc;
+
     @Override
     protected void publishEvent(AbstractMQEvent event) {
+
+
         if(jmsTemplate != null){
             if(event instanceof AbstractMQEvent){
                 if (logger.isDebugEnabled()){
@@ -35,6 +41,8 @@ public class ActMQService extends AbstractMQService {
                 }
                 Destination dest = new ActiveMQTopic(event.getTopicName());
                 jmsTemplate.send(dest,(AbstractMQEvent)event);
+                /*发送消息计数统计*/
+                if(null != sc) sc.getSendMQCount().incrementAndGet();
             }
         }
     }

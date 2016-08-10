@@ -17,7 +17,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @ComponentScan
 @Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class})
-@EnableScheduling
 public class AreaServerMainClass extends AbstractSpringBootStarter{
 
     @Override
