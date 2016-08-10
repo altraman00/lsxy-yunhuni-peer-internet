@@ -31,19 +31,17 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    public List<App> findAppByUserName(String userName){
-        Tenant tenant = tenantService.findTenantByUserName(userName);
+    public List<App> findAppByUserName(String tenantId){
         String hql = "from App obj where obj.tenant.id=?1 order by obj.status";
-        List<App> list = this.findByCustomWithParams(hql, tenant.getId());
+        List<App> list = this.findByCustomWithParams(hql, tenantId);
 
         return list;
     }
 
     @Override
-    public Page<App> pageList(String userName, Integer pageNo, Integer pageSize) {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
+    public Page<App> pageList(String tenantId, Integer pageNo, Integer pageSize) {
         String hql = "from App obj where obj.tenant.id=?1 ";
-        Page<App> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
+        Page<App> page =  this.pageList(hql,pageNo,pageSize,tenantId);
         return page;
     }
 
