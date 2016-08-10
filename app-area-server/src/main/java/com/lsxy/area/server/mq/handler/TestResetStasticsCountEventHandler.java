@@ -1,15 +1,13 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.lsxy.area.server.StasticsCounter;
+import com.lsxy.framework.mq.TestResetStasticsAccountEvent;
 import com.lsxy.framework.mq.api.MQMessageHandler;
-import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RequestWriteException;
-import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ import java.util.Collection;
  */
 @Component
 @Profile(value={"local","development"})
-public class TestResetStasticsCountEventHandler implements MQMessageHandler<APIGatewayRequestEvent>  {
+public class TestResetStasticsCountEventHandler implements MQMessageHandler<TestResetStasticsAccountEvent>  {
 
     private static final Logger logger = LoggerFactory.getLogger(TestResetStasticsCountEventHandler.class);
 
@@ -38,7 +36,7 @@ public class TestResetStasticsCountEventHandler implements MQMessageHandler<APIG
     private ServerSessionContext sessionContext;
 
     @Override
-    public void handleMessage(APIGatewayRequestEvent message) throws JMSException {
+    public void handleMessage(TestResetStasticsAccountEvent message) throws JMSException {
         if(logger.isDebugEnabled()){
             logger.debug("重置统计数据");
         }
