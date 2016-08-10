@@ -29,9 +29,6 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
     @Autowired
     private RPCCaller rpcCaller;
 
-    @Autowired
-    private ServerSessionContext sessionContext;
-
     @Override
     public RPCResponse handleService(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){
@@ -83,6 +80,8 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
                 }
 
                 if(sendRequest!=null){
+                      /*发送给区域的请求次数计数*/
+                    if(sc!=null) sc.getSendAreaNodeRequestCount().incrementAndGet();
                     rpcCaller.invoke(session,sendRequest);
                 }
 
@@ -105,7 +104,6 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
     private RPCRequest randomRequest(RPCRequest request) {
         if(logger.isDebugEnabled()){
 //            RestRequest restRequest = RestRequest.buildRequest();
-//
 //            restRequest.post(url,request.getParamMap())
             logger.debug("请求远程接口参数:{}",request.getParamMap());
         }
