@@ -809,13 +809,19 @@ public class DateUtils {
         return Arrays.copyOfRange(lDate,0,index);
     }
 
+    public static Date newDate(int y,int m, int d){
+        Calendar cal = Calendar.getInstance();
+        cal.set(y,m-1,d);
+        return cal.getTime();
+    }
+
     public static void main(String args[]) {
     	//System.out.println(getMonthLastTime(new Date()));
         /*Date[] ds = getDatesBetween(new Date(2016-1900,7-1,9),new Date());
         for (int i =0;i<ds.length;i++){
             System.out.println(getTime(ds[i],"yyyy-MM-dd"));
         }*/
-
+        System.out.println(getTime(newDate(2016,6,1),"yyyy-MM-dd"));
         System.out.println(getTime(getPrevMonth(new Date()),"yyyy-MM-dd"));
         System.out.println(getTime(getPrevWeek(new Date()),"yyyy-MM-dd"));
     }

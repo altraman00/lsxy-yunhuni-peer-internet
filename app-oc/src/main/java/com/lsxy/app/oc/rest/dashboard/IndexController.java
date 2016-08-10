@@ -101,7 +101,7 @@ public class IndexController {
     private List<Integer> perDayOfMonthMemberStatistic(int year,int month){
         List<Integer> results = new ArrayList<Integer>();
         //先计算出某个月的所有天的开始和结束时间
-        Date cdate = new Date(year-1900,month-1,1);
+        Date cdate = DateUtils.newDate(year,month,1);
         Date d1=DateUtils.getFirstTimeOfMonth(cdate);
         Date d2 =DateUtils.getLastTimeOfMonth(cdate);
         Date[] ds = DateUtils.getDatesBetween(d1,d2);
@@ -140,8 +140,8 @@ public class IndexController {
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
         List<Future<Integer>> fs = new ArrayList<Future<Integer>>();
         //先计算出某年所有月的开始和结束时间
-        for (int month =0;month<month_length;month++){
-            Date month_start = new Date(year-1900,month,1);
+        for (int month =1;month<=month_length;month++){
+            Date month_start = DateUtils.newDate(year,month,1);
             fs.add(pool.submit(new Callable<Integer>() {
                 @Override
                 public Integer call(){
@@ -169,7 +169,7 @@ public class IndexController {
     private List<Integer> perDayOfMonthAppStatistic(int year, int month){
         List<Integer> results = new ArrayList<Integer>();
         //先计算出某个月的所有天的开始和结束时间
-        Date cdate = new Date(year-1900,month-1,1);
+        Date cdate = DateUtils.newDate(year,month,1);
         Date d1=DateUtils.getFirstTimeOfMonth(cdate);
         Date d2 =DateUtils.getLastTimeOfMonth(cdate);
         Date[] ds = DateUtils.getDatesBetween(d1,d2);
@@ -208,8 +208,8 @@ public class IndexController {
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
         List<Future<Integer>> fs = new ArrayList<Future<Integer>>();
         //先计算出某年所有月的开始和结束时间
-        for (int month =0;month<month_length;month++){
-            Date month_start = new Date(year-1900,month,1);
+        for (int month =1;month<=month_length;month++){
+            Date month_start = DateUtils.newDate(year,month,1);
             fs.add(pool.submit(new Callable<Integer>() {
                 @Override
                 public Integer call(){
@@ -359,5 +359,84 @@ public class IndexController {
         Date toDay = new Date();
         Date p_month_date = DateUtils.getPrevMonth(toDay);
         return consumeMonthService.getAmongAmountByDate(p_month_date);
+    }
+
+    @RequestMapping(value = "/consumeAnduration/statistic",method = RequestMethod.GET)
+    public RestResponse consumeAndurationStatistic(
+            @RequestParam(value = "year") Integer year,
+            @RequestParam(value = "month") Integer month){
+        ConsumeAndurationStatisticVO dto = new ConsumeAndurationStatisticVO();
+        dto.setSession(perDayOfMonthDurationStatistic(year,month));
+        dto.setCost(perDayOfMonthConsumeStatistic(year,month));
+        return RestResponse.success(dto);
+    }
+
+    /**
+     * 统计某个月的每天的话务量
+     * @return
+     */
+    private List<Long> perDayOfMonthDurationStatistic(int year,int month){
+        List<Long> results = new ArrayList<Long>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Long>> fs = new ArrayList<Future<Long>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Long>() {
+                    @Override
+                    public Long call(){
+                        //转换成分钟
+                        return (long)Math.round(voiceCdrDayService.getAmongDurationByDate(d)/60);
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Long> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
+    }
+
+    /**
+     * 统计某个月的每天的消费额
+     * @return
+     */
+    private List<Double> perDayOfMonthConsumeStatistic(int year,int month){
+        List<Double> results = new ArrayList<Double>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Double>> fs = new ArrayList<Future<Double>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Double>() {
+                    @Override
+                    public Double call(){
+                        return consumeDayService.getAmongAmountByDate(d).doubleValue();
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Double> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
     }
 }
