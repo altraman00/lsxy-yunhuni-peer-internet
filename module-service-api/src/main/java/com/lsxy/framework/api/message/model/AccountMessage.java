@@ -12,6 +12,9 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_account_message")
 public class AccountMessage extends IdEntity {
+    public  static final Integer READ = 1;
+    public static final Integer DELETE = -1;
+    public static final Integer NOT = 0;
     private Message message;//对于消息
     private Account account;//所属用户
     private Integer status;//消息状态 '0未处理;1已读;-1已删除'
