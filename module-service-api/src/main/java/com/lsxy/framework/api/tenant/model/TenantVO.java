@@ -138,7 +138,10 @@ public class TenantVO implements Serializable {
         this.totalCoin = totalCoin;
     }
 
-    public Long getSessionCount() {
+    public Long getSessionCount() {//秒转换成分钟
+        if(sessionCount !=null){
+            return (long)Math.round(sessionCount/60);
+        }
         return sessionCount;
     }
 
@@ -146,7 +149,10 @@ public class TenantVO implements Serializable {
         this.sessionCount = sessionCount;
     }
 
-    public Long getSessionTime() {
+    public Long getSessionTime() {//秒转换成分钟
+        if(sessionTime !=null){
+            return (long)Math.round(sessionTime/60);
+        }
         return sessionTime;
     }
 
