@@ -37,6 +37,16 @@ public class Tenant extends IdEntity {
 
 	private String registerUserId; //注册的账号ID
 
+	private String tenantName;//租户名称
+	@Column(name = "tenant_name")
+	public String getTenantName() {
+		return tenantName;
+	}
+
+	public void setTenantName(String tenantName) {
+		this.tenantName = tenantName;
+	}
+
 	@Column(name = "is_real_auth")
 	public Integer getIsRealAuth() {
 		return isRealAuth;
