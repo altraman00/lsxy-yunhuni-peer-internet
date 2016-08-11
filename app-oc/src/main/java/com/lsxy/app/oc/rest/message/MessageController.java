@@ -31,7 +31,7 @@ public class MessageController extends AbstractRestController {
 
     /**
      *  根据日期和类型查询消息列表信息
-     * @param type 0用户消息 活动消息
+     * @param type 0用户消息 1活动消息
      * @param status 类型 0未上线 1上线 -1下线
      * @param startTime 开始时间 yyyy-MM-dd
      * @param endTime 结束时间
