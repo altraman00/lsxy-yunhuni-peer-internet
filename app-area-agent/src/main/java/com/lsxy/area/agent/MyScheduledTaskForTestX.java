@@ -55,7 +55,7 @@ public class MyScheduledTaskForTestX implements Runnable{
     @PostConstruct
     public void doTest() throws InterruptedException {
         logger.info("启动测试进程");
-        for(int i=0;i<300;i++){
+        for(int i=0;i<200;i++){
             Thread t = new Thread(this);
             t.start();
         }
