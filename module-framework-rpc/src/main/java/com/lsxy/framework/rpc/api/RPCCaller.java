@@ -214,7 +214,7 @@ public class RPCCaller {
 			Object tmp = responseMap.get(sessionid);
 			if (tmp != null) { 
 				response = (RPCResponse) tmp;
-				logger.debug("收到结果【"+sessionid+"】");
+				logger.debug("收到结果【"+sessionid+"】"+response);
 				break;
 			}
 			try {
