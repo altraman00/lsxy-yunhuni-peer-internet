@@ -3,12 +3,15 @@ package com.lsxy.framework.rpc.api;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
 import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -27,14 +30,23 @@ public class RPCCaller {
 	private Map<String,RPCRequest> requestMap = new HashMap<String,RPCRequest>();
 	private Map<String,RPCResponse> responseMap = new HashMap<String, RPCResponse>();
 
-	private Log logger = LogFactory.getLog(RPCCaller.class);
-
+private static final Logger logger = LoggerFactory.getLogger(RPCCaller.class);
 	public void putResponse(RPCResponse response){
 		logger.debug("putResponse:收到响应【"+response.getSessionid()+"】");
 		responseMap.put(response.getSessionid(), response);
 		logger.debug("responseMap size:"+responseMap.size());
 		logger.debug("this is :"+this);
 	}
+
+	/**
+	 * 根据sessionid找到对应的请求对象
+	 * @param sessionid
+	 * @return
+     */
+	public RPCRequest getRequest(String sessionid) {
+		return this.requestMap.get(sessionid);
+	}
+
 
 	/**
 	 * 
@@ -66,7 +78,6 @@ public class RPCCaller {
 					logger.debug("REQUEST TIME OUT["+request.getSessionid()+"]");
 					break;
 				}
-					
 			}
 			synchronized (this) {
 				this.notify();
@@ -188,13 +199,34 @@ public class RPCCaller {
 	 */
 	@SuppressWarnings("static-access")
 	public RPCResponse invokeWithReturn(Session session, RPCRequest request)
-			throws InterruptedException, RequestTimeOutException, SessionWriteException {
-		RPCResponse response = null;
+			throws InterruptedException, RequestTimeOutException, SessionWriteException, HaveNoExpectedRPCResponseException {
 		String sessionid = UUIDGenerator.uuid();
 		request.setSessionid(sessionid);
 		requestMap.put(request.getSessionid(), request);
 		logger.debug(">>"+request);
 		session.write(request);
+
+		synchronized (request){
+			long startWait = System.currentTimeMillis();
+			request.wait(60000);
+			if(System.currentTimeMillis() - startWait >= 60000){
+				throw new RequestTimeOutException(request);
+			}
+		}
+		if(logger.isDebugEnabled()){
+		    logger.debug("请求醒了:{}",request);
+		}
+		RPCResponse response = responseMap.get(sessionid);
+		if(response == null){
+			throw new HaveNoExpectedRPCResponseException(request);
+		}
+		responseMap.remove(request.getSessionid());
+		requestMap.remove(request.getSessionid());
+		return response;
+	}
+
+
+
 //		CallThread ct = new CallThread(this,request);
 //		ct.start();
 //		synchronized (ct) {
@@ -205,32 +237,32 @@ public class RPCCaller {
 //				throw new RequestTimeOutException();
 //			}
 //		}
-		long currentTime = 0;
-		long s = System.currentTimeMillis();
-		long timeout = Long.parseLong(SystemConfig.getProperty("global.rpc.request..timeout","10"));	//60s超时
-		while (true) {
-			logger.debug("监听结果【"+sessionid+"】"+responseMap.keySet().size());
-			logger.debug("responseMap size:"+responseMap.size());
-			Object tmp = responseMap.get(sessionid);
-			if (tmp != null) { 
-				response = (RPCResponse) tmp;
-				logger.debug("收到结果【"+sessionid+"】"+response);
-				break;
-			}
-			try {
-				Thread.currentThread().sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			long e = System.currentTimeMillis();
-			currentTime = ((e - s)/1000);
-			if(currentTime>timeout){
-				logger.debug("REQUEST TIME OUT["+request.getSessionid()+"]");
-				break;
-			}
-		}
-		responseMap.remove(request.getSessionid());
-		requestMap.remove(request.getSessionid());
-		return response;
-	}
+//		long currentTime = 0;
+//		long s = System.currentTimeMillis();
+//		long timeout = Long.parseLong(SystemConfig.getProperty("global.rpc.request..timeout","10"));	//60s超时
+//		while (true) {
+//			logger.debug("监听结果【"+sessionid+"】"+responseMap.keySet().size());
+//			logger.debug("responseMap size:"+responseMap.size());
+//			Object tmp = responseMap.get(sessionid);
+//			if (tmp != null) {
+//				response = (RPCResponse) tmp;
+//				logger.debug("收到结果【"+sessionid+"】"+response);
+//				break;
+//			}
+//			try {
+//				Thread.currentThread().sleep(1000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//			long e = System.currentTimeMillis();
+//			currentTime = ((e - s)/1000);
+//			if(currentTime>timeout){
+//				logger.debug("REQUEST TIME OUT["+request.getSessionid()+"]");
+//				break;
+//			}
+//		}
+//		responseMap.remove(request.getSessionid());
+//		requestMap.remove(request.getSessionid());
+//		return response;
+//	}
 }

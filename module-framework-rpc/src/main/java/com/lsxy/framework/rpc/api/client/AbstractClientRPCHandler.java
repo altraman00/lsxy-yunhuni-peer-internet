@@ -77,7 +77,18 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
             if(logger.isDebugEnabled()){
                 logger.debug(">>[NM]"+response);
             }
-            rpcCaller.putResponse((RPCResponse) message);
+            rpcCaller.putResponse(response);
+            RPCRequest request = rpcCaller.getRequest(response.getSessionid());
+            if(request != null){
+                if(logger.isDebugEnabled()){
+                    logger.debug("通知请求对象该醒了:{}",request);
+                }
+                synchronized (request){
+                    request.notify();
+                }
+            }else{
+                logger.error("收到一个匹配不到请求对象的响应对象:{}",response);
+            }
         }else{
 //            ....
         }
