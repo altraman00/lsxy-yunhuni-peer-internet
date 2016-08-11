@@ -77,9 +77,10 @@ public class MyScheduledTaskForTestX implements Runnable{
             }
         }
 
-        RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,"param01=001");
+
         while(true){
             try {
+                RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,"param01=001");
                 RPCResponse response = rpcCaller.invokeWithReturn(session,request);
                 long currentTime = System.currentTimeMillis();
                 logger.info("收到响应[{}],花费:{}ms   [{}]  vs [{}]",response,currentTime-response.getTimestamp(),response.getTimestamp(),currentTime);
