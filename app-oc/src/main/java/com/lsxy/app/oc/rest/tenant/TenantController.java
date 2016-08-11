@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.tenant;
 
 import com.lsxy.framework.api.tenant.model.TenantVO;
+import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
@@ -24,6 +25,9 @@ public class TenantController {
 
     @Autowired
     private TenantService tenantService;
+
+    @Autowired
+    private AccountService accountService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -54,6 +58,6 @@ public class TenantController {
             @PathVariable String id,
             @ApiParam(name = "status",value = "账号状态，2正常/启用，1被锁定/禁用")
             @RequestParam Integer status){
-        return RestResponse.success(true);
+        return RestResponse.success(accountService.updateStatusByTenantId(id,status));
     }
 }

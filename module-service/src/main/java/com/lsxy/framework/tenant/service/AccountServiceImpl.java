@@ -247,7 +247,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
             a.setStatus(status);
             this.save(a);
         }
-        return false;
+        return true;
     }
 
     /**
