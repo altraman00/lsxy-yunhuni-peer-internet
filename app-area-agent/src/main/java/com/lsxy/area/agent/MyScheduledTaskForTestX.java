@@ -81,7 +81,8 @@ public class MyScheduledTaskForTestX implements Runnable{
         while(true){
             try {
                 RPCResponse response = rpcCaller.invokeWithReturn(session,request);
-                logger.info("收到响应[{}],花费:{}ms",response,System.currentTimeMillis()-response.getTimestamp());
+                long currentTime = System.currentTimeMillis();
+                logger.info("收到响应[{}],花费:{}ms   [{}]  vs [{}]",response,currentTime-response.getTimestamp(),response.getTimestamp(),currentTime);
                 TimeUnit.SECONDS.sleep(1);
             } catch (SessionWriteException e) {
                 e.printStackTrace();
