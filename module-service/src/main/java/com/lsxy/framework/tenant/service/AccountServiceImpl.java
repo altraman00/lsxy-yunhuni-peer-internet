@@ -26,6 +26,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -237,6 +238,16 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
         Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
         accountDao.cleanExpireRegisterAccount(Account.STATUS_EXPIRE,Account.STATUS_NOT_ACTIVE,limitTime);
+    }
+
+    @Override
+    public boolean updateStatusByTenantId(String tenanId,Integer status) {
+        List<Account> accs = accountDao.findByTenantId(tenanId);
+        for (Account a : accs) {
+            a.setStatus(status);
+            this.save(a);
+        }
+        return false;
     }
 
     /**
