@@ -13,9 +13,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
+ * oss文件操作
  * Created by zhangxb on 2016/8/11.
  */
 @RequestMapping("/ossfile")
