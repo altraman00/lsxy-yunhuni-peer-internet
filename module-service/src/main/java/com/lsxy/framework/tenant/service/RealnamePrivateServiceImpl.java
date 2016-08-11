@@ -70,10 +70,10 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
         String oneself = " (SELECT c.id,c.create_time,c.tenant_name,d.email,d.mobile, 1 as type FROM (SELECT a.id,a.create_time,a.tenant_id,b.tenant_name,b.reg_user_id from  db_lsxy_base.tb_base_realname_private  a LEFT JOIN tb_base_tenant b on a.tenant_id = b.id where a.deleted=0";
         if(authStatus==1){
             corp+= " and a.status='"+2+"' ";
-            oneself+= " where a.status='"+authStatus+"' ";
+            oneself+= " and a.status='"+authStatus+"' ";
         }else if(authStatus==-1){
             corp+= " and a.status='"+-2+"' ";
-            oneself+= " where a.status='"+authStatus+"' ";
+            oneself+= " and a.status='"+authStatus+"' ";
         }else{
             corp+= " and a.status='"+authStatus+"' ";
             oneself+= " and a.status='"+authStatus+"' ";
