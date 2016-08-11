@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
 import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
@@ -87,6 +88,8 @@ public class MyScheduledTaskForTestX implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (RequestTimeOutException e) {
+                e.printStackTrace();
+            } catch (HaveNoExpectedRPCResponseException e) {
                 e.printStackTrace();
             }
         }

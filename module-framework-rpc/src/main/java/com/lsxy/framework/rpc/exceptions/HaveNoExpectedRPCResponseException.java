@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by tandy on 16/8/11.
  */
-public class HaveNoExpectedRPCResponseException extends Throwable {
+public class HaveNoExpectedRPCResponseException extends Exception {
     private static final Logger logger = LoggerFactory.getLogger(HaveNoExpectedRPCResponseException.class);
     public HaveNoExpectedRPCResponseException(RPCRequest request) {
         logger.error("没有得到期待的请求返回值:"+request);
