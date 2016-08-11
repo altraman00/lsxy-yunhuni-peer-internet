@@ -62,6 +62,9 @@ public class TenantController {
     @Autowired
     private ConsumeDayService consumeDayService;
 
+    @Autowired
+    private ApiCallDayService apiCallDayService;
+
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(
@@ -244,6 +247,85 @@ public class TenantController {
             }
             pool.shutdown();
             for (Future<Double> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
+    }
+
+
+    @ApiOperation(value = "租户某月所有天的（会话量/次）统计")
+    @RequestMapping(value = "/tenants/{id}/session/statistic",method = RequestMethod.GET)
+    public RestResponse sessionStatistic(
+            @PathVariable String id,
+            @RequestParam(value = "year") Integer year,
+            @RequestParam(value = "month") Integer month){
+        return RestResponse.success(perDayOfMonthSessionCountStatistic(year,month,id));
+    }
+
+    private List<Long> perDayOfMonthSessionCountStatistic(int year,int month,String tenant){
+        List<Long> results = new ArrayList<Long>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Long>> fs = new ArrayList<Future<Long>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Long>() {
+                    @Override
+                    public Long call(){
+                        return voiceCdrDayService.getAmongCallByDateAndTenant(d,tenant);
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Long> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
+    }
+
+    @ApiOperation(value = "租户某月所有天的（api调用次数）统计")
+    @RequestMapping(value = "/tenants/{id}/api_invoke/statistic",method = RequestMethod.GET)
+    public RestResponse apiInvokeStatistic(
+            @PathVariable String id,
+            @RequestParam(value = "year") Integer year,
+            @RequestParam(value = "month") Integer month){
+        return RestResponse.success(perDayOfMonthApiInvokeStatistic(year,month,id));
+    }
+
+    private List<Long> perDayOfMonthApiInvokeStatistic(int year,int month,String tenant){
+        List<Long> results = new ArrayList<Long>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Long>> fs = new ArrayList<Future<Long>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Long>() {
+                    @Override
+                    public Long call(){
+                        return apiCallDayService.getInvokeCountByDateAndTenant(d,tenant);
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Long> future : fs) {
                 try {
                     results.add(future.get());
                 } catch (Throwable e) {

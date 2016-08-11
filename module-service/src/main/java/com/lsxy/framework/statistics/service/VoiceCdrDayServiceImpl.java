@@ -190,4 +190,20 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
         return sum;
     }
 
+    @Override
+    public long getAmongCallByDateAndTenant(Date d, String tenant) {
+        Date d1 = DateUtils.getFirstTimeOfDate(d);
+        Date d2 = DateUtils.getLastTimeOfDate(d);
+        String hql = "from VoiceCdrDay obj where "
+                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+        List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (VoiceCdrDay day : ds) {
+            if(day!=null && day.getAmongCall() !=null){
+                sum += day.getAmongCall();
+            }
+        }
+        return sum;
+    }
+
 }

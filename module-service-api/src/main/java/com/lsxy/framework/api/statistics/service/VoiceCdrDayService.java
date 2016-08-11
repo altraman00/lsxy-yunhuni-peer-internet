@@ -78,4 +78,11 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @return
      */
     public long getAmongDurationByDateAndTenant(Date d,String tenant);
+
+    /**
+     * 获取某个租户某天的通话次数(会话量)
+     * @param d
+     * @return
+     */
+    public long getAmongCallByDateAndTenant(Date d,String tenant);
 }
