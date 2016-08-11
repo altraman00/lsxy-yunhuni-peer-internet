@@ -1,18 +1,18 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.api.tenant.model.RealnameCorp;
-import com.lsxy.framework.api.tenant.model.RealnamePrivate;
-import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.tenant.dao.RealnameCorpDao;
 import com.lsxy.framework.tenant.dao.RealnamePrivateDao;
 import com.lsxy.framework.tenant.dao.TenantDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +21,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -208,5 +205,76 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         Date d1 = DateUtils.setStartDay(DateUtils.getFirstTimeOfMonth(today));
         Date d2 = DateUtils.setEndDay(DateUtils.getLastTimeOfMonth(today));
         return countConsumeTenantDateBetween(d1,d2);
+    }
+
+    @Override
+    public Page<TenantVO> pageListBySearch(String name,Date regDateStart, Date regDateEnd,
+                                           Integer authStatus, Integer accStatus, int pageNo, int pageSize) {
+        String sql =" FROM db_lsxy_base.tb_base_tenant t" +
+                " LEFT JOIN (SELECT b.tenant_id,b.`status` FROM db_lsxy_base.tb_base_account b GROUP BY b.tenant_id) a ON t.id = a.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app GROUP BY tenant_id) app ON t.id = app.tenant_id" +
+                " LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_billing billing ON t.id = billing.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,sum_amount FROM db_lsxy_base.tb_base_consume_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY dt DESC) consume ON t.id = consume.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,sum_call,sum_duration FROM db_lsxy_base.tb_base_voice_cdr_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY dt DESC) cdr ON t.id = cdr.tenant_id" +
+                " WHERE 1=1";
+        sql += " AND (a.`status` IN ("+Account.STATUS_NORMAL+","+Account.STATUS_LOCK+"))";
+        if(StringUtil.isNotEmpty(name)){
+           sql += " AND (t.tenant_name LIKE :name)";
+        }
+        if(regDateStart !=null){
+            sql += " AND (t.create_time >= :start)";
+        }
+        if(regDateEnd !=null){
+            sql += " AND (t.create_time <= :end)";
+        }
+        if(accStatus !=null){
+            sql += " AND (a.`status` = :accStatus)";
+        }
+        if(authStatus!=null){//认证状态
+            if(authStatus == 1){//已认证
+                sql += " AND (t.is_real_auth IN (:authStatus))";
+            }
+            if(authStatus == 0){
+                sql += " AND (t.is_real_auth NOT IN (:authStatus))";
+            }
+        }
+        String countSql = "SELECT COUNT(t.id) " + sql;
+        String pageSql = "SELECT t.id 'id',t.tenant_name 'name'," +
+                "t.create_time 'regDate',t.is_real_auth 'authStatus'," +
+                "a.`status` 'accountStatus',app.s 'appCount',billing.balance 'remainCoin'," +
+                "consume.sum_amount 'costCoin',recharge.amount 'totalCoin'," +
+                "cdr.sum_call 'sessionCount',cdr.sum_duration 'sessionTime'" + sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        Query pageQuery = em.createNativeQuery(pageSql,"tenantResult");
+        if(StringUtil.isNotEmpty(name)){
+            countQuery.setParameter("name","'%"+name+"%'");
+            pageQuery.setParameter("name","'%"+name+"%'");
+        }
+        if(regDateStart !=null){
+            countQuery.setParameter("start",regDateStart);
+            pageQuery.setParameter("start",regDateStart);
+        }
+        if(regDateEnd !=null){
+            countQuery.setParameter("end",regDateEnd);
+            pageQuery.setParameter("end",regDateEnd);
+        }
+        if(accStatus !=null){
+            countQuery.setParameter("accStatus",accStatus);
+            pageQuery.setParameter("accStatus",accStatus);
+        }
+        if(authStatus!=null){//认证状态
+            String as = StringUtils.join(Tenant.AUTH_STATUS,",");
+            countQuery.setParameter("authStatus",as);
+            pageQuery.setParameter("authStatus",as);
+        }
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        return new Page<>(start,total,pageSize,pageQuery.getResultList());
     }
 }

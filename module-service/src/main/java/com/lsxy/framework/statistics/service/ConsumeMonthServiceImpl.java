@@ -5,6 +5,7 @@ import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.statistics.dao.ConsumeMonthDao;
@@ -138,26 +139,6 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         });
     }
 
-    private BigDecimal getAmongAmountBetween(Date d1,Date d2){
-        String hql = "from ConsumeMonth obj where "
-                +StatisticsUtils.getSqlIsNull(null,null, null)+" obj.dt between ?1 and ?2";
-        List<ConsumeMonth> ds = this.findByCustomWithParams(hql,d1,d2);
-        BigDecimal sum = new BigDecimal(0);
-        for (ConsumeMonth day : ds) {
-            if(day!=null && day.getAmongAmount() !=null){
-                sum.add(day.getAmongAmount());
-            }
-        }
-        return sum;
-    }
-
-    @Override
-    public BigDecimal getAmongAmountByDate(Date d) {
-        Date d1 = DateUtils.getFirstTimeOfMonth(d);
-        Date d2 = DateUtils.getLastTimeOfMonth(d);
-        return getAmongAmountBetween(d1,d2);
-    }
-
     @Override
     public List<ConsumeMonth> getConsumeMonths(String tenantId, String appId, String month) {
         List<ConsumeMonth> consumeMonths = null;
@@ -172,5 +153,32 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         }
 
         return consumeMonths;
+    }
+
+    private BigDecimal getSumFieldBetween(Date d1,Date d2,String field,String tenantId,String appId,String type){
+        String hql = "from ConsumeMonth obj where "
+                +StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt between ?1 and ?2";
+        List<ConsumeMonth> ms = this.findByCustomWithParams(hql,d1,d2);
+        BigDecimal sum = new BigDecimal(0);
+        for (ConsumeMonth month : ms) {
+            if(month!=null && BeanUtils.getProperty2(month,field) !=null){
+                sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    public BigDecimal getAmongAmountByDate(Date d) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongAmount",null,null,null);
+    }
+
+    @Override
+    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongAmount",tenant,null,null);
     }
 }
