@@ -6,7 +6,6 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -219,6 +218,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                 " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum_call,sum_duration FROM db_lsxy_base.tb_base_voice_cdr_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY dt DESC) cdr ON t.id = cdr.tenant_id" +
                 " WHERE 1=1";
+        sql += " AND (a.`status` IN ("+Account.STATUS_NORMAL+","+Account.STATUS_LOCK+"))";
         if(StringUtil.isNotEmpty(name)){
            sql += " AND (t.tenant_name LIKE :name)";
         }
@@ -240,13 +240,13 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
             }
         }
         String countSql = "SELECT COUNT(t.id) " + sql;
-        String pageSql = "SELECT t.id 'id',t.tenant_name '会员名'," +
-                "t.create_time '注册时间',t.is_real_auth '认证状态'," +
-                "a.`status` '账户状态',app.s '应用数',billing.balance '余额'," +
-                "consume.sum_amount '消费额',recharge.amount '充值额'," +
-                "cdr.sum_call '会话量',cdr.sum_duration '话务量'" + sql;
+        String pageSql = "SELECT t.id 'id',t.tenant_name 'name'," +
+                "t.create_time 'regDate',t.is_real_auth 'authStatus'," +
+                "a.`status` 'accountStatus',app.s 'appCount',billing.balance 'remainCoin'," +
+                "consume.sum_amount 'costCoin',recharge.amount 'totalCoin'," +
+                "cdr.sum_call 'sessionCount',cdr.sum_duration 'sessionTime'" + sql;
         Query countQuery = em.createNativeQuery(countSql);
-        Query pageQuery = em.createNativeQuery(pageSql);
+        Query pageQuery = em.createNativeQuery(pageSql,"tenantResult");
         if(StringUtil.isNotEmpty(name)){
             countQuery.setParameter("name","'%"+name+"%'");
             pageQuery.setParameter("name","'%"+name+"%'");
@@ -273,27 +273,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         if(total == 0){
             return new Page<>(start,total,pageSize,null);
         }
-
         pageQuery.setMaxResults(pageSize);
         pageQuery.setFirstResult(start);
-        List<Object[]> results = pageQuery.getResultList();
-        List<TenantVO> tenants = new ArrayList<>(pageSize);
-        if(results!=null&&results.size()>0){
-            String[] fields= new String[]{"id","name","regDate",
-                    "authStatus","accountStatus","appCount","remainCoin",
-                    "costCoin","totalCoin","sessionCount","sessionTime"};
-            for (Object[] obj:results) {
-                TenantVO tenant = new TenantVO();
-                for (int i =0,len=fields.length;i<len;i++){
-                    try {
-                        BeanUtils.setProperty(tenant,fields[i],obj[i]);
-                    } catch (Throwable e) {
-                        throw new RuntimeException("sql results convert to tenantvo failure",e);
-                    }
-                }
-                tenants.add(tenant);
-            }
-        }
-        return new Page<>(start,total,pageSize,tenants);
+        return new Page<>(start,total,pageSize,pageQuery.getResultList());
     }
 }

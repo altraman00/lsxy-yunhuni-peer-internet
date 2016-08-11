@@ -13,14 +13,20 @@ import java.util.Date;
 @Entity()
 @SqlResultSetMapping(name="tenantResult",
 entities= {
-    @EntityResult(entityClass=TenantVO.class,
+    @EntityResult(
+        entityClass=TenantVO.class,
         fields= {
             @FieldResult(name="id", column="id"),
-            @FieldResult(name="title", column="title"),
-            @FieldResult(name="created", column="created"),
-            @FieldResult(name="text", column="text"),
-            @FieldResult(name="cat_name", column="cat_name"),
-            @FieldResult(name="author", column="author")
+            @FieldResult(name="name", column="name"),
+            @FieldResult(name="regDate", column="regDate"),
+            @FieldResult(name="authStatus", column="authStatus"),
+            @FieldResult(name="accountStatus", column="accountStatus"),
+            @FieldResult(name="appCount", column="appCount"),
+            @FieldResult(name="remainCoin", column="remainCoin"),
+            @FieldResult(name="costCoin", column="costCoin"),
+            @FieldResult(name="totalCoin", column="totalCoin"),
+            @FieldResult(name="sessionCount", column="sessionCount"),
+            @FieldResult(name="sessionTime", column="sessionTime"),
         })
     }
 )
@@ -86,7 +92,14 @@ public class TenantVO implements Serializable {
     }
 
     public Integer getAuthStatus() {
-        return authStatus;
+        if(authStatus!=null){
+            for (int i : Tenant.AUTH_STATUS) {
+                if(i == authStatus){
+                    return 1;
+                }
+            }
+        }
+        return 0;
     }
 
     public void setAuthStatus(Integer authStatus) {
