@@ -39,7 +39,7 @@ public class AppController extends AbstractRestController {
      * @param pageSize 每页记录数
      * @return
      */
-    @RequestMapping("/plist/{uid}")
+    @RequestMapping(value ="/plist/{uid}",method = RequestMethod.GET)
     public RestResponse pageList(@PathVariable String uid,@RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20" )Integer pageSize){
         Page<App> page = appService.pageList(uid,pageNo,pageSize);
         return RestResponse.success(page);
