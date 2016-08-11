@@ -1,26 +1,28 @@
 package com.lsxy.yunhuni.recharge.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
-import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.recharge.dao.RechargeDao;
-import com.sun.xml.internal.ws.model.RuntimeModelerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -37,6 +39,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
 
     @Autowired
     BillingService billingService;
+
+    @Autowired
+    EntityManager em;
 
     @Override
     public BaseDaoInterface<Recharge, Serializable> getDao() {
@@ -127,5 +132,24 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         billing.setBalance(billing.getBalance().add(recharge.getAmount()));
         billingService.save(billing);
         return true;
+    }
+
+    @Override
+    public Page<Recharge> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize) {
+        int start = (pageNo-1)*pageSize;
+        String db_name = year +"-" + month;
+        String countsql = "select count(id) from "+db_name+".tb_base_recharge where tenant_id=:tenant";
+        Query countQuery = em.createNativeQuery(countsql,Recharge.class);
+        countQuery.setParameter("tenant",tenantId);
+        long total = ((BigInteger)countQuery.getSingleResult()).longValue();
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        String pagesql = "select * from "+db_name+".tb_base_recharge where tenant_id=:tenant";
+        Query pageQuery = em.createNativeQuery(pagesql,Recharge.class);
+        pageQuery.setParameter("tenant",tenantId);
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        return new Page<>(start,total,pageSize,pageQuery.getResultList());
     }
 }

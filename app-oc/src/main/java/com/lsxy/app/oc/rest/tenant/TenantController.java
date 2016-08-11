@@ -347,4 +347,15 @@ public class TenantController {
             @RequestBody RechargeInput input){
         return RestResponse.success(rechargeService.doRecharge(input.getTenantId(),input.getAmount()));
     }
+
+    @ApiOperation(value = "租户消费记录")
+    @RequestMapping(value = "/tenants/{id}/recharges",method = RequestMethod.GET)
+    public RestResponse recharges(
+            @PathVariable String id,
+            @RequestParam Integer year,
+            @RequestParam Integer month,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize){
+        return RestResponse.success(rechargeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
+    }
 }
