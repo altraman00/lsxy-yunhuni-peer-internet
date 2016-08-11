@@ -89,7 +89,19 @@ public class MessageController extends AbstractRestController {
         return restResponse;
     }
 
-
+    /**
+     * 新建消息 type：1表示活动消息，不需要通知用户 0表示用户消息，status为1是发送消息给用户
+     * @param message
+     * @return
+     */
+    @RequestMapping(value = "/new",method = RequestMethod.GET)
+    public RestResponse create(Message message){
+        message = messageService.save(message);
+        if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
+            sendMessage(message);
+        }
+        return RestResponse.success(message);
+    }
     /**
      * 发送消息给状态正常的用户
      * @param message
