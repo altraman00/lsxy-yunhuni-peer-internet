@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.tenant;
 
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
+import com.lsxy.app.oc.rest.tenant.vo.RechargeInput;
 import com.lsxy.app.oc.rest.tenant.vo.TenantIndicantVO;
 import com.lsxy.framework.api.statistics.service.*;
 import com.lsxy.framework.api.tenant.model.TenantVO;
@@ -11,6 +12,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -64,6 +66,9 @@ public class TenantController {
 
     @Autowired
     private ApiCallDayService apiCallDayService;
+
+    @Autowired
+    private RechargeService rechargeService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -334,5 +339,12 @@ public class TenantController {
             }
         }
         return results;
+    }
+
+    @ApiOperation(value = "给租户充值")
+    @RequestMapping(value = "/tenants/recharge",method = RequestMethod.PUT)
+    public RestResponse apiInvokeStatistic(
+            @RequestBody RechargeInput input){
+        return RestResponse.success(rechargeService.doRecharge(input.getTenantId(),input.getAmount()));
     }
 }

@@ -50,4 +50,9 @@ public interface RechargeService extends BaseService<Recharge> {
      * @return
      */
     Page<Recharge> pageListByUserNameAndTime(String userName, Integer pageNo, Integer pageSize, Date startTime, Date endTime) throws MatchMutiEntitiesException;
+
+    /**
+     * 人工给租户充值
+     */
+    boolean doRecharge(String tenant,BigDecimal amount);
 }
