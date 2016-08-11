@@ -7,9 +7,6 @@ import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
 import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -205,16 +202,17 @@ private static final Logger logger = LoggerFactory.getLogger(RPCCaller.class);
 		requestMap.put(request.getSessionid(), request);
 		logger.debug(">>"+request);
 		session.write(request);
-
+		long startWait = System.currentTimeMillis();
 		synchronized (request){
-			long startWait = System.currentTimeMillis();
 			request.wait(60000);
 			if(System.currentTimeMillis() - startWait >= 60000){
 				throw new RequestTimeOutException(request);
 			}
 		}
+
+
 		if(logger.isDebugEnabled()){
-		    logger.debug("请求醒了:{}",request);
+		    logger.debug("请求醒了:{},已经睡了{}ms",request,(System.currentTimeMillis() - startWait));
 		}
 		RPCResponse response = responseMap.get(sessionid);
 		if(response == null){

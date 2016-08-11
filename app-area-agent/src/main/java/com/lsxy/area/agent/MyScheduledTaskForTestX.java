@@ -54,9 +54,12 @@ public class MyScheduledTaskForTestX implements Runnable{
 
     @PostConstruct
     public void doTest() throws InterruptedException {
-        Thread t = new Thread(this);
         logger.info("启动测试进程");
-        t.start();
+        for(int i=0;i<10;i++){
+            Thread t = new Thread(this);
+            t.start();
+        }
+
     }
 
     @Override
@@ -84,7 +87,7 @@ public class MyScheduledTaskForTestX implements Runnable{
                 RPCResponse response = rpcCaller.invokeWithReturn(session,request);
                 long currentTime = System.currentTimeMillis();
                 logger.info("收到响应[{}],花费:{}ms   [{}]  vs [{}]",response,currentTime-response.getTimestamp(),response.getTimestamp(),currentTime);
-                TimeUnit.SECONDS.sleep(1);
+//                TimeUnit.SECONDS.sleep(1);
             } catch (SessionWriteException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
