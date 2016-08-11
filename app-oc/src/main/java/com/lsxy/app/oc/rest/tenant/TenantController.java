@@ -49,7 +49,11 @@ public class TenantController {
 
     @ApiOperation(value = "租户状态禁用/启用")
     @RequestMapping(value = "/tenants/{id}",method = RequestMethod.PATCH)
-    public RestResponse tenants(@PathVariable String id,@RequestParam Integer status){
+    public RestResponse tenants(
+            @ApiParam(name = "id",value = "租户id")
+            @PathVariable String id,
+            @ApiParam(name = "status",value = "账号状态，2正常/启用，1被锁定/禁用")
+            @RequestParam Integer status){
         return RestResponse.success(true);
     }
 }
