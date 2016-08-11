@@ -26,11 +26,11 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Tandy on 2016/6/24.
@@ -245,6 +245,16 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         String hql = " from Account obj where obj.status=?1 ";
         List<Account> list =  this.list(hql,Account.STATUS_NORMAL);
         return list;
+    }
+
+    @Override
+    public boolean updateStatusByTenantId(String tenanId,Integer status) {
+        List<Account> accs = accountDao.findByTenantId(tenanId);
+        for (Account a : accs) {
+            a.setStatus(status);
+            this.save(a);
+        }
+        return true;
     }
 
     /**

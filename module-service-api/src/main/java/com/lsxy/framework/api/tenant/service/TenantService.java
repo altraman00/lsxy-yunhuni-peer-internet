@@ -2,6 +2,8 @@ package com.lsxy.framework.api.tenant.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.model.TenantVO;
+import com.lsxy.framework.core.utils.Page;
 
 import java.util.Date;
 
@@ -101,4 +103,9 @@ public interface TenantService extends BaseService<Tenant> {
      * @return
      */
     int countConsumeTenantMonth();
+
+    Page<TenantVO> pageListBySearch(String name,Date regDateStart,Date regDateEnd,
+                                    Integer authStatus,Integer accStatus,int pageNo,int pageSize);
+
+
 }
