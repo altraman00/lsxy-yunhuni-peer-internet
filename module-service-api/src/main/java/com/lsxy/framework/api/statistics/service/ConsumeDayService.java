@@ -96,4 +96,11 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @return
      */
     List<ConsumeDay> getConsumeDays(String tenantId, String appId, String month);
+
+    /**
+     * 获取某个租户某天的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountByDateAndTenant(Date d,String tenant);
 }
