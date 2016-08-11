@@ -40,7 +40,7 @@ public class RPCRequest extends  RPCMessage{
 	@Override
 	public String toString() {
 		String sBody = this.getBodyAsString();
-		return "R["+this.getSessionid()+"]["+ DateUtils.formatDate(new Date(this.getTimestamp()),"yyyy-MM-dd HH:mm:ss")+"]["+this.name+"]>>PM:" + this.param+">>SESSIONID:"+this.getSessionid() + ">>BODY:"+sBody;
+		return "R["+this.getSessionid()+"]["+ this.getTimestamp()+"]["+this.name+"]>>PM:" + this.param+">>SESSIONID:"+this.getSessionid() + ">>BODY:"+sBody;
 	}
 	
 	/**

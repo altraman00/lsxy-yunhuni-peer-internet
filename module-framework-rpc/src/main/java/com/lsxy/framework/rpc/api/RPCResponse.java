@@ -52,7 +52,7 @@ public class RPCResponse extends RPCMessage{
 	@Override
 	public String toString() {
 		String sBody = this.getBodyAsString();
-		return "P["+this.getSessionid()+"]>>RP:" +this.message + ">>BODY:"+sBody;
+		return "P["+this.getSessionid()+"]["+this.getTimestamp()+"]>>RP:" +this.message + ">>BODY:"+sBody;
 	}
 	
 }
