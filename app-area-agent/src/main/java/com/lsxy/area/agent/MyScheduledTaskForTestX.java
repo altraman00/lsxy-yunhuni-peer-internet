@@ -1,9 +1,14 @@
 package com.lsxy.area.agent;
 
+import ch.qos.logback.core.util.TimeUtil;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * Created by tandy on 16/7/30.
  */
 
-//@Component
+@Component
 public class MyScheduledTaskForTestX implements Runnable{
 
     public MyScheduledTaskForTestX(){
@@ -28,6 +33,9 @@ public class MyScheduledTaskForTestX implements Runnable{
 
     @Autowired
     private ClientSessionContext sessionContext;
+
+    @Autowired
+    private RPCCaller rpcCaller;
 
     private static final Logger logger = LoggerFactory.getLogger(MyScheduledTaskForTestX.class);
 
@@ -68,11 +76,17 @@ public class MyScheduledTaskForTestX implements Runnable{
             }
         }
 
-        RPCRequest request = RPCRequest.newRequest("HELLO","param01=001");
+        RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,"param01=001");
         while(true){
             try {
-                session.write(request);
+                RPCResponse response = rpcCaller.invokeWithReturn(session,request);
+                logger.info("收到响应[{}],花费:{}ms",response.getSessionid(),System.currentTimeMillis()-response.getTimestamp());
+                TimeUnit.SECONDS.sleep(1);
             } catch (SessionWriteException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (RequestTimeOutException e) {
                 e.printStackTrace();
             }
         }

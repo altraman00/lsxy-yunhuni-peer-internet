@@ -44,8 +44,19 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
             return process_CH_MN_CTI_EVENT(request,session);
         }
 
+        if(request.getName().equals(ServiceConstants.MN_CH_TEST_ECHO)){
+            return process_MN_CH_TEST_ECHO(request,session);
+        }
+
+
         RPCResponse response = RPCResponse.buildResponse(request);
         response.setMessage(RPCResponse.STATE_OK);
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_TEST_ECHO(RPCRequest request, Session session) {
+        RPCResponse response = RPCResponse.buildResponse(request);
+        response.setTimestamp(request.getTimestamp());
         return response;
     }
 
