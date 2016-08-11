@@ -1,4 +1,4 @@
-package com.lsxy.app.oc.rest;
+package com.lsxy.app.oc.rest.account;
 
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Tenant;
