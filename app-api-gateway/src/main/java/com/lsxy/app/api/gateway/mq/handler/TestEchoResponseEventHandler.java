@@ -26,9 +26,6 @@ public class TestEchoResponseEventHandler implements MQMessageHandler<TestEchoRe
     @Autowired
     private AsyncRequestContext requestContext;
 
-    @Autowired
-    private StasticsCounter sc;
-
     @Override
     public void handleMessage(TestEchoResponseEvent message) throws JMSException {
         String requestid = message.getRequestId();

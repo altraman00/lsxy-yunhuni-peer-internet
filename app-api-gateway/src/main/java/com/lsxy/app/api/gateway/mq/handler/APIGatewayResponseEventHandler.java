@@ -26,7 +26,7 @@ public class APIGatewayResponseEventHandler implements MQMessageHandler<APIGatew
     @Autowired
     private AsyncRequestContext requestContext;
 
-    @Autowired
+    @Autowired(required = false)
     private StasticsCounter sc;
 
     @Override
@@ -35,7 +35,7 @@ public class APIGatewayResponseEventHandler implements MQMessageHandler<APIGatew
         DeferredResult dr = requestContext.get(requestid);
 
         /*响应计数器*/
-        sc.getReceivedGWResponseCount().incrementAndGet();
+        if(sc != null) sc.getReceivedGWResponseCount().incrementAndGet();
 
         if(logger.isDebugEnabled()){
             logger.debug("收到响应[{}],花费{}ms",message.getHttpRequestId(),System.currentTimeMillis()-message.getRequestTimestamp());

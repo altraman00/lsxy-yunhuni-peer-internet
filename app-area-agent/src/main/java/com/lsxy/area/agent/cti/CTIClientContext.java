@@ -4,6 +4,7 @@ import com.lsxy.app.area.cti.commander.Client;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -15,6 +16,7 @@ import static javax.xml.bind.JAXBIntrospector.getValue;
  * cti 客户端  环境 用来管理多个客户端连接
  */
 @Component
+@Profile(value={"production","development"})
 public class CTIClientContext {
     private static final Logger logger = LoggerFactory.getLogger(CTIClientContext.class);
     public ListOrderedMap clients = new ListOrderedMap();

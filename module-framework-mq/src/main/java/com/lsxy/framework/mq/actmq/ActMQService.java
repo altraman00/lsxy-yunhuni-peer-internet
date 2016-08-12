@@ -39,8 +39,13 @@ public class ActMQService extends AbstractMQService {
                     logger.debug("发布事件：{}" , event.getEventName());
                     logger.debug("事件内容：{}" , event);
                 }
+                long starttime = System.currentTimeMillis();
                 Destination dest = new ActiveMQTopic(event.getTopicName());
                 jmsTemplate.send(dest,(AbstractMQEvent)event);
+                if(logger.isDebugEnabled()){
+
+                    logger.debug("事件发布完成: {}  花费:{}ms",event,System.currentTimeMillis() - starttime);
+                }
                 /*发送消息计数统计*/
                 if(null != sc) sc.getSendMQCount().incrementAndGet();
             }

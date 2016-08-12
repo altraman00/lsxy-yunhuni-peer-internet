@@ -3,10 +3,12 @@ package com.lsxy.app.api.gateway.rest;
 import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.MQStasticCounter;
+import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
 import com.lsxy.framework.mq.events.apigw.test.TestEchoRequestEvent;
 import com.lsxy.framework.mq.events.apigw.test.TestResetStasticsCountEvent;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Created by tandy on 16/8/10.
  * 为测试使用的控制器
  */
-@Profile(value={"development","local"})
+@Profile(value={"test","development","local"})
 @RestController
 public class TestController {
 
@@ -48,20 +52,15 @@ public class TestController {
     }
 
     @RequestMapping("/test/mq/presure")
-    public DeferredResult<RestResponse> mqPressure(){
-        DeferredResult<RestResponse> result = new DeferredResult<RestResponse>(10000L,RestResponse.failed("240","服务器君有点忙,未能及时响应,抱歉啊!!  稍后再尝试!!"));
-
+    public RestResponse<String> mqPressure(HttpServletRequest request){
+        RestResponse<String> response = RestResponse.success();
+        response.setSuccess(true);
         String requestId = UUIDGenerator.uuid();
 
-        TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"tt");
-        asyncRequestContext.register(event.getRequestId(),result);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("发布异步请求事件到MQ:{}",event );
-        }
+        TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
         mqService.publish(event);
 
-        return result;
-
+        response.setData("OK");
+        return response;
     }
 }

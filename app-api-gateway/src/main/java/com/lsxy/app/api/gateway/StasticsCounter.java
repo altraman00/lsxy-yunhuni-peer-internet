@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 @EnableScheduling
-@Profile(value = {"local","development"})
+@Profile(value = {"local","test","development"})
 public class StasticsCounter extends AsbstractStatisticCounter {
     private static final Logger logger = LoggerFactory.getLogger(StasticsCounter.class);
     //收到区域管理器响应次数

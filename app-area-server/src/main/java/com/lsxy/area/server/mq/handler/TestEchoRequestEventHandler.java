@@ -8,9 +8,13 @@ import com.lsxy.framework.mq.events.apigw.test.TestEchoResponseEvent;
 import com.lsxy.framework.mq.events.apigw.test.TestResetStasticsCountEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
+import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +36,28 @@ public class TestEchoRequestEventHandler implements MQMessageHandler<TestEchoReq
     @Autowired
     private MQService mqService;
 
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private ServerSessionContext sessionContext;
+
     @Override
     public void handleMessage(TestEchoRequestEvent message) throws JMSException {
         if(logger.isDebugEnabled()){
             logger.debug("响应ECHO Request事件:{}",message);
         }
 
-        TestEchoResponseEvent evt = new TestEchoResponseEvent(message.getRequestId(),message.getName());
-        mqService.publish(evt);
+        Session session = sessionContext.getRightSession();
+        RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,"param01=001");
+        RPCResponse response = null;
+        try {
+            response = rpcCaller.invokeWithReturn(session,request);
+            long currentTime = System.currentTimeMillis();
+            logger.info("收到响应[{}],花费:{}ms   [{}]  vs [{}]",response,currentTime-response.getTimestamp(),response.getTimestamp(),currentTime);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -204,7 +204,7 @@ public class RestRequest {
             logger.debug("[{}]REST请求参数：{}",this.id,payload);
             logger.debug("[{}]REST请求头：{}",this.id,entity.getHeaders());
         }
-
+        long starttime = System.currentTimeMillis();
         HttpEntity<RestResponse> response = this.restTemplate.exchange(url, httpMethod, entity, RestResponse.class,uriparams);
         if (response != null) {
             restResponse = response.getBody();
@@ -215,7 +215,7 @@ public class RestRequest {
             }
         }
         if(logger.isDebugEnabled()){
-            logger.debug("[{}]REST响应{}",this.id,restResponse);
+            logger.debug("[{}]REST响应{}  花费: {}ms",this.id,restResponse,System.currentTimeMillis() - starttime);
         }
         return restResponse;
     }
