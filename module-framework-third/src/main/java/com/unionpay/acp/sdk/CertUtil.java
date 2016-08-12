@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.unionpay.acp.sdk.SDKUtil.isEmpty;
+import static java.lang.System.in;
 
 public class CertUtil {
 	private static final Logger logger = LoggerFactory.getLogger(CertUtil.class);
@@ -200,54 +201,42 @@ public class CertUtil {
 
 	/**
 	 * 从指定目录下加载验证签名证书
-	 * (这部分银联的Demo代码用的是目录，我不知道为什么用目录，但是我不懂在Jar包中如何加载目录，fuck，所以我改为文件，加载的是acp_prod_verify_sign.cer
-     * 应该没关系)
+	 *
 	 */
 	private static void initValidateCertFromDir() {
-        SDKConfig config = SDKConfig.getConfig();
         certMap.clear();
-//        String dir = SDKConfig.getConfig().getValidateCertDir();
-//        String dir = CertUtil.class.getClassLoader().getResource(config.getValidateCertDir()).getFile();
-//		logger.info("加载验证签名证书目录==>" + dir);
-//		if (isEmpty(dir)) {
-//			logger.info("ERROR: acpsdk.validateCert.dir is empty");
-//			return;
-//		}
-		CertificateFactory cf = null;
-//		FileInputStream in = null;
-		InputStream in = CertUtil.class.getClassLoader().getResourceAsStream(config.getValidateCertDir());
-		try {
-			cf = CertificateFactory.getInstance("X.509", "BC");
-//			File fileDir = new File(dir);
-//			File[] files = fileDir.listFiles(new CerFilter());
-//			for (int i = 0; i < files.length; i++) {
-//				File file = files[i];
-//				in = new FileInputStream(file.getAbsolutePath());
-				validateCert = (X509Certificate) cf.generateCertificate(in);
-				certMap.put(validateCert.getSerialNumber().toString(),
-						validateCert);
-				// 打印证书加载信息,供测试阶段调试
-				logger.info("[" +
-//                        file.getAbsolutePath() +
-                        "][CertId="
-						+ validateCert.getSerialNumber().toString() + "]");
-//			}
-			logger.info("LoadVerifyCert Successful");
-		} catch (CertificateException e) {
-			logger.error("LoadVerifyCert Error", e);
-//		} catch (FileNotFoundException e) {
-//			logger.error("LoadVerifyCert Error File Not Found", e);
-		} catch (NoSuchProviderException e) {
-			logger.error("LoadVerifyCert Error No BC Provider", e);
-		} finally {
-			if (null != in) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					logger.error(e.toString());
-				}
-			}
-		}
+        String certPaths = SDKConfig.getConfig().getValidateCertDir();
+        if (isEmpty(certPaths)) {
+            logger.info("ERROR: acpsdk.validateCert.dir is empty");
+            return;
+        }
+        String[] certs = certPaths.split(",");
+		InputStream in;
+        for(String cert:certs){
+            in = CertUtil.class.getClassLoader().getResourceAsStream(cert);
+            try {
+                CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
+
+                validateCert = (X509Certificate) cf.generateCertificate(in);
+                certMap.put(validateCert.getSerialNumber().toString(),
+                        validateCert);
+                // 打印证书加载信息,供测试阶段调试
+                logger.info("[" + cert + "][CertId=" + validateCert.getSerialNumber().toString() + "]");
+                logger.info("LoadVerifyCert Successful");
+            } catch (CertificateException e) {
+                logger.error("LoadVerifyCert Error", e);
+            } catch (NoSuchProviderException e) {
+                logger.error("LoadVerifyCert Error No BC Provider", e);
+            } finally {
+                if (null != in) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        logger.error(e.toString());
+                    }
+                }
+            }
+        }
 	}
 
 
