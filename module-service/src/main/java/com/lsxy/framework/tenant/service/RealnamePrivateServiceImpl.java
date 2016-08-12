@@ -147,4 +147,14 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
         }
         return page;
     }
+    @Override
+    public RealnamePrivate findByTenantIdNewest(String tenantId) {
+        String hql = "from RealnamePrivate obj where obj.tenant.id=?1 order by obj.createTime desc";
+        List<RealnamePrivate> ps = this.findByCustomWithParams(hql, tenantId);
+        if(ps != null && ps.size()>0){
+            return ps.get(0);
+        }
+        return null;
+    }
+
 }
