@@ -103,7 +103,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
     public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, Integer type, String[] tenantId, Integer status, String startTime, String endTime) {
         String hql = " from InvoiceApply obj  ";
         boolean isWhere = true;
-        if(StringUtil.isNotEmpty(type+"")){
+        if(type!=null){
             if(isWhere){
                 hql += " where ";
                 isWhere = false;
@@ -112,7 +112,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
             }
             hql+=" obj.type = "+type+" ";
         }
-        if(StringUtil.isNotEmpty(status+"")){
+        if(status!=null){
             if(isWhere){
                 hql += " where ";
                 isWhere = false;
