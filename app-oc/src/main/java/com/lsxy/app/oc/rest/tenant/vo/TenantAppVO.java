@@ -2,6 +2,7 @@ package com.lsxy.app.oc.rest.tenant.vo;
 
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.yunhuni.api.app.model.App;
+import java.util.List;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
  */
 public class TenantAppVO implements Serializable {
 
+    private String id;
     private String name;//应用名字
     private Integer status;//应用状态
     private String description;//应用描述
@@ -31,6 +33,8 @@ public class TenantAppVO implements Serializable {
     private Long sessionCount;
     private Long amongDuration;
 
+    private List<String> testPhone;
+
     public TenantAppVO(){}
     public TenantAppVO(App app){
         try {
@@ -40,6 +44,14 @@ public class TenantAppVO implements Serializable {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
     public String getName() {
         return name;
@@ -175,5 +187,13 @@ public class TenantAppVO implements Serializable {
 
     public void setAmongDuration(Long amongDuration) {
         this.amongDuration = amongDuration;
+    }
+
+    public List<String> getTestPhone() {
+        return testPhone;
+    }
+
+    public void setTestPhone(List<String> testPhone) {
+        this.testPhone = testPhone;
     }
 }

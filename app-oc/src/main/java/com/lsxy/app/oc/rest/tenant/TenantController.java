@@ -22,6 +22,8 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,6 +41,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2016/8/10.
@@ -95,6 +98,9 @@ public class TenantController {
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private TestNumBindService testNumBindService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -500,5 +506,18 @@ public class TenantController {
             }
         }
         return RestResponse.success(dto);
+    }
+
+    @ApiOperation(value = "获取租户的app信息")
+    @RequestMapping(value="/tenants/{tenant}/apps/{appId}",method = RequestMethod.GET)
+    public RestResponse app(@PathVariable String tenant,@PathVariable String appId) {
+        App app = appService.findById(appId);
+        if(!app.getTenant().getId().equals(tenant)){
+            return RestResponse.success(null);
+        }
+        TenantAppVO vo = new TenantAppVO(app);
+        List<TestNumBind> tests = testNumBindService.findByTenant(tenant);
+        vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
+        return RestResponse.success(vo);
     }
 }

@@ -1,7 +1,6 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 
 import java.util.List;
@@ -25,6 +24,8 @@ public interface TestNumBindService extends BaseService<TestNumBind>  {
      * @return
      */
     public List<TestNumBind> findByNumber(String userName, String number)  ;
+
+    public List<TestNumBind> findByTenant(String tenant);
 
 
 }
