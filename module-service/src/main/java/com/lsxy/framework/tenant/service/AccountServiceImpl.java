@@ -281,5 +281,12 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     }
 
 
-
+    public Account findOneByTenant(String tenantId){
+        String hql = "from Account obj where obj.tenant.id=?1";
+        List<Account> accounts = this.findByCustomWithParams(hql, tenantId);
+        if(accounts != null && accounts.size()>0){
+            return accounts.get(0);
+        }
+        return null;
+    }
 }

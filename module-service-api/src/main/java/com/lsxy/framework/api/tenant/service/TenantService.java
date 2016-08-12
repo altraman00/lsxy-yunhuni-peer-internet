@@ -6,6 +6,7 @@ import com.lsxy.framework.api.tenant.model.TenantVO;
 import com.lsxy.framework.core.utils.Page;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 租户Mananger
@@ -108,4 +109,11 @@ public interface TenantService extends BaseService<Tenant> {
                                     Integer authStatus,Integer accStatus,int pageNo,int pageSize);
 
 
+
+    /**
+     * 根据会员名模糊查找Tenant
+     * @param name 会员名字
+     * @return
+     */
+    List<Tenant> pageListByUserName(String name);
 }
