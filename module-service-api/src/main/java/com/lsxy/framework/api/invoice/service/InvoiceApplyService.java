@@ -3,6 +3,7 @@ package com.lsxy.framework.api.invoice.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 
 /**
  * 发票申请Service
@@ -31,5 +32,18 @@ public interface InvoiceApplyService extends BaseService<InvoiceApply> {
      * @return
      */
     InvoiceApply create(InvoiceApply apply, String userName);
+
+    /**
+     * 根据条件查找分页信息
+     * @param pageNo   第几页
+     * @param pageSize 每页记录数
+     * @param tenantId 租户集合
+     * @param status 发票状态
+     * @param type 发票类型
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize,Integer type, String[] tenantId, Integer status, String startTime, String endTime);
 
 }
