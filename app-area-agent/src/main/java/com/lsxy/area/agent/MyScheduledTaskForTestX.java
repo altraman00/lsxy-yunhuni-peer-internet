@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * Created by tandy on 16/7/30.
  */
 
-@Component
+//@Component
 public class MyScheduledTaskForTestX implements Runnable{
 
     public MyScheduledTaskForTestX(){
@@ -52,7 +52,7 @@ public class MyScheduledTaskForTestX implements Runnable{
 //        }
 //    }
 
-    @PostConstruct
+//    @PostConstruct
     public void doTest() throws InterruptedException {
         logger.info("启动测试进程");
         for(int i=0;i<500;i++){
