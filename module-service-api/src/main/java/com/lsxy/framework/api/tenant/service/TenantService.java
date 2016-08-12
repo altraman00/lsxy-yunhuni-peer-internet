@@ -2,7 +2,6 @@ package com.lsxy.framework.api.tenant.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 
 import java.util.List;
 
