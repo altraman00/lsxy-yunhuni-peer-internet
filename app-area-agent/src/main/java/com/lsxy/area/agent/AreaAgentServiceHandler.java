@@ -59,11 +59,20 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             response = this.process_MN_CH_TEST_STASTICS_RESET(request);
         }
 
+        if(request.getName().equals(ServiceConstants.MN_CH_TEST_ECHO)){
+            response = this.process_MN_CH_TEST_ECHO(request);
+        }
 
         if(logger.isDebugEnabled()){
             logger.debug("返回给区域管理器的对象:{}",response);
         }
 
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_TEST_ECHO(RPCRequest request) {
+        RPCResponse response = RPCResponse.buildResponse(request);
+        response.setMessage("OK");
         return response;
     }
 
