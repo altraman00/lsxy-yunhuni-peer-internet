@@ -1,9 +1,11 @@
 package com.lsxy.app.oc.rest.tenant;
 
+import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
+import com.lsxy.app.oc.rest.tenant.vo.ConsumesVO;
+import com.lsxy.app.oc.rest.tenant.vo.RechargeInput;
 import com.lsxy.app.oc.rest.tenant.vo.TenantIndicantVO;
-import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
-import com.lsxy.framework.api.statistics.service.RechargeMonthService;
-import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
+import com.lsxy.framework.api.consume.service.ConsumeService;
+import com.lsxy.framework.api.statistics.service.*;
 import com.lsxy.framework.api.tenant.model.TenantVO;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -12,6 +14,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,7 +23,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * Created by Administrator on 2016/8/10.
@@ -50,6 +59,21 @@ public class TenantController {
 
     @Autowired
     private RechargeMonthService rechargeMonthService;
+
+    @Autowired
+    private VoiceCdrDayService voiceCdrDayService;
+
+    @Autowired
+    private ConsumeDayService consumeDayService;
+
+    @Autowired
+    private ApiCallDayService apiCallDayService;
+
+    @Autowired
+    private RechargeService rechargeService;
+
+    @Autowired
+    private ConsumeService consumeService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -159,6 +183,187 @@ public class TenantController {
                 .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
         dto.setConnectedRateRate(new BigDecimal(((preConnectRate-prepreConnectRate)/(prepreConnectRate+0.1)) * 100)
                 .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+        return RestResponse.success(dto);
+    }
+
+    @ApiOperation(value = "租户某月所有天的（消费额和话务量）统计")
+    @RequestMapping(value = "/tenants/{id}/consumeAnduration/statistic",method = RequestMethod.GET)
+    public RestResponse consumeAndurationStatistic(
+            @PathVariable String id,
+            @RequestParam(value = "year") Integer year,
+            @RequestParam(value = "month") Integer month){
+        ConsumeAndurationStatisticVO dto = new ConsumeAndurationStatisticVO();
+        dto.setSession(perDayOfMonthDurationStatistic(year,month,id));
+        dto.setCost(perDayOfMonthConsumeStatistic(year,month,id));
+        return RestResponse.success(dto);
+    }
+
+    /**
+     * 统计租户某个月的每天的话务量
+     * @return
+     */
+    private List<Long> perDayOfMonthDurationStatistic(int year, int month,String tenant){
+        List<Long> results = new ArrayList<Long>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Long>> fs = new ArrayList<Future<Long>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Long>() {
+                    @Override
+                    public Long call(){
+                        //转换成分钟
+                        return (long)Math.round(voiceCdrDayService.getAmongDurationByDateAndTenant(d,tenant)/60);
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Long> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
+    }
+
+    /**
+     * 统计租户某个月的每天的消费额
+     * @return
+     */
+    private List<Double> perDayOfMonthConsumeStatistic(int year,int month,String tenant){
+        List<Double> results = new ArrayList<Double>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Double>> fs = new ArrayList<Future<Double>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Double>() {
+                    @Override
+                    public Double call(){
+                        return consumeDayService.getAmongAmountByDateAndTenant(d,tenant).doubleValue();
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Double> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
+    }
+
+
+    @ApiOperation(value = "租户某月所有天的（会话量/次）统计")
+    @RequestMapping(value = "/tenants/{id}/session/statistic",method = RequestMethod.GET)
+    public RestResponse sessionStatistic(
+            @PathVariable String id,
+            @RequestParam(value = "year") Integer year,
+            @RequestParam(value = "month") Integer month){
+        return RestResponse.success(perDayOfMonthSessionCountStatistic(year,month,id));
+    }
+
+    private List<Long> perDayOfMonthSessionCountStatistic(int year,int month,String tenant){
+        List<Long> results = new ArrayList<Long>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Long>> fs = new ArrayList<Future<Long>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Long>() {
+                    @Override
+                    public Long call(){
+                        return voiceCdrDayService.getAmongCallByDateAndTenant(d,tenant);
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Long> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
+    }
+
+    @ApiOperation(value = "租户某月所有天的（api调用次数）统计")
+    @RequestMapping(value = "/tenants/{id}/api_invoke/statistic",method = RequestMethod.GET)
+    public RestResponse apiInvokeStatistic(
+            @PathVariable String id,
+            @RequestParam(value = "year") Integer year,
+            @RequestParam(value = "month") Integer month){
+        return RestResponse.success(perDayOfMonthApiInvokeStatistic(year,month,id));
+    }
+
+    private List<Long> perDayOfMonthApiInvokeStatistic(int year,int month,String tenant){
+        List<Long> results = new ArrayList<Long>();
+        //先计算出某个月的所有天的开始和结束时间
+        Date cdate = DateUtils.newDate(year,month,1);
+        Date d1=DateUtils.getFirstTimeOfMonth(cdate);
+        Date d2 =DateUtils.getLastTimeOfMonth(cdate);
+        Date[] ds = DateUtils.getDatesBetween(d1,d2);
+        if(ds!=null && ds.length>0){
+            ExecutorService pool= Executors.newFixedThreadPool(ds.length);
+            List<Future<Long>> fs = new ArrayList<Future<Long>>();
+            for (final Date d: ds) {
+                fs.add(pool.submit(new Callable<Long>() {
+                    @Override
+                    public Long call(){
+                        return apiCallDayService.getInvokeCountByDateAndTenant(d,tenant);
+                    }
+                }));
+            }
+            pool.shutdown();
+            for (Future<Long> future : fs) {
+                try {
+                    results.add(future.get());
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return results;
+    }
+
+    @ApiOperation(value = "给租户充值")
+    @RequestMapping(value = "/tenants/recharge",method = RequestMethod.PUT)
+    public RestResponse apiInvokeStatistic(
+            @RequestBody RechargeInput input){
+        return RestResponse.success(rechargeService.doRecharge(input.getTenantId(),input.getAmount()));
+    }
+
+    @ApiOperation(value = "租户消费记录")
+    @RequestMapping(value = "/tenants/{id}/consumes",method = RequestMethod.GET)
+    public RestResponse recharges(
+            @PathVariable String id,
+            @RequestParam Integer year,
+            @RequestParam Integer month,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize){
+        ConsumesVO dto = new ConsumesVO();
+        dto.setConsumes(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
+        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id));
         return RestResponse.success(dto);
     }
 }

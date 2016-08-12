@@ -1,5 +1,6 @@
 package com.unionpay.acp.utils;
 
+import com.lsxy.framework.config.SystemConfig;
 import com.unionpay.acp.sdk.AcpService;
 import com.unionpay.acp.sdk.SDKConfig;
 import com.unionpay.acp.sdk.SDKConstants;
@@ -22,7 +23,7 @@ import java.util.Map.Entry;
 public class UnionpayUtil {
 
 	//商户号码
-	public static String merId;
+	public static String merId = SystemConfig.getProperty("third.join.gateway.unionpay.mer_id","802440048160857");
 
 	//默认配置的是UTF-8
 	public static String encoding_UTF8 = "UTF-8";
@@ -32,10 +33,10 @@ public class UnionpayUtil {
 	public static String version = "5.0.0";
 	
 	//后台服务对应的写法参照 FrontRcvResponse.java
-	public static String frontUrl = "http://127.0.0.1:8080/ACPSample_B2C/frontRcvResponse";
+	public static String frontUrl = SystemConfig.getProperty("third.join.gateway.unionpay.front_url","http://localhost/console/cost/recharge/unionpay_return");
 
 	//后台服务对应的写法参照 BackRcvResponse.java
-	public static String backUrl = "http://222.222.222.222:8080/ACPSample_B2C/BackRcvResponse";//受理方和发卡方自选填写的域[O]--后台通知地址
+	public static String backUrl = SystemConfig.getProperty("third.join.gateway.unionpay.back_url","http://third.dev.yunhuni.com/third/unionpay/notify");//受理方和发卡方自选填写的域[O]--后台通知地址
 
 	// 商户发送交易时间 格式:YYYYMMDDhhmmss
 	public static String getCurrentTime() {
