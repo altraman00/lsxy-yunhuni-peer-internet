@@ -2,10 +2,9 @@ package com.lsxy.framework.api.tenant.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
+import com.lsxy.framework.core.utils.Page;
 
 import java.util.List;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
 
@@ -23,4 +22,18 @@ public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
      * @return
      */
     public RealnamePrivate findByTenantIdAndStatus(String tenantId,int status);
+
+
+    /**
+     * 查找用户下的分页信息
+     * @param authStatus await|auditing|unauth
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @param type 0个人认证 1企业认证
+     * @param search 会员名
+     * @param pageNo 第几页
+     * @param pageSize 每页记录数
+     * @return
+     */
+    Page pageListAuthInfo(Integer authStatus,String startTime, String endTime, Integer type, String search, Integer pageNo, Integer pageSize);
 }

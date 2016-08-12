@@ -30,6 +30,16 @@ public class RealnameCorp extends IdEntity {
     private String  type03Prop03;//type03_prop03 [三证分离]营业执照号
     private String  type03Prop04;//type03_prop04 [三证分离]营业执照照片
     private Integer status;//实名认证状态 0等待 2成功 -2失败
+    private String reason;//认证失败的原因
+    @Column(name = "reason")
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     public RealnameCorp() {
     }
 

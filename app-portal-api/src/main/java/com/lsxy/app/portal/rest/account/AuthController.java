@@ -69,36 +69,42 @@ public class AuthController extends AbstractRestController {
         Tenant tenant = accountService.findAccountByUserName(userName).getTenant();
         map.put("userName",userName);
         map.put("status",tenant.getIsRealAuth());
-        if(Tenant.AUTH_COMPANY_SUCCESS==tenant.getIsRealAuth()){
-            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_COMPANY_SUCCESS);
+        if(Tenant.AUTH_COMPANY_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_COMPANY_FAIL==tenant.getIsRealAuth()){
+            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),tenant.getIsRealAuth());
             if(realnameCorp!=null) {
                 map.put("realnameCorp",realnameCorp);
                 map.put("createTime2", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
-        }else if(Tenant.AUTH_ONESELF_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
-            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCCESS);
+        }else if(Tenant.AUTH_ONESELF_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_ONESELF_FAIL==tenant.getIsRealAuth()){
+            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),tenant.getIsRealAuth());
             if(realnamePrivate!=null) {
                 map.put("realnamePrivate",realnamePrivate);
                 map.put("createTime1", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
-        }else if(Tenant.AUTH_UPGRADE_SUCCESS==tenant.getIsRealAuth()){
-            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_COMPANY_SUCCESS);
-            if(realnameCorp!=null) {
-                map.put("realnameCorp",realnameCorp);
-                map.put("createTime2", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-            }else{
-                map.put("status",Tenant.AUTH_NO);
-            }
+        }else if(Tenant.AUTH_UPGRADE_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
             RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCCESS);
             if(realnamePrivate!=null) {
                 map.put("realnamePrivate",realnamePrivate);
                 map.put("createTime1", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_UPGRADE_FAIL);
+            }
+            int statusT = tenant.getIsRealAuth();
+            if(Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
+                statusT = Tenant.AUTH_COMPANY_FAIL;
+            }else if(Tenant.AUTH_UPGRADE_SUCCESS==tenant.getIsRealAuth()){
+                statusT = Tenant.AUTH_COMPANY_SUCCESS;
+            }
+            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),statusT);
+            if(realnameCorp!=null) {
+                map.put("realnameCorp",realnameCorp);
+                map.put("createTime2", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            }else{
+                map.put("status",Tenant.AUTH_NO);
             }
         }
         return RestResponse.success(map);
@@ -161,41 +167,5 @@ public class AuthController extends AbstractRestController {
         acount.setTenant(tenant);
         accountService.save(acount);
         return RestResponse.success(realnameCorp);
-    }
-
-    /**
-     * 根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果
-     * @param id 实名认证记录id
-     * @param tenantTd 租户id
-     * @param type 实名认证类型 0个人认证 1实名认证
-     * @param status 1个人成功 2企业成功 -1个人失败 -2企业失败
-     * @return
-     */
-    @RequestMapping("/modify_auth_status")
-    public RestResponse modifyAuthStatus(String id,String tenantTd,String type,Integer status){
-        Tenant tenant = tenantService.findById(tenantTd);
-        Integer statusT = tenant.getIsRealAuth();
-        if(Integer.valueOf(type)==Tenant.AUTH_ONESELF){
-            RealnamePrivate realnamePrivate = realnaePrivateService.findById(id);
-            realnamePrivate.setStatus(status);
-            tenant.setIsRealAuth(status);
-            realnamePrivate.setTenant(tenant);
-            realnaePrivateService.save(realnamePrivate);
-        }else if(Integer.valueOf(type)==Tenant.AUTH_COMPANY){
-            RealnameCorp realnameCorp = realnameCorpService.findById(id);
-            realnameCorp.setStatus(status);
-            if(statusT==Tenant.AUTH_ONESELF_SUCCESS||statusT==Tenant.AUTH_UPGRADE_WAIT||statusT==Tenant.AUTH_UPGRADE_FAIL){
-                if(status==Tenant.AUTH_COMPANY_FAIL){
-                    status=Tenant.AUTH_UPGRADE_FAIL;
-                }else if(status==Tenant.AUTH_COMPANY_SUCCESS){
-                    status=Tenant.AUTH_UPGRADE_SUCCESS;
-                }
-            }
-            tenant.setIsRealAuth(status);
-            realnameCorp.setTenant(tenant);
-            realnameCorpService.save(realnameCorp);
-        }
-        tenant = tenantService.save(tenant);
-        return RestResponse.success(tenant.getIsRealAuth());
     }
 }
