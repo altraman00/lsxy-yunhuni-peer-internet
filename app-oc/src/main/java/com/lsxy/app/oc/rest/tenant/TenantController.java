@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.tenant;
 
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
+import com.lsxy.app.oc.rest.tenant.vo.ConsumesVO;
 import com.lsxy.app.oc.rest.tenant.vo.RechargeInput;
 import com.lsxy.app.oc.rest.tenant.vo.TenantIndicantVO;
 import com.lsxy.framework.api.consume.service.ConsumeService;
@@ -353,13 +354,16 @@ public class TenantController {
     }
 
     @ApiOperation(value = "租户消费记录")
-    @RequestMapping(value = "/tenants/{id}/recharges",method = RequestMethod.GET)
+    @RequestMapping(value = "/tenants/{id}/consumes",method = RequestMethod.GET)
     public RestResponse recharges(
             @PathVariable String id,
             @RequestParam Integer year,
             @RequestParam Integer month,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize){
-        return RestResponse.success(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
+        ConsumesVO dto = new ConsumesVO();
+        dto.setConsumes(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
+        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id));
+        return RestResponse.success(dto);
     }
 }

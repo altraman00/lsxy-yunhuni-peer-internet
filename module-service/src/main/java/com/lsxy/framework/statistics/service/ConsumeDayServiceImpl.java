@@ -18,6 +18,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -37,6 +39,9 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     TenantService tenantService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private EntityManager em;
+
     @Override
     public BaseDaoInterface<ConsumeDay, Serializable> getDao() {
         return consumeDayDao;
@@ -188,5 +193,20 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
             }
         }
         return sum;
+    }
+
+    @Override
+    public BigDecimal getSumAmountByTenant(String tenantId) {
+        if(tenantId == null){
+            throw new IllegalArgumentException();
+        }
+        String sql = "select sum(sum_amount) from (select sum_amount from tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null order by dt desc limit 1) a";
+        Query query = em.createNativeQuery(sql);
+        query.setParameter("tenant",tenantId);
+        Object result = query.getSingleResult();
+        if(result!=null){
+            return (BigDecimal)result;
+        }
+        return BigDecimal.ZERO;
     }
 }
