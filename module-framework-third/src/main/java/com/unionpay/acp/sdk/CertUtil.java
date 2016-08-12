@@ -215,7 +215,7 @@ public class CertUtil {
 //		}
 		CertificateFactory cf = null;
 //		FileInputStream in = null;
-		InputStream in = CertUtil.class.getClassLoader().getResourceAsStream(config.getValidateCertDir());;
+		InputStream in = CertUtil.class.getClassLoader().getResourceAsStream(config.getValidateCertDir());
 		try {
 			cf = CertificateFactory.getInstance("X.509", "BC");
 //			File fileDir = new File(dir);
