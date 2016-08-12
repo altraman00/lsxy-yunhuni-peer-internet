@@ -27,7 +27,7 @@ public interface TenantService extends BaseService<Tenant> {
 
     /**
      * 根据会员名模糊查找Tenant
-     * @param name
+     * @param name 会员名字
      * @return
      */
     List<Tenant>  pageListByUserName(String name);
