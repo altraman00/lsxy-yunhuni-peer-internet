@@ -22,6 +22,7 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -277,4 +278,11 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         pageQuery.setFirstResult(start);
         return new Page<>(start,total,pageSize,pageQuery.getResultList());
     }
+    @Override
+    public List<Tenant> pageListByUserName(String name) {
+        String hql = " FROM Tenant obj WHERE obj.tenantName like ?1 ";
+        List<Tenant> list = this.list(hql,"%"+name+"%");
+        return list;
+    }
+
 }

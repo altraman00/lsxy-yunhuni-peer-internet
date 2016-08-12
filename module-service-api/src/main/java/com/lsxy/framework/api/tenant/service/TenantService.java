@@ -108,4 +108,11 @@ public interface TenantService extends BaseService<Tenant> {
                                     Integer authStatus,Integer accStatus,int pageNo,int pageSize);
 
 
+
+    /**
+     * 根据会员名模糊查找Tenant
+     * @param name
+     * @return
+     */
+    List<Tenant>  pageListByUserName(String name);
 }
