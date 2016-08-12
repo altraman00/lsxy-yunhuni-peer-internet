@@ -28,7 +28,7 @@ import java.util.Collection;
  * Created by tandy on 16/8/10.
  */
 @Component
-@Profile(value={"local","development"})
+@Profile(value={"test","local","development"})
 public class TestEchoRequestEventHandler implements MQMessageHandler<TestEchoRequestEvent>  {
 
     private static final Logger logger = LoggerFactory.getLogger(TestEchoRequestEventHandler.class);
