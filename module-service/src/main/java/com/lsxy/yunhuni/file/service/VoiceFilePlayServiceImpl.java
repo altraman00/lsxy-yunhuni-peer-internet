@@ -49,7 +49,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
             }else{
                 hql +=  " and ";
             }
-            hql+=" obj.app.id= like '"+appId+"' ";
+            hql+=" obj.app.id= '"+appId+"' ";
         }
         if(tenantId!=null&& tenantId.length>0){
             if(isWhere){
