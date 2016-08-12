@@ -1,11 +1,11 @@
 /**
  *
  * Licensed Property to China UnionPay Co., Ltd.
- * 
+ *
  * (C) Copyright of China UnionPay Co., Ltd. 2010
  *     All Rights Reserved.
  *
- * 
+ *
  * Modification History:
  * =============================================================================
  *   Author         Date          Description
@@ -44,7 +44,7 @@ public class CertUtil {
 //	private static X509Certificate encryptTrackCert = null;
 	/** 磁道加密公钥 */
 	private static PublicKey encryptTrackKey = null;
-	
+
 	/** 验证签名证书. */
 	private static X509Certificate validateCert = null;
 	/** 验签证书存储Map. */
@@ -53,7 +53,7 @@ public class CertUtil {
 	private final static ThreadLocal<KeyStore> certKeyStoreLocal = new ThreadLocal<KeyStore>();
 	/** 基于Map存储多商户RSA私钥 */
 	private final static Map<String, KeyStore> certKeyStoreMap = new ConcurrentHashMap<String, KeyStore>();
-	
+
 	static {
 		init();
 	}
@@ -111,11 +111,11 @@ public class CertUtil {
 		logger.info("加载证书文件[" + certFilePath + "]和证书密码[" + certPwd
 				+ "]的签名证书结束.");
 	}
-	
+
 
 	/**
 	 * 加载RSA签名证书
-	 * 
+	 *
 	 * @param certFilePath
 	 * @param certPwd
 	 */
@@ -149,7 +149,7 @@ public class CertUtil {
 //			logger.info("WARN: acpsdk.encryptTrackCert.path is empty");
 //		}
 	}
-	
+
 	/**
 	 * 加载磁道公钥
 	 */
@@ -164,7 +164,7 @@ public class CertUtil {
 		}
 	}
 	/**
-	 * 
+	 *
 	 * @param path
 	 * @return
 	 */
@@ -200,38 +200,43 @@ public class CertUtil {
 
 	/**
 	 * 从指定目录下加载验证签名证书
-	 * 
+	 * (这部分银联的Demo代码用的是目录，我不知道为什么用目录，但是我不懂在Jar包中如何加载目录，fuck，所以我改为文件，加载的是acp_prod_verify_sign.cer
+     * 应该没关系)
 	 */
 	private static void initValidateCertFromDir() {
-		certMap.clear();
+        SDKConfig config = SDKConfig.getConfig();
+        certMap.clear();
 //        String dir = SDKConfig.getConfig().getValidateCertDir();
-        String dir = CertUtil.class.getClassLoader().getResource(SDKConfig.getConfig().getValidateCertDir()).getFile();
-		logger.info("加载验证签名证书目录==>" + dir);
-		if (isEmpty(dir)) {
-			logger.info("ERROR: acpsdk.validateCert.dir is empty");
-			return;
-		}
+//        String dir = CertUtil.class.getClassLoader().getResource(config.getValidateCertDir()).getFile();
+//		logger.info("加载验证签名证书目录==>" + dir);
+//		if (isEmpty(dir)) {
+//			logger.info("ERROR: acpsdk.validateCert.dir is empty");
+//			return;
+//		}
 		CertificateFactory cf = null;
-		FileInputStream in = null;
+//		FileInputStream in = null;
+		InputStream in = CertUtil.class.getClassLoader().getResourceAsStream(config.getValidateCertDir());;
 		try {
 			cf = CertificateFactory.getInstance("X.509", "BC");
-			File fileDir = new File(dir);
-			File[] files = fileDir.listFiles(new CerFilter());
-			for (int i = 0; i < files.length; i++) {
-				File file = files[i];
-				in = new FileInputStream(file.getAbsolutePath());
+//			File fileDir = new File(dir);
+//			File[] files = fileDir.listFiles(new CerFilter());
+//			for (int i = 0; i < files.length; i++) {
+//				File file = files[i];
+//				in = new FileInputStream(file.getAbsolutePath());
 				validateCert = (X509Certificate) cf.generateCertificate(in);
 				certMap.put(validateCert.getSerialNumber().toString(),
 						validateCert);
 				// 打印证书加载信息,供测试阶段调试
-				logger.info("[" + file.getAbsolutePath() + "][CertId="
+				logger.info("[" +
+//                        file.getAbsolutePath() +
+                        "][CertId="
 						+ validateCert.getSerialNumber().toString() + "]");
-			}
+//			}
 			logger.info("LoadVerifyCert Successful");
 		} catch (CertificateException e) {
 			logger.error("LoadVerifyCert Error", e);
-		} catch (FileNotFoundException e) {
-			logger.error("LoadVerifyCert Error File Not Found", e);
+//		} catch (FileNotFoundException e) {
+//			logger.error("LoadVerifyCert Error File Not Found", e);
 		} catch (NoSuchProviderException e) {
 			logger.error("LoadVerifyCert Error No BC Provider", e);
 		} finally {
@@ -248,7 +253,7 @@ public class CertUtil {
 
 	/**
 	 * 获取签名证书私钥（单证书模式）
-	 * 
+	 *
 	 * @return
 	 */
 	public static PrivateKey getSignCertPrivateKey() {
@@ -272,17 +277,17 @@ public class CertUtil {
 			return null;
 		}
 	}
-	
+
 
 	/**
 	 * 通过传入证书绝对路径和证书密码获取所对应的签名证书私钥
-	 * 
+	 *
 	 * @param certPath
 	 *            证书绝对路径
 	 * @param certPwd
 	 *            证书密码
 	 * @return 证书私钥
-	 * 
+	 *
 	 * @deprecated
 	 */
 	public static PrivateKey getSignCertPrivateKeyByThreadLocal(
@@ -305,7 +310,7 @@ public class CertUtil {
 			return null;
 		}
 	}
-	
+
 	public static PrivateKey getSignCertPrivateKeyByStoreMap(String certPath,
 			String certPwd) {
 		if (!certKeyStoreMap.containsKey(certPath)) {
@@ -335,7 +340,7 @@ public class CertUtil {
 
 	/**
 	 * 获取加密证书公钥.密码加密时需要
-	 * 
+	 *
 	 * @return
 	 */
 	public static PublicKey getEncryptCertPublicKey() {
@@ -352,11 +357,11 @@ public class CertUtil {
 			return encryptCert.getPublicKey();
 		}
 	}
-	
+
 	/**
 	 * 获取加密证书公钥.密码加密时需要
 	 * 加密磁道信息证书
-	 * 
+	 *
 	 * @return
 	 */
 	public static PublicKey getEncryptTrackPublicKey() {
@@ -380,7 +385,7 @@ public class CertUtil {
 
 	/**
 	 * 验证签名证书
-	 * 
+	 *
 	 * @return 验证签名证书的公钥
 	 */
 	public static PublicKey getValidateKey() {
@@ -392,7 +397,7 @@ public class CertUtil {
 
 	/**
 	 * 通过certId获取证书Map中对应证书的公钥
-	 * 
+	 *
 	 * @param certId
 	 *            证书物理序号
 	 * @return 通过证书编号获取到的公钥
@@ -417,11 +422,11 @@ public class CertUtil {
 		}
 	}
 
-	
+
 
 	/**
 	 * 获取签名证书中的证书序列号（单证书）
-	 * 
+	 *
 	 * @return 证书的物理编号
 	 */
 	public static String getSignCertId() {
@@ -442,7 +447,7 @@ public class CertUtil {
 
 	/**
 	 * 获取加密证书的证书序列号
-	 * 
+	 *
 	 * @return
 	 */
 	public static String getEncryptCertId() {
@@ -459,7 +464,7 @@ public class CertUtil {
 			return encryptCert.getSerialNumber().toString();
 		}
 	}
-	
+
 	/**
 	 * 获取磁道加密证书的证书序列号
 	 * @deprecated 磁道根本没给证书啊啊啊啊啊啊啊
@@ -483,7 +488,7 @@ public class CertUtil {
 
 	/**
 	 * 获取签名证书公钥对象
-	 * 
+	 *
 	 * @return
 	 */
 	public static PublicKey getSignPublicKey() {
@@ -503,11 +508,11 @@ public class CertUtil {
 			return null;
 		}
 	}
-	
-	
+
+
 	/**
 	 * 将证书文件读取为证书存储对象
-	 * 
+	 *
 	 * @param pfxkeyfile
 	 *            证书文件名
 	 * @param keypwd
@@ -515,7 +520,7 @@ public class CertUtil {
 	 * @param type
 	 *            证书类型
 	 * @return 证书对象
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static KeyStore getKeyInfo(String pfxkeyfile, String keypwd,
 			String type) throws IOException {
@@ -586,7 +591,7 @@ public class CertUtil {
 		printProviders();
 		logger.info("================= SYS INFO end=====================");
 	}
-	
+
 	public static void printProviders() {
 		logger.info("Providers List:");
 		Provider[] providers = Security.getProviders();
@@ -597,7 +602,7 @@ public class CertUtil {
 
 	/**
 	 * 证书文件过滤器
-	 * 
+	 *
 	 */
 	static class CerFilter implements FilenameFilter {
 		public boolean isCer(String name) {
@@ -611,7 +616,7 @@ public class CertUtil {
 			return isCer(name);
 		}
 	}
-	
+
 	/**
 	 * <pre>
 	 * 从一个ThreadLocal中获取当前KeyStore中的CertId,
@@ -639,8 +644,8 @@ public class CertUtil {
 			return "";
 		}
 	}
-	
-	
+
+
 	public static String getCertIdByKeyStoreMap(String certPath, String certPwd) {
 		if (!certKeyStoreMap.containsKey(certPath)) {
 			// 缓存中未查询到,则加载RSA证书
@@ -665,11 +670,11 @@ public class CertUtil {
 			return null;
 		}
 	}
-	
+
 
 	/**
 	 * 获取证书容器
-	 * 
+	 *
 	 * @return
 	 */
 	public static Map<String, X509Certificate> getCertMap() {
@@ -678,16 +683,16 @@ public class CertUtil {
 
 	/**
 	 * 设置证书容器
-	 * 
+	 *
 	 * @param certMap
 	 */
 	public static void setCertMap(Map<String, X509Certificate> certMap) {
 		CertUtil.certMap = certMap;
 	}
-	
+
 	/**
 	 * 使用模和指数生成RSA公钥 注意：此代码用了默认补位方式，为RSA/None/PKCS1Padding，不同JDK默认的补位方式可能不同
-	 * 
+	 *
 	 * @param modulus
 	 *            模
 	 * @param exponent
@@ -706,10 +711,10 @@ public class CertUtil {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * 使用模和指数的方式获取公钥对象
-	 * 
+	 *
 	 * @return
 	 */
 	public static PublicKey getEncryptTrackCertPublicKey(String modulus,
@@ -720,5 +725,5 @@ public class CertUtil {
 		}
 		return getPublicKey(modulus, exponent);
 	}
-	
+
 }
