@@ -28,14 +28,21 @@ public class Tenant extends IdEntity {
 	public static final Integer AUTH_ONESELF_SUCCESS = 1;//个人认证成功
 	public static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
 	public static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
-	private static final long serialVersionUID = 1L;
 	//是否实名
 	private Integer isRealAuth;
-
+	private String tenantName;
 	//租户识别码
 	private String tenantUid;
 
 	private String registerUserId; //注册的账号ID
+	@Column(name = "tenant_name")
+	public String getTenantName() {
+		return tenantName;
+	}
+
+	public void setTenantName(String tenantName) {
+		this.tenantName = tenantName;
+	}
 
 	@Column(name = "is_real_auth")
 	public Integer getIsRealAuth() {

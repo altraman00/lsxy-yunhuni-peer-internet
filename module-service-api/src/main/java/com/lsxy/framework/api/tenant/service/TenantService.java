@@ -4,6 +4,8 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 
+import java.util.List;
+
 /**
  * 租户Mananger
  * 
@@ -23,4 +25,11 @@ public interface TenantService extends BaseService<Tenant> {
      * @return
      */
     Tenant createTenant();
+
+    /**
+     * 根据会员名模糊查找Tenant
+     * @param name
+     * @return
+     */
+    List<Tenant>  pageListByUserName(String name);
 }

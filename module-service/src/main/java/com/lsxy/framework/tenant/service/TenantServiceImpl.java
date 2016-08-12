@@ -18,6 +18,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -61,6 +62,13 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
             cacheManager.del(INCREASE_TID);
         }
         return this.save(tenant);
+    }
+
+    @Override
+    public List<Tenant> pageListByUserName(String name) {
+        String hql = " FROM Tenant obj WHERE obj.tenantName like ?1 ";
+        List<Tenant> list = this.list(hql,"%"+name+"%");
+        return list;
     }
 
 }

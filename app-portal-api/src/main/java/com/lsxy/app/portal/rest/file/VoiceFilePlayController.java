@@ -106,7 +106,7 @@ public class VoiceFilePlayController extends AbstractRestController {
     @RequestMapping("/plist")
     public RestResponse pageList(Integer pageNo,Integer pageSize,String name,String appId){
         Tenant tenant = getCurrentAccount().getTenant();
-        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,tenant.getId());
+        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant.getId()},null,null,null);
         return RestResponse.success(page);
     }
 }
