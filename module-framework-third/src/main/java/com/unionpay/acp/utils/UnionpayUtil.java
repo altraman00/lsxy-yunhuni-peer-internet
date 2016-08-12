@@ -4,6 +4,7 @@ import com.lsxy.framework.config.SystemConfig;
 import com.unionpay.acp.sdk.AcpService;
 import com.unionpay.acp.sdk.SDKConfig;
 import com.unionpay.acp.sdk.SDKConstants;
+import com.unionpay.acp.sdk.SDKUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -144,11 +145,18 @@ public class UnionpayUtil {
 		return ZmDataList;	
 	}
 
-		
+
 	public static void main(String[] args) {
-		System.out.println(AcpService.encryptTrack("12", "utf-8"));
-		SDKConfig.getConfig().loadPropertiesFromSrc();
-		
+		Map map = new HashMap();
+		map.put("aaa","aaa");
+		map.put("bbbb","bbbb");
+
+        Map<String, String> sign = AcpService.sign(map, UnionpayUtil.encoding_UTF8);
+
+        System.out.println(sign);
+
+        System.out.println(AcpService.encryptTrack("12", "utf-8"));
+
 		Map<String,String> customerInfoMap = new HashMap<String,String>();
 		//customerInfoMap.put("certifTp", "01");
 		//customerInfoMap.put("certifId", "341126197709218366");
@@ -158,9 +166,9 @@ public class UnionpayUtil {
 		//customerInfoMap.put("pin", "626262");						//密码加密
 		//customerInfoMap.put("cvn2", "123");           				//卡背面的cvn2三位数字
 		//customerInfoMap.put("expired", "1711");  				    //有效期 年在前月在后
-		
+
 		//System.out.println(getCustomerInfoWithEncrypt(customerInfoMap,"6217001210048797565"));
-		
+
 		parseZMFile("C:\\Users\\wulh\\Desktop\\802310048993424_20150905\\INN15090588ZM_802310048993424");
 	}
 
