@@ -99,4 +99,12 @@ public interface AccountService extends BaseService<Account> {
      * @return
      */
     List<Account> list();
+
+
+    /**
+     * 获取租户的账号信息
+     * @param tenantId
+     * @return
+     */
+    public Account findOneByTenant(String tenantId);
 }
