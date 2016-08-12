@@ -44,6 +44,28 @@ private static final Logger logger = LoggerFactory.getLogger(RPCCaller.class);
 		return this.requestMap.get(sessionid);
 	}
 
+	/**
+	 * 收到了响应对象
+	 * @param response
+     */
+	public void receivedResponse(RPCResponse response) {
+		if(logger.isDebugEnabled()){
+			logger.debug(">>[NM]"+response);
+		}
+		this.putResponse(response);
+		RPCRequest request = this.getRequest(response.getSessionid());
+		if(request != null){
+			if(logger.isDebugEnabled()){
+				logger.debug("通知请求对象该醒了:{}",request);
+			}
+			synchronized (request){
+				request.notify();
+			}
+		}else{
+			logger.error("收到一个匹配不到请求对象的响应对象:{}",response);
+		}
+	}
+
 
 	/**
 	 * 

@@ -16,6 +16,6 @@ public class ServiceConstants {
 
     public static final String MN_CH_TEST_STASTICS_RESET = "MN_CH_TEST_STASTICS_RESET";//测试使用,重置计数器
 
-	public static final String MN_CH_TEST_ECHO= "CH_MN_TEST_ECHO";//压力测试使用
+	public static final String MN_CH_TEST_ECHO= "MN_CH_TEST_ECHO";//压力测试使用
 
 }

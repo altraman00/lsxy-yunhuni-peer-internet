@@ -27,6 +27,8 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
     @Autowired(required = false)
     private AbstractServiceHandler serviceHandler;
 
+    @Autowired
+    private RPCCaller rpcCaller;
 
     public ServerSessionContext getSessionContext() {
         return sessionContext;
@@ -94,7 +96,8 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
             processRequestCount.incrementAndGet();
 
         }else if(message instanceof  RPCResponse){
-
+            RPCResponse response = (RPCResponse) message;
+            rpcCaller.receivedResponse(response);
         }else{
 
         }
