@@ -67,7 +67,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
             }
             hql+=" obj.tenant.id in("+tenantIds+") ";
         }
-        if(StringUtil.isNotEmpty(status+"")){
+        if(status!=null){
             if(isWhere){
                 hql += " where ";
                 isWhere = false;
