@@ -61,7 +61,7 @@ public class CallControllerTest {
 
     @Test
     public void testDoPresure(){
-        for(int i=0;i<100;i++){
+        for(int i=0;i<500;i++){
             Thread thread = new Thread(new RunTask());
             thread.start();
 
