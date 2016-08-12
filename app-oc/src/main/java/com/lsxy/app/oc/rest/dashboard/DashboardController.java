@@ -9,6 +9,7 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +29,10 @@ import java.util.concurrent.Future;
 /**
  * Created by Administrator on 2016/8/9.
  */
+@Api(value = "dashboard", description = "dashboard 相关的接口" )
 @RestController
 @RequestMapping("/dashboard")
-public class IndexController {
+public class DashboardController {
 
     @Autowired
     private TenantService tenantService;
