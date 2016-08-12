@@ -23,7 +23,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AreaServerServiceHandler.class);
 
-    @Autowired
+    @Autowired(required = false)
     private StasticsCounter sc;
 
     @Autowired
