@@ -86,4 +86,11 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      */
     public BigDecimal getAmongAmountByDateAndTenant(Date d,String tenant);
 
+    /**
+     * 获取某月的某个app的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountByDateAndApp(Date d,String app);
+
 }

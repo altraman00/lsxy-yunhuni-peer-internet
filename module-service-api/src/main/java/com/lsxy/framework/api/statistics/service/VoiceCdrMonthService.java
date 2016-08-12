@@ -48,16 +48,30 @@ public interface VoiceCdrMonthService extends BaseService<VoiceCdrMonth> {
     public long getAmongDurationByDateAndTenant(Date d,String tenant);
 
     /**
-     * 获取某月的某个租户的通话时长(会话量)
+     * 获取某月的某个租户的通话次数(会话量)
      * @param d
      * @return
      */
     public long getAmongCallByDateAndTenant(Date d,String tenant);
 
     /**
-     * 获取某月的某个租户的通话时长(接通量)
+     * 获取某月的某个租户的连通次数(接通量)
      * @param d
      * @return
      */
     public long getAmongConnectByDateAndTenant(Date d,String tenant);
+
+    /**
+     * 获取某月的某个租户的通话时长(话务量)
+     * @param d
+     * @return
+     */
+    public long getAmongDurationByDateAndApp(Date d,String app);
+
+    /**
+     * 获取某月的某个租户的通话次数(会话量)
+     * @param d
+     * @return
+     */
+    public long getAmongCallByDateAndApp(Date d,String app);
 }

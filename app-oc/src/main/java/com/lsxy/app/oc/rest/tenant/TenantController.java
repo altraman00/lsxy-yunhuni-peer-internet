@@ -18,6 +18,8 @@ import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import io.swagger.annotations.Api;
@@ -90,6 +92,9 @@ public class TenantController {
 
     @Autowired
     private MQService mqService;
+
+    @Autowired
+    private AppService appService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -467,11 +472,6 @@ public class TenantController {
         return info;
     }
 
-    /**
-     * 重置密码-发送邮件
-     * @param id
-     * @return
-     */
     @ApiOperation(value = "重置租户的密码)")
     @RequestMapping(value="/tenants/{id}/resetPass",method = RequestMethod.PATCH)
     public RestResponse resetPass(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
@@ -481,5 +481,24 @@ public class TenantController {
         }
         mqService.publish(new ResetPwdVerifySuccessEvent(account.getEmail()));
         return RestResponse.success(true);
+    }
+
+    @ApiOperation(value = "租户的app列表，以及app上个月指标")
+    @RequestMapping(value="/tenants/{id}/apps",method = RequestMethod.GET)
+    public RestResponse apps(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
+        List<TenantAppVO> dto = new ArrayList<>();
+        List<App> apps = appService.getAppsByTenantId(id);
+        if(apps != null && apps.size()>0){
+            //获取app上个月的指标
+            Date preMonth = DateUtils.getPrevMonth(new Date());
+            for (App app : apps) {
+                TenantAppVO vo = new TenantAppVO(app);
+                vo.setConsume(consumeMonthService.getAmongAmountByDateAndApp(preMonth,app.getId()));
+                vo.setAmongDuration(voiceCdrMonthService.getAmongDurationByDateAndApp(preMonth,app.getId()));
+                vo.setSessionCount(voiceCdrMonthService.getAmongCallByDateAndApp(preMonth,app.getId()));
+                dto.add(vo);
+            }
+        }
+        return RestResponse.success(dto);
     }
 }
