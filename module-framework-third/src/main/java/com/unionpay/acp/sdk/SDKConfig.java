@@ -154,6 +154,7 @@ public class SDKConfig {
 	public static SDKConfig getConfig() {
 		if (null == config) {
 			config = new SDKConfig();
+			config.loadPropertiesFromSrc();
 		}
 		return config;
 	}
@@ -237,7 +238,7 @@ public class SDKConfig {
 	}
 
 	/**
-	 * 根据传入的 {@link #load(java.util.Properties)}对象设置配置参数
+	 * 根据传入的 {@link #(java.util.Properties)}对象设置配置参数
 	 *
 	 * @param pro
 	 */
