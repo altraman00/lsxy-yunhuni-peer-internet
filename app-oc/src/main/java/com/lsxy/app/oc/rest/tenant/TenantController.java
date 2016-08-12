@@ -1,14 +1,15 @@
 package com.lsxy.app.oc.rest.tenant;
 
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
-import com.lsxy.app.oc.rest.tenant.vo.ConsumesVO;
-import com.lsxy.app.oc.rest.tenant.vo.RechargeInput;
-import com.lsxy.app.oc.rest.tenant.vo.TenantIndicantVO;
+import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.statistics.service.*;
-import com.lsxy.framework.api.tenant.model.TenantVO;
+import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.api.tenant.service.RealnameCorpService;
+import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -22,8 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -74,6 +77,12 @@ public class TenantController {
 
     @Autowired
     private ConsumeService consumeService;
+
+    @Autowired
+    private RealnameCorpService realnameCorpService;
+
+    @Autowired
+    private RealnamePrivateService realnamePrivateService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -355,7 +364,7 @@ public class TenantController {
 
     @ApiOperation(value = "租户消费记录")
     @RequestMapping(value = "/tenants/{id}/consumes",method = RequestMethod.GET)
-    public RestResponse recharges(
+    public RestResponse consumes(
             @PathVariable String id,
             @RequestParam Integer year,
             @RequestParam Integer month,
@@ -365,5 +374,89 @@ public class TenantController {
         dto.setConsumes(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
         dto.setSumAmount(consumeDayService.getSumAmountByTenant(id));
         return RestResponse.success(dto);
+    }
+
+    @ApiOperation(value = "租户基本信息,联系信息,业务信息")
+    @RequestMapping(value = "/tenants/{id}/info",method = RequestMethod.GET)
+    public RestResponse info(@PathVariable String id) throws InvocationTargetException, IllegalAccessException {
+        TenantInfoVO dto = new TenantInfoVO();
+        if(id != null){
+            Tenant tenant = tenantService.findById(id);
+            if(tenant != null){
+                Account account = accountService.findOneByTenant(id);
+                dto.setTenantName(tenant.getTenantName());
+                if(account!=null){
+                    BeanUtils.copyProperties(dto,account);
+                }
+            }
+        }
+        return RestResponse.success(dto);
+    }
+
+    @ApiOperation(value = "认证信息,认证状态(未认证，未审核，已认证，认证失败)")
+    @RequestMapping(value = "/tenants/{id}/auth/info",method = RequestMethod.GET)
+    public RestResponse authInfo(@PathVariable String id) throws InvocationTargetException, IllegalAccessException {
+        AuthInfoVO info = new AuthInfoVO();
+        info.setStatus("未认证");
+        if(id != null){
+            Tenant tenant = tenantService.findById(id);
+            if(tenant != null){
+                Integer status = tenant.getIsRealAuth();
+                getAuthInfo(tenant.getId(),status,info);
+                //未认证，等待审核，已认证，认证失败
+                Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT};//等待审核
+                Integer[] auth_success_status = Tenant.AUTH_STATUS;//已认证
+                Integer[] auth_fail_status = new Integer[]{Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_ONESELF_FAIL};
+                if(Arrays.asList(wait_auth_status).contains(status)){//等待审核
+                    info.setStatus("未审核");
+                    info = getAuthInfo(tenant.getId(),status,info);
+                }else if(Arrays.asList(auth_success_status).contains(status)){//已认证
+                    info.setStatus("已认证");
+                    info = getAuthInfo(tenant.getId(),status,info);
+                }else if(Arrays.asList(auth_fail_status).contains(status)){//认证失败
+                    info.setStatus("认证失败");
+                    info = getAuthInfo(tenant.getId(),status,info);
+                }
+            }
+        }
+        return RestResponse.success(info);
+    }
+
+    private AuthInfoVO getAuthInfo(String tenantId,Integer status,AuthInfoVO info){
+        Integer[] privateAuth_status = new Integer[]{Tenant.AUTH_ONESELF_SUCCESS,
+                Tenant.AUTH_WAIT,Tenant.AUTH_UPGRADE_WAIT,
+                Tenant.AUTH_UPGRADE_FAIL,Tenant.AUTH_ONESELF_FAIL};//个人认证
+        
+        Integer[] companyAuth_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,
+                Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_COMPANY_FAIL};//公司认证
+        AuthInfoVO authInfo = null;
+        if(Arrays.asList(privateAuth_status).contains(status)){
+            authInfo = new PrivateAuthInfoVO();
+            authInfo.setStatus(info.getStatus());
+            authInfo.setType("个人");
+            RealnamePrivate p = realnamePrivateService.findByTenantIdNewest(tenantId);
+            if(p!=null){
+                try {
+                    BeanUtils.copyProperties(authInfo,p);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            info = authInfo;
+        }else if(Arrays.asList(companyAuth_status).contains(status)){
+            authInfo = new CompanyAuthInfoVO();
+            authInfo.setStatus(info.getStatus());
+            authInfo.setType("公司");
+            RealnameCorp p = realnameCorpService.findByTenantIdNewest(tenantId);
+            if(p!=null){
+                try {
+                    BeanUtils.copyProperties(authInfo,p);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            info = authInfo;
+        }
+        return info;
     }
 }

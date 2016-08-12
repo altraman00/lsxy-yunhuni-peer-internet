@@ -5,8 +5,6 @@ import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 
 import java.util.List;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
 
     /**
@@ -23,4 +21,6 @@ public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
      * @return
      */
     public RealnamePrivate findByTenantIdAndStatus(String tenantId,int status);
+
+    public RealnamePrivate findByTenantIdNewest(String tenantId);
 }
