@@ -82,7 +82,7 @@ public class CallControllerTest {
         private String url = restPrefixUrl + "test/mq/presure";
         @Override
         public void run() {
-            while(count-->0) {
+            while(true) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("开始发起请求");
                 }
