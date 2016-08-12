@@ -74,6 +74,7 @@ public class VoiceFilePlayController extends AbstractRestController {
         voiceFilePlay.setApp(app);
         Account account = getCurrentAccount();
         voiceFilePlay.setTenant(account.getTenant());
+        voiceFilePlay.setStatus(VoiceFilePlay.STATUS_WAIT);
         voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
         //更新账户表
         Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
