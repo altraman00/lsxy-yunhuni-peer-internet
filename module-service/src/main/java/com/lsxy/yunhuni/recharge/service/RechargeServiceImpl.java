@@ -1,22 +1,24 @@
 package com.lsxy.yunhuni.recharge.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
-import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.recharge.dao.RechargeDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -35,6 +37,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
 
     @Autowired
     BillingService billingService;
+
+    @Autowired
+    EntityManager em;
 
     @Override
     public BaseDaoInterface<Recharge, Serializable> getDao() {
@@ -82,6 +87,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         return  recharge;
     }
 
+
     @Override
     public Page<Recharge> pageListByUserNameAndTime(String userName, Integer pageNo, Integer pageSize, Date startTime, Date endTime) throws MatchMutiEntitiesException {
         Page<Recharge> page = null;
@@ -102,5 +108,27 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             }
         }
         return page;
+    }
+
+    @Override
+    public boolean doRecharge(String tenantId, BigDecimal amount) {
+        if(StringUtil.isEmpty(tenantId)){
+            throw new IllegalArgumentException();
+        }
+        if(amount == null || amount.doubleValue() < 0){
+            throw new IllegalArgumentException();
+        }
+        Tenant tenant = tenantService.findById(tenantId);
+        if(tenant == null){
+            throw new IllegalArgumentException();
+        }
+        String orderId = UUIDGenerator.uuid();
+        Recharge recharge = new Recharge(tenant,amount,RechargeType.RENGONG, RechargeStatus.PAID,orderId);
+        rechargeDao.save(recharge);
+        //更新账务表的余额
+        Billing billing = billingService.findBillingByTenantId(tenant.getId());
+        billing.setBalance(billing.getBalance().add(recharge.getAmount()));
+        billingService.save(billing);
+        return true;
     }
 }
