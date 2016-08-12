@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.tenant;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.framework.api.consume.service.ConsumeService;
+import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.statistics.service.*;
 import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.AccountService;
@@ -12,6 +13,9 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.mail.MailConfigNotEnabledException;
+import com.lsxy.framework.mail.MailContentNullException;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
@@ -83,6 +87,9 @@ public class TenantController {
 
     @Autowired
     private RealnamePrivateService realnamePrivateService;
+
+    @Autowired
+    private MQService mqService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -458,5 +465,21 @@ public class TenantController {
             info = authInfo;
         }
         return info;
+    }
+
+    /**
+     * 重置密码-发送邮件
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "重置租户的密码)")
+    @RequestMapping(value="/tenants/{id}/resetPass",method = RequestMethod.PATCH)
+    public RestResponse resetPass(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
+        Account account = accountService.findOneByTenant(id);
+        if(account == null || account.getEmail() == null){
+            return RestResponse.success(false);
+        }
+        mqService.publish(new ResetPwdVerifySuccessEvent(account.getEmail()));
+        return RestResponse.success(true);
     }
 }
