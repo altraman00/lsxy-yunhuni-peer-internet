@@ -179,7 +179,7 @@
 <div class="shadow-bg" id="show-bg"></div>
 <div id="mobilebox" class="modal-box" style="display: none;">
     <div class="addmobile1" style="">
-        <div class="title">操作确认<a class="close_a modalCancel"></a></div>
+        <div class="title">操作确认<a class="close_a modalCancel cancelclear"></a></div>
         <div class="content" >
             <div class="tips-box">
                 确认是本账号操作，请再次输入用户名密码
@@ -241,7 +241,6 @@
 
 </div>
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
 <!--must-->
@@ -264,7 +263,7 @@
         $('#email').val("");
         $('#mobile').val("");
         $('#yzm1').val("");
-        $('#moadltips1').val("");
+        $('#moadltips1').html("");
         $('#second-code').val("");
     });
     var isVc = false;//是否需要图形验证码

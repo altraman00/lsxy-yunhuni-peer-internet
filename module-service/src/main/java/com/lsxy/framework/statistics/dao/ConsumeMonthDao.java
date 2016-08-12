@@ -4,6 +4,8 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 消费月统计DAO
@@ -17,4 +19,20 @@ public interface ConsumeMonthDao extends BaseDaoInterface<ConsumeMonth,Serializa
      */
     ConsumeMonth findFirst1ByTenantIdOrderByDtAsc(String tenantId);
 
+    /**
+     * 获取用户的消费月账单
+     * @param tenantId 租户Id
+     * @param dt 时间
+     * @param appId 应用Id
+     * @return
+     */
+    List<ConsumeMonth> findByTenantIdAndDtAndAppIdAndTypeNotNull(String tenantId, Date dt, String appId);
+
+    /**
+     * 获取用户的消费月账单 （所有应用）
+     * @param tenantId
+     * @param dt
+     * @return
+     */
+    List<ConsumeMonth> findByTenantIdAndDtAndAppIdIsNullAndTypeNotNull(String tenantId, Date dt);
 }

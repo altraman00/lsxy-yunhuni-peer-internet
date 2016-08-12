@@ -309,7 +309,6 @@
 </div>
 <!-- /.modal -->
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'></script>
@@ -477,7 +476,7 @@
 
             var html ='';
             for(var i=0 ; i<result.length; i++){
-                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amount.toFixed(2)+'</div></div>';
+                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amongAmount.toFixed(2)+'</div></div>';
             }
 
             document.getElementById('collapse-'+id+'-content').innerHTML=html;

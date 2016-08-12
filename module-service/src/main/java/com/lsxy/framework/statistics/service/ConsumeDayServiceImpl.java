@@ -11,6 +11,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.statistics.dao.ConsumeDayDao;
 import com.lsxy.utils.StatisticsUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -109,5 +110,21 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
                 }
             }
         });
+    }
+
+    @Override
+    public List<ConsumeDay> getConsumeDays(String tenantId, String appId, String day) {
+        List<ConsumeDay> consumeDays = null;
+        if(StringUtils.isBlank(day)){
+            throw new IllegalArgumentException("月份为空");
+        }
+        Date dt = DateUtils.parseDate(day, "yyyy-MM-dd");
+        if(StringUtils.isBlank(appId)){
+            consumeDays = consumeDayDao.findByTenantIdAndDtAndAppIdIsNullAndTypeNotNull(tenantId,dt);
+        }else{
+            consumeDays = consumeDayDao.findByTenantIdAndDtAndAppIdAndTypeNotNull(tenantId, dt, appId);
+        }
+
+        return consumeDays;
     }
 }
