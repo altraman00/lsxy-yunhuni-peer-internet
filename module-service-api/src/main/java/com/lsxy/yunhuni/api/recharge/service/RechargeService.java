@@ -55,10 +55,4 @@ public interface RechargeService extends BaseService<Recharge> {
      * 人工给租户充值
      */
     boolean doRecharge(String tenant,BigDecimal amount);
-
-    /**
-     * 查询某个租户的消费记录
-     */
-
-    Page<Recharge> pageListByTenantAndDate(String tenantId,Integer year,Integer month,Integer pageNo,Integer pageSize);
 }

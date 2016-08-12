@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.tenant;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.RechargeInput;
 import com.lsxy.app.oc.rest.tenant.vo.TenantIndicantVO;
+import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.statistics.service.*;
 import com.lsxy.framework.api.tenant.model.TenantVO;
 import com.lsxy.framework.api.tenant.service.AccountService;
@@ -69,6 +70,9 @@ public class TenantController {
 
     @Autowired
     private RechargeService rechargeService;
+
+    @Autowired
+    private ConsumeService consumeService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -356,6 +360,6 @@ public class TenantController {
             @RequestParam Integer month,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize){
-        return RestResponse.success(rechargeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
+        return RestResponse.success(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
     }
 }
