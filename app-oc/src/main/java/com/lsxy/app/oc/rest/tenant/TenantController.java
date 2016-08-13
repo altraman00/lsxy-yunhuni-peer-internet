@@ -6,11 +6,9 @@ import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.statistics.service.*;
 import com.lsxy.framework.api.tenant.model.*;
-import com.lsxy.framework.api.tenant.service.AccountService;
-import com.lsxy.framework.api.tenant.service.RealnameCorpService;
-import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
-import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.api.tenant.service.*;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
@@ -110,6 +108,9 @@ public class TenantController {
 
     @Autowired
     private VoiceFileRecordService voiceFileRecordService;
+
+    @Autowired
+    private TenantServiceSwitchService tenantServiceSwitchService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -580,5 +581,23 @@ public class TenantController {
     public RestResponse records(
             @PathVariable String tenant,@PathVariable String appId,@PathVariable String record){
         return RestResponse.success("url");
+    }
+
+    @ApiOperation(value = "获取功能开关")
+    @RequestMapping(value = "/tenants/{tenant}/switchs",method = RequestMethod.GET)
+    public RestResponse switchs(
+            @PathVariable String tenant) throws MatchMutiEntitiesException {
+        TenantServiceSwitch switchs=tenantServiceSwitchService.findOneByTenant(tenant);
+        if(switchs == null){
+            switchs = tenantServiceSwitchService.saveOrUpdate(tenant,null);
+        }
+        return RestResponse.success(switchs);
+    }
+
+    @ApiOperation(value = "保存功能开关")
+    @RequestMapping(value = "/tenants/{tenant}/switch",method = RequestMethod.PUT)
+    public RestResponse switchs(
+            @PathVariable String tenant,@RequestBody TenantServiceSwitch switchs){
+        return RestResponse.success(tenantServiceSwitchService.saveOrUpdate(tenant,switchs));
     }
 }
