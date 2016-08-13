@@ -3,19 +3,31 @@ package com.lsxy.app.oc.rest.tenant;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.framework.api.consume.service.ConsumeService;
+import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.statistics.service.*;
 import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.RealnameCorpService;
 import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.*;
+import com.lsxy.framework.mail.MailConfigNotEnabledException;
+import com.lsxy.framework.mail.MailContentNullException;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
+import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
+import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,14 +37,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 /**
  * Created by Administrator on 2016/8/10.
@@ -41,6 +51,8 @@ import java.util.concurrent.Future;
 @RestController
 @RequestMapping("/tenant")
 public class TenantController {
+
+    private  String path= SystemConfig.getProperty("portal.realauth.resource.upload.file.path");
 
     @Autowired
     private TenantService tenantService;
@@ -83,6 +95,21 @@ public class TenantController {
 
     @Autowired
     private RealnamePrivateService realnamePrivateService;
+
+    @Autowired
+    private MQService mqService;
+
+    @Autowired
+    private AppService appService;
+
+    @Autowired
+    private TestNumBindService testNumBindService;
+
+    @Autowired
+    private VoiceFilePlayService voiceFilePlayService;
+
+    @Autowired
+    private VoiceFileRecordService voiceFileRecordService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -458,5 +485,100 @@ public class TenantController {
             info = authInfo;
         }
         return info;
+    }
+
+    @ApiOperation(value = "重置租户的密码)")
+    @RequestMapping(value="/tenants/{id}/resetPass",method = RequestMethod.PATCH)
+    public RestResponse resetPass(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
+        Account account = accountService.findOneByTenant(id);
+        if(account == null || account.getEmail() == null){
+            return RestResponse.success(false);
+        }
+        mqService.publish(new ResetPwdVerifySuccessEvent(account.getEmail()));
+        return RestResponse.success(true);
+    }
+
+    @ApiOperation(value = "租户的app列表，以及app上个月指标")
+    @RequestMapping(value="/tenants/{id}/apps",method = RequestMethod.GET)
+    public RestResponse apps(@PathVariable String id) throws MailConfigNotEnabledException, MailContentNullException {
+        List<TenantAppVO> dto = new ArrayList<>();
+        List<App> apps = appService.getAppsByTenantId(id);
+        if(apps != null && apps.size()>0){
+            //获取app上个月的指标
+            Date preMonth = DateUtils.getPrevMonth(new Date());
+            for (App app : apps) {
+                TenantAppVO vo = new TenantAppVO(app);
+                vo.setConsume(consumeMonthService.getAmongAmountByDateAndApp(preMonth,app.getId()));
+                vo.setAmongDuration(voiceCdrMonthService.getAmongDurationByDateAndApp(preMonth,app.getId()));
+                vo.setSessionCount(voiceCdrMonthService.getAmongCallByDateAndApp(preMonth,app.getId()));
+                dto.add(vo);
+            }
+        }
+        return RestResponse.success(dto);
+    }
+
+    @ApiOperation(value = "获取租户的app信息")
+    @RequestMapping(value="/tenants/{tenant}/apps/{appId}",method = RequestMethod.GET)
+    public RestResponse app(@PathVariable String tenant,@PathVariable String appId) {
+        App app = appService.findById(appId);
+        if(!app.getTenant().getId().equals(tenant)){
+            return RestResponse.success(null);
+        }
+        TenantAppVO vo = new TenantAppVO(app);
+        List<TestNumBind> tests = testNumBindService.findByTenant(tenant);
+        vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
+        return RestResponse.success(vo);
+    }
+
+    @ApiOperation(value = "获取租户的app放音文件列表")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/plays",method = RequestMethod.GET)
+    public RestResponse plays(
+            @PathVariable String tenant,@PathVariable String appId,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String name){
+        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,tenant);
+        return RestResponse.success(page);
+    }
+
+    @ApiOperation(value = "获取租户的文件容量和剩余")
+    @RequestMapping(value="/tenants/{tenant}/apps/{appId}/file/totalSize",method = RequestMethod.GET)
+    public RestResponse fileTotalSize(@PathVariable String tenant,@PathVariable String appId){
+        Map map = new HashMap();
+        Billing billing = billingService.findBillingByTenantId(tenant);
+        if(billing!=null){
+            Long fileTotalSize = billing.getFileTotalSize();
+            map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());
+            map.put("fileTotalSize",fileTotalSize);
+        }else{
+            map.put("fileRemainSize",0);
+            map.put("fileTotalSize",0);
+        }
+        return RestResponse.success(map);
+    }
+
+    @ApiOperation(value = "获取租户的app录音文件列表")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/records",method = RequestMethod.GET)
+    public RestResponse records(
+            @PathVariable String tenant,@PathVariable String appId,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize){
+        Page<VoiceFileRecord> page = voiceFileRecordService.pageList(pageNo,pageSize,appId,tenant);
+        return RestResponse.success(page);
+    }
+
+    @ApiOperation(value = "批量下载租户的app录音文件")
+    @RequestMapping(value="/tenants/{tenant}/apps/{appId}/records/batch/download",method = RequestMethod.GET)
+    public RestResponse batchDownload(
+            @PathVariable String tenant,@PathVariable String appId,
+            Date startTime,Date endTime){
+        return RestResponse.success("url");
+    }
+
+    @ApiOperation(value = "下载单个录音文件")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/records/{record}",method = RequestMethod.GET)
+    public RestResponse records(
+            @PathVariable String tenant,@PathVariable String appId,@PathVariable String record){
+        return RestResponse.success("url");
     }
 }

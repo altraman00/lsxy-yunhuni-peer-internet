@@ -55,4 +55,11 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     int countValidDateBetween(Date d1, Date d2);
+
+    /**
+     * 获取租户的app列表
+     * @param tenantId
+     * @return
+     */
+    List<App> getAppsByTenantId(String tenantId);
 }

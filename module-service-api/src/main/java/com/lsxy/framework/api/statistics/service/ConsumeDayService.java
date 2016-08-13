@@ -86,7 +86,7 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      */
     public BigDecimal getAmongAmountByDate(Date d);
 
-    public List<Map<String, Double>> getConsumeTop(int top);
+    public List<Map<String, Object>> getConsumeTop(int top);
 
     /**
      * 获取某一天的日结账单
