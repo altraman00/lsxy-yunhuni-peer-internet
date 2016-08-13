@@ -138,26 +138,27 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         return getAmongAmountBetween(d1,d2);
     }
 
-    private List<Map<String, Double>> getTops(List<ConsumeDay> ds, String field){
+    private List<Map<String, Object>> getTops(List<ConsumeDay> ds, String field){
         if(ds == null ){
             return null;
         }
-        List<Map<String, Double>> tops = new ArrayList<>();
+        List<Map<String, Object>> tops = new ArrayList<>();
         for (ConsumeDay d: ds) {
             String tenantName = "";
             Tenant t = tenantService.findById(d.getTenantId());
             if(t!=null && t.getTenantName()!=null){
                 tenantName = t.getTenantName();
             }
-            Map<String,Double> map = new HashMap<>();
-            map.put(tenantName, ((BigDecimal)BeanUtils.getProperty2(d,field)).doubleValue());
+            Map<String,Object> map = new HashMap<>();
+            map.put("name",tenantName);
+            map.put("value", ((BigDecimal)BeanUtils.getProperty2(d,field)).doubleValue());
             tops.add(map);
         }
         return tops;
     }
 
     @Override
-    public List<Map<String, Double>> getConsumeTop(int top) {
+    public List<Map<String, Object>> getConsumeTop(int top) {
         String hql = "from ConsumeDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumAmount DESC";
         List<ConsumeDay> list = this.getTopList(hql,false,top);
         return getTops(list,"sumAmount");

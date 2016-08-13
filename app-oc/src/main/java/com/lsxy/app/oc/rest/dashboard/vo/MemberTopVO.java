@@ -12,57 +12,57 @@ import java.util.Map;
 public class MemberTopVO implements Serializable{
 
     @JsonProperty("duration_top")
-    private List<Map<String, Long>> durationTop;
+    private List<Map<String, Object>> durationTop;
 
     @JsonProperty("call_top")
-    private List<Map<String, Long>> callTop;
+    private List<Map<String, Object>> callTop;
 
     @JsonProperty("consume_top")
-    private List<Map<String, Double>> consumeTop;
+    private List<Map<String, Object>> consumeTop;
 
     @JsonProperty("duration_week_top")
-    private List<Map<String, Long>> durationWeekTop;
+    private List<Map<String, Object>> durationWeekTop;
 
     @JsonProperty("call_week_top")
-    private List<Map<String, Long>> callWeekTop;
+    private List<Map<String, Object>> callWeekTop;
 
-    public List<Map<String, Long>> getDurationTop() {
+    public List<Map<String, Object>> getDurationTop() {
         return durationTop;
     }
 
-    public void setDurationTop(List<Map<String, Long>> durationTop) {
+    public void setDurationTop(List<Map<String, Object>> durationTop) {
         this.durationTop = durationTop;
     }
 
-    public List<Map<String, Long>> getCallTop() {
+    public List<Map<String, Object>> getCallTop() {
         return callTop;
     }
 
-    public void setCallTop(List<Map<String, Long>> callTop) {
+    public void setCallTop(List<Map<String, Object>> callTop) {
         this.callTop = callTop;
     }
 
-    public List<Map<String, Double>> getConsumeTop() {
+    public List<Map<String, Object>> getConsumeTop() {
         return consumeTop;
     }
 
-    public void setConsumeTop(List<Map<String, Double>> consumeTop) {
+    public void setConsumeTop(List<Map<String, Object>> consumeTop) {
         this.consumeTop = consumeTop;
     }
 
-    public List<Map<String, Long>> getDurationWeekTop() {
+    public List<Map<String, Object>> getDurationWeekTop() {
         return durationWeekTop;
     }
 
-    public void setDurationWeekTop(List<Map<String, Long>> durationWeekTop) {
+    public void setDurationWeekTop(List<Map<String, Object>> durationWeekTop) {
         this.durationWeekTop = durationWeekTop;
     }
 
-    public List<Map<String, Long>> getCallWeekTop() {
+    public List<Map<String, Object>> getCallWeekTop() {
         return callWeekTop;
     }
 
-    public void setCallWeekTop(List<Map<String, Long>> callWeekTop) {
+    public void setCallWeekTop(List<Map<String, Object>> callWeekTop) {
         this.callWeekTop = callWeekTop;
     }
 }
