@@ -397,7 +397,7 @@
 
             var html ='';
             for(var i=0 ; i<result.length; i++){
-                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amount.toFixed(2)+'</div></div>';
+                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amongAmount.toFixed(2)+'</div></div>';
             }
 
             document.getElementById('collapse-'+id+'-content').innerHTML=html;

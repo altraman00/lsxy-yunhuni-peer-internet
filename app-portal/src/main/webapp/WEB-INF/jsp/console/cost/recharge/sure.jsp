@@ -101,7 +101,7 @@
                                                 <p>充值方式：${recharge.typeName}</p>
                                                 <p>订单状态：${recharge.statusName}</p>
                                                 <br/>
-                                                <form:form action="${ctx}/console/cost/recharge/to_alipay" method="post" target="_blank">
+                                                <form:form action="${ctx}/console/cost/recharge/to_pay" method="post" target="_blank">
                                                     <input type="hidden" name="orderId" value="${recharge.orderId}" />
                                                     <button id="paysubmit" type="submit" class="btn btn-primary  btn-form ">付款</button>
                                                 </form:form>

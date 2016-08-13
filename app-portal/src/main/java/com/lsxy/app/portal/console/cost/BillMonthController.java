@@ -2,7 +2,7 @@ package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.framework.api.consume.model.BillMonth;
+import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -34,10 +34,10 @@ public class BillMonthController extends AbstractPortalController {
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
         }
         String token = this.getSecurityToken(request);
-        List<BillMonth> billMonths = getBillMonthRest(token, appId, month);
-        BigDecimal sumAmount = billMonths.stream().map(b -> b.getAmount()).reduce(new BigDecimal(0), (sum, item) -> sum.add(item));
+        List<ConsumeMonth> consumeMonths = getBillMonthRest(token, appId, month);
+        BigDecimal sumAmount = consumeMonths.stream().map(b -> b.getAmongAmount()).reduce(new BigDecimal(0), (sum, item) -> sum.add(item));
         model.put("sumAmount",sumAmount);
-        model.put("billMonths",billMonths);
+        model.put("billMonths",consumeMonths);
         model.put("appList",getAppList(token));
         model.put("month",month);
         model.put("appId",appId);
@@ -51,9 +51,9 @@ public class BillMonthController extends AbstractPortalController {
      * @param month 查询时间（月份）
      * @return
      */
-    private List<BillMonth> getBillMonthRest(String token,String appId, String month){
-        String getUrl = PortalConstants.REST_PREFIX_URL + "/rest/bill_month/get?appId={1}&month={2}";
-        RestResponse<List<BillMonth>> response = RestRequest.buildSecurityRequest(token).getList(getUrl, BillMonth.class, appId, month);
+    private List<ConsumeMonth> getBillMonthRest(String token, String appId, String month){
+        String getUrl = PortalConstants.REST_PREFIX_URL + "/rest/consume_month/get?appId={1}&month={2}";
+        RestResponse<List<ConsumeMonth>> response = RestRequest.buildSecurityRequest(token).getList(getUrl, ConsumeMonth.class, appId, month);
         return response.getData();
     }
 
