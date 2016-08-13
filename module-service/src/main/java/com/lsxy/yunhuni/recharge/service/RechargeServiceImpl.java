@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liups on 2016/7/1.
@@ -130,5 +131,19 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         billing.setBalance(billing.getBalance().add(recharge.getAmount()));
         billingService.save(billing);
         return true;
+    }
+
+    @Override
+    public List<Recharge> listByTenant(String tenant) {
+        String hql = "from Recharge obj where obj.tenant.id=?1 order by obj.createTime desc";
+        return this.list(hql,tenant);
+    }
+
+    @Override
+    public Page<Recharge> pageListByTenant(String tenant, Integer pageNo, Integer pageSize) {
+        Page<Recharge> page = null;
+        String hql = "from Recharge obj where obj.tenant.id=?1 order by obj.createTime desc";
+        page =  this.pageList(hql,pageNo,pageSize,tenant);
+        return page;
     }
 }
