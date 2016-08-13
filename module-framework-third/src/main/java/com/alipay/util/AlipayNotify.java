@@ -2,6 +2,8 @@ package com.alipay.util;
 
 import com.alipay.config.AlipayConfig;
 import com.alipay.sign.MD5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,7 +25,7 @@ import java.util.Map;
  *调试通知返回时，可查看或改写log日志的写入TXT里的数据，来检查通知返回是否正常
  */
 public class AlipayNotify {
-
+    private static final Logger logger = LoggerFactory.getLogger(AlipayNotify.class);
     /**
      * 支付宝消息验证地址
      */
@@ -107,7 +109,9 @@ public class AlipayNotify {
     */
     private static String checkUrl(String urlvalue) {
         String inputLine = "";
-
+        if(logger.isDebugEnabled()){
+            logger.debug("向阿里服务器发送校验notify_id：{}",urlvalue);
+        }
         try {
             URL url = new URL(urlvalue);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -118,7 +122,9 @@ public class AlipayNotify {
             e.printStackTrace();
             inputLine = "";
         }
-
+        if(logger.isDebugEnabled()){
+            logger.debug("阿里服务器校验notify_id结果：{}",inputLine);
+        }
         return inputLine;
     }
 }
