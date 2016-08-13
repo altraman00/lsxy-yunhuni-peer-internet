@@ -10,9 +10,8 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.RealnameCorpService;
 import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
@@ -20,7 +19,12 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
+import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
+import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
@@ -33,10 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,6 +51,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/tenant")
 public class TenantController {
+
+    private  String path= SystemConfig.getProperty("portal.realauth.resource.upload.file.path");
 
     @Autowired
     private TenantService tenantService;
@@ -101,6 +104,12 @@ public class TenantController {
 
     @Autowired
     private TestNumBindService testNumBindService;
+
+    @Autowired
+    private VoiceFilePlayService voiceFilePlayService;
+
+    @Autowired
+    private VoiceFileRecordService voiceFileRecordService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -519,5 +528,57 @@ public class TenantController {
         List<TestNumBind> tests = testNumBindService.findByTenant(tenant);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
         return RestResponse.success(vo);
+    }
+
+    @ApiOperation(value = "获取租户的app放音文件列表")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/plays",method = RequestMethod.GET)
+    public RestResponse plays(
+            @PathVariable String tenant,@PathVariable String appId,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String name){
+        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,tenant);
+        return RestResponse.success(page);
+    }
+
+    @ApiOperation(value = "获取租户的文件容量和剩余")
+    @RequestMapping(value="/tenants/{tenant}/apps/{appId}/file/totalSize",method = RequestMethod.GET)
+    public RestResponse fileTotalSize(@PathVariable String tenant,@PathVariable String appId){
+        Map map = new HashMap();
+        Billing billing = billingService.findBillingByTenantId(tenant);
+        if(billing!=null){
+            Long fileTotalSize = billing.getFileTotalSize();
+            map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());
+            map.put("fileTotalSize",fileTotalSize);
+        }else{
+            map.put("fileRemainSize",0);
+            map.put("fileTotalSize",0);
+        }
+        return RestResponse.success(map);
+    }
+
+    @ApiOperation(value = "获取租户的app录音文件列表")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/records",method = RequestMethod.GET)
+    public RestResponse records(
+            @PathVariable String tenant,@PathVariable String appId,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize){
+        Page<VoiceFileRecord> page = voiceFileRecordService.pageList(pageNo,pageSize,appId,tenant);
+        return RestResponse.success(page);
+    }
+
+    @ApiOperation(value = "批量下载租户的app录音文件")
+    @RequestMapping(value="/tenants/{tenant}/apps/{appId}/records/batch/download",method = RequestMethod.GET)
+    public RestResponse batchDownload(
+            @PathVariable String tenant,@PathVariable String appId,
+            Date startTime,Date endTime){
+        return RestResponse.success("url");
+    }
+
+    @ApiOperation(value = "下载单个录音文件")
+    @RequestMapping(value = "/tenants/{tenant}/apps/{appId}/records/{record}",method = RequestMethod.GET)
+    public RestResponse records(
+            @PathVariable String tenant,@PathVariable String appId,@PathVariable String record){
+        return RestResponse.success("url");
     }
 }
