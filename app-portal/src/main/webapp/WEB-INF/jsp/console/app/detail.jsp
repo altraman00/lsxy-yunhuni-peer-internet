@@ -370,7 +370,7 @@
 
 
 
-<div class="tips-toast"></div>
+
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript">
     var appId = '${app.id}';
