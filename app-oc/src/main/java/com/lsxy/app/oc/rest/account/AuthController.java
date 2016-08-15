@@ -64,7 +64,7 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/detail/{uid}",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String uid,Integer type){
+    public RestResponse pageList(@PathVariable String uid,@RequestParam Integer type){
         RestResponse restResponse = null;
         Map map = new HashMap();
         if(Tenant.AUTH_ONESELF==type){//个人
@@ -104,7 +104,7 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/edit/{uid}",method = RequestMethod.GET)
-    public RestResponse modifyAuthStatus(@PathVariable String uid,Integer type,Integer status){
+    public RestResponse modifyAuthStatus(@PathVariable String uid,@RequestParam Integer type,@RequestParam(required=false)Integer status){
         Tenant tenant = null;
         RestResponse restResponse = null;
         Integer statusT = null;
