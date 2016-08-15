@@ -52,10 +52,10 @@ public class TestEchoRequestEventHandler implements MQMessageHandler<TestEchoReq
         RPCResponse response = null;
 
         try {
-            Session session = sessionContext.getRightSession();
-            response = rpcCaller.invokeWithReturn(session,request);
-            long currentTime = System.currentTimeMillis();
-            logger.info("收到响应[{}],花费:{}ms   [{}]  vs [{}]",response,currentTime-response.getTimestamp(),response.getTimestamp(),currentTime);
+//            Session session = sessionContext.getRightSession();
+//            response = rpcCaller.invokeWithReturn(session,request);
+//            long currentTime = System.currentTimeMillis();
+//            logger.info("收到响应[{}],花费:{}ms   [{}]  vs [{}]",response,currentTime-response.getTimestamp(),response.getTimestamp(),currentTime);
 
             TestEchoResponseEvent responseMQEvent = new TestEchoResponseEvent(message.getRequestId(),request.getName());
             responseMQEvent.setRequestTimestamp(message.getTimestamp());
