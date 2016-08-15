@@ -66,7 +66,7 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/detail/{uid}",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String uid,@RequestParam Integer type){
+    public RestResponse pageList(@PathVariable String uid,@ApiParam(name = "type",value = "0个人认证 1实名认证 必填")@RequestParam Integer type){
         RestResponse restResponse = null;
         Map map = new HashMap();
         if(Tenant.AUTH_ONESELF==type){//个人
@@ -106,7 +106,8 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/edit/{uid}",method = RequestMethod.GET)
-    public RestResponse modifyAuthStatus(@PathVariable String uid,@RequestParam Integer type,@RequestParam(required=false)Integer status){
+    public RestResponse modifyAuthStatus(@PathVariable String uid,@ApiParam(name = "type",value = "0个人认证 1实名认证 必填")@RequestParam Integer type,
+                                         @ApiParam(name = "status",value = "1个人成功 2企业成功 -1个人失败 -2企业失败 必填")@RequestParam Integer status){
         Tenant tenant = null;
         RestResponse restResponse = null;
         Integer statusT = null;
