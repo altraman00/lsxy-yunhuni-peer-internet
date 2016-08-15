@@ -92,7 +92,7 @@ public class TestController {
                 mqService.publish(event);
 
                 try {
-                    TimeUnit.MILLISECONDS.sleep(100);
+                    TimeUnit.MILLISECONDS.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
