@@ -41,7 +41,7 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/{authStatus}/list",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String authStatus, String startTime, String endTime, Integer type, String search, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(@PathVariable String authStatus, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime, @RequestParam(required=false)Integer type, @RequestParam(required=false)String search, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
         Integer status = null;
         if("await".equals(authStatus)){
             status = 0;
