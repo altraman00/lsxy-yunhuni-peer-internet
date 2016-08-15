@@ -48,20 +48,22 @@ public class TestEchoRequestEventHandler implements MQMessageHandler<TestEchoReq
             logger.debug("响应ECHO Request事件:{}",message);
         }
 
-        Session session = sessionContext.getRightSession();
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,"param01=001");
         RPCResponse response = null;
+
         try {
+            Session session = sessionContext.getRightSession();
             response = rpcCaller.invokeWithReturn(session,request);
             long currentTime = System.currentTimeMillis();
             logger.info("收到响应[{}],花费:{}ms   [{}]  vs [{}]",response,currentTime-response.getTimestamp(),response.getTimestamp(),currentTime);
 
+            TestEchoResponseEvent responseMQEvent = new TestEchoResponseEvent(message.getRequestId(),request.getName());
+            responseMQEvent.setRequestTimestamp(message.getTimestamp());
+            mqService.publish(responseMQEvent);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("响应ECHO Request事件出现异常:{}",message);
+//            e.printStackTrace();
         }
 
-        TestEchoResponseEvent responseMQEvent = new TestEchoResponseEvent(message.getRequestId(),request.getName());
-        responseMQEvent.setRequestTimestamp(message.getTimestamp());
-        mqService.publish(responseMQEvent);
     }
 }

@@ -11,6 +11,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,12 @@ public class APIGatewayRequestEventHandler implements MQMessageHandler<APIGatewa
         evt.setRequestTimestamp(message.getTimestamp());
 
         //找到合适的区域代理
-        Session session = sessionContext.getRightSession();
+        Session session = null;
+        try {
+            session = sessionContext.getRightSession();
+        } catch (RightSessionNotFoundExcepiton rightSessionNotFoundExcepiton) {
+            rightSessionNotFoundExcepiton.printStackTrace();
+        }
 
         if(session != null){
             RPCRequest rpcrequest = null;

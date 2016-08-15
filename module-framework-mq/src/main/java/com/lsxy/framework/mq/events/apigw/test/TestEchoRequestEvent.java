@@ -9,6 +9,8 @@ public class TestEchoRequestEvent extends AbstractMQEvent{
     private String requestId;
     private String name;
 
+    public TestEchoRequestEvent(){}
+
     public TestEchoRequestEvent(String requestId,String name){
         this.requestId = requestId;
         this.name = name;

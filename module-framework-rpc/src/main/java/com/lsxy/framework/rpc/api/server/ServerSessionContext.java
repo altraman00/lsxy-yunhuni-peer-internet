@@ -1,6 +1,7 @@
 package com.lsxy.framework.rpc.api.server;
 
 import com.lsxy.framework.rpc.api.SessionContext;
+import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,12 +58,13 @@ public class ServerSessionContext implements SessionContext{
 	 * 会根据线路成本,运营商,代理繁忙情况获取到合适的区域代理进行处理
 	 * @return
      */
-	public Session getRightSession(){
+	public Session getRightSession() throws RightSessionNotFoundExcepiton {
 		Session session = null;
 		try {
 			session = (Session) this.sessionMap.getValue(0);
 		}catch(Exception ex){
 			logger.error("没有找到有效的与区域会话");
+			throw new RightSessionNotFoundExcepiton("没有找到有效的与区域会话");
 		}
 		return session;
 
