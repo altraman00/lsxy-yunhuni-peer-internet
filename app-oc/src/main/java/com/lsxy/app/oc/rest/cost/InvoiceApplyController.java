@@ -10,6 +10,7 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +48,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/{status}/list")
-    public RestResponse page(@PathVariable String status, String name, String startTime, String endTime, Integer type, @RequestParam(defaultValue = "1")Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
+    public RestResponse page(@ApiParam(name = "status",value = "await|auditing|unauth") @PathVariable String status, @RequestParam(required=false)String name, @RequestParam(required=false)String startTime, @RequestParam(required=false) String endTime, @RequestParam(required=false)Integer type, @RequestParam(defaultValue = "1")Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
         if("await".equals(status)||"auditing".equals(status)||"unauth".equals(status)) {
@@ -87,7 +88,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/edit/{id}")
-    public RestResponse modify(@PathVariable String id,Integer status){
+    public RestResponse modify(@PathVariable String id,@ApiParam(name = "status",value = "修改状态 1通过2异常")@RequestParam Integer status){
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         RestResponse restResponse =null;
         if(status==InvoiceApply.STATUS_DONE||status==InvoiceApply.STATUS_EXCEPTION){
