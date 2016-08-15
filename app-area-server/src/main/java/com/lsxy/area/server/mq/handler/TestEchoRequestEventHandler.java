@@ -59,5 +59,9 @@ public class TestEchoRequestEventHandler implements MQMessageHandler<TestEchoReq
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        TestEchoResponseEvent responseMQEvent = new TestEchoResponseEvent(message.getRequestId(),request.getName());
+        responseMQEvent.setRequestTimestamp(message.getTimestamp());
+        mqService.publish(responseMQEvent);
     }
 }

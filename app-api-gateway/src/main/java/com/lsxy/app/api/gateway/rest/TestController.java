@@ -7,16 +7,19 @@ import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
 import com.lsxy.framework.mq.events.apigw.test.TestEchoRequestEvent;
 import com.lsxy.framework.mq.events.apigw.test.TestResetStasticsCountEvent;
 import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -56,11 +59,30 @@ public class TestController {
         RestResponse<String> response = RestResponse.success();
         response.setSuccess(true);
         String requestId = UUIDGenerator.uuid();
-
         TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
         mqService.publish(event);
 
         response.setData("OK");
         return response;
     }
+
+    @PostConstruct
+    public void doPressureTest(){
+        for(int i=0;i<500;i++){
+            Thread thread = new Thread(new RunTask());
+            thread.start();
+        }
+    }
+
+    class RunTask implements  Runnable{
+        @Override
+        public void run() {
+            while(true){
+                String requestId = UUIDGenerator.uuid();
+                TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
+                mqService.publish(event);
+            }
+        }
+    }
+
 }
