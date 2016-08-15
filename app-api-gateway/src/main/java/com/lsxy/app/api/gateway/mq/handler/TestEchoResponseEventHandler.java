@@ -29,7 +29,9 @@ public class TestEchoResponseEventHandler implements MQMessageHandler<TestEchoRe
     @Override
     public void handleMessage(TestEchoResponseEvent message) throws JMSException {
         if(logger.isDebugEnabled()){
-            logger.debug("收到响应对象,总计花费:{}ms",System.currentTimeMillis() - message.getRequestTimestamp());
+            logger.debug("收到响应对象:{}",message);
+            long currentTime = System.currentTimeMillis();
+            logger.debug("[{}]总计花费:{}ms  [{}]vs[{}]",message.getRequestId(),currentTime - message.getRequestTimestamp(),  currentTime,message.getTimestamp());
         }
 //        String requestid = message.getRequestId();
 //        DeferredResult dr = requestContext.get(requestid);
