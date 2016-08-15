@@ -6,7 +6,6 @@ import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.message.dao.MessageDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
     }
 
     @Override
-    public Page<Message> pageList(String type, String startTime, String endTime, Integer pageNo, Integer pageSize) {
+    public Page<Message> pageList(Integer type,Integer status, String startTime, String endTime, Integer pageNo, Integer pageSize) {
 
         Date date1 = null;
         Date date2 = null;
@@ -62,7 +61,7 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
             hql +=" obj.lineTime<=?"+i;
             i++;
         }
-        if(StringUtil.isNotEmpty(type)){
+        if(type!=null){
             if(flag){
                 hql +=" where ";
                 flag=false;
@@ -70,6 +69,15 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
                 hql +=" and ";
             }
             hql+=" obj.type='"+type+"' ";
+        }
+        if(status!=null){
+            if(flag){
+                hql +=" where ";
+                flag=false;
+            }else{
+                hql +=" and ";
+            }
+            hql+=" obj.status='"+status+"' ";
         }
         Page<Message> page = null;
         if(date1!=null&&date2!=null){
