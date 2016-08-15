@@ -31,7 +31,7 @@ public class TestEchoResponseEventHandler implements MQMessageHandler<TestEchoRe
         if(logger.isDebugEnabled()){
             logger.debug("收到响应对象:{}",message);
             long currentTime = System.currentTimeMillis();
-            logger.debug("[{}]总计花费:{}ms  [{}]vs[{}]",message.getRequestId(),currentTime - message.getRequestTimestamp(),  currentTime,message.getTimestamp());
+            logger.debug("[{}]总计花费:{}ms  [{}]vs[{}]",message.getRequestId(),currentTime - message.getRequestTimestamp(),  currentTime,message.getRequestTimestamp());
         }
 //        String requestid = message.getRequestId();
 //        DeferredResult dr = requestContext.get(requestid);
