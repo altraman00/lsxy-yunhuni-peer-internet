@@ -34,7 +34,7 @@ public class FeedbackController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/list",method = RequestMethod.GET)
-    public RestResponse save(@RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String startTime, String endTime, Integer status)   {
+    public RestResponse save(@RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime, @RequestParam(required=false)Integer status)   {
         Page page = feedbackService.pageList(pageNo,pageSize,startTime,endTime,status);
         return RestResponse.success(page);
     }
