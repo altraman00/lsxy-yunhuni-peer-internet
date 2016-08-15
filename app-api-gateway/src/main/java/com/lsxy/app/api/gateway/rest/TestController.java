@@ -91,11 +91,11 @@ public class TestController {
                 TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
                 mqService.publish(event);
 
-                try {
-                    TimeUnit.MILLISECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    TimeUnit.MILLISECONDS.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }
         }
     }
