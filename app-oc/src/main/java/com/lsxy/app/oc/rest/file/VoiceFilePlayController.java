@@ -39,7 +39,7 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping("/edit/{id}")
-    public RestResponse modifyRemark(@PathVariable String id,@RequestParam(defaultValue = "") String reason,Integer status){
+    public RestResponse modifyRemark(@PathVariable String id,@RequestParam(defaultValue = "") String reason,@RequestParam Integer status){
         RestResponse restResponse = null;
         VoiceFilePlay voiceFilePlay = null;
         if(status==VoiceFilePlay.STATUS_SUCCESS||status==VoiceFilePlay.STATUS_FAIL){
@@ -76,7 +76,7 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/{type}/list",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String type, String name, String startTime, String endTime, @RequestParam(defaultValue = "1") Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(@PathVariable String type, @RequestParam(required=false)String name, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime, @RequestParam(defaultValue = "1") Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
         if("await".equals(type)||"auditing".equals(type)) {

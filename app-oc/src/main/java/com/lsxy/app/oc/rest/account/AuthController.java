@@ -9,6 +9,7 @@ import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +42,8 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/{authStatus}/list",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String authStatus, String startTime, String endTime, Integer type, String search, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(@PathVariable String authStatus, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime,
+                                 @RequestParam(required=false)Integer type, @RequestParam(required=false)String search, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
         Integer status = null;
         if("await".equals(authStatus)){
             status = 0;
@@ -64,7 +66,7 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/detail/{uid}",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String uid,Integer type){
+    public RestResponse pageList(@PathVariable String uid,@ApiParam(name = "type",value = "实名认证类型 0个人认证 1实名认证 必填")@RequestParam Integer type){
         RestResponse restResponse = null;
         Map map = new HashMap();
         if(Tenant.AUTH_ONESELF==type){//个人
@@ -104,7 +106,8 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/edit/{uid}",method = RequestMethod.GET)
-    public RestResponse modifyAuthStatus(@PathVariable String uid,Integer type,Integer status){
+    public RestResponse modifyAuthStatus(@PathVariable String uid, @ApiParam(name = "type",value = "实名认证类型 0个人认证 1实名认证 必填")@RequestParam Integer type,
+                                         @ApiParam(name = "status",value = " 1个人成功 2企业成功 -1个人失败 -2企业失败 必填")@RequestParam Integer status){
         Tenant tenant = null;
         RestResponse restResponse = null;
         Integer statusT = null;
