@@ -28,13 +28,56 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
 
     @Override
     public Page<Feedback> pageList( Integer pageNo, Integer pageSize, String startTime, String endTime,Integer status) {
-        Date date1 = DateUtils.parseDate(startTime,"yyyy-MM-dd");
-        Date date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String hql = "from Feedback obj where obj.createTime>=?1 and obj.createTime<=?2 ";
-        if(status!=null){
-            hql+=" and obj.status='"+status+"' ";
+        Date date1 = null;
+        Date date2 = null;
+        try {
+             date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+        }catch (Exception e){}
+        try {
+            date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+        }catch (Exception e){}
+        String hql = "from Feedback obj  ";
+        boolean flag = true;
+        int i=1;
+        if(date1!=null){
+            if(flag){
+                hql +=" where ";
+                flag=false;
+            }else{
+                hql +=" and ";
+            }
+            hql +=" obj.createTime>=?"+i;
+            i++;
         }
-        Page<Feedback> page = this.pageList(hql,pageNo,pageSize,date1,date2);
+        if(date2!=null){
+            if(flag){
+                hql +=" where ";
+                flag=false;
+            }else{
+                hql +=" and ";
+            }
+            hql +=" obj.createTime<=?"+i;
+            i++;
+        }
+        if(status!=null){
+            if(flag){
+                hql +=" where ";
+                flag=false;
+            }else{
+                hql +=" and ";
+            }
+            hql+="  obj.status='"+status+"' ";
+        }
+        Page<Feedback> page = null;
+        if(date1!=null&&date2!=null){
+            page = this.pageList(hql,pageNo,pageSize,date1,date2);
+        }else if(date1!=null&&date2==null){
+            page = this.pageList(hql,pageNo,pageSize,date1);
+        }else if(date1==null&&date2!=null){
+            page = this.pageList(hql,pageNo,pageSize,date2);
+        }else{
+            page = this.pageList(hql,pageNo,pageSize);
+        }
         return page;
     }
 }
