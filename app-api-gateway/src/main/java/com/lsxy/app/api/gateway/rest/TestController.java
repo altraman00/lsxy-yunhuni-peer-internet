@@ -69,7 +69,7 @@ public class TestController {
 
     @PostConstruct
     public void doPressureTest(){
-        for(int i=0;i<50;i++){
+        for(int i=0;i<1;i++){
             Thread thread = new Thread(new RunTask());
             thread.start();
         }
@@ -91,11 +91,11 @@ public class TestController {
                 TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
                 mqService.publish(event);
 
-//                try {
-//                    TimeUnit.MILLISECONDS.sleep(1);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    TimeUnit.MILLISECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
