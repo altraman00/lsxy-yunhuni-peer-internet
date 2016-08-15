@@ -54,8 +54,4 @@ public class ActMQService extends AbstractMQService {
         }
     }
 
-    @Override
-    public boolean ready() {
-        return false;
-    }
 }
