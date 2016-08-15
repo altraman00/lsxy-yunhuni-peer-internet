@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,8 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @param reason 新备注
      * @return
      */
-    @RequestMapping("/edit/{id}")
-    public RestResponse modifyRemark(@PathVariable String id,@RequestParam(defaultValue = "") String reason,Integer status){
+    @RequestMapping(value = "/edit/{id}" ,method = RequestMethod.GET)
+    public RestResponse modifyRemark(@PathVariable String id,@RequestParam(defaultValue = "") String reason,@ApiParam(name = "status",value = "通过1 不通过-1 必填")@RequestParam Integer status){
         RestResponse restResponse = null;
         VoiceFilePlay voiceFilePlay = null;
         if(status==VoiceFilePlay.STATUS_SUCCESS||status==VoiceFilePlay.STATUS_FAIL){
@@ -76,7 +77,7 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/{type}/list",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String type, String name, String startTime, String endTime, @RequestParam(defaultValue = "1") Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(@ApiParam(name = "type",value = "await|auditing|unauth")@PathVariable String type, @RequestParam(required=false)String name, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
         if("await".equals(type)||"auditing".equals(type)) {
