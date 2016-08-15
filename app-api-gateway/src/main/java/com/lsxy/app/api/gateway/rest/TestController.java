@@ -21,6 +21,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tandy on 16/8/10.
@@ -77,6 +78,14 @@ public class TestController {
     class RunTask implements  Runnable{
         @Override
         public void run() {
+//            while(!mqService.ready()){
+//                try {
+//                    TimeUnit.SECONDS.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                logger.info("mq not ready yet !  waiting ....");
+//            }
             while(true){
                 String requestId = UUIDGenerator.uuid();
                 TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");

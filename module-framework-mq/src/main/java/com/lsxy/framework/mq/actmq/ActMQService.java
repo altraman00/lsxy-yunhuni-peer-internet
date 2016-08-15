@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,7 @@ import javax.jms.Destination;
  */
 @Component
 @Conditional(ActMQCondition.class)
+@DependsOn("jmsTemplate")
 public class ActMQService extends AbstractMQService {
 
     public static final Logger logger = LoggerFactory.getLogger(ActMQService.class);
@@ -50,5 +52,10 @@ public class ActMQService extends AbstractMQService {
                 if(null != sc) sc.getSendMQCount().incrementAndGet();
             }
         }
+    }
+
+    @Override
+    public boolean ready() {
+        return false;
     }
 }
