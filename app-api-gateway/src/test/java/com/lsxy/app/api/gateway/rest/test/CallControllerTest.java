@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes= APIGWMainClass.class)
-@WebIntegrationTest("server.port:0")
+@WebIntegrationTest("server.port:12122")
 public class CallControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CallControllerTest.class);
