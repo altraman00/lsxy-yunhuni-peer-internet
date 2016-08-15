@@ -40,14 +40,9 @@ public class MessageController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/list",method = RequestMethod.GET)
-    public RestResponse pageList(Integer status,@RequestParam(defaultValue = "1")Integer type, String startTime, String endTime, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
-        RestResponse restResponse=null;
-        if(StringUtil.isEmpty(startTime)||StringUtil.isEmpty(endTime)){
-            restResponse = RestResponse.failed("0","参数错误");
-        }else {
-            Page page = messageService.pageList(type,status, startTime, endTime, pageNo, pageSize);
-            restResponse = RestResponse.success(page);
-        }
+    public RestResponse pageList(@RequestParam(defaultValue = "1",required=false)Integer type,@RequestParam(required = false)Integer status, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+        Page page = messageService.pageList(type,status, startTime, endTime, pageNo, pageSize);
+        RestResponse restResponse = RestResponse.success(page);
         return restResponse;
     }
 
