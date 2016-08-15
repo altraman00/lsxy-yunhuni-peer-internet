@@ -34,7 +34,7 @@ public class BillDetailController extends AbstractRestController {
      */
     @RequestMapping(value = "/{uid}/session" ,method = RequestMethod.GET)
     @ResponseBody
-    public RestResponse call(@PathVariable String uid,int type,String time, String appId,
+    public RestResponse call(@PathVariable String uid,@RequestParam Integer type,@RequestParam String time, @RequestParam(required=false)String appId,
                              @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize
                              ){
         Map re = new HashMap();
