@@ -69,7 +69,7 @@ public class TestController {
 
     @PostConstruct
     public void doPressureTest(){
-        for(int i=0;i<2;i++){
+        for(int i=0;i<3;i++){
             Thread thread = new Thread(new RunTask());
             thread.start();
         }
