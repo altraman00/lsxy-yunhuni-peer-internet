@@ -120,7 +120,9 @@ public class TenantController {
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(
     @RequestParam(required = false) String name,
+    @ApiParam(name = "begin",value = "格式:yyyy-MM")
     @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date begin,
+    @ApiParam(name = "end",value = "格式:yyyy-MM")
     @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date end,
     @ApiParam(name = "authStatus",value = "认证状态，1已认证，0未认证")
     @RequestParam(required = false) Integer authStatus,
@@ -416,7 +418,7 @@ public class TenantController {
         return results;
     }
 
-    @ApiOperation(value = "租户某月所有天的（api调用次数）统计")
+    @ApiOperation(value = "租户（某年所有月/某月所有天）的api调用次数统计")
     @RequestMapping(value = "/tenants/{id}/api_invoke/statistic",method = RequestMethod.GET)
     public RestResponse apiInvokeStatistic(
             @PathVariable String id,
@@ -657,8 +659,8 @@ public class TenantController {
     }
 
     @ApiOperation(value = "获取租户的文件容量和剩余")
-    @RequestMapping(value="/tenants/{tenant}/apps/{appId}/file/totalSize",method = RequestMethod.GET)
-    public RestResponse fileTotalSize(@PathVariable String tenant,@PathVariable String appId){
+    @RequestMapping(value="/tenants/{tenant}/file/totalSize",method = RequestMethod.GET)
+    public RestResponse fileTotalSize(@PathVariable String tenant){
         Map map = new HashMap();
         Billing billing = billingService.findBillingByTenantId(tenant);
         if(billing!=null){
@@ -686,7 +688,10 @@ public class TenantController {
     @RequestMapping(value="/tenants/{tenant}/apps/{appId}/records/batch/download",method = RequestMethod.GET)
     public RestResponse batchDownload(
             @PathVariable String tenant,@PathVariable String appId,
-            Date startTime,Date endTime){
+            @ApiParam(name = "startTime",value = "格式:yyyy-MM")
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date startTime,
+            @ApiParam(name = "endTime",value = "格式:yyyy-MM")
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date endTime){
         return RestResponse.success("url");
     }
 
@@ -784,7 +789,7 @@ public class TenantController {
 
     @ApiOperation(value = "租户(某年所有月)的充值额统计")
     @RequestMapping(value = "/tenants/{tenant}/recharges/statistic",method = RequestMethod.GET)
-    public RestResponse recharges(@PathVariable String tenant,Integer year){
+    public RestResponse recharges(@PathVariable String tenant,@RequestParam Integer year){
         return RestResponse.success(perMonthOfYearRechargeStatistic(year,tenant));
     }
 
