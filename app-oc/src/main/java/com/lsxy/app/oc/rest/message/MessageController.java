@@ -1,7 +1,6 @@
 package com.lsxy.app.oc.rest.message;
 
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
@@ -9,7 +8,6 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -61,8 +59,8 @@ public class MessageController extends AbstractRestController {
      * @param message
      * @return
      */
-    @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
-    public RestResponse modify(@PathVariable String id,Message message){
+    @RequestMapping(value = "/edit/{id}",method = RequestMethod.POST)
+    public RestResponse modify(@PathVariable String id, @RequestBody Message message){
         Message message1 = messageService.findById(id);
         boolean isSendMsg = false;
         if(message.getStatus()!=null&&message1.getStatus()!=message.getStatus()){
@@ -90,7 +88,7 @@ public class MessageController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/new",method = RequestMethod.GET)
-    public RestResponse create(Message message){
+    public RestResponse create(@RequestBody Message message){
         message = messageService.save(message);
         if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
             sendMessage(message);
@@ -101,7 +99,7 @@ public class MessageController extends AbstractRestController {
      * 发送消息给状态正常的用户
      * @param message
      */
-    private  void sendMessage(Message message){
+    private  void sendMessage(@RequestBody Message message){
         List<Account> list = accountService.list();
         accountMessageService.insertMultiple(list,message);
     }
