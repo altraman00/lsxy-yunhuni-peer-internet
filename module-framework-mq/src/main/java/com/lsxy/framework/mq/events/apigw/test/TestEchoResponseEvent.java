@@ -13,6 +13,10 @@ public class TestEchoResponseEvent extends AbstractMQEvent{
 
     private long requestTimestamp;
 
+    public TestEchoResponseEvent(){
+
+    }
+
     public long getRequestTimestamp() {
         return requestTimestamp;
     }
@@ -37,5 +41,13 @@ public class TestEchoResponseEvent extends AbstractMQEvent{
 
     public String getMessage() {
         return message;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

@@ -67,7 +67,7 @@ public class TestController {
         return response;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void doPressureTest(){
         for(int i=0;i<3;i++){
             Thread thread = new Thread(new RunTask());
