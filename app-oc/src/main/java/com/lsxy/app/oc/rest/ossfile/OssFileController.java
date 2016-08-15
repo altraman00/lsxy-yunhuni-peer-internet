@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +30,7 @@ public class OssFileController extends AbstractRestController {
     @Autowired
     private OSSService ossService;
     @ApiOperation(value = "文件下载")
-    @RequestMapping("/download")
+    @RequestMapping(value = "/download" ,method = RequestMethod.GET)
     public void download(HttpServletResponse response, @RequestParam String uri, @RequestParam String addr) throws IOException {
         String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
         response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
@@ -39,7 +40,7 @@ public class OssFileController extends AbstractRestController {
         handle(response, uri);
     }
     @ApiOperation(value = "获取资源流")
-    @RequestMapping("/img")
+    @RequestMapping(value = "/img" ,method = RequestMethod.GET)
     public void getImg(HttpServletResponse response, @RequestParam String uri){
         String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
         response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
