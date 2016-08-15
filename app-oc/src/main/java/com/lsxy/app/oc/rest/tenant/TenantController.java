@@ -638,7 +638,9 @@ public class TenantController {
     @RequestMapping(value="/tenants/{tenant}/apps/{appId}",method = RequestMethod.GET)
     public RestResponse app(@PathVariable String tenant,@PathVariable String appId) {
         App app = appService.findById(appId);
-        if(!app.getTenant().getId().equals(tenant)){
+
+        if(app == null || app.getTenant() == null ||
+                !app.getTenant().getId().equals(tenant)){
             return RestResponse.success(null);
         }
         TenantAppVO vo = new TenantAppVO(app);
