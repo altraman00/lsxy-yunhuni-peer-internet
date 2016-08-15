@@ -123,4 +123,17 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
         return getSumFieldBetween(d1,d2,"amongConnect",tenant,null,null);
     }
 
+    @Override
+    public long getAmongDurationByDateAndApp(Date d, String app) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongDuration",null,app,null);
+    }
+
+    @Override
+    public long getAmongCallByDateAndApp(Date d, String app) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongCall",null,app,null);
+    }
 }

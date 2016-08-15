@@ -147,7 +147,8 @@ public class UnionpayUtil {
 
 
 	public static void main(String[] args) {
-		Map map = new HashMap();
+
+        Map map = new HashMap();
 		map.put("aaa","aaa");
 		map.put("bbbb","bbbb");
 

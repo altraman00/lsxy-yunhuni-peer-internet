@@ -181,4 +181,11 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         Date d2 = DateUtils.getLastTimeOfMonth(d);
         return getSumFieldBetween(d1,d2,"amongAmount",tenant,null,null);
     }
+
+    @Override
+    public BigDecimal getAmongAmountByDateAndApp(Date d, String app) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongAmount",null,app,null);
+    }
 }

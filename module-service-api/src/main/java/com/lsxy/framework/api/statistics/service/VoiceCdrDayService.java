@@ -52,25 +52,25 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * 总的会话量排名
      * top
      */
-    public List<Map<String,Long>> getCallTop(int top);
+    public List<Map<String,Object>> getCallTop(int top);
 
     /**
      * 总的话务量排名
      * top
      */
-    public List<Map<String,Long>> getDurationTop(int top);
+    public List<Map<String,Object>> getDurationTop(int top);
 
     /**
      * 时间范围内的会话量排名
      * top
      */
-    public List<Map<String,Long>> getCallTopByDateBetween(int top,Date d1,Date d2);
+    public List<Map<String,Object>> getCallTopByDateBetween(int top,Date d1,Date d2);
 
     /**
      * 时间范围内的话务量排名
      * top
      */
-    public List<Map<String,Long>> getDurationTopByDateBetween(int top,Date d1,Date d2);
+    public List<Map<String,Object>> getDurationTopByDateBetween(int top,Date d1,Date d2);
 
     /**
      * 获取某个租户某天的通话时长(话务量)

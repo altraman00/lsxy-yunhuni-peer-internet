@@ -114,22 +114,23 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
         return getAmongDurationBetween(d1,d2);
     }
 
-    private List<Map<String, Long>> getTops(List<VoiceCdrDay> ds,String field,Integer factor){
+    private List<Map<String, Object>> getTops(List<VoiceCdrDay> ds,String field,Integer factor){
         if(ds == null ){
             return null;
         }
-        List<Map<String, Long>> tops = new ArrayList<>();
+        List<Map<String, Object>> tops = new ArrayList<>();
         for (VoiceCdrDay d: ds) {
             String tenantName = "";
             Tenant t = tenantService.findById(d.getTenantId());
             if(t!=null && t.getTenantName()!=null){
                 tenantName = t.getTenantName();
             }
-            Map<String,Long> map = new HashMap<>();
+            Map<String,Object> map = new HashMap<>();
+            map.put("name",tenantName);
             if(factor == null){
-                map.put(tenantName, (Long)BeanUtils.getProperty2(d,field));
+                map.put("value", (Long)BeanUtils.getProperty2(d,field));
             }else{//单位转换
-                map.put(tenantName, (long)Math.round(((Long)BeanUtils.getProperty2(d,field))/60));
+                map.put("value", (long)Math.round(((Long)BeanUtils.getProperty2(d,field))/60));
             }
             tops.add(map);
         }
@@ -137,21 +138,21 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public List<Map<String, Long>> getCallTop(int top) {
+    public List<Map<String, Object>> getCallTop(int top) {
         String hql = "from VoiceCdrDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumCall DESC";
         List<VoiceCdrDay> list = this.getTopList(hql,false,top);
         return getTops(list,"sumCall",null);
     }
 
     @Override
-    public List<Map<String, Long>> getDurationTop(int top) {
+    public List<Map<String, Object>> getDurationTop(int top) {
         String hql = "from VoiceCdrDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumDuration DESC";
         List<VoiceCdrDay> list = this.getTopList(hql,false,top);
         return getTops(list,"sumDuration",60);
     }
 
     @Override
-    public List<Map<String, Long>> getCallTopByDateBetween(int top, Date d1, Date d2) {
+    public List<Map<String, Object>> getCallTopByDateBetween(int top, Date d1, Date d2) {
         String sql = "select tenant_id,sum(among_call)among_call from tb_base_voice_cdr_day where app_id is null and tenant_id is not null and type is null and dt between :d1 and :d2 group BY tenant_id order by among_call desc";
         Query query = em.createNativeQuery(sql,VoiceCdrDay.class);
         query.setParameter("d1", d1);
@@ -163,7 +164,7 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public List<Map<String, Long>> getDurationTopByDateBetween(int top, Date d1, Date d2) {
+    public List<Map<String, Object>> getDurationTopByDateBetween(int top, Date d1, Date d2) {
         String sql = "select tenant_id,sum(among_duration)among_call from tb_base_voice_cdr_day where app_id is null and tenant_id is not null and type is null and dt between :d1 and :d2 group BY tenant_id order by among_duration desc";
         Query query = em.createNativeQuery(sql,VoiceCdrDay.class);
         query.setParameter("d1", d1);

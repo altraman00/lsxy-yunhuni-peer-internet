@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.security;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +40,10 @@ public class PreUserDetailsService implements AuthenticationUserDetailsService<P
         }
         String principal = (String) token.getPrincipal();
         User user = null;
-        if(!StringUtils.isEmpty(principal)) {
+        if(StringUtils.isNotBlank(principal)&&principal.contains("token_oc_")) {
             //此处应根据token从Redis获取用户并组装成UserDetails返回（principal为tocken） AbstractAuthenticationToken
             String username = cacheManager.get(principal);
-            if(!StringUtils.isEmpty(username)){
+            if(StringUtils.isNotBlank(username)){
                 //此处时间设置得比调用方的session存在时间稍微长一点
                 cacheManager.expire(principal,35*60);
                 user = new User(username,"",true,true,true,true,roles("ROLE_OC_USER"));

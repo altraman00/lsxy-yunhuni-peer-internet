@@ -27,10 +27,10 @@ public class UserRestToken {
      * 构建一个新的token对象
      * @return
      */
-    public static UserRestToken newToken(){
+    public static UserRestToken newApiToken(){
         String token = UUIDGenerator.uuid();
         UserRestToken urt = new UserRestToken();
-        urt.setToken("token_" + token);
+        urt.setToken("token_api_" + token);
         return urt;
     }
 
@@ -41,7 +41,7 @@ public class UserRestToken {
     public static UserRestToken newOcUserToken(){
         String token = UUIDGenerator.uuid();
         UserRestToken urt = new UserRestToken();
-        urt.setToken("token_oc_" + token);
+        urt.setToken("token_oc_" + token );
         return urt;
     }
 

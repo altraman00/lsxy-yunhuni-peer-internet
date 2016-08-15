@@ -4,14 +4,12 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.resourceTelenum.dao.TestNumBindDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.List;
 
@@ -43,6 +41,13 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
         Tenant tenant = tenantService.findTenantByUserName(userName) ;
         String hql = "from TestNumBind obj where obj.tenant.id=?1 ";
         List<TestNumBind> list = this.findByCustomWithParams(hql, tenant.getId());
+        return list;
+    }
+
+    @Override
+    public List<TestNumBind> findByTenant(String tenant) {
+        String hql = "from TestNumBind obj where obj.tenant.id=?1 ";
+        List<TestNumBind> list = this.findByCustomWithParams(hql, tenant);
         return list;
     }
 }
