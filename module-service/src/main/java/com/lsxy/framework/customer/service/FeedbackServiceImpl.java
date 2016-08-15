@@ -66,7 +66,7 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
             }else{
                 hql +=" and ";
             }
-            hql+=" and obj.status='"+status+"' ";
+            hql+="  obj.status='"+status+"' ";
         }
         Page<Feedback> page = null;
         if(date1!=null&&date2!=null){
