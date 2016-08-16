@@ -120,12 +120,13 @@ public class InvoiceApplyController extends AbstractRestController {
 
     /**
      * 保存发票申请信息
-     * @param id 发票记录id
-     * @param status 修改状态 1通过2异常
+     * @param invoiceApplyVo 接收参数对象
      * @return
      */
-    @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
-    public RestResponse modify(@PathVariable String id,@ApiParam(name = "status",value = "修改状态 1通过2异常")@RequestParam Integer status){
+    @RequestMapping(value = "/edit",method = RequestMethod.POST)
+    public RestResponse modify(@RequestBody  InvoiceApplyVo invoiceApplyVo){
+        String id = invoiceApplyVo.getId();
+        Integer status = invoiceApplyVo.getStatus();
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         RestResponse restResponse =null;
         if(status==InvoiceApply.STATUS_DONE||status==InvoiceApply.STATUS_EXCEPTION){
@@ -141,18 +142,16 @@ public class InvoiceApplyController extends AbstractRestController {
     }
     /**
      * 保存发票申请信息
-     * @param id 发票记录id
-     * @param expressNo 快递单号
-     * @param expressCom 快递公司
+     * @param invoiceApplyVo 接收参数对象
      * @return
      */
-    @RequestMapping(value = "/edit/send/{id}",method = RequestMethod.GET)
-    public RestResponse modify(@PathVariable String id,@ApiParam(name = "expressNo",value = "快递单号必填")@RequestParam String expressNo,@ApiParam(name = "expressNo",value = "快递公司")@RequestParam(required = false) String expressCom){
-        InvoiceApply invoiceApply = invoiceApplyService.findById(id);
+    @RequestMapping(value = "/edit/send",method = RequestMethod.POST)
+    public RestResponse modifySend(InvoiceApplyVo invoiceApplyVo){
+        InvoiceApply invoiceApply = invoiceApplyService.findById(invoiceApplyVo.getId());
         RestResponse restResponse =null;
         if(invoiceApply.getStatus()==InvoiceApply.STATUS_DONE){
-            invoiceApply.setExpressNo(expressNo);
-            invoiceApply.setExpressCom(expressCom);
+            invoiceApply.setExpressNo(invoiceApplyVo.getExpressNo());
+            invoiceApply.setExpressCom(invoiceApplyVo.getExpressCom());
             invoiceApply = invoiceApplyService.save(invoiceApply);
         }else{
             restResponse = RestResponse.failed("0","该发票审核未通过，不能发送");
