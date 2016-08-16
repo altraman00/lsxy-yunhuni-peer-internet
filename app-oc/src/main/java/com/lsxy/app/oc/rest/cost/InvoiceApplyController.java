@@ -12,10 +12,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,7 +44,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      * @return
      */
-    @RequestMapping("/{status}/list")
+    @RequestMapping(value = "/{status}/list",method = RequestMethod.GET)
     public RestResponse page(@ApiParam(name = "status",value = "await|auditing|unauth") @PathVariable String status, @RequestParam(required=false)String name, @RequestParam(required=false)String startTime, @RequestParam(required=false) String endTime, @RequestParam(required=false)Integer type, @RequestParam(defaultValue = "1")Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
@@ -87,7 +84,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @param status 修改状态 1通过2异常
      * @return
      */
-    @RequestMapping("/edit/{id}")
+    @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
     public RestResponse modify(@PathVariable String id,@ApiParam(name = "status",value = "修改状态 1通过2异常")@RequestParam Integer status){
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         RestResponse restResponse =null;
@@ -108,7 +105,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @param id 发票记录
      * @return
      */
-    @RequestMapping("/detail/{id}")
+    @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
     public RestResponse get(@PathVariable String id){
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         return RestResponse.success(invoiceApply);
