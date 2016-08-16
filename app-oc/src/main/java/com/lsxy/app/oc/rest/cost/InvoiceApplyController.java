@@ -40,7 +40,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      * @return
      */
-    @RequestMapping(value = "/{status}/list",method = RequestMethod.GET)
+    @RequestMapping(value = "/{status}/send/list",method = RequestMethod.GET)
     public RestResponse page(@ApiParam(name = "status",value = "auditing|unauth") @PathVariable String status,@RequestParam(required=false)Integer type,
                              @RequestParam(required=false)String name, @RequestParam(defaultValue = "1")Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
         RestResponse restResponse = null;
@@ -146,7 +146,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @param expressCom 快递公司
      * @return
      */
-    @RequestMapping(value = "/edit/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/edit/send/{id}",method = RequestMethod.GET)
     public RestResponse modify(@PathVariable String id,@ApiParam(name = "expressNo",value = "快递单号必填")@RequestParam String expressNo,@ApiParam(name = "expressNo",value = "快递公司")@RequestParam(required = false) String expressCom){
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         RestResponse restResponse =null;
