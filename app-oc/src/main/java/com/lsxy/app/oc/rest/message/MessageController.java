@@ -87,7 +87,7 @@ public class MessageController extends AbstractRestController {
      * @param message
      * @return
      */
-    @RequestMapping(value = "/new",method = RequestMethod.GET)
+    @RequestMapping(value = "/new",method = RequestMethod.POST)
     public RestResponse create(@RequestBody Message message){
         message = messageService.save(message);
         if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
