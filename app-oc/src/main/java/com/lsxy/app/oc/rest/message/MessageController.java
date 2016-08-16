@@ -59,9 +59,9 @@ public class MessageController extends AbstractRestController {
      * @param message
      * @return
      */
-    @RequestMapping(value = "/edit/{id}",method = RequestMethod.POST)
-    public RestResponse modify(@PathVariable String id, @RequestBody Message message){
-        Message message1 = messageService.findById(id);
+    @RequestMapping(value = "/edit",method = RequestMethod.POST)
+    public RestResponse modify( @RequestBody Message message){
+        Message message1 = messageService.findById(message.getId());
         boolean isSendMsg = false;
         if(message.getStatus()!=null&&message1.getStatus()!=message.getStatus()){
             if(message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
