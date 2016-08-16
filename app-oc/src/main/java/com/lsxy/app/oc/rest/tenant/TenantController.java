@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.Path;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -500,10 +501,11 @@ public class TenantController {
     }
 
     @ApiOperation(value = "给租户充值")
-    @RequestMapping(value = "/tenants/recharge",method = RequestMethod.PUT)
+    @RequestMapping(value = "/tenants/{id}/recharge",method = RequestMethod.PUT)
     public RestResponse apiInvokeStatistic(
+            @PathVariable String id,
             @RequestBody RechargeInput input){
-        return RestResponse.success(rechargeService.doRecharge(input.getTenantId(),input.getAmount()));
+        return RestResponse.success(rechargeService.doRecharge(id,input.getAmount()));
     }
 
     @ApiOperation(value = "租户消费记录")
