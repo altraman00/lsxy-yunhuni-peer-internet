@@ -33,6 +33,16 @@
         <artifactId>module-framework-web</artifactId>
     </dependency>
 
+    <dependency>
+        <groupId>com.lsxy</groupId>
+        <artifactId>module-framework-dubbo</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>com.lsxy</groupId>
+        <artifactId>module-service-api</artifactId>
+    </dependency>
+
 </dependencies>
 
 </project>

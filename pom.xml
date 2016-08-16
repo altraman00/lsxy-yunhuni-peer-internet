@@ -33,6 +33,7 @@
         <module>module-framework-sms</module>
         <module>module-framework-third</module>
         <module>module-framework-mail</module>
+        <module>module-framework-dubbo</module>
         <module>module-service-api</module>
         <module>module-service</module>
         <module>module-framework-oss</module>
@@ -111,6 +112,11 @@
                 <artifactId>module-framework-mq</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-dubbo</artifactId>
+            <version>${project.version}</version>
+        </dependency>
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-framework-config</artifactId>

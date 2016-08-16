@@ -34,7 +34,7 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
     @Autowired
     private MQService mqService;
 
-    @Autowired
+    @Autowired(required = false)
     private StasticsCounter sc;
 
     @Autowired
@@ -57,7 +57,7 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
         }
 
         /*发送请求次数计数*/
-        sc.getSendGWRequestCount().incrementAndGet();
+        if(sc!=null)sc.getSendGWRequestCount().incrementAndGet();
 
         DeferredResult<RestResponse> result = new DeferredResult<RestResponse>(10000L,RestResponse.failed("240","服务器君有点忙,未能及时响应,抱歉啊!!  稍后再尝试!!"));
 

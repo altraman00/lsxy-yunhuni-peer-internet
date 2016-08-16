@@ -3,10 +3,11 @@ package com.lsxy.app.api.gateway;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
+import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootStarter;
-import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
+import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
         FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class})
 @EnableAsync
 @EnableWebMvc
+@EnableDubboConfiguration
 public class APIGWMainClass extends AbstractSpringBootStarter {
 
     public static void main(String[] args) throws Exception {

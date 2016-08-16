@@ -50,6 +50,11 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-dubbo</artifactId>
+        </dependency>
+
 
         <!--<dependency>-->
             <!--<groupId>com.lsxy</groupId>-->
