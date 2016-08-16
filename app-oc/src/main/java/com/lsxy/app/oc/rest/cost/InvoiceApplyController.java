@@ -146,7 +146,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/edit/send",method = RequestMethod.POST)
-    public RestResponse modifySend(InvoiceApplyVo invoiceApplyVo){
+    public RestResponse modifySend(@RequestBody InvoiceApplyVo invoiceApplyVo){
         InvoiceApply invoiceApply = invoiceApplyService.findById(invoiceApplyVo.getId());
         RestResponse restResponse =null;
         if(invoiceApply.getStatus()==InvoiceApply.STATUS_DONE){
