@@ -35,12 +35,14 @@ public class VoiceFilePlayController extends AbstractRestController {
 
     /**
      * 根据id修改备注
-     * @param id
-     * @param reason 新备注
+     * @param voiceFilePlayVo 接收参数对象
      * @return
      */
-    @RequestMapping(value = "/edit/{id}" ,method = RequestMethod.GET)
-    public RestResponse modifyRemark(@PathVariable String id,@RequestParam(defaultValue = "") String reason,@ApiParam(name = "status",value = "通过1 不通过-1 必填")@RequestParam Integer status){
+    @RequestMapping(value = "/edit" ,method = RequestMethod.POST)
+    public RestResponse modifyRemark(VoiceFilePlayVo voiceFilePlayVo){
+        Integer status = voiceFilePlayVo.getStatus();
+        String id = voiceFilePlayVo.getId();
+        String reason = voiceFilePlayVo.getReason();
         RestResponse restResponse = null;
         VoiceFilePlay voiceFilePlay = null;
         if(status==VoiceFilePlay.STATUS_SUCCESS||status==VoiceFilePlay.STATUS_FAIL){
