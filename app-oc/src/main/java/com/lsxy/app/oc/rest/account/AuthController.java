@@ -100,14 +100,14 @@ public class AuthController extends AbstractRestController {
     }
     /**
      * 根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果
-     * @param uid 实名认证记录id
-     * @param type 实名认证类型 0个人认证 1实名认证
-     * @param status 1个人成功 2企业成功 -1个人失败 -2企业失败
+     * @param authVo 接收信息VO
      * @return
      */
-    @RequestMapping(value = "/member/edit/{uid}",method = RequestMethod.GET)
-    public RestResponse modifyAuthStatus(@PathVariable String uid,@ApiParam(name = "type",value = "0个人认证 1实名认证 必填")@RequestParam Integer type,
-                                         @ApiParam(name = "status",value = "1个人成功 2企业成功 -1个人失败 -2企业失败 必填")@RequestParam Integer status){
+    @RequestMapping(value = "/member/edit",method = RequestMethod.POST)
+    public RestResponse modifyAuthStatus(@RequestBody AuthVo authVo){
+        Integer type = authVo.getType();
+        Integer status = authVo.getStatus();
+        String uid = authVo.getUid();
         Tenant tenant = null;
         RestResponse restResponse = null;
         Integer statusT = null;
