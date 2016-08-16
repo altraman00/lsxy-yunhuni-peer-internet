@@ -46,4 +46,15 @@ public interface InvoiceApplyService extends BaseService<InvoiceApply> {
      */
     Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize,Integer type, String[] tenantId, Integer status, String startTime, String endTime);
 
+    /**
+     * 根据条件查找分页信息
+     * @param pageNo 第几页
+     * @param pageSize 每页记录数
+     * @param tenantId 租户集合
+     * @param status 发票状态
+     * @param type 发票类型
+     * @return
+     */
+    Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, String[] tenantId, String status, Integer type);
+
 }

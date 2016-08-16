@@ -183,4 +183,29 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         return page;
     }
 
+    @Override
+    public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, String[] tenantId, String status, Integer type) {
+        String hql = " from InvoiceApply obj  where obj.status='"+InvoiceApply.STATUS_DONE+"' ";
+        if(type!=null){
+            hql+=" and obj.type = "+type+" ";
+        }
+        if(status!=null){
+            hql+=" and  obj.expressNo is not null ";
+        }else{
+            hql+=" and  obj.expressNo is  null ";
+        }
+        if(tenantId!=null&& tenantId.length>0){
+            String tenantIds = "";
+            for(int i=0;i<tenantId.length;i++){
+                tenantIds += " '"+tenantId[i]+"' ";
+                if(i!=(tenantId.length-1)){
+                    tenantIds+=",";
+                }
+            }
+            hql+=" and obj.tenant.id in("+tenantIds+") ";
+        }
+        Page<InvoiceApply> page = this.pageList(hql,pageNo,pageSize);
+        return page;
+    }
+
 }
