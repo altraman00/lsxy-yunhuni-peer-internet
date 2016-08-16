@@ -39,7 +39,7 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/edit" ,method = RequestMethod.POST)
-    public RestResponse modifyRemark(VoiceFilePlayVo voiceFilePlayVo){
+    public RestResponse modifyRemark(@RequestBody VoiceFilePlayVo voiceFilePlayVo){
         Integer status = voiceFilePlayVo.getStatus();
         String id = voiceFilePlayVo.getId();
         String reason = voiceFilePlayVo.getReason();
