@@ -8,17 +8,7 @@ import java.math.BigDecimal;
  */
 public class RechargeInput implements Serializable{
 
-    private String tenantId;
-
     private BigDecimal amount;
-
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
 
     public BigDecimal getAmount() {
         return amount;
