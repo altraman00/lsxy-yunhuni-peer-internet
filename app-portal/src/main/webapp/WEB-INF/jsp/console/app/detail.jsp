@@ -724,6 +724,14 @@
                         showtoast("删除成功");
                         fileTotalSoze();
                         $('#play-'+id).remove();
+                        if(pagePlay){
+                            pagePlay.count--;
+                            pagePlay.initTotalPage();
+                            if(pagePlay.nowPage>pagePlay.totalPage){
+                                pagePlay.nowPage=pagePlay.totalPage;
+                            }
+                            $('#page'+pagePlay.nowPage+pagePlay.obj).click();
+                        }
                     }else{
                         showtoast("删除失败");
                     }
@@ -757,6 +765,7 @@
     /**
      *触发放音文件分页
      */
+    var pagePlay ;
     function upplay(){
         $('#uploadButton').show();
         //获取数据总数
@@ -774,8 +783,8 @@
         //指定id，创建分页标签
         var pageId = 'playpage';
         //searchTable 为方法名
-        var page = new Page(count,listRow,showPageCount,pageId,playTable);
-        page.show();
+        pagePlay= new Page(count,listRow,showPageCount,pageId,playTable);
+        pagePlay.show();
     }
     var fileTotalSoze = function(){
 
