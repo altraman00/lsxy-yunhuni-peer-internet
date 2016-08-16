@@ -66,8 +66,8 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/member/detail/{uid}",method = RequestMethod.GET)
-   public RestResponse pageList(@PathVariable String uid,@ApiParam(name = "type",value = "实名认证类型 0个人认证 1实名认证 必填")@RequestParam Integer type){
-        RestResponse restResponse = null;
+    public RestResponse pageList(@PathVariable String uid,@ApiParam(name = "type",value = "0个人认证 1实名认证 必填")@RequestParam Integer type){
+         RestResponse restResponse = null;
         Map map = new HashMap();
         if(Tenant.AUTH_ONESELF==type){//个人
             RealnamePrivate realnamePrivate = null;
