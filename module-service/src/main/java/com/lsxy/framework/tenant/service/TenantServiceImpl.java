@@ -251,8 +251,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         Query countQuery = em.createNativeQuery(countSql);
         Query pageQuery = em.createNativeQuery(pageSql,"tenantResult");
         if(StringUtil.isNotEmpty(name)){
-            countQuery.setParameter("name","'%"+name+"%'");
-            pageQuery.setParameter("name","'%"+name+"%'");
+            countQuery.setParameter("name","%"+name+"%");
+            pageQuery.setParameter("name","%"+name+"%");
         }
         if(regDateStart !=null){
             countQuery.setParameter("start",regDateStart);
