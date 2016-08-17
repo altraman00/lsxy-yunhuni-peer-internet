@@ -9,7 +9,7 @@ import static com.lsxy.framework.mq.ons.OnsMQService.logger;
 /**
  * Created by tandy on 16/8/16.
  */
-@Service(parameters = {"session=300000"})
+@Service(parameters = {"session","300000"})
 @Component
 public class TestServiceImpl implements TestService {
     @Override
