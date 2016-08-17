@@ -3,6 +3,7 @@ package com.lsxy.app.api.gateway.rest;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.framework.api.test.TestService;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.MQStasticCounter;
 import com.lsxy.framework.mq.api.MQService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +36,7 @@ public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
 
-    @Reference
+    @Reference(timeout = 3000)
     private TestService testService;
 
     @Autowired(required = false)
@@ -137,6 +139,12 @@ public class TestController {
                 logger.debug("当前线程{}测试完毕,总共用时:{}ms",Thread.currentThread().getName(),System.currentTimeMillis() - starttime);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Date stdt = DateUtils.parseDate("2016-08-18 14:27:26.078","yyyy-MM-dd HH:mm:ss.SSS");
+        Date enddt = DateUtils.parseDate("2016-08-18 14:39:06.349","yyyy-MM-dd HH:mm:ss.SSS");
+        System.out.println(enddt.getTime() - stdt.getTime() );
     }
 
 }
