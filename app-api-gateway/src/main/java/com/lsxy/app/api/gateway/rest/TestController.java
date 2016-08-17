@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,9 +78,25 @@ public class TestController {
 
     @PostConstruct
     public void doPressureTest(){
-        for(int i=0;i<1;i++){
-            Thread thread = new Thread(new RunTask());
-            thread.start();
+        ExecutorService es = Executors.newFixedThreadPool(10);
+
+        long starttime = System.currentTimeMillis();
+        for(int i=0;i<10;i++){
+//            Thread thread = new Thread(new RunTask());
+//            thread.start();
+            es.submit(new RunTask());
+        }
+        es.shutdown();;
+        try {
+            while (!es.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
+                System.out.println("还在跑,线程池没有关闭");
+            }
+
+            if(logger.isDebugEnabled()){
+                logger.debug("整个测试全部完成,共耗时:{}ms",System.currentTimeMillis() - starttime);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -93,22 +111,30 @@ public class TestController {
 //                }
 //                logger.info("mq not ready yet !  waiting ....");
 //            }
-            while(true){
+            int c = 10000;
+            long starttime = System.currentTimeMillis();
+            int sc = 0;
+            while(c -- > 0){
 //                String requestId = UUIDGenerator.uuid();
 //                TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
 //                mqService.publish(event);
-                long startdt = System.currentTimeMillis();
-                String xx = testService.sayHi(UUIDGenerator.uuid());
-                if(logger.isDebugEnabled()){
-                    logger.debug("收到返回值:{},共花费:{}ms",xx,System.currentTimeMillis() - startdt);
-                }
-
                 try {
-                    TimeUnit.MILLISECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                    long startdt = System.currentTimeMillis();
+                    String xx = testService.sayHi(UUIDGenerator.uuid());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("收到返回值:{},共花费:{}ms", xx, System.currentTimeMillis() - startdt);
+                    }
+                }catch (Exception ex){
 
+                }
+//                try {
+//                    TimeUnit.MILLISECONDS.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+            }
+            if(logger.isDebugEnabled()){
+                logger.debug("当前线程{}测试完毕,总共用时:{}ms",Thread.currentThread().getName(),System.currentTimeMillis() - starttime);
             }
         }
     }

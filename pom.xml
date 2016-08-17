@@ -40,6 +40,7 @@
         <module>module-framework-oss</module>
         <module>module-framework-rpc</module>
         <module>app-user-app-demo</module>
+        <module>module-service-area-api</module>
 
     </modules>
     <packaging>pom</packaging>
