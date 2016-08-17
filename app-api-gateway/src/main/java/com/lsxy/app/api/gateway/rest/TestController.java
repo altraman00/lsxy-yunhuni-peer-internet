@@ -121,7 +121,7 @@ public class TestController {
                     long startdt = System.currentTimeMillis();
                     String xx = testService.sayHi(UUIDGenerator.uuid());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("收到返回值:{},共花费:{}ms", xx, System.currentTimeMillis() - startdt);
+                        logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
                     }
                 }catch (Exception ex){
 
