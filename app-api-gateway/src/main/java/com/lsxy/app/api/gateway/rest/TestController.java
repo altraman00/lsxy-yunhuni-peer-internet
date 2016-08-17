@@ -3,7 +3,6 @@ package com.lsxy.app.api.gateway.rest;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.framework.api.test.TestService;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.MQStasticCounter;
 import com.lsxy.framework.mq.api.MQService;
@@ -13,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -60,11 +59,11 @@ public class TestController {
         return RestResponse.success();
     }
 
-    @RequestMapping("/test/mq/presure")
+    @RequestMapping("/test/dubbo")
     public RestResponse<String> mqPressure(HttpServletRequest request){
         RestResponse<String> response = RestResponse.success();
         response.setSuccess(true);
-        String requestId = UUIDGenerator.uuid();
+//        String requestId = UUIDGenerator.uuid();
 //        TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
 //        mqService.publish(event);
         long startdt = System.currentTimeMillis();
@@ -77,12 +76,12 @@ public class TestController {
         return response;
     }
 
-    @PostConstruct
-    public void doPressureTest(){
-        ExecutorService es = Executors.newFixedThreadPool(500);
+    @RequestMapping("/test/presure/{threads}")
+    public void doPressureTest(@PathVariable int threads){
+        ExecutorService es = Executors.newFixedThreadPool(threads);
 
         long starttime = System.currentTimeMillis();
-        for(int i=0;i<500;i++){
+        for(int i=0;i<threads;i++){
 //            Thread thread = new Thread(new RunTask());
 //            thread.start();
             es.submit(new RunTask());
