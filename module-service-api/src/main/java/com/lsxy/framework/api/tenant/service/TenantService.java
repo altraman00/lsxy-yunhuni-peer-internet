@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.tenant.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.model.TenantVO;
 import com.lsxy.framework.core.utils.Page;
@@ -24,9 +25,10 @@ public interface TenantService extends BaseService<Tenant> {
 
     /**
      * 创建租户
+     * @param account 创建租户的用户
      * @return
      */
-    Tenant createTenant();
+    Tenant createTenant(Account account);
 
     /**
      * 获取注册的租户数量(deleted = false)
