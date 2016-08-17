@@ -78,10 +78,10 @@ public class TestController {
 
     @PostConstruct
     public void doPressureTest(){
-        ExecutorService es = Executors.newFixedThreadPool(100);
+        ExecutorService es = Executors.newFixedThreadPool(500);
 
         long starttime = System.currentTimeMillis();
-        for(int i=0;i<100;i++){
+        for(int i=0;i<500;i++){
 //            Thread thread = new Thread(new RunTask());
 //            thread.start();
             es.submit(new RunTask());
