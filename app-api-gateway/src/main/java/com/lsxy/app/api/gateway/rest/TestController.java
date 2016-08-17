@@ -62,8 +62,13 @@ public class TestController {
         RestResponse<String> response = RestResponse.success();
         response.setSuccess(true);
         String requestId = UUIDGenerator.uuid();
-        TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
-        mqService.publish(event);
+//        TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
+//        mqService.publish(event);
+        long startdt = System.currentTimeMillis();
+        String xx = testService.sayHi(UUIDGenerator.uuid());
+        if(logger.isDebugEnabled()){
+            logger.debug("收到返回值:{},共花费:{}ms",xx,System.currentTimeMillis() - startdt);
+        }
 
         response.setData("OK");
         return response;
