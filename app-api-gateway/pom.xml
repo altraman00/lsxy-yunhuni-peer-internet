@@ -12,7 +12,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>app-api-gateway</artifactId>
-
+    <properties>
+        <skip_maven_deploy>true</skip_maven_deploy>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,7 +1,8 @@
 package com.lsxy.framework.mq.ons;
 
-import com.lsxy.framework.mq.api.*;
-import org.apache.log4j.jmx.LoggerDynamicMBean;
+import com.lsxy.framework.mq.api.AbstractMQEvent;
+import com.lsxy.framework.mq.api.AbstractMQService;
+import com.lsxy.framework.mq.api.MQProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

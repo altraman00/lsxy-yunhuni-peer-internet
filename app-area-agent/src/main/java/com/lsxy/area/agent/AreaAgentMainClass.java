@@ -2,7 +2,7 @@ package com.lsxy.area.agent;
 
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
-import com.lsxy.framework.web.web.AbstractSpringBootStarter;
+import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan
 @Import(FrameworkRPCConfig.class)
 @EnableScheduling
-public class AreaAgentMainClass extends AbstractSpringBootStarter {
+public class AreaAgentMainClass extends AbstractSpringBootWebStarter {
 
     public static void main(String[] args) throws RemoteServerStartException {
         SpringApplication.run(AreaAgentMainClass.class);

@@ -15,6 +15,7 @@
     <version>1.0.2-SNAPSHOT</version>
     <properties>
         <spring-security-version>3.2.5.RELEASE</spring-security-version>
+        <skip_maven_deploy>false</skip_maven_deploy>
     </properties>
     <modules>
         <module>app-portal</module>
@@ -294,6 +295,15 @@
     </dependencies>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>${skip_maven_deploy}</skip>
+                </configuration>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>

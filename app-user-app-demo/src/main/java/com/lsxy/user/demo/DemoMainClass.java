@@ -1,6 +1,6 @@
 package com.lsxy.user.demo;
 
-import com.lsxy.framework.web.web.AbstractSpringBootStarter;
+import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -17,7 +17,7 @@ import static com.lsxy.framework.cache.FrameworkCacheConfig.logger;
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableAsync
 @EnableWebMvc
-public class DemoMainClass extends AbstractSpringBootStarter{
+public class DemoMainClass extends AbstractSpringBootWebStarter {
     @Override
     public String systemId() {
         return "user-demo";

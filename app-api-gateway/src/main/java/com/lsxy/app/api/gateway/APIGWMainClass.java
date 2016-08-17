@@ -5,7 +5,7 @@ import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.mq.FrameworkMQConfig;
-import com.lsxy.framework.web.web.AbstractSpringBootStarter;
+import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
@@ -24,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableAsync
 @EnableWebMvc
 @EnableDubboConfiguration
-public class APIGWMainClass extends AbstractSpringBootStarter {
+public class APIGWMainClass extends AbstractSpringBootWebStarter {
 
     public static void main(String[] args) throws Exception {
 

@@ -24,6 +24,7 @@ public class DubboAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ApplicationConfig dubboApplicationConfig() {
+        System.setProperty("dubbo.application.logger","slf4j");
         ApplicationConfig appConfig = new ApplicationConfig();
         appConfig.setName(properties.getApp());
         return appConfig;
