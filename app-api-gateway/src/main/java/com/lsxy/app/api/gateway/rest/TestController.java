@@ -81,7 +81,7 @@ public class TestController {
         ExecutorService es = Executors.newFixedThreadPool(10);
 
         long starttime = System.currentTimeMillis();
-        for(int i=0;i<10;i++){
+        for(int i=0;i<100;i++){
 //            Thread thread = new Thread(new RunTask());
 //            thread.start();
             es.submit(new RunTask());
