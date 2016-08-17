@@ -78,7 +78,7 @@ public class TestController {
 
     @PostConstruct
     public void doPressureTest(){
-        ExecutorService es = Executors.newFixedThreadPool(10);
+        ExecutorService es = Executors.newFixedThreadPool(100);
 
         long starttime = System.currentTimeMillis();
         for(int i=0;i<100;i++){
