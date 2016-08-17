@@ -141,8 +141,8 @@ public class TestController {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(DateUtils.formatDate(new Date(1471433225184L)));
-    }
+//    public static void main(String[] args) {
+//        System.out.println(DateUtils.formatDate(new Date(1471433225184L)));
+//    }
 
 }
