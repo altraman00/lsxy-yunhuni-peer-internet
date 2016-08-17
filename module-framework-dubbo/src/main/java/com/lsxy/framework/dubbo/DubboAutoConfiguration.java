@@ -34,6 +34,7 @@ public class DubboAutoConfiguration {
     @ConditionalOnMissingBean
     public ProtocolConfig dubboProtocolConfig() {
         ProtocolConfig protocolConfig = new ProtocolConfig();
+
         protocolConfig.setName(properties.getProtocol());
         protocolConfig.setPort(properties.getPort());
         protocolConfig.setThreads(properties.getThreads());

@@ -9,7 +9,7 @@ import static com.lsxy.framework.mq.ons.OnsMQService.logger;
 /**
  * Created by tandy on 16/8/16.
  */
-@Service
+@Service()
 @Component
 public class TestServiceImpl implements TestService {
     @Override

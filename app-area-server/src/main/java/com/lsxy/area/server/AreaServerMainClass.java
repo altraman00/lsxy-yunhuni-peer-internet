@@ -1,5 +1,6 @@
 package com.lsxy.area.server;
 
+import com.alibaba.dubbo.common.Constants;
 import com.lsxy.framework.core.AbstractSpringBootStarter;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.mq.FrameworkMQConfig;
@@ -23,8 +24,8 @@ import org.springframework.context.annotation.Import;
 public class AreaServerMainClass extends AbstractSpringBootStarter {
 
     public static void main(String[] args) throws RemoteServerStartException {
+        System.setProperty(Constants.DUBBO_PROPERTIES_KEY,"config.properties");
         SpringApplication.run(AreaServerMainClass.class);
-
     }
 
     @Override
