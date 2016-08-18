@@ -79,7 +79,7 @@ public class TestController {
     }
 
     @RequestMapping("/test/presure/{threads}/{count}")
-    public void doPressureTest(@PathVariable int threads,int count){
+    public RestResponse<String> doPressureTest(@PathVariable int threads,@PathVariable  int count){
         ExecutorService es = Executors.newFixedThreadPool(threads);
 
         long starttime = System.currentTimeMillis();
@@ -100,6 +100,7 @@ public class TestController {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return RestResponse.success("测试完毕了");
     }
 
     class RunTask implements  Runnable{
