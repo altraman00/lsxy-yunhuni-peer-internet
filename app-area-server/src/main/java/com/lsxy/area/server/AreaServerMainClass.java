@@ -1,6 +1,7 @@
 package com.lsxy.area.server;
 
 import com.alibaba.dubbo.common.Constants;
+import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.core.AbstractSpringBootStarter;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.mq.FrameworkMQConfig;
@@ -19,7 +20,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, EmbeddedServletContainerAutoConfiguration.class})
 @ComponentScan
-@Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class})
+@Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class, FrameworkCacheConfig.class})
 @EnableDubboConfiguration
 public class AreaServerMainClass extends AbstractSpringBootStarter {
 
