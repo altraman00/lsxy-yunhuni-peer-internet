@@ -7,6 +7,6 @@
     <logger name="io.netty" level="INFO" additivity="false" />
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.area" level="DEBUG" additivity="true" />
-    <logger name="com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder" level="INFO" additivity="true" />
+    <logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="false" />
 
 </configuration>
