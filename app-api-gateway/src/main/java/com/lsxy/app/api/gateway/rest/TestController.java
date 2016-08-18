@@ -134,9 +134,9 @@ public class TestController {
 //    public static void main(String[] args) {
 //        System.out.println(DateUtils.formatDate(new Date(1471433225184L)));
 //    }
-    public static void main(String[] args) {
-        Date stdt = DateUtils.parseDate("2016-08-18 11:45:14.315","yyyy-MM-dd HH:mm:ss.SSS");
-        Date enddt = DateUtils.parseDate("2016-08-18 11:57:22.950","yyyy-MM-dd HH:mm:ss.SSS");
-        System.out.println(enddt.getTime() - stdt.getTime() );
-    }
+//    public static void main(String[] args) {
+//        Date stdt = DateUtils.parseDate("2016-08-18 11:45:14.315","yyyy-MM-dd HH:mm:ss.SSS");
+//        Date enddt = DateUtils.parseDate("2016-08-18 11:57:22.950","yyyy-MM-dd HH:mm:ss.SSS");
+//        System.out.println(enddt.getTime() - stdt.getTime() );
+//    }
 }
