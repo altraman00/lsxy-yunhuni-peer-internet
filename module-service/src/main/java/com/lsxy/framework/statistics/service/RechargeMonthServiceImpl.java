@@ -35,8 +35,8 @@ public class RechargeMonthServiceImpl extends AbstractService<RechargeMonth> imp
     }
 
     @Override
-    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String sql = "insert into db_lsxy_base.tb_base_recharge_month("+selects+"dt,month,among_amount,sum_amount,sum_num,create_time,last_time,deleted,sortno,version)" +

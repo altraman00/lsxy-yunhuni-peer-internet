@@ -35,8 +35,8 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
     }
 
     @Override
-    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String sql = " insert into db_lsxy_base.tb_base_api_call_day("+map.get("selects")+"dt,day,among_api,sum_api,create_time,last_time,deleted,sortno,version ) " +
                 " select "+map.get("selects")+" ? as dt,? as day, "+
                 " count(1) as among_api, " +

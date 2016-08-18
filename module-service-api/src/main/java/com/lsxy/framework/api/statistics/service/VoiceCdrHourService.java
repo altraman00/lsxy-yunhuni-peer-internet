@@ -19,5 +19,5 @@ public interface VoiceCdrHourService extends BaseService<VoiceCdrHour> {
      * @param hour2 前一个小时
      * @param select 组合groupby条件
      */
-    public void hourStatistics(Date date1, int hour1, Date date2, int hour2, String[] select) throws SQLException;
+    public void hourStatistics(Date date1, int hour1, Date date2, int hour2, String[] select,String[] all) throws SQLException;
 }

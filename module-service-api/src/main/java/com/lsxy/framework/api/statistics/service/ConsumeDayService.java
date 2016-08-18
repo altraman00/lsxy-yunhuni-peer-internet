@@ -66,7 +66,7 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
 
     /**
      * 获取某一天的日结账单

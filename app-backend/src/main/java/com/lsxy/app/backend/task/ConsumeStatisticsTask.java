@@ -47,12 +47,13 @@ public class ConsumeStatisticsTask {
         date = cale.getTime();
         int month2 = (cale.get(Calendar.MONTH)) + 1;
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
-        List<String[]> list = StatisticsUtils.getGroupBys(new String[]{"tenant_id","app_id","type"});
+        String[] all = new String[]{"tenant_id","app_id","type"};
+        List<String[]> list = StatisticsUtils.getGroupBys(all);
         try{
             logger.info("参数date1={}，hour1={}，date2={}，hour2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),month1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),month2);
             for(int i=0;i<list.size();i++){
                 logger.info("子任务：月统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), Arrays.toString(list.get(i)));
-                consumeMonthService.monthStatistics(date1,month1,date2,month2,list.get(i));
+                consumeMonthService.monthStatistics(date1,month1,date2,month2,list.get(i),all);
             }
             long endTime = System.currentTimeMillis();
             logger.info("消费记录指标月统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
@@ -83,12 +84,13 @@ public class ConsumeStatisticsTask {
         date = cale.getTime();
         int day2 = cale.get(Calendar.DATE);
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
-        List<String[]> list = StatisticsUtils.getGroupBys(new String[]{"tenant_id","app_id","type"});
+        String[] all = new String[]{"tenant_id","app_id","type"};
+        List<String[]> list = StatisticsUtils.getGroupBys(all);
         try{
             logger.info("参数date1={}，hour1={}，date2={}，hour2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),day1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),day2);
             for(int i=0;i<list.size();i++){
                 logger.info("子任务：日统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), Arrays.toString(list.get(i)));
-                consumeDayService.dayStatistics(date1,day1,date2,day2,list.get(i));
+                consumeDayService.dayStatistics(date1,day1,date2,day2,list.get(i),all);
             }
             long endTime = System.currentTimeMillis();
             logger.info("消费记录指标日统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
@@ -118,12 +120,13 @@ public class ConsumeStatisticsTask {
         date = cale.getTime();
         int hour2 = cale.get(Calendar.HOUR_OF_DAY);
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
-        List<String[]> list = StatisticsUtils.getGroupBys(new String[]{"tenant_id","app_id","type"});
+        String[] all = new String[]{"tenant_id","app_id","type"};
+        List<String[]> list = StatisticsUtils.getGroupBys(all);
         try{
             logger.info("参数date1={}，hour1={}，date2={}，hour2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),hour1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),hour2);
             for(int i=0;i<list.size();i++){
                 logger.info("子任务：小时统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), Arrays.toString(list.get(i)));
-                consumeHourService.hourStatistics(date1,hour1,date2,hour2,list.get(i));
+                consumeHourService.hourStatistics(date1,hour1,date2,hour2,list.get(i),all);
             }
             long endTime = System.currentTimeMillis();
             logger.info("消费记录指标小时统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");

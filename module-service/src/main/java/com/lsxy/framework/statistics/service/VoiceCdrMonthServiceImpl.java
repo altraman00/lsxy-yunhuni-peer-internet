@@ -42,8 +42,8 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
         return list;
     }
     @Override
-    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");

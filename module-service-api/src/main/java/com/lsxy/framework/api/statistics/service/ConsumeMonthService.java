@@ -61,7 +61,7 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      * @param month2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select) throws SQLException;
+    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select,String[] all) throws SQLException;
 
     /**
      * 获取某个月的月结账单

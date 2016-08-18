@@ -31,5 +31,5 @@ public interface VoiceCdrMonthService extends BaseService<VoiceCdrMonth> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
 }
