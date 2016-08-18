@@ -1,6 +1,7 @@
 package com.lsxy.framework.rpc.api;
 
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
@@ -135,8 +136,7 @@ private static final Logger logger = LoggerFactory.getLogger(RPCCaller.class);
 	 * @throws RequestWriteException
 	 */
 	public void invoke(Session session, RPCRequest request) throws RequestWriteException, SessionWriteException {
-		String sessionid = UUIDGenerator.uuid();
-		request.setSessionid(sessionid);
+		assert StringUtil.isNotEmpty(request.getSessionid());
 		logger.debug(">>*"+request);
 		session.write(request);
 	}
