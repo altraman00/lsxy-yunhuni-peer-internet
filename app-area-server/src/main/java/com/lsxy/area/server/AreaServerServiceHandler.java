@@ -117,27 +117,27 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
      * @return
      */
     private RPCRequest randomRequest(RPCRequest request) {
-        if(logger.isDebugEnabled()){
-            logger.debug("请求远程接口参数:{}",request.getParamMap());
-        }
-
-        RestResponse<String> response = RestRequest.buildRequest().post("http://101.200.73.13:3000/incoming",request.getParamMap());
-
-        RPCRequest requestX = null;
-        if(response != null && response.isSuccess()){
-            String param = response.getData();
-            if(sc != null){
-                /*接听 挂机  次数计数*/
-                if(param.indexOf("sys.call.answer")>=0){
-                    if(sc != null)  sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
-                }else if(param.indexOf("sys.call.drop")>=0){
-                    if(sc != null)  sc.getSendAreaNodeSysDropCount().incrementAndGet();
-                }
-            }
-            requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
-        }else {
-            logger.error("请求用户接口发生异常,用户接口没有READY!!!!!!!!");
-        }
+//        if(logger.isDebugEnabled()){
+//            logger.debug("请求远程接口参数:{}",request.getParamMap());
+//        }
+//
+//        RestResponse<String> response = RestRequest.buildRequest().post("http://101.200.73.13:3000/incoming",request.getParamMap());
+//
+//        RPCRequest requestX = null;
+//        if(response != null && response.isSuccess()){
+//            String param = response.getData();
+//            if(sc != null){
+//                /*接听 挂机  次数计数*/
+//                if(param.indexOf("sys.call.answer")>=0){
+//                    if(sc != null)  sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
+//                }else if(param.indexOf("sys.call.drop")>=0){
+//                    if(sc != null)  sc.getSendAreaNodeSysDropCount().incrementAndGet();
+//                }
+//            }
+//            requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+//        }else {
+//            logger.error("请求用户接口发生异常,用户接口没有READY!!!!!!!!");
+//        }
 
 
 //        int radom = RandomUtils.nextInt(0,100);
@@ -153,10 +153,10 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 ////                logger.debug("这个是接通指令:{}",param);
 ////            }
 ////        }
-//        param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
-//        /*挂机指令计数*/
-//        if(sc != null) sc.getSendAreaNodeSysDropCount().incrementAndGet();
-//        RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+       String  param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
+        /*挂机指令计数*/
+        if(sc != null) sc.getSendAreaNodeSysDropCount().incrementAndGet();
+        RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
 
         return requestX;
     }
