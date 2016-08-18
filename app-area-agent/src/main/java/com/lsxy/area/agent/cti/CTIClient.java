@@ -21,12 +21,14 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Set;
 
+import static com.lsxy.framework.web.utils.WebUtils.logger;
+
 /**
  * Created by tandy on 16/8/5.
  * CTI 客户端启动器  需要配合JNI使用
  */
 @Component
-@Profile(value={"production","development"})
+@Profile(value={"test","production","development"})
 public class CTIClient implements RpcEventListener{
 
 

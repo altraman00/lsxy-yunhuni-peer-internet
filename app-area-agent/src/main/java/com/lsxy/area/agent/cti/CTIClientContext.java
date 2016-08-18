@@ -16,7 +16,7 @@ import static javax.xml.bind.JAXBIntrospector.getValue;
  * cti 客户端  环境 用来管理多个客户端连接
  */
 @Component
-@Profile(value={"production","development"})
+@Profile(value={"test","production","development"})
 public class CTIClientContext {
     private static final Logger logger = LoggerFactory.getLogger(CTIClientContext.class);
     public ListOrderedMap clients = new ListOrderedMap();

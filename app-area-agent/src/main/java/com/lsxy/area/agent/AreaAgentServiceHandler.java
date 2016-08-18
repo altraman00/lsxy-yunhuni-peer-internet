@@ -31,7 +31,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
     @Autowired(required = false)
     private CTIClient cticlient;
 
-    @Autowired(required = false)
+    @Autowired
     private CTIClientContext cticlientContext;
 
     @Autowired(required = false)
