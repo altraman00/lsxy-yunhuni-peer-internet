@@ -44,10 +44,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.requestMatchers().antMatchers("/test/**").
 
 
-        RequestMatcher apiRM = new AntPathRequestMatcher("/v*/**");
+        RequestMatcher apiRM = new AntPathRequestMatcher("/xx/**");
 
         http.authorizeRequests().requestMatchers(apiRM).authenticated()
-                .antMatchers("/test/**").anonymous()
+                .antMatchers("/v*/**").anonymous()
                 .and().httpBasic()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
