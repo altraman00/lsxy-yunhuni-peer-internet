@@ -142,17 +142,18 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 
         int radom = RandomUtils.nextInt(0,100);
         String  param = null;
-        if(radom % 2 == 0){
-            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
-            if(logger.isDebugEnabled()){
-                logger.debug("这个是挂断指令:{}",param);
-            }
-        }else{
-            param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds=5&user_data=1234";
-            if(logger.isDebugEnabled()){
-                logger.debug("这个是接通指令:{}",param);
-            }
-        }
+//        if(radom % 2 == 0){
+//            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
+//            if(logger.isDebugEnabled()){
+//                logger.debug("这个是挂断指令:{}",param);
+//            }
+//        }else{
+//            param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds=5&user_data=1234";
+//            if(logger.isDebugEnabled()){
+//                logger.debug("这个是接通指令:{}",param);
+//            }
+//        }
+        param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
         RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
 
         return requestX;
