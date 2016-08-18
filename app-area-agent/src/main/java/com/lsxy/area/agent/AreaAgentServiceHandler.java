@@ -130,6 +130,11 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         return null;
     }
 
+    /**
+     * 处理语音呼叫指令
+     * @param request
+     * @return
+     */
     private RPCResponse process_MN_CH_SYS_CALL(RPCRequest request) {
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_SYS_CALL:{}",request);

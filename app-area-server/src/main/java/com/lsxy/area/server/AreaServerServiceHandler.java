@@ -1,5 +1,6 @@
 package com.lsxy.area.server;
 
+import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -28,6 +29,9 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 
     @Autowired
     private RPCCaller rpcCaller;
+
+    @Autowired(required = false)
+    private TestIncomingZB tzb;
 
     @Override
     public RPCResponse handleService(RPCRequest request, Session session) {
@@ -66,6 +70,8 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
      */
     private RPCResponse process_CH_MN_CTI_EVENT(RPCRequest request, Session session) {
 
+
+
         /*临时逻辑,如果收到是 incoming 事件  则概率性的挂断或接通
         sys.call.on_dial_completed
         sys.call.on_incoming
@@ -77,6 +83,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         }
 
         if(method.equals("sys.call.on_incoming")){
+            tzb.receivedIncoming(request);
             if(sc != null)  sc.getReceivedAreaNodeInComingEventCount().incrementAndGet();
             if(logger.isDebugEnabled()){
                 logger.debug("<<<<<<INCOMING>>>>>>>");

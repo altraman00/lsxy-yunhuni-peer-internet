@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.exceptions.InvokeCallException;
 import com.lsxy.area.server.StasticsCounter;
+import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -27,6 +28,9 @@ public class CallServiceImpl implements CallService {
 
     @Autowired(required = false)
     private StasticsCounter cs;
+
+    @Autowired(required = false)
+    private TestIncomingZB tzb;
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -54,6 +58,8 @@ public class CallServiceImpl implements CallService {
 
                     /*发送给区域的请求次数计数*/
                     if (cs != null) cs.getSendAreaNodeRequestCount().incrementAndGet();
+
+                    tzb.doCallZB(to,rpcrequest);
 
                     rpcCaller.invoke(session, rpcrequest);
 
