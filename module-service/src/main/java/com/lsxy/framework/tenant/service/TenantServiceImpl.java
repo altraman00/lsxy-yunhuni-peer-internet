@@ -66,9 +66,11 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     }
 
     @Override
-    public Tenant createTenant() {
+    public Tenant createTenant(Account account) {
         long incTid = cacheManager.incr(INCREASE_TID);
         Tenant tenant = new Tenant();
+        tenant.setTenantName(account.getUserName());
+        tenant.setRegisterUserId(account.getId());
         tenant.setIsRealAuth(Tenant.AUTH_NO); //设为未实名认证状态
         tenant.setTenantUid(DateUtils.getTime("yyyyMMdd")+ incTid);
         if(incTid >= 9999){
@@ -249,8 +251,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         Query countQuery = em.createNativeQuery(countSql);
         Query pageQuery = em.createNativeQuery(pageSql,"tenantResult");
         if(StringUtil.isNotEmpty(name)){
-            countQuery.setParameter("name","'%"+name+"%'");
-            pageQuery.setParameter("name","'%"+name+"%'");
+            countQuery.setParameter("name","%"+name+"%");
+            pageQuery.setParameter("name","%"+name+"%");
         }
         if(regDateStart !=null){
             countQuery.setParameter("start",regDateStart);

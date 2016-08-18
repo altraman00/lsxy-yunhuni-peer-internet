@@ -120,20 +120,20 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
 
         //验证用户名是否能注册
-        String userNameHql = "from Account obj where (obj.userName=?1 and obj.status=?2) or (obj.userName=?3 and obj.status=?4 and obj.createTime > ?5)";
-        long userNameCount = countByCustom(userNameHql, userName, Account.STATUS_NORMAL, userName, Account.STATUS_NOT_ACTIVE, limitTime);
+        String userNameHql = "from Account obj where (obj.userName=?1 and obj.status in (?2,?3,?4)) or (obj.userName=?5 and obj.status=?6 and obj.createTime > ?7)";
+        long userNameCount = countByCustom(userNameHql, userName, Account.STATUS_NORMAL,Account.STATUS_ABNORMAL,Account.STATUS_LOCK, userName, Account.STATUS_NOT_ACTIVE, limitTime);
         if(userNameCount > 0){
             return AccountService.REG_CHECK_USERNAME_EXIST;
         }
         //验证手机号是否能注册
-        String mobileHql = "from Account obj where (obj.mobile=?1 and obj.status=?2) or (obj.mobile=?3 and obj.status=?4 and obj.createTime > ?5)";
-        long mobileCount = countByCustom(mobileHql, mobile, Account.STATUS_NORMAL, mobile, Account.STATUS_NOT_ACTIVE, limitTime);
+        String mobileHql = "from Account obj where (obj.mobile=?1 and obj.status in (?2,?3,?4)) or (obj.mobile=?5 and obj.status=?6 and obj.createTime > ?7)";
+        long mobileCount = countByCustom(mobileHql, mobile, Account.STATUS_NORMAL,Account.STATUS_ABNORMAL,Account.STATUS_LOCK, mobile, Account.STATUS_NOT_ACTIVE, limitTime);
         if(mobileCount > 0){
             return AccountService.REG_CHECK_MOBILE_EXIST;
         }
         //验证邮箱是否能注册
-        String emailHql = "from Account obj where (obj.email=?1 and obj.status=?2) or (obj.email=?3 and obj.status=?4 and obj.createTime > ?5)";
-        long emailCount = countByCustom(emailHql, email, Account.STATUS_NORMAL, email, Account.STATUS_NOT_ACTIVE, limitTime);
+        String emailHql = "from Account obj where (obj.email=?1 and obj.status in (?2,?3,?4)) or (obj.email=?5 and obj.status=?6 and obj.createTime > ?7)";
+        long emailCount = countByCustom(emailHql, email, Account.STATUS_NORMAL,Account.STATUS_ABNORMAL,Account.STATUS_LOCK, email, Account.STATUS_NOT_ACTIVE, limitTime);
         if(emailCount > 0){
             return AccountService.REG_CHECK_EMAIL_EXIST;
         }
@@ -142,17 +142,22 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Override
     public Account createAccount(String userName, String mobile, String email) {
-        Tenant tenant = tenantService.createTenant();
+
         Account account = new Account();
         account.setUserName(userName);
         account.setMobile(mobile);
         account.setEmail(email);
         account.setStatus(Account.STATUS_NOT_ACTIVE);
-        account.setTenant(tenant);
+//        account.setTenant(tenant);
         return this.save(account);
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #accountId", beforeInvocation = true)
+            }
+    )
     public Account activeAccount(String accountId, String password) throws RegisterException{
         Account account = this.findById(accountId);
         //账号是否是未激活状态
@@ -160,12 +165,16 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
             //校验激活信息是否重复
             boolean flag = this.checkActiveInfo(account.getUserName(),account.getMobile(),account.getEmail());
             if(flag){
+                //创建租户
+                Tenant tenant = tenantService.createTenant(account);
                 //修改激活状态,设置密码
+                account.setTenant(tenant);
                 account.setStatus(Account.STATUS_NORMAL);
                 account.setPassword(PasswordUtil.springSecurityPasswordEncode(password,account.getUserName()));
                 account.setMm(PasswordUtil.desencode(password));
                 this.save(account);
-                Tenant tenant = account.getTenant();
+                //创建租户
+//                Tenant tenant = account.getTenant();
                 //创建主鉴权账号
                 createApiCertificate(tenant);
                 //帐务数据创建
