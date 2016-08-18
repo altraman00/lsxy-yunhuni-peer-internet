@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,44 +113,47 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
      * @return
      */
     private RPCRequest randomRequest(RPCRequest request) {
-        if(logger.isDebugEnabled()){
-//            RestRequest restRequest = RestRequest.buildRequest();
-//            restRequest.post(url,request.getParamMap())
-            logger.debug("请求远程接口参数:{}",request.getParamMap());
-        }
-
-
-        RestResponse<String> response = RestRequest.buildRequest().post("http://101.200.73.13:3000/incoming",request.getParamMap());
-        if(logger.isDebugEnabled()){
-            logger.debug("请求用户接口获取接下来的动作:{}" , response.getData());
-        }
-        RPCRequest requestX = null;
-        if(response != null && response.isSuccess()){
-            String param = response.getData();
-
-            /*接听 挂机  次数计数*/
-            if(param.indexOf("sys.call.answer")>=0){
-                sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
-            }else if(param.indexOf("sys.call.drop")>=0){
-                sc.getSendAreaNodeSysDropCount().incrementAndGet();
-            }
-            requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
-        }else {
-            logger.error("请求用户接口发生异常,用户接口没有READY!!!!!!!!");
-        }
-//        int radom = RandomUtils.nextInt(0,100);
-
-//        if(radom % 2 == 0){
-//            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
-//            if(logger.isDebugEnabled()){
-//                logger.debug("这个是挂断指令:{}",param);
-//            }
-//        }else{
-//            param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds=5&user_data=1234";
-//            if(logger.isDebugEnabled()){
-//                logger.debug("这个是接通指令:{}",param);
-//            }
+//        if(logger.isDebugEnabled()){
+////            RestRequest restRequest = RestRequest.buildRequest();
+////            restRequest.post(url,request.getParamMap())
+//            logger.debug("请求远程接口参数:{}",request.getParamMap());
 //        }
+//
+//
+//        RestResponse<String> response = RestRequest.buildRequest().post("http://101.200.73.13:3000/incoming",request.getParamMap());
+//        if(logger.isDebugEnabled()){
+//            logger.debug("请求用户接口获取接下来的动作:{}" , response.getData());
+//        }
+//        RPCRequest requestX = null;
+//        if(response != null && response.isSuccess()){
+//            String param = response.getData();
+//
+//            /*接听 挂机  次数计数*/
+//            if(param.indexOf("sys.call.answer")>=0){
+//                sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
+//            }else if(param.indexOf("sys.call.drop")>=0){
+//                sc.getSendAreaNodeSysDropCount().incrementAndGet();
+//            }
+//            requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+//        }else {
+//            logger.error("请求用户接口发生异常,用户接口没有READY!!!!!!!!");
+//        }
+
+
+        int radom = RandomUtils.nextInt(0,100);
+        String  param = null;
+        if(radom % 2 == 0){
+            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
+            if(logger.isDebugEnabled()){
+                logger.debug("这个是挂断指令:{}",param);
+            }
+        }else{
+            param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds=5&user_data=1234";
+            if(logger.isDebugEnabled()){
+                logger.debug("这个是接通指令:{}",param);
+            }
+        }
+        RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
 
         return requestX;
     }
