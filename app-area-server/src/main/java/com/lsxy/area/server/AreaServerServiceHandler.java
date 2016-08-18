@@ -161,11 +161,11 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         return requestX;
     }
 
-    public static void main(String[] args) {
-        String url = "http://101.200.73.13:3000/incoming";
-        RestRequest request = RestRequest.buildRequest();
-        RestResponse<String> response = request.get(url,String.class);
-        System.out.println(response.getData());
-
-    }
+//    public static void main(String[] args) {
+//        String url = "http://101.200.73.13:3000/incoming";
+//        RestRequest request = RestRequest.buildRequest();
+//        RestResponse<String> response = request.get(url,String.class);
+//        System.out.println(response.getData());
+//
+//    }
 }
