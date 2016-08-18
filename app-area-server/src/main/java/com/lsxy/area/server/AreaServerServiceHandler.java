@@ -154,6 +154,8 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 //            }
 //        }
         param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
+        /*挂机指令计数*/
+        if(sc != null) sc.getSendAreaNodeSysDropCount().incrementAndGet();
         RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
 
         return requestX;
