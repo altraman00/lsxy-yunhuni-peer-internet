@@ -80,7 +80,7 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
             }else{
                 if(serviceHandler != null){
                     if(logger.isDebugEnabled()){
-                        logger.debug("serviceHandler is :{}" + serviceHandler.getClass().getName());
+                        logger.debug("serviceHandler is :{}" , serviceHandler.getClass().getName());
                     }
                     response = serviceHandler.handleService(request, getSessionInTheContextObject(ctxObject));
                 }else{

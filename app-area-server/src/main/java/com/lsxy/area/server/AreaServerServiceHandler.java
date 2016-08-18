@@ -31,15 +31,12 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 
     @Override
     public RPCResponse handleService(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-                logger.debug("处理响应");
-        }
 
-        sc.getReceivedAreaNodeRequestCount().incrementAndGet();
+        if(sc != null) sc.getReceivedAreaNodeRequestCount().incrementAndGet();
 
         if(request.getName().equals(ServiceConstants.CH_MN_CTI_EVENT)){
             /*收到CTI事件次数*/
-            sc.getReceivedAreaNodeCTIEventCount().incrementAndGet();
+            if(sc != null)  sc.getReceivedAreaNodeCTIEventCount().incrementAndGet();
 
             return process_CH_MN_CTI_EVENT(request,session);
         }
@@ -80,7 +77,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         }
 
         if(method.equals("sys.call.on_incoming")){
-            sc.getReceivedAreaNodeInComingEventCount().incrementAndGet();
+            if(sc != null)  sc.getReceivedAreaNodeInComingEventCount().incrementAndGet();
             if(logger.isDebugEnabled()){
                 logger.debug("<<<<<<INCOMING>>>>>>>");
             }
@@ -100,9 +97,9 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
                 logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
             }
         }else{
-            if(logger.isDebugEnabled()){
-                logger.debug("不是 INCOMING.........");
-            }
+//            if(logger.isDebugEnabled()){
+//                logger.debug("不是 INCOMING.........");
+//            }
         }
         return null;
     }
@@ -114,25 +111,21 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
      */
     private RPCRequest randomRequest(RPCRequest request) {
         if(logger.isDebugEnabled()){
-//            RestRequest restRequest = RestRequest.buildRequest();
-//            restRequest.post(url,request.getParamMap())
             logger.debug("请求远程接口参数:{}",request.getParamMap());
         }
 
-
         RestResponse<String> response = RestRequest.buildRequest().post("http://101.200.73.13:3000/incoming",request.getParamMap());
-        if(logger.isDebugEnabled()){
-            logger.debug("请求用户接口获取接下来的动作:{}" , response.getData());
-        }
+
         RPCRequest requestX = null;
         if(response != null && response.isSuccess()){
             String param = response.getData();
-
-            /*接听 挂机  次数计数*/
-            if(param.indexOf("sys.call.answer")>=0){
-                sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
-            }else if(param.indexOf("sys.call.drop")>=0){
-                sc.getSendAreaNodeSysDropCount().incrementAndGet();
+            if(sc != null){
+                /*接听 挂机  次数计数*/
+                if(param.indexOf("sys.call.answer")>=0){
+                    if(sc != null)  sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
+                }else if(param.indexOf("sys.call.drop")>=0){
+                    if(sc != null)  sc.getSendAreaNodeSysDropCount().incrementAndGet();
+                }
             }
             requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
         }else {
