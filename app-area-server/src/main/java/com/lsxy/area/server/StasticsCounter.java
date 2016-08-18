@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by tandy on 16/8/9.
  */
-//@Component
-//@EnableScheduling
+@Component
+@EnableScheduling
 @Profile(value = {"test","local","development"})
 public class StasticsCounter extends AsbstractStatisticCounter {
 
