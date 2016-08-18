@@ -140,9 +140,6 @@ public class WebUtils {
 	 * @param request
 	 */
 	public static void logRequestParams(HttpServletRequest request){
-		if(!logger.isDebugEnabled()){
-			return;
-		}
 		//过滤不想看到的日志
 		String url = request.getRequestURI();
 		String excludes[] = SystemConfig.getProperty("log.exclude.url","").split(",");
@@ -152,23 +149,25 @@ public class WebUtils {
 			}
 		}
 		
-		logger.debug("Http请求 ["+getRemoteAddress(request)+"]["+request.getSession().getId()+"]"+request.getRequestURL()+" ");
-		logger.debug("ContentType：{}",request.getContentType());
-		logger.debug("Method:{}",request.getMethod());
-		logger.debug("Encoding:{}",request.getCharacterEncoding());
-		logger.debug("Headers:");
-		Enumeration headerNames = request.getHeaderNames();
-		while(headerNames.hasMoreElements()){
-			String name = (String) headerNames.nextElement();
-			String value = request.getHeader(name);
-			logger.debug("   {}:{}",name,value);
+		logger.info("Http请求 ["+getRemoteAddress(request)+"]["+request.getSession().getId()+"]"+request.getRequestURL()+" ");
+		if(logger.isDebugEnabled()){
+			logger.debug("ContentType：{}",request.getContentType());
+			logger.debug("Method:{}",request.getMethod());
+			logger.debug("Encoding:{}",request.getCharacterEncoding());
+			logger.debug("Headers:");
+			Enumeration headerNames = request.getHeaderNames();
+			while(headerNames.hasMoreElements()){
+				String name = (String) headerNames.nextElement();
+				String value = request.getHeader(name);
+				logger.debug("   {}:{}",name,value);
+			}
 		}
-		logger.debug("Params：");
+		logger.info("Params：");
 		Enumeration<String> params = request.getParameterNames();
 		while(params.hasMoreElements()){
 			String paramName = params.nextElement();
 			String value = request.getParameter(paramName);
-			logger.debug(paramName+":"+value);
+			logger.info(paramName+":"+value);
 		}
 	}
 
