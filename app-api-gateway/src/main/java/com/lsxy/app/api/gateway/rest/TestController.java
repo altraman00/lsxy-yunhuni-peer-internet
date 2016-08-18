@@ -78,15 +78,15 @@ public class TestController {
         return response;
     }
 
-    @RequestMapping("/test/presure/{threads}")
-    public void doPressureTest(@PathVariable int threads){
+    @RequestMapping("/test/presure/{threads}/{count}")
+    public void doPressureTest(@PathVariable int threads,int count){
         ExecutorService es = Executors.newFixedThreadPool(threads);
 
         long starttime = System.currentTimeMillis();
         for(int i=0;i<threads;i++){
 //            Thread thread = new Thread(new RunTask());
 //            thread.start();
-            es.submit(new RunTask());
+            es.submit(new RunTask(count));
         }
         es.shutdown();;
         try {
@@ -103,23 +103,17 @@ public class TestController {
     }
 
     class RunTask implements  Runnable{
+        private int count;
+        public RunTask(int count) {
+            this.count = count;
+        }
+
         @Override
         public void run() {
-//            while(!mqService.ready()){
-//                try {
-//                    TimeUnit.SECONDS.sleep(1);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                logger.info("mq not ready yet !  waiting ....");
-//            }
-            int c = 10000;
+            int c = count;
             long starttime = System.currentTimeMillis();
             int sc = 0;
             while(c -- > 0){
-//                String requestId = UUIDGenerator.uuid();
-//                TestEchoRequestEvent event = new TestEchoRequestEvent(requestId,"HELLO");
-//                mqService.publish(event);
                 try {
                     long startdt = System.currentTimeMillis();
                     String xx = testService.sayHi(UUIDGenerator.uuid());
@@ -129,11 +123,6 @@ public class TestController {
                 }catch (Exception ex){
 
                 }
-//                try {
-//                    TimeUnit.MILLISECONDS.sleep(1);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
             }
             if(logger.isDebugEnabled()){
                 logger.debug("当前线程{}测试完毕,总共用时:{}ms",Thread.currentThread().getName(),System.currentTimeMillis() - starttime);

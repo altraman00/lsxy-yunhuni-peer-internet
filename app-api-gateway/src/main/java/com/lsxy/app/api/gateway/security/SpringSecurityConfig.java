@@ -14,6 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
@@ -38,14 +40,21 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 
 
-        http.authorizeRequests()
-                .antMatchers("/**").authenticated()
+
+//        http.requestMatchers().antMatchers("/test/**").
+
+
+        RequestMatcher apiRM = new AntPathRequestMatcher("/v*/**");
+
+        http.authorizeRequests().requestMatchers(apiRM).authenticated()
+                .antMatchers("/test/**").anonymous()
                 .and().httpBasic()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         ;
 
-        http.addFilterBefore(new SignatureAuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(new SignatureAuthFilter(authenticationManager(),apiRM), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new BlackIpListFilter(),SignatureAuthFilter.class);
     }
 

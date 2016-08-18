@@ -14,6 +14,7 @@ import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -45,6 +46,8 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
 
     private ASyncSaveApiLogTask saveApiLogTask;
 
+    private RequestMatcher requestMatcher;
+
     private static final Logger logger = LoggerFactory.getLogger(SignatureAuthFilter.class);
     // Enable Multi-Read for PUT and POST requests
     private static final Set<String> METHOD_HAS_CONTENT = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER) {
@@ -53,14 +56,20 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
     };
 
 
-    public SignatureAuthFilter(AuthenticationManager authenticationManager){
+    public SignatureAuthFilter(AuthenticationManager authenticationManager , RequestMatcher requestMatcher){
         this.authenticationManager = authenticationManager;
         this.restAuthenticationEntryPoint = new RestAuthenticationEntryPoint();
+        this.requestMatcher = requestMatcher;
 
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws ServletException, IOException {
+
+        if(!requestMatcher.matches(req)){
+            chain.doFilter(req,resp);
+            return;
+        }
 
         long start = System.currentTimeMillis();
 
