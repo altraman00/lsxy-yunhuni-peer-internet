@@ -14,7 +14,6 @@ import java.util.Set;
  * 每个实例如何配置等等配置信息
  */
 @Component
-@Profile(value={"production","development"})
 public class CTIClientConfigFactory {
 
     private Set<CTIClientConfig> configs = new HashSet<>();
