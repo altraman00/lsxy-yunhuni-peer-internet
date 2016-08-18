@@ -18,5 +18,5 @@ public interface AppHourService extends BaseService<AppHour> {
      * @param hour   第几个小时0-23
      * @param select 组合groupby条件
      */
-    public void hourStatistics(Date date, int hour, String[] select) throws SQLException;
+    public void hourStatistics(Date date, int hour, String[] select,String[] all) throws SQLException;
 }

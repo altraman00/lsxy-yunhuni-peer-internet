@@ -83,8 +83,8 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     }
 
     @Override
-    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException {
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException {
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");

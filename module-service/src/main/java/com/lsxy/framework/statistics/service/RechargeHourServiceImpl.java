@@ -36,8 +36,8 @@ public class RechargeHourServiceImpl extends AbstractService<RechargeHour> imple
     }
 
     @Override
-    public void hourStatistics(Date date1, int hour1,Date date2,int hour2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void hourStatistics(Date date1, int hour1,Date date2,int hour2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
