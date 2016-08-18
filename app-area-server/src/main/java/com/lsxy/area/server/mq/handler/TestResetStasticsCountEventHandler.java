@@ -22,7 +22,6 @@ import java.util.Collection;
  * Created by tandy on 16/8/10.
  */
 @Component
-@Profile(value={"test","local","development"})
 public class TestResetStasticsCountEventHandler implements MQMessageHandler<TestResetStasticsCountEvent>  {
 
     private static final Logger logger = LoggerFactory.getLogger(TestResetStasticsCountEventHandler.class);
