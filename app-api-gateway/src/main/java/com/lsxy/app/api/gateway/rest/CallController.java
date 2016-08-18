@@ -1,6 +1,9 @@
 package com.lsxy.app.api.gateway.rest;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
+import com.lsxy.area.api.CallService;
+import com.lsxy.area.api.exceptions.InvokeCallException;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
@@ -23,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static jdk.nashorn.internal.objects.NativeFunction.call;
+
 /**
  * Created by Tandy on 2016/6/28.
  * 呼叫API入口
@@ -37,6 +42,9 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
     @Autowired(required = false)
     private StasticsCounter sc;
 
+    @Reference(timeout=3000)
+    private CallService callService;
+
     @Autowired
     private AsyncRequestContext asyncRequestContext;
 
@@ -49,9 +57,19 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
 //    public RestResponse test(@PathVariable String accountId){
 //        return RestResponse.success(accountId);
 //    }
+//@RequestMapping("/{accountId}/call")
+//public DeferredResult<RestResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
 
-    @RequestMapping("/{accountId}/call")
-    public DeferredResult<RestResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
+    /**
+     *  语音呼叫API
+     *  api.dev.yunhuni.com/v1/account/1234567/call?to=13971068693&maxAnswerSec=10&maxRingSec=20
+     * @param certId   鉴权账号
+     * @param response
+     * @param request
+     * @return
+     */
+    @RequestMapping("/{certId}/call")
+    public RestResponse<String> doCall(@PathVariable String certId, HttpServletResponse response, HttpServletRequest request,String to,String from,int maxAnswerSec,int maxRingSec){
         if(logger.isDebugEnabled()){
             WebUtils.logRequestParams(request);
         }
@@ -59,19 +77,12 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
         /*发送请求次数计数*/
         if(sc!=null)sc.getSendGWRequestCount().incrementAndGet();
 
-        DeferredResult<RestResponse> result = new DeferredResult<RestResponse>(10000L,RestResponse.failed("240","服务器君有点忙,未能及时响应,抱歉啊!!  稍后再尝试!!"));
-
-        String requestId = UUIDGenerator.uuid();
-
-        APIGatewayRequestEvent event = new APIGatewayRequestEvent(requestId,"sys.call",WebUtils.getRequestParams(request));
-        asyncRequestContext.register(event.getRequestId(),result);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("发布请求事件到MQ:{}",event );
+        try {
+            String callid = callService.call(from,to,maxAnswerSec,maxRingSec);
+            return RestResponse.success(callid);
+        } catch (InvokeCallException e) {
+            return RestResponse.failed("0000x",e.getMessage());
         }
-        mqService.publish(event);
-
-        return result;
     }
 
     @RequestMapping("/{accountId}/call/{callId}")

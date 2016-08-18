@@ -35,9 +35,6 @@ public class BlackIpListFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String ip = WebUtils.getRemoteAddress((HttpServletRequest) request);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("进入IP黑名单校验过滤器");
-        }
         boolean result = getApiGwBlankIPService().isBlankIP(ip);
         if(logger.isDebugEnabled()){
             logger.debug("校验IP黑名单：{}  已被黑名单？ {}",ip,result);

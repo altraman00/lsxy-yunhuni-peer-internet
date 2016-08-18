@@ -38,6 +38,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-mq</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-area-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.lsxy</groupId>

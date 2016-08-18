@@ -4,6 +4,7 @@
     <property name="APP_NAME" value="api-gateway" />
     <include resource="logback-yunhuni.xml"/>
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
-    <logger name="org.springframework.security" level="DEBUG" additivity="true" />
+    <logger name="org.springframework.security" level="INFO" additivity="true" />
+    <logger name="com.lsxy.framework.web.utils.WebUtils" level="INFO" additivity="true" />
 
 </configuration>
