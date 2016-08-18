@@ -24,7 +24,7 @@ public class TestIncomingZB {
         if(logger.isDebugEnabled()){
             logger.debug("请求语音呼叫指令,存入REDIS:{}" ,rpcrequest);
         }
-        redisCacheService.set(to,rpcrequest.toString());
+        redisCacheService.set(to,rpcrequest.getTimestamp()+"");
     }
 
 
@@ -34,9 +34,16 @@ public class TestIncomingZB {
         if(StringUtil.isNotEmpty(to)){
             to = to.substring(4);
         }
-        String requestSTring = redisCacheService.get(to);
-        if(logger.isDebugEnabled()){
-            logger.debug("收到incomint ,到缓存里面查到数据:{}",requestSTring);
+        String requestTimestamp = redisCacheService.get(to);
+        if(StringUtil.isNotEmpty(requestTimestamp)){
+            Long ltt = Long.parseLong(requestTimestamp);
+            if(logger.isDebugEnabled()){
+                logger.debug("收到incoming,共花费往返  {}ms", System.currentTimeMillis() - ltt);
+            }
+        }else{
+            if(logger.isDebugEnabled()){
+                logger.debug("我靠  丢了:{}",to);
+            }
         }
     }
 }
