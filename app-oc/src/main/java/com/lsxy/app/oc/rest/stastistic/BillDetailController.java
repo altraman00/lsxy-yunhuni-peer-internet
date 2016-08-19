@@ -7,6 +7,9 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,7 @@ import java.util.Map;
  * Created by zhangxb on 2016/7/6.
  */
 @RequestMapping("/tenant")
+@Api(value = "会话详单", description = "租户中心相关的接口" )
 @RestController
 public class BillDetailController extends AbstractRestController {
     @Autowired
@@ -34,9 +38,19 @@ public class BillDetailController extends AbstractRestController {
      */
     @RequestMapping(value = "/{uid}/session" ,method = RequestMethod.GET)
     @ResponseBody
-    public RestResponse call(@PathVariable String uid,@RequestParam Integer type,@RequestParam String time, @RequestParam(required=false)String appId,
-                             @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize
-                             ){
+    @ApiOperation(value = "会话详单查询")
+    public RestResponse call(
+            @ApiParam(name = "uid",value = "用户id")
+            @PathVariable String uid,
+            @ApiParam(name = "type",value = "1.语音呼叫2.双向回拨3.会议服务4.IVR定制服务5.语音验证码6.录音服务")
+            @RequestParam Integer type,
+            @ApiParam(name = "time",value = "yyyy-MM-dd")
+            @RequestParam String time,
+            @ApiParam(name = "appId",value = "应用id")
+            @RequestParam(required=false)String appId,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "20") Integer pageSize
+    ){
         Map re = new HashMap();
         RestResponse restResponse = null;
         if(StringUtil.isNotEmpty(time)&&StringUtil.isNotEmpty(appId)&&type!=0){
