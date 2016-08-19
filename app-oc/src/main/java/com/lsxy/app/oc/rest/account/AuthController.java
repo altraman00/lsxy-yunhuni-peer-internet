@@ -9,6 +9,8 @@ import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.Map;
  * 实名认证处理类
  * Created by zhangxb on 2016/8/11.
  */
+@Api(value = "实名认证", description = "审核管理相关接口" )
 @RequestMapping("/demand")
 @RestController
 public class AuthController extends AbstractRestController {
@@ -41,9 +44,21 @@ public class AuthController extends AbstractRestController {
      * @param pageSize 每页记录数
      * @return
      */
+    @ApiOperation(value = "查找用户下的分页信息")
     @RequestMapping(value = "/member/{authStatus}/list",method = RequestMethod.GET)
-    public RestResponse pageList(@ApiParam(name = "authStatus",value = "await|auditing|unauth")@PathVariable String authStatus, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime,
-                                 @ApiParam(name = "type",value = "0个人认证 1企业认证") @RequestParam(required=false)Integer type, @RequestParam(required=false)String search, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(
+            @ApiParam(name = "authStatus",value = "await|auditing|unauth")
+            @PathVariable String authStatus,
+            @ApiParam(name = "startTime",value = "yyyy-MM-dd")
+            @RequestParam(required=false)String startTime,
+            @ApiParam(name = "endTime",value = "yyyy-MM-dd")
+            @RequestParam(required=false)String endTime,
+            @ApiParam(name = "type",value = "0个人认证 1企业认证")
+            @RequestParam(required=false)Integer type,
+            @ApiParam(name = "search",value = "搜索的会员名")
+            @RequestParam(required=false)String search,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "20")Integer pageSize){
         Integer status = null;
         if("await".equals(authStatus)){
             status = 0;
@@ -65,8 +80,14 @@ public class AuthController extends AbstractRestController {
      * @param type 认证类型 0个人1企业
      * @return
      */
+    @ApiOperation(value = "根据记录id和认证类型获取详情页面")
     @RequestMapping(value = "/member/detail/{uid}",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String uid,@ApiParam(name = "type",value = "0个人认证 1实名认证 必填")@RequestParam Integer type){
+    public RestResponse pageList(
+            @ApiParam(name = "uid",value = "消息id")
+            @PathVariable String uid,
+            @ApiParam(name = "type",value = "0个人认证 1实名认证 必填")
+            @RequestParam Integer type
+    ){
         RestResponse restResponse = null;
         Map map = new HashMap();
         if(Tenant.AUTH_ONESELF==type){//个人
@@ -100,14 +121,19 @@ public class AuthController extends AbstractRestController {
     }
     /**
      * 根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果
-     * @param authVo 接收信息VO
      * @return
      */
-    @RequestMapping(value = "/member/edit",method = RequestMethod.POST)
-    public RestResponse modifyAuthStatus(@RequestBody AuthVo authVo){
-        Integer type = authVo.getType();
-        Integer status = authVo.getStatus();
-        String uid = authVo.getUid();
+    @ApiOperation(value = "根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果")
+    @RequestMapping(value = "/member/edit",method = RequestMethod.PATCH)
+    public RestResponse modifyAuthStatus(
+            @ApiParam(name = "uid",value = "记录id")
+             String uid,
+             @ApiParam(name = "type",value = "0个人认证 1实名认证 必填")
+             Integer type,
+             @ApiParam(name = "status",value = "1个人成功 2企业成功 -1个人失败 -2企业失败 必填")
+             Integer status,
+             @ApiParam(name = "失败原因",value = "0个人认证 1实名认证 必填")
+             String reason){
         Tenant tenant = null;
         RestResponse restResponse = null;
         Integer statusT = null;
@@ -121,6 +147,7 @@ public class AuthController extends AbstractRestController {
                     tenant.setIsRealAuth(status);
                     tenant.setTenantName(realnamePrivate.getName());
                     realnamePrivate.setTenant(tenant);
+                    realnamePrivate.setReason(reason);
                     realnamePrivateService.save(realnamePrivate);
                     tenant = tenantService.save(tenant);
                 }else{
@@ -145,6 +172,7 @@ public class AuthController extends AbstractRestController {
                     }
                     tenant.setTenantName(realnameCorp.getName());
                     tenant.setIsRealAuth(status);
+                    realnameCorp.setReason(reason);
                     realnameCorp.setTenant(tenant);
                     realnameCorpService.save(realnameCorp);
                     tenant = tenantService.save(tenant);
