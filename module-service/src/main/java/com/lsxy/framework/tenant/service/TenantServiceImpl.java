@@ -21,8 +21,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -236,10 +238,10 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         }
         if(authStatus!=null){//认证状态
             if(authStatus == 1){//已认证
-                sql += " AND (t.is_real_auth IN (:authStatus))";
+                sql += " AND (t.is_real_auth IN ("+ StringUtils.join(Tenant.AUTH_STATUS,",") + "))";
             }
             if(authStatus == 0){
-                sql += " AND (t.is_real_auth NOT IN (:authStatus))";
+                sql += " AND (t.is_real_auth NOT IN (" + StringUtils.join(Tenant.AUTH_STATUS,",") + "))";
             }
         }
         String countSql = "SELECT COUNT(t.id) " + sql;
@@ -266,11 +268,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
             countQuery.setParameter("accStatus",accStatus);
             pageQuery.setParameter("accStatus",accStatus);
         }
-        if(authStatus!=null){//认证状态
-            String as = StringUtils.join(Tenant.AUTH_STATUS,",");
-            countQuery.setParameter("authStatus",as);
-            pageQuery.setParameter("authStatus",as);
-        }
+
         int total = ((BigInteger)countQuery.getSingleResult()).intValue();
         int start = (pageNo-1)*pageSize;
         if(total == 0){
