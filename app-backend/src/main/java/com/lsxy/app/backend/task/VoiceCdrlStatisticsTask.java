@@ -103,7 +103,8 @@ public class VoiceCdrlStatisticsTask {
     /**
      *每个小时的执行一次
      */
-    @Scheduled(cron="0 30 0/1 * * ?")
+    @Scheduled(cron="30 * * * * ?")
+    //@Scheduled(cron="0 30 0/1 * * ?")
     public void hour(){
         long startTime = System.currentTimeMillis();
         logger.info("通话记录统计（session统计）指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
