@@ -36,8 +36,8 @@ public class RechargeDayServiceImpl extends AbstractService<RechargeDay> impleme
     }
 
     @Override
-    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String sql = "insert into db_lsxy_base.tb_base_recharge_day("+selects+"dt,day,among_amount,sum_amount,sum_num,create_time,last_time,deleted,sortno,version)" +

@@ -8,13 +8,15 @@
                 <c:set var="startPageNo" value="${ pageObj.currentPageNo-2}"></c:set>
                 <c:set var="endPageNo" value="${ pageObj.currentPageNo+2}"></c:set>
             </c:if>
-            <c:if test="${pageObj.totalPageCount <= endPageNo}">
+            <c:if test="${ endPageNo>pageObj.totalPageCount }">
                 <c:set  var="endPageNo" value="${pageObj.totalPageCount}"></c:set>
             </c:if>
-            <c:if test="${endPageNo - 4 > 0}">
-                <c:set  var="startPageNo" value="${endPageNo - 4}"></c:set>
+            <c:if test="${endPageNo - startPageNo < 5}">
+                <c:set  var="startPageNo" value="${endPageNo - 5}"></c:set>
             </c:if>
-
+            <c:if test="${startPageNo < 1}">
+                <c:set  var="startPageNo" value="1"></c:set>
+            </c:if>
             <c:if test="${startPageNo > 1}">
                 <li>
                     <a href="${pageUrl}?pageNo=${startPageNo-1}&pageSize=${pageObj.pageSize}${extraParam}" aria-label="Previous">

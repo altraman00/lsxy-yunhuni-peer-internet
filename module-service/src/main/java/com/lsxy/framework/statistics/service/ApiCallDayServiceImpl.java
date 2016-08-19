@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,8 +36,8 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
     }
 
     @Override
-    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String sql = " insert into db_lsxy_base.tb_base_api_call_day("+map.get("selects")+"dt,day,among_api,sum_api,create_time,last_time,deleted,sortno,version ) " +
                 " select "+map.get("selects")+" ? as dt,? as day, "+
                 " count(1) as among_api, " +
@@ -63,6 +64,22 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
                 }
             }
         });
+    }
+
+    @Override
+    public long getInvokeCountByDateAndTenant(Date d, String tenant) {
+        Date d1 = DateUtils.getFirstTimeOfDate(d);
+        Date d2 = DateUtils.getLastTimeOfDate(d);
+        String hql = "from ApiCallDay obj where "
+                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+        List<ApiCallDay> ds = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (ApiCallDay day : ds) {
+            if(day!=null && day.getAmongApi() !=null){
+                sum += day.getAmongApi();
+            }
+        }
+        return sum;
     }
 
 }

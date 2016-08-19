@@ -12,6 +12,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.invoice.dao.InvoiceApplyDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,115 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         apply.setApplyTime(new Date());
         this.save(apply);
         return apply;
+    }
+
+    @Override
+    public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, Integer type, String[] tenantId, Integer status, String startTime, String endTime) {
+        String hql = " from InvoiceApply obj  ";
+        boolean isWhere = true;
+        if(type!=null){
+            if(isWhere){
+                hql += " where ";
+                isWhere = false;
+            }else{
+                hql +=  " and ";
+            }
+            hql+=" obj.type = "+type+" ";
+        }
+        if(status!=null){
+            if(isWhere){
+                hql += " where ";
+                isWhere = false;
+            }else{
+                hql +=  " and ";
+            }
+            hql+=" obj.status= '"+status+"' ";
+        }
+        if(tenantId!=null&& tenantId.length>0){
+            if(isWhere){
+                hql += " where ";
+                isWhere = false;
+            }else{
+                hql +=  " and ";
+            }
+            String tenantIds = "";
+            for(int i=0;i<tenantId.length;i++){
+                tenantIds += " '"+tenantId[i]+"' ";
+                if(i!=(tenantId.length-1)){
+                    tenantIds+=",";
+                }
+            }
+            hql+=" obj.tenant.id in("+tenantIds+") ";
+        }
+        Date date1 = null;
+        if(StringUtil.isNotEmpty(startTime)){
+            try{
+                date1 = DateUtils.parseDate(startTime,"yyyy-MM-dd");
+            }catch (Exception e){}
+        }
+        Date date2 = null;
+        if(StringUtil.isNotEmpty(endTime)){
+            try{
+                date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd");
+            }catch (Exception e){}
+        }
+        int dateNum = 1;
+        if(date1!=null){
+            if(isWhere){
+                hql += " where ";
+                isWhere = false;
+            }else{
+                hql +=  " and ";
+            }
+            hql += " obj.createTime>=?"+dateNum;
+            dateNum++;
+        }
+        if(date2!=null){
+            if(isWhere){
+                hql += " where ";
+                isWhere = false;
+            }else{
+                hql +=  " and ";
+            }
+            hql += " obj.createTime<=?"+dateNum;
+            dateNum++;
+        }
+        Page<InvoiceApply> page =null;
+        if(date1!=null&&date2!=null){
+            page  = this.pageList(hql,pageNo,pageSize,date1,date2);
+        }else if(date1!=null){
+            page = this.pageList(hql,pageNo,pageSize,date1);
+        }else if(date2!=null){
+            page = this.pageList(hql,pageNo,pageSize,date2);
+        }else{
+            page = this.pageList(hql,pageNo,pageSize);
+        }
+        return page;
+    }
+
+    @Override
+    public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, String[] tenantId, String status, Integer type) {
+        String hql = " from InvoiceApply obj  where obj.status='"+InvoiceApply.STATUS_DONE+"' ";
+        if(type!=null){
+            hql+=" and obj.type = "+type+" ";
+        }
+        if(status!=null){
+            hql+=" and  obj.expressNo is not null ";
+        }else{
+            hql+=" and  obj.expressNo is  null ";
+        }
+        if(tenantId!=null&& tenantId.length>0){
+            String tenantIds = "";
+            for(int i=0;i<tenantId.length;i++){
+                tenantIds += " '"+tenantId[i]+"' ";
+                if(i!=(tenantId.length-1)){
+                    tenantIds+=",";
+                }
+            }
+            hql+=" and obj.tenant.id in("+tenantIds+") ";
+        }
+        Page<InvoiceApply> page = this.pageList(hql,pageNo,pageSize);
+        return page;
     }
 
 }

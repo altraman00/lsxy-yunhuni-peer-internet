@@ -5,7 +5,6 @@ import com.lsxy.framework.api.statistics.model.ApiCallMonth;
 import com.lsxy.framework.api.statistics.service.ApiCallMonthService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.statistics.dao.ApiCallMonthDao;
 import com.lsxy.utils.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,8 +36,8 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
     }
 
     @Override
-    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
@@ -67,6 +67,22 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
                 }
             }
         });
+    }
+
+    @Override
+    public long getInvokeCountByDateAndTenant(Date d, String tenant) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        String hql = "from ApiCallMonth obj where "
+                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+        List<ApiCallMonth> ds = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (ApiCallMonth month : ds) {
+            if(month!=null && month.getAmongApi() !=null){
+                sum += month.getAmongApi();
+            }
+        }
+        return sum;
     }
 
 }

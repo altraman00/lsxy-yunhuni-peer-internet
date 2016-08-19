@@ -3,6 +3,7 @@ package com.lsxy.framework.api.statistics.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.statistics.model.RechargeMonth;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -19,5 +20,12 @@ public interface RechargeMonthService extends BaseService<RechargeMonth> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
+
+    /**
+     * 获取某月的某个租户的充值额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant);
 }

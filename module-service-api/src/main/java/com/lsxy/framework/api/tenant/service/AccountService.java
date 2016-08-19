@@ -6,6 +6,8 @@ import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 
+import java.util.List;
+
 public interface AccountService extends BaseService<Account> {
     int REG_CHECK_PASS = 0;             //账号注册信息检验通过
     int REG_CHECK_USERNAME_EXIST = 1;   //账号注册信息失败，用户名已存在
@@ -90,4 +92,19 @@ public interface AccountService extends BaseService<Account> {
      * 清除过期的注册账号（用于定时任务）
      */
     void cleanExpireRegisterAccount();
+
+    boolean updateStatusByTenantId(String tenanId,Integer status);
+    /**
+     * 用户用户的集合
+     * @return
+     */
+    List<Account> list();
+
+
+    /**
+     * 获取租户的账号信息
+     * @param tenantId
+     * @return
+     */
+    public Account findOneByTenant(String tenantId);
 }

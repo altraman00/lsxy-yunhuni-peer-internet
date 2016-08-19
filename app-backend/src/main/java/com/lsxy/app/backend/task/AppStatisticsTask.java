@@ -42,13 +42,14 @@ public class AppStatisticsTask {
         date = cale.getTime();
         int month = (cale.get(Calendar.MONTH)) + 1;
         Date date1 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
+        String[] all = new String[]{"tenant_id"};
         try{
             logger.info("子任务：月统计租户全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //月统计租户全局
-            appMonthService.monthStatistics(date1,month,new String[]{});
+            appMonthService.monthStatistics(date1,month,new String[]{},all);
             logger.info("子任务：月天统计运营全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //月统计运营全局
-            appMonthService.monthStatistics(date1,month,new String[]{"tenant_id"});
+            appMonthService.monthStatistics(date1,month,new String[]{"tenant_id"},all);
             long endTime = System.currentTimeMillis();
             logger.info("应用指标月统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
         }catch (Exception e){
@@ -73,13 +74,14 @@ public class AppStatisticsTask {
         date = cale.getTime();
         int day = cale.get(Calendar.DATE);
         Date date1 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
+        String[] all = new String[]{"tenant_id"};
         try{
             logger.info("子任务：日统计租户全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //日统计租户全局
-            appDayService.dayStatistics(date1,day,new String[]{});
+            appDayService.dayStatistics(date1,day,new String[]{},all);
             logger.info("子任务：日统计运营全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //日统计运营全局
-            appDayService.dayStatistics(date1,day,new String[]{"tenant_id"});
+            appDayService.dayStatistics(date1,day,new String[]{"tenant_id"},all);
             long endTime = System.currentTimeMillis();
             logger.info("应用指标日统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
         }catch (Exception e){
@@ -91,7 +93,7 @@ public class AppStatisticsTask {
     /**
      *每个小时的执行一次
      */
-    @Scheduled(cron="0 30 0/1 * * ?")
+    @Scheduled(cron="0 0 2 1 * ? ")
     public void hour(){
         long startTime = System.currentTimeMillis();
         logger.info("应用指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
@@ -103,13 +105,14 @@ public class AppStatisticsTask {
         cale.setTime(date);
         int hour24 = cale.get(Calendar.HOUR_OF_DAY);
         Date date1 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
+        String[] all = new String[]{"tenant_id"};
         try{
             logger.info("子任务：小时统计租户全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //小时统计租户全局
-            appHourService.hourStatistics(date1,hour24,new String[]{});
+            appHourService.hourStatistics(date1,hour24,new String[]{},all);
             logger.info("子任务：小时统计运营全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //小时统计运营全局
-            appHourService.hourStatistics(date1,hour24,new String[]{"tenant_id"});
+            appHourService.hourStatistics(date1,hour24,new String[]{"tenant_id"},all);
             long endTime = System.currentTimeMillis();
             logger.info("应用指标小时统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
         }catch (Exception e){

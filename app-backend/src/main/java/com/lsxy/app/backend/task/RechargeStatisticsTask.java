@@ -48,12 +48,13 @@ public class RechargeStatisticsTask {
         date = cale.getTime();
         int month2 = (cale.get(Calendar.MONTH)) + 1;
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
+        String[] all = new String[]{"tenant_id"};
         try{
             logger.info("参数date1={}，month1={}，date2={}，month2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),month1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),month2);
             logger.info("子任务：月统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "");
-            rechargeMonthService.monthStatistics(date1,month1,date2,month2,new String[]{});
+            rechargeMonthService.monthStatistics(date1,month1,date2,month2,new String[]{},all);
             logger.info("子任务：月统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "tenant_id");
-            rechargeMonthService.monthStatistics(date1,month1,date2,month2,new String[]{"tenant_id"});
+            rechargeMonthService.monthStatistics(date1,month1,date2,month2,all,all);
             long endTime = System.currentTimeMillis();
             logger.info("订单记录指标月统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
         }catch (Exception e){
@@ -84,12 +85,13 @@ public class RechargeStatisticsTask {
         date = cale.getTime();
         int day2 = cale.get(Calendar.DATE);
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
+        String[] all = new String[]{"tenant_id"};
         try{
             logger.info("参数date1={}，day1={}，date2={}，day2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),day1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),day2);
             logger.info("子任务：日统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "");
-            rechargeDayService.dayStatistics(date1,day1,date2,day2,new String[]{});
+            rechargeDayService.dayStatistics(date1,day1,date2,day2,new String[]{},all);
             logger.info("子任务：日统计维度{}任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"), "tenant_id");
-            rechargeDayService.dayStatistics(date1,day1,date2,day2,new String[]{"tenant_id"});
+            rechargeDayService.dayStatistics(date1,day1,date2,day2,all,all);
             long endTime = System.currentTimeMillis();
             logger.info("订单记录指标日统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
         }catch (Exception e){
@@ -118,14 +120,15 @@ public class RechargeStatisticsTask {
         date = cale.getTime();
         int hour2 = cale.get(Calendar.HOUR_OF_DAY);
         Date date2 = DateUtils.parseDate(DateUtils.getDate(date,partten),partten);
+        String[] all = new String[]{"tenant_id"};
         try{
             logger.info("子任务：小时统计租户全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             logger.info("参数date1={}，hour1={}，date2={}，hour2={}",DateUtils.formatDate(date1,"yyyy-MM-dd HH:mm:ss"),hour1,DateUtils.formatDate(date2,"yyyy-MM-dd HH:mm:ss"),hour2);
             //日统计租户全局
-            rechargeHourService.hourStatistics(date1,hour1,date2,hour2,new String[]{});
+            rechargeHourService.hourStatistics(date1,hour1,date2,hour2,new String[]{},all);
             logger.info("子任务：小时统计运营全局任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             //日统计运营全局
-            rechargeHourService.hourStatistics(date1,hour1,date2,hour2,new String[]{"tenant_id"});
+            rechargeHourService.hourStatistics(date1,hour1,date2,hour2,new String[]{"tenant_id"},all);
             long endTime = System.currentTimeMillis();
             logger.info("订单记录指标小时统计任务结束，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")+" ,花费时间为："+(endTime-startTime)+"毫秒");
         }catch (Exception e){

@@ -2,11 +2,12 @@ package com.lsxy.framework.api.statistics.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.statistics.model.VoiceCdrDay;
-import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.api.tenant.model.Tenant;
 
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通话记录统计（session统计）日统计service
@@ -30,5 +31,58 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
+
+    /**
+     * 获取某个时间范围的总的通话时长(话务量)
+     * @param d
+     * @return
+     */
+    public long getAmongDurationBetween(Date d1,Date d2);
+
+    /**
+     * 获取某天的总的通话时长(话务量)
+     * @param d
+     * @return
+     */
+    public long getAmongDurationByDate(Date d);
+
+    /**
+     * 总的会话量排名
+     * top
+     */
+    public List<Map<String,Object>> getCallTop(int top);
+
+    /**
+     * 总的话务量排名
+     * top
+     */
+    public List<Map<String,Object>> getDurationTop(int top);
+
+    /**
+     * 时间范围内的会话量排名
+     * top
+     */
+    public List<Map<String,Object>> getCallTopByDateBetween(int top,Date d1,Date d2);
+
+    /**
+     * 时间范围内的话务量排名
+     * top
+     */
+    public List<Map<String,Object>> getDurationTopByDateBetween(int top,Date d1,Date d2);
+
+    /**
+     * 获取某个租户某天的通话时长(话务量)
+     * @param d
+     * @return
+     */
+    public long getAmongDurationByDateAndTenant(Date d,String tenant);
+
+    /**
+     * 获取某个租户某天的通话次数(会话量)
+     * @param d
+     * @return
+     */
+    public long getAmongCallByDateAndTenant(Date d,String tenant);
+
 }

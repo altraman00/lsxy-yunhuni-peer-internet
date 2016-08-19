@@ -19,4 +19,14 @@ public interface ApiCallDayService extends BaseService<ApiCallDay> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void dayStatistics(Date date1, int day1,Date date2,int day2, String[] select) throws SQLException;}
+    public void dayStatistics(Date date1, int day1,Date date2,int day2, String[] select,String[] all) throws SQLException;
+
+    /**
+     * 获取某个租户某天的api调用次数
+     * @param d
+     * @return
+     */
+    public long getInvokeCountByDateAndTenant(Date d, String tenant);
+
+}
+
