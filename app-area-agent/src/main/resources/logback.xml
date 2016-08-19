@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <contextName>area-agent</contextName>
+    <property name="APP_NAME" value="area-agent" />
+    <include resource="logback-yunhuni.xml"/>
+    <!--<logger name="org.springframework.boot" level="DEBUG" additivity="true" />-->
+    <!--<logger name="io.netty" level="INFO" additivity="false" />-->
+
+    <logger name="com.lsxy" level="DEBUG" additivity="true" />
+    <logger name="com.lsxy.area" level="DEBUG" additivity="true" />
+    <logger name="com.lsxy.framework.rpc.api.server" level="DEBUG" additivity="true" />
+
+    <logger name="c.l.f.rpc.netty.codec" level="INFO" additivity="true"/>
+    <logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="false"/>
+
+</configuration>

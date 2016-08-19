@@ -1,5 +1,6 @@
 package com.lsxy.framework.mq.actmq;
 
+import com.lsxy.framework.mq.MQStasticCounter;
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQMessageHandler;
@@ -41,6 +42,9 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
     @Autowired
     private ConnectionFactory connectionFactory;
 
+    @Autowired(required = false)
+    private MQStasticCounter sc;
+
 
 
     @Override
@@ -51,11 +55,6 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
 
     @Override
     public void init() throws JMSException {
-//        String brokerUrl = "tcp://localhost:61616";
-//        String queueName = "test_yunhuni_topic_framework_tenant";
-//        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
-//        factory.setUserName("admin");
-//        factory.setPassword("admin");
         connection = connectionFactory.createConnection();
     }
 
@@ -67,8 +66,13 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
             Destination topic = session.createTopic(topicstr);
             MessageConsumer consumer = session.createConsumer(topic);
             consumer.setMessageListener(this);
+
+            logger.info("消息订阅成功:{}",topicstr);
         }
+
         connection.start();
+
+        logger.info("消息服务器启动成功");
     }
 
     @Override
@@ -86,6 +90,8 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
 
     @Override
     public void onMessage(Message message) {
+        /*统计收到消息次数*/
+        if(null != sc) sc.getReceivedMQCount().incrementAndGet();
 
         if (logger.isDebugEnabled()){
             logger.debug("收到消息[原始]："+ message);
