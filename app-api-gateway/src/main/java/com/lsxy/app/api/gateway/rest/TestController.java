@@ -122,7 +122,7 @@ public class TestController {
             while(c -- > 0){
                 try {
                     long startdt = System.currentTimeMillis();
-                    String to = Thread.currentThread() + "_" + c + "_" + startdt;
+                    String to = Thread.currentThread().getId() + "_" + c + "_" + startdt;
                     String xx = callService.call("1234",to,10,10);
                     if (logger.isDebugEnabled()) {
                         logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
