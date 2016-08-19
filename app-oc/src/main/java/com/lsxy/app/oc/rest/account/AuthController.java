@@ -76,7 +76,7 @@ public class AuthController extends AbstractRestController {
 
     /**
      * 根据记录id和认证类型获取详情页面
-     * @param id 记录id
+     * @param id 记录的id
      * @param type 认证类型 0个人1企业
      * @return
      */
