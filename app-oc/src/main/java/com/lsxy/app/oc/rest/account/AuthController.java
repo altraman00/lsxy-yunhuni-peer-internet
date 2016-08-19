@@ -124,23 +124,21 @@ public class AuthController extends AbstractRestController {
      * @return
      */
     @ApiOperation(value = "根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果")
-    @RequestMapping(value = "/member/edit",method = RequestMethod.PATCH)
+    @RequestMapping(value = "/member/edit/{id}",method = RequestMethod.PUT)
     public RestResponse modifyAuthStatus(
-            @ApiParam(name = "uid",value = "记录id")
-             String uid,
-             @ApiParam(name = "type",value = "0个人认证 1实名认证 必填")
-             Integer type,
-             @ApiParam(name = "status",value = "1个人成功 2企业成功 -1个人失败 -2企业失败 必填")
-             Integer status,
-             @ApiParam(name = "失败原因",value = "0个人认证 1实名认证 必填")
-             String reason){
+            @ApiParam(name = "id",value = "记录id")
+             @PathVariable  String id,
+             @RequestBody AuthVo authVo){
         Tenant tenant = null;
         RestResponse restResponse = null;
         Integer statusT = null;
+        Integer type = authVo.getType();
+        Integer status = authVo.getStatus();
+        String reason = authVo.getReason();
         if(Tenant.AUTH_ONESELF==type&&(Tenant.AUTH_ONESELF_FAIL==status||Tenant.AUTH_ONESELF_SUCCESS==status)){//个人
             RealnamePrivate realnamePrivate = null;
             try {
-                realnamePrivate = realnamePrivateService.findById(uid);
+                realnamePrivate = realnamePrivateService.findById(id);
                 tenant = realnamePrivate.getTenant();
                 if(tenant!=null){
                     realnamePrivate.setStatus(status);
@@ -158,7 +156,7 @@ public class AuthController extends AbstractRestController {
         }else if(Tenant.AUTH_COMPANY==type&&(Tenant.AUTH_COMPANY_SUCCESS==status||Tenant.AUTH_COMPANY_FAIL==status)){//企业
             RealnameCorp realnameCorp = null;
             try{
-                realnameCorp = realnameCorpService.findById(uid);
+                realnameCorp = realnameCorpService.findById(id);
                 tenant = realnameCorp.getTenant();
                 if(tenant!=null){
                     statusT = tenant.getIsRealAuth();
