@@ -45,11 +45,12 @@
                                             <lable class="col-md-3 text-right">反馈意见：</lable>
                                         </div>
                                         <div class="form-group height-220" >
-                                            <div class="col-md-5 remove-padding" >
-                                                <textarea name="content" id="text1" cols="30" rows="10" class="form-control input-form customcontent"
-                                                          placeholder="&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;500字以内"></textarea>
+                                            <div class=" remove-padding textarea-box " >
+                                                <textarea name="content" id="text1" cols="30" rows="10" class="form-control input-form customcontent "></textarea>
+                                                <span class="textarea-box-tip">500字以内</span>
                                             </div>
                                         </div>
+
                                         <div class="form-group">
                                             <div class="col-md-3 text-left remove-padding">
                                                 <button type="button" id="validateBtn" class=" btn btn-primary  btn-form">提交</button>
@@ -66,7 +67,7 @@
     </section>
 </section>
 </section>
-<div class="tips-toast"></div>
+
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/custom/index.js'></script>
 <script type="text/javascript">
@@ -77,7 +78,7 @@
             ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
                 if(data.success){
                     $('#text1').val('');
-                    showtoast("删除成功");
+                    showtoast("提交成功");
                 }else{
                     showtoast(data.errorMsg);
                 }

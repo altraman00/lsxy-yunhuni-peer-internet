@@ -117,6 +117,7 @@
                                                             选择开票时间：
                                                             <!--默认第一条消费记录的时间-->
                                                             <input type="text" class="form-control" readonly="readonly" name="start"
+                                                                   <c:if test="${empty start}">placeholder="暂无消费信息"</c:if>
                                                                    value='${start}' id="datestart"/>到
                                                             <input type="text" class="datepicker form-control" name="end" readonly="readonly"
                                                                    data-date-end-date="0m" value=''  id="dateend"/>
@@ -308,7 +309,6 @@
 </div>
 <!-- /.modal -->
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'></script>
@@ -344,6 +344,14 @@
         if (tips) {
             $('.querytips').html(tips);
             return false;
+        }else{
+            //1号7点前不能申请上一个月的发票（因为还没统计出来）
+            var sdate = endtime.split('-');
+            var endDate = new Date(sdate[0],sdate[1]);//此处月份不用减1
+            if(new Date().getTime() - endDate.getTime() < 7 * 60 * 60 * 1000){
+                $('.querytips').html("当月1号7点前不能申请上一个月的发票");
+                return false;
+            }
         }
 
         //显示时间
@@ -468,7 +476,7 @@
 
             var html ='';
             for(var i=0 ; i<result.length; i++){
-                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amount.toFixed(2)+'</div></div>';
+                html+='<div class="col-md-6"><span class="col-md-6">'+ result[i].type +'：</span><div class="col-md-6">'+ result[i].amongAmount.toFixed(2)+'</div></div>';
             }
 
             document.getElementById('collapse-'+id+'-content').innerHTML=html;

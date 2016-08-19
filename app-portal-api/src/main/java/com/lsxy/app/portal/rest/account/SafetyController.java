@@ -25,6 +25,7 @@ public class SafetyController extends AbstractRestController {
     private AccountService accountService;
     @Autowired
     private MQService mqService;
+
     /**
      * 验证密码是否正确
      * @param password 待验证密码
@@ -51,11 +52,11 @@ public class SafetyController extends AbstractRestController {
     public RestResponse modifyEmailBind(String email)   {
         Account account = getCurrentAccount();
         if(email.equals(account.getEmail())){
-            return  RestResponse.failed("1003","该邮件已被使用");
+            return  RestResponse.failed("1003","该邮件地址已被使用");
         }
         boolean flag = accountService.checkEmail(email);
         if(flag){
-            return RestResponse.failed("1004","该邮件已被使用");
+            return RestResponse.failed("1004","该邮件地址已被使用");
         }
         mqService.publish(new ModifyEmailSuccessEvent(account.getId(),email));
         return RestResponse.success();
@@ -93,7 +94,7 @@ public class SafetyController extends AbstractRestController {
     public RestResponse modifyPwd(String oldPassword,String newPassword) throws MatchMutiEntitiesException {
         String userName = getCurrentAccountUserName();
         Account account = accountService.findAccountByUserName(userName);
-        if(!StringUtils.isNotEmpty(oldPassword)){
+        if(StringUtils.isNotEmpty(oldPassword)){
             // 密码加密
             oldPassword =  PasswordUtil.springSecurityPasswordEncode(oldPassword,userName);
             newPassword = PasswordUtil.springSecurityPasswordEncode(newPassword,userName);

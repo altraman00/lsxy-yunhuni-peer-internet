@@ -47,7 +47,8 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
             params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
             mailService.send("重置密码",email,"02-portal-notify-reset-password.vm",params);
             //将参数和对应的邮箱存取redis里
-            cacheManager.set(key,email,72 * 60 * 60);
+            long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
+            cacheManager.set(key,email,expireTime * 60 * 60);
             if(logger.isDebugEnabled()){
                 logger.debug("邮件重置密码：code:{},email:{}",key,email);
             }
@@ -57,4 +58,5 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
             e.printStackTrace();
         }
     }
+
 }

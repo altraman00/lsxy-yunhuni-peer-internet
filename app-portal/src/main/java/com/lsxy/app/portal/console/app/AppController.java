@@ -114,11 +114,14 @@ public class AppController extends AbstractPortalController {
     }
     @RequestMapping("/delete")
     @ResponseBody
-    public Map delete(HttpServletRequest request,String id){
-        deleteApp(request,id);
-        Map map = new HashMap();
-        map.put("msg","删除成功");
-        return map;
+    public RestResponse delete(HttpServletRequest request,String id){
+
+        //Rest删除应用
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app/delete?id={1}";
+        RestResponse<App> response = RestRequest.buildSecurityRequest(token).get(uri, App.class, id);
+        return response;
+
     }
     /**
      * 新建应用
@@ -127,24 +130,15 @@ public class AppController extends AbstractPortalController {
      */
     @RequestMapping("/create")
     @ResponseBody
-    public Map create(HttpServletRequest request, App app){
+    public RestResponse create(HttpServletRequest request, App app){
         app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
         createApp(request,app);
-        Map map = new HashMap();
-        map.put("msg","新建应用成功");
-        return map;
+        return RestResponse.success();
+//        Map map = new HashMap();
+//        map.put("msg","新建应用成功");
+//        return map;
     }
-    /**
-     * 删除应用
-     * @param request
-     * @param id 应用id
-     * @return
-     */
-    private RestResponse deleteApp(HttpServletRequest request,String id ){
-        String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/delete?id={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
-    }
+
     /**
      * 更新应用
      * @param request
@@ -152,11 +146,12 @@ public class AppController extends AbstractPortalController {
      */
     @RequestMapping("/update")
     @ResponseBody
-    public Map update(HttpServletRequest request, App app){
+    public RestResponse update(HttpServletRequest request, App app){
         updateApp(request,app);
-        Map map = new HashMap();
-        map.put("msg","应用修改成功");
-        return map;
+        return RestResponse.success();
+//        Map map = new HashMap();
+//        map.put("msg","应用修改成功");
+//        return map;
     }
     /**
      * 新建应用

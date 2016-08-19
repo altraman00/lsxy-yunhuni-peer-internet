@@ -1,8 +1,10 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.consume.model.ConsumeDay;
-import com.lsxy.framework.api.consume.service.ConsumeDayService;
+import com.lsxy.framework.api.statistics.model.ConsumeDay;
+import com.lsxy.framework.api.statistics.service.ConsumeDayService;
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,32 +26,44 @@ public class ConsumeDayController extends AbstractRestController {
     ConsumeDayService consumeDayService;
 
     /**
-     * 根据时间和应用获取列表数据
+     * 获取用户某时间的列表数据
+     * @param tenantId 对于租户
      * @param appId 应用id
+     * @param type 消费类型
      * @param startTime 时间
+     * @param endTime 结束时间
      * @return
      */
     @RequestMapping("/list")
-    public RestResponse list(String appId,String startTime){
-        String userName = getCurrentAccountUserName();
-        List<ConsumeDay> list =  consumeDayService.list(userName,appId,startTime);
+    public RestResponse list(String tenantId, String appId, String type, String startTime, String endTime ){
+        Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+        if(StringUtils.isEmpty(endTime)){
+            endTime = startTime;
+        }
+        Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        List<ConsumeDay> list =  consumeDayService.list(tenantId,  appId,  type,  date1,  date2 );
         return RestResponse.success(list);
     }
 
     /**
      * 获取分页数据
+     * @param tenantId 对于租户
      * @param appId 应用id
-     * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param type 消费类型
+     * @param startTime 时间 yyyy-MM
+     * @param endTime 结束时间 yyyy-MM
      * @param pageNo 第几页
      * @param pageSize 每页记录数
      * @return
      */
     @RequestMapping("/page")
-    public RestResponse pageList(String appId,String startTime,String endTime ,Integer pageNo ,Integer pageSize){
-        String userName = getCurrentAccountUserName();
-        if(endTime.length()==0){endTime=startTime;}
-        Page<ConsumeDay> page =  consumeDayService.pageList(userName,appId,startTime,endTime,pageNo,pageSize);
+    public RestResponse pageList(String tenantId, String appId,String type,String startTime, String endTime,Integer pageNo,Integer pageSize){
+        Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+        if(StringUtils.isEmpty(endTime)){
+            endTime = startTime;
+        }
+        Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        Page<ConsumeDay> page =  consumeDayService.pageList( tenantId,  appId, type, date1,  date2, pageNo, pageSize);
         return RestResponse.success(page);
     }
 
@@ -85,4 +100,22 @@ public class ConsumeDayController extends AbstractRestController {
         List<ConsumeDay> pageList =  consumeDayService.pageListByTime(userName,appId,startTime,endTime,pageNo ,pageSize);
         return RestResponse.success(pageList);
     }
+
+    /**
+     * 获取某一日的日结账单
+     * @param appId
+     * @param day
+     * @return
+     */
+    @RequestMapping("/get")
+    public RestResponse get(String appId, String day){
+        if(StringUtils.isBlank(day)){
+            Date preDate = DateUtils.getPreDate(new Date());
+            day = DateUtils.getDate(preDate, "yyyy-MM-dd");
+        }
+        Account account = getCurrentAccount();
+        List<ConsumeDay> consumeDays = consumeDayService.getConsumeDays(account.getTenant().getId(),appId,day);
+        return RestResponse.success(consumeDays);
+    }
+
 }

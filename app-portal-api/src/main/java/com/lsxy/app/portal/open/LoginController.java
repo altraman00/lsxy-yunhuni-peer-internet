@@ -2,6 +2,7 @@ package com.lsxy.app.portal.open;
 
 import com.lsxy.app.portal.exceptions.APIErrors;
 import com.lsxy.app.portal.utils.PortalRestResponse;
+import com.lsxy.framework.api.exceptions.AccountNotFoundException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
@@ -36,7 +37,7 @@ public class LoginController {
      * 登录接口
      * @return
      */
-    @RequestMapping(path="",method = RequestMethod.POST)
+    @RequestMapping(path="")
     public RestResponse login(@RequestParam String username,@RequestParam String password){
 
         try {
@@ -50,13 +51,18 @@ public class LoginController {
             } else {
                 return PortalRestResponse.failed(APIErrors.LOGIN_ERROR_PWD_MISTAKE);
             }
+        }catch (AccountNotFoundException e){
+            logger.info("用户登录失败:{}:{} \r\n",username,password);
+            if(logger.isDebugEnabled()){
+                logger.error("用户登录失败：",e);
+            }
+            return PortalRestResponse.failed(APIErrors.LOGIN_ERROR_ACCOUNT_NOT_FOUND);
         }catch (Exception ex){
-                logger.info("用户登录失败:{}:{} \r\n",username,password);
-                if(logger.isDebugEnabled()){
-                    logger.error("用户登录失败：",ex);
-                }
+            logger.info("用户登录失败:{}:{} \r\n",username,password);
+            if(logger.isDebugEnabled()){
+                logger.error("用户登录失败：",ex);
+            }
             return PortalRestResponse.failed(APIErrors.LOGIN_ERROR);
-
         }
     }
 

@@ -57,23 +57,92 @@
                         <section class=" w-f personal-auth">
                             <div class="wrapper header">
                                 <span class="border-left">&nbsp;实名认证</span>
+                                <c:if test="${status==1||status==3||status==4||status==5}">
+                                <h2>个人实名认证完成</h2>
                                 <div class="auth authsuccess thumbnail">
-                                    <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" alt="...">
-                                    <div class="caption fr">
-                                        <h5>实名认证完成!</h5>
+                                    <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" width="190px">
+                                    <div class="caption fl">
                                         <ul>
-                                            <li>认证途径：云呼你平台认证</li>
-                                            <li>认证账号：${userName}</li>
-                                            <c:if test="${status == 1}">
-                                                <li>真实姓名：${name}</li>
-                                            </c:if>
-                                            <c:if test="${status == 2}">
-                                                <li>企业名称：${name}</li>
-                                            </c:if>
-                                            <li>认证时间：${time}</li>
+                                            <li>认证类型：个人认证</li>
+                                            <li>真实姓名：${realnamePrivate.name}</li>
+                                            <li>证件类型：
+                                                <c:if test="${realnamePrivate.idType == '0'}">身份证</c:if>
+                                                <c:if test="${realnamePrivate.idType == '1'}">护照</c:if>
+                                            </li>
+                                            <li>证件号码：${realnamePrivate.idNumber}</li>
+                                            <li>认证时间：${createTime1}</li>
                                         </ul>
                                     </div>
                                 </div>
+                                </c:if>
+                                <c:if test="${status==2||status==4}">
+                                <h2>公司实名认证完成</h2>
+                                <div class="auth authsuccess thumbnail">
+                                    <img class="fl" src="${resPrefixUrl }/images/personal/pass.png" width="190px">
+                                    <div class="caption fl">
+                                        <ul>
+                                            <li>认证类型：公司认证</li>
+                                            <li>公司名称：${realnameCorp.name}</li>
+                                            <li>办公地址：${realnameCorp.addr}</li>
+                                            <li>所属行业：${realnameCorp.industry}</li>
+                                            <li>申请人：${realnameCorp.proposer}</li>
+                                            <li>证件类型：
+                                                <c:if test="${realnameCorp.authType == '0'}">三证合一（一照一码）</c:if>
+                                                <c:if test="${realnameCorp.authType == '1'}">三证合一</c:if>
+                                                <c:if test="${realnameCorp.authType == '2'}">三证分离</c:if>
+                                            </li>
+                                            <c:if test="${realnameCorp.authType == '0'}">
+                                                <li>统一社会信用代码：${realnameCorp.type01Prop02}</li>
+                                            </c:if>
+                                            <c:if test="${realnameCorp.authType == '1'}">
+                                                <li>注册号：${realnameCorp.type02Prop01}</li>
+                                                <li>税务登记号：${realnameCorp.type02Prop02}</li>
+                                            </c:if>
+                                            <c:if test="${realnameCorp.authType == '2'}">
+                                                <li>税务登记号：${realnameCorp.type03Prop01}</li>
+                                                <li>营业执照号：${realnameCorp.type03Prop03}</li>
+                                            </c:if>
+                                            <li>认证时间：${createTime2} </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                </c:if>
+                                <c:if test="${status==6||status==0||status==3}">
+                                    <c:if test="${status==0||status==3}"><h2>公司实名认证审核中</h2></c:if>
+                                    <c:if test="${status==6}"><h2>个人实名认证审核中</h2></c:if>
+                                    <div class="authfail thumbnail">
+                                        <img src="${resPrefixUrl }/images/personal/audit.png" alt="...">
+                                        <div class="caption">
+                                            <p><strong>您的资料提交成功，等待审核...</strong> </p>
+                                            <p>当前审核状态: <span class="text-success">审核中</span></p>
+                                            <p>正常情况审核周期为24小时内，您也可通过客服电话查询400-9287734988</p>
+                                        </div>
+                                    </div>
+                                </c:if>
+                                <c:if test="${status==-1||status==-2||status==5}">
+                                    <c:if test="${status==-1}"><h2>个人实名认证失败</h2></c:if>
+                                    <c:if test="${status==5||status==-2}"><h2>公司实名认证失败</h2></c:if>
+                                    <div class="authfail thumbnail">
+                                        <img src="${resPrefixUrl }/images/personal/smiling_face.png" alt="...">
+                                        <div class="caption">
+                                            <p><strong>审核结束</strong> </p>
+                                            <p>当前审核状态: <span class="text-danger">未通过</span></p>
+                                            <c:if test="${status==-1}"><p>原因：身份证与名称不符合，请重新提交资料认证</p></c:if>
+                                            <c:if test="${status==-2}"><p>原因：上传资料不符合要求，请重新提交资料认证</p></c:if>
+                                        </div>
+                                    </div>
+                                </c:if>
+                                <c:if test="${status==1||status==5}">
+                                    <div class="row">
+                                        <a href="/console/account/auth/index?type=upgrade" class="btn btn-primary btn-form">升级公司认证</a>
+                                        <span class="lineheight-24">个人认证完成后，还可进行公司认证</span>
+                                    </div>
+                                </c:if>
+                                <c:if test="${status==-1||status==-2}">
+                                <div class="row">
+                                    <a href="/console/account/auth/index?type=fail" class="btn btn-primary btn-form">重新认证</a>
+                                </div>
+                                </c:if>
                             </div>
                         </section>
                     </section>

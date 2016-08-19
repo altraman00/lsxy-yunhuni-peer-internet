@@ -134,7 +134,7 @@
                                                     <lable class="col-md-3 text-right ">发票抬头：</lable>
                                                     <div class="col-md-4 ">
                                                         <input type="text" data-fv-notempty="true" placeholder=""  name="title"  value="${invoiceInfo.title}"
-                                                               class="form-control input-form notEmpty"/>
+                                                               class="form-control input-form limit50"/>
                                                     </div>
                                                 </div>
                                                 <!--企业专用票start-->
@@ -143,7 +143,7 @@
                                                         <lable class="col-md-3 text-right ">纳税人识别号：</lable>
                                                         <div class="col-md-4">
                                                             <input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}"
-                                                                   class="form-control input-form notEmpty"/>
+                                                                   class="form-control input-form limit32"/>
                                                         </div>
                                                     </div>
 
@@ -151,28 +151,28 @@
                                                         <lable class="col-md-3 text-right ">银行账户：</lable>
                                                         <div class="col-md-4">
                                                             <input type="text" placeholder="" name="bankAccount"  value="${invoiceInfo.bankAccount}"
-                                                                   class="form-control input-form notEmpty"/>
+                                                                   class="form-control input-form limit32"/>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">开户行：</lable>
                                                         <div class="col-md-4">
                                                             <input type="text" placeholder="" name="bank"  value="${invoiceInfo.bank}"
-                                                                   class="form-control input-form notEmpty"/>
+                                                                   class="form-control input-form limit32"/>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">注册地址：</lable>
                                                         <div class="col-md-4">
                                                             <input type="text" placeholder="" name="regAddress"  value="${invoiceInfo.regAddress}"
-                                                                   class="form-control input-form notEmpty"/>
+                                                                   class="form-control input-form limit100"/>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <lable class="col-md-3 text-right ">企业电话：</lable>
                                                         <div class="col-md-4">
                                                             <input type="text" placeholder="" name="phone"  value="${invoiceInfo.phone}"
-                                                                   class="form-control input-form notEmpty"/>
+                                                                   class="form-control input-form limit32"/>
                                                         </div>
                                                     </div>
                                                     <div class="form-group">
@@ -180,7 +180,7 @@
                                                         <div class="col-md-4">
                                                             <c:set var="defaultImgUrl" value="${(empty invoiceInfo.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(invoiceInfo.qualificationUrl))}" />
                                                             <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${invoiceInfo.qualificationUrl}" data-url='${defaultImgUrl}'>
-                                                            <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">
+                                                            <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。
                                                             <img src='${defaultImgUrl}' alt="" id="imgPre" width="100" height="80" class="recordimg" />
                                                         </div>
                                                     </div>
@@ -194,14 +194,14 @@
                                                     <lable class="col-md-3 text-right ">收取地址：</lable>
                                                     <div class="col-md-4">
                                                         <input type="text" placeholder="" name="receiveAddress" value="${invoiceInfo.receiveAddress}"
-                                                               class="form-control input-form notEmpty"/>
+                                                               class="form-control input-form limit100"/>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right ">收件人：</lable>
                                                     <div class="col-md-4">
                                                         <input type="text" placeholder="" name="receivePeople"  value="${invoiceInfo.receivePeople}"
-                                                               class="form-control input-form notEmpty"/>
+                                                               class="form-control input-form limit32"/>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -231,7 +231,6 @@
     </section>
 </section>
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/invoice.js'></script>
 <script>

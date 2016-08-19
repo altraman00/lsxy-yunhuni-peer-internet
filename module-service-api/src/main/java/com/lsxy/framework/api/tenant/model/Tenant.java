@@ -16,10 +16,18 @@ import javax.persistence.Table;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_tenant")
 public class Tenant extends IdEntity {
-	public   static final Integer AUTH_NO = 100;//未认证
-	public  static final Integer AUTH_COMPANY_SUCESS = 2;//企业认证成功
-	public  static final Integer AUTH_ONESELF_SUCESS = 1;//个人认证成功
-
+	public static final Integer AUTH_COMPANY=1;//认证类型-企业认证
+	public static final Integer AUTH_ONESELF=0;//认证类型-个人认证
+	public static final Integer AUTH_ONESELF_WAIT = 6;//等待审核
+	public static final Integer AUTH_WAIT = 0;//等待审核
+	public static final Integer AUTH_NO = 100;//未认证
+	public static final Integer AUTH_UPGRADE_WAIT = 3;//个人升级企业等待
+	public static final Integer AUTH_UPGRADE_SUCCESS = 4;//个人升级企业成功
+	public static final Integer AUTH_UPGRADE_FAIL = 5;//个人升级企业失败
+	public static final Integer AUTH_COMPANY_SUCCESS = 2;//企业认证成功
+	public static final Integer AUTH_ONESELF_SUCCESS = 1;//个人认证成功
+	public static final Integer AUTH_COMPANY_FAIL = -2;//企业认证失败
+	public static final Integer AUTH_ONESELF_FAIL = -1;//个人认证失败
 	private static final long serialVersionUID = 1L;
 	//是否实名
 	private Integer isRealAuth;

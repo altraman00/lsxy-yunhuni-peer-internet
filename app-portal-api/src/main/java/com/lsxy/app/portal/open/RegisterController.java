@@ -71,7 +71,7 @@ public class RegisterController {
             Account account = accountService.activeAccount(accountId, password);
             response = RestResponse.success(account);
         } catch (RegisterException e) {
-            response = RestResponse.failed("0001",e.getMessage());
+            response = RestResponse.failed("0000",e.getMessage());
         }
         return response;
     }

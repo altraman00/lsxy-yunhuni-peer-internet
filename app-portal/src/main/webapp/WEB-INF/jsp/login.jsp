@@ -27,10 +27,10 @@
 		<div class="row">
 			<form role="form" action="${ctx}/login" method="post" class="login-form" id="defaultForm">
 				<div class="form-group">
-					<input type="text" name="username" placeholder="请输入会员名称、手机号或邮箱" class="form-username form-control" id="form-username">
+					<input type="text" id="username" name="username" placeholder="请输入会员名称、手机号或邮箱" class="form-username form-control" id="form-username">
 				</div>
 				<div class="form-group">
-					<input type="password" name="password" placeholder="请输入密码" class="form-password form-control" id="form-password" />
+					<input type="password" id="password" name="password" placeholder="请输入密码" class="form-password form-control" id="form-password" />
 				</div>
 				<div class="form-group form-block"   >
 					<div class="col-md-6 remove-padding">
@@ -43,7 +43,7 @@
 
 				<div class="form-group form-block" >
 					<div class="col-md-6 remove-padding remember" >
-						<input type="checkbox" class="remember-check" />   记住我
+						<input type="checkbox" class="remember-check" id="rememberMe"/>   记住用户名
 					</div>
 					<div class="col-md-6 remove-padding border text-right">
 						<a href="${ctx}/forget/index">忘记密码?</a>
@@ -61,7 +61,7 @@
 			<div class="row margin-block" >
 				<div class="col-sm-12 text-center " >
 					<c:if test="${not empty param.er}">
-						<c:if test="${param.er eq 'true'}"><a class="tips-error" >密码错误,或账号被锁定</a></c:if>
+						<c:if test="${param.er eq 'true'}"><a class="tips-error" >${SPRING_SECURITY_LAST_EXCEPTION.message}</a></c:if>
 						<c:if test="${param.er eq 'vcer'}"><a class="tips-error" >验证码错误</a></c:if>
 
 					</c:if>
@@ -88,6 +88,7 @@
 <script src="${resPrefixUrl }/bower_components/bootstrapvalidator/dist/js/bootstrapValidator.min.js"></script>
 
 <script src="${resPrefixUrl }/js/register/login.js" ></script>
+<script src="${resPrefixUrl }/js/jquery.cookie.min.js" ></script>
 
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -96,7 +97,31 @@
 			$("#imgValidateCode").prop("src",ctx +  "/vc/get?dt="+(new Date().getTime()));
 		});
 
+		//判断之前是否有设置cookie，如果有，则设置【记住我】选择框
+		if($.cookie('yunhuni_username')!=undefined){
+			$("#rememberMe").attr("checked", true);
+		}else{
+			$("#rememberMe").attr("checked", false);
+		}
+		//读取cookie
+		if($('#rememberMe:checked').length>0){
+			$('#username').val($.cookie('yunhuni_username'));
+		}
+
 	});
+
+	$("#defaultForm").submit(function(){
+		beforeSubmit();
+	});
+	function beforeSubmit(){
+		//监听【记住我】事件
+		if($('#rememberMe:checked').length>0){//设置cookie
+			$.cookie('yunhuni_username', $('#username').val(), {expires: 30});
+		}else{//清除cookie
+			$.removeCookie('yunhuni_username');
+		}
+	}
+
 </script>
 
 </body>

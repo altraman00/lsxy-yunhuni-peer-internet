@@ -103,7 +103,7 @@
                                             </div>
                                             <div class="col-md-9 ">
                                                     <span class="help-block"><a href="#">登录密码</a><br/>
-                                                        <small class="help-small">安全性高的密码可以使账号更安全，设置一个包含字母符号或数字中至少两项且长度超过6位的密码</small>
+                                                        <small class="help-small">安全性高的密码可以使账号更安全，设置一个由字母符号或数字组成的密码</small>
                                                     </span>
                                             </div>
                                             <div class="col-md-2 right">
@@ -179,7 +179,7 @@
 <div class="shadow-bg" id="show-bg"></div>
 <div id="mobilebox" class="modal-box" style="display: none;">
     <div class="addmobile1" style="">
-        <div class="title">操作确认<a class="close_a modalCancel"></a></div>
+        <div class="title">操作确认<a class="close_a modalCancel cancelclear"></a></div>
         <div class="content" >
             <div class="tips-box">
                 确认是本账号操作，请再次输入用户名密码
@@ -241,14 +241,13 @@
 
 </div>
 
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script src="${resPrefixUrl }/js/personal/account.js"></script><!--must-->
 <!--must-->
 <script>
     function sendEmailCode(){
         var email = $('#email').val();
-        var param = {'email':email,parameterName:token};
+        var param = {'email':email,csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/account/safety/modify_email_bind",param,function(result){
           if(result.success){
               showmsg('已发送成功<span style="color:orange;font-size:20px">12小时</span>内有效','moadltips3');
@@ -264,7 +263,7 @@
         $('#email').val("");
         $('#mobile').val("");
         $('#yzm1').val("");
-        $('#moadltips1').val("");
+        $('#moadltips1').html("");
         $('#second-code').val("");
     });
     var isVc = false;//是否需要图形验证码
@@ -283,16 +282,16 @@
             vCode = $("#second-code").val();
         }
         var mobile = $('#mobile').val();
-        var param = {'mobile':mobile,'validateCode':vCode,parameterName:token};
-        ajaxsync(ctx+"/mc/send",param,function(result){
-            if(result.flag){
+        var param = {'mobile':mobile,'validateCode':vCode,csrfParameterName:csrfToken};
+        ajaxsync(ctx+"/mc/send",param,function(response){
+            if(response.data.flag){
                 showmsg('发送短信验证码成功','moadltips2');
                 $('#second-codeblock').html('');
                 sendResult = true;
-            }else if(result.vc){
+            }else if(response.data.vc){
                 sendResult = false;
                 //发送不成功，且要输入图形验证码
-                showmsg(result.err,'moadltips2');
+                showmsg(response.data.err,'moadltips2');
                 isVc = true;
                 //启动二次校验
                 var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
@@ -301,7 +300,7 @@
 
             }else{
                 sendResult = false;
-                showmsg(result.err,'moadltips2');
+                showmsg(response.data.err,'moadltips2');
             }
         },"get");
         sendCodeResult =  sendResult;
@@ -315,7 +314,7 @@
         }
         var type = $('#modaltype').val();
         //验证密码
-        var param = {'oldPws':psw,parameterName:token};
+        var param = {'oldPws':psw,csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/account/safety/validation_psw",param,function(data){
             if(data.sucess==2) {
                 showmsg(data.msg,'moadltips2');
@@ -340,10 +339,10 @@
         }
         var mobile = $('#mobile').val();
         var param = {'mc':code,"mobile":mobile};
-        ajaxsync(ctx+"/mc/check",param,function(data){
-            if(data.flag){
+        ajaxsync(ctx+"/mc/check",param,function(response){
+            if(response.data.flag){
                 //开始绑定手机号码
-                param = {'mobile':mobile,parameterName:token};
+                param = {'mobile':mobile,csrfParameterName:csrfToken};
                 ajaxsync(ctx+"/console/account/safety/edit_mobile",param,function(result){
                     if(result.success){
                         $('#mobileOld').html("您已经绑定了手机 "+mobile.substring(0,3)+"****"+mobile.substring(7,11));
@@ -354,7 +353,7 @@
                     }
                 })
             }else{
-                showmsg(data.err,'moadltips2');
+                showmsg(response.data.err,'moadltips2');
             }
         },"get");
     });

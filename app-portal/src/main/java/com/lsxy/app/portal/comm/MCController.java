@@ -31,7 +31,7 @@ public class MCController {
      */
     @RequestMapping(value = "/send",method = RequestMethod.GET)
     @ResponseBody
-    public Map send(HttpServletRequest request,String mobile,String validateCode){
+    public RestResponse send(HttpServletRequest request,String mobile,String validateCode){
         Map<String,Object> model = new HashMap<>();
         if(StringUtils.isNotBlank(mobile)){
             Long expire = Long.parseLong(SystemConfig.getProperty("global.sms.vc.ip.expire",(30*60)+""));
@@ -86,7 +86,7 @@ public class MCController {
             model.put("flag",false);
             model.put("err","请输入手机号");
         }
-        return model;
+        return RestResponse.success(model);
     }
 
     /**
@@ -94,7 +94,7 @@ public class MCController {
      */
     @RequestMapping(value = "/check",method = RequestMethod.GET)
     @ResponseBody
-    public Map<String,Object> checkMobileCode(HttpServletRequest request, String mobile, String mc){
+    public RestResponse checkMobileCode(HttpServletRequest request, String mobile, String mc){
         Map<String,Object> result = new HashMap<>();
         //检查手机验证码
         if(StringUtils.isNotBlank(mc) && StringUtils.isNotBlank(mobile)){
@@ -108,12 +108,11 @@ public class MCController {
                 result.put("flag",false);
                 result.put("err",s);
             }
-            return result;
         }else{
             result.put("flag",false);
             result.put("err","手机号或验证码为空");
-            return result;
         }
+        return RestResponse.success(result);
     }
 
     /**
