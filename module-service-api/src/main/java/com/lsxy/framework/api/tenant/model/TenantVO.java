@@ -37,7 +37,7 @@ public class TenantVO implements Serializable {
     private String id;
 
     @JsonProperty("registe_date")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(timezone="GMT+8",pattern = "yyyy-MM-dd HH:mm")
     private Date regDate;
 
     @JsonProperty("name")
@@ -138,10 +138,7 @@ public class TenantVO implements Serializable {
         this.totalCoin = totalCoin;
     }
 
-    public Long getSessionCount() {//秒转换成分钟
-        if(sessionCount !=null){
-            return (long)Math.round(sessionCount/60);
-        }
+    public Long getSessionCount() {
         return sessionCount;
     }
 

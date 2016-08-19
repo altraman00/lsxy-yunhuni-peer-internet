@@ -21,8 +21,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -215,7 +217,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                                            Integer authStatus, Integer accStatus, int pageNo, int pageSize) {
         String sql =" FROM db_lsxy_base.tb_base_tenant t" +
                 " LEFT JOIN (SELECT b.tenant_id,b.`status` FROM db_lsxy_base.tb_base_account b GROUP BY b.tenant_id) a ON t.id = a.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app GROUP BY tenant_id) app ON t.id = app.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app where deleted <> 1 GROUP BY tenant_id) app ON t.id = app.tenant_id" +
                 " LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_billing billing ON t.id = billing.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum_amount FROM db_lsxy_base.tb_base_consume_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY dt DESC) consume ON t.id = consume.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
@@ -236,10 +238,10 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         }
         if(authStatus!=null){//认证状态
             if(authStatus == 1){//已认证
-                sql += " AND (t.is_real_auth IN (:authStatus))";
+                sql += " AND (t.is_real_auth IN ("+ StringUtils.join(Tenant.AUTH_STATUS,",") + "))";
             }
             if(authStatus == 0){
-                sql += " AND (t.is_real_auth NOT IN (:authStatus))";
+                sql += " AND (t.is_real_auth NOT IN (" + StringUtils.join(Tenant.AUTH_STATUS,",") + "))";
             }
         }
         String countSql = "SELECT COUNT(t.id) " + sql;
@@ -266,11 +268,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
             countQuery.setParameter("accStatus",accStatus);
             pageQuery.setParameter("accStatus",accStatus);
         }
-        if(authStatus!=null){//认证状态
-            String as = StringUtils.join(Tenant.AUTH_STATUS,",");
-            countQuery.setParameter("authStatus",as);
-            pageQuery.setParameter("authStatus",as);
-        }
+
         int total = ((BigInteger)countQuery.getSingleResult()).intValue();
         int start = (pageNo-1)*pageSize;
         if(total == 0){
