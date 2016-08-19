@@ -184,12 +184,12 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
     }
 
     @Override
-    public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, String[] tenantId, String status, Integer type) {
-        String hql = " from InvoiceApply obj  where obj.status='"+InvoiceApply.STATUS_DONE+"' ";
+    public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, String[] tenantId, Integer status, Integer type,boolean flag) {
+        String hql = " from InvoiceApply obj  where obj.status='"+status+"' ";
         if(type!=null){
             hql+=" and obj.type = "+type+" ";
         }
-        if(status!=null){
+        if(flag){
             hql+=" and  obj.expressNo is not null ";
         }else{
             hql+=" and  obj.expressNo is  null ";

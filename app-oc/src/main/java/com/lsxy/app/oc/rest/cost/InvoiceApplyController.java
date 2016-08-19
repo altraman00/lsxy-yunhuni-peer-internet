@@ -7,19 +7,24 @@ import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
  * 发票申请
  * Created by liups on 2016/7/21.
  */
+@Api(value = "发票审核", description = "财务中心相关的接口" )
 @RequestMapping("/finance/invoice")
 @RestController
 public class InvoiceApplyController extends AbstractRestController {
@@ -33,7 +38,7 @@ public class InvoiceApplyController extends AbstractRestController {
     InvoiceInfoService invoiceInfoService;
     /**
      * 发票申请分页获取
-     * @param status auditing|unauth
+     * @param status await|auditing|unauth
      * @param pageNo 第几页
      * @param pageSize 每页记录数
      * @param name 名字
@@ -41,16 +46,28 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/{status}/send/list",method = RequestMethod.GET)
-    public RestResponse page(@ApiParam(name = "status",value = "auditing|unauth") @PathVariable String status,@RequestParam(required=false)Integer type,
-                             @RequestParam(required=false)String name, @RequestParam(defaultValue = "1")Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
+    @ApiOperation(value = "发票申请分页获取")
+    public RestResponse page(
+            @ApiParam(name = "status",value = "状态await待处理auditing审核通过unauth异常")
+            @PathVariable String status,
+            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
+            @RequestParam(required=false)Integer type,
+            @ApiParam(name = "name",value = "会员名")
+            @RequestParam(required=false)String name,
+            @RequestParam(defaultValue = "1")Integer pageNo,
+            @RequestParam(defaultValue = "20") Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
-        if("auditing".equals(status)||"unauth".equals(status)) {
-            String statusT = null;
-            if("auditing".equals(status)){
-                statusT = "";
+        if("await".equals(status)||"auditing".equals(status)||"unauth".equals(status)) {
+            Integer statusT = null;
+            if("await".equals(status)){
+                statusT = InvoiceApply.STATUS_SUBMIT;
+            }else if("auditing".equals(status)){
+                statusT = InvoiceApply.STATUS_DONE;
+            }else if("unauth".equals(status)){
+                statusT = InvoiceApply.STATUS_EXCEPTION;
             }
-            if (StringUtil.isNotEmpty(name)) {
+            if(StringUtil.isNotEmpty(name)) {
                 List<Tenant> tList = tenantService.pageListByUserName(name);
                 if (tList.size() == 0) {
                     page = null;
@@ -59,10 +76,10 @@ public class InvoiceApplyController extends AbstractRestController {
                     for (int i = 0; i < tList.size(); i++) {
                         tenantId[i] = tList.get(i).getId();
                     }
-                    page = invoiceApplyService.pageList(pageNo,pageSize,tenantId,statusT,type);
+                    page = invoiceApplyService.pageList(pageNo,pageSize,tenantId,statusT,type,true);
                 }
             }else{
-                page = invoiceApplyService.pageList(pageNo, pageSize, new String[]{},statusT,type);
+                page = invoiceApplyService.pageList(pageNo, pageSize, new String[]{},statusT,type,true);
             }
             restResponse = RestResponse.success(page);
         }else{
@@ -81,11 +98,21 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      * @return
      */
+    @ApiOperation(value = "发票邮寄分页获取")
     @RequestMapping(value = "/{status}/list",method = RequestMethod.GET)
-    public RestResponse page(@ApiParam(name = "status",value = "await|auditing|unauth") @PathVariable String status,
-                             @RequestParam(required=false)String name, @RequestParam(required=false)String startTime,
-                             @RequestParam(required=false) String endTime, @RequestParam(required=false)Integer type,
-                             @RequestParam(defaultValue = "1")Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize){
+    public RestResponse page(
+            @ApiParam(name = "status",value = "状态await待处理auditing审核通过unauth异常")
+            @PathVariable String status,
+            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
+            @RequestParam(required=false)Integer type,
+            @ApiParam(name = "name",value = "会员名")
+            @RequestParam(required=false)String name,
+            @ApiParam(name = "startTime",value = "开始时间 yyyy-MM-dd")
+            @RequestParam(required=false)String startTime,
+            @ApiParam(name = "endTime",value = "结束时间 yyyy-MM-dd")
+            @RequestParam(required=false) String endTime,
+            @RequestParam(defaultValue = "1")Integer pageNo,
+            @RequestParam(defaultValue = "20") Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
         if("await".equals(status)||"auditing".equals(status)||"unauth".equals(status)) {
@@ -123,15 +150,26 @@ public class InvoiceApplyController extends AbstractRestController {
      * @param invoiceApplyVo 接收参数对象
      * @return
      */
-    @RequestMapping(value = "/edit",method = RequestMethod.POST)
-    public RestResponse modify(@RequestBody  InvoiceApplyVo invoiceApplyVo){
-        String id = invoiceApplyVo.getId();
+    @ApiOperation(value = "保存发票审核信息")
+    @RequestMapping(value = "/edit/{id}",method = RequestMethod.PUT)
+    public RestResponse modify(
+            @PathVariable String id,
+            @RequestBody  InvoiceApplyVo invoiceApplyVo){
         Integer status = invoiceApplyVo.getStatus();
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         RestResponse restResponse =null;
         if(status==InvoiceApply.STATUS_DONE||status==InvoiceApply.STATUS_EXCEPTION){
             invoiceApply.setStatus(status);
-            invoiceApply = invoiceApplyService.save(invoiceApply);
+            try {
+                BeanUtils.copyProperties(invoiceApply,invoiceApplyVo);
+                invoiceApply = invoiceApplyService.save(invoiceApply);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                restResponse = RestResponse.failed("0","参数错误");
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+                restResponse = RestResponse.failed("0","参数错误");
+            }
         }else{
             restResponse = RestResponse.failed("0","参数错误");
         }
@@ -145,9 +183,12 @@ public class InvoiceApplyController extends AbstractRestController {
      * @param invoiceApplyVo 接收参数对象
      * @return
      */
-    @RequestMapping(value = "/edit/send",method = RequestMethod.POST)
-    public RestResponse modifySend(@RequestBody InvoiceApplyVo invoiceApplyVo){
-        InvoiceApply invoiceApply = invoiceApplyService.findById(invoiceApplyVo.getId());
+    @ApiOperation(value = "保存发票邮寄信息")
+    @RequestMapping(value = "/edit/send/{id}",method = RequestMethod.PUT)
+    public RestResponse modifySend(
+            @PathVariable String id,
+            @RequestBody InvoiceApplyVo invoiceApplyVo){
+        InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         RestResponse restResponse =null;
         if(invoiceApply.getStatus()==InvoiceApply.STATUS_DONE){
             invoiceApply.setExpressNo(invoiceApplyVo.getExpressNo());
@@ -167,6 +208,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @param id 发票记录
      * @return
      */
+    @ApiOperation(value = "查看发票申请信息")
     @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
     public RestResponse get(@PathVariable String id){
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
