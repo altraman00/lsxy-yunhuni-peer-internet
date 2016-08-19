@@ -3,8 +3,6 @@ package com.lsxy.app.oc.rest.message;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Date;
-
 /**
  * Created by zhangxb on 2016/8/19.
  */
