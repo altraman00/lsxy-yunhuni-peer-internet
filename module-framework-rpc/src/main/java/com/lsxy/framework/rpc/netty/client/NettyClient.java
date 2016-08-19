@@ -3,6 +3,7 @@ package com.lsxy.framework.rpc.netty.client;
 import com.lsxy.framework.rpc.api.RPCHandler;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
 import com.lsxy.framework.rpc.api.client.Client;
+import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
 import com.lsxy.framework.rpc.netty.NettyCondition;
@@ -18,6 +19,7 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,10 @@ public class NettyClient extends AbstractClient{
 
     @Autowired
     private NettyClientHandler handler;
+
+    @Autowired
+    private ServerSessionContext sessionContext;
+
 
     private AttributeKey<String> SESSION_ID = AttributeKey.valueOf("sessionid");
 
@@ -86,10 +92,15 @@ public class NettyClient extends AbstractClient{
             f.channel().closeFuture().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    if(logger.isDebugEnabled()){
-                        logger.debug("客户端连接断开啦。。。。。注意注意!1!!!!!!");
+                    logger.error("客户端连接断开啦。。。。。注意注意!1!!!!!!");
+                    Attribute att =future.channel().attr(AttributeKey.valueOf("sessionid"));
+                    if(att != null){
+                        String sessionid = (String)att .get();
+                        if(logger.isDebugEnabled()){
+                            logger.debug("客户端连接断开:{}" , sessionid);
+                        }
+                        sessionContext.remove(sessionid);
                     }
-
                 }
             });
             // Wait until the connection is closed.
