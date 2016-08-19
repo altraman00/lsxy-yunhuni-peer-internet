@@ -32,6 +32,7 @@ public class TestIncomingZB {
 //    @Async
     public void receivedIncoming(RPCRequest request) {
         String to = (String) request.getParameter("to_uri");
+        String resid = (String) request.getParameter("res_id");
         if(StringUtil.isNotEmpty(to)){
             to = to.substring(4);
         }
@@ -40,7 +41,7 @@ public class TestIncomingZB {
         if(StringUtil.isNotEmpty(requestTimestamp)){
             Long ltt = Long.parseLong(requestTimestamp);
             if(logger.isDebugEnabled()){
-                logger.debug("收到incoming[{}],共花费往返[{}] vs [{}]  {}ms",to,now,ltt, now- ltt);
+                logger.debug("收到incoming[{}][{}],共花费往返[{}] vs [{}]  {}ms",to,resid,now,ltt, now- ltt);
             }
         }else{
             if(logger.isDebugEnabled()){
