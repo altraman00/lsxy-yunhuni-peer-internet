@@ -37,7 +37,7 @@ public class TenantVO implements Serializable {
     private String id;
 
     @JsonProperty("registe_date")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(timezone="GMT+8",pattern = "yyyy-MM-dd HH:mm")
     private Date regDate;
 
     @JsonProperty("name")
