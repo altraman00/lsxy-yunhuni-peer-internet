@@ -18,4 +18,6 @@ public interface FeedbackService extends BaseService<Feedback> {
      * @return
      */
     Page<Feedback> pageList( Integer pageNo, Integer pageSize, String startTime, String endTime,Integer status);
+
+    void batchModifyStatus(String[] ids);
 }

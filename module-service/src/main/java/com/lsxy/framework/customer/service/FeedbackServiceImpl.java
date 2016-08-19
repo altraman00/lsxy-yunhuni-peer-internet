@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.customer.dao.FeedbackDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -25,7 +26,8 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
     public BaseDaoInterface<Feedback, Serializable> getDao() {
         return feedbackDao;
     }
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public Page<Feedback> pageList( Integer pageNo, Integer pageSize, String startTime, String endTime,Integer status) {
         Date date1 = null;
@@ -79,5 +81,15 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
             page = this.pageList(hql,pageNo,pageSize);
         }
         return page;
+    }
+
+    @Override
+    public void batchModifyStatus(String[] ids) {
+        String sql = "update db_lsxy_base.tb_base_message set status='"+Feedback.READ+"' where id in ( ";
+        for(int i=0;i<ids.length;i++){
+            sql +=" '"+ids[i]+"', ";
+        }
+        sql+=" )";
+        jdbcTemplate.update(sql);
     }
 }
