@@ -215,7 +215,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                                            Integer authStatus, Integer accStatus, int pageNo, int pageSize) {
         String sql =" FROM db_lsxy_base.tb_base_tenant t" +
                 " LEFT JOIN (SELECT b.tenant_id,b.`status` FROM db_lsxy_base.tb_base_account b GROUP BY b.tenant_id) a ON t.id = a.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app GROUP BY tenant_id) app ON t.id = app.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app where deleted <> 1 GROUP BY tenant_id) app ON t.id = app.tenant_id" +
                 " LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_billing billing ON t.id = billing.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum_amount FROM db_lsxy_base.tb_base_consume_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY dt DESC) consume ON t.id = consume.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
