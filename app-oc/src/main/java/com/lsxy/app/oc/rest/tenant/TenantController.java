@@ -36,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.Path;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -548,7 +547,6 @@ public class TenantController {
             Tenant tenant = tenantService.findById(id);
             if(tenant != null){
                 Integer status = tenant.getIsRealAuth();
-                getAuthInfo(tenant.getId(),status,info);
                 //未认证，等待审核，已认证，认证失败
                 Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT};//等待审核
                 Integer[] auth_success_status = Tenant.AUTH_STATUS;//已认证
@@ -578,8 +576,6 @@ public class TenantController {
         AuthInfoVO authInfo = null;
         if(Arrays.asList(privateAuth_status).contains(status)){
             authInfo = new PrivateAuthInfoVO();
-            authInfo.setStatus(info.getStatus());
-            authInfo.setType("个人");
             RealnamePrivate p = realnamePrivateService.findByTenantIdNewest(tenantId);
             if(p!=null){
                 try {
@@ -588,11 +584,11 @@ public class TenantController {
                     throw new RuntimeException(e);
                 }
             }
+            authInfo.setStatus(info.getStatus());
+            authInfo.setType("个人");
             info = authInfo;
         }else if(Arrays.asList(companyAuth_status).contains(status)){
             authInfo = new CompanyAuthInfoVO();
-            authInfo.setStatus(info.getStatus());
-            authInfo.setType("公司");
             RealnameCorp p = realnameCorpService.findByTenantIdNewest(tenantId);
             if(p!=null){
                 try {
@@ -601,6 +597,8 @@ public class TenantController {
                     throw new RuntimeException(e);
                 }
             }
+            authInfo.setStatus(info.getStatus());
+            authInfo.setType("公司");
             info = authInfo;
         }
         return info;
