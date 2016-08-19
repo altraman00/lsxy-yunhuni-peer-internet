@@ -26,6 +26,13 @@ public class StasticsCounter extends AsbstractStatisticCounter {
     @MarkField("发送给区域管理器的消息次数")
     private AtomicInteger sendGWRequestCount = new AtomicInteger(0);
 
+    @MarkField("语音呼叫接口调用次数")
+    private AtomicInteger callCount = new AtomicInteger(0);
+
+    public AtomicInteger getCallCount() {
+        return callCount;
+    }
+
     public AtomicInteger getReceivedGWResponseCount() {
         return receivedGWResponseCount;
     }

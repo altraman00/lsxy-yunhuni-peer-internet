@@ -45,6 +45,8 @@ public class TestController {
 
     @Autowired(required = false)
     private StasticsCounter sc;
+
+
     @Autowired(required = false)
     private MQStasticCounter mqsc;
 
@@ -118,11 +120,13 @@ public class TestController {
         public void run() {
             int c = count;
             long starttime = System.currentTimeMillis();
-            int sc = 0;
             while(c -- > 0){
                 try {
                     long startdt = System.currentTimeMillis();
                     String to = Thread.currentThread().getId() + "_" + c + "_" + startdt;
+                    /*统计请求次数指标*/
+                   if(sc != null)  sc.getCallCount().incrementAndGet();
+
                     String xx = callService.call("1234",to,10,10);
                     if (logger.isDebugEnabled()) {
                         logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
