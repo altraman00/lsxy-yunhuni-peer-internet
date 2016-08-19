@@ -1,6 +1,7 @@
 package com.lsxy.framework.mq.ons;
 
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
+import com.lsxy.framework.config.SystemConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -17,20 +18,25 @@ import java.util.Properties;
 @Conditional(OnsCondition.class)
 public class OnsMQConfig {
 
+    public OnsMQConfig(){
+        String systemId = System.getProperty("systemId");
+        consumerId = SystemConfig.getProperty(systemId + ".mq.ons.cid","CID_YUNHUNI-TENANT-001");
+        producerId =  SystemConfig.getProperty(systemId + ".mq.ons.pid","PID_YUNHUNI-TENANT-001");
+    }
+
+    private String consumerId;
+    private String producerId;
+
+
     @Value("${global.mq.ons.ak}")
     private String accessKey;
 
     @Value("${global.mq.ons.sk}")
     private String secretKey;
 
-    @Value("${global.mq.ons.cid}")
-    private String consumerId;
-
-    @Value("${global.mq.ons.pid}")
-    private String producerId;
-
 
     public Properties getOnsProperties(){
+
         Properties properties = new Properties();
         properties.put(PropertyKeyConst.ConsumerId, this.consumerId);
         properties.put(PropertyKeyConst.AccessKey, this.accessKey);
