@@ -76,15 +76,15 @@ public class AuthController extends AbstractRestController {
 
     /**
      * 根据记录id和认证类型获取详情页面
-     * @param uid 记录id
+     * @param id 记录id
      * @param type 认证类型 0个人1企业
      * @return
      */
     @ApiOperation(value = "根据记录id和认证类型获取详情页面")
-    @RequestMapping(value = "/member/detail/{uid}",method = RequestMethod.GET)
+    @RequestMapping(value = "/member/detail/{id}",method = RequestMethod.GET)
     public RestResponse pageList(
-            @ApiParam(name = "uid",value = "消息id")
-            @PathVariable String uid,
+            @ApiParam(name = "id",value = "消息id")
+            @PathVariable String id,
             @ApiParam(name = "type",value = "0个人认证 1实名认证 必填")
             @RequestParam Integer type
     ){
@@ -93,7 +93,7 @@ public class AuthController extends AbstractRestController {
         if(Tenant.AUTH_ONESELF==type){//个人
             RealnamePrivate realnamePrivate = null;
             try {
-                realnamePrivate = realnamePrivateService.findById(uid);
+                realnamePrivate = realnamePrivateService.findById(id);
                 if(realnamePrivate.getTenant()!=null){
                     List<RealnamePrivate> list = realnamePrivateService.findByTenantId(realnamePrivate.getTenant().getId());
                     map.put("list",list);
@@ -104,7 +104,7 @@ public class AuthController extends AbstractRestController {
         }else if(Tenant.AUTH_COMPANY==type){//企业
             RealnameCorp realnameCorp = null;
             try{
-                realnameCorp = realnameCorpService.findById(uid);
+                realnameCorp = realnameCorpService.findById(id);
                 if(realnameCorp.getTenant()!=null){
                     List<RealnameCorp> list = realnameCorpService.findByTenantId(realnameCorp.getTenant().getId());
                     map.put("list",list);

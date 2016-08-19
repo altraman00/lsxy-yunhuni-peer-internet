@@ -12,7 +12,7 @@ public class AuthVo {
     private Integer type;//
     @ApiModelProperty(name = "status",value = "1个人成功 2企业成功 -1个人失败 -2企业失败 必填")
     private Integer status;
-    @ApiModelProperty(name = "reason",value = "原因 必填")
+    @ApiModelProperty(name = "reason",value = "原因 ")
     private String reason;
 
     public String getReason() {
