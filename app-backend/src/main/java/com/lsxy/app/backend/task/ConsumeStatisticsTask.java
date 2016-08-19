@@ -103,8 +103,7 @@ public class ConsumeStatisticsTask {
     /**
      *每个小时的执行一次
      */
-    @Scheduled(cron="30 * * * * ?")
-    //@Scheduled(cron="0 30 0/1 * * ?")
+    @Scheduled(cron="0 30 0/1 * * ?")
     public void hour(){
         long startTime = System.currentTimeMillis();
         logger.info("消费记录指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
