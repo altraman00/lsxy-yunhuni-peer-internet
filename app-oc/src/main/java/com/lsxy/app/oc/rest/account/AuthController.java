@@ -9,6 +9,8 @@ import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ import java.util.Map;
  * 实名认证处理类
  * Created by zhangxb on 2016/8/11.
  */
+@Api(value = "实名认证", description = "审核管理相关接口" )
 @RequestMapping("/demand")
 @RestController
 public class AuthController extends AbstractRestController {
@@ -41,9 +44,21 @@ public class AuthController extends AbstractRestController {
      * @param pageSize 每页记录数
      * @return
      */
+    @ApiOperation(value = "查找用户下的分页信息")
     @RequestMapping(value = "/member/{authStatus}/list",method = RequestMethod.GET)
-    public RestResponse pageList(@ApiParam(name = "authStatus",value = "await|auditing|unauth")@PathVariable String authStatus, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime,
-                                 @ApiParam(name = "type",value = "0个人认证 1企业认证") @RequestParam(required=false)Integer type, @RequestParam(required=false)String search, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(
+            @ApiParam(name = "authStatus",value = "await|auditing|unauth")
+            @PathVariable String authStatus,
+            @ApiParam(name = "startTime",value = "yyyy-MM-dd")
+            @RequestParam(required=false)String startTime,
+            @ApiParam(name = "endTime",value = "yyyy-MM-dd")
+            @RequestParam(required=false)String endTime,
+            @ApiParam(name = "type",value = "0个人认证 1企业认证")
+            @RequestParam(required=false)Integer type,
+            @ApiParam(name = "search",value = "搜索的会员名")
+            @RequestParam(required=false)String search,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "20")Integer pageSize){
         Integer status = null;
         if("await".equals(authStatus)){
             status = 0;
@@ -61,18 +76,24 @@ public class AuthController extends AbstractRestController {
 
     /**
      * 根据记录id和认证类型获取详情页面
-     * @param uid 记录id
+     * @param id 记录id
      * @param type 认证类型 0个人1企业
      * @return
      */
-    @RequestMapping(value = "/member/detail/{uid}",method = RequestMethod.GET)
-    public RestResponse pageList(@PathVariable String uid,@ApiParam(name = "type",value = "0个人认证 1实名认证 必填")@RequestParam Integer type){
-         RestResponse restResponse = null;
+    @ApiOperation(value = "根据记录id和认证类型获取详情页面")
+    @RequestMapping(value = "/member/detail/{id}",method = RequestMethod.GET)
+    public RestResponse pageList(
+            @ApiParam(name = "id",value = "消息id")
+            @PathVariable String id,
+            @ApiParam(name = "type",value = "0个人认证 1实名认证 必填")
+            @RequestParam Integer type
+    ){
+        RestResponse restResponse = null;
         Map map = new HashMap();
         if(Tenant.AUTH_ONESELF==type){//个人
             RealnamePrivate realnamePrivate = null;
             try {
-                realnamePrivate = realnamePrivateService.findById(uid);
+                realnamePrivate = realnamePrivateService.findById(id);
                 if(realnamePrivate.getTenant()!=null){
                     List<RealnamePrivate> list = realnamePrivateService.findByTenantId(realnamePrivate.getTenant().getId());
                     map.put("list",list);
@@ -83,7 +104,7 @@ public class AuthController extends AbstractRestController {
         }else if(Tenant.AUTH_COMPANY==type){//企业
             RealnameCorp realnameCorp = null;
             try{
-                realnameCorp = realnameCorpService.findById(uid);
+                realnameCorp = realnameCorpService.findById(id);
                 if(realnameCorp.getTenant()!=null){
                     List<RealnameCorp> list = realnameCorpService.findByTenantId(realnameCorp.getTenant().getId());
                     map.put("list",list);
@@ -100,27 +121,31 @@ public class AuthController extends AbstractRestController {
     }
     /**
      * 根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果
-     * @param authVo 接收信息VO
      * @return
      */
-    @RequestMapping(value = "/member/edit",method = RequestMethod.POST)
-    public RestResponse modifyAuthStatus(@RequestBody AuthVo authVo){
-        Integer type = authVo.getType();
-        Integer status = authVo.getStatus();
-        String uid = authVo.getUid();
+    @ApiOperation(value = "根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果")
+    @RequestMapping(value = "/member/edit/{id}",method = RequestMethod.PUT)
+    public RestResponse modifyAuthStatus(
+            @ApiParam(name = "id",value = "记录id")
+             @PathVariable  String id,
+             @RequestBody AuthVo authVo){
         Tenant tenant = null;
         RestResponse restResponse = null;
         Integer statusT = null;
+        Integer type = authVo.getType();
+        Integer status = authVo.getStatus();
+        String reason = authVo.getReason();
         if(Tenant.AUTH_ONESELF==type&&(Tenant.AUTH_ONESELF_FAIL==status||Tenant.AUTH_ONESELF_SUCCESS==status)){//个人
             RealnamePrivate realnamePrivate = null;
             try {
-                realnamePrivate = realnamePrivateService.findById(uid);
+                realnamePrivate = realnamePrivateService.findById(id);
                 tenant = realnamePrivate.getTenant();
                 if(tenant!=null){
                     realnamePrivate.setStatus(status);
                     tenant.setIsRealAuth(status);
                     tenant.setTenantName(realnamePrivate.getName());
                     realnamePrivate.setTenant(tenant);
+                    realnamePrivate.setReason(reason);
                     realnamePrivateService.save(realnamePrivate);
                     tenant = tenantService.save(tenant);
                 }else{
@@ -131,7 +156,7 @@ public class AuthController extends AbstractRestController {
         }else if(Tenant.AUTH_COMPANY==type&&(Tenant.AUTH_COMPANY_SUCCESS==status||Tenant.AUTH_COMPANY_FAIL==status)){//企业
             RealnameCorp realnameCorp = null;
             try{
-                realnameCorp = realnameCorpService.findById(uid);
+                realnameCorp = realnameCorpService.findById(id);
                 tenant = realnameCorp.getTenant();
                 if(tenant!=null){
                     statusT = tenant.getIsRealAuth();
@@ -145,6 +170,7 @@ public class AuthController extends AbstractRestController {
                     }
                     tenant.setTenantName(realnameCorp.getName());
                     tenant.setIsRealAuth(status);
+                    realnameCorp.setReason(reason);
                     realnameCorp.setTenant(tenant);
                     realnameCorpService.save(realnameCorp);
                     tenant = tenantService.save(tenant);
