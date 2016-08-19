@@ -19,7 +19,7 @@ public class TestIncomingZB {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    @Async
+//    @Async
     public void doCallZB(String to, RPCRequest rpcrequest) {
         if(logger.isDebugEnabled()){
             logger.debug("请求语音呼叫指令,存入REDIS:{}" ,rpcrequest);
@@ -28,7 +28,7 @@ public class TestIncomingZB {
     }
 
 
-    @Async
+//    @Async
     public void receivedIncoming(RPCRequest request) {
         String to = (String) request.getParameter("to_uri");
         if(StringUtil.isNotEmpty(to)){
@@ -38,7 +38,7 @@ public class TestIncomingZB {
         if(StringUtil.isNotEmpty(requestTimestamp)){
             Long ltt = Long.parseLong(requestTimestamp);
             if(logger.isDebugEnabled()){
-                logger.debug("收到incoming,共花费往返  {}ms", System.currentTimeMillis() - ltt);
+                logger.debug("收到incoming[{}],共花费往返  {}ms",to, System.currentTimeMillis() - ltt);
             }
         }else{
             if(logger.isDebugEnabled()){
