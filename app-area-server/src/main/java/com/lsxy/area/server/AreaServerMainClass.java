@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Created by tandy on 16/7/19.
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Import;
 @ComponentScan
 @Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class, FrameworkCacheConfig.class})
 @EnableDubboConfiguration
+@EnableAsync
 public class AreaServerMainClass extends AbstractSpringBootStarter {
 
     public static void main(String[] args) throws RemoteServerStartException {
