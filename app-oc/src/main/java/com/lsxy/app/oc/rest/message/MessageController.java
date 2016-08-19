@@ -80,30 +80,24 @@ public class MessageController extends AbstractRestController {
      * @return
      */
     @ApiOperation(value = "修改消息")
-    @RequestMapping(value = "/edit",method = RequestMethod.PATCH)
+    @RequestMapping(value = "/edit/{id}",method = RequestMethod.PUT)
     public RestResponse modify(
             @ApiParam(name = "id",value = "消息id")
-            @RequestParam String id,
-            @ApiParam(name = "type",value = "1表示活动消息 0表示用户消息")
-            @RequestParam Integer type,
-            @ApiParam(name = "status",value = "-1下线0未发布1上线")
-            @RequestParam Integer status,
-            @ApiParam(name = "lineTime",value = "yyyy-MM-dd HH:mm")
-            @RequestParam(required = false) String lineTime){
+            @PathVariable String id,
+            @RequestBody MessageVo messageVo){
         Message message1 = messageService.findById(id);
         boolean isSendMsg = false;
-        if(status!=null&&message1.getStatus()!=status){
-            if(type==Message.MESSAGE_ACCOUNT&&type==Message.ONLINE) {
+        if(messageVo.getStatus()!=null&&message1.getStatus()!=messageVo.getStatus()){
+            if(messageVo.getType()==Message.MESSAGE_ACCOUNT&&messageVo.getType()==Message.ONLINE) {
                 isSendMsg = true;
             }
         }
         RestResponse restResponse = null;
         try {
-            if(StringUtil.isNotEmpty(lineTime)){
-                message1.setLineTime(DateUtils.parseDate(lineTime,"yyyy-MM-dd HH:mm"));
+            BeanUtils.copyProperties(message1,messageVo);
+            if(StringUtil.isNotEmpty(messageVo.getLine())){
+                message1.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
             }
-            message1.setStatus(status);
-            message1.setType(type);
             message1 = messageService.save(message1);
             if(isSendMsg){
                 sendMessage(message1);
@@ -123,17 +117,13 @@ public class MessageController extends AbstractRestController {
     @ApiOperation(value = "新建消息")
     @RequestMapping(value = "/new",method = RequestMethod.POST)
     public RestResponse create(
-            @ApiParam(name = "messageVo",value = "type：1表示活动消息 0表示用户消息" +
-                    "status：-1下线0未发布1上线" +
-                    "content：消息内容" +
-                    "name:发布人名字（非必填）" +
-                    "title：消息标题" +
-                    "line：yyyy-MM-dd HH:mm（非必填）")
             @RequestBody MessageVo messageVo){
         Message message = new Message();
         try {
             BeanUtils.copyProperties(message,messageVo);
-            message.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
+            if(StringUtil.isNotEmpty(messageVo.getLine())) {
+                message.setLineTime(DateUtils.parseDate(messageVo.getLine(), "yyyy-MM-dd HH:mm"));
+            }
             message = messageService.save(message);
             if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
                 sendMessage(message);
@@ -150,10 +140,10 @@ public class MessageController extends AbstractRestController {
      * @return
      */
     @ApiOperation(value = "删除消息")
-    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     public RestResponse delete(
             @ApiParam(name="id",value = "消息id")
-            @RequestParam  String id
+            @PathVariable  String id
     ) throws InvocationTargetException, IllegalAccessException {
         Message message = messageService.findById(id);
         messageService.delete(message);
