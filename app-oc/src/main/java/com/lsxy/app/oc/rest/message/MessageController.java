@@ -6,6 +6,7 @@ import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -116,15 +117,31 @@ public class MessageController extends AbstractRestController {
 
     /**
      * 新建消息 type：1表示活动消息，不需要通知用户 0表示用户消息，status为1是发送消息给用户
-     * @param message
+     * @param messageVo
      * @return
      */
     @ApiOperation(value = "新建消息")
     @RequestMapping(value = "/new",method = RequestMethod.POST)
-    public RestResponse create(@RequestBody Message message){
-        message = messageService.save(message);
-        if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
-            sendMessage(message);
+    public RestResponse create(
+            @ApiParam(name = "messageVo",value = "type：1表示活动消息 0表示用户消息" +
+                    "status：-1下线0未发布1上线" +
+                    "content：消息内容" +
+                    "name:发布人名字（非必填）" +
+                    "title：消息标题" +
+                    "line：yyyy-MM-dd HH:mm（非必填）")
+            @RequestBody MessageVo messageVo){
+        Message message = new Message();
+        try {
+            BeanUtils.copyProperties(message,messageVo);
+            message.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
+            message = messageService.save(message);
+            if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
+                sendMessage(message);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
         return RestResponse.success(message);
     }
