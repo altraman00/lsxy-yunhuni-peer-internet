@@ -35,7 +35,7 @@ public class CTIClientConfigFactory {
     @PostConstruct
     public void initConfig(){
         //TODO 去REDIS获取配置信息来初始化多个客户端配置
-        CTIClientConfig config = new CTIClientConfig((byte)0,"192.168.2.100");
+        CTIClientConfig config = new CTIClientConfig((byte)0,"192.168.22.10");
         this.configs.add(config);
     }
 

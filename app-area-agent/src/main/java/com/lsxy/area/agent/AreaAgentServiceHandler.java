@@ -160,7 +160,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
-            params.put("to_uri", request.getParameter("to")+"@192.168.2.100:5062");
+            params.put("to_uri", request.getParameter("to")+"@192.168.22.10:5062");
             params.put("max_answer_seconds", iMaxAnswerSec);
             params.put("max_ring_seconds", iMaxRingSec);
 
