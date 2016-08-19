@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
+import com.lsxy.area.api.CallService;
 import com.lsxy.framework.api.test.TestService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -38,6 +39,9 @@ public class TestController {
 
     @Reference(timeout = 3000)
     private TestService testService;
+
+    @Reference(timeout = 3000)
+    private CallService callService;
 
     @Autowired(required = false)
     private StasticsCounter sc;
@@ -77,6 +81,65 @@ public class TestController {
         response.setData("OK");
         return response;
     }
+
+    @RequestMapping("/test/call/presure/{threads}/{count}")
+    public RestResponse<String> doCallPressureTest(@PathVariable int threads,@PathVariable  int count){
+        ExecutorService es = Executors.newFixedThreadPool(threads);
+
+        long starttime = System.currentTimeMillis();
+        long result = 0L;
+        for(int i=0;i<threads;i++){
+            es.submit(new CallTask(count));
+        }
+        es.shutdown();;
+        try {
+            while (!es.awaitTermination(10000, TimeUnit.MILLISECONDS)) {
+                System.out.println("还在跑,线程池没有关闭");
+            }
+
+            result = System.currentTimeMillis() - starttime;
+            if(logger.isDebugEnabled()){
+                logger.debug("整个测试全部完成,共耗时:{}ms",result);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return RestResponse.success("测试完毕,共耗时:"+result+"ms");
+    }
+
+
+    class CallTask implements  Runnable{
+        private int count;
+        public CallTask(int count) {
+            this.count = count;
+        }
+
+        @Override
+        public void run() {
+            int c = count;
+            long starttime = System.currentTimeMillis();
+            int sc = 0;
+            while(c -- > 0){
+                try {
+                    long startdt = System.currentTimeMillis();
+                    String to = Thread.currentThread() + "_" + c + "_" + startdt;
+                    String xx = callService.call("1234",to,10,10);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
+                    }
+                }catch (Exception ex){
+
+                }
+            }
+            if(logger.isDebugEnabled()){
+                logger.debug("当前线程{}测试完毕,总共用时:{}ms",Thread.currentThread().getName(),System.currentTimeMillis() - starttime);
+            }
+        }
+    }
+
+
+
+
 
     @RequestMapping("/test/presure/{threads}/{count}")
     public RestResponse<String> doPressureTest(@PathVariable int threads,@PathVariable  int count){
