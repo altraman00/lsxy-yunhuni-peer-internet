@@ -6,17 +6,23 @@ import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
-import com.lsxy.framework.core.utils.EntityUtils;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
  * Created by zhangxb on 2016/8/10.
  */
+@Api(value = "消息中心")
 @RequestMapping("/message")
 @RestController
 public class MessageController extends AbstractRestController {
@@ -38,47 +44,73 @@ public class MessageController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/list",method = RequestMethod.GET)
-    public RestResponse pageList(@RequestParam(defaultValue = "1",required=false)Integer type,@RequestParam(required = false)Integer status, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    @ApiOperation(value = "根据日期和类型查询消息列表信息")
+    public RestResponse pageList(
+            @ApiParam(name = "type",value = "0用户消息 1活动消息,默认1")
+            @RequestParam(defaultValue = "1",required=false)Integer type,
+            @ApiParam(name = "status",value = "类型 0未上线 1上线 -1下线")
+            @RequestParam(required = false)Integer status,
+            @ApiParam(name = "startTime",value = "yyyy-MM-dd")
+            @RequestParam(required=false)String startTime,
+            @ApiParam(name = "endTime",value = "yyyy-MM-dd")
+            @RequestParam(required=false)String endTime,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "20")Integer pageSize){
         Page page = messageService.pageList(type,status, startTime, endTime, pageNo, pageSize);
         RestResponse restResponse = RestResponse.success(page);
         return restResponse;
     }
 
     /**
-     * 根据消息查新消息
+     * 根据消息id查询消息
      * @param id
      * @return
      */
+    @ApiOperation(value = "根据消息id查询消息")
     @RequestMapping(value = "/detail/{id}",method = RequestMethod.GET)
-    public RestResponse detail(@PathVariable String id){
+    public RestResponse detail(
+            @ApiParam(name = "id",value = "消息id")
+            @PathVariable String id){
         Message message = messageService.findById(id);
         return RestResponse.success(message);
     }
     /**
      * 修改消息 type：1表示活动消息，不需要通知用户 0表示用户消息，status为1是发送消息给用户
-     * @param message
      * @return
      */
-    @RequestMapping(value = "/edit",method = RequestMethod.POST)
-    public RestResponse modify( @RequestBody Message message){
-        Message message1 = messageService.findById(message.getId());
+    @ApiOperation(value = "修改消息")
+    @RequestMapping(value = "/edit",method = RequestMethod.PATCH)
+    public RestResponse modify(
+            @ApiParam(name = "id",value = "消息id")
+            @RequestParam String id,
+            @ApiParam(name = "type",value = "1表示活动消息 0表示用户消息")
+            @RequestParam Integer type,
+            @ApiParam(name = "status",value = "-1下线0未发布1上线")
+            @RequestParam Integer status,
+            @ApiParam(name = "lineTime",value = "yyyy-MM-dd HH:mm")
+            @RequestParam(required = false) String lineTime){
+        Message message1 = messageService.findById(id);
         boolean isSendMsg = false;
-        if(message.getStatus()!=null&&message1.getStatus()!=message.getStatus()){
-            if(message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
+        if(status!=null&&message1.getStatus()!=status){
+            if(type==Message.MESSAGE_ACCOUNT&&type==Message.ONLINE) {
                 isSendMsg = true;
             }
         }
         RestResponse restResponse = null;
         try {
-            EntityUtils.copyProperties(message1, message);
-            messageService.save(message1);
+            if(StringUtil.isNotEmpty(lineTime)){
+                message1.setLineTime(DateUtils.parseDate(lineTime,"yyyy-MM-dd HH:mm"));
+            }
+            message1.setStatus(status);
+            message1.setType(type);
+            message1 = messageService.save(message1);
             if(isSendMsg){
                 sendMessage(message1);
             }
         }catch (Exception e){
-            restResponse = RestResponse.failed("0","转换对象失败");
+            restResponse = RestResponse.failed("0","上传内容不符合要求");
         }
-        restResponse = RestResponse.success(message);
+        restResponse = RestResponse.success(message1);
         return restResponse;
     }
 
@@ -87,12 +119,27 @@ public class MessageController extends AbstractRestController {
      * @param message
      * @return
      */
+    @ApiOperation(value = "新建消息")
     @RequestMapping(value = "/new",method = RequestMethod.POST)
     public RestResponse create(@RequestBody Message message){
         message = messageService.save(message);
         if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
             sendMessage(message);
         }
+        return RestResponse.success(message);
+    }
+    /**
+     * 删除消息
+     * @return
+     */
+    @ApiOperation(value = "删除消息")
+    @RequestMapping(value = "/delete",method = RequestMethod.DELETE)
+    public RestResponse delete(
+            @ApiParam(name="id",value = "消息id")
+            @RequestParam  String id
+    ) throws InvocationTargetException, IllegalAccessException {
+        Message message = messageService.findById(id);
+        messageService.delete(message);
         return RestResponse.success(message);
     }
     /**
