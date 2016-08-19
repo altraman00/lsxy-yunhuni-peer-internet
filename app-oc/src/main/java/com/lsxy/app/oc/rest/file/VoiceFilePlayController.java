@@ -8,6 +8,8 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import java.util.List;
  * 放音文件
  * Created by zhangxb on 2016/7/21.
  */
+@Api(value = "放音文件", description = "审核管理相关的接口" )
 @RequestMapping("/demand/member/voice")
 @RestController
 public class VoiceFilePlayController extends AbstractRestController {
@@ -38,10 +41,12 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @param voiceFilePlayVo 接收参数对象
      * @return
      */
-    @RequestMapping(value = "/edit" ,method = RequestMethod.POST)
-    public RestResponse modifyRemark(@RequestBody VoiceFilePlayVo voiceFilePlayVo){
+    @ApiOperation(value = "根据id修改备注")
+    @RequestMapping(value = "/edit/{id}" ,method = RequestMethod.PUT)
+    public RestResponse modifyRemark(
+            @PathVariable String id,
+            @RequestBody VoiceFilePlayVo voiceFilePlayVo){
         Integer status = voiceFilePlayVo.getStatus();
-        String id = voiceFilePlayVo.getId();
         String reason = voiceFilePlayVo.getReason();
         RestResponse restResponse = null;
         VoiceFilePlay voiceFilePlay = null;
@@ -78,8 +83,20 @@ public class VoiceFilePlayController extends AbstractRestController {
      * @param endTime 结束时间 yyyy-MM-dd
      * @return
      */
+    @ApiOperation(value = "根据名字和应用id查询用户名下的放音文件分页信息")
     @RequestMapping(value = "/{type}/list",method = RequestMethod.GET)
-    public RestResponse pageList(@ApiParam(name = "type",value = "await|auditing|unauth")@PathVariable String type, @RequestParam(required=false)String name, @RequestParam(required=false)String startTime, @RequestParam(required=false)String endTime, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20")Integer pageSize){
+    public RestResponse pageList(
+            @ApiParam(name = "type",value = "状态await待处理auditing审核通过unauth不通过")
+            @PathVariable String type,
+            @ApiParam(name = "name",value = "会员名")
+            @RequestParam(required=false)String name,
+            @ApiParam(name = "startTime",value = "开始时间 yyyy-MM-dd")
+            @RequestParam(required=false)String startTime,
+            @ApiParam(name = "endTime",value = "结束时间 yyyy-MM-dd")
+            @RequestParam(required=false)String endTime,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "20")Integer pageSize
+    ){
         RestResponse restResponse = null;
         Page page = null;
         if("await".equals(type)||"auditing".equals(type)) {
