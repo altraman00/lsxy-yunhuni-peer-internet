@@ -48,7 +48,7 @@ public class InvoiceApplyController extends AbstractRestController {
     @RequestMapping(value = "/{status}/send/list",method = RequestMethod.GET)
     @ApiOperation(value = "发票邮寄分页获取")
     public RestResponse page(
-            @ApiParam(name = "status",value = "状态await待处理auditing审核通过unauth异常")
+            @ApiParam(name = "status",value = "状态await待寄出auditing已寄出")
             @PathVariable String status,
             @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
             @RequestParam(required=false)Integer type,
@@ -58,7 +58,7 @@ public class InvoiceApplyController extends AbstractRestController {
             @RequestParam(defaultValue = "20") Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
-        if("await".equals(status)||"auditing".equals(status)||"unauth".equals(status)) {
+        if("await".equals(status)||"auditing".equals(status)) {
             Integer statusT = InvoiceApply.STATUS_DONE;
             Boolean flag = false;
             if("await".equals(status)){
