@@ -46,9 +46,9 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      */
     @RequestMapping(value = "/{status}/send/list",method = RequestMethod.GET)
-    @ApiOperation(value = "发票申请分页获取")
+    @ApiOperation(value = "发票邮寄分页获取")
     public RestResponse page(
-            @ApiParam(name = "status",value = "状态await待处理auditing审核通过unauth异常")
+            @ApiParam(name = "status",value = "状态await待寄出auditing已寄出")
             @PathVariable String status,
             @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
             @RequestParam(required=false)Integer type,
@@ -58,14 +58,13 @@ public class InvoiceApplyController extends AbstractRestController {
             @RequestParam(defaultValue = "20") Integer pageSize){
         RestResponse restResponse = null;
         Page page = null;
-        if("await".equals(status)||"auditing".equals(status)||"unauth".equals(status)) {
-            Integer statusT = null;
+        if("await".equals(status)||"auditing".equals(status)) {
+            Integer statusT = InvoiceApply.STATUS_DONE;
+            Boolean flag = false;
             if("await".equals(status)){
-                statusT = InvoiceApply.STATUS_SUBMIT;
+                flag=false;
             }else if("auditing".equals(status)){
-                statusT = InvoiceApply.STATUS_DONE;
-            }else if("unauth".equals(status)){
-                statusT = InvoiceApply.STATUS_EXCEPTION;
+                flag=true;
             }
             if(StringUtil.isNotEmpty(name)) {
                 List<Tenant> tList = tenantService.pageListByUserName(name);
@@ -76,10 +75,10 @@ public class InvoiceApplyController extends AbstractRestController {
                     for (int i = 0; i < tList.size(); i++) {
                         tenantId[i] = tList.get(i).getId();
                     }
-                    page = invoiceApplyService.pageList(pageNo,pageSize,tenantId,statusT,type,true);
+                    page = invoiceApplyService.pageList(pageNo,pageSize,tenantId,statusT,type,flag);
                 }
             }else{
-                page = invoiceApplyService.pageList(pageNo, pageSize, new String[]{},statusT,type,true);
+                page = invoiceApplyService.pageList(pageNo, pageSize, new String[]{},statusT,type,flag);
             }
             restResponse = RestResponse.success(page);
         }else{
@@ -98,7 +97,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      * @return
      */
-    @ApiOperation(value = "发票邮寄分页获取")
+    @ApiOperation(value = "发票申请分页获取")
     @RequestMapping(value = "/{status}/list",method = RequestMethod.GET)
     public RestResponse page(
             @ApiParam(name = "status",value = "状态await待处理auditing审核通过unauth异常")
