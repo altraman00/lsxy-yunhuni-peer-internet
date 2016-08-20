@@ -1,10 +1,11 @@
 package com.lsxy.app.oc.rest.cost;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.framework.api.consume.model.Consume;
+import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
-import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
@@ -18,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 发票申请
@@ -33,9 +36,9 @@ public class InvoiceApplyController extends AbstractRestController {
     @Autowired
     TenantService tenantService;
     @Autowired
-    ConsumeMonthService consumeMonthService;
-    @Autowired
     InvoiceInfoService invoiceInfoService;
+    @Autowired
+    ConsumeService consumeService;
     /**
      * 发票申请分页获取
      * @param status await|auditing|unauth
@@ -214,6 +217,23 @@ public class InvoiceApplyController extends AbstractRestController {
         return RestResponse.success(invoiceApply);
     }
 
+    /**
+     * 获取分页数据
+     * @return
+     */
+    @ApiOperation(value = "查看发票申请信息的消费列表信息")
+    @RequestMapping("/detail/list/{id}")
+    public RestResponse consumePageList(
+            @ApiParam(name = "id",value = "发票记录id")
+            @PathVariable String id,
+            @RequestParam(defaultValue = "1") Integer pageNo ,
+            @RequestParam(defaultValue = "20")Integer pageSize){
+        InvoiceApply invoiceApply = invoiceApplyService.findById(id);
+        Map map = new HashMap();
+        map.put("sum",invoiceApply.getAmount());
+        Page<Consume> page =  consumeService.pageList(invoiceApply.getTenant().getId(),pageNo,pageSize,invoiceApply.getStart(),invoiceApply.getEnd());
+        return RestResponse.success(page);
+    }
 
 
 }
