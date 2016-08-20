@@ -45,7 +45,7 @@ public class BillDetailController extends AbstractRestController {
             @ApiParam(name = "type",value = "1.语音呼叫2.双向回拨3.会议服务4.IVR定制服务5.语音验证码6.录音服务")
             @RequestParam Integer type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
-            @RequestParam String time,
+            @RequestParam(required=false) String time,
             @ApiParam(name = "appId",value = "应用id")
             @RequestParam(required=false)String appId,
             @RequestParam(defaultValue = "1") Integer pageNo,
