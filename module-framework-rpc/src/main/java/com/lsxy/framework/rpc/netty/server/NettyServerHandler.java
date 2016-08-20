@@ -41,6 +41,27 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
 
     @ChannelHandler.Sharable
     class IOHandle extends SimpleChannelInboundHandler<RPCMessage>{
+
+        @Override
+        public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+            logger.error("客户端连接断开:{}" ,ctx.channel());
+
+            Session session = getSessionInTheContextObject(ctx);
+            if(session != null) {
+                if(logger.isDebugEnabled()){
+                    logger.debug("清理客户端连接:{}",session.getId());
+                }
+                getSessionContext().remove(session.getId());
+            }
+            super.handlerRemoved(ctx);
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            logger.error("出现异常:{}",cause);
+            super.exceptionCaught(ctx, cause);
+        }
+
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, RPCMessage message) throws Exception {
             if(logger.isDebugEnabled()){
