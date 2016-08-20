@@ -53,7 +53,7 @@ public class BillDetailController extends AbstractRestController {
     ){
         Map re = new HashMap();
         RestResponse restResponse = null;
-        if(StringUtil.isNotEmpty(time)&&StringUtil.isNotEmpty(appId)&&type!=0){
+        if(StringUtil.isNotEmpty(appId)&&type!=0){
             //获取分页数据
             Page page = voiceCdrService.pageList(pageNo,pageSize,type,uid,time,appId);
             re.put("page",page);
