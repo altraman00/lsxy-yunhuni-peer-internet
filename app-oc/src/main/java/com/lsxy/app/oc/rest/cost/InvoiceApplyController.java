@@ -222,7 +222,7 @@ public class InvoiceApplyController extends AbstractRestController {
      * @return
      */
     @ApiOperation(value = "查看发票申请信息的消费列表信息")
-    @RequestMapping("/detail/list/{id}")
+    @RequestMapping(value = "/detail/list/{id}",method = RequestMethod.GET)
     public RestResponse consumePageList(
             @ApiParam(name = "id",value = "发票记录id")
             @PathVariable String id,
