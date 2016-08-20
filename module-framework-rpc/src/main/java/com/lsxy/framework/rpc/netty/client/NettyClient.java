@@ -92,7 +92,7 @@ public class NettyClient extends AbstractClient{
             f.channel().closeFuture().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    logger.error("客户端连接断开啦。。。。。注意注意!1!!!!!!");
+                    logger.error("客户端连接断开啦。。。。。注意注意!1!!!!!!:{}",future.channel());
                     Attribute att =future.channel().attr(AttributeKey.valueOf("sessionid"));
                     if(att != null){
                         String sessionid = (String)att .get();
