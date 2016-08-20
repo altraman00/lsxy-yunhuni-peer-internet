@@ -83,6 +83,9 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         }
 
         if(method.equals("sys.call.on_incoming")){
+            if(logger.isDebugEnabled()){
+                logger.debug("===================");
+            }
             tzb.receivedIncoming(request);
             if(sc != null)  sc.getReceivedAreaNodeInComingEventCount().incrementAndGet();
             if(logger.isDebugEnabled()){
