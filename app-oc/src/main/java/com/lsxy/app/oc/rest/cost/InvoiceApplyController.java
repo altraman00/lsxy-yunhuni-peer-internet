@@ -232,7 +232,8 @@ public class InvoiceApplyController extends AbstractRestController {
         Map map = new HashMap();
         map.put("sum",invoiceApply.getAmount());
         Page<Consume> page =  consumeService.pageList(invoiceApply.getTenant().getId(),pageNo,pageSize,invoiceApply.getStart(),invoiceApply.getEnd());
-        return RestResponse.success(page);
+        map.put("list",page);
+        return RestResponse.success(map);
     }
 
 
