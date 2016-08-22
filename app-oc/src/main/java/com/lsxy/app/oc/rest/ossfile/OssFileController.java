@@ -8,10 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -41,10 +38,19 @@ public class OssFileController extends AbstractRestController {
     }
     @ApiOperation(value = "获取资源流")
     @RequestMapping(value = "/img" ,method = RequestMethod.GET)
-    public void getImg(HttpServletResponse response, @RequestParam String uri){
+    @ResponseBody
+    public InputStream getImg(HttpServletResponse response, @RequestParam String uri){
         String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
         //response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
-        handle(response, uri);
+        //handle(response, uri);
+        InputStream in = null;
+        ServletOutputStream out = null;
+        try {
+            in = ossService.getFileStream(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
+        }catch (Exception e){
+
+        }
+        return in;
     }
 
     /**
