@@ -120,10 +120,10 @@ public class TenantController {
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(
     @RequestParam(required = false) String name,
-    @ApiParam(name = "begin",value = "格式:yyyy-MM")
-    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date begin,
-    @ApiParam(name = "end",value = "格式:yyyy-MM")
-    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") Date end,
+    @ApiParam(name = "begin",value = "格式:yyyy-MM-dd")
+    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date begin,
+    @ApiParam(name = "end",value = "格式:yyyy-MM-dd")
+    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date end,
     @ApiParam(name = "authStatus",value = "认证状态，1已认证，0未认证")
     @RequestParam(required = false) Integer authStatus,
     @ApiParam(name = "accStatus",value = "账号状态，2正常/启用，1被锁定/禁用")
@@ -131,10 +131,10 @@ public class TenantController {
     @RequestParam(required = false,defaultValue = "1") Integer pageNo,
     @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         if(begin!=null){
-            begin = DateUtils.getFirstTimeOfMonth(begin);
+            begin = DateUtils.getFirstTimeOfDate(begin);
         }
         if(end!=null){
-            end = DateUtils.getLastTimeOfMonth(end);
+            end = DateUtils.getLastTimeOfDate(end);
         }
         Page<TenantVO> list = tenantService.pageListBySearch(name,begin,end,authStatus,accStatus,pageNo,pageSize);
         return RestResponse.success(list);
