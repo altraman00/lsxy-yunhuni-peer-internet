@@ -39,8 +39,8 @@ public class OssFileController extends AbstractRestController {
     @ApiOperation(value = "获取资源流")
     @RequestMapping(value = "/img" ,method = RequestMethod.GET)
     public void getImg(HttpServletResponse response, @RequestParam String uri){
-        String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
-        response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
+//        String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
+//        response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
         handle(response, uri);
     }
 
