@@ -419,7 +419,7 @@ public class TenantController {
     }
 
     @ApiOperation(value = "租户（某年所有月/某月所有天）的api调用次数统计")
-    @RequestMapping(value = "/tenants/{id}/api_invoke/statistic",method = RequestMethod.GET)
+    @RequestMapping(value = "/tenants/{id}/apiInvoke/statistic",method = RequestMethod.GET)
     public RestResponse apiInvokeStatistic(
             @PathVariable String id,
             @RequestParam(value = "year") Integer year,
