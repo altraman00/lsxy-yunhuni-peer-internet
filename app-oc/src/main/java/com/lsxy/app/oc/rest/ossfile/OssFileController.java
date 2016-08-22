@@ -38,19 +38,10 @@ public class OssFileController extends AbstractRestController {
     }
     @ApiOperation(value = "获取资源流")
     @RequestMapping(value = "/img" ,method = RequestMethod.GET)
-    @ResponseBody
-    public InputStream getImg(HttpServletResponse response, @RequestParam String uri){
+    public void getImg(HttpServletResponse response, @RequestParam String uri){
         String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
-        //response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
-        //handle(response, uri);
-        InputStream in = null;
-        ServletOutputStream out = null;
-        try {
-            in = ossService.getFileStream(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
-        }catch (Exception e){
-
-        }
-        return in;
+        response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
+        handle(response, uri);
     }
 
     /**
