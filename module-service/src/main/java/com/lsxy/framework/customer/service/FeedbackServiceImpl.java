@@ -85,9 +85,13 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
 
     @Override
     public void batchModifyStatus(String[] ids) {
-        String sql = "update db_lsxy_base.tb_base_message set status='"+Feedback.READ+"' where id in ( ";
+        String sql = "update db_lsxy_base.tb_base_customer_feedback set status='"+Feedback.READ+"' where id in ( ";
         for(int i=0;i<ids.length;i++){
-            sql +=" '"+ids[i]+"', ";
+            if(i==ids.length-1){
+                sql += " '" + ids[i]+ "' ";
+            }else {
+                sql += " '" + ids[i] + "', ";
+            }
         }
         sql+=" )";
         jdbcTemplate.update(sql);

@@ -39,9 +39,9 @@ public class FeedbackController extends AbstractRestController {
     public RestResponse list(
             @ApiParam(name = "status",value = "状态 '0未读;1已读',")
             @RequestParam(required=false)Integer status,
-            @ApiParam(name = "startTime",value = "格式:yyyy-MM")
+            @ApiParam(name = "startTime",value = "格式:yyyy-MM-dd")
             @RequestParam(required=false)String startTime,
-            @ApiParam(name = "endTime",value = "格式:yyyy-MM")
+            @ApiParam(name = "endTime",value = "格式:yyyy-MM-dd")
             @RequestParam(required=false)String endTime,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "20") Integer pageSize
