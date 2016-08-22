@@ -161,9 +161,9 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[((ConsumeMonth)obj).getMonth()]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof ConsumeDay){
-                list1[((ConsumeDay)obj).getDay()]=((ConsumeDay)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
             }
         }
         return list1;
