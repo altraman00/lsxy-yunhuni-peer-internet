@@ -144,7 +144,16 @@ public abstract class AbstractClient implements Client{
                     TimeUnit.SECONDS.sleep(5);
 
                     Session session = sessionContext.getSession(serverUrl);
-                    if(session != null && session.isValid()) continue;;
+                    if(session != null && session.isValid()){
+
+                        RPCRequest echoRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_HEARTBEAT_ECHO,"");
+                        RPCResponse echoResponse = rpcCaller.invokeWithReturn(session,echoRequest);
+
+                        if(logger.isDebugEnabled()){
+                            logger.debug("连接着呢:{}",this.serverUrl);
+                        }
+                        continue;
+                    }
 
                     sessionContext.remove(serverUrl);
                     session = doBind(this.serverUrl);
