@@ -94,7 +94,7 @@ public class MessageController extends AbstractRestController {
         }
         RestResponse restResponse = null;
         try {
-            BeanUtils.copyProperties(message1,messageVo);
+            BeanUtils.copyProperties2(message1,messageVo,false);
             if(StringUtil.isNotEmpty(messageVo.getLine())){
                 message1.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
             }
@@ -120,7 +120,7 @@ public class MessageController extends AbstractRestController {
             @RequestBody MessageVo messageVo){
         Message message = new Message();
         try {
-            BeanUtils.copyProperties(message,messageVo);
+            BeanUtils.copyProperties2(message,messageVo,false);
             if(StringUtil.isNotEmpty(messageVo.getLine())) {
                 message.setLineTime(DateUtils.parseDate(messageVo.getLine(), "yyyy-MM-dd HH:mm"));
             }
