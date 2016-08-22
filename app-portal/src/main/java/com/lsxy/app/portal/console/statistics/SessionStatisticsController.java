@@ -71,8 +71,12 @@ public class SessionStatisticsController extends AbstractPortalController {
         List list = new ArrayList();
         List tempConsumeList = getConsumeList(request,type,appId,startTime);
         List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
-        list.add(getArrays(tempConsumeList));
-        list.add(getArrays(tempVoiceCdrList));
+        Object date = 12;
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
+        list.add(getArrays(tempConsumeList,date));
+        list.add(getArrays(tempVoiceCdrList,date));
         return RestResponse.success(list);
     }
     /**
@@ -113,23 +117,36 @@ public class SessionStatisticsController extends AbstractPortalController {
         String tenantId = getCurrentAccount(request).getTenant().getId();
         return (List)RestRequest.buildSecurityRequest(token).getList(uri, clazz,tenantId,appId,startTime).getData();
     }
+    private int getLong(Object obj){
+        int r = 0;
+        if (obj instanceof Date) {
+            r = Integer.valueOf(DateUtils.getLastDate((Date)obj).split("-")[2]);
+        } else if (obj instanceof Integer) {
+            r =Integer.valueOf((Integer)obj);
+        }
+        return r;
+    }
     /**
      * 获取列表数据
      * @param list 待处理的list
      * @return
      */
-    private Object[] getArrays(List list) {
-        Object[] list1 = new Object[list.size()];
+    private Object[] getArrays(List list,Object date) {
+        int leng = getLong(date);
+        Object[] list1 = new Object[leng];
+        for(int j=0;j<leng;j++){
+            list1[j]=0;
+        }
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[i]=((ConsumeMonth)obj).getSumAmount().doubleValue();
+                list1[((ConsumeMonth)obj).getMonth()]=((ConsumeMonth)obj).getSumAmount().doubleValue();
             }else if(obj instanceof VoiceCdrMonth){
-                list1[i]=((VoiceCdrMonth)obj).getAmongCall();
+                list1[((VoiceCdrMonth)obj).getMonth()]=((VoiceCdrMonth)obj).getAmongCall();
             }else if(obj instanceof ConsumeDay){
-                list1[i]=((ConsumeDay)obj).getSumAmount().doubleValue();
+                list1[((ConsumeDay)obj).getDay()]=((ConsumeDay)obj).getSumAmount().doubleValue();
             }else if(obj instanceof VoiceCdrDay){
-                list1[i]=((VoiceCdrDay)obj).getAmongCall();
+                list1[((VoiceCdrDay)obj).getDay()]=((VoiceCdrDay)obj).getAmongCall();
             }
         }
         return list1;
