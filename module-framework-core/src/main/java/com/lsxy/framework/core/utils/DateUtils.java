@@ -500,7 +500,7 @@ public class DateUtils {
 		Calendar cal = Calendar.getInstance(); 
 		cal.setTime(date);
 		cal.set(Calendar.DATE, 1);
-		cal.set(Calendar.HOUR, -12);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
@@ -516,7 +516,7 @@ public class DateUtils {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.set(Calendar.DATE, 1);
-        cal.set(Calendar.HOUR, -12);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -536,7 +536,7 @@ public class DateUtils {
     	cal.set(Calendar.DATE,1); 
         //下个月1号减去一天，即得到当前月最后一天
     	cal.add(Calendar.DATE,-1);
-    	cal.set(Calendar.HOUR, 11);
+    	cal.set(Calendar.HOUR_OF_DAY, 23);
     	cal.set(Calendar.MINUTE, 59);
     	cal.set(Calendar.SECOND, 59);
     	SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
@@ -558,7 +558,7 @@ public class DateUtils {
         cal.set(Calendar.DATE,1);
         //下个月1号减去一天，即得到当前月最后一天
         cal.add(Calendar.DATE,-1);
-        cal.set(Calendar.HOUR, 11);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -664,7 +664,7 @@ public class DateUtils {
 		//Date date=new Date(month);	
 		Calendar cal = Calendar.getInstance(); 
 		cal.setTime(date);
-		cal.set(Calendar.HOUR, -12);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
@@ -679,13 +679,13 @@ public class DateUtils {
         //Date date=new Date(month);
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR, -12);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return cal.getTime();
     }
-	
+
 	/**
 	 * 功能说明:得到指定天结束时间,精确到时分秒(2015-01-01 23:59:59)
 	 */
@@ -693,7 +693,7 @@ public class DateUtils {
     	//Date date=new Date(month);	
     	Calendar cal = Calendar.getInstance(); 
     	cal.setTime(date);
-    	cal.set(Calendar.HOUR, 11);
+    	cal.set(Calendar.HOUR_OF_DAY, 23);
     	cal.set(Calendar.MINUTE, 59);
     	cal.set(Calendar.SECOND, 59);
     	SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
@@ -709,7 +709,7 @@ public class DateUtils {
         //Date date=new Date(month);
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.set(Calendar.HOUR, 11);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -824,6 +824,8 @@ public class DateUtils {
         System.out.println(getTime(newDate(2016,6,1),"yyyy-MM-dd"));
         System.out.println(getTime(getPrevMonth(new Date()),"yyyy-MM-dd"));
         System.out.println(getTime(getPrevWeek(new Date()),"yyyy-MM-dd"));
+        System.out.println(getTime(getFirstTimeOfDate(new Date()),"yyyy-MM-dd HH"));
+        System.out.println(getTime(getLastTimeOfDate(new Date()),"yyyy-MM-dd HH"));
     }
 
 }
