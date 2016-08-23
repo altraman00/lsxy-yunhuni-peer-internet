@@ -29,7 +29,8 @@ public class ApiCallStatisticsTask {
     /**
      *每个小时的执行一次
      */
-    @Scheduled(cron="0 30 0/1 * * ?")
+    //@Scheduled(cron="0 30 0/1 * * ?")
+    @Scheduled(cron="10 * * * * ?")
     public void hour(){
         long startTime = System.currentTimeMillis();
         logger.info("api请求指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));

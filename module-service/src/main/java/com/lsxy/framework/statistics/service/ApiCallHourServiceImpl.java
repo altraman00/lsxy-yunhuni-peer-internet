@@ -49,7 +49,7 @@ public class ApiCallHourServiceImpl extends AbstractService<ApiCallHour> impleme
         Date date3 = DateUtils.parseDate(DateUtils.formatDate(date1,"yyyy-MM-dd HH")+ ":59:59","yyyy-MM-dd HH:mm:ss");
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         //sql对于参数
-        Object[] obj = new Object[]{sqlDate1,hour1,
+        Object[] obj = new Object[]{
                 new Timestamp(date2.getTime()),hour2,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3

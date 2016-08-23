@@ -1,7 +1,16 @@
 package com.lsxy.app.backend.task;
 
+import com.lsxy.framework.core.utils.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * 定时任务测试样例
@@ -50,17 +59,6 @@ public class TestTask {
      */
     @Scheduled(cron="0/10 * * * * ?")
     public void init(){
-        `tenant_id` varchar(32) default NULL COMMENT '租户标识',
-        `app_id` varchar(32) default NULL COMMENT '应用标识',
-        `type` int(11) default NULL COMMENT '会话类型',
-        `call_dt` datetime default NULL COMMENT '调用时间',
-        `create_time` datetime default NULL COMMENT '新建时间',
-        `last_time` datetime default NULL COMMENT '更新时间',
-        `deleted` int(11) default NULL COMMENT '*删除标记',
-        `delete_time` datetime default NULL COMMENT '删除时间',
-        `sortno` bigint(11) default NULL COMMENT '排序号',
-        `version` int(11) default NULL COMMENT '*版本号',
-        `create_user` varchar(32) default NULL COMMENT '*创建用户标识',
     }
 
 }
