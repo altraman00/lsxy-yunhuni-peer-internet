@@ -153,9 +153,10 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 ////                logger.debug("这个是接通指令:{}",param);
 ////            }
 ////        }
-       String  param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
+        int ansersec = RandomUtils.nextInt(2,20);
+       String   param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds="+ansersec+"&user_data=1234";
         /*挂机指令计数*/
-        if(sc != null) sc.getSendAreaNodeSysDropCount().incrementAndGet();
+        if(sc != null) sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
         RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
 
         return requestX;

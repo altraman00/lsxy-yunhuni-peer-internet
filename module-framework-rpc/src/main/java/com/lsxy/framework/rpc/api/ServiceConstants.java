@@ -18,4 +18,5 @@ public class ServiceConstants {
 
 	public static final String MN_CH_TEST_ECHO= "MN_CH_TEST_ECHO";//压力测试使用
 
+	public static final String CH_MN_HEARTBEAT_ECHO = "CH_MN_HEARTBEAT_ECHO ";		//心跳请求
 }
