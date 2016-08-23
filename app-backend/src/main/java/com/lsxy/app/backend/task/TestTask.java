@@ -49,8 +49,18 @@ public class TestTask {
     "0 15 10 ? * 6#3"	 	每月的第三个星期五上午10:15触发
      */
     @Scheduled(cron="0/10 * * * * ?")
-    public void sout(){
-        System.out.println("**********************************" + System.currentTimeMillis());
+    public void init(){
+        `tenant_id` varchar(32) default NULL COMMENT '租户标识',
+        `app_id` varchar(32) default NULL COMMENT '应用标识',
+        `type` int(11) default NULL COMMENT '会话类型',
+        `call_dt` datetime default NULL COMMENT '调用时间',
+        `create_time` datetime default NULL COMMENT '新建时间',
+        `last_time` datetime default NULL COMMENT '更新时间',
+        `deleted` int(11) default NULL COMMENT '*删除标记',
+        `delete_time` datetime default NULL COMMENT '删除时间',
+        `sortno` bigint(11) default NULL COMMENT '排序号',
+        `version` int(11) default NULL COMMENT '*版本号',
+        `create_user` varchar(32) default NULL COMMENT '*创建用户标识',
     }
 
 }

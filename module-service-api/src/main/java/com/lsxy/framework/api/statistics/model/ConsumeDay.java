@@ -18,7 +18,6 @@ public class ConsumeDay extends IdEntity{
     private Date dt;//统计时间
     private Integer day;//统计日 区间1-31
     private BigDecimal amongAmount;//消费统计 decimal(20,4) DEFAULT NULL,
-    private BigDecimal sumAmount;//消费金额
     private String appId;//所属应用,
     private String tenantId;//所属租户
     private String type;//消费类型
@@ -38,15 +37,6 @@ public class ConsumeDay extends IdEntity{
 
     public void setDay(Integer day) {
         this.day = day;
-    }
-
-    @Column(name = "sum_amount")
-    public BigDecimal getSumAmount() {
-        return sumAmount;
-    }
-
-    public void setSumAmount(BigDecimal sumAmount) {
-        this.sumAmount = sumAmount;
     }
     @Column(name = "dt")
     public Date getDt() {
