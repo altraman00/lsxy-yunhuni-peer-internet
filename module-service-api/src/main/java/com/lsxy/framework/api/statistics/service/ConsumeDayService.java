@@ -2,11 +2,14 @@ package com.lsxy.framework.api.statistics.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.statistics.model.ConsumeDay;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消费日统计service
@@ -68,6 +71,23 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      */
     public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
 
+
+    /**
+     * 获取某个时间范围的总的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountBetween(Date d1, Date d2);
+
+    /**
+     * 获取某天的总的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountByDate(Date d);
+
+    public List<Map<String, Object>> getConsumeTop(int top);
+
     /**
      * 获取某一天的日结账单
      * @param tenantId 租户ID
@@ -76,4 +96,19 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @return
      */
     List<ConsumeDay> getConsumeDays(String tenantId, String appId, String month);
+
+    /**
+     * 获取某个租户某天的消费额
+     * @param d
+     * @return
+     */
+    public BigDecimal getAmongAmountByDateAndTenant(Date d,String tenant);
+
+    /**
+     * 获取某个租户总的消费额
+     * @param tenantId
+     * @return
+     */
+    public BigDecimal getSumAmountByTenant(String tenantId);
+
 }

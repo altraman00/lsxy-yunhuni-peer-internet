@@ -127,8 +127,8 @@
                                         <div class="caption">
                                             <p><strong>审核结束</strong> </p>
                                             <p>当前审核状态: <span class="text-danger">未通过</span></p>
-                                            <c:if test="${status==-1}"><p>原因：身份证与名称不符合，请重新提交资料认证</p></c:if>
-                                            <c:if test="${status==-2}"><p>原因：上传资料不符合要求，请重新提交资料认证</p></c:if>
+                                            <c:if test="${status==-1}"><p>${realnamePrivate.reason}</p></c:if>
+                                            <c:if test="${status==5||status==-2}"><p>${realnameCorp.reason}</p></c:if>
                                         </div>
                                     </div>
                                 </c:if>

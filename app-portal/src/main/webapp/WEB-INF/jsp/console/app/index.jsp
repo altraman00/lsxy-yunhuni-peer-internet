@@ -173,8 +173,6 @@
     </section>
 </section>
 </section>
-<div class="tips-toast"></div>
-<div class="tips-toast"></div>
 <%@include file="/inc/footer.jsp"%>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/create.js'></script>
 
