@@ -99,12 +99,14 @@ public class VoiceFilePlayController extends AbstractRestController {
     ){
         RestResponse restResponse = null;
         Page page = null;
-        if("await".equals(type)||"auditing".equals(type)) {
+        if("await".equals(type)||"auditing".equals(type)||"unauth".equals(type) ){
             Integer status = null;
             if("await".equals(type)){
                 status=VoiceFilePlay.STATUS_WAIT;
             }else if("auditing".equals(type)){
                 status=VoiceFilePlay.STATUS_SUCCESS;
+            }else if("unauth".equals(type) ){
+                status=VoiceFilePlay.STATUS_FAIL;
             }
             if (StringUtil.isNotEmpty(name)) {
                 List<Tenant> tList = tenantService.pageListByUserName(name);
