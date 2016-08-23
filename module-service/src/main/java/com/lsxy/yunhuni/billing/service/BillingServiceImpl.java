@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * Created by liups on 2016/6/28.
@@ -47,5 +48,11 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
             e.printStackTrace();
             throw new RuntimeException("存在多个对应账务信息");
         }
+    }
+
+    @Override
+    public BigDecimal getBalance(String tenantId) {
+        Billing billing = this.findBillingByTenantId(tenantId);
+        return billing.getBalance();
     }
 }
