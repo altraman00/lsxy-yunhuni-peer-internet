@@ -36,4 +36,20 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
      * @param message 消息体
      */
     public void insertMultiple(List<Account> list ,Message message);
+
+    /**
+     * 给指定用户发送模板信息
+     * @param accountId 指定用户
+     * @param type 类型
+     * @param name 发送模板
+     */
+    public AccountMessage sendTempletMessage(String originator,String accountId,String type,String name);
+
+    /**
+     * 给指定用户发送消息
+     * @param accountId 指定用户
+     * @param content 消息内容
+     */
+    public AccountMessage sendMessage(String originator,String accountId,String content);
+
 }

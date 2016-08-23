@@ -4,12 +4,16 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
+import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.core.utils.VelocityUtils;
 import com.lsxy.framework.message.dao.AccountMessageDao;
+import com.lsxy.yunhuni.api.config.model.ConfigGlobal;
+import com.lsxy.yunhuni.api.config.service.ConfigGlobalService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +34,13 @@ import java.util.List;
 public class AccountMessageServiceImpl extends AbstractService<AccountMessage> implements AccountMessageService{
     private static final Logger logger = LoggerFactory.getLogger(AccountMessageServiceImpl.class);
     @Autowired
+    MessageService messageService;
+    @Autowired
     AccountMessageDao accountMessageDao;
     @Autowired
     AccountService accountService;
+    @Autowired
+    ConfigGlobalService configGlobalService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Override
@@ -75,5 +83,32 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
             sql += " ( '"+UUIDGenerator.uuid()+"','"+message.getId()+"','"+list.get(i).getId()+"','"+AccountMessage.NOT+"','"+initDate+"','"+initDate+"','"+0+"','"+times+"','"+0+"') ";
         }
         jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public AccountMessage sendTempletMessage(String originator,String accountId, String type, String name) {
+        ConfigGlobal configGlobal = configGlobalService.findByTypeAndName(type,name);
+        Account account = accountService.findById(accountId);
+        String value = configGlobal.getValue().replace("*",account.getUserName());
+        return sendMessage(originator,accountId,value);
+    }
+
+    @Override
+    public AccountMessage sendMessage(String originator,String accountId,String content) {
+        Account account = accountService.findById(accountId);
+        AccountMessage accountMessage = null;
+        if(account!=null) {
+            Message message = new Message();
+            message.setType(Message.MESSAGE_ACCOUNT);
+            message.setContent(content);
+            message.setName(originator);
+            message = messageService.save(message);//发送消息记录
+            accountMessage = new AccountMessage();
+            accountMessage.setMessage(message);
+            accountMessage.setAccount(account);
+            accountMessage.setStatus(AccountMessage.NOT);
+            accountMessage = accountMessageDao.save(accountMessage);
+        }
+        return accountMessage;
     }
 }
