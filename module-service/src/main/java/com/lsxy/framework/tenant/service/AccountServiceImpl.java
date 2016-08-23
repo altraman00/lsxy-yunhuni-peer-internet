@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Tandy on 2016/6/24.
@@ -237,6 +238,13 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
         Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
         accountDao.cleanExpireRegisterAccount(Account.STATUS_EXPIRE,Account.STATUS_NOT_ACTIVE,limitTime);
+    }
+
+    @Override
+    public List<Account> list() {
+        String hql = " from Account obj where obj.status=?1 ";
+        List<Account> list =  this.list(hql,Account.STATUS_NORMAL);
+        return list;
     }
 
     /**

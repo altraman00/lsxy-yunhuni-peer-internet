@@ -14,9 +14,26 @@ import java.util.Date;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_message")
 public class Message extends IdEntity {
+    public static final Integer ONLINE = 1;//已上线
+    public static final Integer OFFLINE = -1;//已下线
+    public static final Integer NOT = 0;//未上线
+    public static final Integer MESSAGE_ACCOUNT = 0;//用户消息
+    public static final Integer MESSAGE_ACTIVITY = 1;//活动消息
     private Integer type;//消息类型
+    private Integer status;//状态
     private String content;//消息内容
-    private Date createTime;//创建时间
+    private String title;//标题
+    private String name;//发布人
+    private Date lineTime;//上线时间
+    @Column(name = "status")
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     @Column(name = "type")
     public Integer getType() {
         return type;
@@ -32,5 +49,28 @@ public class Message extends IdEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+    @Column(name = "title")
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    @Column(name = "line_time")
+    public Date getLineTime() {
+        return lineTime;
+    }
+
+    public void setLineTime(Date lineTime) {
+        this.lineTime = lineTime;
     }
 }

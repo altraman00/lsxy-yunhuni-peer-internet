@@ -2,7 +2,11 @@ package com.lsxy.framework.api.message.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.framework.api.message.model.Message;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.Page;
+
+import java.util.List;
 
 /**
  * 用户消息service
@@ -25,4 +29,27 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
      * @return
      */
     public Long count(String userName,Integer status);
+
+    /**
+     * 给指定的用户发送消息
+     * @param list 用户集合
+     * @param message 消息体
+     */
+    public void insertMultiple(List<Account> list ,Message message);
+
+    /**
+     * 给指定用户发送模板信息
+     * @param accountId 指定用户
+     * @param type 类型
+     * @param name 发送模板
+     */
+    public AccountMessage sendTempletMessage(String originator,String accountId,String type,String name);
+
+    /**
+     * 给指定用户发送消息
+     * @param accountId 指定用户
+     * @param content 消息内容
+     */
+    public AccountMessage sendMessage(String originator,String accountId,String content);
+
 }
