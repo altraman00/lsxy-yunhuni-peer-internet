@@ -15,9 +15,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 实名认证处理类
@@ -90,13 +88,13 @@ public class AuthController extends AbstractRestController {
     ){
         RestResponse restResponse = null;
         Map map = new HashMap();
+        String tenantId = null;
         if(Tenant.AUTH_ONESELF==type){//个人
             RealnamePrivate realnamePrivate = null;
             try {
                 realnamePrivate = realnamePrivateService.findById(id);
                 if(realnamePrivate.getTenant()!=null){
-                    List<RealnamePrivate> list = realnamePrivateService.findByTenantId(realnamePrivate.getTenant().getId());
-                    map.put("list",list);
+                    tenantId=realnamePrivate.getTenant().getId();
                 }
             }catch (Exception e){
             }
@@ -106,18 +104,62 @@ public class AuthController extends AbstractRestController {
             try{
                 realnameCorp = realnameCorpService.findById(id);
                 if(realnameCorp.getTenant()!=null){
-                    List<RealnameCorp> list = realnameCorpService.findByTenantId(realnameCorp.getTenant().getId());
-                    map.put("list",list);
+                    tenantId=realnameCorp.getTenant().getId();
                 }
             }catch (Exception e){}
             map.put("realname",realnameCorp);
         }else{
             restResponse = RestResponse.failed("0","类型不存");
         }
+        if(tenantId!=null){
+            List<RealnamePrivate> list1 = realnamePrivateService.findByTenantId(tenantId);
+            List<RealnameCorp> list2 = realnameCorpService.findByTenantId(tenantId);
+            List list = getSortList(list1,list2);
+            map.put("list",list);
+        }
         if(restResponse==null){
             restResponse = RestResponse.success(map);
         }
         return restResponse;
+    }
+
+    /**
+     * 对数据进行排序
+     * @param list1
+     * @param list2
+     * @return
+     */
+    public List getSortList(List list1,List list2){
+        List list = new ArrayList();
+        list.addAll(list1);
+        list.addAll(list2);
+        // 按点击数倒序
+        Collections.sort(list, new Comparator<Object>() {
+            public int compare(Object arg0, Object arg1) {
+                long hits0 = 0;
+                long hits1 = 0;
+                try {
+                    if (arg0 instanceof RealnamePrivate) {
+                        hits0 = ((RealnamePrivate) arg0).getCreateTime().getTime();
+                    } else if (arg0 instanceof RealnameCorp) {
+                        hits0 = ((RealnameCorp) arg0).getCreateTime().getTime();
+                    }
+                    if (arg1 instanceof RealnamePrivate) {
+                        hits1 = ((RealnamePrivate) arg1).getCreateTime().getTime();
+                    } else if (arg1 instanceof RealnameCorp) {
+                        hits1 = ((RealnameCorp) arg1).getCreateTime().getTime();
+                    }
+                }catch (Exception e){}
+                if (hits1 < hits0) {
+                    return 1;
+                } else if (hits1 == hits0) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        return list;
     }
     /**
      * 根据实名认证记录id，租户id，实名认证类型，修改后的结果来修改实名认证结果
