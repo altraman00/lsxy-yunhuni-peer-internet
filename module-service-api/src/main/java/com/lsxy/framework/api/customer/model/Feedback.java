@@ -13,8 +13,8 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_customer_feedback")
 public class Feedback extends IdEntity {
-    private static final long serialVersionUID = 1L;
-
+    public  static final Integer  READ = 1;
+    public  static final Integer UNREAD = 0;
     private String content;// 内容
     private Integer status;//状态 '0未处理;1已处理',
     Tenant tenant;//所属租户
@@ -27,10 +27,6 @@ public class Feedback extends IdEntity {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
     }
 
     @Column(name = "status")
