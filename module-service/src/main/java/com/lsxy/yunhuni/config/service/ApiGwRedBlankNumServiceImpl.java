@@ -1,17 +1,19 @@
-package com.lsxy.framework.config.service;
+package com.lsxy.yunhuni.config.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.config.model.ApiGwRedBlankNum;
-import com.lsxy.framework.api.config.service.ApiGwRedBlankNumService;
+import com.lsxy.yunhuni.api.config.model.ApiGwRedBlankNum;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.config.dao.ApiGwRedBlankNumDao;
+import com.lsxy.yunhuni.config.dao.ApiGwRedBlankNumDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 
 /**
  * Created by liups on 2016/8/23.
  */
+@Service
 public class ApiGwRedBlankNumServiceImpl extends AbstractService<ApiGwRedBlankNum> implements ApiGwRedBlankNumService {
     @Autowired
     ApiGwRedBlankNumDao apiGwRedBlankNumDao;

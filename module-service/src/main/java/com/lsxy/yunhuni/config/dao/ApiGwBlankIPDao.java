@@ -1,7 +1,7 @@
-package com.lsxy.framework.config.dao;
+package com.lsxy.yunhuni.config.dao;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.config.model.ApiGwBlankIP;
+import com.lsxy.yunhuni.api.config.model.ApiGwBlankIP;
 
 import java.io.Serializable;
 

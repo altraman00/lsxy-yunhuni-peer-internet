@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.config.model;
+package com.lsxy.yunhuni.api.config.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 
@@ -7,22 +7,25 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * Created by Tandy on 2016/7/7.
- * api gateway 黑名单配置
- *
+ * 区域
+ * Created by liups on 2016/8/24.
  */
 @Entity
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_ip_blacklist")
-public class ApiGwBlankIP  extends IdEntity {
-
-    //启用状态
-    public static final int ST_ENABLED=1;
-    //禁用状态
-    public static final int ST_DISABLED=2;
-
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_area")
+public class Area extends IdEntity {
+    private String name;
     private String ip;
     private Integer status;
     private String remark;
+
+    @Column(name = "name")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @Column(name = "ip")
     public String getIp() {

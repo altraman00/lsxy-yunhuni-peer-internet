@@ -1,7 +1,7 @@
-package com.lsxy.framework.api.config.service;
+package com.lsxy.yunhuni.api.config.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.framework.api.config.model.ApiGwRedBlankNum;
+import com.lsxy.yunhuni.api.config.model.ApiGwRedBlankNum;
 
 /**
  * Created by liups on 2016/8/23.

@@ -169,6 +169,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
                         this.bindIvrToApp(app, action.getTelNumber(), tenant);
+                        //绑定应用与区域的关系
+
                     }
                     //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
                     if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
