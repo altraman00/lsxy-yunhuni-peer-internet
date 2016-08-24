@@ -194,8 +194,7 @@ public abstract class AbstractClient implements Client{
                     bindCallback.doCallback(session);
                 }
             } else {
-                String msg = new String(response.getBody(), "utf-8");
-                logger.error("连接异常不成功:"+msg);
+                logger.error("连接异常不成功:{}",response.getBodyAsString());
                 session.close(true);
             }
         }catch (Exception ex){

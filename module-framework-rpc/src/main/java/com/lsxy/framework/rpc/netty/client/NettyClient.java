@@ -94,14 +94,14 @@ public class NettyClient extends AbstractClient{
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if(logger.isDebugEnabled()){
-                        logger.error("客户端连接断开啦。。。。。注意注意!1!!!!!!:{}",future.channel());
+                        logger.error("客户端连接断开啦。。。。。{}",future.channel());
                     }
 
                     Attribute att =future.channel().attr(AttributeKey.valueOf("sessionid"));
                     if(att != null){
                         String sessionid = (String)att .get();
                         if(logger.isDebugEnabled()){
-                            logger.debug("客户端连接断开:{}" , sessionid);
+                            logger.debug("清理会话:{}" , sessionid);
                         }
                         sessionContext.remove(sessionid);
                     }
