@@ -10,10 +10,9 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.core.utils.VelocityUtils;
 import com.lsxy.framework.message.dao.AccountMessageDao;
-import com.lsxy.yunhuni.api.config.model.ConfigGlobal;
-import com.lsxy.yunhuni.api.config.service.ConfigGlobalService;
+import com.lsxy.yunhuni.api.config.model.GlobalConfig;
+import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     @Autowired
     AccountService accountService;
     @Autowired
-    ConfigGlobalService configGlobalService;
+    GlobalConfigService configGlobalService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Override
@@ -87,7 +86,7 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
 
     @Override
     public AccountMessage sendTempletMessage(String originator,String accountId, String type, String name) {
-        ConfigGlobal configGlobal = configGlobalService.findByTypeAndName(type,name);
+        GlobalConfig configGlobal = configGlobalService.findByTypeAndName(type,name);
         Account account = accountService.findById(accountId);
         String value = configGlobal.getValue().replace("*",account.getUserName());
         return sendMessage(originator,accountId,value);

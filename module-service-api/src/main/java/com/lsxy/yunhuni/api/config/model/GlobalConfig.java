@@ -1,5 +1,7 @@
 package com.lsxy.yunhuni.api.config.model;
 
+import com.lsxy.framework.api.base.IdEntity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,7 +13,7 @@ import java.util.Date;
  */
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_global")
-public class ConfigGlobal {
+public class GlobalConfig extends IdEntity {
     public static final String TYPE_MESSAGE = "message";
     public static final String TYPE_MESSAGE_AUTH_ONESELE_SUCCESS = "1";
     public static final String TYPE_MESSAGE_AUTH_ONESELE_FILE = "3";
