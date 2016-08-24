@@ -1,6 +1,8 @@
 package com.lsxy.app.oc.rest.account;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -31,6 +33,9 @@ public class AuthController extends AbstractRestController {
     RealnameCorpService realnameCorpService;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    AccountMessageService accountMessageService;
+
     /**
      * 查找用户下的分页信息
      * @param authStatus await|auditing|unauth
@@ -74,7 +79,7 @@ public class AuthController extends AbstractRestController {
 
     /**
      * 根据记录id和认证类型获取详情页面
-     * @param id 记录的id
+     * @param id 记录id
      * @param type 认证类型 0个人1企业
      * @return
      */
@@ -190,8 +195,13 @@ public class AuthController extends AbstractRestController {
                     }
                     realnamePrivate.setTenant(tenant);
                     realnamePrivate.setReason(reason);
-                    realnamePrivateService.save(realnamePrivate);
+                    realnamePrivate = realnamePrivateService.save(realnamePrivate);
                     tenant = tenantService.save(tenant);
+                    if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_FAIL){
+                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_FAIL);
+                    }else if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_SUCCESS){
+                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_SUCCESS);
+                    }
                 }else{
                     restResponse = RestResponse.failed("0","租户不存在");
                 }
@@ -212,14 +222,19 @@ public class AuthController extends AbstractRestController {
                             status=Tenant.AUTH_UPGRADE_SUCCESS;
                         }
                     }
-                    if(Tenant.AUTH_COMPANY_SUCCESS==status) {
+                    if(Tenant.AUTH_COMPANY_SUCCESS==realnameCorp.getStatus()) {
                         tenant.setTenantName(realnameCorp.getName());
                     }
                     tenant.setIsRealAuth(status);
                     realnameCorp.setReason(reason);
                     realnameCorp.setTenant(tenant);
-                    realnameCorpService.save(realnameCorp);
+                    realnameCorp = realnameCorpService.save(realnameCorp);
                     tenant = tenantService.save(tenant);
+                    if(realnameCorp.getStatus()==Tenant.AUTH_COMPANY_FAIL){
+                        accountMessageService.sendTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_FAIL);
+                    }else if(realnameCorp.getStatus()==Tenant.AUTH_COMPANY_SUCCESS){
+                        accountMessageService.sendTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_SUCCESS);
+                    }
                 }else{
                     restResponse = RestResponse.failed("0","租户不存在");
                 }
