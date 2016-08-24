@@ -247,4 +247,15 @@ public class AuthController extends AbstractRestController {
         }
         return restResponse;
     }
+    /**
+     * 等待处理数量
+     * @return
+     */
+    @ApiOperation(value = "等待处理数量,tenant表示会员未处理，voiceFilePlay表示放音文件未处理")
+    @RequestMapping(value = "/await/num",method = RequestMethod.GET)
+    public RestResponse getAwaitNum(){
+        Map map = new HashMap();
+        map.putAll(tenantService.getAwaitNum());
+        return RestResponse.success(map);
+    }
 }
