@@ -1,6 +1,8 @@
 package com.lsxy.app.oc.rest.file;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
@@ -33,7 +35,8 @@ public class VoiceFilePlayController extends AbstractRestController {
     VoiceFilePlayService voiceFilePlayService;
     @Autowired
     TenantService tenantService;
-
+    @Autowired
+    AccountMessageService accountMessageService;
 
 
     /**
@@ -58,6 +61,11 @@ public class VoiceFilePlayController extends AbstractRestController {
                     voiceFilePlay.setReason(reason);
                     voiceFilePlay.setCheckTime(new Date());
                     voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
+                    if(voiceFilePlay.getStatus()==VoiceFilePlay.STATUS_FAIL){
+                        accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_INVOCE_APPLY_FAIL);
+                    }else if(voiceFilePlay.getStatus()==VoiceFilePlay.STATUS_SUCCESS){
+                        accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_VOICE_PLAY_SUCCESS);
+                    }
                 } else {
                     restResponse = RestResponse.failed("0", "参数id无效");
                 }

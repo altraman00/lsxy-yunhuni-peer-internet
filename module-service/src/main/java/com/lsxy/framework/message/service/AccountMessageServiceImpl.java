@@ -93,7 +93,7 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     }
 
     @Override
-    public AccountMessage sendTempletMessage(String originator,String tenantId, String type) {
+    public AccountMessage sendTenantTempletMessage(String originator, String tenantId, String type) {
         AccountMessage accountMessage = null;
         Tenant tenant = tenantService.findById(tenantId);
         if(tenant!=null) {
@@ -105,6 +105,23 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
                 originator = "系统";
             }
             accountMessage = sendMessage(originator,tenant.getRegisterUserId(),"系统通知",value);
+        }
+        return accountMessage;
+    }
+
+    @Override
+    public AccountMessage sendTempletMessage(String originator,String accountId, String type) {
+        AccountMessage accountMessage = null;
+        Account account = accountService.findById(accountId);
+        if(account!=null) {
+            Map map = new HashMap();
+            map.put("name", account.getUserName());
+            String value = VelocityUtils.getVelocityContext(type, map);
+            value = value.substring(value.indexOf("\r\n")+2,value.length());
+            if (StringUtil.isEmpty(originator)) {
+                originator = "系统";
+            }
+            accountMessage = sendMessage(originator,account.getId(),"系统通知",value);
         }
         return accountMessage;
     }

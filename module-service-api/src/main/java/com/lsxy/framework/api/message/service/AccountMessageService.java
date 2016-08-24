@@ -39,11 +39,16 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
 
     /**
      * 给指定用户发送模板信息
+     * @param tenantId 指定租户
+     * @param type 模板类型
+     */
+    public AccountMessage sendTenantTempletMessage(String originator,String tenantId,String type);
+    /**
+     * 给指定用户发送模板信息
      * @param accountId 指定用户
      * @param type 模板类型
      */
     public AccountMessage sendTempletMessage(String originator,String accountId,String type);
-
     /**
      * 给指定用户发送消息
      * @param accountId 指定用户
