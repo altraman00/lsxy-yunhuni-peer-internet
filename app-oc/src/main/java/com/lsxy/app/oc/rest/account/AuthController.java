@@ -185,7 +185,9 @@ public class AuthController extends AbstractRestController {
                 if(tenant!=null){
                     realnamePrivate.setStatus(status);
                     tenant.setIsRealAuth(status);
-                    tenant.setTenantName(realnamePrivate.getName());
+                    if(Tenant.AUTH_ONESELF_SUCCESS==status) {
+                        tenant.setTenantName(realnamePrivate.getName());
+                    }
                     realnamePrivate.setTenant(tenant);
                     realnamePrivate.setReason(reason);
                     realnamePrivateService.save(realnamePrivate);
@@ -210,7 +212,9 @@ public class AuthController extends AbstractRestController {
                             status=Tenant.AUTH_UPGRADE_SUCCESS;
                         }
                     }
-                    tenant.setTenantName(realnameCorp.getName());
+                    if(Tenant.AUTH_COMPANY_SUCCESS==status) {
+                        tenant.setTenantName(realnameCorp.getName());
+                    }
                     tenant.setIsRealAuth(status);
                     realnameCorp.setReason(reason);
                     realnameCorp.setTenant(tenant);
