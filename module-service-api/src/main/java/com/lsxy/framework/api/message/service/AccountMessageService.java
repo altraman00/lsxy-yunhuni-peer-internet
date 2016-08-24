@@ -40,10 +40,9 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
     /**
      * 给指定用户发送模板信息
      * @param accountId 指定用户
-     * @param type 类型
-     * @param name 发送模板
+     * @param type 模板类型
      */
-    public AccountMessage sendTempletMessage(String originator,String accountId,String type,String name);
+    public AccountMessage sendTempletMessage(String originator,String accountId,String type);
 
     /**
      * 给指定用户发送消息
