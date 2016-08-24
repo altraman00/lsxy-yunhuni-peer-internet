@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,5 +58,37 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
             return false;
         }
     }
+
+    @Override
+    public long countOnline() {
+        return this.countByCustom("from App obj where obj.status = ?1",App.STATUS_ONLINE);
+    }
+
+    @Override
+    public long countValid() {
+        return this.countByCustom("from App obj");
+    }
+
+    @Override
+    public int countValidDateBetween(Date d1, Date d2) {
+        if(d1 == null){
+            throw new NullPointerException();
+        }
+        if(d2 == null){
+            throw new NullPointerException();
+        }
+        return appDao.countByDeletedAndCreateTimeBetween(Boolean.FALSE,d1,d2);
+    }
+
+    @Override
+    public List<App> getAppsByTenantId(String tenantId) {
+        if(tenantId == null){
+            throw new IllegalArgumentException();
+        }
+        String hql = "from App obj where deleted != 1 and obj.tenant.id=?1 order by obj.status";
+        List<App> list = this.findByCustomWithParams(hql, tenantId);
+        return list;
+    }
+
 
 }

@@ -167,7 +167,7 @@
                                         </a>
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
-                                    <li class="right"><a href="#" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+                                    <li class="right" id="uploadButton" hidden><a href="#" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <div class="tab-pane fade in active" id="play">
@@ -325,10 +325,11 @@
 
 <!---上传文件--->
 <div class="modal-box application-detail-box application-file-box" id="modalfour" style="display:none ">
-    <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four"></a></div>
+    <div class="modal-loadding loadding"></div>
+    <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" ></a></div>
     <div class="content">
         <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
-        <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" onsubmit="return startUpload();" target="hidden_frame">
+        <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row  mt-10">
                     <input type="hidden" name="appId" value="${app.id}">
@@ -336,45 +337,150 @@
                         文件 :
                     </div>
                     <div class="col-md-10">
-                        <input type="file" value="" class="input-text form-control" name="file" id="singlefile" multiple="multiple" />
-                        <div class="progress h10 mt-10">
-                            <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar"  aria-valuemin="0" aria-valuemax="100" style="width: 0%" id="uploadLength">
-                            </div>
+                        <span class="btn btn-success fileinput-button">
+                        <i class="glyphicon glyphicon-plus"></i>
+                        <span>选择文件</span>
+                            <!-- The file input field used as target for the file upload widget -->
+                        <input id="fileupload" type="file" name="file" >
+                      </span>
+                        <span id="fileName"></span>
+                        <br>
+                        <br>
+                        <!-- The global progress bar -->
+                        <div id="progress" class="progress" hidden>
+                            <div class="progress-bar progress-bar-success"></div>
                         </div>
+                        <div id="files" class="files"></div>
+                    </span>
                     </div>
+                    <div class="modal-loadding loadding"></div>
                 </div>
                 <div class="row text-left mt-10">
-                    <p>允许一次选择20个文件，并且建议在网络环境好的情况下使用，以防止上传错误文件</p>
+                    <p>一次允许选择1个文件，并且建议在网络环境好的情况下使用，以防止上传错误文件</p>
                 </div>
             </div>
-            <iframe name='hidden_frame' id="hidden_frame" style='display:none'></iframe>
             <input type="reset" id="resetForm" hidden/>
-        </form:form>
     </div>
     <div class="footer">
-        <a class="cancel modalCancel-app-up" data-id="four">返回</a>
-        <a class="sure modalSureFour" data-id="four">确认</a>
+        <a class="cancel modalCancel-app-up " data-id="four" >返回</a>
+        <a class="sure modalSureFour modalCancel-app-down" data-id="four" >确认</a>
     </div>
+    </form:form>
 </div>
 
 
 
-<div class="tips-toast"></div>
+
 <%@include file="/inc/footer.jsp"%>
+<script type="text/javascript">
+    var appId = '${app.id}';
+</script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/detail.js'> </script>
 <!--syncpage-->
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
+<script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload.js"></script>
+<script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-ui.js"></script>
+<script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js"></script>
+<script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js"></script>
+<script src="${resPrefixUrl }/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>
+
+
+        <script>
+            // 上传多个文件
+            var cancelCancel=false;
+            $(function(){
+                var Allfile = [],allFileLength = 0, errorFileArray = [];
+                $('#fileupload').fileupload({
+                    url: '${ctx}/console/app/file/play/upload',
+                    maxFileSize: 5* 1024 * 1024,
+                    dataType: 'json',
+                    autoUpload: true,
+                    acceptFileTypes: /(\.|\/)(wav)$/i,
+                    add: function(e, data) {
+                        $('#progress .progress-bar').css(
+                                'width',
+                                0 + '%'
+                        );
+//                        $('.modalCancel-app-up').one("click",function(){
+//                            data.abort();
+//                        });
+                        var filename = data.files[0].name;
+                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
+                        var result=  re.test(filename);
+                        if(result){
+                            if(data.files[0].size <= (5* 1024 * 1024)) {
+                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
+                                        $('#progress').show();
+                                        $('#fileName').html(filename);
+                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
+                                            data.submit();
+                                            cancelCancel=false;
+                                            $('#fileupload').attr('disabled',"disabled");
+                                        });
+                                    }else{
+                                        $('#progress').hide();
+                                        showtoast("存储空间不足，无法上传");
+                                    }
+                                },"post");
+                            }else{
+                                $('#progress').hide();
+                                showtoast("上传文件超过5M");
+                            }
+                        }else{
+                            $('#progress').hide();
+                            showtoast("上传格式不正确");
+                        }
+                    },
+                    done: function (e, data) {
+                        showtoast('上传成功');
+                        $('#progress .progress-bar').css(
+                                'width',
+                                0 + '%'
+                        );
+                        cancelCancel=true;
+                        $('.modal-loadding').hide();
+                        $('.modalCancel-app-up').click();
+                        fileTotalSoze();
+                        upplay();
+                    },
+                    progressall: function (e, data) {
+                        var progress = parseInt(data.loaded / data.total * 100, 10);
+                        $('#progress .progress-bar').css(
+                                'width',
+                                progress + '%'
+                        );
+                        if(progress==100){
+                            $('.modal-loadding').show();
+                        }
+                    },fail: function(e, data) {
+                        cancelCancel=true;
+                        showtoast('上传失败');
+                        $('.modal-loadding').hide();
+                        $('#fileupload').removeAttr('disabled');
+                    }
+                });
+            })
+        </script>
+
+
+
 
 <script>
     $('.modalCancel-app-up').click(function(){
-        clearTimeout(timer);
-        $('#resetForm').click();
-        $('#uploadLength').attr("style","width:"+0+"%");
-        var id = $(this).attr('data-id');
-        $('#modal'+id).fadeOut();
-        $('#show-bg').fadeOut();
+        var v = $('#progress .progress-bar').css('width');
+        if(v=='0%'||v=='0px'||cancelCancel){
+            $('#resetForm').click();
+            $('#fileName').html("");
+            var id = $(this).attr('data-id');
+            $('#modal'+id).fadeOut();
+            $('#show-bg').fadeOut();
+            $('#progress').hide();
+            $('#fileupload').removeAttr('disabled');
+        }
     });
     /**
      *绑定测试电话号码
@@ -395,7 +501,7 @@
                 numbers =  ","+numbers;
             }
         }
-        ajaxsync(ctx + "/console/telenum/bind/update_app_number",{ 'numbers':numbers,'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/telenum/bind/update_app_number",{ 'numbers':numbers,'appId':appId,csrfParameterName:csrfToken},function(response){
             $('#testNumBind').html(testNumBindHtml);
             hideModal(id);
             showtoast("应用绑定号码更新成功");
@@ -439,7 +545,7 @@
         var html  = "";
         //异步查询文件信息
 
-        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 //添加加载文件信息
                 html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
@@ -455,7 +561,7 @@
             html +='<p>--开始压缩打包</p>';
             $('#scrolldiv'+id).append(html);
 
-            ajaxsync(ctx + "/console/app/file/record/zip",{'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+            ajaxsync(ctx + "/console/app/file/record/zip",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
                 if(response.success){
                     var fileName = new String(response.data);
                     var index = fileName.lastIndexOf("/");
@@ -492,7 +598,7 @@
         endtime+=" 23:59:59";
         bootbox.confirm("确认删除所选文件", function(result) {
             if(result){
-                ajaxsync(ctx + "/console/app/file/record/batch_delete",{'id':id,'appId':'${app.id}','startTime':starttime,'endTime':endtime,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                ajaxsync(ctx + "/console/app/file/record/batch_delete",{'id':id,'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("批量删除成功");
                     }else{
@@ -510,36 +616,6 @@
         });
     });
 
-    /**
-     * 文件上传地址
-     */
-    $('.modalSureFour').click(function(){
-        var id = $(this).attr('data-id');
-        //验证文件格式
-        var file = $('#singlefile');
-
-        if(file[0].files.length==0){
-            showtoast("请上传文件");
-        }
-
-        var allowtype =  ["WAV"];
-        for(var i=0 ; i<file[0].files.length ;i++ ){
-            var names =  getFiletype(file[0].files[i].name);
-            if ($.inArray(names,allowtype) == -1)
-            {
-                showtoast("上传失败，只支持 .wav 格式的文件");
-                return false;
-            }
-            if(file[0].files[i].size> 5* 1024 * 1024){
-                showtoast("上传失败，单条语音最大支持 5M");
-                return false;
-            }
-        }
-        $('#uploadLength').show();
-        $('#uploadMianForm').submit();
-
-        //hideModal(id)
-    });
 
     /**
      * 单文件
@@ -588,7 +664,7 @@
                                 var id = new String(thisT.id).replace('remark-b-','');
                                 //异步请求修改数据
 
-                                ajaxsync(ctx + "/console/app/file/play/modify",{'id':id,'remark':remark,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                                ajaxsync(ctx + "/console/app/file/play/modify",{'id':id,'remark':remark,csrfParameterName:csrfToken},function(response){
                                     if(response.success){
                                         showtoast("修改成功");
                                         //成功执行
@@ -620,7 +696,7 @@
             if(result){
                 var id = new String(idType.id).replace("voice-record-","");
 
-                ajaxsync(ctx + "/console/app/file/record/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                ajaxsync(ctx + "/console/app/file/record/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
                         recordFileTotalSize();
@@ -643,7 +719,7 @@
         bootbox.confirm("确认删除文件", function(result) {
             if(result){
                 var id = new String(idType.id).replace("delete-","");
-                ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+                ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
                         fileTotalSoze();
@@ -661,7 +737,7 @@
      */
     var recordFileTotalSize = function(){
 
-        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':'${app.id}','${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,csrfParameterName:csrfToken},function(response){
             if(response.success){
                 $('#voiceFileRecord').html("录音文件总计占用："+resultFileSize(response.data.size));
             }else{
@@ -682,11 +758,12 @@
      *触发放音文件分页
      */
     function upplay(){
+        $('#uploadButton').show();
         //获取数据总数
         var count = 0;
         var name = $('#name').val();
 
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
             count=response.data.totalCount;
         },"post");
 
@@ -702,7 +779,7 @@
     }
     var fileTotalSoze = function(){
 
-        ajaxsync(ctx + "/console/app/file/play/total",{'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
             $('#voiceFilePlay').html("共计" + resultFileSize(response.data.fileTotalSize) + ",已占用" + resultFileSize(response.data.fileRemainSize)+ "");
         },"post");
 
@@ -726,7 +803,7 @@
     {
         var name = $('#name').val();
 
-        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
             var data =[];
             for(var j=0;j<response.data.result.length;j++){
                 var tempFile = response.data.result[j];
@@ -758,11 +835,12 @@
      *触发录音文件分页
      */
     function upvoice(){
+        $('#uploadButton').hide();
         recordFileTotalSize();
         //获取数据总数
         var count = 0;
 
-        ajaxsync(ctx + "/console/app/file/record/list",{ 'appId':'${app.id}','pageNo':1,'pageSize':20,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/list",{ 'appId':appId,'pageNo':1,'pageSize':20,csrfParameterName:csrfToken},function(response){
             count=response.data.totalCount;
         },"post");
 
@@ -783,7 +861,7 @@
      * */
     var voiceTable = function(nowPage,listRows)
     {
-        ajaxsync(ctx + "/console/app/file/record/list",{'appId':'${app.id}','pageNo':nowPage,'pageSize':listRows,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
+        ajaxsync(ctx + "/console/app/file/record/list",{'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
             var data =[];
             for(var j=0;j< response.data.result.length;j++){
                 var tempFile = response.data.result[j];
@@ -811,30 +889,7 @@
             upplay();
         }
     });
-    var timer = "";
-    function startUpload(){
-        timer = window.setTimeout(startListener,1000);
-        return true;
-    }
-    function startListener(){
-        ajaxsync(ctx + "/console/app/file/play/status",{'${_csrf.parameterName}':'${_csrf.token}'},function(response){
-            $('#uploadLength').attr("style","width:"+response.data.percentComplete+"%");
-            if(response.data.flag){
-                clearTimeout(timer);
-                showtoast('上传成功');
-                fileTotalSoze();
-                upplay();
-                var id = $('.modalSureFour').attr('data-id');
-                hideModal(id);
-                //清除内容
-                $('#resetForm').click();
-                $('#uploadLength').attr("style","width:"+0+"%");
-            }else{
-                startUpload();
-            }
-        },"post");
 
-    }
     fileTotalSoze();
 </script>
 
