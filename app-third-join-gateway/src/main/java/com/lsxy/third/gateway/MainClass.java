@@ -25,6 +25,6 @@ public class MainClass  extends AbstractSpringBootWebStarter {
 
     @Override
     public String systemId() {
-        return "third.join.apigw";
+        return "third.join.gateway";
     }
 }

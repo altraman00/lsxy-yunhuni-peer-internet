@@ -44,6 +44,13 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     }
 
     @Override
+    public Page<Consume> pageList(String tenantId, Integer pageNo, Integer pageSize, Date startTime, Date endTime) {
+        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<=?2 and obj.dt>=?3   ORDER BY obj.dt";
+        Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenantId,endTime,startTime);
+        return page;
+    }
+
+    @Override
     public Page<Consume> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize) {
         int start = (pageNo-1)*pageSize;
         String db_name = "db_lsxy_base";//year +"-" + month;

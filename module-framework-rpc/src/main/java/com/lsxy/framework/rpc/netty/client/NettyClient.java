@@ -30,6 +30,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by tandy on 16/8/1.
  * Netty Client
@@ -39,6 +41,9 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "global.rpc.provider", havingValue = "netty", matchIfMissing = false)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class NettyClient extends AbstractClient{
+
+    @Autowired
+    private ServerSessionContext sessionContext;
 
     @Autowired
     private NettyClientHandler handler;
@@ -70,8 +75,6 @@ public class NettyClient extends AbstractClient{
                     pipeline.addLast("decoder", new RPCMessageDecoder());
                     pipeline.addLast("encoder", new RPCMessageEncoder());
                     pipeline.addLast("handler", handler.getIoHandler());
-
-//                    ch.writeAndFlush("连接上了,你看到了蛮");
                 }
             });
 
@@ -81,6 +84,9 @@ public class NettyClient extends AbstractClient{
 
             // Start the client.
             ChannelFuture f = b.connect(host, port).sync();
+            //连接成功后,稍微等一下,如果连接时通过nginx做的代理,刚开始连接上,如果后端服务没有READY的情况下,连接成功后,过一会会断开连接
+            TimeUnit.SECONDS.sleep(2);
+
             if(f.isSuccess() && f.channel().isActive()){
                 if(logger.isDebugEnabled()){
                     logger.debug("客户端连接成功,准备发送注册客户端命令");
@@ -92,7 +98,10 @@ public class NettyClient extends AbstractClient{
             f.channel().closeFuture().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    logger.error("客户端连接断开啦。。。。。注意注意!1!!!!!!:{}",future.channel());
+                    if(logger.isDebugEnabled()){
+                        logger.error("客户端连接断开啦。。。。。注意注意!1!!!!!!:{}",future.channel());
+                    }
+
                     Attribute att =future.channel().attr(AttributeKey.valueOf("sessionid"));
                     if(att != null){
                         String sessionid = (String)att .get();

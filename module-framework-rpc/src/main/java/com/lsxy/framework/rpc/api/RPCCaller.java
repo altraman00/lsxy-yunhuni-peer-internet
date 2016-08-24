@@ -225,13 +225,13 @@ private static final Logger logger = LoggerFactory.getLogger(RPCCaller.class);
 		logger.debug(">>"+request);
 		session.write(request);
 		long startWait = System.currentTimeMillis();
+		long timeout = Long.parseLong(SystemConfig.getProperty("global.rpc.request.timeout","10000"));	//10s超时
 		synchronized (request){
-			request.wait(60000);
-			if(System.currentTimeMillis() - startWait >= 60000){
+			request.wait(timeout);
+			if(System.currentTimeMillis() - startWait >= timeout){
 				throw new RequestTimeOutException(request);
 			}
 		}
-
 
 		if(logger.isDebugEnabled()){
 		    logger.debug("请求醒了:{},已经睡了{}ms",request,(System.currentTimeMillis() - startWait));

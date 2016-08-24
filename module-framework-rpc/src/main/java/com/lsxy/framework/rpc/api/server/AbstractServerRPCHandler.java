@@ -77,7 +77,10 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
             }
             if(request.getName().equals(ServiceConstants.CH_MN_CONNECT)){
                 response = process_CH_MN_CONNECT(ctxObject,request);
-            }else{
+            } else if (request.getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO)){    //心跳
+                response = RPCResponse.buildResponse(request);
+                response.setMessage(RPCResponse.STATE_OK);
+            } else {
                 if(serviceHandler != null){
                     if(logger.isDebugEnabled()){
                         logger.debug("serviceHandler is :{}" , serviceHandler.getClass().getName());
