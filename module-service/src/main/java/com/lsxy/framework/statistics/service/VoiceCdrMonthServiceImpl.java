@@ -4,8 +4,8 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.statistics.model.VoiceCdrMonth;
 import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.statistics.dao.VoiceCdrMonthDao;
 import com.lsxy.utils.StatisticsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,4 +78,58 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
         });
     }
 
+    private long getSumFieldBetween(Date d1,Date d2,String field,String tenantId,String appId,String type){
+        String hql = "from VoiceCdrMonth obj where "
+                +StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt between ?1 and ?2";
+        List<VoiceCdrMonth> ms = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (VoiceCdrMonth month : ms) {
+            if(month!=null && BeanUtils.getProperty2(month,field) !=null){
+                sum += (long)BeanUtils.getProperty2(month,field);
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    public long getAmongDurationByDate(Date d) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongDuration",null,null,null);
+    }
+
+    @Override
+    public long getAmongDurationByDateAndTenant(Date d, String tenant) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongDuration",tenant,null,null);
+    }
+
+    @Override
+    public long getAmongCallByDateAndTenant(Date d, String tenant) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongCall",tenant,null,null);
+    }
+
+    @Override
+    public long getAmongConnectByDateAndTenant(Date d, String tenant) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongConnect",tenant,null,null);
+    }
+
+    @Override
+    public long getAmongDurationByDateAndApp(Date d, String app) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongDuration",null,app,null);
+    }
+
+    @Override
+    public long getAmongCallByDateAndApp(Date d, String app) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongCall",null,app,null);
+    }
 }

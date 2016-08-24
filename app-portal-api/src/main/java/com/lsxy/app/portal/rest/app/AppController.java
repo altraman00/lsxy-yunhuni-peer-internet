@@ -36,7 +36,7 @@ public class AppController extends AbstractRestController {
      */
     @RequestMapping("/list")
     public RestResponse listApp() throws Exception{
-        List<App> apps = appService.findAppByUserName(getCurrentAccountUserName());
+        List<App> apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
         return RestResponse.success(apps);
     }
 
@@ -48,8 +48,7 @@ public class AppController extends AbstractRestController {
      */
     @RequestMapping("/plist")
     public RestResponse pageList(Integer pageNo,Integer pageSize){
-        String userName = getCurrentAccountUserName();
-        Page<App> page = appService.pageList(userName,pageNo,pageSize);
+        Page<App> page = appService.pageList(getCurrentAccount().getTenant().getId(),pageNo,pageSize);
         return RestResponse.success(page);
     }
 

@@ -26,13 +26,16 @@
 		}
 	})
 	var showtoastNum='';
-	function showtoast(tips,url) {
+	function showtoast(tips,url,times) {
 		if(showtoastNum!=''){
 			clearInterval(showtoastNum);
 		}
 		$('.tips-toast').hide().html('');
 		$('.tips-toast').css('display','block').html(tips);
-		showtoastNum = setTimeout(function(){hidetoast(url);},3000);
+		if(!times){
+			times = 3000;
+		}
+		showtoastNum = setTimeout(function(){hidetoast(url);},times);
 	}
 	function hidetoast(url){
 		$('.tips-toast').hide();

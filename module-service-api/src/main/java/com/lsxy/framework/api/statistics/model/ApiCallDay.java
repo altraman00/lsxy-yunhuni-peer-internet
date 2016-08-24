@@ -12,7 +12,7 @@ import java.util.Date;
  * Created by zhangxb on 2016/8/1.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_app_day")
+@Table(schema="db_lsxy_base",name = "tb_base_api_call_day")
 public class ApiCallDay extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
