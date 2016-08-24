@@ -39,7 +39,7 @@ public class ASyncSaveApiLogTask {
         apiInvokeLogService.save(log);
 
         if(logger.isDebugEnabled()) {
-            logger.debug("调用日志异步入库中完成");
+            logger.debug("调用日志异步入库中完成:{}",log);
         }
     }
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <contextName>module-framework-rpc</contextName>
+    <property name="APP_NAME" value="module-framework-rpc" />
+    <include resource="logback-yunhuni.xml"/>
+    <logger name="org.springframework.web" level="DEBUG" additivity="true" />
+    <logger name="io.netty" level="DEBUG" additivity="true" />
+
+</configuration>

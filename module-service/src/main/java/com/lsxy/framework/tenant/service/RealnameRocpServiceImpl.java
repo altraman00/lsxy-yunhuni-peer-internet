@@ -48,4 +48,14 @@ public class RealnameRocpServiceImpl extends AbstractService<RealnameCorp> imple
             return null;
         }
     }
+
+    @Override
+    public RealnameCorp findByTenantIdNewest(String tenantId) {
+        String hql = "from RealnameCorp obj where obj.tenant.id=?1 order by obj.createTime desc";
+        List<RealnameCorp> ps = this.findByCustomWithParams(hql, tenantId);
+        if(ps != null && ps.size()>0){
+            return ps.get(0);
+        }
+        return null;
+    }
 }

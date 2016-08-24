@@ -6,6 +6,7 @@ import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,22 +28,19 @@ import java.util.TreeSet;
  */
 
 //@Component  不能打开该注释，否则会出问题
-public class BlackIpListFilter extends GenericFilterBean{
+public class BlackIpListFilter extends OncePerRequestFilter{
     private static final Logger logger = LoggerFactory.getLogger(BlackIpListFilter.class);
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String ip = WebUtils.getRemoteAddress((HttpServletRequest) request);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("进入IP黑名单校验过滤器");
-        }
         boolean result = getApiGwBlankIPService().isBlankIP(ip);
         if(logger.isDebugEnabled()){
             logger.debug("校验IP黑名单：{}  已被黑名单？ {}",ip,result);
         }
         if(!result){
-            chain.doFilter(request,response);
+            filterChain.doFilter(request,response);
         }else{
             IPAuthenticationException ex = new IPAuthenticationException("IP地址已被列入黑名单:"+ip);
             new BlackIpEntryPoint().commence((HttpServletRequest)request,(HttpServletResponse) response,ex);

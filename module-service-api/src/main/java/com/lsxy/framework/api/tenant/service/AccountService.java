@@ -97,4 +97,14 @@ public interface AccountService extends BaseService<Account> {
      * @return
      */
     List<Account> list();
+
+    boolean updateStatusByTenantId(String tenanId,Integer status);
+
+
+    /**
+     * 获取租户的账号信息
+     * @param tenantId
+     * @return
+     */
+    public Account findOneByTenant(String tenantId);
 }

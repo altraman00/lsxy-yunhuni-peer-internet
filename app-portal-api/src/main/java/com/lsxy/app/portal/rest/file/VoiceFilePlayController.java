@@ -74,6 +74,7 @@ public class VoiceFilePlayController extends AbstractRestController {
         voiceFilePlay.setApp(app);
         Account account = getCurrentAccount();
         voiceFilePlay.setTenant(account.getTenant());
+        voiceFilePlay.setStatus(VoiceFilePlay.STATUS_WAIT);
         voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
         //更新账户表
         Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
@@ -106,7 +107,7 @@ public class VoiceFilePlayController extends AbstractRestController {
     @RequestMapping("/plist")
     public RestResponse pageList(Integer pageNo,Integer pageSize,String name,String appId){
         Tenant tenant = getCurrentAccount().getTenant();
-        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,tenant.getId());
+        Page<VoiceFilePlay> page = voiceFilePlayService.pageList(pageNo,pageSize,name,appId,new String[]{tenant.getId()},null,null,null);
         return RestResponse.success(page);
     }
 }
