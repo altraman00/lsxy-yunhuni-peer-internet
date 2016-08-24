@@ -2,19 +2,34 @@ package com.lsxy.framework.message.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
+import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.core.utils.VelocityUtils;
 import com.lsxy.framework.message.dao.AccountMessageDao;
+import com.lsxy.yunhuni.api.config.model.GlobalConfig;
+import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户消息实现类
@@ -24,9 +39,17 @@ import java.io.Serializable;
 public class AccountMessageServiceImpl extends AbstractService<AccountMessage> implements AccountMessageService{
     private static final Logger logger = LoggerFactory.getLogger(AccountMessageServiceImpl.class);
     @Autowired
+    MessageService messageService;
+    @Autowired
     AccountMessageDao accountMessageDao;
     @Autowired
     AccountService accountService;
+    @Autowired
+    TenantService tenantService;
+    @Autowired
+    GlobalConfigService configGlobalService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<AccountMessage, Serializable> getDao() {
         return accountMessageDao;
@@ -53,5 +76,73 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
             result = (Long) obj;
         }
         return result;
+    }
+
+    @Override
+    public void insertMultiple(List<Account> list, Message message) {
+        String sql =" INSERT INTO db_lsxy_base.tb_base_account_message(id,message_id,account_id,status,create_time,last_time,deleted,sortno,version) VALUES ";
+        long times = new Date().getTime();
+        Timestamp initDate = new Timestamp(times);
+        for(int i=0;i<list.size();i++){
+            if(i!=0){
+                sql += " , ";
+            }
+            sql += " ( '"+UUIDGenerator.uuid()+"','"+message.getId()+"','"+list.get(i).getId()+"','"+AccountMessage.NOT+"','"+initDate+"','"+initDate+"','"+0+"','"+times+"','"+0+"') ";
+        }
+        jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public AccountMessage sendTenantTempletMessage(String originator, String tenantId, String type) {
+        AccountMessage accountMessage = null;
+        Tenant tenant = tenantService.findById(tenantId);
+        if(tenant!=null) {
+            Map map = new HashMap();
+            map.put("name", tenant.getTenantName());
+            String value = VelocityUtils.getVelocityContext(type, map);
+            value = value.substring(value.indexOf("\r\n")+2,value.length());
+            if (StringUtil.isEmpty(originator)) {
+                originator = "系统";
+            }
+            accountMessage = sendMessage(originator,tenant.getRegisterUserId(),"系统通知",value);
+        }
+        return accountMessage;
+    }
+
+    @Override
+    public AccountMessage sendTempletMessage(String originator,String accountId, String type) {
+        AccountMessage accountMessage = null;
+        Account account = accountService.findById(accountId);
+        if(account!=null) {
+            Map map = new HashMap();
+            map.put("name", account.getUserName());
+            String value = VelocityUtils.getVelocityContext(type, map);
+            value = value.substring(value.indexOf("\r\n")+2,value.length());
+            if (StringUtil.isEmpty(originator)) {
+                originator = "系统";
+            }
+            accountMessage = sendMessage(originator,account.getId(),"系统通知",value);
+        }
+        return accountMessage;
+    }
+
+    @Override
+    public AccountMessage sendMessage(String originator,String accountId,String title,String content) {
+        Account account = accountService.findById(accountId);
+        AccountMessage accountMessage = null;
+        if(account!=null) {
+            Message message = new Message();
+            message.setType(Message.MESSAGE_ACCOUNT);
+            message.setTitle(title);
+            message.setContent(content);
+            message.setName(originator);
+            message = messageService.save(message);//发送消息记录
+            accountMessage = new AccountMessage();
+            accountMessage.setMessage(message);
+            accountMessage.setAccount(account);
+            accountMessage.setStatus(AccountMessage.NOT);
+            accountMessage = accountMessageDao.save(accountMessage);
+        }
+        return accountMessage;
     }
 }

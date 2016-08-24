@@ -3,10 +3,14 @@ package com.lsxy.app.oc.rest.ossfile;
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.oss.OSSService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletOutputStream;
@@ -18,14 +22,16 @@ import java.io.InputStream;
  * oss文件操作
  * Created by zhangxb on 2016/8/11.
  */
+@Api(value = "OSS文件操作", description = "租户中心相关的接口" )
 @RequestMapping("/ossfile")
 @RestController
 public class OssFileController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(OssFileController.class);
     @Autowired
     private OSSService ossService;
-    @RequestMapping("/download")
-    public void download(HttpServletResponse response, String uri,String addr) throws IOException {
+    @ApiOperation(value = "文件下载")
+    @RequestMapping(value = "/download" ,method = RequestMethod.GET)
+    public void download(HttpServletResponse response, @RequestParam String uri, @RequestParam String addr) throws IOException {
         String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
         response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
         response.reset();
@@ -33,8 +39,9 @@ public class OssFileController extends AbstractRestController {
         response.setContentType("application/octet-stream; charset=utf-8");
         handle(response, uri);
     }
-    @RequestMapping("/img")
-    public void getImg(HttpServletResponse response, String uri){
+    @ApiOperation(value = "获取资源流")
+    @RequestMapping(value = "/img" ,method = RequestMethod.GET)
+    public void getImg(HttpServletResponse response, @RequestParam String uri){
         String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
         response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
         handle(response, uri);
