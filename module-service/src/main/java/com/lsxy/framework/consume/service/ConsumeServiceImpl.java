@@ -11,8 +11,11 @@ import com.lsxy.framework.core.utils.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.util.Date;
+import java.math.BigInteger;
 
 /**
  * 消费记录ServiceImpl
@@ -24,6 +27,9 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     ConsumeDao consumeDao;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    EntityManager em;
+
     @Override
     public BaseDaoInterface<Consume, Serializable> getDao() {
         return consumeDao;
@@ -42,5 +48,24 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<=?2 and obj.dt>=?3   ORDER BY obj.dt";
         Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenantId,endTime,startTime);
         return page;
+    }
+
+    @Override
+    public Page<Consume> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize) {
+        int start = (pageNo-1)*pageSize;
+        String db_name = "db_lsxy_base";//year +"-" + month;
+        String countsql = "select count(1) from "+db_name+".tb_base_consume where tenant_id=:tenant";
+        Query countQuery = em.createNativeQuery(countsql);
+        countQuery.setParameter("tenant",tenantId);
+        long total = ((BigInteger)countQuery.getSingleResult()).longValue();
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        String pagesql = "select * from "+db_name+".tb_base_consume where tenant_id=:tenant";
+        Query pageQuery = em.createNativeQuery(pagesql,Consume.class);
+        pageQuery.setParameter("tenant",tenantId);
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        return new Page<>(start,total,pageSize,pageQuery.getResultList());
     }
 }

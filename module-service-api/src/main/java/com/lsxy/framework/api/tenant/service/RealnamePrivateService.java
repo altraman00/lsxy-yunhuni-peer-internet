@@ -23,6 +23,8 @@ public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
      */
     public RealnamePrivate findByTenantIdAndStatus(String tenantId,int status);
 
+    public RealnamePrivate findByTenantIdNewest(String tenantId);
+
 
     /**
      * 查找用户下的分页信息

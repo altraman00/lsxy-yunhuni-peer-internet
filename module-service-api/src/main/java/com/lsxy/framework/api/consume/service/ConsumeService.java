@@ -32,4 +32,8 @@ public interface ConsumeService extends BaseService<Consume> {
      */
     public Page<Consume> pageList(String tenantId, Integer pageNo, Integer pageSize, Date startTime, Date endTime);
 
+    /**
+     * 查询某个租户的消费记录
+     */
+    Page<Consume> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize);
 }
