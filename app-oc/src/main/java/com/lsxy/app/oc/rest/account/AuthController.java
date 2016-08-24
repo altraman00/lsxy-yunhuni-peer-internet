@@ -1,6 +1,8 @@
 package com.lsxy.app.oc.rest.account;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.RealnameCorp;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.api.tenant.model.Tenant;
@@ -31,6 +33,9 @@ public class AuthController extends AbstractRestController {
     RealnameCorpService realnameCorpService;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    AccountMessageService accountMessageService;
+
     /**
      * 查找用户下的分页信息
      * @param authStatus await|auditing|unauth
@@ -185,11 +190,18 @@ public class AuthController extends AbstractRestController {
                 if(tenant!=null){
                     realnamePrivate.setStatus(status);
                     tenant.setIsRealAuth(status);
-                    tenant.setTenantName(realnamePrivate.getName());
+                    if(Tenant.AUTH_ONESELF_SUCCESS==status) {
+                        tenant.setTenantName(realnamePrivate.getName());
+                    }
                     realnamePrivate.setTenant(tenant);
                     realnamePrivate.setReason(reason);
-                    realnamePrivateService.save(realnamePrivate);
+                    realnamePrivate = realnamePrivateService.save(realnamePrivate);
                     tenant = tenantService.save(tenant);
+                    if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_FAIL){
+                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_FAIL);
+                    }else if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_SUCCESS){
+                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_SUCCESS);
+                    }
                 }else{
                     restResponse = RestResponse.failed("0","租户不存在");
                 }
@@ -210,12 +222,19 @@ public class AuthController extends AbstractRestController {
                             status=Tenant.AUTH_UPGRADE_SUCCESS;
                         }
                     }
-                    tenant.setTenantName(realnameCorp.getName());
+                    if(Tenant.AUTH_COMPANY_SUCCESS==realnameCorp.getStatus()) {
+                        tenant.setTenantName(realnameCorp.getName());
+                    }
                     tenant.setIsRealAuth(status);
                     realnameCorp.setReason(reason);
                     realnameCorp.setTenant(tenant);
-                    realnameCorpService.save(realnameCorp);
+                    realnameCorp = realnameCorpService.save(realnameCorp);
                     tenant = tenantService.save(tenant);
+                    if(realnameCorp.getStatus()==Tenant.AUTH_COMPANY_FAIL){
+                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_FAIL);
+                    }else if(realnameCorp.getStatus()==Tenant.AUTH_COMPANY_SUCCESS){
+                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_SUCCESS);
+                    }
                 }else{
                     restResponse = RestResponse.failed("0","租户不存在");
                 }
