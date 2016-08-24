@@ -52,6 +52,7 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
 
     @Override
     public BigDecimal getBalance(String tenantId) {
+        //TODO 获取余额
         Billing billing = this.findBillingByTenantId(tenantId);
         return billing.getBalance();
     }

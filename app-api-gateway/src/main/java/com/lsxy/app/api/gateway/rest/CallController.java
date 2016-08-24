@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Tandy on 2016/6/28.
@@ -86,11 +88,19 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
     }
 
     @RequestMapping("/{account_id}/call/duo_callback")
-    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id){
+    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id) {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
-        String res_id = callService.duoCallback(ip,appId, duoCallbackVO, account_id);
-        return RestResponse.success(res_id);
+        String callId = null;
+        try {
+            callId = callService.duoCallback(ip,appId, duoCallbackVO);
+        } catch (InvokeCallException e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        Map<String,String> result = new HashMap<>();
+        result.put("callId",callId);
+        result.put("user_data",duoCallbackVO.getUser_data());
+        return RestResponse.success(result);
     }
 //
 //

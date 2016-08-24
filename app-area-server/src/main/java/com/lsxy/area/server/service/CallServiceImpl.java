@@ -1,11 +1,13 @@
 package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.DuoCallbackVO;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -21,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import java.util.Map;
  * Created by tandy on 16/8/18.
  */
 @Service
+@Component
 public class CallServiceImpl implements CallService {
 
     private static final Logger logger = LoggerFactory.getLogger(CallServiceImpl.class);
@@ -47,13 +51,13 @@ public class CallServiceImpl implements CallService {
     @Autowired
     private ServerSessionContext sessionContext;
 
-    @Autowired
+    @Autowired(required = false)
     private ApiGwRedBlankNumService apiGwRedBlankNumService;
 
-    @Autowired
+    @Autowired(required = false)
     AppService appService;
 
-    @Autowired
+    @Autowired(required = false)
     BillingService billingService;
 
     @Override
@@ -98,7 +102,8 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO, String account_id) {
+    public String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws InvokeCallException {
+        String callId = UUIDGenerator.uuid();
         String to1 = duoCallbackVO.getTo1();
         String to2 = duoCallbackVO.getTo2();
         if(apiGwRedBlankNumService.isRedOrBlankNum(to1) || apiGwRedBlankNumService.isRedOrBlankNum(to2)){
@@ -114,19 +119,39 @@ public class CallServiceImpl implements CallService {
         if(app.getIsVoiceCallback() != 1){
             throw new AppServiceNotOn("app没开通所需的服务");
         }
-
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnough("余额不足");
         }
-
-
-        return null;
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(duoCallbackVO, Map.class);
+        map.put("callId",callId);
+        String params = mapToString(map);
+        try {
+            //找到合适的区域代理
+            Session session = sessionContext.getRightSession();
+            if (session != null) {
+                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
+                try {
+                    rpcCaller.invoke(session, rpcrequest);
+                } catch (Exception e) {
+                    logger.error("消息发送到区域失败:{}", rpcrequest);
+                    throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+                }
+            } else {
+                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
+                throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call=>" + params);
+            }
+            return callId;
+        }catch(RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
     }
 
+
     public String mapToString(Map<String,Object> params){
-            List<String> keys = new ArrayList<String>(params.keySet());
+            List<String> keys = new ArrayList<>(params.keySet());
             String result = "";
             for (int i = 0; i < keys.size(); i++) {
                 String key = keys.get(i);
