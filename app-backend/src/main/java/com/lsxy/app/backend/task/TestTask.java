@@ -50,7 +50,7 @@ public class TestTask {
      */
     @Scheduled(cron="0/10 * * * * ?")
     public void sout(){
-        System.out.println("**********************************" + System.currentTimeMillis());
+        System.out.println("***************测试*******************" + System.currentTimeMillis());
     }
 
 }
