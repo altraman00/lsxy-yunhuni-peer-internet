@@ -20,7 +20,6 @@ public interface ApiCallMonthService extends BaseService<ApiCallMonth> {
      * @param select 组合groupby条件
      */
     public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
-    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
 
     /**
      * 获取某个租户某月的api调用次数
