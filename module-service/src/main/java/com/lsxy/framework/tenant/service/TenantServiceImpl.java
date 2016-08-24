@@ -285,9 +285,9 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     @Override
     public Map getAwaitNum() {
         String hql = " FORM Tenant obj where obj.isRealAuth=?1 or obj.isRealAuth=?2 ";
-        long tenant =  countByCustom(hql,true,Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT);
+        long tenant =  this.countByCustom(hql,Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT);
         String hql2 = "  FORM VoiceFilePlay obj where obj.status=?1  ";
-        long voiceFilePlay = countByCustom(hql2,true, VoiceFilePlay.STATUS_WAIT);
+        long voiceFilePlay = this.countByCustom(hql2, VoiceFilePlay.STATUS_WAIT);
         Map map = new HashMap();
         map.put("tenant",tenant);
         map.put("voiceFilePlay",voiceFilePlay);
