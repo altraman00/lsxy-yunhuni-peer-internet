@@ -3,16 +3,20 @@ package com.lsxy.app.api.gateway.security.auth;
 import com.lsxy.app.api.gateway.util.SpringContextHolder;
 import com.lsxy.framework.api.gateway.model.ApiInvokeLog;
 import com.lsxy.framework.api.gateway.service.ApiInvokeLogService;
+import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,9 +33,11 @@ import java.util.TreeSet;
 /**
  * Created by Tandy on 2016/6/30.
  * 签名认证过滤器
+ * 此处一定不能继承GenericFilterBean,一定要继承OncePerRequestFilter
+ * 由于使用了异步请求,普通的过滤器会被多次触发
  */
 //@Component  不能打开该注释，否则会出问题
-public class SignatureAuthFilter extends GenericFilterBean{
+public class SignatureAuthFilter extends OncePerRequestFilter{
 
 
     private AuthenticationManager authenticationManager;
@@ -39,6 +45,8 @@ public class SignatureAuthFilter extends GenericFilterBean{
     private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     private ASyncSaveApiLogTask saveApiLogTask;
+
+    private RequestMatcher requestMatcher;
 
     private static final Logger logger = LoggerFactory.getLogger(SignatureAuthFilter.class);
     // Enable Multi-Read for PUT and POST requests
@@ -48,14 +56,23 @@ public class SignatureAuthFilter extends GenericFilterBean{
     };
 
 
-    public SignatureAuthFilter(AuthenticationManager authenticationManager){
+    public SignatureAuthFilter(AuthenticationManager authenticationManager , RequestMatcher requestMatcher){
         this.authenticationManager = authenticationManager;
         this.restAuthenticationEntryPoint = new RestAuthenticationEntryPoint();
+        this.requestMatcher = requestMatcher;
 
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws ServletException, IOException {
+
+        if(!requestMatcher.matches(req)){
+            chain.doFilter(req,resp);
+            return;
+        }
+
+        long start = System.currentTimeMillis();
+
         // use wrapper to read multiple times the content
         AuthenticationRequestWrapper request = new AuthenticationRequestWrapper((HttpServletRequest) req);
         HttpServletResponse response = (HttpServletResponse) resp;
@@ -63,49 +80,51 @@ public class SignatureAuthFilter extends GenericFilterBean{
         if (logger.isDebugEnabled()) {
             logger.debug("进入签名认证过滤器：" + request.getRequestURI());
         }
-//         Get authorization header
-        String credentials = request.getHeader("Authorization");
+        //参数签名
+        String signature = request.getHeader("Signature");
+        //鉴权账号
+        String certID = request.getHeader("CertID");
         String timestamp = request.getHeader("Timestamp");
         String appid = request.getHeader("AppID");
         String payload = request.getPayload();
         String method = request.getMethod();
-        // If there's not credentials return...
-        if (credentials == null || credentials.indexOf(":") < 0) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("没有签名认证凭证：" + request.getRequestURI());
-            }
-//            chain.doFilter(request, response);
-            return;
-        }
-
-        // Authorization header is in the form <public_access_key>:<signature>
-        String auth[] = credentials.split(":");
-        String certid = auth[0];
-        String signature = auth[1];
-        String apiuri = request.getRequestURI();
-
-        // 是否有post 或者 put  body
-        boolean hasContent = METHOD_HAS_CONTENT.contains(request.getMethod());
-
-        String contentMd5 = hasContent ? (new Md5PasswordEncoder()).encodePassword(payload, null) : "";
-        String contentType = hasContent ? request.getContentType() : "";
-
-        // 组织签名数据
-        StringBuilder toSign = new StringBuilder();
-        toSign.append(method).append("\n")
-                .append(contentMd5).append("\n")
-                .append(contentType).append("\n")
-                .append(timestamp).append("\n")
-                .append(appid).append("\n")
-                .append(apiuri);
-
-        RestCredentials restCredential = new RestCredentials(toSign.toString(), signature);
         try {
+            // If there's not credentials return...
+            if (StringUtil.isEmpty(certID) ||
+                    StringUtil.isEmpty(signature) ||
+                    StringUtil.isEmpty(timestamp) ||
+                    StringUtil.isEmpty(appid)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("没有签名认证凭证：" + request.getRequestURI());
+                }
+                throw new AuthenticationCredentialsNotFoundException("没有找到授权凭证");
+            }
+
+            // Authorization header is in the form <public_access_key>:<signature>
+            String apiuri = request.getRequestURI();
+
+            // 是否有post 或者 put  body
+            boolean hasContent = METHOD_HAS_CONTENT.contains(request.getMethod());
+
+            String contentMd5 = hasContent ? (new Md5PasswordEncoder()).encodePassword(payload, null) : "";
+            String contentType = hasContent ? request.getContentType() : "";
+
+            // 组织签名数据
+            StringBuilder toSign = new StringBuilder();
+            toSign.append(method).append("\n")
+                    .append(contentMd5).append("\n")
+                    .append(contentType).append("\n")
+                    .append(timestamp).append("\n")
+                    .append(appid).append("\n")
+                    .append(apiuri);
+
+            RestCredentials restCredential = new RestCredentials(toSign.toString(), signature);
+
             Date date = DateUtils.parseDate(timestamp, "yyyyMMddHHmmss");
 
 
             // Create an authentication token
-            Authentication authentication = new RestToken(certid, restCredential, date);
+            Authentication authentication = new RestToken(certID, restCredential, date);
 
             Authentication successfulAuthentication = authenticationManager.authenticate(authentication);
 
@@ -115,11 +134,17 @@ public class SignatureAuthFilter extends GenericFilterBean{
             //调用日志异步入库
             getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri);
 
-            if(logger.isDebugEnabled()) {
-                logger.debug("异步入库中，继续doFilter");
+            if(logger.isDebugEnabled()){
+                logger.debug("签名校验完毕,花费{}ms",(System.currentTimeMillis()-start));
             }
+
+            start = System.currentTimeMillis();
             // Continue with the Filters
             chain.doFilter(request, response);
+            if(logger.isDebugEnabled()){
+                logger.debug("执行体执行完毕,花费:{}ms",(System.currentTimeMillis() - start));
+            }
+
         } catch (AuthenticationException authenticationException) {
             SecurityContextHolder.clearContext();
             restAuthenticationEntryPoint.commence(request, response, authenticationException);

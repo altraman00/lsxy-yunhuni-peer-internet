@@ -119,11 +119,11 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right line30">充值方式：</lable>
                                                 <div class="col-md-2 input-box">
-                                                    <input type="radio" name="type" class="radiovalid" value="ZHIFUBAO" />
+                                                    <input type="radio" name="type" class="radiovalid" value="ALIPAY" />
                                                     <img src="${resPrefixUrl }/images/zhifubao.png"/>
                                                 </div>
                                                 <div class="col-md-2 input-box">
-                                                    <input type="radio" name="type" class="radiovalid" value="YINLIAN"/>
+                                                    <input type="radio" name="type" class="radiovalid" value="UNIONPAY"/>
                                                     <img src="${resPrefixUrl }/images/yinlian.png"/>
                                                 </div>
                                             </div>
