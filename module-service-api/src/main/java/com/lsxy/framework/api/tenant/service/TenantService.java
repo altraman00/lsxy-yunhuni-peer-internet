@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.Page;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 租户Mananger
@@ -117,5 +118,11 @@ public interface TenantService extends BaseService<Tenant> {
      * @param name 会员名字
      * @return
      */
-    List<Tenant> pageListByUserName(String name);
+    List<Tenant>  pageListByUserName(String name);
+
+    /**
+     * 获取未处理的记录数
+     * @return
+     */
+    Map getAwaitNum();
 }
