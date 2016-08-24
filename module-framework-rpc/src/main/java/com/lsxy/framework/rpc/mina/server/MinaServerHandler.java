@@ -122,7 +122,7 @@ public class MinaServerHandler extends AbstractServerRPCHandler {
 //				RPCRequest request = (RPCRequest) message;
 //				RPCResponse response = null;
 //				if(request.getName().equals(ServiceConstants.CH_MN_CONNECT)){
-//					response = process_CH_MN_CONNECT(iosession,request);
+//					response = doConnect(iosession,request);
 //				}else{
 //					Session session = remoteServer.getSessionContext().getSessionInTheContextObject(iosession.hashCode());
 //					response = serviceHandler.handleService(request,session);
@@ -158,30 +158,39 @@ public class MinaServerHandler extends AbstractServerRPCHandler {
         return getSessionContext().getSession(sessionid);
     }
 
-    /**
-     * 处理客户端连接命令
-     * @param request
-     * @return
-     */
-    @Override
-    protected RPCResponse process_CH_MN_CONNECT(Object ctxObject, RPCRequest request) {
-        IoSession iosession = (IoSession) ctxObject;
-        RPCResponse response = RPCResponse.buildResponse(request);
+	@Override
+	protected void refuseConnect(Object ctxObject, RPCRequest request) {
 
-//        InetSocketAddress addr  = (InetSocketAddress) iosession.getRemoteAddress();
-//        if(logger.isDebugEnabled()){
-//            logger.debug("有连接接入 {}:{}" , addr.getAddress().getHostAddress(),addr.getPort());
-//        }
+	}
 
-        //TODO 需要验证IP白名单,允许指定IP的客户端连接
-        response.setMessage(RPCResponse.STATE_OK);
-//		String clientId = request.getParameter("clientId");
-//		String sessionid = (String) iosession.getAttribute("sessionid");
-//		iosession.setAttribute("sessionid",clientId);
-        Session session = new MinaServerSession(iosession,this);
-        getSessionContext().putSession(session);
-        return response;
-    }
+	@Override
+	protected Session doConnect(Object contextObject, RPCRequest request) {
+		return null;
+	}
+
+//    /**
+//     * 处理客户端连接命令
+//     * @param request
+//     * @return
+//     */
+//    @Override
+//    protected RPCResponse doConnect(Object ctxObject, RPCRequest request) {
+//        IoSession iosession = (IoSession) ctxObject;
+//        RPCResponse response = RPCResponse.buildResponse(request);
+//
+////        InetSocketAddress addr  = (InetSocketAddress) iosession.getRemoteAddress();
+////        if(logger.isDebugEnabled()){
+////            logger.debug("有连接接入 {}:{}" , addr.getAddress().getHostAddress(),addr.getPort());
+////        }
+//
+//        response.setMessage(RPCResponse.STATE_OK);
+////		String clientId = request.getParameter("clientId");
+////		String sessionid = (String) iosession.getAttribute("sessionid");
+////		iosession.setAttribute("sessionid",clientId);
+//        Session session = new MinaServerSession(iosession,this);
+//        getSessionContext().putSession(session);
+//        return response;
+//    }
 
 
 	

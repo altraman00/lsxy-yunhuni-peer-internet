@@ -1,5 +1,6 @@
 package com.lsxy.framework.rpc.netty.server;
 
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.rpc.api.*;
 import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -29,6 +31,9 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     private SimpleChannelInboundHandler<RPCMessage> ioHandler = new IOHandle();
 
     private AttributeKey<String> SESSION_ID = AttributeKey.valueOf("sessionid");
+
+    @Autowired
+    private ServerSessionContext sessionContext;
 
 
     @Override
@@ -53,7 +58,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
 //                RPCRequest request = (RPCRequest) message;
 //                RPCResponse response = null;
 //                if(request.getName().equals(ServiceConstants.CH_MN_CONNECT)){
-//                    response = process_CH_MN_CONNECT(iosession,request);
+//                    response = doConnect(iosession,request);
 //                }else{
 //                    Session session = remoteServer.getSessionContext().getSessionInTheContextObject(iosession.hashCode());
 //                    response = serviceHandler.handleService(request,session);
@@ -106,6 +111,20 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     }
 
 
+    /**
+     * 拒绝连接消息发给客户端
+     * 因为抽象方法中,在未connect的情况下,无法拿到session对象,所以只能在具体实现类中直接响应消息给客户端
+     * @param ctxObject
+     * @param request
+     */
+    @Override
+    protected void refuseConnect(Object ctxObject, RPCRequest request) {
+        RPCResponse response = RPCResponse.buildResponse(request);
+        response.setMessage(RPCResponse.STATE_EXCEPTION);
+        response.setBody("拒绝连接");
+        ChannelHandlerContext ctx = (ChannelHandlerContext) ctxObject;
+        ctx.channel().writeAndFlush(response);
+    }
 
     /**
      * 处理连接命令
@@ -114,19 +133,46 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
      * @return
      */
     @Override
-    protected RPCResponse process_CH_MN_CONNECT(Object contextObject, RPCRequest request) {
+    protected Session doConnect(Object contextObject, RPCRequest request) {
         ChannelHandlerContext ctx = (ChannelHandlerContext) contextObject;
-        //TODO 需要验证连接的有效性  连接IP白名单验证
 
         String sessionid = (String) request.getParameter("sessionid");
-        Session session = new NettyServerSession(sessionid,ctx.channel(),this);
-        getSessionContext().putSession(session);
-        ctx.channel().attr(SESSION_ID).setIfAbsent(sessionid);
-        RPCResponse response = RPCResponse.buildResponse(request);
-        response.setMessage(RPCResponse.STATE_OK);
+        String areaid = (String) request.getParameter("aid");
+        String nodeid = (String) request.getParameter("nid");
 
+        String blankipList = SystemConfig.getProperty("area.server.blank.iplist","");
+        String blankipEnabled = SystemConfig.getProperty("area.server.blank.iplist.enabled","false");
+
+        RPCResponse response = RPCResponse.buildResponse(request);
+        response.setMessage(RPCResponse.STATE_EXCEPTION);
+
+        InetSocketAddress isa = (InetSocketAddress) ctx.channel().remoteAddress();
+        String ip = isa.getAddress().getHostAddress();
+
+        Session session = null;
+        //如果启用了白名单机制,并且非法连接
+        if("true".equals(blankipEnabled) && !(blankipList.indexOf(ip)>=0)){
+            logger.error("白名单机制启用,连接ip["+ip+"]不在白名单中["+blankipList+"],拒绝连接");
+            response.setBody("非法连接,被拒绝");
+            ctx.channel().writeAndFlush(response);
+            return null;
+        }
+
+        //判断是否重复连接
+        if(sessionContext.getSessionByArea(areaid,nodeid) != null){
+            logger.error("节点尝试重复连接["+areaid+"]["+nodeid+"],被拒绝!");
+            response.setBody("节点尝试重复连接["+areaid+"]["+nodeid+"],被拒绝!");
+            ctx.channel().writeAndFlush(response);
+            return null;
+        }
+        //所有条件满足,连接成功,将session放入sessioncontext
+        session = new NettyServerSession(sessionid,ctx.channel(),this);
+        getSessionContext().putSession(areaid,nodeid,session);
+        ctx.channel().attr(SESSION_ID).setIfAbsent(sessionid);
+        response.setMessage(RPCResponse.STATE_OK);
         logger.info("区域连接成功:{}",ctx.channel());
-        return response;
+
+        return session;
     }
 
     public SimpleChannelInboundHandler<RPCMessage> getIoHandler() {

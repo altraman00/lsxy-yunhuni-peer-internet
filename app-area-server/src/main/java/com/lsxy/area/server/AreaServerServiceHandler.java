@@ -1,19 +1,27 @@
 package com.lsxy.area.server;
 
 import com.lsxy.area.server.test.TestIncomingZB;
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
+import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.service.AreaService;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /**
  * Created by tandy on 16/8/8.
@@ -26,6 +34,12 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 
     @Autowired(required = false)
     private StasticsCounter sc;
+
+    @Autowired
+    private AreaService areaService;
+
+    @Autowired
+    private ServerSessionContext sessionContext;
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -54,6 +68,82 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         response.setMessage(RPCResponse.STATE_OK);
         return response;
     }
+
+    /**
+     * 判断指定的区域和节点编号的连接是否有效
+     * @param areaid 区域标识
+     * @param nodeid  节点编号
+     * @return
+     */
+    @Override
+    public boolean isConnectAvalid(String areaid, String nodeid) {
+        boolean result = false;
+        Area area = areaService.findById(areaid);
+        if(area!=null){
+            if(area.isEnabled()){
+                logger.error("区域[{}]未启用,连接失败",areaid);
+            }else{
+                result = true;
+            }
+        }else{
+            logger.error("非法连接,拒绝 : {}-{}  ",areaid,nodeid);
+        }
+        return result;
+    }
+
+//    /**
+//     * 处理区域连接注册指令
+//     *
+//     * @param request   解析出来的请求对象  params={arid=?&nid=?}
+//     * @param session  RPC SESSION
+//     * @return
+//     */
+//    @Override
+//    public RPCResponse process_CH_MN_CONNECT(String areaid,String nodeid,RPCRequest request) {
+//        InetSocketAddress add = session.getRemoteAddress();
+//        InetAddress addrs = add.getAddress();
+//        String ip = addrs.getHostAddress();
+////        String ip = session.getRemoteAddress().getAddress().getHostAddress();
+//        String blankipList = SystemConfig.getProperty("area.server.blank.iplist","");
+//        String blankipEnabled = SystemConfig.getProperty("area.server.blank.iplist.enabled","false");
+//        RPCResponse response = RPCResponse.buildResponse(request);
+//        response.setMessage(RPCResponse.STATE_EXCEPTION);
+//
+//        //如果启用了白名单机制,并且非法连接
+//        if("true".equals(blankipEnabled) && !(blankipList.indexOf(ip)>=0)){
+//            logger.error("白名单机制启用,连接ip["+ip+"]不在白名单中["+blankipList+"],拒绝连接");
+//            response.setBody("非法连接,被拒绝");
+//            return response;
+//        }
+//
+//        if(StringUtil.isNotEmpty(areaid)){
+//
+//            //判断是否重复连接
+//            if(sessionContext.getSessionByArea(areaid,nodeid) != null){
+//                logger.error("节点尝试重复连接["+areaid+"]["+nodeid+"],被拒绝!");
+//                response.setBody("节点尝试重复连接["+areaid+"]["+nodeid+"],被拒绝!");
+//                return response;
+//            }
+//
+//            Area area = areaService.findById(areaid);
+//            if(area!=null){
+//                if(area.isEnabled()){
+//                    logger.error("区域[{}]未启用,连接失败",areaid);
+//                    response.setMessage(RPCResponse.STATE_EXCEPTION);
+//                    response.setBody("区域["+areaid+"]未启用,连接被拒绝!!");
+//                }else{
+//                    sessionContext.putSession(areaid,nodeid,session);
+//                    response.setMessage(RPCResponse.STATE_OK);
+//                }
+//            }else{
+//                response.setBody("非法区域标识:"+areaid+",连接被拒绝");
+//            }
+//        }else{
+//            response.setBody("缺少区域标识参数,连接被拒绝");
+//        }
+//        return response;
+//    }
+
 
     private RPCResponse process_MN_CH_TEST_ECHO(RPCRequest request, Session session) {
         RPCResponse response = RPCResponse.buildResponse(request);

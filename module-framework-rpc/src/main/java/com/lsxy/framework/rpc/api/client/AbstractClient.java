@@ -10,12 +10,12 @@ import com.lsxy.framework.rpc.exceptions.ClientConnecException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tandy on 16/8/1.
@@ -27,8 +27,9 @@ public abstract class AbstractClient implements Client{
     //服务器连接url 多个
     private String serverUrls[];
 
-    //客户端标识
-    private String clientId;
+    private String areaid;
+
+    private String nodeid;
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -45,7 +46,7 @@ public abstract class AbstractClient implements Client{
     public void bind() {
         executorService = Executors.newFixedThreadPool(serverUrls.length);
         for (String serverUrl:serverUrls) {
-            ServerDeamonTask task = new ServerDeamonTask(serverUrl,this.clientId);
+            ServerDeamonTask task = new ServerDeamonTask(serverUrl,this.areaid);
             //刚刚开始就执行一次绑定
             try {
                 Session session = this.doBind(serverUrl);
@@ -84,8 +85,9 @@ public abstract class AbstractClient implements Client{
     }
 
     @Override
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setClientId(String areaid,String nodeid) {
+        this.areaid = areaid;
+        this.nodeid = nodeid;
     }
 
 
@@ -112,7 +114,7 @@ public abstract class AbstractClient implements Client{
 //    }
 //
 //    public String getClientId() {
-//        return clientId;
+//        return areaid;
 //    }
 
     public RPCCaller getRpcCaller() {
@@ -148,9 +150,10 @@ public abstract class AbstractClient implements Client{
 
                         RPCRequest echoRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_HEARTBEAT_ECHO,"");
                         RPCResponse echoResponse = rpcCaller.invokeWithReturn(session,echoRequest);
-
-                        if(logger.isDebugEnabled()){
-                            logger.debug("连接着呢:{}",this.serverUrl);
+                        if(echoResponse.isOk()) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("连接着呢:{}", this.serverUrl);
+                            }
                         }
                         continue;
                     }
@@ -180,7 +183,7 @@ public abstract class AbstractClient implements Client{
             if(session==null || !session.isValid()){
                 throw new ClientConnecException("客户端连接通道无效,无法发送区域节点注册指令:"+session.getId());
             }
-            String param = "sessionid=" + session.getId();
+            String param = "aid=" + areaid+"&nid="+nodeid+"&sessionid="+session.getId();
             RPCRequest request = RPCRequest.newRequest(ServiceConstants.CH_MN_CONNECT,param);
             RPCResponse response = getRpcCaller().invokeWithReturn(session, request);
             if(response == null){
@@ -192,7 +195,7 @@ public abstract class AbstractClient implements Client{
                 }
             } else {
                 String msg = new String(response.getBody(), "utf-8");
-                logger.info(msg);
+                logger.error("连接异常不成功:"+msg);
                 session.close(true);
             }
         }catch (Exception ex){

@@ -23,9 +23,9 @@ public interface Client {
     void setServerUrl(String serverUrl);
 
     /**
-     * set client id
-     * client id作为客户端标识进行连接,不允许重复,一个clientid只能连接一次
-     * @param clientId
+     * set area id
+     * area id作为客户端标识进行连接
+     * @param areaid
      */
-    void setClientId(String clientId);
+    void setClientId(String areaid,String nodeid);
 }

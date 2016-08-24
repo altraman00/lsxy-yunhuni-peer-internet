@@ -2,7 +2,6 @@ package com.lsxy.area.agent;
 
 import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
-import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,11 @@ public class AreaClient {
     @Value("${area.agent.server.url}")
     private String serverUrl;
 
-    @Value("${area.agent.client.id}")
-    private String clientId;
+    @Value("${area.agent.areaid}")
+    private String areaid;
+
+    @Value("${area.agent.nodeid}")
+    private String nodeid;
 
     @Autowired
     private Client client;
@@ -50,13 +52,10 @@ public class AreaClient {
     @PostConstruct
     public void start() throws ClientBindException {
         if(logger.isDebugEnabled()){
-            logger.debug("客户端启动:  {}  {}" , serverUrl,clientId);
+            logger.debug("客户端启动:  {}  {}-{}" , serverUrl, areaid,nodeid);
         }
         client.setServerUrl(serverUrl);
-        client.setClientId(clientId);
+        client.setClientId(areaid,nodeid);
         client.bind();
     }
-
-
-
 }
