@@ -92,11 +92,6 @@ public interface AccountService extends BaseService<Account> {
      * 清除过期的注册账号（用于定时任务）
      */
     void cleanExpireRegisterAccount();
-    /**
-     * 用户用户的集合
-     * @return
-     */
-    List<Account> list();
 
     boolean updateStatusByTenantId(String tenanId,Integer status);
 
