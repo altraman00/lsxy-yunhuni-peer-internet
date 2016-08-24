@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * Netty Client
  */
 @Component
-//@Conditional(NettyCondition.class)
 @ConditionalOnProperty(value = "global.rpc.provider", havingValue = "netty", matchIfMissing = false)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class NettyClient extends AbstractClient{
@@ -47,10 +46,6 @@ public class NettyClient extends AbstractClient{
 
     @Autowired
     private NettyClientHandler handler;
-
-    @Autowired
-    private ServerSessionContext sessionContext;
-
 
     private AttributeKey<String> SESSION_ID = AttributeKey.valueOf("sessionid");
 
@@ -110,6 +105,7 @@ public class NettyClient extends AbstractClient{
                         }
                         sessionContext.remove(sessionid);
                     }
+
                 }
             });
             // Wait until the connection is closed.
