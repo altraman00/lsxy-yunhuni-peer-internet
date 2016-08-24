@@ -20,4 +20,6 @@ public interface RealnameCorpService extends BaseService<RealnameCorp> {
      * @return
      */
     public RealnameCorp findByTenantIdAndStatus(String tenantId,int status);
+
+    public RealnameCorp findByTenantIdNewest(String tenantId);
 }

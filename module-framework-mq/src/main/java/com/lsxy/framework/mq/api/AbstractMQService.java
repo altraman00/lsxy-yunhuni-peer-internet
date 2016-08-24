@@ -1,5 +1,6 @@
 package com.lsxy.framework.mq.api;
 
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 
 import java.util.Date;
@@ -10,9 +11,10 @@ import java.util.Date;
 public abstract class AbstractMQService implements MQService {
     @Override
     public void publish(AbstractMQEvent event) {
-        event.setId(UUIDGenerator.uuid());
-        event.setTimestamp(new Date().getTime());
-
+        if(StringUtil.isEmpty(event.getId())){
+            event.setId(UUIDGenerator.uuid());
+            event.setTimestamp(new Date().getTime());
+        }
         publishEvent(event);
     }
 

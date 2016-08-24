@@ -62,6 +62,16 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
     }
 
     @Override
+    public RealnamePrivate findByTenantIdNewest(String tenantId) {
+        String hql = "from RealnamePrivate obj where obj.tenant.id=?1 order by obj.createTime desc";
+        List<RealnamePrivate> ps = this.findByCustomWithParams(hql, tenantId);
+        if(ps != null && ps.size()>0){
+            return ps.get(0);
+        }
+        return null;
+    }
+
+    @Override
     public Page pageListAuthInfo(Integer authStatus, String startTime, String endTime, Integer type, String search, Integer pageNo, Integer pageSize) {
 
         String sql  = " SELECT e.id as uid,e.create_time as date,e.tenant_name as name ,e.email as email,e.mobile as phone, e.type as type FROM ( ";
