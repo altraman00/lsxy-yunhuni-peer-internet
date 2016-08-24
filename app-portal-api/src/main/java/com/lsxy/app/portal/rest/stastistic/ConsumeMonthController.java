@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest.stastistic;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -59,4 +60,16 @@ public class ConsumeMonthController extends AbstractRestController {
         Page<ConsumeMonth> page =  consumeMonthService.pageList(tenantId,appId,type,date1,date2,pageNo,pageSize);
         return RestResponse.success(page);
     }
+
+    @RequestMapping("/get")
+    public RestResponse get(String appId,String month){
+        if(org.apache.commons.lang.StringUtils.isBlank(month)){
+            String curMonth = DateUtils.getDate("yyyy-MM");
+            month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
+        }
+        Account account = getCurrentAccount();
+        List<ConsumeMonth> consumeMonths = consumeMonthService.getConsumeMonths(account.getTenant().getId(),appId,month);
+        return RestResponse.success(consumeMonths);
+    }
+
 }

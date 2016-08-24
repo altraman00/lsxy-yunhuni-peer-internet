@@ -7,6 +7,7 @@ import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -15,6 +16,11 @@ import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.model.ThirdPayRecord;
+import com.unionpay.acp.sdk.AcpService;
+import com.unionpay.acp.sdk.SDKConstants;
+import com.unionpay.acp.utils.UnionpayUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,15 +28,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static com.alipay.util.AlipaySubmit.ALIPAY_GATEWAY_NEW;
+import java.util.*;
 
 /**
  * 充值控制器
@@ -39,6 +41,7 @@ import static com.alipay.util.AlipaySubmit.ALIPAY_GATEWAY_NEW;
 @Controller
 @RequestMapping("/console/cost/recharge")
 public class RechargeController extends AbstractPortalController {
+    private static final Logger logger = LoggerFactory.getLogger(RechargeController.class);
     /**
      * 去往充值页面
      * @param request
@@ -82,23 +85,26 @@ public class RechargeController extends AbstractPortalController {
     }
 
     /**
-     * 返回跳转到支付宝付款的页面
+     * 返回跳转到支付的页面(支宝付或银联)
      * @param request
      * @param orderId 充值记录的orderId
      * @return
      */
-    @RequestMapping(value = "/to_alipay",method = RequestMethod.POST)
+    @RequestMapping(value = "/to_pay",method = RequestMethod.POST)
     public ModelAndView toAliPay(HttpServletRequest request,String orderId) throws Exception {
         Map<String,Object> model = new HashMap<>();
+        String returnHtml = null;
         String token = getSecurityToken(request);
         Recharge recharge = getRecharge(token, orderId);
-        //支付处理调用
-        AliPayVO aliPayVO = AliPayVO.buildAliPayVO(recharge.getOrderId(),recharge.getAmount()+"");
-        //阿里支付网关
-        String aliPayGateWay = ALIPAY_GATEWAY_NEW + "_input_charset=" + AlipayConfig.input_charset;
-        model.put("aliPayVO",aliPayVO);
-        model.put("aliPayGateWay",aliPayGateWay);
-        return new ModelAndView("console/cost/recharge/toalipay",model);
+        if(recharge.getType().equals(RechargeType.ALIPAY.name())){
+            //支付宝支付处理调用
+            returnHtml = PayBuilder.builderAliPay(recharge.getOrderId(), recharge.getAmount());
+        }else if(recharge.getType().equals(RechargeType.UNIONPAY.name())){
+            //银联支付调用
+            returnHtml = PayBuilder.builderUnionpay(recharge.getOrderId(), recharge.getAmount());
+        }
+        model.put("returnHtml",returnHtml);
+        return new ModelAndView("console/cost/recharge/topay",model);
     }
 
 
@@ -109,8 +115,8 @@ public class RechargeController extends AbstractPortalController {
      * @param trade_status 交易状态
      * @return
      */
-    @RequestMapping(value = "/pay_return")
-    public ModelAndView payReturn(HttpServletRequest request,String trade_status){
+    @RequestMapping(value = "/alipay_return")
+    public ModelAndView aliPayReturn(HttpServletRequest request,String trade_status){
         Map model = new HashMap();
         //处理支付宝返回的数据
         handleAliPayResult(request, trade_status);
@@ -259,15 +265,20 @@ public class RechargeController extends AbstractPortalController {
             //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
             params.put(name, valueStr);
         }
+        if(logger.isDebugEnabled()){
+            logger.debug("开始校验阿里返回参数:{}", JSONUtil.mapToJson(params));
+        }
         //计算得出通知验证结果
         boolean verify_result = AlipayNotify.verify(params);
+        if(logger.isDebugEnabled()){
+            logger.debug("阿里远程校验结果:{}", verify_result);
+        }
         if(verify_result){
             //验证成功
             if(tradeStatus.equals("TRADE_FINISHED") || tradeStatus.equals("TRADE_SUCCESS")){
                 //调用RestApi对该订单进行处理，并将付款记录存到数据库
-                String successUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/pay_success";
                 ThirdPayRecord payRecord = new ThirdPayRecord();
-                payRecord.setPayType(RechargeType.ZHIFUBAO.name());
+                payRecord.setPayType(RechargeType.ALIPAY.name());
                 payRecord.setOrderId(params.get("out_trade_no"));
                 payRecord.setTradeNo(params.get("trade_no"));
                 payRecord.setTradeStatus(params.get("trade_status"));
@@ -277,12 +288,23 @@ public class RechargeController extends AbstractPortalController {
                 payRecord.setSellerName(params.get("seller_email"));
                 payRecord.setBuyerName(params.get("buyer_email"));
                 if(AlipayConfig.seller_id.equals(payRecord.getSellerId())){
-                    ObjectMapper mapper = new ObjectMapper();
-                    Map<String, Object> map = mapper.convertValue(payRecord, Map.class);
-                    RestRequest.buildSecurityRequest(token).post(successUrl, map,Recharge.class);
+                    paySuccess(token, payRecord);
                 }
+
             }
         }
+    }
+
+    /**
+     * 插入支付记录
+     * @param token
+     * @param payRecord
+     */
+    private void paySuccess(String token, ThirdPayRecord payRecord) {
+        String successUrl = PortalConstants.REST_PREFIX_URL + "/rest/recharge/pay_success";
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(payRecord, Map.class);
+        RestRequest.buildSecurityRequest(token).post(successUrl, map,Recharge.class);
     }
 
     /**
@@ -313,4 +335,70 @@ public class RechargeController extends AbstractPortalController {
         vo.setTypeName(RechargeType.valueOf(vo.getType()).getName());
         return vo;
     }
+
+    /**
+     * 银联支付完后的跳转页面(由银联跳转回我们的网站)
+     * 获取银联的通知返回参数，可参考技术文档中页面跳转同步通知参数列表
+     * @param request HttpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/unionpay_return")
+    public ModelAndView unionPayReturn(HttpServletRequest request) throws UnsupportedEncodingException {
+        Map model = new HashMap();
+        //处理银联返回的数据
+        handleUnionPayResult(request);
+        //重定向到列表
+        return new ModelAndView("redirect:/console/cost/recharge/list",model);
+    }
+
+    /**
+     * 处理银联返回的数据
+     * @param request
+     * @throws UnsupportedEncodingException
+     */
+    private void handleUnionPayResult(HttpServletRequest request) throws UnsupportedEncodingException {
+        String token = getSecurityToken(request);
+        logger.info("FrontRcvResponse前台接收报文返回开始");
+        String encoding = request.getParameter(SDKConstants.param_encoding);
+        logger.info("返回报文中encoding=[" + encoding + "]");
+
+        Map<String, String> valideData = new HashMap<String, String>();
+        Enumeration<?> temp = request.getParameterNames();
+        if (null != temp) {
+            while (temp.hasMoreElements()) {
+                String en = (String) temp.nextElement();
+                String value = request.getParameter(en);
+                // 在报文上送时，如果字段的值为空，则不上送<下面的处理为在获取所有参数数据时，判断若值为空，则删除这个字段>
+                if (value != null && !"".equals(value)) {
+                    value = new String(value.getBytes(encoding), encoding);
+                    valideData.put(en, value);
+                }
+            }
+        }
+        if (!AcpService.validate(valideData, encoding)) {
+            logger.info("验证签名结果[失败].");
+        } else {
+            logger.info("验证签名结果[成功].");
+//            System.out.println(valideData.get("orderId")); //其他字段也可用类似方式获取
+            //调用RestApi对该订单进行处理，并将付款记录存到数据库
+            ThirdPayRecord payRecord = new ThirdPayRecord();
+            payRecord.setPayType(RechargeType.UNIONPAY.name());
+            payRecord.setOrderId(valideData.get("orderId"));
+            payRecord.setTradeNo(valideData.get("queryId"));
+            payRecord.setTradeStatus(valideData.get("respCode"));
+            //银联返回的金额是分为单位，所以要除以100
+            BigDecimal amount = new BigDecimal(valideData.get("txnAmt").trim()).divide(new BigDecimal(100));
+            payRecord.setTotalFee(amount);
+            payRecord.setSellerId(valideData.get("merId"));
+            if(UnionpayUtil.merId.equals(payRecord.getSellerId())){
+                paySuccess(token, payRecord);
+            }
+        }
+        logger.info("FrontRcvResponse前台接收报文返回结束");
+        
+    }
+
+
+
+
 }

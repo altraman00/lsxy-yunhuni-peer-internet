@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,4 +35,31 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     boolean isAppBelongToUser(String userName, String appId);
+
+    /**
+     * 已上线应用数
+     * @return
+     */
+    long countOnline();
+
+    /**
+     * 应用总数
+     * @return
+     */
+    long countValid();
+
+    /**
+     * 获取时间范围内创建的应用总数
+     * @param d1
+     * @param d2
+     * @return
+     */
+    int countValidDateBetween(Date d1, Date d2);
+
+    /**
+     * 获取租户的app列表
+     * @param tenantId
+     * @return
+     */
+    List<App> getAppsByTenantId(String tenantId);
 }

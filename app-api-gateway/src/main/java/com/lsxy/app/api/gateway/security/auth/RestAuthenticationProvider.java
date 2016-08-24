@@ -97,17 +97,29 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         return (diff/1000) > expiredMinute*60;
     }
 
+
     public boolean supports(Class<?> authentication) {
         return RestToken.class.equals(authentication);
     }
 
+    /**
+     *HmacSHA256签名算法
+     * @param secret    秘钥
+     * @param data      签名数据
+     * @return              签名后数据
+     */
     String calculateHMAC(String secret, String data) {
         try {
+            long start = System.currentTimeMillis();
             SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(signingKey);
             byte[] rawHmac = mac.doFinal(data.getBytes());
             String result = new String(Base64.encodeBase64(rawHmac));
+
+            if(logger.isDebugEnabled()){
+                logger.debug("[{}]签名花费时长:{}ms",secret,(System.currentTimeMillis() - start));
+            }
             return result;
         } catch (GeneralSecurityException e) {
             throw new IllegalArgumentException();

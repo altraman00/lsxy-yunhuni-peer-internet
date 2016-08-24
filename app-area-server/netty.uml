@@ -1,0 +1,801 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>io.netty.channel.socket.nio.NioServerSocketChannel</OriginalElement>
+  <nodes>
+    <node x="912.1755747126438" y="855.0">io.netty.util.AttributeMap</node>
+    <node x="576.25" y="1250.0">io.netty.channel.epoll.EpollServerDomainSocketChannel</node>
+    <node x="2344.0" y="692.0">io.netty.channel.MultithreadEventLoopGroup</node>
+    <node x="820.4802083333333" y="1482.0">io.netty.channel.ChannelInboundHandlerAdapter</node>
+    <node x="912.2451282051285" y="435.0">java.util.concurrent.Executors.DelegatedExecutorService</node>
+    <node x="717.7870265151514" y="1403.0">io.netty.channel.ChannelInboundHandler</node>
+    <node x="861.875" y="1250.0">io.netty.channel.socket.oio.OioServerSocketChannel</node>
+    <node x="1144.780512820513" y="692.0">io.netty.util.concurrent.SingleThreadEventExecutor.DefaultThreadProperties</node>
+    <node x="2114.495128205129" y="692.0">io.netty.channel.embedded.EmbeddedEventLoop</node>
+    <node x="150.49010416666658" y="1324.0">java.lang.AutoCloseable</node>
+    <node x="991.280512820513" y="603.0">io.netty.util.concurrent.GlobalEventExecutor</node>
+    <node x="354.75" y="1250.0">io.netty.channel.epoll.AbstractEpollServerChannel.EpollServerSocketUnsafe</node>
+    <node x="2824.0305128205127" y="692.0">io.netty.util.concurrent.MultithreadEventExecutorGroup.EventExecutorChooser</node>
+    <node x="118.25" y="1793.0">java.nio.channels.spi.SelectorProvider</node>
+    <node x="0.0" y="1013.0">io.netty.channel.socket.DatagramChannel</node>
+    <node x="455.375" y="1171.0">io.netty.channel.epoll.AbstractEpollServerChannel</node>
+    <node x="3118.25" y="692.0">io.netty.util.concurrent.DefaultEventExecutorGroup</node>
+    <node x="860.4802083333333" y="1640.0">com.alibaba.rocketmq.remoting.netty.NettyRemotingServer.NettyServerHandler</node>
+    <node x="494.14038461538485" y="524.0">java.util.concurrent.Executors.FinalizableDelegatedExecutorService</node>
+    <node x="0.0" y="435.0">java.util.concurrent.Executors.PrivilegedCallable</node>
+    <node x="2902.05" y="316.0">io.netty.util.concurrent.AbstractEventExecutorGroup</node>
+    <node x="53.02916666666658" y="1561.0">java.nio.channels.spi.AbstractInterruptibleChannel</node>
+    <node x="328.91465517241386" y="1013.0">io.netty.channel.socket.SocketChannel</node>
+    <node x="1420.875" y="1250.0">io.netty.channel.nio.AbstractNioByteChannel.NioByteUnsafe</node>
+    <node x="170.49010416666658" y="1403.0">java.nio.channels.Channel</node>
+    <node x="430.24512820512837" y="435.0">java.util.concurrent.Executors.RunnableAdapter</node>
+    <node x="1135.8552083333334" y="1482.0">io.netty.channel.ChannelOutboundHandlerAdapter</node>
+    <node x="1026.7870265151514" y="1403.0">io.netty.channel.ChannelHandlerAdapter</node>
+    <node x="201.0" y="1951.0">sun.nio.ch.PollSelectorProvider</node>
+    <node x="1088.5" y="1250.0">io.netty.channel.socket.nio.NioServerSocketChannel</node>
+    <node x="1158.375" y="1171.0">io.netty.channel.nio.AbstractNioMessageChannel</node>
+    <node x="710.1140804597701" y="1092.0">io.netty.channel.ServerChannel</node>
+    <node x="533.530512820513" y="316.0">java.util.concurrent.Executors</node>
+    <node x="2128.5" y="781.0">io.netty.channel.nio.NioEventLoopGroup</node>
+    <node x="24.98020833333328" y="1640.0">sun.nio.ch.ServerSocketChannelImpl</node>
+    <node x="2491.5" y="781.0">io.netty.channel.local.LocalEventLoopGroup</node>
+    <node x="1257.0" y="524.0">io.netty.util.concurrent.AbstractScheduledEventExecutor</node>
+    <node x="1837.75" y="692.0">io.netty.channel.SingleThreadEventLoop</node>
+    <node x="1033.4802083333334" y="1640.0">org.springframework.http.client.Netty4ClientHttpRequest.RequestExecuteHandler</node>
+    <node x="2919.5" y="781.0">io.netty.util.concurrent.MultithreadEventExecutorGroup.PowerOfTwoEventExecutorChooser</node>
+    <node x="225.48020833333328" y="1719.0">sun.nio.ch.InheritedChannel.InheritedDatagramChannelImpl</node>
+    <node x="473.4802083333333" y="1719.0">sun.nio.ch.DatagramChannelImpl.DefaultOptionsHolder</node>
+    <node x="2892.55" y="603.0">io.netty.util.concurrent.MultithreadEventExecutorGroup</node>
+    <node x="2008.7083333333335" y="316.0">io.netty.util.concurrent.EventExecutor</node>
+    <node x="1011.7451282051285" y="316.0">java.util.concurrent.AbstractExecutorService</node>
+    <node x="1018.780512820513" y="692.0">io.netty.util.concurrent.GlobalEventExecutor.TaskRunner</node>
+    <node x="104.25" y="1872.0">sun.nio.ch.SelectorProviderImpl</node>
+    <node x="895.6755747126438" y="1013.0">io.netty.channel.AbstractChannel</node>
+    <node x="590.2451282051284" y="435.0">java.util.concurrent.Executors.PrivilegedCallableUsingCurrentClassLoader</node>
+    <node x="921.7870265151514" y="1403.0">io.netty.channel.ChannelHandler.Sharable</node>
+    <node x="28.25" y="1171.0">io.netty.channel.epoll.EpollDatagramChannel</node>
+    <node x="1579.1352564102567" y="603.0">io.netty.util.concurrent.ImmediateEventExecutor.ImmediateProgressivePromise</node>
+    <node x="1567.780512820513" y="435.0">io.netty.util.concurrent.AbstractEventExecutor</node>
+    <node x="975.375" y="1171.0">io.netty.channel.socket.ServerSocketChannel</node>
+    <node x="35.48020833333328" y="1719.0">sun.nio.ch.ServerSocketChannelImpl.DefaultOptionsHolder</node>
+    <node x="1461.5000000000002" y="781.0">io.netty.channel.epoll.EpollEventLoop</node>
+    <node x="349.0291666666666" y="1640.0">sun.nio.ch.DatagramChannelImpl</node>
+    <node x="1609.5000000000002" y="781.0">io.netty.channel.ThreadPerChannelEventLoop</node>
+    <node x="473.91465517241386" y="1013.0">io.netty.channel.unix.UnixChannel</node>
+    <node x="34.02916666666658" y="1482.0">java.nio.channels.InterruptibleChannel</node>
+    <node x="289.27643678160916" y="1092.0">io.netty.channel.epoll.AbstractEpollChannel</node>
+    <node x="1702.0" y="524.0">io.netty.util.concurrent.ImmediateEventExecutor</node>
+    <node x="917.6755747126438" y="934.0">io.netty.util.DefaultAttributeMap</node>
+    <node x="402.0" y="1793.0">java.nio.Buffer</node>
+    <node x="2305.5" y="781.0">io.netty.channel.epoll.EpollEventLoopGroup</node>
+    <node x="1853.280512820513" y="158.0">java.util.concurrent.ScheduledExecutorService</node>
+    <node x="1515.0" y="524.0">io.netty.util.concurrent.AbstractEventExecutor.EventExecutorIterator</node>
+    <node x="1294.375" y="1092.0">io.netty.channel.nio.AbstractNioChannel</node>
+    <node x="1809.655512820513" y="79.0">java.util.concurrent.ExecutorService</node>
+    <node x="928.7451282051285" y="524.0">java.util.concurrent.Executors.DelegatedScheduledExecutorService</node>
+    <node x="80.375" y="1250.0">io.netty.channel.epoll.EpollDatagramChannel.EpollDatagramChannelUnsafe</node>
+    <node x="1978.5000000000002" y="781.0">io.netty.channel.local.LocalEventLoop</node>
+    <node x="2256.375" y="603.0">io.netty.channel.EventLoopGroup</node>
+    <node x="1246.6279356060604" y="1403.0">io.netty.channel.ChannelOutboundHandler</node>
+    <node x="163.0" y="435.0">java.util.concurrent.Executors.DefaultThreadFactory</node>
+    <node x="1831.655512820513" y="0.0">java.util.concurrent.Executor</node>
+    <node x="1331.280512820513" y="603.0">io.netty.util.concurrent.SingleThreadEventExecutor</node>
+    <node x="688.4802083333333" y="1640.0">com.alibaba.rocketmq.remoting.netty.NettyRemotingClient.NettyClientHandler</node>
+    <node x="2222.030512820513" y="237.0">io.netty.util.concurrent.EventExecutorGroup</node>
+    <node x="496.375" y="934.0">io.netty.channel.Channel</node>
+    <node x="1348.780512820513" y="692.0">io.netty.util.concurrent.DefaultEventExecutor</node>
+    <node x="2679.5" y="781.0">io.netty.util.concurrent.MultithreadEventExecutorGroup.GenericEventExecutorChooser</node>
+    <node x="680.375" y="1171.0">io.netty.channel.unix.ServerDomainSocketChannel</node>
+    <node x="1819.1352564102567" y="603.0">io.netty.util.concurrent.ImmediateEventExecutor.ImmediatePromise</node>
+    <node x="261.25" y="1171.0">io.netty.channel.epoll.AbstractEpollChannel.AbstractEpollUnsafe</node>
+    <node x="0.0" y="1951.0">sun.nio.ch.KQueueSelectorProvider</node>
+    <node x="823.9802083333333" y="1561.0">io.netty.channel.SimpleChannelInboundHandler</node>
+    <node x="1839.5000000000002" y="781.0">io.netty.channel.nio.NioEventLoop</node>
+    <node x="970.8552083333333" y="1324.0">io.netty.channel.ChannelHandler</node>
+    <node x="463.625" y="855.0">java.lang.Comparable</node>
+    <node x="204.0" y="524.0">java.util.concurrent.Executors.PrivilegedThreadFactory</node>
+    <node x="354.9385416666666" y="1561.0">sun.nio.ch.SelChImpl</node>
+    <node x="1390.375" y="1171.0">io.netty.channel.nio.AbstractNioByteChannel</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="java.util.concurrent.Executors.DefaultThreadFactory" target="java.util.concurrent.Executors">
+      <point x="0.0" y="-14.5" />
+      <point x="246.5" y="375.0" />
+      <point x="551.155512820513" y="375.0" />
+      <point x="-29.375" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.socket.DatagramChannel" target="io.netty.channel.Channel">
+      <point x="0.0" y="-14.5" />
+      <point x="72.0" y="983.0" />
+      <point x="504.675" y="983.0" />
+      <point x="-33.19999999999999" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelOutboundHandler" target="io.netty.channel.ChannelHandler">
+      <point x="0.0" y="-14.5" />
+      <point x="1344.1279356060604" y="1373.0" />
+      <point x="1086.3552083333334" y="1373.0" />
+      <point x="49.5" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.AbstractExecutorService" target="java.util.concurrent.ExecutorService">
+      <point x="0.0" y="-14.5" />
+      <point x="1103.7451282051284" y="133.0" />
+      <point x="1842.405512820513" y="133.0" />
+      <point x="-32.75" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.DelegatedScheduledExecutorService" target="java.util.concurrent.Executors.DelegatedExecutorService">
+      <point x="0.0" y="-14.5" />
+      <point x="48.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.MultithreadEventExecutorGroup.GenericEventExecutorChooser" target="io.netty.util.concurrent.MultithreadEventExecutorGroup">
+      <point x="-55.0" y="-14.5" />
+      <point x="2734.5" y="761.0" />
+      <point x="2790.75" y="761.0" />
+      <point x="2790.75" y="662.0" />
+      <point x="2961.8500000000004" y="662.0" />
+      <point x="-46.19999999999982" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelOutboundHandlerAdapter" target="io.netty.channel.ChannelOutboundHandler">
+      <point x="61.0" y="-14.5" />
+      <point x="1318.8552083333334" y="1457.0" />
+      <point x="1344.1279356060604" y="1457.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelInboundHandler" target="io.netty.channel.ChannelHandler">
+      <point x="0.0" y="-14.5" />
+      <point x="809.7870265151514" y="1373.0" />
+      <point x="987.3552083333333" y="1373.0" />
+      <point x="-49.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.embedded.EmbeddedEventLoop" target="io.netty.channel.EventLoopGroup">
+      <point x="54.0" y="-14.5" />
+      <point x="2249.495128205129" y="672.0" />
+      <point x="2323.875" y="672.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.nio.AbstractNioChannel" target="io.netty.channel.AbstractChannel">
+      <point x="0.0" y="-14.5" />
+      <point x="1373.375" y="1072.0" />
+      <point x="1009.0089080459773" y="1072.0" />
+      <point x="45.33333333333337" y="14.5" />
+    </edge>
+    <edge source="java.nio.channels.InterruptibleChannel" target="java.nio.channels.Channel">
+      <point x="0.0" y="-14.5" />
+      <point x="114.52916666666658" y="1462.0" />
+      <point x="195.39010416666662" y="1462.0" />
+      <point x="-16.599999999999994" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollServerDomainSocketChannel" target="io.netty.channel.epoll.AbstractEpollServerChannel">
+      <point x="-60.75" y="-14.5" />
+      <point x="637.0" y="1225.0" />
+      <point x="609.125" y="1225.0" />
+      <point x="51.25" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.Channel" target="java.lang.Comparable">
+      <point x="-20.75" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.MultithreadEventExecutorGroup.PowerOfTwoEventExecutorChooser" target="io.netty.util.concurrent.MultithreadEventExecutorGroup">
+      <point x="62.75" y="-14.5" />
+      <point x="3107.75" y="672.0" />
+      <point x="3054.25" y="672.0" />
+      <point x="46.19999999999982" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollEventLoop" target="io.netty.channel.SingleThreadEventLoop">
+      <point x="0.0" y="-14.5" />
+      <point x="1525.5000000000002" y="741.0" />
+      <point x="1860.0" y="741.0" />
+      <point x="-66.75" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.DefaultEventExecutorGroup" target="io.netty.util.concurrent.MultithreadEventExecutorGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="3220.75" y="662.0" />
+      <point x="3100.4500000000003" y="662.0" />
+      <point x="92.40000000000009" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ServerChannel" target="io.netty.channel.Channel">
+      <point x="0.0" y="-14.5" />
+      <point x="770.6140804597701" y="993.0" />
+      <point x="554.475" y="993.0" />
+      <point x="16.600000000000023" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.AbstractEventExecutor" target="java.util.concurrent.AbstractExecutorService">
+      <point x="-43.5" y="-14.5" />
+      <point x="1611.280512820513" y="415.0" />
+      <point x="1149.7451282051284" y="415.0" />
+      <point x="46.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.AbstractEpollServerChannel" target="io.netty.channel.ServerChannel">
+      <point x="51.25" y="-14.5" />
+      <point x="609.125" y="1151.0" />
+      <point x="730.2807471264366" y="1151.0" />
+      <point x="-40.33333333333337" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.local.LocalEventLoop" target="io.netty.channel.SingleThreadEventLoop">
+      <point x="-2.2737367544323206E-13" y="-14.5" />
+      <point x="2043.5" y="761.0" />
+      <point x="1993.5" y="761.0" />
+      <point x="66.75" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.MultithreadEventExecutorGroup.PowerOfTwoEventExecutorChooser" target="io.netty.util.concurrent.MultithreadEventExecutorGroup.EventExecutorChooser">
+      <point x="-62.75" y="-14.5" />
+      <point x="2982.25" y="761.0" />
+      <point x="2953.7805128205127" y="761.0" />
+      <point x="43.25" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelInboundHandlerAdapter" target="io.netty.channel.ChannelHandlerAdapter">
+      <point x="58.25" y="-14.5" />
+      <point x="995.2302083333333" y="1457.0" />
+      <point x="1072.0370265151514" y="1457.0" />
+      <point x="-45.25" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollDatagramChannel.EpollDatagramChannelUnsafe" target="io.netty.channel.epoll.AbstractEpollChannel.AbstractEpollUnsafe">
+      <point x="54.5" y="-14.5" />
+      <point x="243.875" y="1225.0" />
+      <point x="301.0" y="1225.0" />
+      <point x="-39.75" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.ScheduledExecutorService" target="java.util.concurrent.ExecutorService">
+      <point x="-2.2737367544323206E-13" y="-14.5" />
+      <point x="1950.7805128205127" y="133.0" />
+      <point x="1907.905512820513" y="133.0" />
+      <point x="32.75" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.PrivilegedCallable" target="java.util.concurrent.Executors">
+      <point x="0.0" y="-14.5" />
+      <point x="71.5" y="365.0" />
+      <point x="539.405512820513" y="365.0" />
+      <point x="-41.125" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.DefaultEventExecutor" target="io.netty.util.concurrent.SingleThreadEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.socket.nio.NioServerSocketChannel" target="io.netty.channel.nio.AbstractNioMessageChannel">
+      <point x="46.25" y="-14.5" />
+      <point x="1227.25" y="1225.0" />
+      <point x="1264.375" y="1225.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.AbstractScheduledEventExecutor" target="io.netty.util.concurrent.AbstractEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1376.0" y="494.0" />
+      <point x="1596.780512820513" y="494.0" />
+      <point x="-58.0" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.RunnableAdapter" target="java.util.concurrent.Executors">
+      <point x="0.0" y="-14.5" />
+      <point x="499.74512820512837" y="405.0" />
+      <point x="586.405512820513" y="405.0" />
+      <point x="5.875" y="14.5" />
+    </edge>
+    <edge source="com.alibaba.rocketmq.remoting.netty.NettyRemotingServer.NettyServerHandler" target="io.netty.channel.SimpleChannelInboundHandler">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelHandler.Sharable" target="io.netty.channel.ChannelHandler">
+      <point x="0.0" y="-14.5" />
+      <point x="964.2870265151514" y="1383.0" />
+      <point x="1020.3552083333333" y="1383.0" />
+      <point x="-16.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.Channel" target="io.netty.util.AttributeMap">
+      <point x="20.75" y="-14.5" />
+      <point x="558.625" y="909.0" />
+      <point x="940.6755747126438" y="909.0" />
+      <point x="-28.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.AbstractChannel" target="io.netty.util.DefaultAttributeMap">
+      <point x="34.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.AbstractEpollChannel" target="io.netty.channel.AbstractChannel">
+      <point x="41.75" y="-14.5" />
+      <point x="414.52643678160916" y="1072.0" />
+      <point x="918.3422413793105" y="1072.0" />
+      <point x="-45.33333333333337" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.ImmediateEventExecutor.ImmediateProgressivePromise" target="io.netty.util.concurrent.ImmediateEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1689.1352564102567" y="578.0" />
+      <point x="1748.75" y="578.0" />
+      <point x="-46.75" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.socket.oio.OioServerSocketChannel" target="io.netty.channel.socket.ServerSocketChannel">
+      <point x="46.25" y="-14.5" />
+      <point x="1000.625" y="1225.0" />
+      <point x="1016.125" y="1225.0" />
+      <point x="-40.75" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.AbstractEpollServerChannel" target="io.netty.channel.epoll.AbstractEpollChannel">
+      <point x="-51.25" y="-14.5" />
+      <point x="506.625" y="1151.0" />
+      <point x="428.44310344827585" y="1151.0" />
+      <point x="55.666666666666686" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.DatagramChannelImpl" target="java.nio.channels.Channel">
+      <point x="57.333333333333314" y="-14.5" />
+      <point x="492.3624999999999" y="1620.0" />
+      <point x="475.79166666666663" y="1620.0" />
+      <point x="475.79166666666663" y="1452.0" />
+      <point x="245.19010416666663" y="1452.0" />
+      <point x="33.20000000000002" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.InheritedChannel.InheritedDatagramChannelImpl" target="sun.nio.ch.DatagramChannelImpl">
+      <point x="0.0" y="-14.5" />
+      <point x="339.4802083333333" y="1694.0" />
+      <point x="392.0291666666666" y="1694.0" />
+      <point x="-43.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.DatagramChannelImpl" target="java.nio.channels.spi.AbstractInterruptibleChannel">
+      <point x="-57.33333333333337" y="-14.5" />
+      <point x="377.6958333333332" y="1610.0" />
+      <point x="213.52916666666658" y="1610.0" />
+      <point x="53.5" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.ExecutorService" target="java.util.concurrent.Executor">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.unix.UnixChannel" target="io.netty.channel.Channel">
+      <point x="0.0" y="-14.5" />
+      <point x="529.9146551724139" y="993.0" />
+      <point x="537.875" y="993.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.AbstractChannel" target="io.netty.channel.Channel">
+      <point x="-34.0" y="-14.5" />
+      <point x="929.6755747126438" y="983.0" />
+      <point x="571.075" y="983.0" />
+      <point x="33.200000000000045" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.nio.AbstractNioByteChannel.NioByteUnsafe" target="io.netty.channel.nio.AbstractNioByteChannel">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.KQueueSelectorProvider" target="sun.nio.ch.SelectorProviderImpl">
+      <point x="0.0" y="-14.5" />
+      <point x="90.5" y="1926.0" />
+      <point x="144.5" y="1926.0" />
+      <point x="-40.25" y="14.5" />
+    </edge>
+    <edge source="java.nio.channels.spi.AbstractInterruptibleChannel" target="java.nio.channels.InterruptibleChannel">
+      <point x="-53.5" y="-14.5" />
+      <point x="106.52916666666658" y="1536.0" />
+      <point x="114.52916666666658" y="1536.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.ServerSocketChannelImpl.DefaultOptionsHolder" target="sun.nio.ch.ServerSocketChannelImpl">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelHandlerAdapter" target="io.netty.channel.ChannelHandler">
+      <point x="0.0" y="-14.5" />
+      <point x="1117.2870265151514" y="1383.0" />
+      <point x="1053.3552083333334" y="1383.0" />
+      <point x="16.5" y="14.5" />
+    </edge>
+    <edge source="org.springframework.http.client.Netty4ClientHttpRequest.RequestExecuteHandler" target="io.netty.channel.SimpleChannelInboundHandler">
+      <point x="0.0" y="-14.5" />
+      <point x="1123.4802083333334" y="1615.0" />
+      <point x="1012.3135416666665" y="1615.0" />
+      <point x="75.33333333333326" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.DatagramChannelImpl.DefaultOptionsHolder" target="sun.nio.ch.DatagramChannelImpl">
+      <point x="0.0" y="-14.5" />
+      <point x="558.4802083333333" y="1694.0" />
+      <point x="478.0291666666666" y="1694.0" />
+      <point x="43.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.ServerSocketChannelImpl" target="sun.nio.ch.SelChImpl">
+      <point x="63.66666666666666" y="-14.5" />
+      <point x="184.14687499999994" y="1620.0" />
+      <point x="378.6885416666666" y="1620.0" />
+      <point x="-23.75" y="14.5" />
+    </edge>
+    <edge source="java.nio.channels.spi.AbstractInterruptibleChannel" target="java.nio.channels.Channel">
+      <point x="53.5" y="-14.5" />
+      <point x="213.52916666666658" y="1536.0" />
+      <point x="205.52916666666658" y="1536.0" />
+      <point x="205.52916666666658" y="1462.0" />
+      <point x="211.99010416666658" y="1462.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.EventLoopGroup" target="io.netty.util.concurrent.EventExecutorGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="2323.875" y="291.0" />
+      <point x="2301.530512820513" y="291.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.AbstractEpollChannel.AbstractEpollUnsafe" target="io.netty.channel.epoll.AbstractEpollChannel">
+      <point x="0.0" y="-14.5" />
+      <point x="340.75" y="1151.0" />
+      <point x="372.77643678160916" y="1151.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.nio.AbstractNioByteChannel" target="io.netty.channel.nio.AbstractNioChannel">
+      <point x="0.0" y="-14.5" />
+      <point x="1482.375" y="1151.0" />
+      <point x="1412.875" y="1151.0" />
+      <point x="39.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.AbstractEventExecutor" target="io.netty.util.concurrent.EventExecutor">
+      <point x="43.5" y="-14.5" />
+      <point x="1698.280512820513" y="405.0" />
+      <point x="2028.8750000000002" y="405.0" />
+      <point x="-40.33333333333326" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.SelChImpl" target="java.nio.channels.Channel">
+      <point x="0.0" y="-14.5" />
+      <point x="402.4385416666666" y="1462.0" />
+      <point x="228.5901041666666" y="1462.0" />
+      <point x="16.599999999999994" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.nio.NioEventLoop" target="io.netty.channel.SingleThreadEventLoop">
+      <point x="0.0" y="-14.5" />
+      <point x="1899.0000000000002" y="761.0" />
+      <point x="1949.0" y="761.0" />
+      <point x="22.25" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.SingleThreadEventLoop" target="io.netty.channel.EventLoopGroup">
+      <point x="59.33333333333326" y="-14.5" />
+      <point x="1986.0833333333335" y="662.0" />
+      <point x="2278.875" y="662.0" />
+      <point x="-45.0" y="14.5" />
+    </edge>
+    <edge source="com.alibaba.rocketmq.remoting.netty.NettyRemotingClient.NettyClientHandler" target="io.netty.channel.SimpleChannelInboundHandler">
+      <point x="0.0" y="-14.5" />
+      <point x="764.4802083333333" y="1615.0" />
+      <point x="861.6468749999999" y="1615.0" />
+      <point x="-75.33333333333337" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollServerDomainSocketChannel" target="io.netty.channel.unix.ServerDomainSocketChannel">
+      <point x="60.75" y="-14.5" />
+      <point x="758.5" y="1225.0" />
+      <point x="786.375" y="1225.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.socket.oio.OioServerSocketChannel" target="io.netty.channel.AbstractChannel">
+      <point x="-46.25" y="-14.5" />
+      <point x="908.125" y="1225.0" />
+      <point x="928.75" y="1225.0" />
+      <point x="928.75" y="1072.0" />
+      <point x="963.6755747126438" y="1072.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.embedded.EmbeddedEventLoop" target="io.netty.util.concurrent.AbstractScheduledEventExecutor">
+      <point x="-54.0" y="-14.5" />
+      <point x="2141.495128205129" y="652.0" />
+      <point x="1568.6352564102567" y="652.0" />
+      <point x="1568.6352564102567" y="578.0" />
+      <point x="1455.3333333333335" y="578.0" />
+      <point x="79.33333333333326" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.unix.ServerDomainSocketChannel" target="io.netty.channel.ServerChannel">
+      <point x="53.0" y="-14.5" />
+      <point x="839.375" y="1151.0" />
+      <point x="770.6140804597701" y="1151.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.ImmediateEventExecutor" target="io.netty.util.concurrent.AbstractEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1795.5" y="504.0" />
+      <point x="1712.780512820513" y="504.0" />
+      <point x="58.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.EventExecutorGroup" target="java.util.concurrent.ScheduledExecutorService">
+      <point x="0.0" y="-14.5" />
+      <point x="2301.530512820513" y="212.0" />
+      <point x="1999.530512820513" y="212.0" />
+      <point x="48.75" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.unix.ServerDomainSocketChannel" target="io.netty.channel.unix.UnixChannel">
+      <point x="-53.0" y="-14.5" />
+      <point x="733.375" y="1141.0" />
+      <point x="699.6140804597701" y="1141.0" />
+      <point x="699.6140804597701" y="1062.0" />
+      <point x="557.9146551724139" y="1062.0" />
+      <point x="28.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelInboundHandlerAdapter" target="io.netty.channel.ChannelInboundHandler">
+      <point x="-58.25" y="-14.5" />
+      <point x="878.7302083333333" y="1457.0" />
+      <point x="809.7870265151514" y="1457.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ThreadPerChannelEventLoop" target="io.netty.channel.SingleThreadEventLoop">
+      <point x="0.0" y="-14.5" />
+      <point x="1714.5000000000002" y="751.0" />
+      <point x="1904.5" y="751.0" />
+      <point x="-22.25" y="14.5" />
+    </edge>
+    <edge source="java.nio.channels.Channel" target="java.lang.AutoCloseable">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.DelegatedExecutorService" target="java.util.concurrent.Executors">
+      <point x="-48.5" y="-14.5" />
+      <point x="960.7451282051285" y="405.0" />
+      <point x="621.655512820513" y="405.0" />
+      <point x="41.125" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.DefaultAttributeMap" target="io.netty.util.AttributeMap">
+      <point x="0.0" y="-14.5" />
+      <point x="28.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.embedded.EmbeddedEventLoop" target="io.netty.util.concurrent.EventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="2195.495128205129" y="652.0" />
+      <point x="2204.765384615385" y="652.0" />
+      <point x="2204.765384615385" y="415.0" />
+      <point x="2109.541666666667" y="415.0" />
+      <point x="40.333333333333485" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.MultithreadEventExecutorGroup.EventExecutorChooser" target="io.netty.util.concurrent.MultithreadEventExecutorGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="2910.5305128205127" y="672.0" />
+      <point x="3008.05" y="672.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.PollSelectorProvider" target="sun.nio.ch.SelectorProviderImpl">
+      <point x="0.0" y="-14.5" />
+      <point x="279.0" y="1926.0" />
+      <point x="225.0" y="1926.0" />
+      <point x="40.25" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.GlobalEventExecutor.TaskRunner" target="io.netty.util.concurrent.GlobalEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.AbstractEpollServerChannel.EpollServerSocketUnsafe" target="io.netty.channel.epoll.AbstractEpollServerChannel">
+      <point x="46.5" y="-14.5" />
+      <point x="494.25" y="1225.0" />
+      <point x="506.625" y="1225.0" />
+      <point x="-51.25" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.PrivilegedCallableUsingCurrentClassLoader" target="java.util.concurrent.Executors">
+      <point x="0.0" y="-14.5" />
+      <point x="741.2451282051284" y="415.0" />
+      <point x="609.905512820513" y="415.0" />
+      <point x="29.375" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.DatagramChannelImpl" target="sun.nio.ch.SelChImpl">
+      <point x="0.0" y="-14.5" />
+      <point x="435.0291666666666" y="1620.0" />
+      <point x="426.1885416666666" y="1620.0" />
+      <point x="23.75" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.DelegatedScheduledExecutorService" target="java.util.concurrent.Executors">
+      <point x="-86.0" y="-14.5" />
+      <point x="971.7451282051285" y="494.0" />
+      <point x="579.7451282051284" y="494.0" />
+      <point x="579.7451282051284" y="415.0" />
+      <point x="598.155512820513" y="415.0" />
+      <point x="17.625" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollDatagramChannel" target="io.netty.channel.socket.DatagramChannel">
+      <point x="-43.75" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.EventExecutor" target="io.netty.util.concurrent.EventExecutorGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="2069.2083333333335" y="291.0" />
+      <point x="2248.530512820513" y="291.0" />
+      <point x="-53.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.AbstractEventExecutor.EventExecutorIterator" target="io.netty.util.concurrent.AbstractEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1598.5" y="504.0" />
+      <point x="1654.780512820513" y="504.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.local.LocalEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="2575.5" y="761.0" />
+      <point x="2516.5" y="761.0" />
+      <point x="69.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.SingleThreadEventExecutor.DefaultThreadProperties" target="io.netty.util.concurrent.SingleThreadEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1236.780512820513" y="672.0" />
+      <point x="1364.9471794871797" y="672.0" />
+      <point x="-67.33333333333326" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.socket.nio.NioServerSocketChannel" target="io.netty.channel.socket.ServerSocketChannel">
+      <point x="-46.25" y="-14.5" />
+      <point x="1134.75" y="1225.0" />
+      <point x="1097.625" y="1225.0" />
+      <point x="40.75" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.ChannelOutboundHandlerAdapter" target="io.netty.channel.ChannelHandlerAdapter">
+      <point x="-61.0" y="-14.5" />
+      <point x="1196.8552083333334" y="1457.0" />
+      <point x="1162.5370265151514" y="1457.0" />
+      <point x="45.25" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.MultithreadEventExecutorGroup" target="io.netty.util.concurrent.AbstractEventExecutorGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.socket.ServerSocketChannel" target="io.netty.channel.ServerChannel">
+      <point x="0.0" y="-14.5" />
+      <point x="1056.875" y="1141.0" />
+      <point x="810.9474137931034" y="1141.0" />
+      <point x="40.33333333333337" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.AbstractEventExecutorGroup" target="io.netty.util.concurrent.EventExecutorGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="3008.05" y="291.0" />
+      <point x="2354.5305128205127" y="291.0" />
+      <point x="53.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.nio.AbstractNioMessageChannel" target="io.netty.channel.nio.AbstractNioChannel">
+      <point x="0.0" y="-14.5" />
+      <point x="1264.375" y="1151.0" />
+      <point x="1333.875" y="1151.0" />
+      <point x="-39.5" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.FinalizableDelegatedExecutorService" target="java.util.concurrent.Executors.DelegatedExecutorService">
+      <point x="65.25" y="-14.5" />
+      <point x="689.8903846153848" y="504.0" />
+      <point x="960.7451282051285" y="504.0" />
+      <point x="-48.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.AbstractEpollServerChannel.EpollServerSocketUnsafe" target="io.netty.channel.epoll.AbstractEpollChannel.AbstractEpollUnsafe">
+      <point x="-46.5" y="-14.5" />
+      <point x="401.25" y="1225.0" />
+      <point x="380.5" y="1225.0" />
+      <point x="39.75" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.PrivilegedThreadFactory" target="java.util.concurrent.Executors">
+      <point x="45.5" y="-14.5" />
+      <point x="340.5" y="385.0" />
+      <point x="562.905512820513" y="385.0" />
+      <point x="-17.625" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.SingleThreadEventLoop" target="io.netty.util.concurrent.SingleThreadEventExecutor">
+      <point x="-59.33333333333326" y="-14.5" />
+      <point x="1867.416666666667" y="672.0" />
+      <point x="1499.6138461538462" y="672.0" />
+      <point x="67.33333333333326" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollDatagramChannel.EpollDatagramChannelUnsafe" target="io.netty.channel.epoll.EpollDatagramChannel">
+      <point x="-54.5" y="-14.5" />
+      <point x="134.875" y="1225.0" />
+      <point x="115.75" y="1225.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.ServerSocketChannelImpl" target="java.nio.channels.Channel">
+      <point x="-63.66666666666666" y="-14.5" />
+      <point x="56.81354166666662" y="1620.0" />
+      <point x="0.0" y="1620.0" />
+      <point x="0.0" y="1452.0" />
+      <point x="178.7901041666666" y="1452.0" />
+      <point x="-33.20000000000002" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.SingleThreadEventExecutor" target="io.netty.util.concurrent.AbstractScheduledEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1432.280512820513" y="578.0" />
+      <point x="1376.0" y="578.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="2388.5" y="761.0" />
+      <point x="2447.5" y="761.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollDatagramChannel" target="io.netty.channel.epoll.AbstractEpollChannel">
+      <point x="43.75" y="-14.5" />
+      <point x="159.5" y="1151.0" />
+      <point x="317.1097701149425" y="1151.0" />
+      <point x="-55.666666666666686" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.FinalizableDelegatedExecutorService" target="java.util.concurrent.Executors">
+      <point x="-65.25" y="-14.5" />
+      <point x="559.3903846153848" y="504.0" />
+      <point x="419.74512820512837" y="504.0" />
+      <point x="419.74512820512837" y="395.0" />
+      <point x="574.655512820513" y="395.0" />
+      <point x="-5.875" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.ImmediateEventExecutor.ImmediatePromise" target="io.netty.util.concurrent.ImmediateEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1893.1352564102567" y="578.0" />
+      <point x="1842.25" y="578.0" />
+      <point x="46.75" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.SelectorProviderImpl" target="java.nio.channels.spi.SelectorProvider">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="sun.nio.ch.ServerSocketChannelImpl" target="java.nio.channels.spi.AbstractInterruptibleChannel">
+      <point x="0.0" y="-14.5" />
+      <point x="120.48020833333328" y="1620.0" />
+      <point x="106.52916666666658" y="1620.0" />
+      <point x="-53.5" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.MultithreadEventLoopGroup" target="io.netty.util.concurrent.MultithreadEventExecutorGroup">
+      <point x="51.75" y="-14.5" />
+      <point x="2499.25" y="652.0" />
+      <point x="2915.65" y="652.0" />
+      <point x="-92.40000000000009" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.SimpleChannelInboundHandler" target="io.netty.channel.ChannelInboundHandlerAdapter">
+      <point x="0.0" y="-14.5" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.GlobalEventExecutor" target="io.netty.util.concurrent.AbstractScheduledEventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1071.780512820513" y="578.0" />
+      <point x="1296.666666666667" y="578.0" />
+      <point x="-79.33333333333326" y="14.5" />
+    </edge>
+    <edge source="io.netty.util.concurrent.MultithreadEventExecutorGroup.GenericEventExecutorChooser" target="io.netty.util.concurrent.MultithreadEventExecutorGroup.EventExecutorChooser">
+      <point x="55.0" y="-14.5" />
+      <point x="2844.5" y="761.0" />
+      <point x="2867.2805128205127" y="761.0" />
+      <point x="-43.25" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.DelegatedExecutorService" target="java.util.concurrent.AbstractExecutorService">
+      <point x="48.5" y="-14.5" />
+      <point x="-46.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.SingleThreadEventLoop" target="io.netty.util.concurrent.EventExecutor">
+      <point x="0.0" y="-14.5" />
+      <point x="1926.75" y="672.0" />
+      <point x="1977.6352564102567" y="672.0" />
+      <point x="1977.6352564102567" y="415.0" />
+      <point x="2069.2083333333335" y="415.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.MultithreadEventLoopGroup" target="io.netty.channel.EventLoopGroup">
+      <point x="-51.75" y="-14.5" />
+      <point x="2395.75" y="672.0" />
+      <point x="2368.875" y="672.0" />
+      <point x="45.0" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.PrivilegedThreadFactory" target="java.util.concurrent.Executors.DefaultThreadFactory">
+      <point x="-45.5" y="-14.5" />
+      <point x="249.5" y="504.0" />
+      <point x="246.5" y="504.0" />
+      <point x="0.0" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.nio.NioEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup">
+      <point x="0.0" y="-14.5" />
+      <point x="2207.0" y="761.0" />
+      <point x="2378.5" y="761.0" />
+      <point x="-69.0" y="14.5" />
+    </edge>
+    <edge source="java.util.concurrent.Executors.DelegatedScheduledExecutorService" target="java.util.concurrent.ScheduledExecutorService">
+      <point x="86.0" y="-14.5" />
+      <point x="1143.7451282051284" y="484.0" />
+      <point x="1403.780512820513" y="484.0" />
+      <point x="1403.780512820513" y="212.0" />
+      <point x="1902.030512820513" y="212.0" />
+      <point x="-48.75" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.socket.SocketChannel" target="io.netty.channel.Channel">
+      <point x="0.0" y="-14.5" />
+      <point x="391.41465517241386" y="993.0" />
+      <point x="521.275" y="993.0" />
+      <point x="-16.600000000000023" y="14.5" />
+    </edge>
+    <edge source="io.netty.channel.epoll.AbstractEpollChannel" target="io.netty.channel.unix.UnixChannel">
+      <point x="-41.75" y="-14.5" />
+      <point x="331.02643678160916" y="1062.0" />
+      <point x="501.91465517241386" y="1062.0" />
+      <point x="-28.0" y="14.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="1175.5" y="1638.5" />
+  <SelectedNodes>
+    <node>io.netty.channel.ChannelHandlerAdapter</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
