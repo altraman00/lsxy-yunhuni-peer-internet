@@ -286,6 +286,19 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/js/bootstrap-datepicker.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/list.js'> </script>
+<script type="text/javascript">
+    var pageObj = {
+        currentPageNo : '${pageObj.currentPageNo}',
+        totalCount : '${pageObj.totalCount}',
+        pageSize : '${pageObj.pageSize}',
+        pageUrl : '${pageUrl}',
+        totalPageCount : '${pageObj.totalPageCount}',
+        initToTalPageCount :function(){
+            this.totalPageCount = this.totalCount%this.pageSize==0?parseInt(this.totalCount/ this.pageSize) : parseInt(this.totalCount/ this.pageSize+1);
+        }
+    }
+    console.info(JSON.stringify(pageObj));
+</script>
 <script>
 
     //判断是否实名认证
@@ -432,8 +445,13 @@
                 if(result){
                     ajaxsync(ctx + "/console/app/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
                         if(response.success){
-                            showtoast("删除成功！");
                             $('#app-'+id).remove();
+                            pageObj.totalCount--;
+                            pageObj.initToTalPageCount();
+                            if(pageObj.currentPageNo>pageObj.totalPageCount){
+                                pageObj.currentPageNo = pageObj.totalPageCount;
+                            }
+                            showtoast("删除成功！",pageObj.pageUrl+"?pageNo="+pageObj.currentPageNo+"&pageSize="+pageObj.pageSize,1000);
                         }else{
                             showtoast("删除失败！" + response.errorMsg);
                         }
