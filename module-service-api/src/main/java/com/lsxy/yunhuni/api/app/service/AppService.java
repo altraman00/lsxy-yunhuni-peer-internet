@@ -14,19 +14,19 @@ import java.util.List;
 public interface AppService extends BaseService<App> {
     /**
      * 获取记录的集合
-     * @param userName
+     * @param tenantId 租户id
      * @return
      */
-    List<App> findAppByUserName(String userName)  ;
+    List<App> findAppByUserName(String tenantId)  ;
 
     /**
      * 获取分页信息
-     * @param userName 用户名
+     * @param tenantId 租户id
      * @param pageNo 第几页
      * @param pageSize 每页面记录数
      * @return
      */
-    Page<App> pageList(String userName,Integer pageNo,Integer pageSize);
+    Page<App> pageList(String tenantId,Integer pageNo,Integer pageSize);
 
     /**
      * 应用是否属于用户
