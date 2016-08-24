@@ -2,9 +2,9 @@ package com.lsxy.yunhuni.config.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.yunhuni.api.config.model.ConfigGlobal;
-import com.lsxy.yunhuni.api.config.service.ConfigGlobalService;
-import com.lsxy.yunhuni.config.dao.ConfigGlobalDao;
+import com.lsxy.yunhuni.api.config.model.GlobalConfig;
+import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
+import com.lsxy.yunhuni.config.dao.GlobalConfigDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +15,16 @@ import java.io.Serializable;
  * Created by zhangxb on 2016/8/23.
  */
 @Service
-public class ConfigGlobalServiceImpl extends AbstractService<ConfigGlobal> implements ConfigGlobalService {
+public class GlobalConfigServiceImpl extends AbstractService<GlobalConfig> implements GlobalConfigService {
     @Autowired
-    private ConfigGlobalDao configGlobalDao;
+    private GlobalConfigDao configGlobalDao;
     @Override
-    public BaseDaoInterface<ConfigGlobal, Serializable> getDao() {
+    public BaseDaoInterface<GlobalConfig, Serializable> getDao() {
         return this.configGlobalDao;
     }
 
     @Override
-    public ConfigGlobal findByTypeAndName(String type, String name) {
+    public GlobalConfig findByTypeAndName(String type, String name) {
         return configGlobalDao.findByTypeAndName(type,name);
     }
 }
