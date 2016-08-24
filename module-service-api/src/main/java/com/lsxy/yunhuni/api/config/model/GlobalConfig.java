@@ -14,17 +14,6 @@ import java.util.Date;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_global")
 public class GlobalConfig extends IdEntity {
-    public static final String TYPE_MESSAGE = "message";
-    public static final String TYPE_MESSAGE_AUTH_ONESELE_SUCCESS = "1";
-    public static final String TYPE_MESSAGE_AUTH_ONESELE_FILE = "3";
-    public static final String TYPE_MESSAGE_AUTH_COMPANY_SUCCESS = "2";
-    public static final String TYPE_MESSAGE_AUTH_COMPANY_FILE = "4";
-    public static final String TYPE_MESSAGE_VOICE_PLAY_SUCCESS = "5";
-    public static final String TYPE_MESSAGE_VOICE_PLAY_FAIL = "6";
-    public static final String TYPE_MESSAGE_INVOCE_APPLY_SUCCESS = "7";
-    public static final String TYPE_MESSAGE_INVOCE_APPLY_FAIL = "8";
-    public static final String TYPE_MESSAGE_ARREARS= "9";
-    public static final String TYPE_MESSAGE_FEEDBACK= "10";
     private String type;//配置项类型
     private String name;//配置项名称
     private String value;//配置项值

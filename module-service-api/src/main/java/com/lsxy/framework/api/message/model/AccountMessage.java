@@ -12,6 +12,16 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_account_message")
 public class AccountMessage extends IdEntity {
+    public static final String MESSAGE_TYPE_AUTH_ONESELE_SUCCESS = "01_message_type_auth_onesele_success.vm";
+    public static final String MESSAGE_TYPE_AUTH_ONESELE_FAIL = "02_message_type_auth_onesele_fail.vm";
+    public static final String MESSAGE_TYPE_AUTH_COMPANY_SUCCESS = "03_message_type_auth_company_success.vm";
+    public static final String MESSAGE_TYPE_AUTH_COMPANY_FAIL = "04_message_type_auth_company_fail.vm";
+    public static final String MESSAGE_TYPE_VOICE_PLAY_SUCCESS = "05_message_type_voice_play_success.vm";
+    public static final String MESSAGE_TYPE_VOICE_PLAY_FAIL = "06_message_type_voice_play_fail.vm";
+    public static final String MESSAGE_TYPE_INVOCE_APPLY_SUCCESS = "07_message_type_invoce_apply_success.vm";
+    public static final String MESSAGE_TYPE_INVOCE_APPLY_FAIL = "08_message_type_invoce_apply_fail.vm";
+    public static final String MESSAGE_TYPE_ARREARS= "09_message_type_arrears.vm";
+    public static final String MESSAGE_TYPE_FEEDBACK= "10_message_type_feedback.vm";
     public  static final Integer READ = 1;
     public static final Integer DELETE = -1;
     public static final Integer NOT = 0;
