@@ -14,6 +14,14 @@ public interface RealnameCorpService extends BaseService<RealnameCorp> {
     public List<RealnameCorp> findByTenantId(String tenantId) ;
 
     /**
+     * 根据租户和状态换取记录
+     * @param tenantId 租户id
+     * @param status 状态
+     * @return
+     */
+    public List<RealnameCorp> list(String tenantId,int status) ;
+
+    /**
      * 根据租户id和状态查找
      * @param tenantId 租户id
      * @param status 状态
