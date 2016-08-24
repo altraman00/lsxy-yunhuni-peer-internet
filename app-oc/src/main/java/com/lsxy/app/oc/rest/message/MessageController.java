@@ -154,7 +154,7 @@ public class MessageController extends AbstractRestController {
      * @param message
      */
     private  void sendMessage(@RequestBody Message message){
-        List<Account> list = accountService.list();
+        List<Account> list = null;//accountService.list();
         accountMessageService.insertMultiple(list,message);
     }
 
