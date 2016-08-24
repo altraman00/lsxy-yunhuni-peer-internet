@@ -2,7 +2,6 @@ package com.lsxy.app.portal.console.app;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.app.portal.console.test.upload.UploadEntity;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -130,14 +129,14 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/upload")
-    public void uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ){
+    @ResponseBody
+    public RestResponse uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
-        UploadEntity oss = new UploadEntity();
+        String msg = "";
         try {
             if (null != multipartfiles && multipartfiles.length > 0) {
                 //遍历并保存文件
-                oss.setUploadTotalSize(multipartfiles.length);
                 for (int i=0;i< multipartfiles.length;i++) {
                     MultipartFile file  = multipartfiles[i];
                     String name = file.getOriginalFilename();//文件名
@@ -148,24 +147,23 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     if(flag){//文件保存成功，将对象保存数据库
                         RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
                         if(restResponse.isSuccess()){
-                            logger.info("文件上传成功",name);
-                            oss.setStatus(oss.getStatus()+name+"文件上传");
+                            logger.info("文件上传成功：{}",name);
+                           // oss.setStatus(oss.getStatus()+name+"文件上传成功");
                         }else{
-                            logger.info("上传成功，保存失败",name);
+                            logger.info("上传成功，保存失败：{}",name);
                             ossService.deleteObject(repository, fileKey);
-                            oss.setStatus(oss.getStatus()+name+"文件上传失败");
+                            msg+=name+"文件上传失败；";
                         }
                     }else{
                         logger.info("上创失败",name);
-                        oss.setStatus(oss.getStatus()+name+"文件上传失败");
+                        msg+=name+"文件上传失败；";
                     }
-                    oss.setReadTotalSize(i+1);
-                    request.getSession().setAttribute("ossUpload",oss);
                 }
             }
         }catch (Exception e){
+            logger.info("文件上传异常：{}",e);
         }
-        oss.setFlag(true);
+        return RestResponse.success();
     }
 
     /**
@@ -194,30 +192,5 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     private String getFileKey(String tenantId,String appId,String ymd,String type){
         String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd+"/"+ UUIDGenerator.uuid()+type;
         return result;
-    }
-    /**
-     * 查看文件上传进度
-     * @param request
-     */
-    @RequestMapping("/status"  )
-    @ResponseBody
-    public RestResponse  status(HttpServletRequest request ){
-        UploadEntity fuploadStatus = (UploadEntity) request.getSession().getAttribute("ossUpload");
-        Map map = new HashMap();
-        if(fuploadStatus==null){
-            map.put("flag",false);
-            map.put("percentComplete",0);
-        }else{
-            //计算上传完成的百分比
-            long percentComplete = (long) Math.floor(((double) fuploadStatus.getReadTotalSize() / (double) fuploadStatus.getUploadTotalSize()) * 100.0);
-             if (((long) fuploadStatus.getReadTotalSize() == (long) fuploadStatus.getUploadTotalSize())) {
-                 map.put("flag",true);
-                 map.put("percentComplete",percentComplete);
-             }else{
-                 map.put("flag",false);
-                 map.put("percentComplete",percentComplete);
-             }
-        }
-        return RestResponse.success(map);
     }
 }

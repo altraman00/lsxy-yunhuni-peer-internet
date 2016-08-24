@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,8 +44,8 @@ public class LoginController {
             if (account != null) {
 
                 //将token放入redis 与account形成映射关系
-                UserRestToken token = UserRestToken.newToken();
-                cacheManager.set(token.getToken(),account.getUserName(),30*60);
+                UserRestToken token = UserRestToken.newApiToken();
+                cacheManager.set(token.getToken(),account.getUserName(),35*60);
                 return PortalRestResponse.success(token);
             } else {
                 return PortalRestResponse.failed(APIErrors.LOGIN_ERROR_PWD_MISTAKE);
