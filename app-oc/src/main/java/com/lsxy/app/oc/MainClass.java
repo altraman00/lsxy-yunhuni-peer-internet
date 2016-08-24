@@ -6,7 +6,9 @@ import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.sms.FrameworkSmsConfig;
-import com.lsxy.framework.web.web.AbstractSpringBootStarter;
+import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
+import com.lsxy.oc.api.OcApiConfig;
+import com.lsxy.oc.user.OcServiceConfig;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
@@ -19,8 +21,8 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class,
-        FrameworkSmsConfig.class, FrameworkMQConfig.class, SwaggerConfig.class})
-public class MainClass extends AbstractSpringBootStarter{
+        FrameworkSmsConfig.class, FrameworkMQConfig.class, SwaggerConfig.class, OcServiceConfig.class, OcApiConfig.class})
+public class MainClass extends AbstractSpringBootWebStarter{
 
     public static final String systemId = "oc.api";
 
