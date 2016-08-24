@@ -47,8 +47,9 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
     /**
      * 给指定用户发送消息
      * @param accountId 指定用户
+     * @param title 消息标题
      * @param content 消息内容
      */
-    public AccountMessage sendMessage(String originator,String accountId,String content);
+    public AccountMessage sendMessage(String originator,String accountId,String title,String content);
 
 }

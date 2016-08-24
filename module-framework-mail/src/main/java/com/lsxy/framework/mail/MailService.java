@@ -161,7 +161,7 @@ public class MailService {
 		return writer.toString();
 	}
 
-//    public static void main(String[] args) throws MailConfigNotEnabledException, MailContentNullException {
+    public static void main(String[] args) throws MailConfigNotEnabledException, MailContentNullException {
 //        String title = "哈哈哈哈哈哈哈";
 //        String url = "http://www.baidu.com";
 //        Map<String, String> params = new HashMap<String, String>() {
@@ -173,5 +173,6 @@ public class MailService {
 ////        MailService.send(title,mailto,"这是邮件内容，测试使用的");
 //        String template = "01-portal-notify-account-activate.vm";
 //        MailService.send(title,mailto,template,params);
-//    }
+		System.out.println("\r\n".length());
+    }
 }

@@ -6,7 +6,9 @@ import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -42,6 +44,8 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     AccountMessageDao accountMessageDao;
     @Autowired
     AccountService accountService;
+    @Autowired
+    TenantService tenantService;
     @Autowired
     GlobalConfigService configGlobalService;
     @Autowired
@@ -89,28 +93,30 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     }
 
     @Override
-    public AccountMessage sendTempletMessage(String originator,String accountId, String type) {
+    public AccountMessage sendTempletMessage(String originator,String tenantId, String type) {
         AccountMessage accountMessage = null;
-        Account account = accountService.findById(accountId);
-        if(account!=null) {
+        Tenant tenant = tenantService.findById(tenantId);
+        if(tenant!=null) {
             Map map = new HashMap();
-            map.put("name", account.getUserName());
+            map.put("name", tenant.getTenantName());
             String value = VelocityUtils.getVelocityContext(type, map);
+            value = value.substring(value.indexOf("\r\n")+2,value.length());
             if (StringUtil.isEmpty(originator)) {
-                originator = "系统自动发起";
+                originator = "系统";
             }
-            accountMessage = sendMessage(originator,accountId,value);
+            accountMessage = sendMessage(originator,tenant.getRegisterUserId(),"系统通知",value);
         }
         return accountMessage;
     }
 
     @Override
-    public AccountMessage sendMessage(String originator,String accountId,String content) {
+    public AccountMessage sendMessage(String originator,String accountId,String title,String content) {
         Account account = accountService.findById(accountId);
         AccountMessage accountMessage = null;
         if(account!=null) {
             Message message = new Message();
             message.setType(Message.MESSAGE_ACCOUNT);
+            message.setTitle(title);
             message.setContent(content);
             message.setName(originator);
             message = messageService.save(message);//发送消息记录
