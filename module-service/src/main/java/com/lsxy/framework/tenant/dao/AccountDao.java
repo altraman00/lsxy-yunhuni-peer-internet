@@ -1,12 +1,12 @@
 package com.lsxy.framework.tenant.dao;
 
 
-
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Account;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -71,4 +71,7 @@ public interface AccountDao extends BaseDaoInterface<Account, Serializable> {
     @Modifying(clearAutomatically = true)
     @Query("update Account a set a.status=:expireStatus where a.status=:notActivityStatus and a.createTime < :expireTime")
     void cleanExpireRegisterAccount(@Param("expireStatus")int expireStatus,@Param("notActivityStatus")int notActivityStatus, @Param("expireTime") Date expireTime);
+
+    @Query("from Account a where a.tenant.id = :tenantId")
+    List<Account> findByTenantId(@Param("tenantId") String tenantId);
 }
