@@ -246,6 +246,23 @@ public abstract class AbstractService<T> implements BaseService<T> {
         return query.getResultList();
     }
 
+    public List getTopList(String jpql,boolean excludeDeleted, int top, Object... params) {
+        if(logger.isDebugEnabled()){
+            logger.debug("getTopList:"+jpql);
+        }
+        if(excludeDeleted){
+            jpql = HqlUtil.addCondition(jpql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
+        }
+        Query query = this.em.createQuery(jpql);
+        for (int i = 0; i < params.length; i++) {
+            Object object = params[i];
+            query.setParameter(i+1, object);
+        }
+        query.setMaxResults(top);
+        query.setFirstResult(0);
+        return query.getResultList();
+    }
+
     /**
      * 根据条件查询总数
      * @param jpql

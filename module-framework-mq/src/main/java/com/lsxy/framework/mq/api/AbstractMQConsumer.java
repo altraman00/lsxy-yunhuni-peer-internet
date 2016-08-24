@@ -18,8 +18,15 @@ public abstract class AbstractMQConsumer implements  MQConsumer{
 	@Autowired
 	private MQMessageParser mqMessageParser;
 
+	//systemId 在 AbstractSpringBootStarter 中定义的 并有各自系统自己实现
+	@Autowired
+	private String systemId;
+
 	public String[] getTopics(){
-		String t = SystemConfig.getProperty("global.mq.subscribe.topics","yunhuni_topic_framework_tenant");
+		if(StringUtil.isEmpty(systemId)){
+			systemId = "global";
+		}
+		String t = SystemConfig.getProperty(systemId+".mq.subscribe.topics","yunhuni_topic_framework_tenant");
 		String[] topics = null;
 		if(StringUtil.isNotEmpty(t)){
 			topics = t.split(",");

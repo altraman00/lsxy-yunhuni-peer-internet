@@ -16,5 +16,5 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      * @param name 文件名字
      * @return
      */
-    public Page<VoiceFilePlay> pageList(Integer pageNo,Integer pageSize,String name,String appId,String tenantId);
+    public Page<VoiceFilePlay> pageList(Integer pageNo,Integer pageSize,String name,String appId,String[] tenantId,Integer status,String startTime,String endTime);
 }

@@ -27,6 +27,16 @@ public class VoiceFilePlay extends IdEntity {
     private Integer status;//'审核状态0带审核，1审核通过，-1审核不通过'
     private String checker;//审核人
     private Date checkTime;//审核时间
+    private String reason;//不通过原因
+    @Column(name = "reason")
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     @ManyToOne
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
