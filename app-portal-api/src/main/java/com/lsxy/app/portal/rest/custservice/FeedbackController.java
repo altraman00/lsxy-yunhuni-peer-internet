@@ -3,6 +3,8 @@ package com.lsxy.app.portal.rest.custservice;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.customer.model.Feedback;
 import com.lsxy.framework.api.customer.service.FeedbackService;
+import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
@@ -22,7 +24,8 @@ public class FeedbackController extends AbstractRestController {
     private FeedbackService feedbackService;
     @Autowired
     private AccountService accountService;
-
+    @Autowired
+    AccountMessageService accountMessageService;
     /**
      * 保存反馈信息
      * @param content 反馈内容
@@ -39,6 +42,7 @@ public class FeedbackController extends AbstractRestController {
         feedback.setContent(content);
         feedback.setStatus(Integer.valueOf(status));
         feedback = feedbackService.save(feedback);
+        accountMessageService.sendTempletMessage(null,account.getId(), AccountMessage.MESSAGE_TYPE_FEEDBACK);
         return RestResponse.success(feedback);
     }
 }

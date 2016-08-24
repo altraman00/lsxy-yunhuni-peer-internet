@@ -198,9 +198,9 @@ public class AuthController extends AbstractRestController {
                     realnamePrivate = realnamePrivateService.save(realnamePrivate);
                     tenant = tenantService.save(tenant);
                     if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_FAIL){
-                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_FAIL);
+                        accountMessageService.sendTenantTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_FAIL);
                     }else if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_SUCCESS){
-                        accountMessageService.sendTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_SUCCESS);
+                        accountMessageService.sendTenantTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_SUCCESS);
                     }
                 }else{
                     restResponse = RestResponse.failed("0","租户不存在");
@@ -231,9 +231,9 @@ public class AuthController extends AbstractRestController {
                     realnameCorp = realnameCorpService.save(realnameCorp);
                     tenant = tenantService.save(tenant);
                     if(realnameCorp.getStatus()==Tenant.AUTH_COMPANY_FAIL){
-                        accountMessageService.sendTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_FAIL);
+                        accountMessageService.sendTenantTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_FAIL);
                     }else if(realnameCorp.getStatus()==Tenant.AUTH_COMPANY_SUCCESS){
-                        accountMessageService.sendTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_SUCCESS);
+                        accountMessageService.sendTenantTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_COMPANY_SUCCESS);
                     }
                 }else{
                     restResponse = RestResponse.failed("0","租户不存在");

@@ -6,6 +6,8 @@ import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
+import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
@@ -39,6 +41,8 @@ public class InvoiceApplyController extends AbstractRestController {
     InvoiceInfoService invoiceInfoService;
     @Autowired
     ConsumeService consumeService;
+    @Autowired
+    AccountMessageService accountMessageService;
     /**
      * 发票申请分页获取
      * @param status await|auditing|unauth
@@ -165,6 +169,9 @@ public class InvoiceApplyController extends AbstractRestController {
             try {
                 BeanUtils.copyProperties(invoiceApply,invoiceApplyVo);
                 invoiceApply = invoiceApplyService.save(invoiceApply);
+                if(invoiceApply.getStatus()==InvoiceApply.STATUS_EXCEPTION){
+                    accountMessageService.sendTenantTempletMessage(null,invoiceApply.getTenant().getId(), AccountMessage.MESSAGE_TYPE_INVOCE_APPLY_FAIL);
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 restResponse = RestResponse.failed("0","参数错误");
@@ -196,6 +203,7 @@ public class InvoiceApplyController extends AbstractRestController {
             invoiceApply.setExpressNo(invoiceApplyVo.getExpressNo());
             invoiceApply.setExpressCom(invoiceApplyVo.getExpressCom());
             invoiceApply = invoiceApplyService.save(invoiceApply);
+            accountMessageService.sendTenantTempletMessage(null,invoiceApply.getTenant().getId(), AccountMessage.MESSAGE_TYPE_INVOCE_APPLY_SUCCESS);
         }else{
             restResponse = RestResponse.failed("0","该发票审核未通过，不能发送");
         }
