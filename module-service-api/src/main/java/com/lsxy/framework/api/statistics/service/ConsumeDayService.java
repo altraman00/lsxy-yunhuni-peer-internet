@@ -74,7 +74,7 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
 
     /**
      * 获取某个时间范围的总的消费额
-     * @param d
+     * @param
      * @return
      */
     public BigDecimal getAmongAmountBetween(Date d1, Date d2);

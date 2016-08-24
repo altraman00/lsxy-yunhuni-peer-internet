@@ -140,11 +140,11 @@ public class SessionStatisticsController extends AbstractPortalController {
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getSumAmount().doubleValue();
+                list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof VoiceCdrMonth){
                 list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
             }else if(obj instanceof ConsumeDay){
-                list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getSumAmount().doubleValue();
+                list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof VoiceCdrDay){
                 list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
             }

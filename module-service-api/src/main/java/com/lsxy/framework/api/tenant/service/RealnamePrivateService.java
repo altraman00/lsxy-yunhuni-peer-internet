@@ -16,7 +16,13 @@ public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
      * @return
      */
     public List<RealnamePrivate> findByTenantId(String tenantId) ;
-
+    /**
+     * 根据租户和状态换取记录
+     * @param tenantId 租户id
+     * @param status 状态
+     * @return
+     */
+    public List<RealnamePrivate> list(String tenantId,int status) ;
     /**
      * 根据组合id和状态查找认证信息
      * @param tenantId 租户id

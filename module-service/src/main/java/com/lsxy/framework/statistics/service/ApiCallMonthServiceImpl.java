@@ -41,12 +41,11 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql = " insert into db_lsxy_base.tb_base_api_call_month("+selects+"dt,month,among_api,sum_api,create_time,last_time,deleted,sortno,version ) " +
+        String sql = " insert into db_lsxy_base.tb_base_api_call_month("+selects+"dt,month,among_api,create_time,last_time,deleted,sortno,version ) " +
                 " select "+selects+" ? as dt,? as month, "+
                 " count(1) as among_api, " +
-                " count(1)+IFNULL((select sum_api from db_lsxy_base.tb_base_api_call_month h where "+wheres+" h.dt = ? and h.month=? ),0) as  sum_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += " from db_lsxy_base.tb_base_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt>=? and a.dt<=? "+groupbys;
+        sql += " from db_lsxy_base.tb_base_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ?,? "+groupbys;
 
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();

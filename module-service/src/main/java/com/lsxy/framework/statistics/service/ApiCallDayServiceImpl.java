@@ -38,12 +38,11 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
     @Override
     public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select,String[] all) throws  SQLException{
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
-        String sql = " insert into db_lsxy_base.tb_base_api_call_day("+map.get("selects")+"dt,day,among_api,sum_api,create_time,last_time,deleted,sortno,version ) " +
+        String sql = " insert into db_lsxy_base.tb_base_api_call_day("+map.get("selects")+"dt,day,among_api,create_time,last_time,deleted,sortno,version ) " +
                 " select "+map.get("selects")+" ? as dt,? as day, "+
                 " count(1) as among_api, " +
-                " count(1)+IFNULL((select sum_api from db_lsxy_base.tb_base_api_call_day h where "+map.get("wheres")+" h.dt = ? and h.day=? ),0) as  sum_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += " from db_lsxy_base.tb_base_api_call_hour a where tenant_id is not null and app_id is not null and type is not null and a.dt>=? and a.dt<=? "+map.get("groupbys");
+        sql += " from db_lsxy_base.tb_base_api_call_hour a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ?,?  "+map.get("groupbys");
 
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
@@ -51,7 +50,7 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
         Date date3 = DateUtils.parseDate(DateUtils.formatDate(date1,"yyyy-MM-dd")+ " 23:59:59","yyyy-MM-dd HH:mm:ss");
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         //sql对于参数
-        Object[] obj = new Object[]{sqlDate1,day1,
+        Object[] obj = new Object[]{
                 new Timestamp(date2.getTime()),day2,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3

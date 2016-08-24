@@ -52,6 +52,13 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
     }
 
     @Override
+    public List<RealnamePrivate> list(String tenantId, int status) {
+        String hql = "FROM RealnamePrivate obj WHERE obj.tenant.id=?1 and obj.status=?2 ORDER BY obj.lastTime  DESC";
+        List<RealnamePrivate> list = this.findByCustomWithParams(hql, tenantId,status);
+        return list;
+    }
+
+    @Override
     public RealnamePrivate findByTenantIdAndStatus(String tenantId, int status) {
         try {
             return  realnamePrivaateDao.findByTenantIdAndStatus(tenantId,status);
