@@ -6,10 +6,14 @@ import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.AccountService;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.core.utils.VelocityUtils;
 import com.lsxy.framework.message.dao.AccountMessageDao;
 import com.lsxy.yunhuni.api.config.model.GlobalConfig;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
@@ -23,7 +27,9 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户消息实现类
@@ -38,6 +44,8 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     AccountMessageDao accountMessageDao;
     @Autowired
     AccountService accountService;
+    @Autowired
+    TenantService tenantService;
     @Autowired
     GlobalConfigService configGlobalService;
     @Autowired
@@ -85,20 +93,30 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     }
 
     @Override
-    public AccountMessage sendTempletMessage(String originator,String accountId, String type, String name) {
-        GlobalConfig configGlobal = configGlobalService.findByTypeAndName(type,name);
-        Account account = accountService.findById(accountId);
-        String value = configGlobal.getValue().replace("*",account.getUserName());
-        return sendMessage(originator,accountId,value);
+    public AccountMessage sendTempletMessage(String originator,String tenantId, String type) {
+        AccountMessage accountMessage = null;
+        Tenant tenant = tenantService.findById(tenantId);
+        if(tenant!=null) {
+            Map map = new HashMap();
+            map.put("name", tenant.getTenantName());
+            String value = VelocityUtils.getVelocityContext(type, map);
+            value = value.substring(value.indexOf("\r\n")+2,value.length());
+            if (StringUtil.isEmpty(originator)) {
+                originator = "系统";
+            }
+            accountMessage = sendMessage(originator,tenant.getRegisterUserId(),"系统通知",value);
+        }
+        return accountMessage;
     }
 
     @Override
-    public AccountMessage sendMessage(String originator,String accountId,String content) {
+    public AccountMessage sendMessage(String originator,String accountId,String title,String content) {
         Account account = accountService.findById(accountId);
         AccountMessage accountMessage = null;
         if(account!=null) {
             Message message = new Message();
             message.setType(Message.MESSAGE_ACCOUNT);
+            message.setTitle(title);
             message.setContent(content);
             message.setName(originator);
             message = messageService.save(message);//发送消息记录
