@@ -88,11 +88,23 @@ public class RegisterController {
         RestResponse response;
         //创建用户前再进行一次校验
         int result = accountService.checkRegInfo(userName,mobile,email);
+        if(logger.isDebugEnabled()){
+            logger.debug("checkRegInfo：{}"+result);
+        }
         if(result == AccountService.REG_CHECK_PASS){
             Account account = accountService.createAccount(userName,mobile,email);
+            if(logger.isDebugEnabled()){
+                logger.debug("createAccount：{}"+account);
+            }
             if(account != null){
+                if(logger.isDebugEnabled()){
+                    logger.debug("RegisterSuccessEvent-start;{}"+account);
+                }
                 RegisterSuccessEvent event = new RegisterSuccessEvent(account.getId());
                 mqService.publish(event);
+                if(logger.isDebugEnabled()){
+                    logger.debug("RegisterSuccessEvent-end;{},{}"+account,event);
+                }
                 response = RestResponse.success(account);
             }else{
                 response = failed("0000","注册用户失败，系统出错！");
