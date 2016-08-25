@@ -12,6 +12,19 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_account_message")
 public class AccountMessage extends IdEntity {
+    public static final String MESSAGE_TYPE_AUTH_ONESELE_SUCCESS = "message-templates/01_message_type_auth_onesele_success.vm";
+    public static final String MESSAGE_TYPE_AUTH_ONESELE_FAIL = "message-templates/02_message_type_auth_onesele_fail.vm";
+    public static final String MESSAGE_TYPE_AUTH_COMPANY_SUCCESS = "message-templates/03_message_type_auth_company_success.vm";
+    public static final String MESSAGE_TYPE_AUTH_COMPANY_FAIL = "message-templates/04_message_type_auth_company_fail.vm";
+    public static final String MESSAGE_TYPE_VOICE_PLAY_SUCCESS = "message-templates/05_message_type_voice_play_success.vm";
+    public static final String MESSAGE_TYPE_VOICE_PLAY_FAIL = "message-templates/06_message_type_voice_play_fail.vm";
+    public static final String MESSAGE_TYPE_INVOCE_APPLY_SUCCESS = "message-templates/07_message_type_invoce_apply_success.vm";
+    public static final String MESSAGE_TYPE_INVOCE_APPLY_FAIL = "message-templates/08_message_type_invoce_apply_fail.vm";
+    public static final String MESSAGE_TYPE_ARREARS= "message-templates/09_message_type_arrears.vm";
+    public static final String MESSAGE_TYPE_FEEDBACK= "message-templates/10_message_type_feedback.vm";
+    public  static final Integer READ = 1;
+    public static final Integer DELETE = -1;
+    public static final Integer NOT = 0;
     private Message message;//对于消息
     private Account account;//所属用户
     private Integer status;//消息状态 '0未处理;1已读;-1已删除'

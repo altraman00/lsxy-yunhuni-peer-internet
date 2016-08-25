@@ -94,7 +94,9 @@ public class AuthController extends AbstractRestController {
                 map.put("status",Tenant.AUTH_UPGRADE_FAIL);
             }
             int statusT = tenant.getIsRealAuth();
-            if(Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
+            if(Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()){
+                statusT = Tenant.AUTH_WAIT;
+            }else if(Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
                 statusT = Tenant.AUTH_COMPANY_FAIL;
             }else if(Tenant.AUTH_UPGRADE_SUCCESS==tenant.getIsRealAuth()){
                 statusT = Tenant.AUTH_COMPANY_SUCCESS;

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.util.Date;
 import java.math.BigInteger;
 
 /**
@@ -39,6 +40,13 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         Tenant tenant = tenantService.findTenantByUserName(userName);
         String hql = "from Consume obj where obj.tenant.id=?1 and ( DATE_FORMAT(obj.dt,'%Y-%m')<=?2 and DATE_FORMAT(obj.dt,'%Y-%m')>=?3 )  ORDER BY obj.dt";
         Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
+        return page;
+    }
+
+    @Override
+    public Page<Consume> pageList(String tenantId, Integer pageNo, Integer pageSize, Date startTime, Date endTime) {
+        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<=?2 and obj.dt>=?3   ORDER BY obj.dt";
+        Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenantId,endTime,startTime);
         return page;
     }
 
