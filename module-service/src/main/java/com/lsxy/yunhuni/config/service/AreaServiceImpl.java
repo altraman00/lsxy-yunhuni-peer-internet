@@ -23,4 +23,14 @@ public class AreaServiceImpl extends AbstractService<Area> implements AreaServic
         return this.areaDao;
     }
 
+    @Override
+    public Area getOneAvailableArea() {
+        Iterable<Area> list = this.list();
+        for(Area area:list){
+            if(area != null){
+                return area;
+            }
+        }
+        return null;
+    }
 }

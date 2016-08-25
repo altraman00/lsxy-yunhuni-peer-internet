@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.app.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.yunhuni.api.config.model.Area;
 
 import javax.persistence.*;
 
@@ -30,6 +31,7 @@ public class App extends IdEntity {
     private Integer isRecording;//是否录音服务0否，1是
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
+    private Area area;  //所属区域（应用上线后要指定区域）
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -155,5 +157,15 @@ public class App extends IdEntity {
 
     public void setIsIvrService(Integer isIvrService) {
         this.isIvrService = isIvrService;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "area_id")
+    public Area getArea() {
+        return area;
+    }
+
+    public void setArea(Area area) {
+        this.area = area;
     }
 }

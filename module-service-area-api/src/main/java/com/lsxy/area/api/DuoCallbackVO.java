@@ -1,10 +1,12 @@
 package com.lsxy.area.api;
 
+import java.io.Serializable;
+
 /**
  * 双向回拔
  * Created by liups on 2016/8/23.
  */
-public class DuoCallbackVO {
+public class DuoCallbackVO implements Serializable {
     private String from1;               //第一方主叫号码
     private String to1;                 //第一方被叫号码
     private String from2;               //第二方主叫号码

@@ -13,6 +13,8 @@ import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.service.AreaService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
 import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
@@ -54,6 +56,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Autowired
     ResourcesRentService resourcesRentService;
+
+    @Autowired
+    AreaService areaService;
 
     @Override
     public BaseDaoInterface<AppOnlineAction, Serializable> getDao() {
@@ -169,8 +174,6 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
                         this.bindIvrToApp(app, action.getTelNumber(), tenant);
-                        //绑定应用与区域的关系
-
                     }
                     //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
                     if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
@@ -225,6 +228,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             //如果ivr号码被占用，则抛出异常
             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
         }
+        //绑定应用与区域的关系
+        app.setArea(resourceTelenum.getLine().getArea());
     }
 
     /**
@@ -310,6 +315,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 this.save(newAction);
                 //应用状态改为上线
                 app.setStatus(App.STATUS_ONLINE);
+                //应用绑定区域
+                app.setArea(areaService.getOneAvailableArea());
                 appService.save(app);
                 return newAction;
             }else if(app.getStatus() == App.STATUS_ONLINE ){

@@ -20,8 +20,7 @@ public interface CallService {
      * @param ip ip
      * @param appId 应用id
      * @param duoCallbackVO 双向回拔数据
-     * @param account_id 鉴权账号
      * @return
      */
-    String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO, String account_id);
+    String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws InvokeCallException;
 }

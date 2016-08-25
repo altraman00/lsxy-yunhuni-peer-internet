@@ -12,13 +12,12 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Tandy on 2016/6/28.
@@ -85,12 +84,20 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
         return RestResponse.success(callId);
     }
 
-    @RequestMapping("/{account_id}/call/duo_callback")
-    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id){
+    @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
+    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id) {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
-        String res_id = callService.duoCallback(ip,appId, duoCallbackVO, account_id);
-        return RestResponse.success(res_id);
+        String callId = null;
+        try {
+            callId = callService.duoCallback(ip,appId, duoCallbackVO);
+        } catch (InvokeCallException e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        Map<String,String> result = new HashMap<>();
+        result.put("callId",callId);
+        result.put("user_data",duoCallbackVO.getUser_data());
+        return RestResponse.success(result);
     }
 //
 //
