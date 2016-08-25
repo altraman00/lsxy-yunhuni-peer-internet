@@ -2,11 +2,14 @@ package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lsxy.area.api.CallCacheVO;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.DuoCallbackVO;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -58,6 +61,9 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     private BillingService billingService;
+
+    @Autowired
+    RedisCacheService redisCacheService;
 
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws InvokeCallException {
@@ -142,6 +148,8 @@ public class CallServiceImpl implements CallService {
                 logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
                 throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call=>" + params);
             }
+            //将数据存到redis
+            redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",duoCallbackVO.getUser_data())),5 * 60 * 60);
             return callId;
         }catch(RightSessionNotFoundExcepiton ex){
             throw new InvokeCallException(ex.getMessage());
