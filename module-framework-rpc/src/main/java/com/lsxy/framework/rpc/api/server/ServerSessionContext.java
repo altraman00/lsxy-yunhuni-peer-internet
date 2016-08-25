@@ -3,8 +3,9 @@ package com.lsxy.framework.rpc.api.server;
 import com.lsxy.framework.rpc.api.SessionContext;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 @Component
 public class ServerSessionContext implements SessionContext{
-	public static final Log logger = LogFactory.getLog(ServerSessionContext.class);
+	private static final Logger logger = LoggerFactory.getLogger(ServerSessionContext.class);
 	//<sessionid,session>
 	private ListOrderedMap sessionMap = new ListOrderedMap();
 
@@ -68,6 +69,17 @@ public class ServerSessionContext implements SessionContext{
 		}
 		return session;
 
+	}
+
+	@Scheduled(fixedDelay=10000)
+	public void contextMonitor(){
+		if (logger.isDebugEnabled()) {
+			logger.debug("==========SESSION MONITOR=========");
+			for (int i = 0; i < this.sessionMap.size(); i++) {
+				logger.debug("SESSION[{}]:{}", i, this.sessionMap.getValue(i));
+			}
+			logger.debug("\r\n");
+		}
 	}
 
 }
