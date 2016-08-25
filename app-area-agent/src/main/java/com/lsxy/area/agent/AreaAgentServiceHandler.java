@@ -110,8 +110,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.createResource(0, 0, "ext.duo_callback", params, null);
+            String res_id = cticlient.createResource(0, 0, "ext.duo_callback", params, null);
             response.setMessage(RPCResponse.STATE_OK);
+            response.setBody(res_id);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
             e.printStackTrace();

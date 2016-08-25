@@ -10,10 +10,10 @@ import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
@@ -21,6 +21,7 @@ import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +140,12 @@ public class CallServiceImpl implements CallService {
             if (session != null) {
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
                 try {
-                    rpcCaller.invoke(session, rpcrequest);
+                    RPCResponse response = rpcCaller.invokeWithReturn(session, rpcrequest);
+                    if(response.getMessage().equals(RPCResponse.STATE_OK)){
+                        String resId = response.getBodyAsString();
+                        //将数据存到redis
+                        redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",resId,duoCallbackVO.getUser_data())),5 * 60 * 60);
+                    }
                 } catch (Exception e) {
                     logger.error("消息发送到区域失败:{}", rpcrequest);
                     throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -148,8 +154,6 @@ public class CallServiceImpl implements CallService {
                 logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
                 throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call=>" + params);
             }
-            //将数据存到redis
-            redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",duoCallbackVO.getUser_data())),5 * 60 * 60);
             return callId;
         }catch(RightSessionNotFoundExcepiton ex){
             throw new InvokeCallException(ex.getMessage());
