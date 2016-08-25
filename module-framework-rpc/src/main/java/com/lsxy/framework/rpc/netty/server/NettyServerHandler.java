@@ -5,6 +5,7 @@ import com.lsxy.framework.rpc.api.*;
 import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import com.lsxy.framework.rpc.netty.NettyCondition;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -133,7 +134,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
      * @return
      */
     @Override
-    protected Session doConnect(Object contextObject, RPCRequest request) {
+    protected Session doConnect(Object contextObject, RPCRequest request) throws SessionWriteException {
         ChannelHandlerContext ctx = (ChannelHandlerContext) contextObject;
 
         String sessionid = (String) request.getParameter("sessionid");
@@ -171,7 +172,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
         ctx.channel().attr(SESSION_ID).setIfAbsent(sessionid);
         response.setMessage(RPCResponse.STATE_OK);
         logger.info("区域连接成功:{}",ctx.channel());
-
+        session.write(response);
         return session;
     }
 

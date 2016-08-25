@@ -80,7 +80,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
         boolean result = false;
         Area area = areaService.findById(areaid);
         if(area!=null){
-            if(area.isEnabled()){
+            if(!area.isEnabled()){
                 logger.error("区域[{}]未启用,连接失败",areaid);
             }else{
                 result = true;

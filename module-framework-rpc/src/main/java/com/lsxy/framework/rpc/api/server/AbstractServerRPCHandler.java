@@ -131,5 +131,5 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
      * @param request
      * @return
      */
-    protected abstract Session doConnect(Object contextObject, RPCRequest request);
+    protected abstract Session doConnect(Object contextObject, RPCRequest request) throws SessionWriteException;
 }
