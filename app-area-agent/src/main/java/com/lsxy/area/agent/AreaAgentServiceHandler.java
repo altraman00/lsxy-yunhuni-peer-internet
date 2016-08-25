@@ -44,7 +44,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
 
         /*收到区域管理器请求次数计数*/
-        sc.getReceivedAreaServerRequestCount().incrementAndGet();
+        if(sc!=null) sc.getReceivedAreaServerRequestCount().incrementAndGet();
 
         RPCResponse response = null;
 
