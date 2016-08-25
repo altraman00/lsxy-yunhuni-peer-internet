@@ -4,6 +4,7 @@ import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.area.agent.cti.CTIClient;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -107,6 +108,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
 
         try {
+            if(logger.isDebugEnabled()){
+                logger.debug("调用CTI创建双向回拔资源，参数为", JSONUtil.objectToJson(params));
+            }
             cticlient.createResource(0, 0, "ext.duo_callback", params, null);
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
@@ -207,7 +211,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
-            params.put("to_uri", request.getParameter("to")+"@"+ SystemConfig.getProperty("area.agent.client.cti.sip.host","192.168.22.10")+":"+SystemConfig.getProperty("area.agent.client.cti.sip.port","5062"));
+            params.put("to_uri", request.getParameter("to")+"@192.168.22.10:5062");
             params.put("max_answer_seconds", iMaxAnswerSec);
             params.put("max_ring_seconds", iMaxRingSec);
 
