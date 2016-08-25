@@ -291,4 +291,9 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         }
         return null;
     }
+
+    @Override
+    public List<Account> findByStatus(Integer status) {
+        return accountDao.findByStatus(status);
+    }
 }

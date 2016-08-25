@@ -6,6 +6,8 @@ import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 
+import java.util.List;
+
 public interface AccountService extends BaseService<Account> {
     int REG_CHECK_PASS = 0;             //账号注册信息检验通过
     int REG_CHECK_USERNAME_EXIST = 1;   //账号注册信息失败，用户名已存在
@@ -100,4 +102,11 @@ public interface AccountService extends BaseService<Account> {
      * @return
      */
     public Account findOneByTenant(String tenantId);
+
+    /**
+     * 根据状态获取用户集合
+     * @param status
+     * @return
+     */
+    List<Account> findByStatus(Integer status);
 }
