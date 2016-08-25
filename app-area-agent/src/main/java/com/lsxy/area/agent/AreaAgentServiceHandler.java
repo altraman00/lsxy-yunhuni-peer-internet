@@ -5,6 +5,7 @@ import com.lsxy.app.area.cti.commander.RpcError;
 import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClient;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -160,7 +161,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("from_uri", "");
-            params.put("to_uri", request.getParameter("to")+"@192.168.22.10:5062");
+            params.put("to_uri", request.getParameter("to")+"@"+ SystemConfig.getProperty("area.agent.client.cti.sip.host","192.168.22.10")+":"+SystemConfig.getProperty("area.agent.client.cti.sip.port","5062"));
             params.put("max_answer_seconds", iMaxAnswerSec);
             params.put("max_ring_seconds", iMaxRingSec);
 
