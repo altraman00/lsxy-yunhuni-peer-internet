@@ -1,16 +1,18 @@
 package com.lsxy.area.server;
 
 import com.alibaba.dubbo.common.Constants;
+import com.lsxy.framework.FrameworkServiceConfig;
+import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.core.AbstractSpringBootStarter;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
+import com.lsxy.yunhuni.YunhuniServiceConfig;
+import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
