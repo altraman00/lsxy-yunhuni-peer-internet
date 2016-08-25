@@ -1,7 +1,12 @@
 package com.lsxy.app.backend.task;
 
+import com.lsxy.framework.core.utils.DateUtils;
+import org.junit.Test;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * 定时任务测试样例
@@ -48,9 +53,56 @@ public class TestTask {
     "0 15 10 ? * 6L 2002-2005"	 	2002年至2005年的每月的最后一个星期五上午10:15触发
     "0 15 10 ? * 6#3"	 	每月的第三个星期五上午10:15触发
      */
-    @Scheduled(cron="0/10 * * * * ?")
-    public void sout(){
-        System.out.println("**********************************" + System.currentTimeMillis());
+    //@Scheduled(cron="0/10 * * * * ?")
+    @Test
+    public void init(){
+        String startTime = "2016-01-01 00:00:00";
+        String endTime = "2016-08-24 00:00:00";
+        int days= DateUtils.compareStringTimes(endTime,startTime,"yyyy-MM-dd HH:mm:ss");
+        System.out.println("days:"+days);
+        Date startDate = DateUtils.parseDate(startTime,"yyyy-MM-dd HH:mm:ss");
+        Calendar ca1Month = Calendar.getInstance();
+        ca1Month.setTime(startDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        // 当前年
+//        int year = cal.get(Calendar.YEAR);
+        // 当前月
+//        int month = (cal.get(Calendar.MONTH)) + 1;
+        // 当前月的第几天：即当前日
+//        int day = cal.get(Calendar.DAY_OF_MONTH);
+        // 当前时：HOUR_OF_DAY-24小时制；HOUR-12小时制
+//        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        ConsumeStatisticsTask consumeStatisticsTask = new ConsumeStatisticsTask();
+        VoiceCdrStatisticsTask voiceCdrStatisticsTask = new VoiceCdrStatisticsTask();
+        for(int i=0;i<days;i++){
+            for(int j=0;j<24;j++) {
+                cal.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY) + 1);
+                Date date = cal.getTime();
+                System.out.println("小时:"+DateUtils.getDate(date,"yyyy-MM-dd HH:mm:ss"));
+                //调用费用小时统计
+//                consumeStatisticsTask.hourStatistics(date);
+                //调用cdr小时统计
+//                voiceCdrStatisticsTask.hourStatistics(date);
+            }
+            Date date = cal.getTime();
+            System.out.println("日:"+DateUtils.getDate(date,"yyyy-MM-dd HH:mm:ss"));
+            //调用费用小时统计
+//            consumeStatisticsTask.dayStatistics(date);
+            //调用cdr小时统计
+//            voiceCdrStatisticsTask.dayStatistics(date);
+        }
+        int months = 7;
+        for(int k = 0;k<months;k++){
+            ca1Month.set(Calendar.MONTH, ca1Month.get(Calendar.MONTH) + 1);
+            Date date = ca1Month.getTime();
+            System.out.println("月:"+DateUtils.getDate(date,"yyyy-MM-dd HH:mm:ss"));
+            //调用费用小时统计
+//            consumeStatisticsTask.monthStatistics(date);
+            //调用cdr小时统计
+//            voiceCdrStatisticsTask.monthStatistics(date);
+        }
+
     }
 
 }
