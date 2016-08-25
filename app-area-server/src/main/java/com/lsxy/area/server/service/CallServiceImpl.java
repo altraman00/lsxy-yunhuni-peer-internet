@@ -7,7 +7,6 @@ import com.lsxy.area.api.DuoCallbackVO;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -117,12 +116,12 @@ public class CallServiceImpl implements CallService {
             }
         }
         if(app.getIsVoiceCallback() != 1){
-            throw new AppServiceNotOn("app没开通所需的服务");
+            throw new AppServiceInvalidException("app没开通所需的服务");
         }
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnough("余额不足");
+            throw new BalanceNotEnoughException("余额不足");
         }
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(duoCallbackVO, Map.class);
