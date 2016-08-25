@@ -29,14 +29,13 @@ public class ApiCallStatisticsTask {
     /**
      *每个小时的执行一次
      */
-    //@Scheduled(cron="0 30 0/1 * * ?")
-    @Scheduled(cron="10 * * * * ?")
+    @Scheduled(cron="0 30 0/1 * * ?")
     public void hour(){
         Date date=new Date();
         hourStatistics(date);
     }
 
-    private void hourStatistics(Date date) {
+    public  void hourStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("api请求指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         //租户 应用 运营商 地区 业务类型 应用上线个数增量/总量 应用未上线个数增量/总量 应用总个数增量/总量
@@ -79,7 +78,7 @@ public class ApiCallStatisticsTask {
         dayStatistics(date);
     }
 
-    private void dayStatistics(Date date) {
+    public void dayStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("api请求指标日统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         String partten = "yyyy-MM-dd";
@@ -121,7 +120,7 @@ public class ApiCallStatisticsTask {
         monthStatistics(date);
     }
 
-    private void monthStatistics(Date date) {
+    public void monthStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("api请求指标月统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         String partten = "yyyy-MM";

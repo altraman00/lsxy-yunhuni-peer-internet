@@ -36,7 +36,7 @@ public class ConsumeStatisticsTask {
         monthStatistics(date);
     }
 
-    private void monthStatistics(Date date) {
+    public void monthStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("消费记录指标月统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         String partten = "yyyy-MM";
@@ -77,7 +77,7 @@ public class ConsumeStatisticsTask {
         dayStatistics(date);
     }
 
-    private void dayStatistics(Date date) {
+    public void dayStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("消费记录指标日统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         String partten = "yyyy-MM-dd";
@@ -119,7 +119,7 @@ public class ConsumeStatisticsTask {
         hourStatistics(date);
     }
 
-    private void hourStatistics(Date date) {
+    public void hourStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("消费记录指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         //租户 应用 运营商 地区 业务类型 应用上线个数增量/总量 应用未上线个数增量/总量 应用总个数增量/总量

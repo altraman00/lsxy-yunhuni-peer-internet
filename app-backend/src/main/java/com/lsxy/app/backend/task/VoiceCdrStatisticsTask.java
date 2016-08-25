@@ -18,8 +18,8 @@ import java.util.*;
  * Created by zhangxb on 2016/7/29.
  */
 @Component
-public class VoiceCdrlStatisticsTask {
-    private static final Logger logger = LoggerFactory.getLogger(VoiceCdrlStatisticsTask.class);
+public class VoiceCdrStatisticsTask {
+    private static final Logger logger = LoggerFactory.getLogger(VoiceCdrStatisticsTask.class);
     @Autowired
     VoiceCdrHourService voiceCdrHourService;
     @Autowired
@@ -36,7 +36,7 @@ public class VoiceCdrlStatisticsTask {
         monthStatistics(date);
     }
 
-    private void monthStatistics(Date date) {
+    public void monthStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("通话记录统计（session统计）指标月统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         String partten = "yyyy-MM";
@@ -77,7 +77,7 @@ public class VoiceCdrlStatisticsTask {
         dayStatistics(date);
     }
 
-    private void dayStatistics(Date date) {
+    public void dayStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("通话记录统计（session统计）指标日统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         String partten = "yyyy-MM-dd";
@@ -119,7 +119,7 @@ public class VoiceCdrlStatisticsTask {
         hourStatistics(date);
     }
 
-    private void hourStatistics(Date date) {
+    public void hourStatistics(Date date) {
         long startTime = System.currentTimeMillis();
         logger.info("通话记录统计（session统计）指标小时统计任务开启，当前时间" + DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
         //租户 应用 运营商 地区 业务类型 应用上线个数增量/总量 应用未上线个数增量/总量 应用总个数增量/总量
