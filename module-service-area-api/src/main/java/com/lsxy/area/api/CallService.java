@@ -14,4 +14,13 @@ public interface CallService {
      * @return
      */
     String call(String from, String to, int maxAnswerSec, int maxRingSec) throws InvokeCallException;
+
+    /**
+     * 双向回拔
+     * @param ip ip
+     * @param appId 应用id
+     * @param duoCallbackVO 双向回拔数据
+     * @return
+     */
+    String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws InvokeCallException;
 }

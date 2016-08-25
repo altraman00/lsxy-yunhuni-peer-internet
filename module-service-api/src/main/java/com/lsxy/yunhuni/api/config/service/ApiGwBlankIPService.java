@@ -1,7 +1,7 @@
-package com.lsxy.framework.api.config.service;
+package com.lsxy.yunhuni.api.config.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.framework.api.config.model.ApiGwBlankIP;
+import com.lsxy.yunhuni.api.config.model.ApiGwBlankIP;
 
 /**
  * Created by Tandy on 2016/7/7.

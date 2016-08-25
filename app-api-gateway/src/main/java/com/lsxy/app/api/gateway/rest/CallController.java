@@ -2,31 +2,25 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
+import com.lsxy.area.api.DuoCallbackVO;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.exceptions.InvokeCallException;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.apigw.APIGatewayRequestEvent;
-import com.lsxy.framework.mq.events.apigw.APIGatewayResponseEvent;
-import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
-import org.apache.commons.collections.map.HashedMap;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static jdk.nashorn.internal.objects.NativeFunction.call;
 
 /**
  * Created by Tandy on 2016/6/28.
@@ -47,6 +41,9 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
 
     @Autowired
     private AsyncRequestContext asyncRequestContext;
+
+    @Autowired
+    private AppService appService;
 
 //    /**
 //     * 自动化测试用例使用
@@ -88,6 +85,22 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
     @RequestMapping("/{accountId}/call/{callId}")
     public RestResponse getCall(@PathVariable String accountId,@PathVariable String callId){
         return RestResponse.success(callId);
+    }
+
+    @RequestMapping("/{account_id}/call/duo_callback")
+    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id) {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+        String callId = null;
+        try {
+            callId = callService.duoCallback(ip,appId, duoCallbackVO);
+        } catch (InvokeCallException e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        Map<String,String> result = new HashMap<>();
+        result.put("callId",callId);
+        result.put("user_data",duoCallbackVO.getUser_data());
+        return RestResponse.success(result);
     }
 //
 //
