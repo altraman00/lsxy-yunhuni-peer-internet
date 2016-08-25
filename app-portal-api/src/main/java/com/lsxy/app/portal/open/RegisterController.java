@@ -89,7 +89,7 @@ public class RegisterController {
         //创建用户前再进行一次校验
         int result = accountService.checkRegInfo(userName,mobile,email);
         if(logger.isDebugEnabled()){
-            logger.debug("checkRegInfo：{}"+result);
+            logger.debug("checkRegInfo：{} "+result);
         }
         if(result == AccountService.REG_CHECK_PASS){
             Account account = accountService.createAccount(userName,mobile,email);
