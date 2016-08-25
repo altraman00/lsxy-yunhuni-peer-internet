@@ -19,9 +19,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 /**
  * Created by tandy on 16/7/19.
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, EmbeddedServletContainerAutoConfiguration.class})
+@SpringBootApplication(exclude = {EmbeddedServletContainerAutoConfiguration.class})
 @ComponentScan
-@Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class, FrameworkCacheConfig.class})
+@Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class, FrameworkCacheConfig.class, FrameworkServiceConfig.class, YunhuniServiceConfig.class, YunhuniApiConfig.class, FrameworkApiConfig.class})
 @EnableDubboConfiguration
 @EnableAsync
 public class AreaServerMainClass extends AbstractSpringBootStarter {

@@ -1,8 +1,6 @@
 package com.lsxy.area.agent;
 
 import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.app.area.cti.commander.RpcError;
-import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClient;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -51,7 +49,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         if(request.getName().equals(ServiceConstants.MN_CH_SYS_CALL)){
             response = this.process_MN_CH_SYS_CALL(request);
         }
-
+        if(request.getName().equals(ServiceConstants.MN_CH_EXT_DUO_CALLBACK)){
+            response = this.process_MN_CH_EXT_DUO_CALLBACK(request);
+        }
         if(request.getName().equals(ServiceConstants.MN_CH_CTI_API)){
             response = this.process_MN_CH_CTI_API(request);
         }
@@ -65,6 +65,52 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
 
         if(logger.isDebugEnabled()){
             logger.debug("返回给区域管理器的对象:{}",response);
+        }
+
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_EXT_DUO_CALLBACK(RPCRequest request) {
+        RPCResponse response = RPCResponse.buildResponse(request);
+
+        Client cticlient = cticlientContext.getAvalibleClient();
+        if(cticlient == null) {
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
+            return response;
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK:{}",request);
+        }
+        //TODO 获取线路IP和端口
+        String lineGatewayIp = "192.168.22.10";
+        String lineGatewayPort = "5062";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("from1_uri", request.getParameter("from1")+"@"+lineGatewayIp+":"+lineGatewayPort);
+        params.put("to1_uri", request.getParameter("to1")+"@"+lineGatewayIp+":"+lineGatewayPort);
+        params.put("from2_uri", request.getParameter("from2")+"@"+lineGatewayIp+":"+lineGatewayPort);
+        params.put("to2_uri",request.getParameter("to2")+"@"+lineGatewayIp+":"+lineGatewayPort);
+        params.put("max_connect_seconds",Integer.parseInt((String) request.getParameter("max_call_duration")));
+        params.put("max_ring_seconds",Integer.parseInt((String) request.getParameter("max_dial_duration")));
+        params.put("ring_play_file",request.getParameter("ring_tone"));
+        params.put("ring_play_mode",Integer.parseInt((String) request.getParameter("ring_tone_mode")));
+        params.put("user_data",request.getParameter("callId"));
+        //录音
+        Boolean recording = new Boolean((String) request.getParameter("recording"));
+        if(recording){
+            //TODO 录音文件名称
+            params.put("record_file ",request.getParameter("callId"));
+            params.put("record_mode",Integer.parseInt((String) request.getParameter("record_mode")));
+            params.put("record_format ",1);
+        }
+
+        try {
+            cticlient.createResource(0, 0, "ext.duo_callback", params, null);
+            response.setMessage(RPCResponse.STATE_OK);
+        } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
+            e.printStackTrace();
         }
 
         return response;
@@ -180,4 +226,6 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
         return response;
     }
+
+
 }
