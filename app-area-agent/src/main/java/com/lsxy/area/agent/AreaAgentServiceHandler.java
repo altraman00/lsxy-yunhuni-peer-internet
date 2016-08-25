@@ -3,6 +3,7 @@ package com.lsxy.area.agent;
 import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.area.agent.cti.CTIClient;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -106,6 +107,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
 
         try {
+            if(logger.isDebugEnabled()){
+                logger.debug("调用CTI创建双向回拔资源，参数为", JSONUtil.objectToJson(params));
+            }
             cticlient.createResource(0, 0, "ext.duo_callback", params, null);
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
