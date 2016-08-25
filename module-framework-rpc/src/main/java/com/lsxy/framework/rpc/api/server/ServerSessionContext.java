@@ -70,16 +70,16 @@ public class ServerSessionContext implements SessionContext{
 		return session;
 
 	}
-
-	@Scheduled(fixedDelay=10000)
-	public void contextMonitor(){
-		if (logger.isDebugEnabled()) {
-			logger.debug("==========SESSION MONITOR=========");
-			for (int i = 0; i < this.sessionMap.size(); i++) {
-				logger.debug("SESSION[{}]:{}", i, this.sessionMap.getValue(i));
-			}
-			logger.debug("\r\n");
-		}
-	}
+//
+//	@Scheduled(fixedDelay=10000)
+//	public void contextMonitor(){
+//		if (logger.isDebugEnabled()) {
+//			logger.debug("==========SESSION MONITOR=========");
+//			for (int i = 0; i < this.sessionMap.size(); i++) {
+//				logger.debug("SESSION[{}]:{}", i, this.sessionMap.getValue(i));
+//			}
+//			logger.debug("\r\n");
+//		}
+//	}
 
 }
