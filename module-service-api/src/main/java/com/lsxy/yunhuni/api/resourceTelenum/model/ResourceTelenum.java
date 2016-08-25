@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 
 import javax.persistence.*;
 
@@ -18,8 +19,12 @@ public class ResourceTelenum extends IdEntity{
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
     private Tenant tenant;//所属租户
+    private LineGateway line;  //所属线路
+    private String operator; //运营商
+    private String provider;    //供应商
+    private String remark;      //备注
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
@@ -44,5 +49,42 @@ public class ResourceTelenum extends IdEntity{
 
     public void setTelNumber(String telNumber) {
         this.telNumber = telNumber;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    public LineGateway getLine() {
+        return line;
+    }
+
+    public void setLine(LineGateway line) {
+        this.line = line;
+    }
+
+    @Column(name = "operator")
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    @Column(name = "provider")
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    @Column(name = "remark")
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

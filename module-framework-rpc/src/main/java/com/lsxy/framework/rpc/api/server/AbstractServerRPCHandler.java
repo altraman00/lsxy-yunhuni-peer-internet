@@ -75,8 +75,17 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
             if(logger.isDebugEnabled()){
                 logger.debug("消息统一处理入口:{}",message);
             }
+
+
             if(request.getName().equals(ServiceConstants.CH_MN_CONNECT)){
-                response = process_CH_MN_CONNECT(ctxObject,request);
+                String areaid = (String) request.getParameter("aid");
+                String nodeid = (String) request.getParameter("nid");
+
+                if(serviceHandler.isConnectAvalid(areaid,nodeid)){
+                    doConnect(ctxObject,request);
+                }else{
+                    refuseConnect(ctxObject,request);
+                }
             } else if (request.getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO)){    //心跳
                 response = RPCResponse.buildResponse(request);
                 response.setMessage(RPCResponse.STATE_OK);
@@ -94,7 +103,8 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
             }
             if(response != null){
                 Session session = getSessionInTheContextObject(ctxObject);
-                session.write(response);
+                if(session != null)
+                    session.write(response);
             }
             processRequestCount.incrementAndGet();
 
@@ -106,18 +116,20 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
         }
     }
 
-
+    /**
+     * 拒绝连接  给客户端响应一个rpcresponse 告诉客户端连接失败
+     * @param ctxObject
+     * @param request
+     */
+    protected abstract void refuseConnect(Object ctxObject, RPCRequest request);
 
 
     /**
-     * 处理连接命令 客户端连接到服务端,第一件事,发送CH_MN_CONNECT命令到服务器进行注册
-     * 如果出现注册失败,就直接结束掉,如果注册成功,则返回成功的响应对象
-     * @param ctx  根据环境不同而不同  mina 为 iosession   netty 为channelcontext
-     * @param request   解析出来的请求对象
+     * 处理客户端连接指令,需要判断是否合法,如果合法,构建对应的Session并丢入sessionContext
+     * 在此处理ip白名单
+     * @param contextObject
+     * @param request
      * @return
-     *      如果注册成功并且在IP白名单中,则允许连接  否则拒绝连接
      */
-    protected abstract RPCResponse process_CH_MN_CONNECT(Object ctx, RPCRequest request);
-
-
+    protected abstract Session doConnect(Object contextObject, RPCRequest request) throws SessionWriteException;
 }
