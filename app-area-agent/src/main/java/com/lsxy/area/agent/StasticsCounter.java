@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 @EnableScheduling
-@Profile(value = {"test","development"})
+@Profile(value = {"test"})
 public class StasticsCounter extends AsbstractStatisticCounter {
 
     @MarkField(" 收到区域管理器请求次数")
