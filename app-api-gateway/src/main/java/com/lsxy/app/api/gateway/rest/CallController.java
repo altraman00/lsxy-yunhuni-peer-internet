@@ -12,10 +12,7 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,7 +84,7 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
         return RestResponse.success(callId);
     }
 
-    @RequestMapping("/{account_id}/call/duo_callback")
+    @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
     public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id) {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
