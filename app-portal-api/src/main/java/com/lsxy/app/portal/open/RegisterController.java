@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.lsxy.framework.web.rest.RestResponse.failed;
@@ -84,21 +85,26 @@ public class RegisterController {
      * @return
      */
     @RequestMapping("/create_account")
-    public RestResponse createAccount(String userName,String mobile,String email) throws Exception {
-        RestResponse response;
-        //创建用户前再进行一次校验
-        int result = accountService.checkRegInfo(userName,mobile,email);
-        if(result == AccountService.REG_CHECK_PASS){
-            Account account = accountService.createAccount(userName,mobile,email);
-            if(account != null){
-                RegisterSuccessEvent event = new RegisterSuccessEvent(account.getId());
-                mqService.publish(event);
-                response = RestResponse.success(account);
-            }else{
-                response = failed("0000","注册用户失败，系统出错！");
+    public RestResponse createAccount(String userName,String mobile,String email) {
+            RestResponse response;
+        try {
+            //创建用户前再进行一次校验
+            int result = accountService.checkRegInfo(userName, mobile, email);
+            if (result == AccountService.REG_CHECK_PASS) {
+                Account account = accountService.createAccount(userName, mobile, email);
+                if (account != null) {
+                    RegisterSuccessEvent event = new RegisterSuccessEvent(account.getId());
+                    mqService.publish(event);
+                    response = RestResponse.success(account);
+                } else {
+                    response = failed("0000", "注册用户失败，系统出错！");
+                }
+            } else {
+                response = failed("0000", "注册用户失败,注册信息已存在");
             }
-        }else{
-            response = failed("0000","注册用户失败,注册信息已存在");
+        }catch(Exception ex){
+            logger.error("注册用户失败:{}",ex);
+            response = failed("0000", "注册用户失败，！" + ex.getMessage());
         }
         return response;
     }
