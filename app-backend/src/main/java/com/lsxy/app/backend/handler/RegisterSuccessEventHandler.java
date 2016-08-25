@@ -38,6 +38,9 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
     @Override
     public void handleMessage(RegisterSuccessEvent message) throws JMSException {
         try {
+            if(logger.isDebugEnabled()){
+                logger.debug("接收到MQ：发邮件事件：{}",message);
+            }
             String accountId = message.getAccountId();
             Account account = accountService.findById(accountId);
             // 发送激活邮件
