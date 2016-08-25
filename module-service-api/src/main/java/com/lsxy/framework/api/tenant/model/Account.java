@@ -177,9 +177,8 @@ public class Account extends IdEntity {
 
 	@Override
 	public String toString() {
-		return "Account{" +
+		String account =  "Account{" +
 				"userName='" + userName + '\'' +
-				", tenant=" + tenant.toString() +
 				", mobile='" + mobile + '\'' +
 				", email='" + email + '\'' +
 				", password='" + password + '\'' +
@@ -191,7 +190,11 @@ public class Account extends IdEntity {
 				", business='" + business + '\'' +
 				", url='" + url + '\'' +
 				", province='" + province + '\'' +
-				", city='" + city + '\'' +
-				'}';
+				", city='" + city + '\'' ;
+		if(tenant!=null){
+			account+=",tenatn='"+tenant.toString()+"'";
+		}
+		account+='}';
+		return account;
 	}
 }
