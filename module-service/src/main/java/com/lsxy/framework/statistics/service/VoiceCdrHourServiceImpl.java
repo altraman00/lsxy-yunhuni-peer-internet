@@ -47,7 +47,7 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
                 " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+" c1.call_ack_dt is null ) as  among_not_connect ," +
                 " count(1) as among_call,"+
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr a where last_time>=? and last_time<=? "+groupbys;
+                " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr a where last_time BETWEEN ? AND ? "+groupbys;
 
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());

@@ -47,7 +47,7 @@ public class RechargeMonthServiceImpl extends AbstractService<RechargeMonth> imp
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " IFNULL(sum(among_num),0) as  among_num, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += " from db_lsxy_base.tb_base_recharge_day a where tenant_id is not null and a.dt between ?,?  " +groupbys;
+        sql += " from db_lsxy_base.tb_base_recharge_day a where tenant_id is not null and a.dt between ? AND ?  " +groupbys;
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();

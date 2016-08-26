@@ -115,7 +115,7 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
                 " SELECT "+selects+" ? as dt,? as month, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_base.tb_base_consume_day a where tenant_id is not null and app_id is not null and type is not null and dt BETWEEN ?,? "+groupbys;
+                " from db_lsxy_base.tb_base_consume_day a where tenant_id is not null and app_id is not null and type is not null and dt BETWEEN ? AND ? "+groupbys;
         //拼装参数
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
