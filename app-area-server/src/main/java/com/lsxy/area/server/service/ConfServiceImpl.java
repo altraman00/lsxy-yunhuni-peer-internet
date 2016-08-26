@@ -72,13 +72,13 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnough("余额不足");
+            throw new BalanceNotEnoughException("余额不足");
         }
 
         Session session = null;
@@ -120,7 +120,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
         Session session = null;
         try{
@@ -163,13 +163,13 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnough("余额不足");
+            throw new BalanceNotEnoughException("余额不足");
         }
 
         Session session = null;
@@ -209,13 +209,13 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnough("余额不足");
+            throw new BalanceNotEnoughException("余额不足");
         }
 
         Session session = null;
@@ -253,7 +253,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         Session session = null;
@@ -291,7 +291,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         Session session = null;
@@ -329,7 +329,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         Session session = null;
@@ -366,7 +366,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         Session session = null;
@@ -403,7 +403,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceNotOn("app没开通会议服务");
+            throw new AppServiceInvalidException("app没开通会议服务");
         }
 
         Session session = null;
