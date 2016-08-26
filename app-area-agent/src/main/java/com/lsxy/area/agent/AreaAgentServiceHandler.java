@@ -3,7 +3,7 @@ package com.lsxy.area.agent;
 import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.area.agent.cti.CTIClient;
 import com.lsxy.area.agent.cti.CTIClientContext;
-import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -13,6 +13,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -26,6 +27,12 @@ import java.util.Map;
 @Component
 public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
     private static final Logger logger = LoggerFactory.getLogger(AreaAgentServiceHandler.class);
+
+    @Value("${area.agent.client.cti.sip.host}")
+    private String ctiHost;
+
+    @Value("${area.agent.client.cti.sip.port}")
+    private int ctiPort;
 
     @Autowired(required = false)
     private CTIClient cticlient;
@@ -310,14 +317,11 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK:{}",request);
         }
         //TODO 获取线路IP和端口
-        String lineGatewayIp = "192.168.22.10";
-        String lineGatewayPort = "5062";
-
         Map<String, Object> params = new HashMap<>();
-        params.put("from1_uri", request.getParameter("from1")+"@"+lineGatewayIp+":"+lineGatewayPort);
-        params.put("to1_uri", request.getParameter("to1")+"@"+lineGatewayIp+":"+lineGatewayPort);
-        params.put("from2_uri", request.getParameter("from2")+"@"+lineGatewayIp+":"+lineGatewayPort);
-        params.put("to2_uri",request.getParameter("to2")+"@"+lineGatewayIp+":"+lineGatewayPort);
+        params.put("from1_uri", request.getParameter("from1")+"@"+ctiHost+":"+ctiPort);
+        params.put("to1_uri", request.getParameter("to1")+"@"+ctiHost+":"+ctiPort);
+        params.put("from2_uri", request.getParameter("from2")+"@"+ctiHost+":"+ctiPort);
+        params.put("to2_uri",request.getParameter("to2")+"@"+ctiHost+":"+ctiPort);
         params.put("max_connect_seconds",Integer.parseInt((String) request.getParameter("max_call_duration")));
         params.put("max_ring_seconds",Integer.parseInt((String) request.getParameter("max_dial_duration")));
         params.put("ring_play_file",request.getParameter("ring_tone"));
@@ -333,8 +337,12 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
 
         try {
-            cticlient.createResource(0, 0, "ext.duo_callback", params, null);
+            if(logger.isDebugEnabled()){
+                logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
+            }
+            String res_id = cticlient.createResource(0, 0, "ext.duo_callback", params, null);
             response.setMessage(RPCResponse.STATE_OK);
+            response.setBody(res_id);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
             e.printStackTrace();
@@ -432,8 +440,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
         try {
             Map<String, Object> params = new HashMap<>();
+
             params.put("from_uri", "");
-            params.put("to_uri", request.getParameter("to")+"@"+ SystemConfig.getProperty("area.agent.client.cti.sip.host","192.168.22.10")+":"+SystemConfig.getProperty("area.agent.client.cti.sip.port","5062"));
+            params.put("to_uri", request.getParameter("to") + "@" + ctiHost + ":" + ctiPort);
             params.put("max_answer_seconds", iMaxAnswerSec);
             params.put("max_ring_seconds", iMaxRingSec);
 
