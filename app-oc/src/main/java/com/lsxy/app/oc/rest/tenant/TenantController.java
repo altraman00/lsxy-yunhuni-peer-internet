@@ -1,5 +1,6 @@
 package com.lsxy.app.oc.rest.tenant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.framework.api.consume.service.ConsumeService;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -163,7 +165,18 @@ public class TenantController {
     public RestResponse billing(
             @ApiParam(name = "id",value = "租户id")
             @PathVariable String id){
-        return RestResponse.success(billingService.findBillingByTenantId(id));
+        Billing billing = billingService.findBillingByTenantId(id);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map map= objectMapper.convertValue(billing,Map.class);
+        //余额正数部分
+        int vTemp = billing.getBalance().intValue();
+        //余额小数部分
+        DecimalFormat df   = new DecimalFormat("######0.00");
+        String format = df.format(billing.getBalance());
+        String vTempDec = format.substring(format.indexOf('.') + 1, format.length());
+        map.put("balance",vTemp);
+        map.put("balanceDec",vTempDec);
+        return RestResponse.success(map);
     }
 
     @ApiOperation(value = "租户上个月数据指标")
