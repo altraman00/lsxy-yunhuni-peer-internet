@@ -1,7 +1,6 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.fastjson.JSON;
 import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.app.api.gateway.dto.*;
 import com.lsxy.area.api.ConfService;
@@ -34,7 +33,7 @@ public class ConfController extends AbstractAPIController{
                                     @RequestHeader(value = "AppID",required = false) String appId,
                                     @RequestBody ConfCreateInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("创建会议API参数,accountId={},appId={},dto={}",accountId,appId,JSON.toJSON(dto));
+            logger.debug("创建会议API参数,accountId={},appId={},dto={}",accountId,appId,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
@@ -71,7 +70,7 @@ public class ConfController extends AbstractAPIController{
                                 @RequestHeader(value = "AppID",required = false) String appId,
                                 @RequestBody ConfInviteCallInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("邀请会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
+            logger.debug("邀请会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
@@ -93,7 +92,7 @@ public class ConfController extends AbstractAPIController{
                                    @RequestHeader(value = "AppID",required = false) String appId,
                                    @RequestBody ConfJoinInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("加入会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
+            logger.debug("加入会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean  result = false;
@@ -110,7 +109,7 @@ public class ConfController extends AbstractAPIController{
                              @RequestHeader(value = "AppID",required = false) String appId,
                              @RequestBody ConfQuitInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("推出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
+            logger.debug("推出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean  result = false;
@@ -193,7 +192,7 @@ public class ConfController extends AbstractAPIController{
                                    @RequestHeader(value = "AppID",required = false) String appId,
                                    @RequestBody ConfSetVoiceModeInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("设置会议成员录放音模式API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
+            logger.debug("设置会议成员录放音模式API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean  result = false;
