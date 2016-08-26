@@ -20,7 +20,6 @@ public class ConsumeHour extends IdEntity {
     private Date dt;//统计时间
     private Integer hour;//统计小时 区间0-23
     private BigDecimal amongAmount;//本小时消费统计 decimal(20,4) DEFAULT NULL,
-    private BigDecimal sumAmount;//累计消费金额
     private String type;//消费类型
     @Column(name = "type")
     public String getType() {
@@ -35,14 +34,6 @@ public class ConsumeHour extends IdEntity {
     }
     public void setHour(Integer hour) {
         this.hour = hour;
-    }
-    @Column(name = "sum_amount")
-    public BigDecimal getSumAmount() {
-        return sumAmount;
-    }
-
-    public void setSumAmount(BigDecimal sumAmount) {
-        this.sumAmount = sumAmount;
     }
     @Column(name = "dt")
     public Date getDt() {

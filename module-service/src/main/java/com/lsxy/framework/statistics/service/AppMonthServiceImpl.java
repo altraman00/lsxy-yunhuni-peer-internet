@@ -38,8 +38,8 @@ public class AppMonthServiceImpl extends AbstractService<AppMonth> implements Ap
     }
 
     @Override
-    public void monthStatistics(Date date, int month,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void monthStatistics(Date date, int month,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");

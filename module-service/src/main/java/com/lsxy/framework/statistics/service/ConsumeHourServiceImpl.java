@@ -35,18 +35,17 @@ public class ConsumeHourServiceImpl extends AbstractService<ConsumeHour> impleme
     }
 
     @Override
-    public void hourStatistics(Date date1, int hour1, Date date2, int hour2, String[] select) throws SQLException {
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void hourStatistics(Date date1, int hour1, Date date2, int hour2, String[] select,String[] all) throws SQLException {
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
        //拼装sql
-        String sql = "insert into db_lsxy_base.tb_base_consume_hour("+selects+" dt,hour,among_amount,sum_amount,create_time,last_time,deleted,sortno,version )" +
+        String sql = "insert into db_lsxy_base.tb_base_consume_hour("+selects+" dt,hour,among_amount,create_time,last_time,deleted,sortno,version )" +
                 " select "+selects+" ? as dt,? as hour, "+
                 " IFNULL(sum(amount),0) as among_amount, " +
-                " IFNULL(sum(amount),0)+IFNULL((select sum_amount from db_lsxy_base.tb_base_consume_hour h where  "+wheres+" h.dt =? and h.hour=? ),0) as  sum_amount, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_base.tb_base_consume a where dt>=? and dt<=? "+groupbys;
+                " from db_lsxy_base.tb_base_consume a where dt BETWEEN ?,? "+groupbys;
        //拼装参数
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
@@ -55,7 +54,7 @@ public class ConsumeHourServiceImpl extends AbstractService<ConsumeHour> impleme
         Date date3 = DateUtils.parseDate(DateUtils.formatDate(date1,"yyyy-MM-dd HH")+ ":59:59","yyyy-MM-dd HH:mm:ss");
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
-                sqlDate1,hour1,sqlDate2,hour2,
+                sqlDate1,hour1,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };

@@ -69,12 +69,12 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
 
 
     /**
      * 获取某个时间范围的总的消费额
-     * @param d
+     * @param
      * @return
      */
     public BigDecimal getAmongAmountBetween(Date d1, Date d2);

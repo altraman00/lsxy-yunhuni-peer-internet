@@ -35,24 +35,17 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
     }
 
     @Override
-    public void hourStatistics(Date date1, int hour1,Date date2,int hour2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void hourStatistics(Date date1, int hour1,Date date2,int hour2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql =" insert into db_lsxy_base.tb_base_voice_cdr_hour("+selects+"dt,hour,among_duration,sum_duration,among_connect,sum_connect,among_not_connect,sum_not_connect,among_call,sum_call,create_time,last_time,deleted,sortno,version )" +
+        String sql =" insert into db_lsxy_base.tb_base_voice_cdr_hour("+selects+"dt,hour,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
                 " select "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(call_time_long),0) as among_duration," +
-                " IFNULL(sum(call_time_long),0)+IFNULL((select sum_duration from db_lsxy_base.tb_base_voice_cdr_hour h where "+wheres+" h.dt =? and h.hour=? ),0) as sum_duration , " +
-
                 " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+"  c1.call_ack_dt is not null ) as among_connect," +
-                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+"  c1.call_ack_dt is not null ) + IFNULL((select sum_connect from db_lsxy_base.tb_base_voice_cdr_hour h where "+wheres+"  h.dt = ? and h.hour=? ),0) as  sum_connect, " +
-
                 " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+" c1.call_ack_dt is null ) as  among_not_connect ," +
-                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+" c1.call_ack_dt is null )+IFNULL((select sum_not_connect from db_lsxy_base.tb_base_voice_cdr_hour h where "+wheres+" h.dt =? and h.hour=? ),0) as  sum_not_connect, " +
-
                 " count(1) as among_call,"+
-                " count(1) + IFNULL((select sum_call from db_lsxy_base.tb_base_voice_cdr_hour h where "+wheres+" h.dt =? and h.hour=? ),0) as sum_call," +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
                 " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr a where last_time>=? and last_time<=? "+groupbys;
 
@@ -64,7 +57,7 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         Date date3 = DateUtils.parseDate(DateUtils.formatDate(date1,"yyyy-MM-dd HH")+ ":59:59","yyyy-MM-dd HH:mm:ss");
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
-                sqlDate1,hour1,sqlDate2,hour2,sqlDate2,hour2,sqlDate2,hour2,sqlDate2,hour2,
+                sqlDate1,hour1,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };

@@ -2,10 +2,7 @@ package com.lsxy.utils;
 
 import com.lsxy.framework.core.utils.StringUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhangxb on 2016/8/4.
@@ -16,19 +13,25 @@ public class StatisticsUtils {
      * @param select
      * @return
      */
-    public static Map<String, String> getSqlRequirements(String[] select) {
+    public static Map<String, String> getSqlRequirements(String[] ...select) {
         Map<String,String> map = new HashMap();
         String selects = "";
         String groupbys = "";
         String wheres = "";
-        for(int i=0;i<select.length;i++){
-            if(i==select.length-1){
-                groupbys += select[i] ;
+        for(int i=0;i<select[0].length;i++){
+            if(i==select[0].length-1){
+                groupbys += select[0][i] ;
             }else {
-                groupbys += select[i] + " , ";
+                groupbys += select[0][i] + " , ";
             }
-            selects += select[i] + " , ";
-            wheres += select[i]+"=a."+select[i] +" and ";
+            selects += select[0][i] + " , ";
+            wheres += select[0][i]+"=a."+select[0][i] +" and ";
+        }
+        List isList = Arrays.asList(select[0]);
+        for(int j=0;j<select[1].length;j++){
+            if(!isList.contains(select[1][j])){
+                wheres += select[1][j]+" is null  and ";
+            }
         }
         if(StringUtil.isNotEmpty(groupbys)){
             groupbys = " group by "+groupbys;
