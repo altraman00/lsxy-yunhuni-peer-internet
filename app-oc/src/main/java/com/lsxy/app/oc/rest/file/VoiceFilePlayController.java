@@ -62,7 +62,7 @@ public class VoiceFilePlayController extends AbstractRestController {
                     voiceFilePlay.setCheckTime(new Date());
                     voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
                     if(voiceFilePlay.getStatus()==VoiceFilePlay.STATUS_FAIL){
-                        accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_INVOCE_APPLY_FAIL);
+                        accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_VOICE_PLAY_FAIL);
                     }else if(voiceFilePlay.getStatus()==VoiceFilePlay.STATUS_SUCCESS){
                         accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_VOICE_PLAY_SUCCESS);
                     }
