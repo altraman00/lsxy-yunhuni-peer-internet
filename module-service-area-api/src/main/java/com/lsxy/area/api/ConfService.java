@@ -51,7 +51,7 @@ public interface ConfService {
      * 退出会议
      * @return
      */
-    public boolean quit(String ip,String appId,String confId,String callId);
+    public boolean quit(String ip,String appId,String confId,String callId) throws InvokeCallException;
 
     /**
      * 会议放音

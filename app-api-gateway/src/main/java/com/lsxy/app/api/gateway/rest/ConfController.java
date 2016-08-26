@@ -6,6 +6,7 @@ import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.app.api.gateway.dto.ConfCreateInputDTO;
 import com.lsxy.app.api.gateway.dto.ConfInviteCallInputDTO;
 import com.lsxy.app.api.gateway.dto.ConfJoinInputDTO;
+import com.lsxy.app.api.gateway.dto.ConfQuitInputDTO;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
@@ -101,6 +102,23 @@ public class ConfController extends AbstractAPIController{
         boolean  result = false;
         try {
             result = confService.join(ip,appId,id,dto.getCallId(),dto.getMaxDuration(),dto.getPlayFile(),dto.getVoiceMode());
+        } catch (Exception e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        return RestResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{accountId}/conf/{id}/quit",method = RequestMethod.POST)
+    public RestResponse quit(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
+                             @RequestHeader(value = "AppID",required = false) String appId,
+                             @RequestBody ConfQuitInputDTO dto) {
+        if(logger.isDebugEnabled()){
+            logger.debug("创建会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        boolean  result = false;
+        try {
+            result = confService.quit(ip,appId,id,dto.getCallId());
         } catch (Exception e) {
             return RestResponse.failed("0000x",e.getMessage());
         }

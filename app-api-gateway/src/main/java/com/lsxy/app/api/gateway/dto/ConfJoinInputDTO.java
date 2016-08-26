@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class ConfJoinInputDTO implements Serializable{
 
     @JsonProperty("call_id")
-    private String callId;//主叫号码
+    private String callId;//呼叫id
 
     @JsonProperty("max_duration")
     private Integer maxDuration;//最大会议时间（秒）

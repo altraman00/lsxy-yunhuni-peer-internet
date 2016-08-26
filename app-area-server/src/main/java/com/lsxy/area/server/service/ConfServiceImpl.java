@@ -243,8 +243,41 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean quit(String ip, String appId, String confId, String callId) {
-        return false;
+    public boolean quit(String ip, String appId, String confId, String callId) throws InvokeCallException {
+        //TODO IP黑名单
+
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(whiteList != null && StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException("ip不在白名单");
+            }
+        }
+
+        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+            throw new AppServiceNotOn("app没开通会议服务");
+        }
+
+        Session session = null;
+        try{
+            session = sessionContext.getRightSession();
+        }catch (RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
+        if(session == null){
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call.conf_enter");
+        }
+        //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id
+        String params = String.format("res_id=%s&conf_res_id=%s",
+                callId, confId);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
+        try {
+            RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            //TODO
+        } catch (Exception e) {
+            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+        }
+        return true;
     }
 
     @Override
