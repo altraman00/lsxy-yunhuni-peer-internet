@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class HomeVO {
     private Long messageNum = 0l;//未读消息数量
+    private String arrearage = "";//默认不欠费
     private String balanceInt = "0";              //余额整数
 
     private String balanceDec = "00";              //余额小数
@@ -36,6 +37,14 @@ public class HomeVO {
     private String secretKey;               //secretKey
 
     private List<AppStateVO> appStateVOs;    //应用
+
+    public String getArrearage() {
+        return arrearage;
+    }
+
+    public void setArrearage(String arrearage) {
+        this.arrearage = arrearage;
+    }
 
     public Long getMessageNum() {
         return messageNum;

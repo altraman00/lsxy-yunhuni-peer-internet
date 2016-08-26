@@ -32,7 +32,7 @@
                                               <strong>余额</strong>
                                             </span>
                                             <span>
-                                              <small class="text-muted text-uc account-number">${homeVO.balanceInt}</small>
+                                                ${homeVO.arrearage}<small class="text-muted text-uc account-number">${homeVO.balanceInt}</small>
                                               <small class="account-number-decimal">.${homeVO.balanceDec}</small>
                                               元
                                             </span>
