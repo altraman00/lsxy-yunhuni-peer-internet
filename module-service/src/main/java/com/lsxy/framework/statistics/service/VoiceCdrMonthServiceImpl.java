@@ -54,7 +54,7 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
                 " IFNULL(SUM(among_not_connect),0) as  among_not_connect ," +
                 " IFNULL(SUM(among_call),0) as among_call,"+
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_base.tb_base_voice_cdr_day a where tenant_id is not null and app_id is not null and type is not null and  dt>=? and dt<=? "+groupbys;
+                " from db_lsxy_base.tb_base_voice_cdr_day a where tenant_id is not null and app_id is not null and type is not null and  dt BETWEEN ? AND ? "+groupbys;
 
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
