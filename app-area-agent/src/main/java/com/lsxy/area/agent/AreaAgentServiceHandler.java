@@ -53,6 +53,9 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         if(request.getName().equals(ServiceConstants.MN_CH_SYS_CONF)){
             response = this.process_MN_CH_SYS_CONF(request);
         }
+        if(request.getName().equals(ServiceConstants.MN_CH_SYS_CONF_RELEASE)){
+            response = this.process_MN_CH_SYS_CONF_RELEASE(request);
+        }
         if(request.getName().equals(ServiceConstants.MN_CH_EXT_DUO_CALLBACK)){
             response = this.process_MN_CH_EXT_DUO_CALLBACK(request);
         }
@@ -74,8 +77,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         return response;
     }
 
-    private RPCResponse process_MN_CH_SYS_CONF(RPCRequest request) {
-
+    private RPCResponse process_MN_CH_SYS_CONF_RELEASE(RPCRequest request){
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Client cticlient = cticlientContext.getAvalibleClient();
@@ -85,7 +87,33 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
 
         if(logger.isDebugEnabled()){
-            logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK:{}",request);
+            logger.debug("handler process_MN_CH_SYS_CONF_RELEASE:{}",request);
+        }
+
+        Map<String, Object> params = request.getParamMap();
+        params.put("user_data",request.getParameter("callId"));
+
+        try {
+            cticlient.createResource(0, 0, "sys.conf.release", params, null);
+            response.setMessage(RPCResponse.STATE_OK);
+        } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
+        }
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_SYS_CONF(RPCRequest request) {
+        RPCResponse response = RPCResponse.buildResponse(request);
+
+        Client cticlient = cticlientContext.getAvalibleClient();
+
+        if(cticlient == null) {
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
+            return response;
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("handler process_MN_CH_SYS_CONF:{}",request);
         }
 
         Map<String, Object> params = request.getParamMap();

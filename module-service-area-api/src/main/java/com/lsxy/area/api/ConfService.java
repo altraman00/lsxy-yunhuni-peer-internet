@@ -28,7 +28,7 @@ public interface ConfService {
     /**
      * 解散会议
      */
-    public boolean dismiss(String ip,String appId,String confId);
+    public boolean dismiss(String ip,String appId,String confId) throws InvokeCallException;
 
     /**
      * 会议邀请呼叫

@@ -7,8 +7,6 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.web.rest.RestRequest;
-import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +101,8 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
             } catch (Exception e) {
                 logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
             }
+        }else if(method.equals("sys.conf.on_released")){//会议结束时间
+                logger.info("会议结束时间");
         }else{
 //            if(logger.isDebugEnabled()){
 //                logger.debug("不是 INCOMING.........");

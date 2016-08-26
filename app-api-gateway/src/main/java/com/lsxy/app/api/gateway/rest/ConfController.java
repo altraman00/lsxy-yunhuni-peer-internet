@@ -50,4 +50,19 @@ public class ConfController extends AbstractAPIController{
     }
 
 
+    @RequestMapping(value = "/{accountId}/conf/{id}/dismiss",method = RequestMethod.POST)
+    public RestResponse dismiss(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
+                               @RequestHeader(value = "AppID",required = false) String appId) {
+        if(logger.isDebugEnabled()){
+            logger.debug("创建会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        boolean result = false;
+        try {
+            result = confService.dismiss(ip,appId,id);
+        } catch (Exception e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        return RestResponse.success(result);
+    }
 }

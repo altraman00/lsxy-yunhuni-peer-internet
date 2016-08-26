@@ -108,8 +108,48 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean dismiss(String ip, String appId, String confId) {
-        return false;
+    public boolean dismiss(String ip, String appId, String confId) throws InvokeCallException {
+        //TODO IP黑名单
+
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(whiteList != null && StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException("ip不在白名单");
+            }
+        }
+
+        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+            throw new AppServiceNotOn("app没开通会议服务");
+        }
+
+        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
+        //TODO 判断余额是否充足
+        if(balance.compareTo(new BigDecimal(0)) != 1){
+            throw new BalanceNotEnough("余额不足");
+        }
+
+        String callId = UUIDGenerator.uuid();
+        Map<String, Object> map = new HashMap<String,Object>();
+        map.put("callId",callId);
+        //TODO 根据callId 获取res_id
+        map.put("res_id",null);
+        Session session = null;
+        try{
+            session = sessionContext.getRightSession();
+        }catch (RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
+        if(session == null){
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.release");
+        }
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, map);
+        try {
+            rpcCaller.invokeWithReturn(session, rpcrequest);
+        } catch (Exception e) {
+            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+        }
+        return true;
     }
 
     @Override
