@@ -37,14 +37,14 @@ public interface ConfService {
     public String invite(String ip,String appId,String confId,
                          String from,String to,String customFrom,String customTO,
                          Integer maxDuration,Integer maxDialDuration,
-                         Integer dialVoiceStopCond,String playFile,Integer voiceMode);
+                         Integer dialVoiceStopCond,String playFile,Integer voiceMode) throws InvokeCallException;
 
     /**
      * 将通话加入到会议
      * @return
      */
     public boolean join(String ip,String appId,String confId,String callId,Integer maxDuration,
-                        String playFile,Integer voiceMode);
+                        String playFile,Integer voiceMode) throws InvokeCallException;
 
 
     /**
