@@ -85,5 +85,5 @@ public interface ConfService {
      * 4: 不能听；不能说
      * @return
      */
-    public boolean setVoiceMode(String ip,String appId,String confId,String callId,Integer voiceMode);
+    public boolean setVoiceMode(String ip,String appId,String confId,String callId,Integer voiceMode) throws InvokeCallException;
 }

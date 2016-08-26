@@ -71,7 +71,7 @@ public class ConfController extends AbstractAPIController{
                                 @RequestHeader(value = "AppID",required = false) String appId,
                                 @RequestBody ConfInviteCallInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("创建会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
+            logger.debug("邀请会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
         }
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
@@ -93,7 +93,7 @@ public class ConfController extends AbstractAPIController{
                                    @RequestHeader(value = "AppID",required = false) String appId,
                                    @RequestBody ConfJoinInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("创建会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
+            logger.debug("加入会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean  result = false;
@@ -110,7 +110,7 @@ public class ConfController extends AbstractAPIController{
                              @RequestHeader(value = "AppID",required = false) String appId,
                              @RequestBody ConfQuitInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("创建会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
+            logger.debug("推出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean  result = false;
@@ -127,12 +127,78 @@ public class ConfController extends AbstractAPIController{
                              @RequestHeader(value = "AppID",required = false) String appId,
                              @RequestBody ConfPlayInputDTO dto) {
         if(logger.isDebugEnabled()){
-            logger.debug("创建会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
+            logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean  result = false;
         try {
             result = confService.startPlay(ip,appId,id,dto.getFiles());
+        } catch (Exception e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        return RestResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{accountId}/conf/{id}/stop_play",method = RequestMethod.POST)
+    public RestResponse stopPlay(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
+                             @RequestHeader(value = "AppID",required = false) String appId) {
+        if(logger.isDebugEnabled()){
+            logger.debug("会议停止放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        boolean  result = false;
+        try {
+            result = confService.stopPlay(ip,appId,id);
+        } catch (Exception e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        return RestResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{accountId}/conf/{id}/start_record",method = RequestMethod.POST)
+    public RestResponse record(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
+                             @RequestHeader(value = "AppID",required = false) String appId,
+                             @RequestBody ConfRecordInputDTO dto) {
+        if(logger.isDebugEnabled()){
+            logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        boolean  result = false;
+        try {
+            result = confService.startRecord(ip,appId,id,dto.getMaxDuration());
+        } catch (Exception e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        return RestResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{accountId}/conf/{id}/stop_record",method = RequestMethod.POST)
+    public RestResponse stopRecord(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
+                             @RequestHeader(value = "AppID",required = false) String appId) {
+        if(logger.isDebugEnabled()){
+            logger.debug("会议停止放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        boolean  result = false;
+        try {
+            result = confService.stopRecord(ip,appId,id);
+        } catch (Exception e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        return RestResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{accountId}/conf/{id}/set_voice_mode",method = RequestMethod.POST)
+    public RestResponse setVoiceMode(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
+                                   @RequestHeader(value = "AppID",required = false) String appId,
+                                   @RequestBody ConfSetVoiceModeInputDTO dto) {
+        if(logger.isDebugEnabled()){
+            logger.debug("设置会议成员录放音模式API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,JSON.toJSON(dto));
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        boolean  result = false;
+        try {
+            result = confService.setVoiceMode(ip,appId,id,dto.getCallId(),dto.getVoiceMode());
         } catch (Exception e) {
             return RestResponse.failed("0000x",e.getMessage());
         }

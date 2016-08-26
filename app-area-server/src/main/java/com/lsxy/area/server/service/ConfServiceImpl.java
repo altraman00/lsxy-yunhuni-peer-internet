@@ -456,7 +456,42 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) {
-        return false;
+    public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) throws InvokeCallException {
+        //TODO IP黑名单
+
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(whiteList != null && StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException("ip不在白名单");
+            }
+        }
+
+        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+            throw new AppServiceInvalidException("app没开通会议服务");
+        }
+
+        Session session = null;
+        try{
+            session = sessionContext.getRightSession();
+        }catch (RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
+        if(session == null){
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.record_stop");
+        }
+        //TODO 此处需要根据confId获取呼叫的res_id
+        String params = String.format("res_id=%s&call_res_id=%s&mode=%d",confId,callId,voiceMode);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
+        try {
+            RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
+            //TODO
+        } catch (Exception e) {
+            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+        }
+        return true;
     }
 }
