@@ -22,7 +22,15 @@ public class CompanyAuthInfoVO extends AuthInfoVO{
     private String type03Prop02;//type03_prop02 [三证分离]税务登记证照片
     private String type03Prop03;//type03_prop03 [三证分离]营业执照号
     private String type03Prop04;//type03_prop04 [三证分离]营业执照照片
+    private String proposer;//申请人
 
+    public String getProposer() {
+        return proposer;
+    }
+
+    public void setProposer(String proposer) {
+        this.proposer = proposer;
+    }
 
     public String getName() {
         return name;
