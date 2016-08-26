@@ -1,6 +1,7 @@
 package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.fastjson.JSON;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
@@ -100,6 +101,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -136,6 +140,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -189,6 +196,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -233,6 +243,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -271,6 +284,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -309,6 +325,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -346,6 +365,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -383,6 +405,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
@@ -420,6 +445,9 @@ public class ConfServiceImpl implements ConfService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            if(logger.isDebugEnabled()){
+                logger.debug("响应",JSON.toJSON(res));
+            }
             //TODO
         } catch (Exception e) {
             throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
