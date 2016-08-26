@@ -1,10 +1,10 @@
-package com.lsxy.framework.config.service;
+package com.lsxy.yunhuni.config.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.config.model.ApiGwBlankIP;
-import com.lsxy.framework.api.config.service.ApiGwBlankIPService;
+import com.lsxy.yunhuni.api.config.model.ApiGwBlankIP;
+import com.lsxy.yunhuni.api.config.service.ApiGwBlankIPService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.config.dao.ApiGwBlankIPDao;
+import com.lsxy.yunhuni.config.dao.ApiGwBlankIPDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
