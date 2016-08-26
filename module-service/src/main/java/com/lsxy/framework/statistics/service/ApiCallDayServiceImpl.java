@@ -42,7 +42,7 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
                 " select "+map.get("selects")+" ? as dt,? as day, "+
                 " count(1) as among_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += " from db_lsxy_base.tb_base_api_call_hour a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ?,?  "+map.get("groupbys");
+        sql += " from db_lsxy_base.tb_base_api_call_hour a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ? AND ?  "+map.get("groupbys");
 
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
