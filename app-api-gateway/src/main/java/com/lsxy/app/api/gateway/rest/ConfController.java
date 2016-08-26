@@ -3,10 +3,7 @@ package com.lsxy.app.api.gateway.rest;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.lsxy.app.api.gateway.StasticsCounter;
-import com.lsxy.app.api.gateway.dto.ConfCreateInputDTO;
-import com.lsxy.app.api.gateway.dto.ConfInviteCallInputDTO;
-import com.lsxy.app.api.gateway.dto.ConfJoinInputDTO;
-import com.lsxy.app.api.gateway.dto.ConfQuitInputDTO;
+import com.lsxy.app.api.gateway.dto.*;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
@@ -119,6 +116,23 @@ public class ConfController extends AbstractAPIController{
         boolean  result = false;
         try {
             result = confService.quit(ip,appId,id,dto.getCallId());
+        } catch (Exception e) {
+            return RestResponse.failed("0000x",e.getMessage());
+        }
+        return RestResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{accountId}/conf/{id}/start_play",method = RequestMethod.POST)
+    public RestResponse play(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
+                             @RequestHeader(value = "AppID",required = false) String appId,
+                             @RequestBody ConfPlayInputDTO dto) {
+        if(logger.isDebugEnabled()){
+            logger.debug("创建会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
+        }
+        String ip = WebUtils.getRemoteAddress(request);
+        boolean  result = false;
+        try {
+            result = confService.startPlay(ip,appId,id,dto.getFiles());
         } catch (Exception e) {
             return RestResponse.failed("0000x",e.getMessage());
         }

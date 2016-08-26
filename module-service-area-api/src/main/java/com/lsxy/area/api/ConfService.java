@@ -57,25 +57,25 @@ public interface ConfService {
      * 会议放音
      * @return
      */
-    public boolean startPlay(String ip,String appId,String confId,List<String> playFiles);
+    public boolean startPlay(String ip,String appId,String confId,List<String> playFiles) throws InvokeCallException;
 
     /**
      * 停止会议放音
      * @return
      */
-    public boolean stopPlay(String ip,String appId,String confId);
+    public boolean stopPlay(String ip,String appId,String confId) throws InvokeCallException;
 
     /**
      * 会议录音
      * @return
      */
-    public boolean startRecord(String ip,String appId,String confId,Integer maxDuration);
+    public boolean startRecord(String ip,String appId,String confId,Integer maxDuration) throws InvokeCallException;
 
     /**
      * 停止会议录音
      * @return
      */
-    public boolean stopRecord(String ip,String appId,String confId);
+    public boolean stopRecord(String ip,String appId,String confId) throws InvokeCallException;
 
     /**
      * 设置成员声音模式

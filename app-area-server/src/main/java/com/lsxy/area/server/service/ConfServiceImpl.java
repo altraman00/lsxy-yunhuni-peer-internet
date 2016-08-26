@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by tandy on 16/8/18.
@@ -80,13 +81,6 @@ public class ConfServiceImpl implements ConfService {
             throw new BalanceNotEnough("余额不足");
         }
 
-        String callId = UUIDGenerator.uuid();
-        Map<String, Object> map = new HashMap<String,Object>();
-        map.put("callId",callId);
-        map.put("max_seconds",maxDuration);
-        map.put("bg_file",bgmFile);
-        map.put("release_threshold",0);
-
         Session session = null;
         try{
             session = sessionContext.getRightSession();
@@ -96,6 +90,13 @@ public class ConfServiceImpl implements ConfService {
         if(session == null){
             throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf");
         }
+        String callId = UUIDGenerator.uuid();
+        Map<String, Object> map = new HashMap<String,Object>();
+        map.put("callId",callId);
+        map.put("max_seconds",maxDuration);
+        map.put("bg_file",bgmFile);
+        map.put("release_threshold",0);
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
@@ -121,12 +122,6 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceNotOn("app没开通会议服务");
         }
-
-        String callId = UUIDGenerator.uuid();
-        Map<String, Object> map = new HashMap<String,Object>();
-        map.put("callId",callId);
-        //TODO 根据callId 获取res_id
-        map.put("res_id",null);
         Session session = null;
         try{
             session = sessionContext.getRightSession();
@@ -136,7 +131,9 @@ public class ConfServiceImpl implements ConfService {
         if(session == null){
             throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.release");
         }
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, map);
+        //TODO 根据confId 获取res_id
+        String params = String.format("res_id=%s",confId);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
             //TODO
@@ -175,10 +172,6 @@ public class ConfServiceImpl implements ConfService {
             throw new BalanceNotEnough("余额不足");
         }
 
-        String callId = UUIDGenerator.uuid();
-        String params = String.format("to=%s&from=%s&maxAnswerSec=%d&maxRingSec=%d&callId=%s",
-                                        to, from, maxDuration, maxDialDuration, callId);
-        //TODO 调用sys.call 需要把当前的业务。。邀请会议保存到user_data
         Session session = null;
         try{
             session = sessionContext.getRightSession();
@@ -188,6 +181,11 @@ public class ConfServiceImpl implements ConfService {
         if(session == null){
             throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.invite");
         }
+
+        String callId = UUIDGenerator.uuid();
+        String params = String.format("to=%s&from=%s&maxAnswerSec=%d&maxRingSec=%d&callId=%s",
+                to, from, maxDuration, maxDialDuration, callId);
+        //TODO 调用sys.call 需要把当前的业务。。邀请会议保存到user_data
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
             RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
@@ -265,7 +263,7 @@ public class ConfServiceImpl implements ConfService {
             throw new InvokeCallException(ex.getMessage());
         }
         if(session == null){
-            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call.conf_enter");
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call.conf_exit");
         }
         //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id
         String params = String.format("res_id=%s&conf_res_id=%s",
@@ -281,23 +279,152 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) {
-        return false;
+    public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) throws InvokeCallException {
+        //TODO IP黑名单
+
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(whiteList != null && StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException("ip不在白名单");
+            }
+        }
+
+        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+            throw new AppServiceNotOn("app没开通会议服务");
+        }
+
+        Session session = null;
+        try{
+            session = sessionContext.getRightSession();
+        }catch (RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
+        if(session == null){
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.play_start");
+        }
+        //TODO 此处需要根据confId获取呼叫的res_id
+        String params = String.format("res_id=%s&file=%s",
+                            confId,StringUtils.join(playFiles,"|"));
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
+        try {
+            RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            //TODO
+        } catch (Exception e) {
+            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+        }
+        return true;
     }
 
     @Override
-    public boolean stopPlay(String ip, String appId, String confId) {
-        return false;
+    public boolean stopPlay(String ip, String appId, String confId) throws InvokeCallException {
+        //TODO IP黑名单
+
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(whiteList != null && StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException("ip不在白名单");
+            }
+        }
+
+        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+            throw new AppServiceNotOn("app没开通会议服务");
+        }
+
+        Session session = null;
+        try{
+            session = sessionContext.getRightSession();
+        }catch (RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
+        if(session == null){
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.play_stop");
+        }
+        //TODO 此处需要根据confId获取呼叫的res_id
+        String params = String.format("res_id=%s",confId);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
+        try {
+            RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            //TODO
+        } catch (Exception e) {
+            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+        }
+        return true;
     }
 
     @Override
-    public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) {
-        return false;
+    public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) throws InvokeCallException {
+        //TODO IP黑名单
+
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(whiteList != null && StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException("ip不在白名单");
+            }
+        }
+
+        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+            throw new AppServiceNotOn("app没开通会议服务");
+        }
+
+        Session session = null;
+        try{
+            session = sessionContext.getRightSession();
+        }catch (RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
+        if(session == null){
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.record_start");
+        }
+        //TODO 此处需要根据CONFId获取呼叫的res_id，录音文件名，录音格式
+        String params = String.format("res_id=%s&max_seconds=%d&record_file=%s&record_format=%d",confId,maxDuration, UUID.randomUUID(),6);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
+        try {
+            RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            //TODO
+        } catch (Exception e) {
+            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+        }
+        return true;
     }
 
     @Override
-    public boolean stopRecord(String ip, String appId, String confId) {
-        return false;
+    public boolean stopRecord(String ip, String appId, String confId) throws InvokeCallException {
+        //TODO IP黑名单
+
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(whiteList != null && StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException("ip不在白名单");
+            }
+        }
+
+        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+            throw new AppServiceNotOn("app没开通会议服务");
+        }
+
+        Session session = null;
+        try{
+            session = sessionContext.getRightSession();
+        }catch (RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex.getMessage());
+        }
+        if(session == null){
+            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.record_stop");
+        }
+        //TODO 此处需要根据confId获取呼叫的res_id
+        String params = String.format("res_id=%s",confId);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP, params);
+        try {
+            RPCResponse res = rpcCaller.invokeWithReturn(session, rpcrequest);
+            //TODO
+        } catch (Exception e) {
+            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+        }
+        return true;
     }
 
     @Override

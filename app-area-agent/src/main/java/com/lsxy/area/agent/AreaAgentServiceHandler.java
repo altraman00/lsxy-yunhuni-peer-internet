@@ -63,6 +63,18 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         if(request.getName().equals(ServiceConstants.MN_CH_SYS_CONF_RELEASE)){
             response = this.process_MN_CH_SYS_CONF_RELEASE(request);
         }
+        if(request.getName().equals(ServiceConstants.MN_CH_SYS_CONF_PLAY)){
+            response = this.process_MN_CH_SYS_CONF_PLAY(request);
+        }
+        if(request.getName().equals(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP)){
+            response = this.process_MN_CH_SYS_CONF_PLAY_STOP(request);
+        }
+        if(request.getName().equals(ServiceConstants.MN_CH_SYS_CONF_RECORD)){
+            response = this.process_MN_CH_SYS_CONF_RECORD(request);
+        }
+        if(request.getName().equals(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP)){
+            response = this.process_MN_CH_SYS_CONF_RECORD_STOP(request);
+        }
         if(request.getName().equals(ServiceConstants.MN_CH_EXT_DUO_CALLBACK)){
             response = this.process_MN_CH_EXT_DUO_CALLBACK(request);
         }
@@ -81,6 +93,106 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
             logger.debug("返回给区域管理器的对象:{}",response);
         }
 
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_SYS_CONF_RECORD_STOP(RPCRequest request){
+        RPCResponse response = RPCResponse.buildResponse(request);
+
+        Client cticlient = cticlientContext.getAvalibleClient();
+        if(cticlient == null) {
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
+            return response;
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("handler process_MN_CH_SYS_CONF_RECORD_STOP:{}",request);
+        }
+
+        Map<String, Object> params = request.getParamMap();
+        params.put("user_data",request.getParameter("callId"));
+
+        try {
+            cticlient.createResource(0, 0, "sys.conf.record_stop", params, null);
+            response.setMessage(RPCResponse.STATE_OK);
+        } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
+        }
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_SYS_CONF_RECORD(RPCRequest request){
+        RPCResponse response = RPCResponse.buildResponse(request);
+
+        Client cticlient = cticlientContext.getAvalibleClient();
+        if(cticlient == null) {
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
+            return response;
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("handler process_MN_CH_SYS_CONF_RECORD:{}",request);
+        }
+
+        Map<String, Object> params = request.getParamMap();
+        params.put("user_data",request.getParameter("callId"));
+
+        try {
+            cticlient.createResource(0, 0, "sys.conf.record_start", params, null);
+            response.setMessage(RPCResponse.STATE_OK);
+        } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
+        }
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_SYS_CONF_PLAY_STOP(RPCRequest request){
+        RPCResponse response = RPCResponse.buildResponse(request);
+
+        Client cticlient = cticlientContext.getAvalibleClient();
+        if(cticlient == null) {
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
+            return response;
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("handler process_MN_CH_SYS_CONF_PLAY_STOP:{}",request);
+        }
+
+        Map<String, Object> params = request.getParamMap();
+        params.put("user_data",request.getParameter("callId"));
+
+        try {
+            cticlient.createResource(0, 0, "sys.conf.play_stop", params, null);
+            response.setMessage(RPCResponse.STATE_OK);
+        } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
+        }
+        return response;
+    }
+
+    private RPCResponse process_MN_CH_SYS_CONF_PLAY(RPCRequest request){
+        RPCResponse response = RPCResponse.buildResponse(request);
+
+        Client cticlient = cticlientContext.getAvalibleClient();
+        if(cticlient == null) {
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
+            return response;
+        }
+
+        if(logger.isDebugEnabled()){
+            logger.debug("handler process_MN_CH_SYS_CONF_PLAY:{}",request);
+        }
+
+        Map<String, Object> params = request.getParamMap();
+        params.put("user_data",request.getParameter("callId"));
+
+        try {
+            cticlient.createResource(0, 0, "sys.conf.play_start", params, null);
+            response.setMessage(RPCResponse.STATE_OK);
+        } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
+        }
         return response;
     }
 
