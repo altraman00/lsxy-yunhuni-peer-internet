@@ -55,6 +55,13 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     }
 
     @Override
+    public Page<ConsumeDay> compareStartTimeAndEndTimePageList(String tenantId, String appId, String type, Date startTime1, Date endTime1, Date startTime2, Date endTime2, Integer pageNo, Integer pageSize) {
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" (obj.dt >=?1 and obj.dt<=?2 ) or (obj.dt >=?3 and obj.dt<=?4 ) ORDER BY obj.dt";
+        Page<ConsumeDay>   page =  this.pageList(hql,pageNo,pageSize,startTime1,endTime1,startTime2,endTime2);
+        return page;
+    }
+
+    @Override
     public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
         String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt";
         List<ConsumeDay>  list = this.list(hql,startTime,endTime);

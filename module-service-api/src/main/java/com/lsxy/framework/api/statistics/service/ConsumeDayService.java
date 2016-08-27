@@ -28,7 +28,20 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @return
      */
     public Page<ConsumeDay> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize);
-
+    /**
+     * 获取两个时间点的数据
+     * @param tenantId 对于租户
+     * @param appId 应用id
+     * @param type 消费类型
+     * @param startTime1 时间点1
+     * @param endTime1 结束时间点1
+     * @param startTime2 时点2
+     * @param endTime2 结束时间点2
+     * @param pageNo 第几页
+     * @param pageSize 每页记录数
+     * @return
+     */
+    Page<ConsumeDay> compareStartTimeAndEndTimePageList (String tenantId, String appId,String type,Date startTime1, Date endTime1,Date startTime2, Date endTime2,Integer pageNo,Integer pageSize);
     /**
      * 获取用户某时间的列表数据
      * @param tenantId 对于租户
