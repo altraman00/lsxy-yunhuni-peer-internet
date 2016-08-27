@@ -55,7 +55,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     @Override
     public Page<Consume> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize) {
 
-        String hql = "from Consume obj where obj.tenant.id=?1 AND BETWEEN dt ? AND ? ";
+        String hql = "from Consume obj where obj.tenant.id=?1 AND  dt BETWEEN ?2 AND ?3 ";
         Date date1 = DateUtils.parseDate(year+"-"+month,"yyyy-MM");
         Calendar cale  = Calendar.getInstance();
         cale.setTime(date1);
