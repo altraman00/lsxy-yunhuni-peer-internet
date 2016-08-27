@@ -17,7 +17,7 @@ import java.util.Map;
  *
  */
 @Component
-public class ServerSessionContext implements SessionContext{
+public class ServerSessionContext extends SessionContext{
 	public static final Log logger = LogFactory.getLog(ServerSessionContext.class);
 	//<sessionid,session>
 	private ListOrderedMap sessionMap = new ListOrderedMap();

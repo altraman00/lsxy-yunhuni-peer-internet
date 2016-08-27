@@ -1,6 +1,8 @@
 package com.lsxy.framework.rpc.queue;
 
 import com.lsxy.framework.rpc.api.RPCMessage;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.SessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
@@ -46,6 +48,12 @@ public class FixQueue implements Runnable,InitializingBean{
      * @throws InterruptedException
      */
     public void fix(RPCMessage message) {
+        if(message instanceof RPCRequest){
+            RPCRequest request = (RPCRequest) message;
+            if(request.getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO)){
+                return;
+            }
+        }
         boolean putResult = false;
         //没有放入成功,继续放入
         while(!putResult){

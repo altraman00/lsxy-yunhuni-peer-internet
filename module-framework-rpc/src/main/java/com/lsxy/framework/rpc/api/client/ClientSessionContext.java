@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by tandy on 16/7/30.
  */
 @Component
-public class ClientSessionContext implements SessionContext{
+public class ClientSessionContext extends SessionContext{
 
     //有效会话选择器
     private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
