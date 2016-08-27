@@ -49,14 +49,14 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
 
     @Override
     public Page<ConsumeDay> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize) {
-        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt>=?1 and obj.dt<=?2 ) ORDER BY obj.dt,obj.day";
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt >=?1 and obj.dt<=?2  ORDER BY obj.dt";
         Page<ConsumeDay>   page =  this.pageList(hql,pageNo,pageSize,startTime,endTime);
         return page;
     }
 
     @Override
     public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt";
         List<ConsumeDay>  list = this.list(hql,startTime,endTime);
         return list;
     }
