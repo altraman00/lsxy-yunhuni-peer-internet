@@ -166,7 +166,7 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeMonth month : ms) {
             if(month!=null && BeanUtils.getProperty2(month,field) !=null){
-                sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
+                sum = sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
             }
         }
         return sum;

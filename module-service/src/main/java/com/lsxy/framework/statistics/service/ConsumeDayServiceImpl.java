@@ -131,7 +131,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeDay day : ds) {
             if(day!=null && day.getAmongAmount() !=null){
-                sum.add(day.getAmongAmount());
+                sum = sum.add(day.getAmongAmount());
             }
         }
         return sum;
@@ -196,7 +196,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeDay day : ds) {
             if(day!=null && day.getAmongAmount() !=null){
-                sum.add(day.getAmongAmount());
+                sum = sum.add(day.getAmongAmount());
             }
         }
         return sum;
@@ -207,7 +207,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         if(tenantId == null){
             throw new IllegalArgumentException();
         }
-        String sql = "select sum(among_amount) from  tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null  ";
+        String sql = "select sum(sum_amount) from (select sum_amount from tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null order by dt desc limit 1) a";
         Query query = em.createNativeQuery(sql);
         query.setParameter("tenant",tenantId);
         Object result = query.getSingleResult();
