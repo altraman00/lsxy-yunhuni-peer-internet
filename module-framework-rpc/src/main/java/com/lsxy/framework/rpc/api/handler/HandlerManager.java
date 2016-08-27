@@ -2,6 +2,7 @@ package com.lsxy.framework.rpc.api.handler;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.server.Session;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,15 @@ public class HandlerManager {
     public void init() {
         Reflections reflections = new Reflections("com.lsxy");
         Set<Class<? extends RpcRequestHandler>> handlerClasss = reflections.getSubTypesOf(RpcRequestHandler.class);
-        logger.debug("found "+handlers.size()+" handlers");
         for (Class<? extends RpcRequestHandler> handlerClass : handlerClasss) {
             RpcRequestHandler handler = applicationContext.getBean(handlerClass);
             handlers.put(handler.getEventName(),handler);
+            logger.info("注册消息处理器:{},{}",handler.getEventName(),handler);
         }
     }
 
-    public RPCResponse fire(RPCRequest request){
+    public RPCResponse fire(RPCRequest request, Session session){
         RpcRequestHandler handler = handlers.get(request.getName());
-        return handler.handle(request);
+        return handler.handle(request,session);
     }
 }
