@@ -7,12 +7,14 @@ import com.lsxy.yunhuni.api.product.service.ProductPriceService;
 import com.lsxy.yunhuni.product.dao.ProductPriceDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 
 /**
  * Created by liups on 2016/8/27.
  */
+@Service
 public class ProductPriceServiceImpl extends AbstractService<ProductPrice> implements ProductPriceService {
     @Autowired
     ProductPriceDao  productPriceDao;
