@@ -203,13 +203,17 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     }
 
     @Override
-    public BigDecimal getSumAmountByTenant(String tenantId) {
+    public BigDecimal getSumAmountByTenant(String tenantId,String time) {
         if(tenantId == null){
             throw new IllegalArgumentException();
         }
-        String sql = "select sum(sum_amount) from (select sum_amount from tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null order by dt desc limit 1) a";
+        Date startTime = DateUtils.parseDate(time,"yyyy-MM");
+        Date endTime = DateUtils.getLastTimeOfMonth(startTime);
+        String sql = "select sum(among_amount) from tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null and dt BETWEEN :start AND :end ";
         Query query = em.createNativeQuery(sql);
         query.setParameter("tenant",tenantId);
+        query.setParameter("start",startTime);
+        query.setParameter("end",endTime);
         Object result = query.getSingleResult();
         if(result!=null){
             return (BigDecimal)result;

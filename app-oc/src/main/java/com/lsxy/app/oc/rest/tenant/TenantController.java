@@ -530,7 +530,7 @@ public class TenantController {
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
         dto.setConsumes(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
-        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id));
+        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
         return RestResponse.success(dto);
     }
 
