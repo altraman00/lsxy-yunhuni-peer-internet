@@ -1,6 +1,7 @@
 package com.lsxy.framework.rpc.api;
 
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.framework.rpc.mina.client.MinaClientSession;
 
 import java.util.Collection;
@@ -35,5 +36,12 @@ public interface SessionContext {
      * @return
      */
     public Collection<Session> sessions();
+
+
+    /**
+     * 根据具体情况获取合适的,正确的RPC SESSION对象
+     * @return
+     */
+    public Session getRightSession() throws RightSessionNotFoundExcepiton;
 
 }

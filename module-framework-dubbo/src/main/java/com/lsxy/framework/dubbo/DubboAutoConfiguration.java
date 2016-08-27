@@ -26,7 +26,7 @@ public class DubboAutoConfiguration {
     public ApplicationConfig dubboApplicationConfig() {
         System.setProperty("dubbo.application.logger","slf4j");
         ApplicationConfig appConfig = new ApplicationConfig();
-        appConfig.setName(properties.getApp());
+        appConfig.setName(System.getProperty("system.id"));
         return appConfig;
     }
 

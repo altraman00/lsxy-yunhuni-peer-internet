@@ -2,6 +2,7 @@ package com.lsxy.framework.rpc.api.client;
 
 import com.lsxy.framework.rpc.api.SessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.framework.rpc.mina.client.MinaClientSession;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.springframework.stereotype.Component;
@@ -91,35 +92,40 @@ public class ClientSessionContext implements SessionContext{
     }
 
 
+
     /**
      * 获取有效的会话
      * 负载均衡算法
      * @return
-     */
-    public Session getAvalibleSession() {
-        int idx = 0;    //索引  默认为0
-        int times = 1;  //遍历次数,一次
-        int j = 0;      //当前遍历次数
-        Session session = null;
-        while(j<times && size()>0) {
-            int i = this.sessionSelectCounter.addAndGet(1);
-            //如果总计数器达到整型最大值,重置0
-            if (i >= (Integer.MAX_VALUE - 1)) {
-                this.sessionSelectCounter.set(0);
+     * */
+    @Override
+    public Session getRightSession() throws RightSessionNotFoundExcepiton {
+            int idx = 0;    //索引  默认为0
+            int times = 1;  //遍历次数,一次
+            int j = 0;      //当前遍历次数
+            if(size()<=0)
+                throw new RightSessionNotFoundExcepiton("没有找到有效的会话");
+            Session session = null;
+            while(j<times && size()>0) {
+                int i = this.sessionSelectCounter.addAndGet(1);
+                //如果总计数器达到整型最大值,重置0
+                if (i >= (Integer.MAX_VALUE - 1)) {
+                    this.sessionSelectCounter.set(0);
+                }
+                int size = size();
+                idx = i % size;
+                //遍历到最后一个表示到了一轮
+                if(idx == (size -1)){
+                    j++;
+                }
+                session = getSessionByIndex(idx);
+                if(session.isValid()){
+                    return session;
+                }else{
+                    continue;
+                }
             }
-            int size = size();
-            idx = i % size;
-            //遍历到最后一个表示到了一轮
-            if(idx == (size -1)){
-                j++;
-            }
-            session = getSessionByIndex(idx);
-            if(session.isValid()){
-                return session;
-            }else{
-                continue;
-            }
-        }
-        return session;
+            return session;
     }
+
 }

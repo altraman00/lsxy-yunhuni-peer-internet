@@ -1,24 +1,19 @@
 package com.lsxy.area.agent;
 
-import ch.qos.logback.core.util.TimeUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.client.Client;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
 import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
+import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,7 +40,7 @@ public class MyScheduledTaskForTestX implements Runnable{
 //    public void doTest(){
 //        if(logger.isDebugEnabled()){
 //        }
-//        Session session = client.getAvalibleSession();
+//        Session session = client.getRightSession();
 //        if(session != null){
 //            RPCRequest request = RPCRequest.newRequest("REQUEST","VALUE0=001");
 //            session.write(request);
@@ -67,7 +62,11 @@ public class MyScheduledTaskForTestX implements Runnable{
             logger.info("开始测试");
         Session session = null;
         while(true){
-            session = sessionContext.getAvalibleSession();
+            try {
+                session = sessionContext.getRightSession();
+            } catch (RightSessionNotFoundExcepiton rightSessionNotFoundExcepiton) {
+                rightSessionNotFoundExcepiton.printStackTrace();
+            }
             if(session == null || !session.isValid()){
                     logger.info("没有有效的session,等着吧");
                 try {
