@@ -122,6 +122,6 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param tenantId
      * @return
      */
-    public BigDecimal getSumAmountByTenant(String tenantId);
+    public BigDecimal getSumAmountByTenant(String tenantId,String time);
 
 }
