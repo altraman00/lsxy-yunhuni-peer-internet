@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.message;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +28,17 @@ import java.util.Map;
 public class AccountMessageController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(AccountMessageController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
-
+    /**
+     * 获取未读消息
+     * @return
+     */
+    @RequestMapping("/not/read")
+    @ResponseBody
+    private RestResponse countMessage(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/message/account_message/count?status=0";
+        return  RestRequest.buildSecurityRequest(token).get(uri, Long.class);
+    }
     /**
      * 用户消息首页
      * @param request
@@ -40,7 +52,18 @@ public class AccountMessageController extends AbstractPortalController {
         Page<AccountMessage> pageObj = restResponse.getData();
         mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/message/index");
+        edit(request);
         return mav;
+    }
+    /**
+     * 修改状态为已读
+     * @param request
+     * @return
+     */
+    private RestResponse edit(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/message/account_message/edit";
+        return  RestRequest.buildSecurityRequest(token).get(uri, Object.class);
     }
     /**
      * 查询用户下所有消息rest请求
