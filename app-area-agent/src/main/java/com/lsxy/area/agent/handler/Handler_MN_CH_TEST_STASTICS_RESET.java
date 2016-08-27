@@ -1,0 +1,49 @@
+package com.lsxy.area.agent.handler;
+
+import com.lsxy.area.agent.StasticsCounter;
+import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
+import com.lsxy.framework.rpc.api.server.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/**
+ * Created by liuws on 2016/8/27.
+ */
+@Component
+public class Handler_MN_CH_TEST_STASTICS_RESET extends RpcRequestHandler{
+
+    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_TEST_STASTICS_RESET.class);
+
+    @Value("${area.agent.client.cti.sip.host}")
+    private String ctiHost;
+
+    @Value("${area.agent.client.cti.sip.port}")
+    private int ctiPort;
+
+    @Autowired
+    private CTIClientContext cticlientContext;
+
+    @Autowired(required = false)
+    private StasticsCounter sc;
+
+    @Override
+    public String getEventName() {
+        return ServiceConstants.MN_CH_TEST_STASTICS_RESET;
+    }
+
+    @Override
+    public RPCResponse handle(RPCRequest request, Session session) {
+        if(logger.isDebugEnabled()){
+            logger.debug("重置计数器");
+        }
+        if(sc!=null) sc.reset();
+        return null;
+    }
+}
