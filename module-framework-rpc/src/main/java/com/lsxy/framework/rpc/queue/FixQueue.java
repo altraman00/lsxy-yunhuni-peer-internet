@@ -5,7 +5,6 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.SessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +24,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @Component
-public class FixQueue implements Runnable,InitializingBean{
-
-    private static FixQueue fixQueue = null;
+public class FixQueue implements Runnable{
 
     @Autowired
     private SessionContext sessionContext;
@@ -108,15 +105,5 @@ public class FixQueue implements Runnable,InitializingBean{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        fixQueue = this;
-    }
-
-    public static FixQueue getInstance(){
-        return fixQueue;
     }
 }
