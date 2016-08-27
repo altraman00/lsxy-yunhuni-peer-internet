@@ -5,6 +5,8 @@ import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.framework.rpc.mina.client.MinaClientSession;
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -18,6 +20,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Component
 public class ClientSessionContext extends SessionContext{
+
+    private static final Logger logger = LoggerFactory.getLogger(ClientSessionContext.class);
 
     //有效会话选择器
     private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
@@ -99,12 +103,15 @@ public class ClientSessionContext extends SessionContext{
      * @return
      * */
     @Override
-    public Session getRightSession() throws RightSessionNotFoundExcepiton {
+    public Session getRightSession()  {
             int idx = 0;    //索引  默认为0
             int times = 1;  //遍历次数,一次
             int j = 0;      //当前遍历次数
-            if(size()<=0)
-                throw new RightSessionNotFoundExcepiton("没有找到有效的会话");
+            if(size()<=0) {
+                logger.error("没有找到有效的会话");
+                return null;
+            }
+
             Session session = null;
             while(j<times && size()>0) {
                 int i = this.sessionSelectCounter.addAndGet(1);

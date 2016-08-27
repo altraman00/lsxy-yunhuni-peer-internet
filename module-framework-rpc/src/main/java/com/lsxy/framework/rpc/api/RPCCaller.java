@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
 import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
+import com.lsxy.framework.rpc.queue.FixQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -111,11 +112,16 @@ public class RPCCaller {
 
 	/**
 	 * 调用远程服务，无返回值
-	 * @param session
+	 * @param session 允许外接session为空,将为空判断放入方法体主要是为了统一处理会话丢失导致的消息丢失,将消息丢入修正队列
 	 * @throws RequestWriteException
 	 */
 	public void invoke(Session session, RPCRequest request) throws RequestWriteException, SessionWriteException {
-		assert StringUtil.isNotEmpty(request.getSessionid());
+		//如果session为空
+		if(session == null) {
+			logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}", request);
+			FixQueue.getInstance().fix(request);
+			return;
+		}
 		logger.debug(">>*"+request);
 		session.write(request);
 	}
@@ -128,9 +134,13 @@ public class RPCCaller {
 	 * @throws RequestWriteException
 	 */
 	public void invoke(Session session, RPCRequest request, RequestListener rqListener) throws RequestWriteException, SessionWriteException {
-		String sessionid =UUIDGenerator.uuid();
-		request.setSessionid(sessionid);
-		
+		//如果session为空
+		if(session == null){
+			logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);
+			FixQueue.getInstance().fix(request);
+			return;
+		}
+
 		rqListener.setRequest(request);
 		this.addRequestListener(rqListener);
 		
@@ -138,16 +148,6 @@ public class RPCCaller {
 		session.write(request);
 	}
 	
-	/**
-	 * 指定的session的response是否存在
-	 * @param sessionid
-	 * @return
-	 */
-	public boolean isHaveResponse(String sessionid) {
-		RPCResponse response = responseMap.get(sessionid);
-		return response != null;
-	}
-
 	/**
 	 * 调用指定的服务，发出请求
 	 * 
@@ -159,8 +159,6 @@ public class RPCCaller {
 	@SuppressWarnings("static-access")
 	public RPCResponse invokeWithReturn(Session session, RPCRequest request)
 			throws InterruptedException, RequestTimeOutException, SessionWriteException, HaveNoExpectedRPCResponseException {
-		String sessionid = UUIDGenerator.uuid();
-		request.setSessionid(sessionid);
 		requestMap.put(request.getSessionid(), request);
 		logger.debug(">>"+request);
 		session.write(request);
@@ -176,15 +174,15 @@ public class RPCCaller {
 		if(logger.isDebugEnabled()){
 		    logger.debug("请求醒了:{},已经睡了{}ms",request,(System.currentTimeMillis() - startWait));
 		}
-		RPCResponse response = responseMap.get(sessionid);
+		RPCResponse response = responseMap.get(request.getSessionid());
+		responseMap.remove(request.getSessionid());
+		requestMap.remove(request.getSessionid());
+
 		if(response == null){
 			throw new HaveNoExpectedRPCResponseException(request);
 		}
-		responseMap.remove(request.getSessionid());
-		requestMap.remove(request.getSessionid());
 		return response;
 	}
-
 
 
 }

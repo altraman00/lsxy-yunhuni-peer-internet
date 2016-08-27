@@ -40,9 +40,12 @@ public abstract class SessionContext {
 
     /**
      * 根据具体情况获取合适的,正确的RPC SESSION对象
+     * 去掉 RightSessionNotFoundExcepiton  ,不再抛出该异常
+     * 如果没找到就返回空
+     * 为了能够让rpccall自己判断是否session为空,统一处理消息重发问题
      * @return
      */
-    public abstract Session getRightSession() throws RightSessionNotFoundExcepiton;
+    public abstract Session getRightSession();
 
 
 

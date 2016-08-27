@@ -92,16 +92,14 @@ public class ServerSessionContext extends SessionContext{
 	 * @return
      */
 	@Override
-	public Session getRightSession() throws RightSessionNotFoundExcepiton {
+	public Session getRightSession()  {
 		Session session = null;
 		try {
 			session = (Session) this.sessionMap.getValue(0);
 		}catch(Exception ex){
 			logger.error("没有找到有效的与区域会话");
-			throw new RightSessionNotFoundExcepiton("没有找到有效的与区域会话");
 		}
 		return session;
-
 	}
 
 }

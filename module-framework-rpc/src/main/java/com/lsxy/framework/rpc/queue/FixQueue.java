@@ -48,6 +48,7 @@ public class FixQueue implements Runnable,InitializingBean{
      * @throws InterruptedException
      */
     public void fix(RPCMessage message) {
+        logger.info("消息进入修正队列:{},当前已累积消息:{}个"+message,this.queue.size());
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
             if(request.getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO)){
@@ -66,6 +67,7 @@ public class FixQueue implements Runnable,InitializingBean{
                 }
             }
         }
+
     }
 
     /**
@@ -90,12 +92,14 @@ public class FixQueue implements Runnable,InitializingBean{
                     message.tryWriteMark();
                     logger.info("尝试重新发送消息:{}",message);
                     Session session = sessionContext.getRightSession();
-                    session.write(message);
-                } catch (RightSessionNotFoundExcepiton ex) {
-                    logger.error("连接丢失了,没有找到有效的会话,10S后尝试重新发送累积的消息,已累积[{}]条消息",this.queue.size());
-                    //消息重新放入队列后休息10秒
-                    this.fix(message);
-                    TimeUnit.SECONDS.sleep(10);
+                    if(session != null){
+                        session.write(message);
+                    }else{
+                        logger.error("连接丢失了,没有找到有效的会话,10S后尝试重新发送累积的消息,已累积[{}]条消息",this.queue.size());
+                        //消息重新放入队列后休息10秒
+                        this.fix(message);
+                        TimeUnit.SECONDS.sleep(10);
+                    }
                 } catch (SessionWriteException e) {
                     logger.error("消息写入失败,重新放入队列:"+message+" 队列积累["+this.queue.size()+"]条消息",e);
                     this.fix(message);
