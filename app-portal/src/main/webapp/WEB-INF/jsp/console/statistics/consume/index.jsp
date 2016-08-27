@@ -373,7 +373,7 @@
                 var tempData = new Date(resultData[i].dt);
                 var tempDataStr = tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate();
                 if(type=='year'){tempDataStr =  tempData.getFullYear()+"-"+(tempData.getMonth()+1);}
-                var temp = [tempDataStr,resultData[i].sumAmount];
+                var temp = [tempDataStr,resultData[i].amongAmount];
                 data[i]=temp;
             }
             i++;
