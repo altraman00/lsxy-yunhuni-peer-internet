@@ -37,8 +37,8 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     }
     @Override
     public List<VoiceCdrMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.month";
-        List<VoiceCdrMonth>list = this.findByCustomWithParams(hql,startTime,endTime);
+        String hql = "from VoiceCdrMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt between ?1 and ?2 ORDER BY obj.month";
+        List<VoiceCdrMonth>list = this.list(hql,startTime,endTime);
         return list;
     }
     @Override
