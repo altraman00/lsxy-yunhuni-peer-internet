@@ -1,4 +1,4 @@
-package com.lsxy.area.agent.handler;
+package com.lsxy.framework.rpc.api.handler;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +40,7 @@ public class HandlerManager {
      * 初始化handler集合，扫描类路径中所有的handler并放入map中方便使用
      */
     public void init() {
-        Reflections reflections = new Reflections("com.lsxy.area.agent.handler");
+        Reflections reflections = new Reflections("com.lsxy");
         Set<Class<? extends RpcRequestHandler>> handlerClasss = reflections.getSubTypesOf(RpcRequestHandler.class);
         logger.debug("found "+handlers.size()+" handlers");
         for (Class<? extends RpcRequestHandler> handlerClass : handlerClasss) {
