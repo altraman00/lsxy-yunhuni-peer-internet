@@ -4,13 +4,17 @@ package com.lsxy.area.api.exceptions;
  * Created by liups on 2016/8/23.
  */
 public class AppServiceInvalidException extends YunhuniApiException {
-    public AppServiceInvalidException(String message) {
-        super(message);
+    public AppServiceInvalidException(Throwable t) {
+        super(t);
+    }
+
+    public AppServiceInvalidException() {
+        super();
     }
 
     @Override
-    public String getCode() {
-        return "101010";
+    public ApiExceptionEnum getApiExceptionEnum() {
+        return ApiExceptionEnum.AppServiceInvalid;
     }
 
 }

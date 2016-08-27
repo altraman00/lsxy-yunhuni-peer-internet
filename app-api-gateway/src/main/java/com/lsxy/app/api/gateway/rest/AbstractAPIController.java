@@ -26,7 +26,7 @@ public class AbstractAPIController {
         if(ex instanceof YunhuniApiException){
             failed = RestResponse.failed(((YunhuniApiException) ex).getCode(),ex.getMessage());
         }else{
-            failed = RestResponse.failed("111111", ex.getMessage());
+            failed = RestResponse.failed("111111", "未知错误");
         }
         return JSONUtil2.objectToJson(failed);
     }

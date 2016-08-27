@@ -51,23 +51,23 @@ public class ConfServiceImpl implements ConfService {
     private BillingService billingService;
 
     @Override
-    public String create(String ip, String appId, Integer maxDuration, Integer maxParts, Boolean recording, Boolean autoHangup, String bgmFile, String callBackURL, String userData) throws InvokeCallException {
+    public String create(String ip, String appId, Integer maxDuration, Integer maxParts, Boolean recording, Boolean autoHangup, String bgmFile, String callBackURL, String userData) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnoughException("余额不足");
+            throw new BalanceNotEnoughException();
         }
         Session session = null;
         try {
@@ -87,29 +87,29 @@ public class ConfServiceImpl implements ConfService {
             rpcCaller.invoke(session, rpcrequest);
 
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return callId;
     }
 
     @Override
-    public boolean dismiss(String ip, String appId, String confId) throws InvokeCallException {
+    public boolean dismiss(String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
 
         //TODO 根据confId 获取res_id
@@ -119,7 +119,7 @@ public class ConfServiceImpl implements ConfService {
             rpcCaller.invoke(session, rpcrequest);
 
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
@@ -128,34 +128,34 @@ public class ConfServiceImpl implements ConfService {
     public String invite(String ip, String appId, String confId,
                          String from, String to, String customFrom,
                          String customTO, Integer maxDuration, Integer maxDialDuration,
-                         Integer dialVoiceStopCond, String playFile, Integer voiceMode) throws InvokeCallException{
+                         Integer dialVoiceStopCond, String playFile, Integer voiceMode) throws YunhuniApiException{
         if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
-            throw new NumberNotAllowToCallException("不能呼叫该号码");
+            throw new NumberNotAllowToCallException();
         }
 
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnoughException("余额不足");
+            throw new BalanceNotEnoughException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
 
         String callId = UUIDGenerator.uuid();
@@ -166,36 +166,36 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return callId;
     }
 
     @Override
-    public boolean join(String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws InvokeCallException{
+    public boolean join(String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnoughException("余额不足");
+            throw new BalanceNotEnoughException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
 
         //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id，volume不知道填多少填个5
@@ -205,30 +205,30 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
 
     @Override
-    public boolean quit(String ip, String appId, String confId, String callId) throws InvokeCallException {
+    public boolean quit(String ip, String appId, String confId, String callId) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException();
         }
 
         //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id
@@ -238,30 +238,30 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
 
     @Override
-    public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) throws InvokeCallException {
+    public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
 
         //TODO 此处需要根据confId获取呼叫的res_id
@@ -271,30 +271,30 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
 
     @Override
-    public boolean stopPlay(String ip, String appId, String confId) throws InvokeCallException {
+    public boolean stopPlay(String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
 
         //TODO 此处需要根据confId获取呼叫的res_id
@@ -303,30 +303,30 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
 
     @Override
-    public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) throws InvokeCallException {
+    public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
 
         //TODO 此处需要根据CONFId获取呼叫的res_id，录音文件名，录音格式
@@ -335,33 +335,33 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
 
     @Override
-    public boolean stopRecord(String ip, String appId, String confId) throws InvokeCallException {
+    public boolean stopRecord(String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
         if(session == null){
-            throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.conf.record_stop");
+            throw new InvokeCallException();
         }
         //TODO 此处需要根据confId获取呼叫的res_id
         String params = String.format("res_id=%s",confId);
@@ -369,30 +369,30 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
 
     @Override
-    public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) throws InvokeCallException {
+    public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("ip不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
 
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-            throw new AppServiceInvalidException("app没开通会议服务");
+            throw new AppServiceInvalidException();
         }
 
         Session session = null;
         try{
             session = sessionContext.getRightSession();
         }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex.getMessage());
+            throw new InvokeCallException(ex);
         }
 
         //TODO 此处需要根据confId获取呼叫的res_id
@@ -401,7 +401,7 @@ public class ConfServiceImpl implements ConfService {
         try {
             rpcCaller.invoke(session, rpcrequest);
         } catch (Exception e) {
-            throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+            throw new InvokeCallException(e);
         }
         return true;
     }
