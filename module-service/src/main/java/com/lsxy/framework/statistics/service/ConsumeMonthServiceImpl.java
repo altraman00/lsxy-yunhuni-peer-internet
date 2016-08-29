@@ -180,10 +180,10 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
     }
 
     @Override
-    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant) {
+    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
-        return getSumFieldBetween(d1,d2,"amongAmount",tenant,null,null);
+        return getSumFieldBetween(d1,d2,"amongAmount",tenant,appId,null);
     }
 
     @Override

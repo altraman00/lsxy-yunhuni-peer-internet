@@ -187,7 +187,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     }
 
     @Override
-    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant) {
+    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from ConsumeDay obj where "
