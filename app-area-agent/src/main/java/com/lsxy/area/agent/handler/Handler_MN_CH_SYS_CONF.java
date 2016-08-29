@@ -101,6 +101,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
 
                 @Override
                 protected void onTimeout() {
+                    logger.error("资源{}[{}]创建超时",getEventName(),conf_id);
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);
