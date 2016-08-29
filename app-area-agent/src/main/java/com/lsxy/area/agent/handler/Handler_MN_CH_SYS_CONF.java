@@ -73,6 +73,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
                 protected void onResult(Object o) {
                     logger.info("111111111111111");
                     logger.info("{}",o);
+                    down.countDown();
 
                 }
 
