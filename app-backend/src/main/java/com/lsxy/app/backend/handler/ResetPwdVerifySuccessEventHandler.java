@@ -1,6 +1,8 @@
 package com.lsxy.app.backend.handler;
 
 import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
+import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -26,7 +28,8 @@ import java.util.Map;
 @Component
 public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<ResetPwdVerifySuccessEvent> {
     private static final Logger logger = LoggerFactory.getLogger(ResetPwdVerifySuccessEventHandler.class);
-
+    @Autowired
+    AccountService accountService;
     @Autowired
     private RedisCacheService cacheManager;
 
@@ -40,11 +43,13 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
             String email = message.getEmail();
             //发送邮件（参数是一个reset_pwd_{uuid}），并将其存到数据库（redis?）
             String key = "reset_pwd_" + UUIDGenerator.uuid();
+            Account account = accountService.findById(message.getAccountId());
             //发送邮件
             Map<String,String> params = new HashMap<>();
             params.put("host", SystemConfig.getProperty("portal.system.root.url"));
             params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
             params.put("key",key);
+            params.put("uid",account.getId());
             params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
             //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
             String testEmail = SystemConfig.getProperty("global.mail.tester.email");

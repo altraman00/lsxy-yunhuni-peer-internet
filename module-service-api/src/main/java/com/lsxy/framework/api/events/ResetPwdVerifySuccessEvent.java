@@ -9,7 +9,7 @@ import com.lsxy.framework.mq.api.AbstractMQEvent;
 public class ResetPwdVerifySuccessEvent extends AbstractMQEvent {
 
     private String email;//要重置密码的用户的邮箱
-
+    private String accountId;//用户id
     @Override
     public String getTopicName() {
         return "topic_framework_account";
@@ -18,8 +18,9 @@ public class ResetPwdVerifySuccessEvent extends AbstractMQEvent {
     public ResetPwdVerifySuccessEvent() {
     }
 
-    public ResetPwdVerifySuccessEvent(String email) {
+    public ResetPwdVerifySuccessEvent(String email,String accountId) {
         this.email = email;
+        this.accountId = accountId;
     }
 
     public String getEmail() {
@@ -28,5 +29,13 @@ public class ResetPwdVerifySuccessEvent extends AbstractMQEvent {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 }
