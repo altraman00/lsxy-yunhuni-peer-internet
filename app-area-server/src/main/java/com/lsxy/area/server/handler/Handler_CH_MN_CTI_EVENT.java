@@ -1,5 +1,7 @@
 package com.lsxy.area.server.handler;
 
+import com.lsxy.area.api.BusinessState;
+import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.rpc.api.*;
@@ -31,6 +33,8 @@ public class Handler_CH_MN_CTI_EVENT extends RpcRequestHandler{
     @Autowired
     private SessionContext sessionContext;
 
+    @Autowired
+    private BusinessStateService businessStateService;
 
     @Override
     public String getEventName() {
@@ -70,8 +74,11 @@ public class Handler_CH_MN_CTI_EVENT extends RpcRequestHandler{
             } catch (Exception e) {
                 logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
             }
-        }else if(method.equals("sys.conf.on_released")){//会议结束时间
-            logger.info("会议结束时间");
+        }else if(method.equals("sys.conf.on_released")){//会议结束事件
+            String conf_id = (String)request.getParamMap().get("user_data");
+            BusinessState state = businessStateService.get(conf_id);
+            logger.info("confi_id={},state={}",conf_id,state);
+            logger.info("会议结束事件");
         }else{
 //            if(logger.isDebugEnabled()){
 //                logger.debug("不是 INCOMING.........");

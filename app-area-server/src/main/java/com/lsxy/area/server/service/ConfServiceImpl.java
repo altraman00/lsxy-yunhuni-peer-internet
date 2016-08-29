@@ -87,13 +87,13 @@ public class ConfServiceImpl implements ConfService {
             throw new InvokeCallException(e);
         }
         //保存业务数据
-        BusinessState cache = new BusinessState(tenantId,app.getId(),confId,"sys_conf",
+        BusinessState state = new BusinessState(tenantId,app.getId(),confId,"sys_conf",
                 userData,new MapBuilder<String,Object>()
                 .put("max_parts",maxParts)
                 .put("auto_hangup",autoHangup)
                 .put("callback_url",callBackURL)
                 .build());
-        businessStateService.save(cache);
+        businessStateService.save(state);
         return confId;
     }
 
