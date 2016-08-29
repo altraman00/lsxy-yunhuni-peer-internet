@@ -69,12 +69,6 @@ public class ConfServiceImpl implements ConfService {
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
         }
-        Session session = null;
-        try {
-            session = sessionContext.getRightSession();
-        } catch (RightSessionNotFoundExcepiton rightSessionNotFoundExcepiton) {
-            rightSessionNotFoundExcepiton.printStackTrace();
-        }
         String callId = UUIDGenerator.uuid();
         Map<String, Object> map = new HashMap<String,Object>();
         map.put("callId",callId);
@@ -84,7 +78,7 @@ public class ConfServiceImpl implements ConfService {
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
 
         } catch (Exception e) {
             throw new InvokeCallException(e);
@@ -105,18 +99,11 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-
         //TODO 根据confId 获取res_id
         String params = String.format("res_id=%s",confId);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
 
         } catch (Exception e) {
             throw new InvokeCallException(e);
@@ -151,20 +138,13 @@ public class ConfServiceImpl implements ConfService {
             throw new BalanceNotEnoughException();
         }
 
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-
         String callId = UUIDGenerator.uuid();
         String params = String.format("to=%s&from=%s&maxAnswerSec=%d&maxRingSec=%d&callId=%s",
                 to, from, maxDuration, maxDialDuration, callId);
         //TODO 调用sys.call 需要把当前的业务。。邀请会议保存到user_data
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -190,20 +170,12 @@ public class ConfServiceImpl implements ConfService {
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
         }
-
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-
         //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id，volume不知道填多少填个5
         String params = String.format("res_id=%s&conf_res_id=%s&max_seconds=%d&voice_mode=%d&volume=%d&play_file=%s",
                 callId, confId, maxDuration, voiceMode, 5,playFile);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -223,20 +195,12 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
-
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException();
-        }
-
         //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id
         String params = String.format("res_id=%s&conf_res_id=%s",
                 callId, confId);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -257,19 +221,12 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-
         //TODO 此处需要根据confId获取呼叫的res_id
         String params = String.format("res_id=%s&file=%s",
                             confId,StringUtils.join(playFiles,"|"));
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -290,18 +247,11 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-
         //TODO 此处需要根据confId获取呼叫的res_id
         String params = String.format("res_id=%s",confId);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -322,18 +272,11 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-
         //TODO 此处需要根据CONFId获取呼叫的res_id，录音文件名，录音格式
         String params = String.format("res_id=%s&max_seconds=%d&record_file=%s&record_format=%d",confId,maxDuration, UUID.randomUUID(),6);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -354,20 +297,11 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-        if(session == null){
-            throw new InvokeCallException();
-        }
         //TODO 此处需要根据confId获取呼叫的res_id
         String params = String.format("res_id=%s",confId);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -388,18 +322,11 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        Session session = null;
-        try{
-            session = sessionContext.getRightSession();
-        }catch (RightSessionNotFoundExcepiton ex){
-            throw new InvokeCallException(ex);
-        }
-
         //TODO 此处需要根据confId获取呼叫的res_id
         String params = String.format("res_id=%s&call_res_id=%s&mode=%d",confId,callId,voiceMode);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
         try {
-            rpcCaller.invoke(session, rpcrequest);
+            rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }

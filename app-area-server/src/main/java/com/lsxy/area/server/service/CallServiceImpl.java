@@ -16,8 +16,6 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
@@ -75,8 +73,6 @@ public class CallServiceImpl implements CallService {
 
         try {
             //找到合适的区域代理
-            Session session = sessionContext.getRightSession();
-            if (session != null) {
 
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
                 try {
@@ -89,19 +85,15 @@ public class CallServiceImpl implements CallService {
 
                     tzb.doCallZB(to,rpcrequest);
 
-                    rpcCaller.invoke(session, rpcrequest);
+                    rpcCaller.invoke(sessionContext, rpcrequest);
 
                     /*呼叫API调用次数计数*/
                     if(cs!=null)cs.getSendAreaNodeSysCallCount().incrementAndGet();
                 } catch (Exception e) {
                     throw new InvokeCallException(e);
                 }
-            } else {
-                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
-                throw new InvokeCallException();
-            }
             return callid;
-        }catch(RightSessionNotFoundExcepiton ex){
+        }catch(Exception ex){
             throw new InvokeCallException(ex);
         }
     }
@@ -135,23 +127,17 @@ public class CallServiceImpl implements CallService {
         String params = mapToString(map);
         try {
             //找到合适的区域代理
-            Session session = sessionContext.getRightSession();
-            if (session != null) {
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
                 try {
-                    rpcCaller.invoke(session, rpcrequest);
+                    rpcCaller.invoke(sessionContext, rpcrequest);
                     //将数据存到redis
                     redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",null,duoCallbackVO.getUser_data())),5 * 60 * 60);
                 } catch (Exception e) {
                     logger.error("消息发送到区域失败:{}", rpcrequest);
                     throw new InvokeCallException(e);
                 }
-            } else {
-                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
-                throw new InvokeCallException();
-            }
             return callId;
-        }catch(RightSessionNotFoundExcepiton ex){
+        }catch(Exception ex){
             throw new InvokeCallException(ex);
         }
     }
@@ -184,23 +170,12 @@ public class CallServiceImpl implements CallService {
         String params = mapToString(map);
         try {
             //找到合适的区域代理
-            Session session = sessionContext.getRightSession();
-            if (session != null) {
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
-                try {
-                    rpcCaller.invoke(session, rpcrequest);
-                    //将数据存到redis
-                    redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"notify_call",null,notifyCallVO.getUser_data())),5 * 60 * 60);
-                } catch (Exception e) {
-                    logger.error("消息发送到区域失败:{}", rpcrequest);
-                    throw new InvokeCallException(e);
-                }
-            } else {
-                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
-                throw new InvokeCallException();
-            }
+                rpcCaller.invoke(sessionContext, rpcrequest);
+                //将数据存到redis
+                redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"notify_call",null,notifyCallVO.getUser_data())),5 * 60 * 60);
             return callId;
-        }catch(RightSessionNotFoundExcepiton ex){
+        }catch(Exception ex){
             throw new InvokeCallException(ex);
         }
     }

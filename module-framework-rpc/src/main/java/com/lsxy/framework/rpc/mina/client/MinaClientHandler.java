@@ -61,14 +61,7 @@ public class MinaClientHandler extends AbstractClientRPCHandler {
 			if(message instanceof RPCResponse){
 				RPCResponse response = (RPCResponse) message;
 				logger.debug(">>[NM]"+response);
-				RequestListener rl = requestListeners.get(response.getSessionid());
-				if(rl != null){
-					rl.recivedResponse(response);
-					removeRequestListener(rl);
-				}else{
-					rpcCaller.putResponse(response);
-				}
-
+				rpcCaller.receivedResponse(response);
 			}
 		}
 

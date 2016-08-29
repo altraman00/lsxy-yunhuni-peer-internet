@@ -3,6 +3,5 @@
     <contextName>yunhuni-app-portal-api</contextName>
     <property name="APP_NAME" value="app-portal-api" />
     <include resource="logback-yunhuni.xml"/>
-    <logger name="org.springframework.boot" level="DEBUG" additivity="true" />
-
+    <logger name="com.lsxy" level="DEBUG" additivity="true" />
 </configuration>
