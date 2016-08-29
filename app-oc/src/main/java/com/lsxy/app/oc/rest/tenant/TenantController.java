@@ -657,7 +657,7 @@ public class TenantController {
             return RestResponse.success(null);
         }
         TenantAppVO vo = new TenantAppVO(app);
-        List<TestNumBind> tests = testNumBindService.findByTenant(tenant);
+        List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
         return RestResponse.success(vo);
     }
