@@ -172,11 +172,11 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public long getAmongDurationByDateAndTenant(Date d, String tenant) {
+    public long getAmongDurationByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from VoiceCdrDay obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
         long sum = 0;
         for (VoiceCdrDay day : ds) {
@@ -188,11 +188,11 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public long getAmongCallByDateAndTenant(Date d, String tenant) {
+    public long getAmongCallByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from VoiceCdrDay obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
         long sum = 0;
         for (VoiceCdrDay day : ds) {

@@ -115,7 +115,7 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param d
      * @return
      */
-    public BigDecimal getAmongAmountByDateAndTenant(Date d,String tenant);
+    public BigDecimal getAmongAmountByDateAndTenant(Date d,String tenant,String appId);
 
     /**
      * 获取某个租户总的消费额
