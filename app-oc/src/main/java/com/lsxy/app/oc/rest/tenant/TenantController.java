@@ -768,11 +768,13 @@ public class TenantController {
             @PathVariable String tenant,
             @RequestParam(value = "year") Integer year,
             @ApiParam(name = "month",value="不传month就是某年所有月的统计")
-            @RequestParam(value = "month",required = false) Integer month){
+            @RequestParam(value = "month",required = false) Integer month,
+            @RequestParam(required = false) String appId
+    ){
         if(month!=null){
-            return RestResponse.success(perDayOfMonthConsumeStatistic(year,month,tenant,null));
+            return RestResponse.success(perDayOfMonthConsumeStatistic(year,month,tenant,appId));
         }
-        return RestResponse.success(perMonthOfYearConsumeStatistic(year,tenant,null));
+        return RestResponse.success(perMonthOfYearConsumeStatistic(year,tenant,appId));
     }
 
     /**
