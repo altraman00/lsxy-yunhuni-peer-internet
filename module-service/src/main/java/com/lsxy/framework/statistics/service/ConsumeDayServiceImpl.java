@@ -191,7 +191,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from ConsumeDay obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<ConsumeDay> ds = this.findByCustomWithParams(hql,d1,d2);
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeDay day : ds) {
