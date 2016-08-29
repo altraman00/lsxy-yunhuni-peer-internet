@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.enabled;
+
 /**
  * 区域
  * Created by liups on 2016/8/24.
@@ -17,6 +19,8 @@ public class Area extends IdEntity {
     private String ip;
     private Integer status;
     private String remark;
+
+    private boolean enabled;
 
     @Column(name = "name")
     public String getName() {
@@ -52,5 +56,14 @@ public class Area extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "enabled")
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

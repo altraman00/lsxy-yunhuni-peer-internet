@@ -5,6 +5,7 @@ import com.lsxy.app.area.cti.commander.RpcError;
 import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -67,9 +68,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
         }
 
         Map<String, Object> params = request.getParamMap();
-        String conf_id = (String)request.getParameter("callId");
-
-        params.put("user_data",conf_id);
+        String conf_id = (String)request.getParameter("user_data");
 
         try {
             cticlient.createResource(0, 0, "sys.conf", params, new RpcResultListener(){
@@ -83,12 +82,14 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
                     String res_id = o.toString();
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_ON_START,
-                            String.format("res_id=%s&conf_id=%s",res_id,conf_id));
-                    Session session = sessionContext.getAvalibleSession();
+                            new MapBuilder<String,Object>()
+                            .put("res_id",res_id)
+                            .put("conf_id",conf_id)
+                            .build());
                     try {
                         /*发送区域管理器请求次数计数*/
                         if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
-                        rpcCaller.invoke(session,req);
+                        rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",ServiceConstants.MN_CH_SYS_CONF_ON_START);
                     }
@@ -101,6 +102,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
 
                 @Override
                 protected void onTimeout() {
+                    logger.error("资源{}[{}]创建超时",getEventName(),conf_id);
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);

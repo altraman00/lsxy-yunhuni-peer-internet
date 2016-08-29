@@ -25,7 +25,7 @@ public class MinaServerSession extends AbstractSession {
     }
 
     @Override
-    public void write(Object object) {
+    public void concreteWrite(Object object) {
         ioSession.write(object);
     }
 
