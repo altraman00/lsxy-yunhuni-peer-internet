@@ -34,7 +34,7 @@ public class CalCostServiceImpl implements CalCostService{
             cost = productPrice.getPrice().multiply(new BigDecimal(discount));
         }else{
             //如果是计时，则只需（时长/时长单位（不满一个时长单位按一个时长单位算））*单价*折扣
-            BigDecimal calNum  = new BigDecimal((double) time / product.getTimeUnit()).setScale(0, BigDecimal.ROUND_UP);
+            BigDecimal calNum  = new BigDecimal(time).divide(new BigDecimal(product.getTimeUnit())).setScale(0, BigDecimal.ROUND_UP);
             cost = calNum.multiply(productPrice.getPrice()).multiply(new BigDecimal(discount));
         }
         return cost;

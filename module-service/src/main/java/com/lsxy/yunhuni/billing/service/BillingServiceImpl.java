@@ -23,6 +23,7 @@ import java.util.Date;
  */
 @Service
 public class BillingServiceImpl extends AbstractService<Billing> implements BillingService {
+
     @Autowired
     private BillingDao billingDao;
 
@@ -73,16 +74,16 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
                 balance = getBalanceByPrePreDateSum(tenantId, date, preBalanceStr);
             }else{
                 Billing billing = this.findBillingByTenantId(tenantId);
-                BigDecimal consume = this.getConsumeStr(tenantId, preDate);
-                BigDecimal recharge = this.getRechargeStr(tenantId, preDate);
+                BigDecimal consume = this.getConsume(tenantId, preDate);
+                BigDecimal recharge = this.getRecharge(tenantId, preDate);
                 if(consume.compareTo(new BigDecimal(0))==1 || recharge.compareTo(new BigDecimal(0))==1 ){
                     //前日结算
                     Date prePreDate = DateUtils.getPreDate(preDate);
-                    preBalanceStr = this.setBalanceToRedis(tenantId, prePreDate, billing);
+                    preBalanceStr = this.setBalanceToRedis(tenantId, prePreDate, billing.getBalance());
                     balance = getBalanceByPrePreDateSum(tenantId, date, preBalanceStr);
                 }else{
                     //昨日结算
-                    balanceStr = this.setBalanceToRedis(tenantId, preDate, billing);
+                    balanceStr = this.setBalanceToRedis(tenantId, preDate, billing.getBalance());
                     balance = getBalanceByPreDateSum(tenantId, date, balanceStr);
                 }
             }
@@ -100,8 +101,8 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
      */
     private BigDecimal getBalanceByPreDateSum(String tenantId, Date date, String balanceStr) {
         BigDecimal balance;
-        BigDecimal consume = getConsumeStr(tenantId, date);
-        BigDecimal recharge = getRechargeStr(tenantId, date);
+        BigDecimal consume = getConsume(tenantId, date);
+        BigDecimal recharge = getRecharge(tenantId, date);
         balance = new BigDecimal(balanceStr).add(recharge).subtract(consume);
         return balance;
     }
@@ -115,27 +116,34 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
      */
     private BigDecimal getBalanceByPrePreDateSum(String tenantId, Date date, String balanceStr) {
         BigDecimal balance;
-        BigDecimal consume = getConsumeStr(tenantId, date);
-        BigDecimal recharge = getRechargeStr(tenantId, date);
+        BigDecimal consume = getConsume(tenantId, date);
+        BigDecimal recharge = getRecharge(tenantId, date);
         Date preDate = DateUtils.getPreDate(date);
-        BigDecimal preDateConsume = getConsumeStr(tenantId, preDate);
-        BigDecimal preDateRecharge = getRechargeStr(tenantId, preDate);
+        BigDecimal preDateConsume = getConsume(tenantId, preDate);
+        BigDecimal preDateRecharge = getRecharge(tenantId, preDate);
         balance = new BigDecimal(balanceStr).add(recharge).subtract(consume).add(preDateRecharge).subtract(preDateConsume);
         return balance;
     }
 
-
     /**
-     * 将余额存入redis中
+     * 从redis中获取前一天的结算
      * @param tenantId
-     * @param preDate
-     * @param billing
+     * @param date
+     * @return
      */
-    private String setBalanceToRedis(String tenantId, Date preDate, Billing billing) {
-        String balanceStr;
+    private String getBalanceStr(String tenantId, Date date) {
+        Date preDate = DateUtils.getPreDate(date);
         String preDateStr = DateUtils.getTime(preDate,"yyyyMMdd");
-        balanceStr = billing.getBalance().toString();
-        redisCacheService.set("rbalance_" + tenantId + "_" + preDateStr,balanceStr,5*24*60*60);
+        String balanceStr = redisCacheService.get(REMAIN_BALANCE_PREFIX + "_" + tenantId + "_" + preDateStr);
+        return balanceStr;
+    }
+
+    @Override
+    public String setBalanceToRedis(String tenantId, Date date, BigDecimal balance) {
+        String balanceStr;
+        String dateStr = DateUtils.getTime(date,"yyyyMMdd");
+        balanceStr = balance.toString();
+        redisCacheService.set(REMAIN_BALANCE_PREFIX + "_"  + tenantId + "_" + dateStr,balanceStr,5*24*60*60);
         return balanceStr;
     }
 
@@ -145,16 +153,8 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
      * @param date
      * @return
      */
-    private BigDecimal getConsumeStr(String tenantId, Date date){
-        BigDecimal consume;
-        String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String consumeStr = redisCacheService.get("ubalance_" + tenantId + "_" + dateStr);
-        if(StringUtils.isBlank(consumeStr)){
-            consume = new BigDecimal(0);
-        }else{
-            consume = new BigDecimal(consumeStr);
-        }
-        return consume;
+    private BigDecimal getConsume(String tenantId, Date date){
+        return getIncrAmount(tenantId,date,USE_BALANCE_PREFIX);
     }
 
     /**
@@ -163,30 +163,53 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
      * @param date
      * @return
      */
-    private BigDecimal getRechargeStr(String tenantId, Date date){
-        String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String rechargeStr = redisCacheService.get("abalance" + tenantId + "_" + dateStr);
-        BigDecimal recharge;
-        if(StringUtils.isBlank(rechargeStr)){
-            recharge = new BigDecimal(0);
-        }else{
-            recharge = new BigDecimal(rechargeStr);
-        }
-        return recharge;
+    private BigDecimal getRecharge(String tenantId, Date date){
+       return getIncrAmount(tenantId,date,ADD_BALANCE_PREFIX);
     }
 
     /**
-     * 从redis中获取昨天的结算
+     * 从redis中获取增量金额（充值或消费）
      * @param tenantId
      * @param date
+     * @param type 类型（充值或消费的key前缀）
      * @return
      */
-    private String getBalanceStr(String tenantId, Date date) {
-        Date preDate = DateUtils.getPreDate(date);
-        String preDateStr = DateUtils.getTime(preDate,"yyyyMMdd");
-        String balanceStr = redisCacheService.get("rbalance_" + tenantId + "_" + preDateStr);
-        return balanceStr;
+    private BigDecimal getIncrAmount(String tenantId, Date date,String type){
+        BigDecimal incrAmount;
+        String dateStr = DateUtils.getTime(date,"yyyyMMdd");
+        String rechargeStr = redisCacheService.get(type + "_" + tenantId + "_" + dateStr);
+        if(StringUtils.isBlank(rechargeStr)){
+            incrAmount = new BigDecimal(0);
+        }else{
+            //redis以long型存金额的增量，真实金额=redis中的金额/10000
+            incrAmount = new BigDecimal(rechargeStr).divide(new BigDecimal(AMOUNT_REDIS_MULTIPLE));
+        }
+        return incrAmount;
     }
 
 
+    @Override
+    public void incRecharge(String tenantId,Date date,BigDecimal amount){
+        incAmount(tenantId,date,amount,ADD_BALANCE_PREFIX);
+    }
+
+
+    @Override
+    public void incConsume(String tenantId,Date date,BigDecimal amount){
+        incAmount(tenantId,date,amount,USE_BALANCE_PREFIX);
+    }
+
+    /**
+     * redis中的金额增量增加(充值或消费)
+     * @param tenantId 租户ID
+     * @param date 日期
+     * @param amount 金额
+     * @param type 类型（充值或消费的key前缀）
+     */
+    private void incAmount(String tenantId,Date date,BigDecimal amount,String type){
+        //以long型存金额的增量，真实金额=redis中的金额/10000
+        String dateStr = DateUtils.getTime(date,"yyyyMMdd");
+        long l = amount.multiply(new BigDecimal(AMOUNT_REDIS_MULTIPLE)).setScale(0, BigDecimal.ROUND_HALF_UP).longValue();
+        redisCacheService.incrBy(type + "_" + tenantId + "_" + dateStr, l);
+    }
 }
