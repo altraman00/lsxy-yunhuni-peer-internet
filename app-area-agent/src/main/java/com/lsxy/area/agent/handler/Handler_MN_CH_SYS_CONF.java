@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by liuws on 2016/8/27.
@@ -62,13 +63,17 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
         Map<String, Object> params = request.getParamMap();
         params.put("user_data",request.getParameter("callId"));
 
+        CountDownLatch down = new CountDownLatch(1);
         try {
+
+
             cticlient.createResource(0, 0, "sys.conf", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
                     logger.info("111111111111111");
                     logger.info("{}",o);
+
                 }
 
                 @Override
@@ -85,7 +90,12 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
         }
-
+        try {
+            down.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        logger.info("哈哈哈啊哈哈");
         return response;
 
     }
