@@ -41,6 +41,7 @@
         <module>module-framework-rpc</module>
         <module>app-user-app-demo</module>
         <module>module-service-area-api</module>
+        <module>module-framework-jmx</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -366,6 +367,13 @@
             <id>development</id>
             <properties>
                 <profiles.active>development</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 开发环境 -->
+            <id>localdev</id>
+            <properties>
+                <profiles.active>localdev</profiles.active>
             </properties>
         </profile>
         <profile>

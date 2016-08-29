@@ -1,8 +1,10 @@
 package com.lsxy.framework.rpc.netty.client;
 
 import com.lsxy.framework.rpc.api.RPCHandler;
+import com.lsxy.framework.rpc.api.SessionContext;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
 import com.lsxy.framework.rpc.api.client.Client;
+import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
@@ -24,6 +26,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.Ordered;
@@ -39,10 +42,11 @@ import java.util.concurrent.TimeUnit;
 @Component
 @ConditionalOnProperty(value = "global.rpc.provider", havingValue = "netty", matchIfMissing = false)
 @Order(Ordered.HIGHEST_PRECEDENCE)
+@ConditionalOnClass(name="com.lsxy.area.agent.AreaClient")
 public class NettyClient extends AbstractClient{
 
     @Autowired
-    private ServerSessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @Autowired
     private NettyClientHandler handler;

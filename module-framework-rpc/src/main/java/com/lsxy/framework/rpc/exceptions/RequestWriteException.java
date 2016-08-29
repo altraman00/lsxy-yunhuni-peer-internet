@@ -12,4 +12,7 @@ public class RequestWriteException extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	public RequestWriteException(String s) {
+		super(s);
+	}
 }

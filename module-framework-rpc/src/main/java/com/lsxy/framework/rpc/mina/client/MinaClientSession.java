@@ -5,6 +5,7 @@ import com.lsxy.framework.rpc.api.RPCHandler;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.server.AbstractSession;
 import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.apache.mina.core.session.IoSession;
 
 import java.net.InetSocketAddress;
@@ -23,12 +24,10 @@ public class MinaClientSession extends AbstractSession {
         this.setServerUrl(serverUrl);
     }
 
-
     @Override
-    public void write(Object object) {
+    public void concreteWrite(Object object) throws SessionWriteException {
         ioSession.write(object);
     }
-
 
     @Override
     public boolean isValid() {

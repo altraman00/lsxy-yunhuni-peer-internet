@@ -7,9 +7,6 @@ package com.lsxy.framework.rpc.api;
  */
 public abstract class RequestListener {
 	private RPCRequest request;
-//	public RequestListener(RPCRequest request){
-//		this.request = request;
-//	}
 	/**
 	 * 获取到响应
 	 * @param response

@@ -13,6 +13,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Conditional(NettyCondition.class)
+@ConditionalOnBean(NettyClient.class)
 public class NettyClientHandler extends AbstractClientRPCHandler {
 
     private IOHandler ioHandler = new IOHandler();

@@ -29,19 +29,8 @@ public abstract class NettySession extends AbstractSession {
     }
 
     @Override
-    public void write(Object object) throws SessionWriteException {
-
-        if(this.isValid()){
-            if(logger.isDebugEnabled()){
-                logger.debug("[{}]>>{}",this.getId(),object);
-            }
-            channel.writeAndFlush(object);
-        }else {
-            if(logger.isDebugEnabled()){
-                logger.debug("channel is not writable or invalid , drop object {}",object);
-            }
-            throw new SessionWriteException("通道无效,无法写入对象");
-        }
+    public void concreteWrite(Object object) throws SessionWriteException {
+        channel.writeAndFlush(object);
     }
 
     @Override
