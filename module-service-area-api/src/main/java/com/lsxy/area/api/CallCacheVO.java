@@ -1,15 +1,19 @@
 package com.lsxy.area.api;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/8/25.
  */
 public class CallCacheVO implements Serializable{
+    private String tenantId;
+    private String appId;
     private String callId;
     private String callType;
     private String userdata;
     private String resId;
+    private Map<String,Object> businessData;
 
     public CallCacheVO() {
     }
@@ -20,6 +24,7 @@ public class CallCacheVO implements Serializable{
         this.userdata = userdata;
         this.resId = resId;
     }
+
 
     public String getCallId() {
         return callId;
@@ -51,5 +56,29 @@ public class CallCacheVO implements Serializable{
 
     public void setResId(String resId) {
         this.resId = resId;
+    }
+
+    public Map<String, Object> getBusinessData() {
+        return businessData;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public void setBusinessData(Map<String, Object> businessData) {
+        this.businessData = businessData;
     }
 }
