@@ -370,6 +370,13 @@
             </properties>
         </profile>
         <profile>
+            <!-- 开发环境 -->
+            <id>localdev</id>
+            <properties>
+                <profiles.active>localdev</profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <!-- 测试环境 -->
             <id>test</id>
             <properties>

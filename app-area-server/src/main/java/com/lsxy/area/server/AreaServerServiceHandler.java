@@ -1,20 +1,10 @@
 package com.lsxy.area.server;
 
-import com.lsxy.area.server.test.TestIncomingZB;
-import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.handler.HandlerManager;
 import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
-import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.web.rest.RestRequest;
-import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.service.AreaService;
-import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,30 +32,15 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
     private ServerSessionContext sessionContext;
 
     @Autowired
-    private RPCCaller rpcCaller;
-
-    @Autowired(required = false)
-    private TestIncomingZB tzb;
+    private HandlerManager handlerManager;
 
     @Override
     public RPCResponse handleService(RPCRequest request, Session session) {
 
         if(sc != null) sc.getReceivedAreaNodeRequestCount().incrementAndGet();
 
-        if(request.getName().equals(ServiceConstants.CH_MN_CTI_EVENT)){
-            /*收到CTI事件次数*/
-            if(sc != null)  sc.getReceivedAreaNodeCTIEventCount().incrementAndGet();
+        RPCResponse response = handlerManager.fire(request,session);
 
-            return process_CH_MN_CTI_EVENT(request,session);
-        }
-
-        if(request.getName().equals(ServiceConstants.MN_CH_TEST_ECHO)){
-            return process_MN_CH_TEST_ECHO(request,session);
-        }
-
-
-        RPCResponse response = RPCResponse.buildResponse(request);
-        response.setMessage(RPCResponse.STATE_OK);
         return response;
     }
 

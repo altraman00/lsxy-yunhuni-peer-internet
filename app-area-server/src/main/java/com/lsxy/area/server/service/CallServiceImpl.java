@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.bouncycastle.asn1.ua.DSTU4145NamedCurves.params;
-
 /**
  * Created by tandy on 16/8/18.
  */
@@ -68,7 +66,7 @@ public class CallServiceImpl implements CallService {
     RedisCacheService redisCacheService;
 
     @Override
-    public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws InvokeCallException {
+    public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
 
         String callid = UUIDGenerator.uuid();
         String params = "to=%s&from=%s&maxAnswerSec=%d&maxRingSec=%d&callid=%s";
@@ -98,9 +96,13 @@ public class CallServiceImpl implements CallService {
                     logger.error("消息发送到区域失败:{}", rpcrequest);
                     throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
                 }
+            } else {
+                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
+                throw new InvokeCallException();
+            }
             return callid;
-        }catch(Exception ex){
-            throw new InvokeCallException(ex.getMessage());
+        }catch(RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex);
         }
     }
 
@@ -110,22 +112,22 @@ public class CallServiceImpl implements CallService {
         String to1 = duoCallbackVO.getTo1();
         String to2 = duoCallbackVO.getTo2();
         if(apiGwRedBlankNumService.isRedOrBlankNum(to1) || apiGwRedBlankNumService.isRedOrBlankNum(to2)){
-            throw new NumberNotAllowToCallException("不能呼叫该号码");
+            throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
             if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException("id不在白名单");
+                throw new IPNotInWhiteListException();
             }
         }
         if(app.getIsVoiceCallback() != 1){
-            throw new AppServiceInvalidException("app没开通所需的服务");
+            throw new AppServiceInvalidException();
         }
         BigDecimal balance = billingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
-            throw new BalanceNotEnoughException("余额不足");
+            throw new BalanceNotEnoughException();
         }
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(duoCallbackVO, Map.class);
@@ -133,24 +135,73 @@ public class CallServiceImpl implements CallService {
         String params = mapToString(map);
         try {
             //找到合适的区域代理
-//            Session session = sessionContext.getRightSession();
-//            if (session != null) {
+            Session session = sessionContext.getRightSession();
+            if (session != null) {
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
-//                try {
-                    rpcCaller.invoke(sessionContext, rpcrequest);
-//                } catch (Exception e) {
-//                    logger.error("消息发送到区域失败:{}", rpcrequest);
-//                    throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
-//                }
-//            } else {
-//                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
-//                throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call=>" + params);
-//            }
-            //将数据存到redis
-            redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",duoCallbackVO.getUser_data())),5 * 60 * 60);
+                try {
+                    rpcCaller.invoke(session, rpcrequest);
+                    //将数据存到redis
+                    redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",null,duoCallbackVO.getUser_data())),5 * 60 * 60);
+                } catch (Exception e) {
+                    logger.error("消息发送到区域失败:{}", rpcrequest);
+                    throw new InvokeCallException(e);
+                }
+            } else {
+                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
+                throw new InvokeCallException();
+            }
             return callId;
-        }catch(Exception ex){
-            throw new InvokeCallException(ex.getMessage());
+        }catch(RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex);
+        }
+    }
+
+    @Override
+    public String notifyCall(String ip, String appId, NotifyCallVO notifyCallVO) throws YunhuniApiException{
+        String callId = UUIDGenerator.uuid();
+        String to1 = notifyCallVO.getTo();
+        if(apiGwRedBlankNumService.isRedOrBlankNum(to1)){
+            throw new NumberNotAllowToCallException();
+        }
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(app.getIsVoiceCallback() != 1){
+            throw new AppServiceInvalidException();
+        }
+        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
+        //TODO 判断余额是否充足
+        if(balance.compareTo(new BigDecimal(0)) != 1){
+            throw new BalanceNotEnoughException();
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> map = mapper.convertValue(notifyCallVO, Map.class);
+        map.put("callId",callId);
+        String params = mapToString(map);
+        try {
+            //找到合适的区域代理
+            Session session = sessionContext.getRightSession();
+            if (session != null) {
+                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
+                try {
+                    rpcCaller.invoke(session, rpcrequest);
+                    //将数据存到redis
+                    redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"notify_call",null,notifyCallVO.getUser_data())),5 * 60 * 60);
+                } catch (Exception e) {
+                    logger.error("消息发送到区域失败:{}", rpcrequest);
+                    throw new InvokeCallException(e);
+                }
+            } else {
+                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
+                throw new InvokeCallException();
+            }
+            return callId;
+        }catch(RightSessionNotFoundExcepiton ex){
+            throw new InvokeCallException(ex);
         }
     }
 
