@@ -84,11 +84,10 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_ON_START,
                             String.format("res_id=%s&conf_id=%s",res_id,conf_id));
-                    Session session = sessionContext.getAvalibleSession();
                     try {
                         /*发送区域管理器请求次数计数*/
                         if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
-                        rpcCaller.invoke(session,req);
+                        rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
                         logger.error("CTI发送事件%s,失败",ServiceConstants.MN_CH_SYS_CONF_ON_START);
                     }

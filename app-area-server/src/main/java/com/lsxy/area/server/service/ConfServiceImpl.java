@@ -1,15 +1,16 @@
 package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.lsxy.area.api.BusinessState;
+import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.*;
+import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,9 +50,14 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private BillingService billingService;
 
+    @Autowired
+    private BusinessStateService businessStateService;
+
     @Override
     public String create(String ip, String appId, Integer maxDuration, Integer maxParts, Boolean recording, Boolean autoHangup, String bgmFile, String callBackURL, String userData) throws YunhuniApiException {
         App app = appService.findById(appId);
+        String tenantId = app.getTenant().getId();
+
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
@@ -64,26 +69,32 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
+        BigDecimal balance = billingService.getBalance(tenantId);
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
         }
-        String callId = UUIDGenerator.uuid();
-        Map<String, Object> map = new HashMap<String,Object>();
-        map.put("callId",callId);
-        map.put("max_seconds",maxDuration);
-        map.put("bg_file",bgmFile);
-        map.put("release_threshold",0);
-
+        String confId = UUIDGenerator.uuid();
+        Map<String, Object> map = new MapBuilder<String,Object>()
+                                .put("user_data",confId)
+                                .put("max_seconds",maxDuration)
+                                .put("bg_file",bgmFile)
+                                .put("release_threshold",0).build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
-
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
-        return callId;
+        //保存业务数据
+        BusinessState cache = new BusinessState(tenantId,app.getId(),confId,"sys_conf",
+                userData,new MapBuilder<String,Object>()
+                .put("max_parts",maxParts)
+                .put("auto_hangup",autoHangup)
+                .put("callback_url",callBackURL)
+                .build());
+        businessStateService.save(cache);
+        return confId;
     }
 
     @Override

@@ -2,15 +2,10 @@ package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lsxy.area.api.CallCacheVO;
-import com.lsxy.area.api.CallService;
-import com.lsxy.area.api.DuoCallbackVO;
-import com.lsxy.area.api.NotifyCallVO;
+import com.lsxy.area.api.*;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
-import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -62,7 +57,7 @@ public class CallServiceImpl implements CallService {
     private BillingService billingService;
 
     @Autowired
-    RedisCacheService redisCacheService;
+    BusinessStateService businessStateService;
 
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
@@ -131,7 +126,8 @@ public class CallServiceImpl implements CallService {
                 try {
                     rpcCaller.invoke(sessionContext, rpcrequest);
                     //将数据存到redis
-                    redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",null,duoCallbackVO.getUser_data())),5 * 60 * 60);
+                    BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"duo_call",duoCallbackVO.getUser_data());
+                    businessStateService.save(cache);
                 } catch (Exception e) {
                     logger.error("消息发送到区域失败:{}", rpcrequest);
                     throw new InvokeCallException(e);
@@ -173,7 +169,8 @@ public class CallServiceImpl implements CallService {
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
                 rpcCaller.invoke(sessionContext, rpcrequest);
                 //将数据存到redis
-                redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"notify_call",null,notifyCallVO.getUser_data())),5 * 60 * 60);
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call",notifyCallVO.getUser_data());
+                businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);

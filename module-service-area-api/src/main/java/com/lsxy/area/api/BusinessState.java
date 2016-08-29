@@ -6,40 +6,50 @@ import java.util.Map;
 /**
  * Created by liups on 2016/8/25.
  */
-public class CallCacheVO implements Serializable{
+public class BusinessState implements Serializable{
     private String tenantId;
     private String appId;
-    private String callId;
-    private String callType;
+    private String id;
+    private String type;
     private String userdata;
     private String resId;
     private Map<String,Object> businessData;
 
-    public CallCacheVO() {
+    public BusinessState() {
     }
 
-    public CallCacheVO(String callId, String callType, String resId,String userdata) {
-        this.callId = callId;
-        this.callType = callType;
+    public BusinessState(String tenantId, String appId, String id, String type, String userdata) {
+        this(tenantId,appId,id,type,userdata,null,null);
+    }
+
+    public BusinessState(String tenantId, String appId, String id, String type, String userdata, Map<String,Object> businessData) {
+        this(tenantId,appId,id,type,userdata,null,businessData);
+    }
+
+    public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, Map<String,Object> businessData) {
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.id = id;
+        this.type = type;
         this.userdata = userdata;
         this.resId = resId;
+        this.businessData = businessData;
     }
 
-
-    public String getCallId() {
-        return callId;
+    public String getId() {
+        return id;
     }
 
-    public void setCallId(String callId) {
-        this.callId = callId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getCallType() {
-        return callType;
+    public String getType() {
+        return type;
     }
 
-    public void setCallType(String callType) {
-        this.callType = callType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUserdata() {
