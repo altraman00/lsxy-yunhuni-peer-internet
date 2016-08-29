@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.bouncycastle.asn1.ua.DSTU4145NamedCurves.params;
+
 /**
  * Created by tandy on 16/8/18.
  */
@@ -88,7 +90,7 @@ public class CallServiceImpl implements CallService {
                     tzb.doCallZB(to,rpcrequest);
 
                     Session session = sessionContext.getRightSession();
-                    rpcCaller.invoke(session, rpcrequest);
+                    rpcCaller.invoke(sessionContext, rpcrequest);
 
                     /*呼叫API调用次数计数*/
                     if(cs!=null)cs.getSendAreaNodeSysCallCount().incrementAndGet();
@@ -131,19 +133,19 @@ public class CallServiceImpl implements CallService {
         String params = mapToString(map);
         try {
             //找到合适的区域代理
-            Session session = sessionContext.getRightSession();
-            if (session != null) {
+//            Session session = sessionContext.getRightSession();
+//            if (session != null) {
                 RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
-                try {
-                    rpcCaller.invoke(session, rpcrequest);
-                } catch (Exception e) {
-                    logger.error("消息发送到区域失败:{}", rpcrequest);
-                    throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
-                }
-            } else {
-                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
-                throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call=>" + params);
-            }
+//                try {
+                    rpcCaller.invoke(sessionContext, rpcrequest);
+//                } catch (Exception e) {
+//                    logger.error("消息发送到区域失败:{}", rpcrequest);
+//                    throw new InvokeCallException("消息发送到区域失败:" + rpcrequest);
+//                }
+//            } else {
+//                logger.error("没有找到合适的区域代理处理该请求:sys.call=>{}", params);
+//                throw new InvokeCallException("没有找到合适的区域代理处理该请求:sys.call=>" + params);
+//            }
             //将数据存到redis
             redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",duoCallbackVO.getUser_data())),5 * 60 * 60);
             return callId;

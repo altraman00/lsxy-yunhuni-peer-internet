@@ -4,10 +4,7 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
-import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
-import com.lsxy.framework.rpc.exceptions.RequestWriteException;
-import com.lsxy.framework.rpc.exceptions.SessionWriteException;
+import com.lsxy.framework.rpc.exceptions.*;
 import com.lsxy.framework.rpc.queue.FixQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,49 +112,53 @@ public class RPCCaller {
 
 	/**
 	 * 调用远程服务，无返回值
-	 * @param session 允许外接session为空,将为空判断放入方法体主要是为了统一处理会话丢失导致的消息丢失,将消息丢入修正队列
+	 * @param sessionContext 允许外接session为空,将为空判断放入方法体主要是为了统一处理会话丢失导致的消息丢失,将消息丢入修正队列
 	 * @throws RequestWriteException
 	 */
-	public void invoke(Session session, RPCRequest request)  {
-		//如果session为空
-		if(session == null) {
-			logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}", request);
-			fixQueue.fix(request);
-			return;
-		}
-		logger.debug(">>*"+request);
-		try {
+	public void invoke(SessionContext sessionContext, RPCRequest request) throws RightSessionNotFoundExcepiton, SessionWriteException {
+		try{
+			Session session = sessionContext.getRightSession();
+			//如果session为空
+			if(session == null) {
+				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}", request);
+				fixQueue.fix(request);
+			}
+			logger.debug(">>*"+request);
 			session.write(request);
-		} catch (SessionWriteException e) {
+		} catch (SessionWriteException | RightSessionNotFoundExcepiton e) {
 			logger.error("RPC请求发送失败,请求消息丢入修正队列:"+request,e);
 			fixQueue.fix(request);
+			throw e;
 		}
 	}
 
 	/**
 	 * 异步调用，并指定回调函数 ,无超时限制,不期待有返回值,如果有返回值,则执行回调
-	 * @param session
+	 * @param sessionContext
 	 * @param request
 	 * @param rqListener
 	 * @throws RequestWriteException
 	 */
-	public void invoke(Session session, RPCRequest request, RequestListener rqListener)  {
-		//如果session为空
-		if(session == null){
-			logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);
-			fixQueue.fix(request);
-			return;
-		}
-
-		rqListener.setRequest(request);
-		this.addRequestListener(rqListener);
-		
-		logger.debug(">>*"+request);
+	public void invoke(SessionContext sessionContext, RPCRequest request, RequestListener rqListener) throws RightSessionNotFoundExcepiton, SessionWriteException {
 		try {
+			Session session = sessionContext.getRightSession();
+			//如果session为空
+			if(session == null){
+				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);
+				fixQueue.fix(request);
+				return;
+			}
+
+			rqListener.setRequest(request);
+			this.addRequestListener(rqListener);
+
+			logger.debug(">>*"+request);
+
 			session.write(request);
-		} catch (SessionWriteException e) {
-			logger.error("RPC请求发送失败,请求消息丢入修正队列:"+request,e);
+		} catch (RightSessionNotFoundExcepiton | SessionWriteException e) {
+			logger.error("RPC请求发送失败,请求消息丢入修正队列:" + request, e);
 			fixQueue.fix(request);
+			throw e;
 		}
 	}
 	
@@ -172,6 +173,7 @@ public class RPCCaller {
 	@SuppressWarnings("static-access")
 	public RPCResponse invokeWithReturn(Session session, RPCRequest request)
 			throws InterruptedException, RequestTimeOutException, HaveNoExpectedRPCResponseException {
+//		Session session = sessionContext.getRightSession();
 		//如果session为空
 		if(session == null){
 			logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);

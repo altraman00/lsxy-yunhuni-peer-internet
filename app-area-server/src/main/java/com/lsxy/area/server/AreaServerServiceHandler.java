@@ -187,7 +187,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
                 if(sendRequest!=null){
                       /*发送给区域的请求次数计数*/
                     if(sc!=null) sc.getSendAreaNodeRequestCount().incrementAndGet();
-                    rpcCaller.invoke(session,sendRequest);
+                    rpcCaller.invoke(sessionContext,sendRequest);
                 }
 
             } catch (Exception e) {

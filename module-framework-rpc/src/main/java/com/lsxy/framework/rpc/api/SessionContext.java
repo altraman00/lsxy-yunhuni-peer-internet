@@ -45,7 +45,7 @@ public abstract class SessionContext {
      * 为了能够让rpccall自己判断是否session为空,统一处理消息重发问题
      * @return
      */
-    public abstract Session getRightSession();
+    public abstract Session getRightSession() throws RightSessionNotFoundExcepiton;
 
 
 
