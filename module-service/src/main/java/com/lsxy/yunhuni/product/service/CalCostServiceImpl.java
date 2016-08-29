@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 /**
  * Created by liups on 2016/8/27.
@@ -31,14 +33,13 @@ public class CalCostServiceImpl implements CalCostService{
         Double discount = productTenantDiscountService.getDiscountByProductIdAndTenantId(product.getId(), tenantId);
         if(product.getCalType() == Product.CAL_TYPE_NUM){
             //如果是计量，则只需单价*折扣
-            cost = productPrice.getPrice().multiply(new BigDecimal(discount));
+            cost = productPrice.getPrice().multiply(new BigDecimal(Double.toString(discount)));
         }else{
             //如果是计时，则只需（时长/时长单位（不满一个时长单位按一个时长单位算））*单价*折扣
-            BigDecimal calNum  = new BigDecimal(time).divide(new BigDecimal(product.getTimeUnit())).setScale(0, BigDecimal.ROUND_UP);
-            cost = calNum.multiply(productPrice.getPrice()).multiply(new BigDecimal(discount));
+            BigDecimal calNum  = new BigDecimal(time).divide(new BigDecimal(product.getTimeUnit()),0,BigDecimal.ROUND_UP);
+            cost = calNum.multiply(productPrice.getPrice()).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
         }
         return cost;
     }
-
 
 }
