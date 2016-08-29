@@ -1,6 +1,8 @@
 package com.lsxy.area.agent.handler;
 
 import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.commander.RpcError;
+import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -61,7 +63,23 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
         params.put("user_data",request.getParameter("callId"));
 
         try {
-            cticlient.createResource(0, 0, "sys.conf", params, null);
+            cticlient.createResource(0, 0, "sys.conf", params, new RpcResultListener(){
+
+                @Override
+                protected void onResult(Object o) {
+                    logger.info("111111111111111111");
+                }
+
+                @Override
+                protected void onError(RpcError rpcError) {
+                    logger.info("222222222222222");
+                }
+
+                @Override
+                protected void onTimeout() {
+                    logger.info("333333333333333333");
+                }
+            });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
