@@ -71,10 +71,10 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
     @Override
     public Page pageListAuthInfo(Integer authStatus, String startTime, String endTime, Integer type, String search, Integer pageNo, Integer pageSize) {
 
-        String sql  = " SELECT e.id as uid,e.create_time as date,e.tenant_name as name ,e.email as email,e.mobile as phone, e.type as type FROM ( ";
+        String sql  = " SELECT e.id as uid,e.create_time as date,e.tenant_name as name ,e.tenant_id as tenantId,e.email as email,e.mobile as phone, e.type as type FROM ( ";
         String sqlCount = " SELECT COUNT(1) FROM ( ";
-        String corp = " (SELECT c.id,c.create_time,c.tenant_name,d.email,d.mobile, 1 as type FROM (SELECT a.id,a.create_time,a.tenant_id,b.tenant_name,b.reg_user_id from  db_lsxy_base.tb_base_realname_corp  a LEFT JOIN tb_base_tenant b on a.tenant_id = b.id where a.deleted=0 ";
-        String oneself = " (SELECT c.id,c.create_time,c.tenant_name,d.email,d.mobile, 0 as type FROM (SELECT a.id,a.create_time,a.tenant_id,b.tenant_name,b.reg_user_id from  db_lsxy_base.tb_base_realname_private  a LEFT JOIN tb_base_tenant b on a.tenant_id = b.id where a.deleted=0";
+        String corp = " (SELECT c.id,c.create_time,c.tenant_name,c.tenant_id,d.email,d.mobile, 1 as type FROM (SELECT a.id,a.create_time,a.tenant_id,b.tenant_name,b.reg_user_id from  db_lsxy_base.tb_base_realname_corp  a LEFT JOIN tb_base_tenant b on a.tenant_id = b.id where a.deleted=0 ";
+        String oneself = " (SELECT c.id,c.create_time,c.tenant_name,c.tenant_id,d.email,d.mobile, 0 as type FROM (SELECT a.id,a.create_time,a.tenant_id,b.tenant_name,b.reg_user_id from  db_lsxy_base.tb_base_realname_private  a LEFT JOIN tb_base_tenant b on a.tenant_id = b.id where a.deleted=0";
         if(authStatus==1){
             corp+= " and a.status='"+2+"' ";
             oneself+= " and a.status='"+authStatus+"' ";
