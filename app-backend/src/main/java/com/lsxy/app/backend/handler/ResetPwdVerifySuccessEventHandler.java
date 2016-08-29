@@ -9,6 +9,7 @@ import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,12 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
             params.put("resPrefixUrl", SystemConfig.getProperty("global.resPrefixUrl"));
             params.put("key",key);
             params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
+            //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
+            String testEmail = SystemConfig.getProperty("global.mail.tester.email");
+            if(StringUtils.isNotBlank(testEmail)){
+                mailService.send("重置密码",testEmail,"02-portal-notify-reset-password.vm",params);
+            }
+            //↑↑↑↑↑测试环境专用，往测试人员发邮件--end-->
             mailService.send("重置密码",email,"02-portal-notify-reset-password.vm",params);
             //将参数和对应的邮箱存取redis里
             long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
