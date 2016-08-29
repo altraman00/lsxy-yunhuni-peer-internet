@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by tandy on 16/7/30.
  */
-@Component
 public class ClientSessionContext extends SessionContext{
 
     private static final Logger logger = LoggerFactory.getLogger(ClientSessionContext.class);

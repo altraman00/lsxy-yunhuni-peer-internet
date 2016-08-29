@@ -205,12 +205,13 @@ public class RPCCaller {
 		    logger.debug("请求醒了:{},已经睡了{}ms",request,(System.currentTimeMillis() - startWait));
 		}
 		RPCResponse response = responseMap.get(request.getSessionid());
-		responseMap.remove(request.getSessionid());
-		requestMap.remove(request.getSessionid());
 
-		if(response == null || request.getSessionid().equals(request.getSessionid())){
+		if(response == null || !request.getSessionid().equals(request.getSessionid())){
 			throw new HaveNoExpectedRPCResponseException(request,response);
 		}
+
+		responseMap.remove(request.getSessionid());
+		requestMap.remove(request.getSessionid());
 		return response;
 	}
 

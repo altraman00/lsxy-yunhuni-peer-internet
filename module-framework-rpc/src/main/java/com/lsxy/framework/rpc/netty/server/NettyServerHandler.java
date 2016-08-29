@@ -7,6 +7,7 @@ import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import com.lsxy.framework.rpc.netty.NettyCondition;
+import com.lsxy.framework.rpc.netty.client.NettyClient;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -14,7 +15,9 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
@@ -25,6 +28,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Component
 @Conditional(NettyCondition.class)
+@ConditionalOnBean(NettyRemoteServer.class)
+@DependsOn("sessionContext")
 public class NettyServerHandler extends AbstractServerRPCHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);

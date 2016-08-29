@@ -2,10 +2,7 @@ package com.lsxy.area.server.handler;
 
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
-import com.lsxy.framework.rpc.api.RPCCaller;
-import com.lsxy.framework.rpc.api.RPCRequest;
-import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.*;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.server.Session;
 import org.apache.commons.lang3.RandomUtils;
@@ -30,6 +27,9 @@ public class Handler_CH_MN_CTI_EVENT extends RpcRequestHandler{
 
     @Autowired(required = false)
     private TestIncomingZB tzb;
+
+    @Autowired
+    private SessionContext sessionContext;
 
 
     @Override
@@ -64,7 +64,7 @@ public class Handler_CH_MN_CTI_EVENT extends RpcRequestHandler{
                 if(sendRequest!=null){
                       /*发送给区域的请求次数计数*/
                     if(sc!=null) sc.getSendAreaNodeRequestCount().incrementAndGet();
-                    rpcCaller.invoke(session,sendRequest);
+                    rpcCaller.invoke(sessionContext,sendRequest);
                 }
 
             } catch (Exception e) {

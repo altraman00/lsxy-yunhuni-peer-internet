@@ -5,18 +5,14 @@ import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * IOSession环境变量
  * @author tandy
  *
  */
-@Component
 public class ServerSessionContext extends SessionContext{
 	public static final Log logger = LogFactory.getLog(ServerSessionContext.class);
 	//<sessionid,session>
