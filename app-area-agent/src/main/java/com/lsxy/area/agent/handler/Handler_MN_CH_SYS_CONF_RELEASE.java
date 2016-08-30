@@ -1,6 +1,8 @@
 package com.lsxy.area.agent.handler;
 
 import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.commander.RpcError;
+import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -59,7 +61,23 @@ public class Handler_MN_CH_SYS_CONF_RELEASE extends RpcRequestHandler{
         Map<String, Object> params = request.getParamMap();
         String res_id = (String)params.get("res_id");
         try {
-            cticlient.operateResource(0, 0,res_id, "sys.conf.release", params, null);
+            cticlient.operateResource(0, 0,res_id, "sys.conf.release", params, new RpcResultListener(){
+
+                @Override
+                protected void onResult(Object o) {
+                    logger.info("sys.conf.release执行成功");
+                }
+
+                @Override
+                protected void onError(RpcError rpcError) {
+                    logger.info("sys.conf.release执行失败：{}",rpcError);
+                }
+
+                @Override
+                protected void onTimeout() {
+                    logger.info("sys.conf.release执行超时");
+                }
+            });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
