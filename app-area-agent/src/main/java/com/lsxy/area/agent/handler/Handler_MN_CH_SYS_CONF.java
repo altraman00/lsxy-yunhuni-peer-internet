@@ -75,18 +75,16 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
             cticlient.createResource(0, 0, "sys.conf", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
-
+                    Map<String,String> params = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
                         logger.debug("资源{}[{}={}]创建成功",getEventName(),conf_id,o);
                     }
 
-                    String res_id = o.toString();
-
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                             .put("method",Constants.EVENT_SYS_CONF_ON_START)
-                            .put("res_id",res_id)
-                            .put("user_data",conf_id)
+                            .put("res_id",params.get("res_id"))
+                            .put("user_data",params.get("user_data"))
                             .build());
                     try {
                         /*发送区域管理器请求次数计数*/
