@@ -14,7 +14,6 @@ public class ServiceConstants {
 	public static final String MN_CH_SYS_CALL_CONF_ENTER = "MN_CH_SYS_CALL_CONF_ENTER";//将呼叫加入会议
 	public static final String MN_CH_SYS_CALL_CONF_EXIT = "MN_CH_SYS_CALL_CONF_EXIT";//将呼叫退出会议
 	public static final String MN_CH_SYS_CONF = "MN_CH_SYS_CONF";	//会议
-	public static final String MN_CH_SYS_CONF_ON_START = "MN_CH_SYS_CONF_ON_START";	//会议创建成功
 	public static final String MN_CH_SYS_CONF_RELEASE = "MN_CH_SYS_CONF_RELEASE"; //删除会议
 	public static final String MN_CH_SYS_CONF_PLAY = "MN_CH_SYS_CONF_PLAY";//会议放音
 	public static final String MN_CH_SYS_CONF_PLAY_STOP = "MN_CH_SYS_CONF_PLAY_STOP";//停止会议放音
@@ -34,4 +33,5 @@ public class ServiceConstants {
 	public static final String MN_CH_TEST_ECHO= "MN_CH_TEST_ECHO";//压力测试使用
 
 	public static final String CH_MN_HEARTBEAT_ECHO = "CH_MN_HEARTBEAT_ECHO ";		//心跳请求
+
 }
