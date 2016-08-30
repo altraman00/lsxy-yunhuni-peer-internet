@@ -13,7 +13,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class ConfServiceImpl implements ConfService {
     private AppService appService;
 
     @Autowired
-    private BillingService billingService;
+    private CalBillingService calBillingService;
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -69,7 +69,7 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        BigDecimal balance = billingService.getBalance(tenantId);
+        BigDecimal balance = calBillingService.getBalance(tenantId);
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
@@ -158,7 +158,7 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
+        BigDecimal balance = calBillingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
@@ -214,7 +214,7 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
+        BigDecimal balance = calBillingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
