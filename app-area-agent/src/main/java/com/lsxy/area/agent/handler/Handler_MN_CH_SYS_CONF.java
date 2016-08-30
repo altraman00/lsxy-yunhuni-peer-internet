@@ -81,8 +81,9 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
 
                     String res_id = o.toString();
 
-                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_ON_START,
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
+                            .put("method",ServiceConstants.MN_CH_SYS_CONF_ON_START)
                             .put("res_id",res_id)
                             .put("conf_id",conf_id)
                             .build());
