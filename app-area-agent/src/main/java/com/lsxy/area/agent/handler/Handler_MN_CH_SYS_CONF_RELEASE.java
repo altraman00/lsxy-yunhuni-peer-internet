@@ -57,10 +57,9 @@ public class Handler_MN_CH_SYS_CONF_RELEASE extends RpcRequestHandler{
         }
 
         Map<String, Object> params = request.getParamMap();
-        params.put("user_data",request.getParameter("callId"));
-
+        String res_id = (String)params.get("res_id");
         try {
-            cticlient.createResource(0, 0, "sys.conf.release", params, null);
+            cticlient.operateResource(0, 0,res_id, "sys.conf.release", params, null);
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);

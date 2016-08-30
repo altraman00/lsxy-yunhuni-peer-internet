@@ -59,6 +59,9 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             logger.info("businessstate is null");
             return res;
         }
+
+        businessStateService.delete(conf_id);
+
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
         }

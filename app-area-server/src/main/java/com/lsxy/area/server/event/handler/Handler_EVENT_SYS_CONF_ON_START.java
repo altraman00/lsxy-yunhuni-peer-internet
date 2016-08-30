@@ -48,6 +48,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         }
         RPCResponse res = null;
         String conf_id = (String)request.getParamMap().get("user_data");
+        String res_id = (String)request.getParamMap().get("res_id");
         if(StringUtils.isBlank(conf_id)){
             logger.info("conf_id is null");
             return res;
@@ -57,10 +58,13 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             logger.info("businessstate is null");
             return res;
         }
+        if(res_id!=null){
+            state.setResId(res_id);
+            businessStateService.save(state);
+        }
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
         }
-
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
