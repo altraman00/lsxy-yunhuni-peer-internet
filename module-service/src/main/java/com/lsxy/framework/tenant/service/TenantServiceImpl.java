@@ -157,8 +157,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     @Override
     public int countAuthTenantWeek() {
         Date today = new Date();
-        Date d1 = DateUtils.setStartDay(DateUtils.getFirstDayOfWeek(today));
-        Date d2 = DateUtils.setEndDay(DateUtils.getLastDayOfWeek(today));
+        Date d1 = DateUtils.getFirstDayOfWeek(today);
+        Date d2 = DateUtils.getLastDayOfWeek(today);
         return countAuthTenantDateBetween(d1,d2);
     }
 
