@@ -46,7 +46,10 @@ public class HandlerManager {
         for (Class<? extends RpcRequestHandler> handlerClass : handlerClasss) {
             RpcRequestHandler handler = applicationContext.getBean(handlerClass);
             handlers.put(handler.getEventName(),handler);
-            logger.info("注册消息处理器:{},{}",handler.getEventName(),handler);
+            if(logger.isDebugEnabled()){
+                logger.debug("注册消息处理器:{},{}",handler.getEventName(),handler);
+            }
+
         }
     }
 
