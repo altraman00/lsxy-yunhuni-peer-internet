@@ -631,7 +631,7 @@ public class TenantController {
         if(account == null || account.getEmail() == null){
             return RestResponse.success(false);
         }
-        mqService.publish(new ResetPwdVerifySuccessEvent(account.getEmail(),account.getId()));
+        mqService.publish(new ResetPwdVerifySuccessEvent(account.getEmail()));
         return RestResponse.success(true);
     }
 
