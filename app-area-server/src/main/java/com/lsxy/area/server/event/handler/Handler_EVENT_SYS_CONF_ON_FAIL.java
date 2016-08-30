@@ -92,7 +92,6 @@ public class Handler_EVENT_SYS_CONF_ON_FAIL extends EventHandler{
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .put("user_data",user_data)
                 .put("appid",appId)
-                .put("createtime",System.currentTimeMillis())
                 .put("confid",conf_id).build();
         notifyCallbackUtil.postNotify(notify_url,notify_data,3);
         if(logger.isDebugEnabled()){
