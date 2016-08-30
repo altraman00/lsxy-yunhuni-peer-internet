@@ -11,6 +11,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
+import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.server.Session;
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                            .put("method",ServiceConstants.MN_CH_SYS_CONF_ON_START)
+                            .put("method",Constants.EVENT_SYS_CONF_ON_START)
                             .put("res_id",res_id)
                             .put("user_data",conf_id)
                             .build());
@@ -92,18 +93,42 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
                         if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件%s,失败",ServiceConstants.MN_CH_SYS_CONF_ON_START);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CONF_ON_START);
                     }
                 }
 
                 @Override
                 protected void onError(RpcError rpcError) {
                     logger.error("资源{}[{}]创建失败:{}",getEventName(),conf_id,rpcError);
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method",Constants.EVENT_SYS_CONF_ON_FAIL)
+                                    .put("user_data",conf_id)
+                                    .build());
+                    try {
+                        /*发送区域管理器请求次数计数*/
+                        if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CONF_ON_FAIL);
+                    }
                 }
 
                 @Override
                 protected void onTimeout() {
                     logger.error("资源{}[{}]创建超时",getEventName(),conf_id);
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method",Constants.EVENT_SYS_CONF_ON_TIMEOUT)
+                                    .put("user_data",conf_id)
+                                    .build());
+                    try {
+                        /*发送区域管理器请求次数计数*/
+                        if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CONF_ON_TIMEOUT);
+                    }
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);
