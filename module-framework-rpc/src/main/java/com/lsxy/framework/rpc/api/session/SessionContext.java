@@ -1,16 +1,17 @@
-package com.lsxy.framework.rpc.api;
+package com.lsxy.framework.rpc.api.session;
 
-import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
-import com.lsxy.framework.rpc.mina.client.MinaClientSession;
+import org.apache.commons.collections.map.ListOrderedMap;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Created by tandy on 16/8/3.
  */
 public abstract class SessionContext {
+
+    //选择合适的session的策略
+    private SelectSessionPolicy selectSessionPolicy = new DefaultSelectSessionPolicy(this);
 
     /**
      * 放入session对象到环境中
@@ -24,7 +25,12 @@ public abstract class SessionContext {
      * @return
      */
     public abstract Session getSession(String sessionid);
-
+    /**
+     * 会话交互过程中,根据sessionid获取会话对象
+     * @param idx
+     * @return
+     */
+    public abstract Session getSession(int idx);
     /**
      * 根据会话标识清理会话数据
      * @param sessionid
@@ -45,8 +51,20 @@ public abstract class SessionContext {
      * 为了能够让rpccall自己判断是否session为空,统一处理消息重发问题
      * @return
      */
-    public abstract Session getRightSession() throws RightSessionNotFoundExcepiton;
+    public Session getRightSession() throws RightSessionNotFoundExcepiton {
+        if(this.selectSessionPolicy != null)
+            return this.selectSessionPolicy.select();
+        else{
+            return null;
+        }
+    }
+    /**
+     * 设置会话选择策略
+     * @param selectSessionPolicy
+     */
+    public void setSelectSessionPolicy(SelectSessionPolicy selectSessionPolicy){
+        this.selectSessionPolicy = selectSessionPolicy;
+    }
 
-
-
+    public abstract int size();
 }

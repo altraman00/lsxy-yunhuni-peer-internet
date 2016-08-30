@@ -1,6 +1,7 @@
 package com.lsxy.framework.rpc.api.server;
 
-import com.lsxy.framework.rpc.api.SessionContext;
+import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
@@ -78,24 +79,30 @@ public class ServerSessionContext extends SessionContext{
 	 * @param idx
 	 * @return
      */
+	@Override
 	public Session getSession(int idx){
 		return (Session) this.sessionMap.getValue(idx);
 	}
 
-	/**
-	 * 获取对的区域代理连接会话
-	 * 会根据线路成本,运营商,代理繁忙情况获取到合适的区域代理进行处理
-	 * @return
-     */
+//	/**
+//	 * 获取对的区域代理连接会话
+//	 * 会根据线路成本,运营商,代理繁忙情况获取到合适的区域代理进行处理
+//	 * @return
+//     */
+//	@Override
+//	public Session getRightSession() throws RightSessionNotFoundExcepiton {
+//		Session session;
+//		try {
+//			session = (Session) this.sessionMap.getValue(0);
+//		}catch(Exception ex){
+//			throw new RightSessionNotFoundExcepiton("没有找到有效的区域会话");
+//		}
+//		return session;
+//	}
+
 	@Override
-	public Session getRightSession() throws RightSessionNotFoundExcepiton {
-		Session session;
-		try {
-			session = (Session) this.sessionMap.getValue(0);
-		}catch(Exception ex){
-			throw new RightSessionNotFoundExcepiton("没有找到有效的区域会话");
-		}
-		return session;
+	public int size() {
+		return this.sessionMap.size();
 	}
 
 }

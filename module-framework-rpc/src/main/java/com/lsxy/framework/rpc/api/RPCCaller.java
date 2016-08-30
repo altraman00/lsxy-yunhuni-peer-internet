@@ -1,9 +1,8 @@
 package com.lsxy.framework.rpc.api;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.*;
 import com.lsxy.framework.rpc.queue.FixQueue;
 import org.slf4j.Logger;

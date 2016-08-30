@@ -1,11 +1,9 @@
-package com.lsxy.framework.rpc.api.server;
+package com.lsxy.framework.rpc;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 
-import com.lsxy.framework.rpc.mina.server.MinaRemoteServer;
-import org.apache.mina.core.session.IoSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lsxy.framework.rpc.api.session.Session;
 
 
 /**
