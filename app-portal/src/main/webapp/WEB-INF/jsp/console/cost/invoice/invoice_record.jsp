@@ -214,7 +214,7 @@
                                                         <span class="success">处理完成，发票已寄出</span>
                                                     </c:if>
                                                     <c:if test="${result.status == 2}">
-                                                        <span class="nosuccess" data-toggle="tooltip" title="${result.remark}">
+                                                        <span class="nosuccess" data-toggle="tooltip" title="${result.reason}">
                                                             异常<i class="fa fa-exclamation-triangle"></i>
                                                         </span>
                                                     </c:if>
