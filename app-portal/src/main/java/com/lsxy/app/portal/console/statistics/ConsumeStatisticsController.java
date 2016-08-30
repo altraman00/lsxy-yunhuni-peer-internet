@@ -115,7 +115,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         Map map = new HashMap();
         map.put("name",DateUtils.formatDate(DateUtils.parseDate(startTime,"yyyy-MM"),"MM月"));
         map.put("type","line");
-        map.put("data",getArrays(list));
+        map.put("data",getArrays(list,DateUtils.parseDate(startTime,"yyyy-MM")));
         return map;
     }
     /**
@@ -135,22 +135,35 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         Map map = new HashMap();
         map.put("name",startTime+"年");
         map.put("type","line");
-        map.put("data",getArrays(list));
+        map.put("data",getArrays(list,12));
         return map;
+    }
+    private int getLong(Object obj){
+        int r = 0;
+        if (obj instanceof Date) {
+            r = Integer.valueOf(DateUtils.getLastDate((Date)obj).split("-")[2]);
+        } else if (obj instanceof Integer) {
+            r =Integer.valueOf((Integer)obj);
+        }
+        return r;
     }
     /**
      * 获取列表数据
      * @param list 待处理的list
      * @return
      */
-    private double[] getArrays(List list) {
-        double[] list1 = new double[list.size()];
+    private double[] getArrays(List list,Object date) {
+        int leng = getLong(date);
+        double[] list1 = new double[leng];
+        for(int j=0;j<leng;j++){
+            list1[j]=0;
+        }
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[i]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof ConsumeDay){
-                list1[i]=((ConsumeDay)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
             }
         }
         return list1;

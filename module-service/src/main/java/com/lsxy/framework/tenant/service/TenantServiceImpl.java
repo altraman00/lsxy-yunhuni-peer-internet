@@ -12,6 +12,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.tenant.dao.RealnameCorpDao;
 import com.lsxy.framework.tenant.dao.RealnamePrivateDao;
 import com.lsxy.framework.tenant.dao.TenantDao;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by zhangxb on 2016/6/29.
@@ -219,9 +217,9 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                 " LEFT JOIN (SELECT b.tenant_id,b.`status` FROM db_lsxy_base.tb_base_account b GROUP BY b.tenant_id) a ON t.id = a.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app where deleted <> 1 GROUP BY tenant_id) app ON t.id = app.tenant_id" +
                 " LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_billing billing ON t.id = billing.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,sum_amount  FROM (SELECT * FROM db_lsxy_base.tb_base_consume_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY dt DESC ) a GROUP BY a.tenant_id) consume ON t.id = consume.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,sum(among_amount) as sum_amount FROM db_lsxy_base.tb_base_consume_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL GROUP BY tenant_id) consume ON t.id = consume.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,sum_call,sum_duration  FROM (SELECT * FROM db_lsxy_base.tb_base_voice_cdr_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY dt DESC ) a GROUP BY a.tenant_id) cdr ON t.id = cdr.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,sum(among_call) as sum_call,sum(among_duration) as sum_duration  FROM db_lsxy_base.tb_base_voice_cdr_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY tenant_id) cdr ON t.id = cdr.tenant_id" +
                 " WHERE 1=1";
         sql += " AND (a.`status` IN ("+Account.STATUS_NORMAL+","+Account.STATUS_LOCK+"))";
         if(StringUtil.isNotEmpty(name)){
@@ -284,5 +282,15 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         List<Tenant> list = this.list(hql,"%"+name+"%");
         return list;
     }
-
+    @Override
+    public Map getAwaitNum() {
+        String hql = " from Tenant obj where obj.isRealAuth=?1 or obj.isRealAuth=?2 ";
+        long tenant =  this.countByCustom(hql,Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT);
+        String hql2 = "  from VoiceFilePlay obj where obj.status=?1  ";
+        long voiceFilePlay = this.countByCustom(hql2, VoiceFilePlay.STATUS_WAIT);
+        Map map = new HashMap();
+        map.put("tenant",tenant);
+        map.put("voiceFilePlay",voiceFilePlay);
+        return map;
+    }
 }

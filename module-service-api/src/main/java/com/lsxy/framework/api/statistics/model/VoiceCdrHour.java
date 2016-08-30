@@ -22,13 +22,9 @@ public class VoiceCdrHour extends IdEntity {
     private Date dt;//统计时间
     private Integer hour;//统计小时范围0-23
     private Long amongDuration;//本时段会话时长
-    private Long sumDuration;//总消会话时长
     private Long amongConnect;//本时段接通个数
-    private Long sumConnect;//总接通个数
     private Long amongNotConnect;//本时段未接通个数
-    private Long sumNotConnect;//总未接通个数
     private Long amongCall;//本时段总通话个数
-    private Long sumCall;//总通话个数
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
@@ -94,14 +90,6 @@ public class VoiceCdrHour extends IdEntity {
         this.amongDuration = amongDuration;
     }
 
-    @Column(name = "sum_duration")
-    public Long getSumDuration() {
-        return sumDuration;
-    }
-
-    public void setSumDuration(Long sumDuration) {
-        this.sumDuration = sumDuration;
-    }
     @Column(name = "among_connect")
     public Long getAmongConnect() {
         return amongConnect;
@@ -109,14 +97,6 @@ public class VoiceCdrHour extends IdEntity {
 
     public void setAmongConnect(Long amongConnect) {
         this.amongConnect = amongConnect;
-    }
-    @Column(name = "sum_connect")
-    public Long getSumConnect() {
-        return sumConnect;
-    }
-
-    public void setSumConnect(Long sumConnect) {
-        this.sumConnect = sumConnect;
     }
     @Column(name = "among_not_connect")
     public Long getAmongNotConnect() {
@@ -126,14 +106,6 @@ public class VoiceCdrHour extends IdEntity {
     public void setAmongNotConnect(Long amongNotConnect) {
         this.amongNotConnect = amongNotConnect;
     }
-    @Column(name = "sum_not_connect")
-    public Long getSumNotConnect() {
-        return sumNotConnect;
-    }
-
-    public void setSumNotConnect(Long sumNotConnect) {
-        this.sumNotConnect = sumNotConnect;
-    }
     @Column(name = "among_call")
     public Long getAmongCall() {
         return amongCall;
@@ -141,13 +113,5 @@ public class VoiceCdrHour extends IdEntity {
 
     public void setAmongCall(Long amongCall) {
         this.amongCall = amongCall;
-    }
-    @Column(name = "sum_call")
-    public Long getSumCall() {
-        return sumCall;
-    }
-
-    public void setSumCall(Long sumCall) {
-        this.sumCall = sumCall;
     }
 }

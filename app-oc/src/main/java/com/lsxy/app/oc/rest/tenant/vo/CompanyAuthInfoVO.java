@@ -9,6 +9,7 @@ public class CompanyAuthInfoVO extends AuthInfoVO{
     private String addr;
     private String industry;
 
+    private String proposer;//申请人
     private String authType;// 认证类型
     private String type01Prop01;// [一照一码]营业执照照片
     private String type01Prop02;//type01_prop02 [一照一码]统一社会信用代码
@@ -23,6 +24,13 @@ public class CompanyAuthInfoVO extends AuthInfoVO{
     private String type03Prop03;//type03_prop03 [三证分离]营业执照号
     private String type03Prop04;//type03_prop04 [三证分离]营业执照照片
 
+    public String getProposer() {
+        return proposer;
+    }
+
+    public void setProposer(String proposer) {
+        this.proposer = proposer;
+    }
 
     public String getName() {
         return name;
