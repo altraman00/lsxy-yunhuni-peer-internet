@@ -1,6 +1,8 @@
 package com.lsxy.area.agent.handler;
 
 import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.commander.RpcError;
+import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -57,10 +59,23 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
         }
 
         Map<String, Object> params = request.getParamMap();
-        params.put("user_data",request.getParameter("callId"));
-
         try {
-            cticlient.createResource(0, 0, "sys.call.conf_enter", params, null);
+            cticlient.createResource(0, 0, "sys.call.conf_enter", params, new RpcResultListener(){
+                @Override
+                protected void onResult(Object o) {
+                    logger.info("sys.call.conf_enter执行成功");
+                }
+
+                @Override
+                protected void onError(RpcError rpcError) {
+                    logger.info("sys.call.conf_enter执行失败：{}",rpcError);
+                }
+
+                @Override
+                protected void onTimeout() {
+                    logger.info("sys.call.conf_enter执行超时");
+                }
+            });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);

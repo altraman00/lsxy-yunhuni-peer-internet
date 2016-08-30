@@ -219,16 +219,7 @@ public class ConfServiceImpl implements ConfService {
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
         }
-        //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id，volume不知道填多少填个5
-        String params = String.format("res_id=%s&conf_res_id=%s&max_seconds=%d&voice_mode=%d&volume=%d&play_file=%s",
-                callId, confId, maxDuration, voiceMode, 5,playFile);
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
-        try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
-        } catch (Exception e) {
-            throw new InvokeCallException(e);
-        }
-        return true;
+        return this.confEnter(callId,confId);
     }
 
     @Override
@@ -374,6 +365,57 @@ public class ConfServiceImpl implements ConfService {
         //TODO 此处需要根据confId获取呼叫的res_id
         String params = String.format("res_id=%s&call_res_id=%s&mode=%d",confId,callId,voiceMode);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            throw new InvokeCallException(e);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean confEnter(String call_id, String conf_id) throws YunhuniApiException {
+        BusinessState call_state = businessStateService.get(call_id);
+        BusinessState conf_state = businessStateService.get(conf_id);
+        if(call_state == null || call_state.getResId() == null){
+            throw new InvokeCallException();
+        }
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new InvokeCallException();
+        }
+        Map<String,Object> call_business=call_state.getBusinessData();
+        Map<String,Object> conf_business=call_state.getBusinessData();
+
+        Integer max_seconds = 0;
+        Integer voice_mode = 1;
+        Integer volume = 100;
+        String play_file = "";
+        if(call_business!=null){
+            if(call_business.get("max_seconds")!=null){
+                max_seconds = (Integer)call_business.get("max_seconds");
+            }else if(conf_business.get("max_seconds")!=null){
+                max_seconds = (Integer)conf_business.get("max_seconds");
+            }
+            if(call_business.get("voice_mode")!=null){
+                voice_mode = (Integer) call_business.get("voice_mode");
+            }
+            if(call_business.get("volume")!=null){
+                volume = (Integer) call_business.get("volume");
+            }
+            if(call_business.get("play_file")!=null){
+                play_file = (String) call_business.get("play_file");
+            }
+        }
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                                    .put("res_id",call_state.getResId())
+                                    .put("conf_res_id",conf_state.getResId())
+                                    .put("max_seconds",max_seconds)
+                                    .put("voice_mode",voice_mode)
+                                    .put("volume",volume)
+                                    .put("play_file",play_file)
+                                    .put("user_data",call_id)
+                                    .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {

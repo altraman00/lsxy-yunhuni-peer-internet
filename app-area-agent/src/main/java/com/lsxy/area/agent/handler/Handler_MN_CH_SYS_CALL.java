@@ -78,14 +78,11 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
         try {
             Map<String, Object> params = new HashMap<>();
             String call_id = (String)request.getParameter("user_data");
-            params.put("from_uri", request.getParameter("from") + "@" + ctiHost + ":" + ctiPort);
+            params.put("from_uri", request.getParameter("from"));
             params.put("to_uri", request.getParameter("to") + "@" + ctiHost + ":" + ctiPort);
             params.put("max_answer_seconds", maxAnswerSec);
             params.put("max_ring_seconds", maxRingSec);
             params.put("user_data",call_id);
-            if(logger.isDebugEnabled()){
-                logger.debug("呼叫API调用参数:{}",params);
-            }
 
             cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener(){
                 @Override
@@ -94,8 +91,6 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     if(logger.isDebugEnabled()){
                         logger.debug("资源{}[{}={}]创建成功",getEventName(),call_id,o);
                     }
-
-                    String res_id = o.toString();
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()

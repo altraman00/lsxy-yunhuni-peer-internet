@@ -11,6 +11,7 @@ public class ServiceConstants {
 	public static final String CH_MN_CONNECT = "CH_MN_CONNECT"; // 渠道连接渠道管理器
 
 	public static final String MN_CH_SYS_CALL = "MN_CH_SYS_CALL";  //呼叫业务
+
 	public static final String MN_CH_SYS_CALL_CONF_ENTER = "MN_CH_SYS_CALL_CONF_ENTER";//将呼叫加入会议
 	public static final String MN_CH_SYS_CALL_CONF_EXIT = "MN_CH_SYS_CALL_CONF_EXIT";//将呼叫退出会议
 	public static final String MN_CH_SYS_CONF = "MN_CH_SYS_CONF";	//会议
