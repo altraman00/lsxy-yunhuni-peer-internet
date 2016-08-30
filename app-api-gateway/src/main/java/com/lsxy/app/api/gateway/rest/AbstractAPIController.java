@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by Tandy on 2016/6/28.
@@ -20,7 +21,8 @@ public class AbstractAPIController {
      * @return
      */
     @ExceptionHandler(Exception.class)
-    public String exp(HttpServletRequest request, Exception ex) {
+    public String exp(HttpServletRequest request, HttpServletResponse response, Exception ex) {
+        response.setContentType("application/json;charset=UTF-8");
         ex.printStackTrace();
         RestResponse failed;
         if(ex instanceof YunhuniApiException){
