@@ -17,5 +17,5 @@ public interface AppMonthService extends BaseService<AppMonth> {
      * @param month 第几个月 1-12
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date, int month, String[] select) throws SQLException;
+    public void monthStatistics(Date date, int month, String[] select,String[] all) throws SQLException;
 }

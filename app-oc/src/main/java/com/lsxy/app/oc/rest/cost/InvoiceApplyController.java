@@ -243,6 +243,16 @@ public class InvoiceApplyController extends AbstractRestController {
         map.put("list",page);
         return RestResponse.success(map);
     }
-
+    /**
+     * 等待处理数量
+     * @return
+     */
+    @ApiOperation(value = "等待处理数量,await表示未处理，awaitSend未寄送")
+    @RequestMapping(value = "/await/num",method = RequestMethod.GET)
+    public RestResponse getAwaitNum(){
+        Map map = new HashMap();
+        map.putAll(invoiceApplyService.getAwaitNum());
+        return RestResponse.success(map);
+    }
 
 }

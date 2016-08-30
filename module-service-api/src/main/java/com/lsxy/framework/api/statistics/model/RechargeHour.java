@@ -19,8 +19,7 @@ public class RechargeHour extends IdEntity {
     private Date dt;//统计时间
     private Integer hour;//统计日期范围1-31
     private BigDecimal among_amount;//该时间充值金额
-    private BigDecimal sum_amount;//总充值金额
-    private Long sum_num;//总充值次数
+    private Long among_num;//该时间充值次数
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
@@ -54,20 +53,12 @@ public class RechargeHour extends IdEntity {
     public void setAmong_amount(BigDecimal among_amount) {
         this.among_amount = among_amount;
     }
-    @Column(name = "sum_amount")
-    public BigDecimal getSum_amount() {
-        return sum_amount;
+    @Column(name = "among_num")
+    public Long getAmong_num() {
+        return among_num;
     }
 
-    public void setSum_amount(BigDecimal sum_amount) {
-        this.sum_amount = sum_amount;
-    }
-    @Column(name = "sum_num")
-    public Long getSum_num() {
-        return sum_num;
-    }
-
-    public void setSum_num(Long sum_num) {
-        this.sum_num = sum_num;
+    public void setAmong_num(Long among_num) {
+        this.among_num = among_num;
     }
 }

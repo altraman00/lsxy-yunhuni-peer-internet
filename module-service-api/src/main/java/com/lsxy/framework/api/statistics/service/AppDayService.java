@@ -17,5 +17,5 @@ public interface AppDayService extends BaseService<AppDay> {
      * @param day 第几天 1-31
      * @param select 组合groupby条件
      */
-    public void dayStatistics(Date date, int day, String[] select) throws SQLException;
+    public void dayStatistics(Date date, int day, String[] select,String[] all) throws SQLException;
 }
