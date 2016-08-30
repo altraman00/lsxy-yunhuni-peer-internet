@@ -9,11 +9,15 @@ import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.jmx.FrameworkJMXConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
+import com.lsxy.framework.rpc.api.RPCMessage;
+import com.lsxy.framework.rpc.api.session.SelectSessionPolicy;
+import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
@@ -34,6 +38,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class AreaServerMainClass extends AbstractSpringBootStarter {
 
+    @Autowired
+    private AreaServerSelectSessionPolicy selectSessionPolicy;
+
     public static void main(String[] args) throws RemoteServerStartException {
         System.setProperty(Constants.DUBBO_PROPERTIES_KEY,"config.properties");
         SpringApplication.run(AreaServerMainClass.class);
@@ -42,6 +49,7 @@ public class AreaServerMainClass extends AbstractSpringBootStarter {
     @Bean(name = "sessionContext")
     public SessionContext getSessionContext(){
         SessionContext sessionContext = new ServerSessionContext();
+        sessionContext.setSelectSessionPolicy(selectSessionPolicy);
         return sessionContext;
     }
 

@@ -1,7 +1,7 @@
 package com.lsxy.framework.rpc.api.session;
 
+import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
-import org.apache.commons.collections.map.ListOrderedMap;
 
 import java.util.Collection;
 
@@ -50,10 +50,11 @@ public abstract class SessionContext {
      * 如果没找到就返回空
      * 为了能够让rpccall自己判断是否session为空,统一处理消息重发问题
      * @return
+     * @param request
      */
-    public Session getRightSession() throws RightSessionNotFoundExcepiton {
+    public Session getRightSession(RPCMessage request) throws RightSessionNotFoundExcepiton {
         if(this.selectSessionPolicy != null)
-            return this.selectSessionPolicy.select();
+            return this.selectSessionPolicy.select(request);
         else{
             return null;
         }

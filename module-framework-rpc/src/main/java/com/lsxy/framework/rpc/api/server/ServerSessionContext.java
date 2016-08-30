@@ -7,6 +7,7 @@ import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -105,4 +106,19 @@ public class ServerSessionContext extends SessionContext{
 		return this.sessionMap.size();
 	}
 
+	/**
+	 * 获取指定区域的所有会话
+	 * @param areaid
+	 * @return
+     */
+	public ListOrderedMap getSessionsByArea(String areaid) {
+		ListOrderedMap result = new ListOrderedMap();
+		for(Object key:this.areaSessionMap.keySet()){
+			String strKey = (String) key;
+			if(strKey.substring(0,strKey.indexOf("-")).equals(areaid)){
+				result.put(strKey,areaSessionMap.get(key));
+			}
+		}
+		return result;
+	}
 }

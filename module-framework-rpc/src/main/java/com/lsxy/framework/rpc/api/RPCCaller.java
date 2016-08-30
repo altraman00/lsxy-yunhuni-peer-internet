@@ -114,7 +114,7 @@ public class RPCCaller {
 	 */
 	public void invoke(SessionContext sessionContext, RPCRequest request) throws RightSessionNotFoundExcepiton, SessionWriteException {
 		try{
-			Session session = sessionContext.getRightSession();
+			Session session = sessionContext.getRightSession(request);
 			//如果session为空
 			if(session == null) {
 				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}", request);
@@ -138,7 +138,7 @@ public class RPCCaller {
 	 */
 	public void invoke(SessionContext sessionContext, RPCRequest request, RequestListener rqListener) throws RightSessionNotFoundExcepiton, SessionWriteException {
 		try {
-			Session session = sessionContext.getRightSession();
+			Session session = sessionContext.getRightSession(request);
 			//如果session为空
 			if(session == null){
 				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);

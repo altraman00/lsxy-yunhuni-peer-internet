@@ -1,7 +1,6 @@
 package com.lsxy.framework.rpc.api.session;
 
-import com.lsxy.framework.rpc.api.session.SelectSessionPolicy;
-import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.framework.rpc.api.RPCMessage;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -11,7 +10,7 @@ import static com.lsxy.framework.rpc.api.server.ServerSessionContext.logger;
  * Created by tandy on 16/8/30.
  */
 public class DefaultSelectSessionPolicy implements SelectSessionPolicy {
-    private SessionContext sessionContext;
+    protected SessionContext sessionContext;
 
     //有效会话选择器
     private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
@@ -21,11 +20,9 @@ public class DefaultSelectSessionPolicy implements SelectSessionPolicy {
     }
 
     @Override
-    public Session select() {
+    public Session select(RPCMessage request) {
         return getSession();
     }
-
-
 
     /**
      * 获取有效的会话

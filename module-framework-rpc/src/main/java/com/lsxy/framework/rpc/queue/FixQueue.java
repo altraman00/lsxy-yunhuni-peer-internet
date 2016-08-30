@@ -87,7 +87,7 @@ public class FixQueue implements Runnable{
                 try {
                     message.tryWriteMark();
                     logger.info("[FIX]尝试重新发送消息:{}",message);
-                    Session session = sessionContext.getRightSession();
+                    Session session = sessionContext.getRightSession(message);
                     if(session != null){
                         session.write(message);
                     }else{
