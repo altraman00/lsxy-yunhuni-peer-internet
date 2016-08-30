@@ -85,7 +85,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
                             new MapBuilder<String,Object>()
                             .put("method",ServiceConstants.MN_CH_SYS_CONF_ON_START)
                             .put("res_id",res_id)
-                            .put("conf_id",conf_id)
+                            .put("user_data",conf_id)
                             .build());
                     try {
                         /*发送区域管理器请求次数计数*/
