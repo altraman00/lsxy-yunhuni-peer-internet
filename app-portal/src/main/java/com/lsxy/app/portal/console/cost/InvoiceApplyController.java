@@ -207,9 +207,11 @@ public class InvoiceApplyController extends AbstractPortalController {
             throw new RuntimeException("用户未进行实名认证");
         }
         SecurityUser user = this.getCurrentUser(request);
-        String imgUrl = UploadFile(user.getTenantId(), uploadfile);
-        if(StringUtils.isNotBlank(imgUrl)){
-            paramsMap.put("qualificationUrl",imgUrl);
+        if(uploadfile!=null) {//只有有上传图片才要保存图片
+            String imgUrl = UploadFile(user.getTenantId(), uploadfile);
+            if (StringUtils.isNotBlank(imgUrl)) {
+                paramsMap.put("qualificationUrl", imgUrl);
+            }
         }
         this.save(token,paramsMap);
         return new ModelAndView("redirect:/console/cost/invoice_apply/page");

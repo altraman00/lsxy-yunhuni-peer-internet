@@ -3,6 +3,7 @@ package com.lsxy.app.portal.rest.account;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.service.AccountMessageService;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,16 @@ public class AccountMessageController extends AbstractRestController {
         Page<AccountMessage> list = accountMessageService.pageListByAccountId(userName,pageNo,pageSize);
         return RestResponse.success(list);
     }
-
+    /**
+     * 修改状态为已读
+     * @return
+     */
+    @RequestMapping("/edit")
+    public RestResponse modifyStauts(){
+        Account account = getCurrentAccount();
+        accountMessageService.modifyMessageStatus(account.getId(),AccountMessage.READ);
+        return RestResponse.success();
+    }
     /**
      * 根据状态查询数量
      * @param status

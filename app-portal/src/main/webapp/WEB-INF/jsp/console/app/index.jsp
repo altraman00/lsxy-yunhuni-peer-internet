@@ -73,8 +73,9 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
                                             </div>
-                                            <span class="span-required">*</span>20字符内，符合<a href="">应用审核规范要求</a>
+                                            <span class="span-required">*</span>
                                         </div>
+                                        <p class="tips">20字符内，符合<a href="">应用审核规范要求</a></p>
 
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用描述：</lable>
@@ -121,9 +122,8 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form limit300"/>
                                             </div>
-                                            <a href="">回调说明文档</a>
                                         </div>
-
+                                        <p class="tips"><a href="">回调说明文档</a></p>
                                         <p class="tips">
                                             <input type="checkbox" name="isAuth" value="1" <c:if test="${app.isAuth=='1'}">checked='checked'</c:if>> 鉴权 (网络直拨,回拨,互联网语音,视频通话会涉及鉴权流程，勾选但未实现会呼叫失败)
                                         </p>

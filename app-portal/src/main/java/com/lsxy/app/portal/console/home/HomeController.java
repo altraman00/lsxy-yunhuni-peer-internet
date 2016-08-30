@@ -76,7 +76,12 @@ public class HomeController extends AbstractPortalController {
         if(billing != null){
             //TODO 从redis里取出套餐剩余数据
             //余额正数部分
-            vo.setBalanceInt(billing.getBalance().intValue()+"");
+            int vTemp = billing.getBalance().intValue();
+            if(vTemp<0){
+                vo.setArrearage("欠费");
+                vTemp = Math.abs(vTemp);
+            }
+            vo.setBalanceInt(vTemp+"");
             //余额小数部分
             DecimalFormat df   = new DecimalFormat("######0.00");
             String format = df.format(billing.getBalance());

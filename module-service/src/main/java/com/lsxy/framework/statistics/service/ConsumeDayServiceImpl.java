@@ -49,14 +49,21 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
 
     @Override
     public Page<ConsumeDay> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize) {
-        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt>=?1 and obj.dt<=?2 ) ORDER BY obj.dt,obj.day";
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" obj.dt >=?1 and obj.dt<=?2  ORDER BY obj.dt";
         Page<ConsumeDay>   page =  this.pageList(hql,pageNo,pageSize,startTime,endTime);
         return page;
     }
 
     @Override
+    public Page<ConsumeDay> compareStartTimeAndEndTimePageList(String tenantId, String appId, String type, Date startTime1, Date endTime1, Date startTime2, Date endTime2, Integer pageNo, Integer pageSize) {
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  (obj.dt BETWEEN ?1 and ?2  or obj.dt  between ?3 and ?4 ) ORDER BY obj.dt";
+        Page<ConsumeDay>   page =  this.pageList(hql,pageNo,pageSize,startTime1,endTime1,startTime2,endTime2);
+        return page;
+    }
+
+    @Override
     public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt";
         List<ConsumeDay>  list = this.list(hql,startTime,endTime);
         return list;
     }
@@ -124,7 +131,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeDay day : ds) {
             if(day!=null && day.getAmongAmount() !=null){
-                sum.add(day.getAmongAmount());
+                sum = sum.add(day.getAmongAmount());
             }
         }
         return sum;
@@ -180,29 +187,33 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     }
 
     @Override
-    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant) {
+    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from ConsumeDay obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<ConsumeDay> ds = this.findByCustomWithParams(hql,d1,d2);
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeDay day : ds) {
             if(day!=null && day.getAmongAmount() !=null){
-                sum.add(day.getAmongAmount());
+                sum = sum.add(day.getAmongAmount());
             }
         }
         return sum;
     }
 
     @Override
-    public BigDecimal getSumAmountByTenant(String tenantId) {
+    public BigDecimal getSumAmountByTenant(String tenantId,String time) {
         if(tenantId == null){
             throw new IllegalArgumentException();
         }
-        String sql = "select sum(sum_amount) from (select sum_amount from tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null order by dt desc limit 1) a";
+        Date startTime = DateUtils.parseDate(time,"yyyy-MM");
+        Date endTime = DateUtils.getLastTimeOfMonth(startTime);
+        String sql = "select sum(among_amount) from tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null and dt BETWEEN :start AND :end ";
         Query query = em.createNativeQuery(sql);
         query.setParameter("tenant",tenantId);
+        query.setParameter("start",startTime);
+        query.setParameter("end",endTime);
         Object result = query.getSingleResult();
         if(result!=null){
             return (BigDecimal)result;

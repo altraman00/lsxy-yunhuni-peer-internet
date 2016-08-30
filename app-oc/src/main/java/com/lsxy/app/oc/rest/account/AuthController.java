@@ -86,9 +86,9 @@ public class AuthController extends AbstractRestController {
     @ApiOperation(value = "根据记录id和认证类型获取详情页面")
     @RequestMapping(value = "/member/detail/{id}",method = RequestMethod.GET)
     public RestResponse pageList(
-            @ApiParam(name = "id",value = "消息id")
+            @ApiParam(name = "id",value = "记录id")
             @PathVariable String id,
-            @ApiParam(name = "type",value = "0个人认证 1实名认证 必填")
+            @ApiParam(name = "type",value = "0个人认证 1企业认证 必填")
             @RequestParam Integer type
     ){
         RestResponse restResponse = null;

@@ -1,5 +1,6 @@
 package com.lsxy.area.agent.cti;
 
+import com.lsxy.framework.config.SystemConfig;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,8 @@ public class CTIClientConfigFactory {
 
     private Set<CTIClientConfig> configs = new HashSet<>();
 
+
+
     class CTIClientConfig {
         String ctiHost;
         byte clientId;
@@ -35,7 +38,7 @@ public class CTIClientConfigFactory {
     @PostConstruct
     public void initConfig(){
         //TODO 去REDIS获取配置信息来初始化多个客户端配置
-        CTIClientConfig config = new CTIClientConfig((byte)0,"192.168.22.10");
+        CTIClientConfig config = new CTIClientConfig((byte)0, SystemConfig.getProperty("area.agent.client.cti.host"));
         this.configs.add(config);
     }
 

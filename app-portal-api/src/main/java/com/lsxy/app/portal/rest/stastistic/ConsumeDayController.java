@@ -66,6 +66,26 @@ public class ConsumeDayController extends AbstractRestController {
         Page<ConsumeDay> page =  consumeDayService.pageList( tenantId,  appId, type, date1,  date2, pageNo, pageSize);
         return RestResponse.success(page);
     }
+    /**
+     * 获取比较时间的分页数据
+     * @param tenantId 对于租户
+     * @param appId 应用id
+     * @param type 消费类型
+     * @param startTime 时间 yyyy-MM
+     * @param endTime 结束时间 yyyy-MM
+     * @param pageNo 第几页
+     * @param pageSize 每页记录数
+     * @return
+     */
+    @RequestMapping("/compare_page")
+    public RestResponse compareStartTimeAndEndTimePageList(String tenantId, String appId,String type,String startTime, String endTime,Integer pageNo,Integer pageSize){
+        Date startDate1 = DateUtils.parseDate(startTime,"yyyy-MM");
+        Date endDate1 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(startTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        Date startDate2 = DateUtils.parseDate(endTime,"yyyy-MM");
+        Date endDate2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        Page<ConsumeDay> page =  consumeDayService.compareStartTimeAndEndTimePageList( tenantId,  appId, type, startDate1,  endDate1,startDate2,endDate2,pageNo, pageSize);
+        return RestResponse.success(page);
+    }
 
     /**
      * 获取一定时段内的统计数据的条数，参数是传月份 yyyy-MM

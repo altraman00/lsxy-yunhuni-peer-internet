@@ -37,8 +37,8 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     }
     @Override
     public List<VoiceCdrMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.month";
-        List<VoiceCdrMonth>list = this.findByCustomWithParams(hql,startTime,endTime);
+        String hql = "from VoiceCdrMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt between ?1 and ?2 ORDER BY obj.month";
+        List<VoiceCdrMonth>list = this.list(hql,startTime,endTime);
         return list;
     }
     @Override
@@ -99,17 +99,17 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     }
 
     @Override
-    public long getAmongDurationByDateAndTenant(Date d, String tenant) {
+    public long getAmongDurationByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
-        return getSumFieldBetween(d1,d2,"amongDuration",tenant,null,null);
+        return getSumFieldBetween(d1,d2,"amongDuration",tenant,appId,null);
     }
 
     @Override
-    public long getAmongCallByDateAndTenant(Date d, String tenant) {
+    public long getAmongCallByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
-        return getSumFieldBetween(d1,d2,"amongCall",tenant,null,null);
+        return getSumFieldBetween(d1,d2,"amongCall",tenant,appId,null);
     }
 
     @Override

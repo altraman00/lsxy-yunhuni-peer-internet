@@ -66,11 +66,11 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
     }
 
     @Override
-    public long getInvokeCountByDateAndTenant(Date d, String tenant) {
+    public long getInvokeCountByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from ApiCallDay obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<ApiCallDay> ds = this.findByCustomWithParams(hql,d1,d2);
         long sum = 0;
         for (ApiCallDay day : ds) {

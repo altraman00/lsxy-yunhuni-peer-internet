@@ -75,7 +75,7 @@ public class RechargeMonthServiceImpl extends AbstractService<RechargeMonth> imp
         BigDecimal sum = new BigDecimal(0);
         for (RechargeMonth month : ms) {
             if(month!=null && BeanUtils.getProperty2(month,field) !=null){
-                sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
+                sum = sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
             }
         }
         return sum;

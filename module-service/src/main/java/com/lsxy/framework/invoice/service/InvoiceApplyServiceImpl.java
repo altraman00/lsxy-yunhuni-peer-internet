@@ -148,7 +148,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         Date date2 = null;
         if(StringUtil.isNotEmpty(endTime)){
             try{
-                date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd");
+                date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             }catch (Exception e){}
         }
         int dateNum = 1;

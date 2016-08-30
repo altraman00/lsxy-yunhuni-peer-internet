@@ -25,7 +25,7 @@ public interface TestNumBindService extends BaseService<TestNumBind>  {
      */
     public List<TestNumBind> findByNumber(String userName, String number)  ;
 
-    public List<TestNumBind> findByTenant(String tenant);
+    public List<TestNumBind> findByTenant(String tenant,String appId);
 
 
 }

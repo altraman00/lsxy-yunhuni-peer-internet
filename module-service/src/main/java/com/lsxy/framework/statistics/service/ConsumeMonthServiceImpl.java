@@ -49,7 +49,12 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         Page<ConsumeMonth>   page = this.pageList(hql,pageNo,pageSize,startTime,endTime);
         return page;
     }
-
+    @Override
+    public Page<ConsumeMonth> compareStartTimeAndEndTimePageList(String tenantId, String appId, String type, Date startTime1, Date endTime1, Date startTime2, Date endTime2, Integer pageNo, Integer pageSize) {
+        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" (obj.dt BETWEEN ?1 and ?2  or obj.dt  between ?3 and ?4 ) ORDER BY obj.dt";
+        Page<ConsumeMonth>   page =  this.pageList(hql,pageNo,pageSize,startTime1,endTime1,startTime2,endTime2);
+        return page;
+    }
     @Override
     public List<ConsumeMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
         String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.month";
@@ -161,7 +166,7 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeMonth month : ms) {
             if(month!=null && BeanUtils.getProperty2(month,field) !=null){
-                sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
+                sum = sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
             }
         }
         return sum;
@@ -175,10 +180,10 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
     }
 
     @Override
-    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant) {
+    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
-        return getSumFieldBetween(d1,d2,"amongAmount",tenant,null,null);
+        return getSumFieldBetween(d1,d2,"amongAmount",tenant,appId,null);
     }
 
     @Override
