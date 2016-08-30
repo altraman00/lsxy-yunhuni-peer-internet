@@ -20,11 +20,11 @@ public class HomeVO {
 
     private Double lineLinkRate;            //接通率
 
-    private Integer voiceRemain;           //语音剩余量（分钟）
+    private Long voiceRemain;           //语音剩余量（分钟）
 
-    private Integer smsRemain;             //短信剩余量（条）
+    private Long smsRemain;             //短信剩余量（条）
 
-    private Integer conferenceRemain;         //会议剩余量（分钟）
+    private Long conferenceRemain;         //会议剩余量（分钟）
 
     private Long fileTotalSize;                //总容量
 
@@ -94,27 +94,27 @@ public class HomeVO {
         this.lineLinkRate = lineLinkRate;
     }
 
-    public Integer getVoiceRemain() {
+    public Long getVoiceRemain() {
         return voiceRemain;
     }
 
-    public void setVoiceRemain(Integer voiceRemain) {
+    public void setVoiceRemain(Long voiceRemain) {
         this.voiceRemain = voiceRemain;
     }
 
-    public Integer getSmsRemain() {
+    public Long getSmsRemain() {
         return smsRemain;
     }
 
-    public void setSmsRemain(Integer smsRemain) {
+    public void setSmsRemain(Long smsRemain) {
         this.smsRemain = smsRemain;
     }
 
-    public Integer getConferenceRemain() {
+    public Long getConferenceRemain() {
         return conferenceRemain;
     }
 
-    public void setConferenceRemain(Integer conferenceRemain) {
+    public void setConferenceRemain(Long conferenceRemain) {
         this.conferenceRemain = conferenceRemain;
     }
 

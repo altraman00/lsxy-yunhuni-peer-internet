@@ -207,9 +207,9 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         Billing billing = new Billing();
         billing.setTenant(tenant);
         billing.setBalance(new BigDecimal(0.00));
-        billing.setSmsRemain(0);
-        billing.setVoiceRemain(0);
-        billing.setConferenceRemain(0);
+        billing.setSmsRemain(0L);
+        billing.setVoiceRemain(0L);
+        billing.setConferenceRemain(0L);
         billing.setFileTotalSize(defaultSize);
         billing.setFileRemainSize(defaultSize);
         billingService.save(billing);

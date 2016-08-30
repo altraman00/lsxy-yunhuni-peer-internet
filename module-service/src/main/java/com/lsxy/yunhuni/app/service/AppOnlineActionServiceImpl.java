@@ -169,7 +169,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 //当上一步是应用正在支付中时，如果余额足够，则生成新的动作--上线
                 Tenant tenant = tenantService.findTenantByUserName(userName);
                 Billing billing = billingService.findBillingByTenantId(tenant.getId());
-                if(billing.getBalance().compareTo(action.getAmount()) >= 0){
+                //调用获取余额接口
+                if(billingService.getBalance(tenant.getId()).compareTo(action.getAmount()) >= 0){
                     //当应用有ivr功能时，绑定IVR号码绑定
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
@@ -178,7 +179,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
                     if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
                         //支付扣费，并插入消费记录
-                        this.pay(appId, action.getAmount(), tenant, billing);
+                        this.pay(appId, action.getAmount(), tenant);
                     }
                     //将上一步设为已支付和完成
                     for(AppOnlineAction a:actionList){
@@ -237,14 +238,14 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
      * @param appId
      * @param amount
      * @param tenant
-     * @param billing
      */
-    private void pay(String appId, BigDecimal amount, Tenant tenant, Billing billing) {
-        //TODO 调用扣费接口
-        billing.setBalance(billing.getBalance().subtract(amount));
-        billingService.save(billing);
+    private void pay(String appId, BigDecimal amount, Tenant tenant) {
+        //TODO 支付
+        Date curTime = new Date();
+        //Redis中消费增加
+        billingService.incConsume(tenant.getId(),curTime,amount);
         //插入消费记录
-        Consume consume = new Consume(new Date(),"应用上线",amount,"应用上线",appId,tenant);
+        Consume consume = new Consume(curTime,"应用上线",amount,"应用上线",appId,tenant);
         consumeService.save(consume);
     }
 

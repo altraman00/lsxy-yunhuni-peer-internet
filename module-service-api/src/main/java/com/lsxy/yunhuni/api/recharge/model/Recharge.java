@@ -7,6 +7,7 @@ import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 充值记录表
@@ -21,16 +22,18 @@ public class Recharge  extends IdEntity {
     private String type;                  //充值方式 参考RechargeType
     private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
+    private Date payTime;                   //付款时间,人工充值的付款时间为创建时的时间
 
     public Recharge() {
     }
 
-    public Recharge(Tenant tenant, BigDecimal amount, RechargeType type, RechargeStatus status, String orderId) {
+    public Recharge(Tenant tenant, BigDecimal amount, RechargeType type, RechargeStatus status, String orderId,Date payTime) {
         this.tenant = tenant;
         this.amount = amount;
         this.type = type.name();
         this.status = status.name();
         this.orderId = orderId;
+        this.payTime = payTime;
     }
 
     @ManyToOne
@@ -79,4 +82,12 @@ public class Recharge  extends IdEntity {
         this.orderId = orderId;
     }
 
+    @Column(name = "pay_time")
+    public Date getPayTime() {
+        return payTime;
+    }
+
+    public void setPayTime(Date payTime) {
+        this.payTime = payTime;
+    }
 }

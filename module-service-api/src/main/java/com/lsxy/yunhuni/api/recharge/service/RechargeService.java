@@ -22,7 +22,7 @@ public interface RechargeService extends BaseService<Recharge> {
      * @param amount 充值金额
      * @return
      */
-    Recharge createRecharge(String userName, String type, BigDecimal amount) throws Exception;
+    Recharge createRecharge(String userName, String type, BigDecimal amount);
 
     /**
      * 根据orderId获取充值订单
