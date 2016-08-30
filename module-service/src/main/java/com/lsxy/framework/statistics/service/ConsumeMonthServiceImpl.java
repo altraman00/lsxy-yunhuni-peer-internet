@@ -49,7 +49,12 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         Page<ConsumeMonth>   page = this.pageList(hql,pageNo,pageSize,startTime,endTime);
         return page;
     }
-
+    @Override
+    public Page<ConsumeMonth> compareStartTimeAndEndTimePageList(String tenantId, String appId, String type, Date startTime1, Date endTime1, Date startTime2, Date endTime2, Integer pageNo, Integer pageSize) {
+        String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+" (obj.dt BETWEEN ?1 and ?2  or obj.dt  between ?3 and ?4 ) ORDER BY obj.dt";
+        Page<ConsumeMonth>   page =  this.pageList(hql,pageNo,pageSize,startTime1,endTime1,startTime2,endTime2);
+        return page;
+    }
     @Override
     public List<ConsumeMonth> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
         String hql = "from ConsumeMonth obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.month";
@@ -105,18 +110,17 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
     }
 
     @Override
-    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select) throws SQLException {
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select,String[] all) throws SQLException {
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
         //拼装sql
-        String sql = "insert into db_lsxy_base.tb_base_consume_month("+selects+" dt,month,among_amount,sum_amount,create_time,last_time,deleted,sortno,version )" +
+        String sql = "insert into db_lsxy_base.tb_base_consume_month("+selects+" dt,month,among_amount,create_time,last_time,deleted,sortno,version )" +
                 " SELECT "+selects+" ? as dt,? as month, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
-                " IFNULL(sum(sum_amount),0) as  sum_amount, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_base.tb_base_consume_day a where tenant_id is not null and app_id is not null and type is not null and dt>=? and dt<=? "+groupbys;
+                " from db_lsxy_base.tb_base_consume_day a where tenant_id is not null and app_id is not null and type is not null and dt BETWEEN ? AND ? "+groupbys;
         //拼装参数
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
@@ -162,7 +166,7 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         BigDecimal sum = new BigDecimal(0);
         for (ConsumeMonth month : ms) {
             if(month!=null && BeanUtils.getProperty2(month,field) !=null){
-                sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
+                sum = sum.add((BigDecimal)BeanUtils.getProperty2(month,field));
             }
         }
         return sum;
@@ -176,10 +180,10 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
     }
 
     @Override
-    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant) {
+    public BigDecimal getAmongAmountByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
-        return getSumFieldBetween(d1,d2,"amongAmount",tenant,null,null);
+        return getSumFieldBetween(d1,d2,"amongAmount",tenant,appId,null);
     }
 
     @Override

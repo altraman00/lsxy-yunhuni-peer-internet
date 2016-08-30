@@ -145,4 +145,10 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         }
         return accountMessage;
     }
+
+    @Override
+    public void modifyMessageStatus(String accountId, Integer status) {
+        String sql = " update db_lsxy_base.tb_base_account_message set status='"+status+"' where account_id='"+accountId+"' and deleted='0' and status<>'-1' ";
+        jdbcTemplate.update(sql);
+    }
 }

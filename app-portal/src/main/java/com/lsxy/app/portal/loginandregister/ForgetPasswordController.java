@@ -5,6 +5,7 @@ import com.lsxy.app.portal.comm.MobileCodeUtils;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
@@ -84,21 +85,28 @@ public class ForgetPasswordController {
 
     @RequestMapping(value = "/reset_pwd_mail",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
-    public ModelAndView resetPasswordByEmail(HttpServletRequest request,String key){
-        Map<String,String> model = new HashMap<>();
+    public ModelAndView resetPasswordByEmail(HttpServletRequest request,String key,String code) {
+        Map<String, String> model = new HashMap<>();
         //判断key是否有效，并查出与之关联的邮箱，一个key只有一次有效性
-        String email = cacheManager.get(key);
-        if(StringUtils.isNotBlank(email)){
-            request.getSession().setAttribute(ALLOW_RESET_PASSWORD,true);
-            request.getSession().setAttribute(RESET_EMAIL,email);
-            request.getSession().setAttribute(RESET_EMAIL_KEY,key);
-            model.put(RESET_TYPE,"email");
-            return new ModelAndView("forget/reset_password",model);
+        String re = cacheManager.get(key);
+        Map<String,String> map = JSONUtil.parseObject(re);
+        if (code.equals(map.get("code"))) {//验证成功，进行邮箱修改
+            if (StringUtils.isNotBlank(map.get("email"))) {
+                request.getSession().setAttribute(ALLOW_RESET_PASSWORD, true);
+                request.getSession().setAttribute(RESET_EMAIL,map.get("email"));
+                request.getSession().setAttribute(RESET_EMAIL_KEY, key);
+                model.put(RESET_TYPE, "email");
+                return new ModelAndView("forget/reset_password", model);
+            } else {
+                model.put("erInfo", "无效的链接，或链接已过期");
+                return new ModelAndView("forget/reset_fail", model);
+            }
         }else{
-            model.put("erInfo","无效的链接，或链接已过期");
-            return new ModelAndView("forget/reset_fail",model);
+            model.put("erInfo", "无效的链接，或链接已过期");
+            return new ModelAndView("forget/reset_fail", model);
         }
     }
+
 
     @RequestMapping(value = "/reset_pwd_mobile",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个

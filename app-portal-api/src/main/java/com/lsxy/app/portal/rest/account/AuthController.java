@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,26 +71,26 @@ public class AuthController extends AbstractRestController {
         map.put("userName",userName);
         map.put("status",tenant.getIsRealAuth());
         if(Tenant.AUTH_COMPANY_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_COMPANY_FAIL==tenant.getIsRealAuth()){
-            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),tenant.getIsRealAuth());
-            if(realnameCorp!=null) {
-                map.put("realnameCorp",realnameCorp);
-                map.put("createTime2", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            List<RealnameCorp> realnameCorpList = realnameCorpService.list(tenant.getId(),tenant.getIsRealAuth());
+            if(realnameCorpList.size()>0&&realnameCorpList.get(0)!=null) {
+                map.put("realnameCorp",realnameCorpList.get(0));
+                map.put("createTime2", DateUtils.getTime(realnameCorpList.get(0).getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
         }else if(Tenant.AUTH_ONESELF_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_ONESELF_FAIL==tenant.getIsRealAuth()){
-            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),tenant.getIsRealAuth());
-            if(realnamePrivate!=null) {
-                map.put("realnamePrivate",realnamePrivate);
-                map.put("createTime1", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            List<RealnamePrivate> realnamePrivateList =  realnaePrivateService.list(tenant.getId(),tenant.getIsRealAuth());
+            if(realnamePrivateList.size()>0&&realnamePrivateList.get(0)!=null) {
+                map.put("realnamePrivate",realnamePrivateList.get(0));
+                map.put("createTime1", DateUtils.getTime(realnamePrivateList.get(0).getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }
         }else if(Tenant.AUTH_UPGRADE_SUCCESS==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_WAIT==tenant.getIsRealAuth()||Tenant.AUTH_UPGRADE_FAIL==tenant.getIsRealAuth()){
-            RealnamePrivate realnamePrivate =  realnaePrivateService.findByTenantIdAndStatus(tenant.getId(),Tenant.AUTH_ONESELF_SUCCESS);
-            if(realnamePrivate!=null) {
-                map.put("realnamePrivate",realnamePrivate);
-                map.put("createTime1", DateUtils.getTime(realnamePrivate.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            List<RealnamePrivate> realnamePrivateList =  realnaePrivateService.list(tenant.getId(),Tenant.AUTH_ONESELF_SUCCESS);
+            if(realnamePrivateList.size()>0&&realnamePrivateList.get(0)!=null) {
+                map.put("realnamePrivate",realnamePrivateList.get(0));
+                map.put("createTime1", DateUtils.getTime(realnamePrivateList.get(0).getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_UPGRADE_FAIL);
             }
@@ -101,10 +102,10 @@ public class AuthController extends AbstractRestController {
             }else if(Tenant.AUTH_UPGRADE_SUCCESS==tenant.getIsRealAuth()){
                 statusT = Tenant.AUTH_COMPANY_SUCCESS;
             }
-            RealnameCorp realnameCorp = realnameCorpService.findByTenantIdAndStatus(tenant.getId(),statusT);
-            if(realnameCorp!=null) {
-                map.put("realnameCorp",realnameCorp);
-                map.put("createTime2", DateUtils.getTime(realnameCorp.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            List<RealnameCorp> realnameCorpList = realnameCorpService.list(tenant.getId(),statusT);
+            if(realnameCorpList.size()>0&&realnameCorpList.get(0)!=null) {
+                map.put("realnameCorp",realnameCorpList.get(0));
+                map.put("createTime2", DateUtils.getTime(realnameCorpList.get(0).getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
             }else{
                 map.put("status",Tenant.AUTH_NO);
             }

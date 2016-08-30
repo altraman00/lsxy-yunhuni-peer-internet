@@ -36,17 +36,16 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
     }
 
     @Override
-    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void monthStatistics(Date date1, int month1,Date date2,int month2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql = " insert into db_lsxy_base.tb_base_api_call_month("+selects+"dt,month,among_api,sum_api,create_time,last_time,deleted,sortno,version ) " +
+        String sql = " insert into db_lsxy_base.tb_base_api_call_month("+selects+"dt,month,among_api,create_time,last_time,deleted,sortno,version ) " +
                 " select "+selects+" ? as dt,? as month, "+
                 " count(1) as among_api, " +
-                " count(1)+IFNULL((select sum_api from db_lsxy_base.tb_base_api_call_month h where "+wheres+" h.dt = ? and h.month=? ),0) as  sum_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += " from db_lsxy_base.tb_base_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt>=? and a.dt<=? "+groupbys;
+        sql += " from db_lsxy_base.tb_base_api_call_day a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ? AND ? "+groupbys;
 
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
@@ -70,11 +69,11 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
     }
 
     @Override
-    public long getInvokeCountByDateAndTenant(Date d, String tenant) {
+    public long getInvokeCountByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
         String hql = "from ApiCallMonth obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<ApiCallMonth> ds = this.findByCustomWithParams(hql,d1,d2);
         long sum = 0;
         for (ApiCallMonth month : ds) {

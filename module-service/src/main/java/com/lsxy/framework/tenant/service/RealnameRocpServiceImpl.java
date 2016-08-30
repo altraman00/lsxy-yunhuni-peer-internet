@@ -40,6 +40,13 @@ public class RealnameRocpServiceImpl extends AbstractService<RealnameCorp> imple
     }
 
     @Override
+    public List<RealnameCorp> list(String tenantId, int status) {
+        String hql = "FROM RealnameCorp obj WHERE obj.tenant.id=?1 and obj.status=?2 ORDER BY obj.lastTime  DESC";
+        List<RealnameCorp> list = this.findByCustomWithParams(hql, tenantId,status);
+        return list;
+    }
+
+    @Override
     public RealnameCorp findByTenantIdAndStatus(String tenantId, int status) {
         try {
             return realnameCorpDao.findByTenantIdAndStatus(tenantId,status);

@@ -55,23 +55,19 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql =" insert into db_lsxy_base.tb_base_voice_cdr_day("+selects+"dt,day,among_duration,sum_duration,among_connect,sum_connect,among_not_connect,sum_not_connect,among_call,sum_call,create_time,last_time,deleted,sortno,version )" +
+        String sql =" insert into db_lsxy_base.tb_base_voice_cdr_day("+selects+"dt,day,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
                 " select "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(among_duration),0) as among_duration," +
-                " IFNULL(sum(sum_duration),0) as sum_duration , " +
                 " IFNULL(SUM(among_connect),0) as among_connect," +
-                " IFNULL(SUM(sum_connect),0) as  sum_connect, " +
                 " IFNULL(SUM(among_not_connect),0) as  among_not_connect ," +
-                " IFNULL(SUM(sum_not_connect),0) as  sum_not_connect, " +
                 " IFNULL(SUM(among_call),0) as among_call,"+
-                " IFNULL(SUM(sum_call),0) as sum_call," +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_base.tb_base_voice_cdr_hour a where tenant_id is not null and app_id is not null and type is not null and  dt>=? and dt<=? "+groupbys;
+                " from db_lsxy_base.tb_base_voice_cdr_hour a where tenant_id is not null and app_id is not null and type is not null and  dt BETWEEN ? AND ?"+groupbys;
 
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
@@ -176,11 +172,11 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public long getAmongDurationByDateAndTenant(Date d, String tenant) {
+    public long getAmongDurationByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from VoiceCdrDay obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
         long sum = 0;
         for (VoiceCdrDay day : ds) {
@@ -192,11 +188,11 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
-    public long getAmongCallByDateAndTenant(Date d, String tenant) {
+    public long getAmongCallByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         String hql = "from VoiceCdrDay obj where "
-                +StatisticsUtils.getSqlIsNull(tenant,null, null)+" obj.dt between ?1 and ?2";
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
         List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
         long sum = 0;
         for (VoiceCdrDay day : ds) {

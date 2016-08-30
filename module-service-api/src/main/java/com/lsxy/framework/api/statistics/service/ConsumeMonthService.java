@@ -26,6 +26,20 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      * @return
      */
     public Page<ConsumeMonth> pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize);
+    /**
+     * 获取两个时间点的数据
+     * @param tenantId 对于租户
+     * @param appId 应用id
+     * @param type 消费类型
+     * @param startTime1 时间点1
+     * @param endTime1 结束时间点1
+     * @param startTime2 时点2
+     * @param endTime2 结束时间点2
+     * @param pageNo 第几页
+     * @param pageSize 每页记录数
+     * @return
+     */
+    Page<ConsumeMonth> compareStartTimeAndEndTimePageList (String tenantId, String appId,String type,Date startTime1, Date endTime1,Date startTime2, Date endTime2,Integer pageNo,Integer pageSize);
 
     /**
      * 获取用户某时间的列表数据
@@ -61,7 +75,7 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      * @param month2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select) throws SQLException;
+    public void monthStatistics(Date date1, int month1, Date date2, int month2, String[] select,String[] all) throws SQLException;
 
     /**
      * 获取某月的总的消费额
@@ -84,7 +98,7 @@ public interface ConsumeMonthService extends BaseService<ConsumeMonth> {
      * @param d
      * @return
      */
-    public BigDecimal getAmongAmountByDateAndTenant(Date d,String tenant);
+    public BigDecimal getAmongAmountByDateAndTenant(Date d,String tenant,String appId);
 
     /**
      * 获取某月的某个app的消费额

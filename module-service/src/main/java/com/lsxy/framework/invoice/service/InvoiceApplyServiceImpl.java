@@ -25,6 +25,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/7/21.
@@ -146,7 +148,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         Date date2 = null;
         if(StringUtil.isNotEmpty(endTime)){
             try{
-                date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd");
+                date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             }catch (Exception e){}
         }
         int dateNum = 1;
@@ -206,6 +208,18 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         }
         Page<InvoiceApply> page = this.pageList(hql,pageNo,pageSize);
         return page;
+    }
+
+    @Override
+    public Map getAwaitNum() {
+        String hql = " from InvoiceApply obj where obj.status=?1 ";
+        long await =  this.countByCustom(hql,InvoiceApply.STATUS_SUBMIT);
+        String hql2 = "  from InvoiceApply obj where obj.status=?1  and obj.expressNo is null ";
+        long awaitSend = this.countByCustom(hql2,InvoiceApply.STATUS_SUBMIT);
+        Map map = new HashMap();
+        map.put("await",await);
+        map.put("awaitSend",awaitSend);
+        return map;
     }
 
 }

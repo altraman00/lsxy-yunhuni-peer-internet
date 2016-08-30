@@ -17,7 +17,12 @@ import java.util.List;
  */
 public interface AccountDao extends BaseDaoInterface<Account, Serializable> {
     Account findById(String id);
-
+    /**
+     * 根据状态获取用户
+     * @param status
+     * @return
+     */
+    List<Account> findByStatus(Integer status);
     /**
      * 根据用户名来查找账号
      * @param userName 用户名

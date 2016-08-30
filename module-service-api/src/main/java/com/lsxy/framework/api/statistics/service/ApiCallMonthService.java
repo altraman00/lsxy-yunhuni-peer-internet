@@ -19,12 +19,12 @@ public interface ApiCallMonthService extends BaseService<ApiCallMonth> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
+    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
 
     /**
      * 获取某个租户某月的api调用次数
      * @param d
      * @return
      */
-    public long getInvokeCountByDateAndTenant(Date d, String tenant);
+    public long getInvokeCountByDateAndTenant(Date d, String tenant,String appId);
 }

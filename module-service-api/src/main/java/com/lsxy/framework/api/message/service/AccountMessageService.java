@@ -57,4 +57,11 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
      */
     public AccountMessage sendMessage(String originator,String accountId,String title,String content);
 
+    /**
+     * 修改状态为已读
+     * @param accountId
+     * @param status
+     */
+    void modifyMessageStatus(String accountId,Integer status);
+
 }

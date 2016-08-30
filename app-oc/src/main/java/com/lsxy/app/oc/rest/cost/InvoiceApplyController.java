@@ -57,7 +57,7 @@ public class InvoiceApplyController extends AbstractRestController {
     public RestResponse page(
             @ApiParam(name = "status",value = "状态await待寄出auditing已寄出")
             @PathVariable String status,
-            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
+            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通发票3:企业增值税专用发票")
             @RequestParam(required=false)Integer type,
             @ApiParam(name = "name",value = "会员名")
             @RequestParam(required=false)String name,
@@ -109,7 +109,7 @@ public class InvoiceApplyController extends AbstractRestController {
     public RestResponse page(
             @ApiParam(name = "status",value = "状态await待处理auditing审核通过unauth异常")
             @PathVariable String status,
-            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
+            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通发票3:企业增值税专用发票")
             @RequestParam(required=false)Integer type,
             @ApiParam(name = "name",value = "会员名")
             @RequestParam(required=false)String name,
@@ -243,6 +243,16 @@ public class InvoiceApplyController extends AbstractRestController {
         map.put("list",page);
         return RestResponse.success(map);
     }
-
+    /**
+     * 等待处理数量
+     * @return
+     */
+    @ApiOperation(value = "等待处理数量,await表示未处理，awaitSend未寄送")
+    @RequestMapping(value = "/await/num",method = RequestMethod.GET)
+    public RestResponse getAwaitNum(){
+        Map map = new HashMap();
+        map.putAll(invoiceApplyService.getAwaitNum());
+        return RestResponse.success(map);
+    }
 
 }

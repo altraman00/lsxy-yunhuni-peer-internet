@@ -1,5 +1,6 @@
 package com.lsxy.app.oc.rest.tenant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.framework.api.consume.service.ConsumeService;
@@ -33,11 +34,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -163,7 +166,18 @@ public class TenantController {
     public RestResponse billing(
             @ApiParam(name = "id",value = "租户id")
             @PathVariable String id){
-        return RestResponse.success(billingService.findBillingByTenantId(id));
+        Billing billing = billingService.findBillingByTenantId(id);
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map map= objectMapper.convertValue(billing,Map.class);
+        //余额正数部分
+        int vTemp = billing.getBalance().intValue();
+        //余额小数部分
+        DecimalFormat df   = new DecimalFormat("######0.00");
+        String format = df.format(billing.getBalance());
+        String vTempDec = format.substring(format.indexOf('.') + 1, format.length());
+        map.put("balance",vTemp);
+        map.put("balanceDec",vTempDec);
+        return RestResponse.success(map);
     }
 
     @ApiOperation(value = "租户上个月数据指标")
@@ -175,13 +189,13 @@ public class TenantController {
         //上个月
         Date preMonth = DateUtils.getPrevMonth(new Date());
         //上个月消费额
-        double preConsume = consumeMonthService.getAmongAmountByDateAndTenant(preMonth,id).doubleValue();
+        double preConsume = consumeMonthService.getAmongAmountByDateAndTenant(preMonth,id,null).doubleValue();
         //上个月消费额
         double preRecharge = rechargeMonthService.getAmongAmountByDateAndTenant(preMonth,id).doubleValue();
         //上个月会话量
-        long preAmongCall = voiceCdrMonthService.getAmongCallByDateAndTenant(preMonth,id);
+        long preAmongCall = voiceCdrMonthService.getAmongCallByDateAndTenant(preMonth,id,null);
         //上个月话务量 分钟
-        long preAmongDuration = Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(preMonth,id)/60);
+        long preAmongDuration = Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(preMonth,id,null)/60);
         //上个月连通量
         long preAmongConnect = voiceCdrMonthService.getAmongConnectByDateAndTenant(preMonth,id);
         //上个月平均通话时长
@@ -193,13 +207,13 @@ public class TenantController {
         //上上个月
         Date prepreMonth = DateUtils.getPrevMonth(preMonth);
         //上上个月消费额
-        double prepreConsume = consumeMonthService.getAmongAmountByDateAndTenant(prepreMonth,id).doubleValue();
+        double prepreConsume = consumeMonthService.getAmongAmountByDateAndTenant(prepreMonth,id,null).doubleValue();
         //上上个月消费额
         double prepreRecharge = rechargeMonthService.getAmongAmountByDateAndTenant(prepreMonth,id).doubleValue();
         //上上个月会话量
-        long prepreAmongCall = voiceCdrMonthService.getAmongCallByDateAndTenant(prepreMonth,id);
+        long prepreAmongCall = voiceCdrMonthService.getAmongCallByDateAndTenant(prepreMonth,id,null);
         //上上个月话务量 分钟
-        long prepreAmongDuration = Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(prepreMonth,id)/60);
+        long prepreAmongDuration = Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(prepreMonth,id,null)/60);
         //上上个月连通量
         long prepreAmongConnect = voiceCdrMonthService.getAmongConnectByDateAndTenant(prepreMonth,id);
         //上上个月平均通话时长
@@ -234,14 +248,16 @@ public class TenantController {
     public RestResponse consumeAndurationStatistic(
             @PathVariable String id,
             @RequestParam(value = "year") Integer year,
-            @RequestParam(required = false,value = "month") Integer month){
+            @RequestParam(required = false,value = "month") Integer month,
+            @RequestParam(required =false) String appId
+    ){
         ConsumeAndurationStatisticVO dto = new ConsumeAndurationStatisticVO();
         if(month!=null){//某月所有天
-            dto.setSession(perDayOfMonthDurationStatistic(year,month,id));
-            dto.setCost(perDayOfMonthConsumeStatistic(year,month,id));
+            dto.setSession(perDayOfMonthDurationStatistic(year,month,id,appId));
+            dto.setCost(perDayOfMonthConsumeStatistic(year,month,id,appId));
         }else{//某年所有月
-            dto.setSession(perMonthOfYearDurationStatistic(year,id));
-            dto.setCost(perMonthOfYearConsumeStatistic(year,id));
+            dto.setSession(perMonthOfYearDurationStatistic(year,id,appId));
+            dto.setCost(perMonthOfYearConsumeStatistic(year,id,appId));
         }
         return RestResponse.success(dto);
     }
@@ -250,7 +266,7 @@ public class TenantController {
      * 统计租户某个月的每天的话务量
      * @return
      */
-    private List<Long> perDayOfMonthDurationStatistic(int year, int month,String tenant){
+    private List<Long> perDayOfMonthDurationStatistic(int year, int month,String tenant,String appId){
         List<Long> results = new ArrayList<Long>();
         //先计算出某个月的所有天的开始和结束时间
         Date cdate = DateUtils.newDate(year,month,1);
@@ -265,7 +281,7 @@ public class TenantController {
                     @Override
                     public Long call(){
                         //转换成分钟
-                        return (long)Math.round(voiceCdrDayService.getAmongDurationByDateAndTenant(d,tenant)/60);
+                        return (long)Math.round(voiceCdrDayService.getAmongDurationByDateAndTenant(d,tenant,appId)/60);
                     }
                 }));
             }
@@ -285,7 +301,7 @@ public class TenantController {
      * 统计某个租户某年的每月的话务量
      * @return
      */
-    private List<Long> perMonthOfYearDurationStatistic(int year,String tenant){
+    private List<Long> perMonthOfYearDurationStatistic(int year,String tenant,String appId){
         List<Long> results = new ArrayList<Long>();
         int month_length = 12;
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
@@ -296,7 +312,7 @@ public class TenantController {
             fs.add(pool.submit(new Callable<Long>() {
                 @Override
                 public Long call(){
-                    return (long)Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(month_start,tenant)/60);
+                    return (long)Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(month_start,tenant,appId)/60);
                 }
             }));
         }
@@ -315,7 +331,7 @@ public class TenantController {
      * 统计租户某个月的每天的消费额
      * @return
      */
-    private List<Double> perDayOfMonthConsumeStatistic(int year,int month,String tenant){
+    private List<Double> perDayOfMonthConsumeStatistic(int year,int month,String tenant,String appId){
         List<Double> results = new ArrayList<Double>();
         //先计算出某个月的所有天的开始和结束时间
         Date cdate = DateUtils.newDate(year,month,1);
@@ -329,7 +345,7 @@ public class TenantController {
                 fs.add(pool.submit(new Callable<Double>() {
                     @Override
                     public Double call(){
-                        return consumeDayService.getAmongAmountByDateAndTenant(d,tenant).doubleValue();
+                        return consumeDayService.getAmongAmountByDateAndTenant(d,tenant,appId).doubleValue();
                     }
                 }));
             }
@@ -351,14 +367,16 @@ public class TenantController {
     public RestResponse sessionStatistic(
             @PathVariable String id,
             @RequestParam(value = "year") Integer year,
-            @RequestParam(required = false,value = "month") Integer month){
+            @RequestParam(required = false,value = "month") Integer month,
+            @RequestParam(required = false) String appId
+    ){
         if(month!=null){//某月所有天
-            return RestResponse.success(perDayOfMonthSessionCountStatistic(year,month,id));
+            return RestResponse.success(perDayOfMonthSessionCountStatistic(year,month,id,appId));
         }
-        return RestResponse.success(perMonthOfYearSessionCountStatistic(year,id));
+        return RestResponse.success(perMonthOfYearSessionCountStatistic(year,id,appId));
     }
 
-    private List<Long> perDayOfMonthSessionCountStatistic(int year,int month,String tenant){
+    private List<Long> perDayOfMonthSessionCountStatistic(int year,int month,String tenant,String appId){
         List<Long> results = new ArrayList<Long>();
         //先计算出某个月的所有天的开始和结束时间
         Date cdate = DateUtils.newDate(year,month,1);
@@ -372,7 +390,7 @@ public class TenantController {
                 fs.add(pool.submit(new Callable<Long>() {
                     @Override
                     public Long call(){
-                        return voiceCdrDayService.getAmongCallByDateAndTenant(d,tenant);
+                        return voiceCdrDayService.getAmongCallByDateAndTenant(d,tenant,appId);
                     }
                 }));
             }
@@ -392,7 +410,7 @@ public class TenantController {
      * 统计某个租户某年的每月的会话量
      * @return
      */
-    private List<Long> perMonthOfYearSessionCountStatistic(int year,String tenant){
+    private List<Long> perMonthOfYearSessionCountStatistic(int year,String tenant,String appId){
         List<Long> results = new ArrayList<Long>();
         int month_length = 12;
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
@@ -403,7 +421,7 @@ public class TenantController {
             fs.add(pool.submit(new Callable<Long>() {
                 @Override
                 public Long call(){
-                    return voiceCdrMonthService.getAmongCallByDateAndTenant(month_start,tenant);
+                    return voiceCdrMonthService.getAmongCallByDateAndTenant(month_start,tenant,appId);
                 }
             }));
         }
@@ -423,11 +441,13 @@ public class TenantController {
     public RestResponse apiInvokeStatistic(
             @PathVariable String id,
             @RequestParam(value = "year") Integer year,
-            @RequestParam(required = false,value = "month") Integer month){
+            @RequestParam(required = false,value = "month") Integer month,
+            @RequestParam(required = false) String appId
+    ){
         if(month!=null){//某月所有天
-            return RestResponse.success(perDayOfMonthApiInvokeStatistic(year,month,id));
+            return RestResponse.success(perDayOfMonthApiInvokeStatistic(year,month,id,appId));
         }
-        return RestResponse.success(perMonthOfYearApiInvokeStatistic(year,id));
+        return RestResponse.success(perMonthOfYearApiInvokeStatistic(year,id,appId));
     }
 
     /**
@@ -437,7 +457,7 @@ public class TenantController {
      * @param tenant
      * @return
      */
-    private List<Long> perDayOfMonthApiInvokeStatistic(int year,int month,String tenant){
+    private List<Long> perDayOfMonthApiInvokeStatistic(int year,int month,String tenant,String appId){
         List<Long> results = new ArrayList<Long>();
         //先计算出某个月的所有天的开始和结束时间
         Date cdate = DateUtils.newDate(year,month,1);
@@ -451,7 +471,7 @@ public class TenantController {
                 fs.add(pool.submit(new Callable<Long>() {
                     @Override
                     public Long call(){
-                        return apiCallDayService.getInvokeCountByDateAndTenant(d,tenant);
+                        return apiCallDayService.getInvokeCountByDateAndTenant(d,tenant,appId);
                     }
                 }));
             }
@@ -473,7 +493,7 @@ public class TenantController {
      * @param tenant
      * @return
      */
-    private List<Long> perMonthOfYearApiInvokeStatistic(int year,String tenant){
+    private List<Long> perMonthOfYearApiInvokeStatistic(int year,String tenant,String appId){
         List<Long> results = new ArrayList<Long>();
         int month_length = 12;
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
@@ -484,7 +504,7 @@ public class TenantController {
             fs.add(pool.submit(new Callable<Long>() {
                 @Override
                 public Long call(){
-                    return apiCallMonthService.getInvokeCountByDateAndTenant(month_start,tenant);
+                    return apiCallMonthService.getInvokeCountByDateAndTenant(month_start,tenant,appId);
                 }
             }));
         }
@@ -517,7 +537,7 @@ public class TenantController {
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
         dto.setConsumes(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
-        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id));
+        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
         return RestResponse.success(dto);
     }
 
@@ -644,7 +664,7 @@ public class TenantController {
             return RestResponse.success(null);
         }
         TenantAppVO vo = new TenantAppVO(app);
-        List<TestNumBind> tests = testNumBindService.findByTenant(tenant);
+        List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
         return RestResponse.success(vo);
     }
@@ -748,18 +768,20 @@ public class TenantController {
             @PathVariable String tenant,
             @RequestParam(value = "year") Integer year,
             @ApiParam(name = "month",value="不传month就是某年所有月的统计")
-            @RequestParam(value = "month",required = false) Integer month){
+            @RequestParam(value = "month",required = false) Integer month,
+            @RequestParam(required = false) String appId
+    ){
         if(month!=null){
-            return RestResponse.success(perDayOfMonthConsumeStatistic(year,month,tenant));
+            return RestResponse.success(perDayOfMonthConsumeStatistic(year,month,tenant,appId));
         }
-        return RestResponse.success(perMonthOfYearConsumeStatistic(year,tenant));
+        return RestResponse.success(perMonthOfYearConsumeStatistic(year,tenant,appId));
     }
 
     /**
      * 统计某个租户某年的每月的消费额
      * @return
      */
-    private List<Double> perMonthOfYearConsumeStatistic(int year,String tenant){
+    private List<Double> perMonthOfYearConsumeStatistic(int year,String tenant,String appId){
         List<Double> results = new ArrayList<Double>();
         int month_length = 12;
         ExecutorService pool= Executors.newFixedThreadPool(month_length);
@@ -770,7 +792,7 @@ public class TenantController {
             fs.add(pool.submit(new Callable<Double>() {
                 @Override
                 public Double call(){
-                    BigDecimal dec = consumeMonthService.getAmongAmountByDateAndTenant(month_start,tenant);
+                    BigDecimal dec = consumeMonthService.getAmongAmountByDateAndTenant(month_start,tenant,appId);
                     if(dec!=null){
                         return dec.doubleValue();
                     }

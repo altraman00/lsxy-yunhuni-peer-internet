@@ -23,7 +23,7 @@
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
-                                    <div class="col-md-4 padder-v fix-padding">
+                                    <div class="col-md-6 padder-v fix-padding">
                                         <div class='wrapperBox'>
                                             <span class="pull-left m-r-sm">
                                               <img src="${resPrefixUrl}/images/photo.png" width="50"/>
@@ -32,7 +32,7 @@
                                               <strong>余额</strong>
                                             </span>
                                             <span>
-                                              <small class="text-muted text-uc account-number">${homeVO.balanceInt}</small>
+                                                ${homeVO.arrearage}<small class="text-muted text-uc account-number">${homeVO.balanceInt}</small>
                                               <small class="account-number-decimal">.${homeVO.balanceDec}</small>
                                               元
                                             </span>
@@ -42,7 +42,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 padder-v fix-padding">
+                                    <div class="col-md-6 padder-v fix-padding">
                                         <div class='wrapperBox'>
                                             <div class="row">
                                                 <div class="col-md-4 remove-padding">
@@ -75,34 +75,34 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4 padder-v fix-padding">
-                                        <div class='wrapperBox'>
-                                            <span class="h5 block m-t-xs">
-                                              <strong>套餐剩余量</strong>
-                                            </span>
-                                            <div class='account-left'>
-                                              <span class="w-half">
-                                                <img src="${resPrefixUrl}/images/index/voice.png" alt="">
-                                                语音剩余:  <small class="account-number-small">${homeVO.voiceRemain}</small> 分钟
-                                              </span>
-                                              <span class="w-half">
-                                                <img src="${resPrefixUrl}/images/index/meeting.png" alt="">
-                                                会议剩余:  <small class="account-number-small">${homeVO.conferenceRemain}</small> 分钟
-                                              </span>
-                                              <span class="">
-                                                <img  src="${resPrefixUrl}/images/index/message.png" alt="">
-                                                短信剩余:  <small class="account-number-small">${homeVO.smsRemain}</small> 条
-                                              </span>
-                                              <span class="w-half">
-                                                <img  src="${resPrefixUrl}/images/index/status_1.png" alt="">
-                                                存储用量：<small class="account-number-small">${homeVO.fileUsedSize}M/${homeVO.fileTotalSize}M</small>
-                                              </span>
-                                            </div>
-                                            <div class="box-footer">
-                                                <a href="#" class="btn btn-default fr" >购买流量包</a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <%--<div class="col-md-4 padder-v fix-padding">--%>
+                                        <%--<div class='wrapperBox'>--%>
+                                            <%--<span class="h5 block m-t-xs">--%>
+                                              <%--<strong>套餐剩余量</strong>--%>
+                                            <%--</span>--%>
+                                            <%--<div class='account-left'>--%>
+                                              <%--<span class="w-half">--%>
+                                                <%--<img src="${resPrefixUrl}/images/index/voice.png" alt="">--%>
+                                                <%--语音剩余:  <small class="account-number-small">${homeVO.voiceRemain}</small> 分钟--%>
+                                              <%--</span>--%>
+                                              <%--<span class="w-half">--%>
+                                                <%--<img src="${resPrefixUrl}/images/index/meeting.png" alt="">--%>
+                                                <%--会议剩余:  <small class="account-number-small">${homeVO.conferenceRemain}</small> 分钟--%>
+                                              <%--</span>--%>
+                                              <%--<span class="">--%>
+                                                <%--<img  src="${resPrefixUrl}/images/index/message.png" alt="">--%>
+                                                <%--短信剩余:  <small class="account-number-small">${homeVO.smsRemain}</small> 条--%>
+                                              <%--</span>--%>
+                                              <%--<span class="w-half">--%>
+                                                <%--<img  src="${resPrefixUrl}/images/index/status_1.png" alt="">--%>
+                                                <%--存储用量：<small class="account-number-small">${homeVO.fileUsedSize}M/${homeVO.fileTotalSize}M</small>--%>
+                                              <%--</span>--%>
+                                            <%--</div>--%>
+                                            <%--<div class="box-footer">--%>
+                                                <%--<a href="#" class="btn btn-default fr" >购买流量包</a>--%>
+                                            <%--</div>--%>
+                                        <%--</div>--%>
+                                    <%--</div>--%>
                                 </div>
                             </section>
                             <section class="panel panel-default pos-rlt clearfix ">
