@@ -74,6 +74,11 @@ public class Handler_CH_MN_CTI_EVENT extends RpcRequestHandler{
             } catch (Exception e) {
                 logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
             }
+        }else if(method.equals(ServiceConstants.MN_CH_SYS_CONF_ON_START)){
+            String conf_id = (String)request.getParamMap().get("conf_id");
+            BusinessState state = businessStateService.get(conf_id);
+            logger.info("confi_id={},state={}",conf_id,state);
+            logger.info("会议创建成功事件");
         }else if(method.equals("sys.conf.on_released")){//会议结束事件
             String conf_id = (String)request.getParamMap().get("user_data");
             BusinessState state = businessStateService.get(conf_id);
