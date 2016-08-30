@@ -822,7 +822,7 @@
             var html ='';
             //数据列表
             for(var i = 0 ; i<data.length; i++){
-                html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                html +='<tr class="playtr" id="play-'+data[i][5]+'"><td class="voice-format">'+data[i][1]+'</td>';
                 if(data[i][2]==-1){
                     html+='<td class="nosuccess" title="审核不通过原因：'+data[i][0]+'">审核不通过<i class="fa fa-exclamation-triangle"></i></td>';
                 }else if(data[i][2]==1){
