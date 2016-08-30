@@ -35,6 +35,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_START;
@@ -84,6 +85,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             return res;
         }
         //开始通知开发者
+        if(logger.isDebugEnabled()){
+            logger.debug("开始发送会议创建成功通知给开发者");
+        }
         String notify_url = callbackUrl+"/createconfsucc";
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
         .put("user_data",user_data)
@@ -91,6 +95,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         .put("createtime",System.currentTimeMillis())
         .put("confid",conf_id).build();
         notifyCallbackUtil.postNotify(notify_url,notify_data,3);
+        if(logger.isDebugEnabled()){
+            logger.debug("会议创建成功通知发送成功");
+        }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
