@@ -26,7 +26,7 @@ public interface ApiCallDayService extends BaseService<ApiCallDay> {
      * @param d
      * @return
      */
-    public long getInvokeCountByDateAndTenant(Date d, String tenant);
+    public long getInvokeCountByDateAndTenant(Date d, String tenant,String appId);
 
 }
 

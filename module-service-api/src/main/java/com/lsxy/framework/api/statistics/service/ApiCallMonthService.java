@@ -26,5 +26,5 @@ public interface ApiCallMonthService extends BaseService<ApiCallMonth> {
      * @param d
      * @return
      */
-    public long getInvokeCountByDateAndTenant(Date d, String tenant);
+    public long getInvokeCountByDateAndTenant(Date d, String tenant,String appId);
 }

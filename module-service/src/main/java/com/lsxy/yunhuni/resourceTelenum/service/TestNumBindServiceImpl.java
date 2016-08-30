@@ -45,9 +45,9 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
     }
 
     @Override
-    public List<TestNumBind> findByTenant(String tenant) {
-        String hql = "from TestNumBind obj where obj.tenant.id=?1 ";
-        List<TestNumBind> list = this.findByCustomWithParams(hql, tenant);
+    public List<TestNumBind> findByTenant(String tenant,String appId) {
+        String hql = "from TestNumBind obj where obj.tenant.id=?1 and obj.app.id=?2 ";
+        List<TestNumBind> list = this.findByCustomWithParams(hql, tenant,appId);
         return list;
     }
 }
