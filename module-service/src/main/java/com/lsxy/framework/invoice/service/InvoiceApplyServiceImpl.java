@@ -215,7 +215,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         String hql = " from InvoiceApply obj where obj.status=?1 ";
         long await =  this.countByCustom(hql,InvoiceApply.STATUS_SUBMIT);
         String hql2 = "  from InvoiceApply obj where obj.status=?1  and obj.expressNo is null ";
-        long awaitSend = this.countByCustom(hql2,InvoiceApply.STATUS_SUBMIT);
+        long awaitSend = this.countByCustom(hql2,InvoiceApply.STATUS_DONE);
         Map map = new HashMap();
         map.put("await",await);
         map.put("awaitSend",awaitSend);
