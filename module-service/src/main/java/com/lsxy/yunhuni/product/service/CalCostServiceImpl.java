@@ -35,11 +35,22 @@ public class CalCostServiceImpl implements CalCostService{
             //如果是计量，则只需单价*折扣
             cost = productPrice.getPrice().multiply(new BigDecimal(Double.toString(discount)));
         }else{
-            //如果是计时，则只需（时长/时长单位（不满一个时长单位按一个时长单位算））*单价*折扣
-            BigDecimal calNum  = new BigDecimal(time).divide(new BigDecimal(product.getTimeUnit()),0,BigDecimal.ROUND_UP);
+            //如果是计时，则只需 时长单位数量*单价*折扣
+            BigDecimal calNum = calUnitNum(time, product);
             cost = calNum.multiply(productPrice.getPrice()).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
         }
         return cost;
     }
+
+    /**
+     * 多少个时长单位，时长/时长单位（不满一个时长单位按一个时长单位算)
+     * @param time
+     * @param product
+     * @return
+     */
+    private BigDecimal calUnitNum(Long time, Product product) {
+        return new BigDecimal(time).divide(new BigDecimal(product.getTimeUnit()),0,BigDecimal.ROUND_UP);
+    }
+
 
 }

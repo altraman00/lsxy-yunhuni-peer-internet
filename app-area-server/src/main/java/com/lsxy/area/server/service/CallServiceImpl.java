@@ -10,7 +10,6 @@ import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -20,7 +19,8 @@ import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class CallServiceImpl implements CallService {
     private AppService appService;
 
     @Autowired
-    private BillingService billingService;
+    private CalBillingService calBillingService;
 
     @Autowired
     RedisCacheService redisCacheService;
@@ -124,7 +124,7 @@ public class CallServiceImpl implements CallService {
         if(app.getIsVoiceCallback() != 1){
             throw new AppServiceInvalidException("app没开通所需的服务");
         }
-        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
+        BigDecimal balance = calBillingService.getBalance(app.getTenant().getId());
         //TODO 判断余额是否充足
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException("余额不足");
