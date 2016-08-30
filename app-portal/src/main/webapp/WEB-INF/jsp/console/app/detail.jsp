@@ -816,7 +816,7 @@
             var data =[];
             for(var j=0;j<response.data.result.length;j++){
                 var tempFile = response.data.result[j];
-                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason];
+                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:''];
                 data[j]=temp;
             }
             var html ='';
