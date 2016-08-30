@@ -17,20 +17,23 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     @Autowired
     private RedisCacheService redisCacheService;
 
+    private String getKey(String id){
+        return "business_state_" + id;
+    }
     @Override
     public void save(BusinessState state) {
-        redisCacheService.set("call_"+state.getId(), JSONUtil.objectToJson(state),5 * 60 * 60);
+        redisCacheService.set(getKey(state.getId()), JSONUtil.objectToJson(state),5 * 60 * 60);
     }
 
     @Override
     public BusinessState get(String id) {
-        return JSONUtil2.fromJson(redisCacheService.get(id),BusinessState.class);
+        return JSONUtil2.fromJson(redisCacheService.get(getKey(id)),BusinessState.class);
     }
 
     @Override
     public void delete(String id) {
         try{
-            redisCacheService.del(id);
+            redisCacheService.del(getKey(id));
         }catch (Throwable t){
         }
     }
