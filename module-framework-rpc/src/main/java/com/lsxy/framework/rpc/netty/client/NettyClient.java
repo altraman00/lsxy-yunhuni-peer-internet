@@ -76,9 +76,7 @@ public class NettyClient extends AbstractClient{
             TimeUnit.SECONDS.sleep(2);
 
             if(f.isSuccess() && f.channel().isActive()){
-                if(logger.isDebugEnabled()){
-                    logger.debug("客户端连接成功,准备发送注册客户端命令");
-                }
+                logger.info("客户端连接成功,准备发送注册客户端命令");
                 session = new NettyClientSession(f.channel(),handler,serverUrl);
                 f.channel().attr(SESSION_ID).set(session.getId());
                 this.doConnect(session);

@@ -189,6 +189,8 @@ public abstract class AbstractClient implements Client{
                 throw new ClientConnecException("区域节点注册时出现异常:"+session.getId());
             }
             if (response.isOk()) {
+                logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
+
                 if (bindCallback != null) {
                     bindCallback.doCallback(session);
                 }

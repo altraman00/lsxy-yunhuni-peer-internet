@@ -26,10 +26,6 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
 
     @Override
     public RPCResponse handleService(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("收到请求:{}",request );
-        }
-
         /*收到区域管理器请求次数计数*/
         if(sc!=null) sc.getReceivedAreaServerRequestCount().incrementAndGet();
 
