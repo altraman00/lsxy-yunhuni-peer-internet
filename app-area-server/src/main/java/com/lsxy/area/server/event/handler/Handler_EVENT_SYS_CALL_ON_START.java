@@ -3,7 +3,6 @@ package com.lsxy.area.server.event.handler;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -78,8 +77,8 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         if(conf_id!=null){
             try {
                 confService.confEnter(call_id,conf_id);
-            } catch (YunhuniApiException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                logger.error("将呼叫加入到会议失败",e);
             }
         }
         return res;

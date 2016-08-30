@@ -59,8 +59,9 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
         }
 
         Map<String, Object> params = request.getParamMap();
+        String res_id = (String)params.get("res_id");
         try {
-            cticlient.createResource(0, 0, "sys.call.conf_enter", params, new RpcResultListener(){
+            cticlient.operateResource(0, 0,res_id, "sys.call.conf_enter", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     logger.info("sys.call.conf_enter执行成功");
