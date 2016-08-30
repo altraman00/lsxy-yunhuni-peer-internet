@@ -717,7 +717,7 @@ public class DateUtils {
     }
 
     /**
-     * 取得某天所在周的第一天
+     * 取得某天所在周的第一天 时间显示yyyy-MM-dd 00：00：00
      * @param date  某天
      * @return
      */
@@ -726,11 +726,12 @@ public class DateUtils {
         c.setFirstDayOfWeek(Calendar.MONDAY);
         c.setTime(date);
         c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
-        return c.getTime();
+//        c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
+        return parseDate(getDate(c.getTime(),"yyyy-MM-dd"),"yyyy-MM-dd");
     }
 
     /**
-     * 取得某天所在周的最后一天
+     * 取得某天所在周的最后一天 时间显示yyyy-MM-dd 23：59：59
      * @param date  某天
      * @return
      */
@@ -739,7 +740,8 @@ public class DateUtils {
         c.setFirstDayOfWeek(Calendar.MONDAY);
         c.setTime(date);
         c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek() + 6);
-        return c.getTime();
+//        c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
+        return parseDate(getDate(c.getTime(),"yyyy-MM-dd")+" 23:59:59","yyyy-MM-dd HH:mm:ss");
     }
 
     /**
