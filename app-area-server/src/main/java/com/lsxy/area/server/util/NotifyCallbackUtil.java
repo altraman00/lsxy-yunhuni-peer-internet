@@ -108,7 +108,8 @@ public class NotifyCallbackUtil {
                 logger.error("调用{}失败",url);
                 t.printStackTrace();
             }
-        }while (!res_result && re_times<retry);
+            re_times++;
+        }while (!res_result && re_times<=retry);
         res.setData(res_data);
         res.setResult(res_result);
         return res;
@@ -116,7 +117,7 @@ public class NotifyCallbackUtil {
 
     private String receiveResponse(InputStream inputStream) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        String line = null;
+        String line;
         StringBuilder sb = new StringBuilder();
         while((line = br.readLine())!=null){
             sb.append(line);
@@ -146,13 +147,13 @@ public class NotifyCallbackUtil {
         }
     }
 
-    public static void main(String[] args) {
-        /*NotifyCallbackUtil a = new NotifyCallbackUtil();
+    /*public static void main(String[] args) {
+        NotifyCallbackUtil a = new NotifyCallbackUtil();
                 a.init();
         Map<String,Object> data = new HashedMap();
         data.put("max_duration",1);
         data.put("max_parts",3);
         Response res = a.postNotify("http://192.168.20.102:18082/v1/account/11/conf/create",data);
-        System.out.println(res.getData());*/
-    }
+        System.out.println(res.getData());x
+    }*/
 }

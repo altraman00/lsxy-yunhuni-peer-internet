@@ -84,10 +84,12 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             return res;
         }
         //开始通知开发者
-        String notify_url = callbackUrl+"/conf_create_success";
+        String notify_url = callbackUrl+"/createconfsucc";
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
         .put("user_data",user_data)
-        .put("callid",conf_id).build();
+        .put("appid",appId)
+        .put("createtime",System.currentTimeMillis())
+        .put("confid",conf_id).build();
         notifyCallbackUtil.postNotify(notify_url,notify_data,3);
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
