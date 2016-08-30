@@ -90,6 +90,7 @@ public class ConfServiceImpl implements ConfService {
         BusinessState state = new BusinessState(tenantId,app.getId(),confId,"sys_conf",
                 userData,new MapBuilder<String,Object>()
                 .put("max_parts",maxParts)
+                .put("parts_num",0)
                 .put("auto_hangup",autoHangup)
                 .put("callback_url",callBackURL)
                 .build());
