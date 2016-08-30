@@ -16,9 +16,9 @@ public class Billing extends IdEntity {
 
     private Tenant tenant;                //所属租户
     private BigDecimal balance;               //余额
-    private Integer voiceRemain;          //剩余语音流量（分钟）
-    private Integer smsRemain;            //语音短信余量（条）
-    private Integer conferenceRemain;     //会议剩余量（分钟）
+    private Long voiceRemain;          //剩余语音流量（秒）
+    private Long smsRemain;            //语音短信余量（条）
+    private Long conferenceRemain;     //会议剩余量（秒）
     private Long fileRemainSize;//剩余存储容量，单位byte
     private Long fileTotalSize;//总容量，单位byte
 
@@ -49,29 +49,29 @@ public class Billing extends IdEntity {
     }
 
     @Column(name = "voice_remain")
-    public Integer getVoiceRemain() {
+    public Long getVoiceRemain() {
         return voiceRemain;
     }
 
-    public void setVoiceRemain(Integer voiceRemain) {
+    public void setVoiceRemain(Long voiceRemain) {
         this.voiceRemain = voiceRemain;
     }
 
     @Column(name = "sms_remain")
-    public Integer getSmsRemain() {
+    public Long getSmsRemain() {
         return smsRemain;
     }
 
-    public void setSmsRemain(Integer smsRemain) {
+    public void setSmsRemain(Long smsRemain) {
         this.smsRemain = smsRemain;
     }
 
     @Column(name = "conference_remain")
-    public Integer getConferenceRemain() {
+    public Long getConferenceRemain() {
         return conferenceRemain;
     }
 
-    public void setConferenceRemain(Integer conferenceRemain) {
+    public void setConferenceRemain(Long conferenceRemain) {
         this.conferenceRemain = conferenceRemain;
     }
 
