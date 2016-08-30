@@ -54,8 +54,6 @@ public class RPCCaller {
 	public void putResponse(RPCResponse response){
 		logger.debug("putResponse:收到响应【"+response.getSessionid()+"】");
 		responseMap.put(response.getSessionid(), response);
-		logger.debug("responseMap size:"+responseMap.size());
-		logger.debug("this is :"+this);
 	}
 
 	/**
