@@ -1,6 +1,6 @@
 package com.lsxy.area.agent;
 
-import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.*;
 import com.lsxy.area.agent.cti.CTIClient;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -73,7 +73,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
     private RPCResponse process_MN_CH_EXT_DUO_CALLBACK(RPCRequest request) {
         RPCResponse response = RPCResponse.buildResponse(request);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -106,7 +106,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         }
 
         try {
-            cticlient.createResource(0, 0, "ext.duo_callback", params, null);
+            cticlient.createResource(new BusAddress((byte)0, (byte)0), "ext.duo_callback", params, null);
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
@@ -139,7 +139,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         if(logger.isDebugEnabled()){
             logger.debug("响应CTI API:{}",request);
         }
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         String resId = (String) request.getParameter("res_id");
         String method = (String) request.getParameter("method");
         Map<String, Object> params = new HashMap<>();
@@ -165,7 +165,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
                 logger.debug("开始操作资源:{}{}",method,resId);
             }
 
-            cticlient.operateResource(0,1,resId,method,params,null);
+            cticlient.operateResource(new BusAddress((byte)0,(byte)1),resId,method,params,null);
 
             /*发送请求给CTI次数计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
@@ -198,7 +198,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
         Integer iMaxAnswerSec = Integer.parseInt(maxAnswerSec);
         Integer iMaxRingSec = Integer.parseInt(maxRingSec);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -214,7 +214,7 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
                 logger.debug("呼叫API调用参数:{}",params);
             }
 
-            cticlient.createResource(0, 0, "sys.call", params, null);
+            cticlient.createResource(new BusAddress((byte)0, (byte)0), "sys.call", params, null);
 
             /*给CTI发送请求计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
