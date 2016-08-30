@@ -109,4 +109,12 @@ public interface AccountService extends BaseService<Account> {
      * @return
      */
     List<Account> findByStatus(Integer status);
+
+    /**
+     * 根据邮箱查找账号
+     * @param email 邮箱
+     * @param status 状态
+     * @return
+     */
+    Account findByEmailAndStatus(String email,int status);
 }
