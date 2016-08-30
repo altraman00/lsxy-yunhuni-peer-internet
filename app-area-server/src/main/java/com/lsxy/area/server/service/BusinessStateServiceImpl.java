@@ -29,6 +29,9 @@ public class BusinessStateServiceImpl implements BusinessStateService {
 
     @Override
     public void delete(String id) {
-        redisCacheService.del(id);
+        try{
+            redisCacheService.del(id);
+        }catch (Throwable t){
+        }
     }
 }

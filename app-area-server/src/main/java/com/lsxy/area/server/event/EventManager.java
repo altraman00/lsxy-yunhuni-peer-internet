@@ -46,7 +46,7 @@ public class EventManager {
         for (Class<? extends EventHandler> handlerClass : handlerClasss) {
             EventHandler handler = applicationContext.getBean(handlerClass);
             handlers.put(handler.getEventName(),handler);
-            logger.info("注册消息处理器:{},{}",handler.getEventName(),handler);
+            logger.info("注册CTI事件处理器:{},{}",handler.getEventName(),handler);
         }
     }
 

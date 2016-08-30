@@ -89,10 +89,11 @@ public class ConfServiceImpl implements ConfService {
         //保存业务数据
         BusinessState state = new BusinessState(tenantId,app.getId(),confId,"sys_conf",
                 userData,new MapBuilder<String,Object>()
-                .put("max_parts",maxParts)
-                .put("parts_num",0)
-                .put("auto_hangup",autoHangup)
-                .put("callback_url",callBackURL)
+                .put("max_seconds",maxDuration)//会议最大持续时长
+                .put("max_parts",maxParts)//最大与会数
+                .put("parts_num",0)//与会数
+                .put("auto_hangup",autoHangup)//会议结束是否自动挂断
+                .put("callback_url",callBackURL)//通知url
                 .build());
         businessStateService.save(state);
         return confId;
@@ -111,12 +112,24 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
-        //TODO 根据confId 获取res_id
-        String params = String.format("res_id=%s",confId);
+        BusinessState state = businessStateService.get(confId);
+
+        if(state == null){
+            throw new ConfNotExistsException();
+        }
+
+        if(!appId.equals(state.getAppId())){
+            //不能跨app操作
+            throw new ConfNotExistsException();
+        }
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .put("res_id",state.getResId())
+                .put("user_data",confId)
+                .build();
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
-
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
@@ -128,11 +141,12 @@ public class ConfServiceImpl implements ConfService {
                          String from, String to, String customFrom,
                          String customTO, Integer maxDuration, Integer maxDialDuration,
                          Integer dialVoiceStopCond, String playFile, Integer voiceMode) throws YunhuniApiException{
+
         if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
             throw new NumberNotAllowToCallException();
         }
-
         App app = appService.findById(appId);
+        String tenantId = app.getTenant().getId();
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
@@ -150,16 +164,39 @@ public class ConfServiceImpl implements ConfService {
             throw new BalanceNotEnoughException();
         }
 
+        BusinessState state = businessStateService.get(confId);
+        if(state == null){
+            throw new ConfNotExistsException();
+        }
+        if(!appId.equals(state.getAppId())){
+            //不能跨app操作
+            throw new ConfNotExistsException();
+        }
+
         String callId = UUIDGenerator.uuid();
-        String params = String.format("to=%s&from=%s&maxAnswerSec=%d&maxRingSec=%d&callId=%s",
-                to, from, maxDuration, maxDialDuration, callId);
-        //TODO 调用sys.call 需要把当前的业务。。邀请会议保存到user_data
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .put("to",to)
+                .put("from",from)
+                .put("maxAnswerSec",maxDuration)
+                .put("maxRingSec",maxDialDuration)
+                .put("user_data",callId)
+                .build();
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
+        //保存业务数据，后续事件要用到
+        BusinessState callstate = new BusinessState(tenantId,app.getId(),callId,"sys_conf_invite",null
+                ,new MapBuilder<String,Object>()
+                .put("max_seconds",state.getBusinessData().get("max_seconds"))//最大时间,默认与会议一只
+                .put("conf_id",confId)//所属会议
+                .put("play_file",playFile)//加入后在会议播放这个文件
+                .put("voice_mode",voiceMode)//加入后的声音模式
+                .build());
+        businessStateService.save(callstate);
         return callId;
     }
 

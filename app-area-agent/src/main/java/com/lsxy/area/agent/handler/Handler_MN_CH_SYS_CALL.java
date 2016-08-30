@@ -1,11 +1,17 @@
 package com.lsxy.area.agent.handler;
 
 import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.commander.RpcError;
+import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.client.ClientSessionContext;
+import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.server.Session;
 import org.slf4j.Logger;
@@ -35,6 +41,12 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
     @Autowired
     private CTIClientContext cticlientContext;
 
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private ClientSessionContext sessionContext;
+
     @Autowired(required = false)
     private StasticsCounter sc;
 
@@ -51,15 +63,12 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
         RPCResponse response = RPCResponse.buildResponse(request);
 
         String to = (String) request.getParameter("to");
-        String maxAnswerSec = (String) request.getParameter("maxAnswerSec");
-        String maxRingSec = (String) request.getParameter("maxRingSec");
+        Integer maxAnswerSec = (Integer) request.getParameter("maxAnswerSec");
+        Integer maxRingSec = (Integer) request.getParameter("maxRingSec");
 
         assert  to != null;
         assert maxAnswerSec != null;
         assert maxRingSec!=null;
-
-        Integer iMaxAnswerSec = Integer.parseInt(maxAnswerSec);
-        Integer iMaxRingSec = Integer.parseInt(maxRingSec);
 
         Client cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
@@ -68,17 +77,75 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
         }
         try {
             Map<String, Object> params = new HashMap<>();
-
-            params.put("from_uri", "");
+            String call_id = (String)request.getParameter("user_data");
+            params.put("from_uri", request.getParameter("from") + "@" + ctiHost + ":" + ctiPort);
             params.put("to_uri", request.getParameter("to") + "@" + ctiHost + ":" + ctiPort);
-            params.put("max_answer_seconds", iMaxAnswerSec);
-            params.put("max_ring_seconds", iMaxRingSec);
-
+            params.put("max_answer_seconds", maxAnswerSec);
+            params.put("max_ring_seconds", maxRingSec);
+            params.put("user_data",call_id);
             if(logger.isDebugEnabled()){
                 logger.debug("呼叫API调用参数:{}",params);
             }
 
-            cticlient.createResource(0, 0, "sys.call", params, null);
+            cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener(){
+                @Override
+                protected void onResult(Object o) {
+
+                    if(logger.isDebugEnabled()){
+                        logger.debug("资源{}[{}={}]创建成功",getEventName(),call_id,o);
+                    }
+
+                    String res_id = o.toString();
+
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method", Constants.EVENT_SYS_CALL_ON_START)
+                                    .put("res_id",res_id)
+                                    .put("user_data",call_id)
+                                    .build());
+                    try {
+                        /*发送区域管理器请求次数计数*/
+                        if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_ON_START);
+                    }
+                }
+
+                @Override
+                protected void onError(RpcError rpcError) {
+                    logger.error("资源{}[{}]创建失败:{}",getEventName(),call_id,rpcError);
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method",Constants.EVENT_SYS_CALL_ON_FAIL)
+                                    .put("user_data",call_id)
+                                    .build());
+                    try {
+                        /*发送区域管理器请求次数计数*/
+                        if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_FAIL);
+                    }
+                }
+
+                @Override
+                protected void onTimeout() {
+                    logger.error("资源{}[{}]创建超时",getEventName(),call_id);
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("user_data",call_id)
+                                    .build());
+                    try {
+                        /*发送区域管理器请求次数计数*/
+                        if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_TIMEOUT);
+                    }
+                }
+            });
 
             /*给CTI发送请求计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
