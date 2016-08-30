@@ -165,9 +165,12 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
 
     @Override
     public List<Map<String, Object>> getConsumeTop(int top) {
-        String hql = "from ConsumeDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumAmount DESC";
-        List<ConsumeDay> list = this.getTopList(hql,false,top);
-        return getTops(list,"sumAmount");
+//        String hql = "from ConsumeDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumAmount DESC";
+//        List<ConsumeDay> list = this.getTopList(hql,false,top);
+//        return getTops(list,"sumAmount");
+        String sql = "select FORMAT(sum(among_amount),2) as value ,tenant_id as id ,b.tenant_name as name from db_lsxy_base.tb_base_consume_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null group by a.tenant_id ORDER BY sum(a.among_amount) DESC limit 0,?";
+        List list = jdbcTemplate.queryForList(sql,top);
+        return list;
     }
 
     @Override

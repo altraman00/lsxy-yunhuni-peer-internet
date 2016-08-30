@@ -135,40 +135,49 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
 
     @Override
     public List<Map<String, Object>> getCallTop(int top) {
-        String hql = "from VoiceCdrDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumCall DESC";
-        List<VoiceCdrDay> list = this.getTopList(hql,false,top);
-        return getTops(list,"sumCall",null);
+        String sql = "select sum(among_call) as value ,tenant_id as id ,b.tenant_name as name from db_lsxy_base.tb_base_voice_cdr_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null group by a.tenant_id ORDER BY sum(a.among_call) DESC limit 0,?";
+        List list = jdbcTemplate.queryForList(sql,top);
+        return list;
     }
 
     @Override
     public List<Map<String, Object>> getDurationTop(int top) {
-        String hql = "from VoiceCdrDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumDuration DESC";
-        List<VoiceCdrDay> list = this.getTopList(hql,false,top);
-        return getTops(list,"sumDuration",60);
+        String sql = "select FORMAT(sum(among_duration)/60,0) as value ,tenant_id as id ,b.tenant_name as name from db_lsxy_base.tb_base_voice_cdr_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null group by a.tenant_id ORDER BY sum(a.among_duration) DESC limit 0,?";
+        List list = jdbcTemplate.queryForList(sql,top);
+//        String hql = "from VoiceCdrDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY sum(obj.amongDuration) DESC";
+//        List<VoiceCdrDay> list = this.getTopList(hql,false,top);
+      //  return getTops(list,"sumDuration",60);
+        return list;
     }
 
     @Override
     public List<Map<String, Object>> getCallTopByDateBetween(int top, Date d1, Date d2) {
-        String sql = "select id,tenant_id,sum(among_call)among_call from tb_base_voice_cdr_day where app_id is null and tenant_id is not null and type is null and dt between :d1 and :d2 group BY tenant_id order by among_call desc";
-        Query query = em.createNativeQuery(sql,VoiceCdrDay.class);
-        query.setParameter("d1", d1);
-        query.setParameter("d2", d2);
-        query.setFirstResult(0);
-        query.setMaxResults(top);
-        List<VoiceCdrDay> list = query.getResultList();
-        return getTops(list,"amongCall",null);
+//        String sql = "select id,tenant_id,sum(among_call)among_call from tb_base_voice_cdr_day where app_id is null and tenant_id is not null and type is null and dt between :d1 and :d2 group BY tenant_id order by among_call desc";
+//        Query query = em.createNativeQuery(sql,VoiceCdrDay.class);
+//        query.setParameter("d1", d1);
+//        query.setParameter("d2", d2);
+//        query.setFirstResult(0);
+//        query.setMaxResults(top);
+//        List<VoiceCdrDay> list = query.getResultList();
+//        return getTops(list,"amongCall",null);
+        String sql = "select a.tenant_id as id ,sum(a.among_call) as value,b.tenant_name as name  from db_lsxy_base.tb_base_voice_cdr_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null and a.dt between ? and ? group BY a.tenant_id order by sum(a.among_call) desc limit 0,?" ;
+        List list = jdbcTemplate.queryForList(sql,d1,d2,top);
+        return list;
     }
 
     @Override
     public List<Map<String, Object>> getDurationTopByDateBetween(int top, Date d1, Date d2) {
-        String sql = "select id,tenant_id,sum(among_duration)among_call from tb_base_voice_cdr_day where app_id is null and tenant_id is not null and type is null and dt between :d1 and :d2 group BY tenant_id order by among_duration desc";
-        Query query = em.createNativeQuery(sql,VoiceCdrDay.class);
-        query.setParameter("d1", d1);
-        query.setParameter("d2", d2);
-        query.setFirstResult(0);
-        query.setMaxResults(top);
-        List<VoiceCdrDay> list = query.getResultList();
-        return getTops(list,"amongDuration",60);
+//        String sql = "select id,tenant_id,sum(among_duration)among_call from tb_base_voice_cdr_day where app_id is null and tenant_id is not null and type is null and dt between :d1 and :d2 group BY tenant_id order by among_duration desc";
+//        Query query = em.createNativeQuery(sql,VoiceCdrDay.class);
+//        query.setParameter("d1", d1);
+//        query.setParameter("d2", d2);
+//        query.setFirstResult(0);
+//        query.setMaxResults(top);
+//        List<VoiceCdrDay> list = query.getResultList();
+//        return getTops(list,"amongDuration",60);
+        String sql = "select a.tenant_id as id ,FORMAT(sum(a.among_duration)/60,0) as value,b.tenant_name as name  from db_lsxy_base.tb_base_voice_cdr_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null and a.dt between ? and ? group BY a.tenant_id order by sum(a.among_duration) desc limit 0,?" ;
+        List list = jdbcTemplate.queryForList(sql,d1,d2,top);
+        return list;
     }
 
     @Override
