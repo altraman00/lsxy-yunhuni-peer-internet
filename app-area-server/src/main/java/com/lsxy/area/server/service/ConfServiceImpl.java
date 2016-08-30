@@ -383,6 +383,10 @@ public class ConfServiceImpl implements ConfService {
         if(conf_state == null || conf_state.getResId() == null){
             throw new InvokeCallException();
         }
+        if(!call_state.getAppId().equals(conf_state.getAppId())){
+            //不合法的参数
+            throw new IllegalArgumentException();
+        }
         Map<String,Object> call_business=call_state.getBusinessData();
         Map<String,Object> conf_business=call_state.getBusinessData();
 
@@ -420,6 +424,13 @@ public class ConfServiceImpl implements ConfService {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
+        }
+        if(call_business!=null){
+            if(call_business.get("conf_id") == null){
+                call_business.put("conf_id",conf_id);
+                call_state.setBusinessData(call_business);
+                businessStateService.save(call_state);
+            }
         }
         return true;
     }
