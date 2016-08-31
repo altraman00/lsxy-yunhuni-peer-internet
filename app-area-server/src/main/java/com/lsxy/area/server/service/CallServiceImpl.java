@@ -11,7 +11,7 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.server.ServerSessionContext;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
@@ -45,7 +45,7 @@ public class CallServiceImpl implements CallService {
     private RPCCaller rpcCaller;
 
     @Autowired
-    private ServerSessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @Autowired
     private ApiGwRedBlankNumService apiGwRedBlankNumService;
