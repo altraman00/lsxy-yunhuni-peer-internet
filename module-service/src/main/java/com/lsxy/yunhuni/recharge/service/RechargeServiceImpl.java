@@ -15,6 +15,7 @@ import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.recharge.dao.RechargeDao;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -112,7 +113,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     }
 
     @Override
-    public boolean doRecharge(String tenantId, BigDecimal amount) {
+    public Billing doRecharge(String tenantId, BigDecimal amount) {
         if(StringUtil.isEmpty(tenantId)){
             throw new IllegalArgumentException();
         }
@@ -123,14 +124,18 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         if(tenant == null){
             throw new IllegalArgumentException();
         }
-        String orderId = UUIDGenerator.uuid();
-        Recharge recharge = new Recharge(tenant,amount,RechargeType.RENGONG, RechargeStatus.PAID,orderId);
-        rechargeDao.save(recharge);
-        //更新账务表的余额
         Billing billing = billingService.findBillingByTenantId(tenant.getId());
-        billing.setBalance(billing.getBalance().add(recharge.getAmount()));
-        billingService.save(billing);
-        return true;
+        if(billing!=null) {
+            String orderId = UUIDGenerator.uuid();
+            Recharge recharge = new Recharge(tenant, amount, RechargeType.RENGONG, RechargeStatus.PAID, orderId);
+            rechargeDao.save(recharge);
+            //更新账务表的余额
+            billing.setBalance(billing.getBalance().add(recharge.getAmount()));
+            billing = billingService.save(billing);
+        }else{
+
+        }
+        return billing;
     }
 
     @Override
