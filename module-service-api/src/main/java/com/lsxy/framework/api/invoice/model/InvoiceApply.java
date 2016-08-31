@@ -17,7 +17,7 @@ public class InvoiceApply extends IdEntity {
     public static Integer STATUS_SUBMIT = 0;    //申请已提交
     public static Integer STATUS_DONE = 1;      //处理完成，发票已寄出
     public static Integer STATUS_EXCEPTION = 2; //异常，这种状态一般为用户填写的资料有误，运营中心驳回申请
-
+    private String reason;//原因
     private BigDecimal amount;      //金额
     private Date start;             //开始时间
     private Date end;               //结束时间
@@ -38,6 +38,14 @@ public class InvoiceApply extends IdEntity {
     private String expressCom;  //快递公司
     private String expressNo;  //快递单号
     private String qualificationUrl; //资格证书URL （图片）
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
 
     @Column(name = "amount")
     public BigDecimal getAmount() {

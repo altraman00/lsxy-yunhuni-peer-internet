@@ -106,7 +106,17 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum.money}" pattern="0.00"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：<fmt:formatNumber value="${sum.size}" pattern="0.00"></fmt:formatNumber> M</span></th>
+                                                <c:set var="sum_money" value="0.00"></c:set>
+                                                <c:set var="sum_size" value="0"></c:set>
+                                                <c:if test="${sum!=null}">
+                                                    <c:if test="${ sum.money!=null}">
+                                                        <c:set value="${sum.money}" var="sum_money"></c:set>
+                                                    </c:if>
+                                                    <c:if test="${ sum.size!=null}">
+                                                        <c:set value="${sum.size}" var="sum_size"></c:set>
+                                                    </c:if>
+                                                </c:if>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_money}" pattern="0.00"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：<fmt:formatNumber value="${sum_size}" pattern="0.00"></fmt:formatNumber> M</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>

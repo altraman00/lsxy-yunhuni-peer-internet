@@ -41,7 +41,30 @@ public class StatisticsUtils {
         map.put("wheres",wheres);
         return map;
     }
-
+    /**
+     * 将租户和应用和类型对为空和非为空时进行处理成sql
+     * @param tenantId 租户id
+     * @param appId 应用id
+     * @param type 类型
+     * @return
+     */
+    public static String getSqlIsNull2(String tenantId,String appId,String type){
+        Map<String, String> map = new HashMap<String,String>();
+        map.put("tenant_id",tenantId);
+        map.put("app_id",appId);
+        map.put("type",type);
+        String sql = "";
+        for(Map.Entry<String, String> entry:map.entrySet()){
+            String name = entry.getKey();
+            String value = entry.getValue();
+            if(StringUtil.isEmpty(value)){
+                sql += " "+name+" is null and ";
+            }else{
+                sql += " "+name+"='"+value + "' and ";
+            }
+        }
+        return sql;
+    }
     /**
      * 将租户和应用和类型对为空和非为空时进行处理成sql
      * @param tenantId 租户id

@@ -4,6 +4,8 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.core.utils.Page;
 
+import java.util.Date;
+
 /**
  * 消息service
  * Created by zhangxb on 2016/7/4.
@@ -20,4 +22,11 @@ public interface MessageService extends BaseService<Message> {
      * @return
      */
     Page<Message> pageList(Integer type,Integer status,String startTime,String endTime,Integer pageNo, Integer pageSize);
+
+    /**
+     * 批量更新
+     * @param startTime
+     * @param endTime
+     */
+    void bacthUpdateStatus(Date startTime,Date endTime);
 }

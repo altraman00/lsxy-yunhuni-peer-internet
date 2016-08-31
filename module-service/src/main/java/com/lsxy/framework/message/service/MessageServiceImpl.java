@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.message.dao.MessageDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -19,7 +20,8 @@ import java.util.Date;
  */
 @Service
 public class MessageServiceImpl extends AbstractService<Message> implements MessageService{
-
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     @Autowired
     MessageDao messageDao;
     @Override
@@ -90,5 +92,11 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
             page = this.pageList(hql,pageNo,pageSize);
         }
         return page;
+    }
+
+    @Override
+    public void bacthUpdateStatus(Date startTime,Date endTime) {
+        String sql = "UPDATE db_lsxy_base.tb_base_message SET status=? WHERE deleted=0 AND type=? AND status=?  AND line_time BETWEEN ? and ?  ";
+        jdbcTemplate.update(sql,Message.ONLINE,Message.MESSAGE_ACTIVITY,Message.NOT,startTime,endTime);
     }
 }

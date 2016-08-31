@@ -6,6 +6,7 @@ import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.utils.StatisticsUtils;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
@@ -40,12 +41,12 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, Integer type,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where deleted=0 and type=? and tenant_id=? and app_id=? and create_time>=? and create_time<=?";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type+"")+ " deleted=0 and   last_time BETWEEN ? and ?";
         String sqlCount = "select count(1) "+sql;
-        Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{type,tenantId,appId,date1,date2});
+        Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{date1,date2});
         sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" limit ?,?";
         pageNo--;
-        List rows = jdbcTemplate.queryForList(sql,new Object[]{type,tenantId,appId,date1,date2,pageNo*pageSize,pageSize});
+        List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2,pageNo*pageSize,pageSize});
         List list = new ArrayList();
         for(int i=0;i<rows.size();i++){
             VoiceCdr voiceCdr = new VoiceCdr();
@@ -70,8 +71,8 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         if(CallSession.TYPE_VOICE_RECORDING==type){
             costType = " sum(record_size) as size,sum(cost) as money ";
         }
-        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where deleted=0 and type=? and tenant_id=? and app_id=?  and create_time>=? and create_time<=? ";
-        Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{type,tenantId,appId,date1,date2});
+        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type+"")+ " deleted=0  and last_time BETWEEN ? and ? ";
+        Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
         return result;
     }
 }
