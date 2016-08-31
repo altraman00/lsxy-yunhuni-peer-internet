@@ -11,7 +11,7 @@ import java.util.Collection;
 public abstract class SessionContext {
 
     //选择合适的session的策略
-    private SelectSessionPolicy selectSessionPolicy = new DefaultSelectSessionPolicy(this);
+    private SelectSessionPolicy selectSessionPolicy;
 
     /**
      * 放入session对象到环境中
@@ -53,9 +53,13 @@ public abstract class SessionContext {
      * @param request
      */
     public Session getRightSession(RPCMessage request) throws RightSessionNotFoundExcepiton {
+        if(this.selectSessionPolicy == null){
+            this.selectSessionPolicy = DefaultSelectSessionPolicy.getInstance(this);
+        }
         if(this.selectSessionPolicy != null)
             return this.selectSessionPolicy.select(request);
         else{
+
             return null;
         }
     }
