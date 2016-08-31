@@ -3,8 +3,8 @@ package com.lsxy.framework.rpc.queue;
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.SessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
@@ -87,7 +87,7 @@ public class FixQueue implements Runnable{
                 try {
                     message.tryWriteMark();
                     logger.info("[FIX]尝试重新发送消息:{}",message);
-                    Session session = sessionContext.getRightSession();
+                    Session session = sessionContext.getRightSession(message);
                     if(session != null){
                         session.write(message);
                     }else{

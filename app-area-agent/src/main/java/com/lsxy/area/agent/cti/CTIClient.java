@@ -9,7 +9,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,8 +105,6 @@ public class CTIClient implements RpcEventListener{
             rpcRequest.getParams().put("method",rpcRequest.getMethod());
             //收到事件,向中心报告所有事件
             RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
-            Session session = sessionContext.getRightSession();
-
             assert rpcCaller!=null;
             /*发送区域管理器请求次数计数*/
             if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();

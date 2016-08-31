@@ -1,4 +1,4 @@
-package com.lsxy.framework.rpc.api.server;
+package com.lsxy.framework.rpc.api.session;
 
 import com.lsxy.framework.rpc.api.RPCHandler;
 import com.lsxy.framework.rpc.api.RPCMessage;

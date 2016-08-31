@@ -1,21 +1,5 @@
 package com.lsxy.area.agent;
 
-import com.lsxy.framework.rpc.api.RPCCaller;
-import com.lsxy.framework.rpc.api.RPCRequest;
-import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.client.ClientSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
-import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
-import com.lsxy.framework.rpc.exceptions.SessionWriteException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by tandy on 16/7/30.
  */

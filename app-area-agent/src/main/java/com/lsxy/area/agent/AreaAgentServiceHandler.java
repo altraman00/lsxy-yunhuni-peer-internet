@@ -4,7 +4,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.client.AbstractClientServiceHandler;
 import com.lsxy.framework.rpc.api.handler.HandlerManager;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,6 @@ public class AreaAgentServiceHandler extends AbstractClientServiceHandler {
 
     @Override
     public RPCResponse handleService(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("收到请求:{}",request );
-        }
-
         /*收到区域管理器请求次数计数*/
         if(sc!=null) sc.getReceivedAreaServerRequestCount().incrementAndGet();
 
