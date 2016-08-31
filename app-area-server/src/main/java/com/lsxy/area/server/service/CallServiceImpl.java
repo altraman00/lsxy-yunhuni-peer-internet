@@ -13,8 +13,8 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+
+import static com.lsxy.yunhuni.api.product.enums.ProductCode.duo_call;
 
 /**
  * Created by tandy on 16/8/18.
@@ -54,7 +54,7 @@ public class CallServiceImpl implements CallService {
     private AppService appService;
 
     @Autowired
-    private CalBillingService calBillingService;
+    private CalCostService calCostService;
 
     @Autowired
     BusinessStateService businessStateService;
@@ -102,6 +102,7 @@ public class CallServiceImpl implements CallService {
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
+
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
             if(!whiteList.contains(ip)){
@@ -111,27 +112,27 @@ public class CallServiceImpl implements CallService {
         if(app.getIsVoiceCallback() != 1){
             throw new AppServiceInvalidException();
         }
-        BigDecimal balance = calBillingService.getBalance(app.getTenant().getId());
-        //TODO 判断余额是否充足
-        if(balance.compareTo(new BigDecimal(0)) != 1){
+
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("duo_call", app.getTenant().getId());
+        if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
+
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(duoCallbackVO, Map.class);
         map.put("callId",callId);
-        String params = mapToString(map);
         try {
             //找到合适的区域代理
-                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
-                try {
-                    rpcCaller.invoke(sessionContext, rpcrequest);
-                    //将数据存到redis
-                    BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"duo_call",duoCallbackVO.getUser_data());
-                    businessStateService.save(cache);
-                } catch (Exception e) {
-                    logger.error("消息发送到区域失败:{}", rpcrequest);
-                    throw new InvokeCallException(e);
-                }
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, map);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+                //将数据存到redis
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"duo_call",duoCallbackVO.getUser_data());
+                businessStateService.save(cache);
+            } catch (Exception e) {
+                logger.error("消息发送到区域失败:{}", rpcrequest);
+                throw new InvokeCallException(e);
+            }
             return callId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);
@@ -155,18 +156,16 @@ public class CallServiceImpl implements CallService {
         if(app.getIsVoiceCallback() != 1){
             throw new AppServiceInvalidException();
         }
-        BigDecimal balance = calBillingService.getBalance(app.getTenant().getId());
-        //TODO 判断余额是否充足
-        if(balance.compareTo(new BigDecimal(0)) != 1){
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("notify_call", app.getTenant().getId());
+        if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(notifyCallVO, Map.class);
         map.put("callId",callId);
-        String params = mapToString(map);
         try {
             //找到合适的区域代理
-                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
+                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, map);
                 rpcCaller.invoke(sessionContext, rpcrequest);
                 //将数据存到redis
                 BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call",notifyCallVO.getUser_data());
@@ -177,20 +176,5 @@ public class CallServiceImpl implements CallService {
         }
     }
 
-
-    public String mapToString(Map<String,Object> params){
-            List<String> keys = new ArrayList<>(params.keySet());
-            String result = "";
-            for (int i = 0; i < keys.size(); i++) {
-                String key = keys.get(i);
-                String value = params.get(key)+"";
-                if (i == keys.size() - 1) {//拼接时，不包括最后一个&字符
-                    result = result + key + "=" + value;
-                } else {
-                    result = result + key + "=" + value + "&";
-                }
-            }
-            return result;
-    }
 
 }

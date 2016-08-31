@@ -28,4 +28,11 @@ public interface CalCostService {
      */
     void consume(String apiCmd, String tenantId, String appId, Long time, Date dt);
 
+    /**
+     * 判断是否有剩余呼叫时间或者余额是否充足
+     * @param apiCmd
+     * @param tenantId
+     * @return
+     */
+    boolean isCallTimeRemainOrBalanceEnough(String apiCmd, String tenantId);
 }

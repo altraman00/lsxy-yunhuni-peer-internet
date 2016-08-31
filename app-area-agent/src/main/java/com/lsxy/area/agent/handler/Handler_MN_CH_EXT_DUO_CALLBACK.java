@@ -1,6 +1,7 @@
 package com.lsxy.area.agent.handler;
 
 import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
@@ -81,9 +82,8 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            String res_id = cticlient.createResource(0, 0, "ext.duo_callback", params, null);
+            cticlient.createResource(0, 0, "ext.duo_callback", params,null);
             response.setMessage(RPCResponse.STATE_OK);
-            response.setBody(res_id);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
             e.printStackTrace();
