@@ -214,15 +214,17 @@
                                                 <!--<lable class="col-md-9 line34 success">申请已提交</lable>-->
                                                 <!--<lable class="col-md-9 line34 nosuccess">异常</lable>-->
                                                 <c:if test="${apply.status == 1}">
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right ">快递公司：</lable>
-                                                        <lable class="col-md-9 line34 ">${apply.expressCom}</lable>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right ">快递单号：</lable>
-                                                        <lable class="col-md-9 line34 ">${apply.expressNo}</lable>
-                                                    </div>
-
+                                                <c:if test="${apply.status == 1}">
+                                                    <c:if test="${apply.expressNo != null}">
+                                                        <div class="form-group">
+                                                            <lable class="col-md-3 text-right ">快递公司：</lable>
+                                                            <lable class="col-md-9 line34 ">${apply.expressCom}</lable>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <lable class="col-md-3 text-right ">快递单号：</lable>
+                                                            <lable class="col-md-9 line34 ">${apply.expressNo}</lable>
+                                                        </div>
+                                                    </c:if>
                                                 </c:if>
                                             </div>
                                             <!--申请已提交的状态可以编辑
