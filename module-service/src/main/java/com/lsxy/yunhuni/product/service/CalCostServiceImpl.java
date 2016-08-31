@@ -61,64 +61,71 @@ public class CalCostServiceImpl implements CalCostService{
 
     @Override
     public void consume(String apiCmd, String tenantId, String appId, Long time, Date dt) {
-        String code = ProductCode.changeApiCmdToCode(apiCmd);
-        Product product = productService.getProductByCode(code);
-        if(ProductCode.captcha_call.name().equals(code)){
-            //短信
-            Long sms = calBillingService.getSms(tenantId);
-            if(sms >0){
-                calBillingService.incUseSms(tenantId,dt,1L);
-                CaptchaUse captchaUse = new CaptchaUse(dt,code,appId,tenantId);
-                captchaUseService.save(captchaUse);
-            }else{
-                insertConsume(tenantId, appId, time, dt, code, product);
+        ProductCode productCode = ProductCode.changeApiCmdToProductCode(apiCmd);
+        Product product = productService.getProductByCode(productCode.name());
+        switch (productCode){
+            case captcha_call:{
+                //短信
+                Long sms = calBillingService.getSms(tenantId);
+                if(sms >0){
+                    calBillingService.incUseSms(tenantId,dt,1L);
+                    CaptchaUse captchaUse = new CaptchaUse(dt,productCode.name(),appId,tenantId);
+                    captchaUseService.save(captchaUse);
+                }else{
+                    insertConsume(tenantId, appId, time, dt, productCode.name(),productCode.getRemark(), product);
+                }
+                break;
             }
-        }else {
-            Long useTime = calUnitNum(time, product) * product.getTimeUnit();
-            if(ProductCode.conf_call.name().equals(code)){
+            case conf_call:{
                 //会议
+                Long useTime = calUnitNum(time, product) * product.getTimeUnit();
                 Long conference = calBillingService.getConference(tenantId);
                 if(useTime <= conference){
                     calBillingService.incUseConference(tenantId,dt,useTime);
-                    VoiceTimeUse use = new VoiceTimeUse(dt,code,time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                    VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
                 }else if(conference > 0){
                     //先扣量
                     calBillingService.incUseConference(tenantId,dt,conference);
-                    VoiceTimeUse use = new VoiceTimeUse(dt,code,time,conference,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                    VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,conference,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
                     //再扣费
-                    insertConsume(tenantId, appId, useTime - conference, dt, code, product);
+                    insertConsume(tenantId, appId, useTime - conference, dt, productCode.name(),productCode.getRemark(), product);
                 } else{
-                    insertConsume(tenantId, appId, time, dt, code, product);
+                    insertConsume(tenantId, appId, time, dt, productCode.name(),productCode.getRemark(), product);
                 }
-            }else{
+                break;
+            }
+            default:{
+                Long useTime = calUnitNum(time, product) * product.getTimeUnit();
                 //语音
                 Long voice = calBillingService.getVoice(tenantId);
                 if(useTime <= voice){
                     calBillingService.incUseVoice(tenantId,dt,useTime);
-                    VoiceTimeUse use = new VoiceTimeUse(dt,code,time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                    VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
                 }else if(voice > 0){
                     //先扣量
                     calBillingService.incUseVoice(tenantId,dt,voice);
-                    VoiceTimeUse use = new VoiceTimeUse(dt,code,time,voice,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                    VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,voice,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
                     //再扣费
-                    insertConsume(tenantId, appId, useTime - voice, dt, code, product);
+                    insertConsume(tenantId, appId, useTime - voice, dt, productCode.name(),productCode.getRemark(), product);
                 } else{
-                    insertConsume(tenantId, appId, time, dt, code, product);
+                    insertConsume(tenantId, appId, time, dt, productCode.name(),productCode.getRemark(), product);
                 }
+                break;
             }
         }
+
     }
 
-    private void insertConsume(String tenantId, String appId, Long time, Date dt, String code, Product product) {
+    private void insertConsume(String tenantId, String appId, Long time, Date dt, String code, String remark,Product product) {
         Tenant tenant = new Tenant();
         tenant.setId(tenantId);
         BigDecimal cost = this.calCost(product, tenantId, time);
         calBillingService.incConsume(tenantId,dt,cost);
-        Consume consume = new Consume(dt,code,cost,code,appId,tenant);
+        Consume consume = new Consume(dt,code,cost,remark,appId,tenant);
         consumeService.save(consume);
     }
 
