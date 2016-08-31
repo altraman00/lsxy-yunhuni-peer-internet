@@ -30,8 +30,8 @@ public class CalCostTest {
     private CalBillingService calBillingService;
     @Test
     public void testCalCost(){
-        BigDecimal cost = calCostService.calCost("duo_call", "8a2bc5f656c1194c0156c46a187f0002", 60251L);
-        System.out.println(cost);
+//        BigDecimal cost = calCostService.calCost("duo_call", "8a2bc5f656c1194c0156c46a187f0002", 60251L);
+//        System.out.println(cost);
     }
 
     @Test

@@ -172,7 +172,6 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             if(action.getAction() == AppOnlineAction.ACTION_PAYING){
                 //当上一步是应用正在支付中时，如果余额足够，则生成新的动作--上线
                 Tenant tenant = tenantService.findTenantByUserName(userName);
-                Billing billing = billingService.findBillingByTenantId(tenant.getId());
                 //调用获取余额接口
                 if(calBillingService.getBalance(tenant.getId()).compareTo(action.getAmount()) >= 0){
                     //当应用有ivr功能时，绑定IVR号码绑定
@@ -249,7 +248,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         //Redis中消费增加
         calBillingService.incConsume(tenant.getId(),curTime,amount);
         //插入消费记录
-        Consume consume = new Consume(curTime,"应用上线",amount,"应用上线",appId,tenant);
+        Consume consume = new Consume(curTime,Consume.RENT_NUMBER,amount,"号码租用",appId,tenant);
         consumeService.save(consume);
     }
 

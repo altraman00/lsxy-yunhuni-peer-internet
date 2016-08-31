@@ -14,12 +14,21 @@ import java.util.Date;
 @Table(schema="db_lsxy_base",name = "tb_base_captcha_use")
 public class CaptchaUse extends IdEntity {
     private Date dt;
-    private String type = "5";
+    private String type;
     private Integer num = 1;
     private String unit = "条";
     private String appId;
     private String tenantId;
 
+    public CaptchaUse() {
+    }
+
+    public CaptchaUse(Date dt, String type,String appId, String tenantId) {
+        this.dt = dt;
+        this.type = type;
+        this.appId = appId;
+        this.tenantId = tenantId;
+    }
 
     @Column(name = "dt")
     public Date getDt() {

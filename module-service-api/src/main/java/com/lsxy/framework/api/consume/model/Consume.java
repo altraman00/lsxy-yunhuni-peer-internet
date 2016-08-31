@@ -14,8 +14,10 @@ import java.util.Date;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_consume")
 public class Consume extends IdEntity {
+    public static String RENT_NUMBER = "rent_number";  //租用号码的消费类型
+
     private Date dt;//消费时间
-    private String type;//消费类型 目前直接存名字
+    private String type;//消费类型 或产品的标识码
     private BigDecimal amount;//消费金额
     private String remark;//备注
     private String appId;//所属应用编号（仅用查询，如需关联应用等合并结构后改）

@@ -262,12 +262,12 @@ public class CalBillingServiceImpl implements CalBillingService{
      * redis中的增量增加
      * @param tenantId 租户ID
      * @param date 日期
-     * @param time 时长（秒）
+     * @param l 时长（秒）或数量（条数）
      * @param type 类型（购买或消费的key前缀）
      */
-    private void incLong(String tenantId,Date date,Long time,String type){
+    private void incLong(String tenantId,Date date,Long l,String type){
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        redisCacheService.incrBy(type + "_" + tenantId + "_" + dateStr, time);
+        redisCacheService.incrBy(type + "_" + tenantId + "_" + dateStr, l);
     }
 
     /*
@@ -382,10 +382,10 @@ public class CalBillingServiceImpl implements CalBillingService{
         String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
         if(preDateStr.equals(balanceDateStr)){
             //昨日结算
-            sms = getSmsByPreDateSum(tenantId, date, billing.getVoiceRemain());
+            sms = getSmsByPreDateSum(tenantId, date, billing.getSmsRemain());
         }else{
             //前日结算
-            sms = getSmsByPrePreDateSum(tenantId, date, billing.getVoiceRemain());
+            sms = getSmsByPrePreDateSum(tenantId, date, billing.getSmsRemain());
         }
 
         return sms;
@@ -442,13 +442,13 @@ public class CalBillingServiceImpl implements CalBillingService{
     }
 
     @Override
-    public void incAddSms(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time,ADD_SMS_PREFIX);
+    public void incAddSms(String tenantId,Date date,Long num){
+        incLong(tenantId,date,num,ADD_SMS_PREFIX);
     }
 
     @Override
-    public void incUseSms(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time, USE_SMS_PREFIX);
+    public void incUseSms(String tenantId,Date date,Long num){
+        incLong(tenantId,date,num, USE_SMS_PREFIX);
     }
 
 }
