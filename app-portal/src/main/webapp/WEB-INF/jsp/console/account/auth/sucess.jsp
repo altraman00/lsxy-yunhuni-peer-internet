@@ -127,8 +127,10 @@
                                         <div class="caption">
                                             <p><strong>审核结束</strong> </p>
                                             <p>当前审核状态: <span class="text-danger">未通过</span></p>
-                                            <c:if test="${status==-1}"><p>${realnamePrivate.reason}</p></c:if>
-                                            <c:if test="${status==5||status==-2}"><p>${realnameCorp.reason}</p></c:if>
+                                             <p>审核不通过原因:
+                                            <c:if test="${status==-1}">${realnamePrivate.reason}</c:if>
+                                            <c:if test="${status==5||status==-2}">${realnameCorp.reason}</c:if>
+                                             </p>
                                         </div>
                                     </div>
                                 </c:if>
