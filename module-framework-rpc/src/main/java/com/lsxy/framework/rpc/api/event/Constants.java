@@ -19,8 +19,7 @@ public class Constants {
     public static final String EVENT_SYS_CONF_ON_FAIL = "EVENT_SYS_CONF_ON_FAIL";	//会议创建失败
     public static final String EVENT_SYS_CONF_ON_TIMEOUT = "EVENT_SYS_CONF_ON_TIMEOUT";	//会议创建超时
     public static final String EVENT_SYS_CONF_ON_RELEASE = "sys.conf.on_released";//会议结束事件
-
-
-
+    public static final String EVENT_SYS_CONF_ON_PLAY_COMPLETED = "sys.conf.on_play_completed";//会议放音结束事件
+    public static final String EVENT_SYS_CONF_ON_RECORD_COMPLETED = "sys.conf.on_play_completed";//会议录音结束事件
 
 }
