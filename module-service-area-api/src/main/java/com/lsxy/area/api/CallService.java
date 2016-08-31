@@ -19,17 +19,17 @@ public interface CallService {
      * 双向回拔
      * @param ip ip
      * @param appId 应用id
-     * @param duoCallbackVO 双向回拔数据
+     * @param duoCallbackDTO 双向回拔数据
      * @return
      */
-    String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws YunhuniApiException;
+    String duoCallback(String ip,String appId, DuoCallbackDTO duoCallbackDTO) throws YunhuniApiException;
 
     /**
      * 外呼通知
      * @param ip
      * @param appId
-     * @param notifyCallVO
+     * @param notifyCallDTO
      * @return
      */
-    String notifyCall(String ip, String appId, NotifyCallVO notifyCallVO) throws YunhuniApiException;
+    String notifyCall(String ip, String appId, NotifyCallDTO notifyCallDTO) throws YunhuniApiException;
 }

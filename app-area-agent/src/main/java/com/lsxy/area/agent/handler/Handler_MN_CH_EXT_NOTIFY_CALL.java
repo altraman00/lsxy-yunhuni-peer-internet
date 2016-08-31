@@ -57,15 +57,8 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_NOTIFY_CALL:{}",request);
         }
-        //TODO 获取线路IP和端口
-        Map<String, Object> params = new HashMap<>();
-        params.put("from_uri", request.getParameter("from")+"@"+ctiHost+":"+ctiPort);
-        params.put("to_uri", request.getParameter("to")+"@"+ctiHost+":"+ctiPort);
-        params.put("play_content",Integer.parseInt((String) request.getParameter("files")));
-        params.put("play_repeat",Integer.parseInt((String) request.getParameter("repeat")));
-        params.put("max_ring_seconds",request.getParameter("max_dial_duration"));
-        params.put("user_data",request.getParameter("callId"));
 
+        Map<String, Object> params = request.getParamMap();
         try {
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));

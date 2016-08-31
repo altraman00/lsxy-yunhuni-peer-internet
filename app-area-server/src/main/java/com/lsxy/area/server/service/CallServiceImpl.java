@@ -6,6 +6,7 @@ import com.lsxy.area.api.*;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -19,12 +20,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
-
-import static com.lsxy.yunhuni.api.product.enums.ProductCode.duo_call;
 
 /**
  * Created by tandy on 16/8/18.
@@ -58,6 +58,12 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     BusinessStateService businessStateService;
+
+    @Value("${area.agent.client.cti.sip.host}")
+    private String ctiHost;
+
+    @Value("${area.agent.client.cti.sip.port}")
+    private int ctiPort;
 
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
@@ -94,10 +100,10 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws YunhuniApiException {
-        String callId = UUIDGenerator.uuid();
-        String to1 = duoCallbackVO.getTo1();
-        String to2 = duoCallbackVO.getTo2();
+    public String duoCallback(String ip,String appId, DuoCallbackDTO dto) throws YunhuniApiException {
+        String duocCallId = UUIDGenerator.uuid();
+        String to1 = dto.getTo1();
+        String to2 = dto.getTo2();
         if(apiGwRedBlankNumService.isRedOrBlankNum(to1) || apiGwRedBlankNumService.isRedOrBlankNum(to2)){
             throw new NumberNotAllowToCallException();
         }
@@ -118,31 +124,48 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.convertValue(duoCallbackVO, Map.class);
-        map.put("callId",callId);
+
+        //TODO 获取线路IP和端口
+        Map<String, Object> params = new HashMap<>();
+        params.put("from1_uri", dto.getFrom1()+"@"+ctiHost+":"+ctiPort);
+        params.put("to1_uri", dto.getTo1()+"@"+ctiHost+":"+ctiPort);
+        params.put("from2_uri", dto.getFrom2()+"@"+ctiHost+":"+ctiPort);
+        params.put("to2_uri",dto.getTo2()+"@"+ctiHost+":"+ctiPort);
+        params.put("max_connect_seconds",dto.getMax_call_duration());
+        params.put("max_ring_seconds",dto.getMax_dial_duration());
+        params.put("ring_play_file",dto.getRing_tone());
+        params.put("ring_play_mode",dto.getRing_tone_mode());
+        params.put("user_data",duocCallId);
+        //录音
+        if(dto.getRecording()){
+            //TODO 录音文件名称
+            params.put("record_file ",duocCallId);
+            params.put("record_mode",dto.getRecord_mode());
+            params.put("record_format ",1);
+        }
+
         try {
             //找到合适的区域代理
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, map);
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
             try {
                 rpcCaller.invoke(sessionContext, rpcrequest);
                 //将数据存到redis
-                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"duo_call",duoCallbackVO.getUser_data());
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,"duo_call", dto.getUser_data());
                 businessStateService.save(cache);
             } catch (Exception e) {
                 logger.error("消息发送到区域失败:{}", rpcrequest);
                 throw new InvokeCallException(e);
             }
-            return callId;
+            return duocCallId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);
         }
     }
 
     @Override
-    public String notifyCall(String ip, String appId, NotifyCallVO notifyCallVO) throws YunhuniApiException{
+    public String notifyCall(String ip, String appId, NotifyCallDTO dto) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
-        String to1 = notifyCallVO.getTo();
+        String to1 = dto.getTo();
         if(apiGwRedBlankNumService.isRedOrBlankNum(to1)){
             throw new NumberNotAllowToCallException();
         }
@@ -160,21 +183,27 @@ public class CallServiceImpl implements CallService {
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.convertValue(notifyCallVO, Map.class);
-        map.put("callId",callId);
+
+        //TODO 获取线路IP和端口
+        Map<String, Object> params = new HashMap<>();
+        params.put("from_uri", dto.getFrom()+"@"+ctiHost+":"+ctiPort);
+        params.put("to_uri", dto.getTo()+"@"+ctiHost+":"+ctiPort);
+        params.put("play_content",JSONUtil.objectToJson(dto.getFiles()));
+        params.put("play_repeat",dto.getRepeat());
+        params.put("max_ring_seconds",dto.getMax_dial_duration());
+        params.put("user_data",callId);
+
         try {
             //找到合适的区域代理
-                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, map);
-                rpcCaller.invoke(sessionContext, rpcrequest);
-                //将数据存到redis
-                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call",notifyCallVO.getUser_data());
-                businessStateService.save(cache);
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+            //将数据存到redis
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", dto.getUser_data());
+            businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);
         }
     }
-
 
 }
