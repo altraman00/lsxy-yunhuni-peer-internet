@@ -97,7 +97,7 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
 
     @Override
     public List<Message> bacthUpdateStatus(Date startTime, Date endTime) {
-        String hql =" from Message  WHERE type=? AND status=?  AND line_time BETWEEN ? and ? ";
+        String hql =" from Message obj WHERE obj.type=? AND obj.status=?  AND obj.lineTime BETWEEN ? and ? ";
         List list = this.list(hql,Message.MESSAGE_ACTIVITY,Message.NOT,startTime,endTime);
         String sql = "UPDATE db_lsxy_base.tb_base_message SET status=? WHERE deleted=0 AND type=? AND status=?  AND line_time BETWEEN ? and ?  ";
         jdbcTemplate.update(sql,Message.ONLINE,Message.MESSAGE_ACTIVITY,Message.NOT,startTime,endTime);
