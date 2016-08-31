@@ -189,7 +189,7 @@ public class ConfServiceImpl implements ConfService {
             throw new InvokeCallException(e);
         }
         //保存业务数据，后续事件要用到
-        BusinessState callstate = new BusinessState(tenantId,app.getId(),callId,"sys_conf_invite",null
+        BusinessState callstate = new BusinessState(tenantId,app.getId(),callId,"sys_conf",null
                 ,new MapBuilder<String,Object>()
                 .put("max_seconds",state.getBusinessData().get("max_seconds"))//最大时间,默认与会议一只
                 .put("conf_id",confId)//所属会议
@@ -219,16 +219,7 @@ public class ConfServiceImpl implements ConfService {
         if(balance.compareTo(new BigDecimal(0)) != 1){
             throw new BalanceNotEnoughException();
         }
-        //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id，volume不知道填多少填个5
-        String params = String.format("res_id=%s&conf_res_id=%s&max_seconds=%d&voice_mode=%d&volume=%d&play_file=%s",
-                callId, confId, maxDuration, voiceMode, 5,playFile);
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
-        try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
-        } catch (Exception e) {
-            throw new InvokeCallException(e);
-        }
-        return true;
+        return this.confEnter(callId,confId);
     }
 
     @Override
@@ -244,9 +235,23 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
-        //TODO 此处需要根据callId获取呼叫的res_id，confId获取conf_res_id
-        String params = String.format("res_id=%s&conf_res_id=%s",
-                callId, confId);
+        BusinessState call_state = businessStateService.get(callId);
+        BusinessState conf_state = businessStateService.get(confId);
+        if(call_state == null || call_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+        if(!call_state.getAppId().equals(conf_state.getAppId())){
+            throw new IllegalArgumentException();
+        }
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .put("res_id",call_state.getResId())
+                .put("conf_res_id",conf_state.getResId())
+                .put("user_data",callId)
+                .build();
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -269,10 +274,18 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
+        BusinessState conf_state = businessStateService.get(confId);
 
-        //TODO 此处需要根据confId获取呼叫的res_id
-        String params = String.format("res_id=%s&file=%s",
-                            confId,StringUtils.join(playFiles,"|"));
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .put("res_id",conf_state.getResId())
+                .put("file",StringUtils.join(playFiles,"|"))
+                .put("user_data",confId)
+                .build();
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -295,9 +308,17 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
+        BusinessState conf_state = businessStateService.get(confId);
 
-        //TODO 此处需要根据confId获取呼叫的res_id
-        String params = String.format("res_id=%s",confId);
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .put("res_id",conf_state.getResId())
+                .put("user_data",confId)
+                .build();
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -320,9 +341,19 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
+        BusinessState conf_state = businessStateService.get(confId);
 
-        //TODO 此处需要根据CONFId获取呼叫的res_id，录音文件名，录音格式
-        String params = String.format("res_id=%s&max_seconds=%d&record_file=%s&record_format=%d",confId,maxDuration, UUID.randomUUID(),6);
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .put("res_id",conf_state.getResId())
+                .put("max_seconds",maxDuration)
+                .put("record_file",UUID.randomUUID())
+                .put("user_data",confId)
+                .build();
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -345,9 +376,17 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
+        BusinessState conf_state = businessStateService.get(confId);
 
-        //TODO 此处需要根据confId获取呼叫的res_id
-        String params = String.format("res_id=%s",confId);
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .put("res_id",conf_state.getResId())
+                .put("user_data",confId)
+                .build();
+
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -370,14 +409,92 @@ public class ConfServiceImpl implements ConfService {
         if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
             throw new AppServiceInvalidException();
         }
+        BusinessState call_state = businessStateService.get(callId);
+        BusinessState conf_state = businessStateService.get(confId);
+        if(call_state == null || call_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+        if(!call_state.getAppId().equals(conf_state.getAppId())){
+            throw new IllegalArgumentException();
+        }
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .put("res_id",conf_state.getResId())
+                .put("call_res_id",call_state.getResId())
+                .put("mode",voiceMode)
+                .put("user_data",callId)
+                .build();
 
-        //TODO 此处需要根据confId获取呼叫的res_id
-        String params = String.format("res_id=%s&call_res_id=%s&mode=%d",confId,callId,voiceMode);
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Exception e) {
             throw new InvokeCallException(e);
+        }
+        return true;
+
+    }
+
+    @Override
+    public boolean confEnter(String call_id, String conf_id) throws YunhuniApiException {
+        BusinessState call_state = businessStateService.get(call_id);
+        BusinessState conf_state = businessStateService.get(conf_id);
+        if(call_state == null || call_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+        if(conf_state == null || conf_state.getResId() == null){
+            throw new IllegalArgumentException();
+        }
+        if(!call_state.getAppId().equals(conf_state.getAppId())){
+            //不合法的参数
+            throw new IllegalArgumentException();
+        }
+        Map<String,Object> call_business=call_state.getBusinessData();
+        Map<String,Object> conf_business=call_state.getBusinessData();
+
+        Integer max_seconds = 0;
+        Integer voice_mode = 1;
+        Integer volume = 100;
+        String play_file = "";
+        if(call_business!=null){
+            if(call_business.get("max_seconds")!=null){
+                max_seconds = (Integer)call_business.get("max_seconds");
+            }else if(conf_business.get("max_seconds")!=null){
+                max_seconds = (Integer)conf_business.get("max_seconds");
+            }
+            if(call_business.get("voice_mode")!=null){
+                voice_mode = (Integer) call_business.get("voice_mode");
+            }
+            if(call_business.get("volume")!=null){
+                volume = (Integer) call_business.get("volume");
+            }
+            if(call_business.get("play_file")!=null){
+                play_file = (String) call_business.get("play_file");
+            }
+        }
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                                    .put("res_id",call_state.getResId())
+                                    .put("conf_res_id",conf_state.getResId())
+                                    .put("max_seconds",max_seconds)
+                                    .put("voice_mode",voice_mode)
+                                    .put("volume",volume)
+                                    .put("play_file",play_file)
+                                    .put("user_data",call_id)
+                                    .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            throw new InvokeCallException(e);
+        }
+        if(call_business!=null){
+            if(call_business.get("conf_id") == null){
+                call_business.put("conf_id",conf_id);
+                call_state.setBusinessData(call_business);
+                businessStateService.save(call_state);
+            }
         }
         return true;
     }
