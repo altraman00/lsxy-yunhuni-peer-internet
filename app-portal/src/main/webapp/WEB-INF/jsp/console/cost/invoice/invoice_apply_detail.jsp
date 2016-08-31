@@ -196,7 +196,12 @@
                                                     <lable class="col-md-9 line34 success">申请已提交</lable>
                                                 </c:if>
                                                 <c:if test="${apply.status == 1}">
-                                                    <lable class="col-md-9 line34 success">已受理完成，发票已寄出</lable>
+                                                    <c:if test="${apply.expressNo == null}">
+                                                        <lable class="col-md-9 line34 success">申请已提交</lable>
+                                                    </c:if>
+                                                    <c:if test="${apply.expressNo != null}">
+                                                        <lable class="col-md-9 line34 success">已受理完成，发票已寄出</lable>
+                                                    </c:if>
                                                 </c:if>
                                                 <c:if test="${apply.status == 2}">
                                                     <lable class="col-md-9 line34 nosuccess">异常</lable>
