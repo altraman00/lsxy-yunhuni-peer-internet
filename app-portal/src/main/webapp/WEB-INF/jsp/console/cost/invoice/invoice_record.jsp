@@ -219,7 +219,7 @@
                                                         </c:if>
                                                     </c:if>
                                                     <c:if test="${result.status == 2}">
-                                                        <span class="nosuccess" data-toggle="tooltip" title="${result.reason}">
+                                                        <span class="nosuccess" data-toggle="tooltip" title="审核不通过原因:${result.reason}">
                                                             异常<i class="fa fa-exclamation-triangle"></i>
                                                         </span>
                                                     </c:if>
