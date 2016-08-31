@@ -2,6 +2,7 @@ package com.lsxy.area.server.event.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -32,6 +33,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private ConfService confService;
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
@@ -68,10 +72,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
-        String callbackUrl = null;
-        if(businessData!=null){
-            callbackUrl = (String)businessData.get("callback_url");
-        }
+
         if(StringUtils.isBlank(appId)){
             logger.info("没有找到对应的app信息appId={}",appId);
             return res;
@@ -81,29 +82,33 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             logger.info("没有找到对应的app信息appId={}",appId);
             return res;
         }
-        if(StringUtils.isBlank(callbackUrl)){
-            callbackUrl = app.getUrl();
-        }
-        if(StringUtils.isBlank(callbackUrl)){
-            logger.info("没有找到对应的http通知地址",appId);
+
+        if(StringUtils.isBlank(app.getUrl())){
+            logger.info("没有找到appId={}的回调地址",appId);
             return res;
         }
         //开始通知开发者
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议创建成功通知给开发者");
         }
-        String notify_url = callbackUrl+"/createconfsucc";
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-        .put("user_data",user_data)
-        .put("appid",appId)
-        .put("createtime",System.currentTimeMillis())
-        .put("confid",conf_id).build();
-        notifyCallbackUtil.postNotify(notify_url,notify_data,3);
+                .put("event","conf.create.fail")
+                .put("id",conf_id)
+                .put("begin_time",System.currentTimeMillis())
+                .put("user_data",user_data)
+                .build();
+        notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         if(logger.isDebugEnabled()){
             logger.debug("会议创建成功通知发送成功");
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
+        }
+        if(businessData.get("recording")!=null){
+            //会议创建成功自动录音
+            if((Boolean)businessData.get("recording")){
+                //TODO
+            }
         }
         return res;
     }

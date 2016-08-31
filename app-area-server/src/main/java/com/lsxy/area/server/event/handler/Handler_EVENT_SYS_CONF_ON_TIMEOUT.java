@@ -65,10 +65,7 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
-        String callbackUrl = null;
-        if(businessData!=null){
-            callbackUrl = (String)businessData.get("callback_url");
-        }
+
         if(StringUtils.isBlank(appId)){
             logger.info("没有找到对应的app信息appId={}",appId);
             return res;
@@ -78,10 +75,8 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
             logger.info("没有找到对应的app信息appId={}",appId);
             return res;
         }
-        if(StringUtils.isBlank(callbackUrl)){
-            callbackUrl = app.getUrl();
-        }
-        if(StringUtils.isBlank(callbackUrl)){
+
+        if(StringUtils.isBlank(app.getUrl())){
             logger.info("没有找到对应的http通知地址",appId);
             return res;
         }
@@ -89,12 +84,12 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议创建超时通知给开发者");
         }
-        String notify_url = callbackUrl+"/createconftimeout";
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                .put("event","conf.create.timeout")
+                .put("id",conf_id)
                 .put("user_data",user_data)
-                .put("appid",appId)
-                .put("confid",conf_id).build();
-        notifyCallbackUtil.postNotify(notify_url,notify_data,3);
+                .build();
+        notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         if(logger.isDebugEnabled()){
             logger.debug("会议创建超时通知发送成功");
         }

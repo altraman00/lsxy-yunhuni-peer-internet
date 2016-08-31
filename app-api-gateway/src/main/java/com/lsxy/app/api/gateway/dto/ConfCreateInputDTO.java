@@ -24,9 +24,6 @@ public class ConfCreateInputDTO implements Serializable{
     @JsonProperty("bgm_file")
     private String bgmFile;// 背景音文件
 
-    @JsonProperty("callback_url")
-    private String callbackUrl;// 事件通知地址
-
     @JsonProperty("user_data")
     private String userData;// 用户数据
 
@@ -70,14 +67,6 @@ public class ConfCreateInputDTO implements Serializable{
 
     public void setBgmFile(String bgmFile) {
         this.bgmFile = bgmFile;
-    }
-
-    public String getCallbackUrl() {
-        return callbackUrl;
-    }
-
-    public void setCallbackUrl(String callbackUrl) {
-        this.callbackUrl = callbackUrl;
     }
 
     public String getUserData() {
