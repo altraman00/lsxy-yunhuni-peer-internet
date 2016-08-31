@@ -1,23 +1,21 @@
 package com.lsxy.framework.rpc.api.server;
 
-import com.lsxy.framework.rpc.api.SessionContext;
+import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * IOSession环境变量
  * @author tandy
  *
  */
-@Component
-public class ServerSessionContext implements SessionContext{
+public class ServerSessionContext extends SessionContext{
 	public static final Log logger = LogFactory.getLog(ServerSessionContext.class);
 	//<sessionid,session>
 	private ListOrderedMap sessionMap = new ListOrderedMap();
@@ -82,25 +80,45 @@ public class ServerSessionContext implements SessionContext{
 	 * @param idx
 	 * @return
      */
+	@Override
 	public Session getSession(int idx){
 		return (Session) this.sessionMap.getValue(idx);
 	}
 
-	/**
-	 * 获取对的区域代理连接会话
-	 * 会根据线路成本,运营商,代理繁忙情况获取到合适的区域代理进行处理
-	 * @return
-     */
-	public Session getRightSession() throws RightSessionNotFoundExcepiton {
-		Session session = null;
-		try {
-			session = (Session) this.sessionMap.getValue(0);
-		}catch(Exception ex){
-			logger.error("没有找到有效的与区域会话");
-			throw new RightSessionNotFoundExcepiton("没有找到有效的与区域会话");
-		}
-		return session;
+//	/**
+//	 * 获取对的区域代理连接会话
+//	 * 会根据线路成本,运营商,代理繁忙情况获取到合适的区域代理进行处理
+//	 * @return
+//     */
+//	@Override
+//	public Session getRightSession() throws RightSessionNotFoundExcepiton {
+//		Session session;
+//		try {
+//			session = (Session) this.sessionMap.getValue(0);
+//		}catch(Exception ex){
+//			throw new RightSessionNotFoundExcepiton("没有找到有效的区域会话");
+//		}
+//		return session;
+//	}
 
+	@Override
+	public int size() {
+		return this.sessionMap.size();
 	}
 
+	/**
+	 * 获取指定区域的所有会话
+	 * @param areaid
+	 * @return
+     */
+	public ListOrderedMap getSessionsByArea(String areaid) {
+		ListOrderedMap result = new ListOrderedMap();
+		for(Object key:this.areaSessionMap.keySet()){
+			String strKey = (String) key;
+			if(strKey.substring(0,strKey.indexOf("-")).equals(areaid)){
+				result.put(strKey,areaSessionMap.get(key));
+			}
+		}
+		return result;
+	}
 }

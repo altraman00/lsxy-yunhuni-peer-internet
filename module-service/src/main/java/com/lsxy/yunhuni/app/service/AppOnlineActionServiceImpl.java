@@ -13,6 +13,7 @@ import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.service.AreaService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
@@ -59,6 +60,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Autowired
     AreaService areaService;
+
+    @Autowired
+    CalBillingService calBillingService;
 
     @Override
     public BaseDaoInterface<AppOnlineAction, Serializable> getDao() {
@@ -168,9 +172,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             if(action.getAction() == AppOnlineAction.ACTION_PAYING){
                 //当上一步是应用正在支付中时，如果余额足够，则生成新的动作--上线
                 Tenant tenant = tenantService.findTenantByUserName(userName);
-                Billing billing = billingService.findBillingByTenantId(tenant.getId());
                 //调用获取余额接口
-                if(billingService.getBalance(tenant.getId()).compareTo(action.getAmount()) >= 0){
+                if(calBillingService.getBalance(tenant.getId()).compareTo(action.getAmount()) >= 0){
                     //当应用有ivr功能时，绑定IVR号码绑定
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
@@ -243,9 +246,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         //TODO 支付
         Date curTime = new Date();
         //Redis中消费增加
-        billingService.incConsume(tenant.getId(),curTime,amount);
+        calBillingService.incConsume(tenant.getId(),curTime,amount);
         //插入消费记录
-        Consume consume = new Consume(curTime,"应用上线",amount,"应用上线",appId,tenant);
+        Consume consume = new Consume(curTime,Consume.RENT_NUMBER,amount,"号码租用",appId,tenant);
         consumeService.save(consume);
     }
 

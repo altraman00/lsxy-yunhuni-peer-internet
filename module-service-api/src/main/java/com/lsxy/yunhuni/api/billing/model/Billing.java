@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 账务
@@ -21,6 +22,7 @@ public class Billing extends IdEntity {
     private Long conferenceRemain;     //会议剩余量（秒）
     private Long fileRemainSize;//剩余存储容量，单位byte
     private Long fileTotalSize;//总容量，单位byte
+    private Date balanceDate;   //结算时间
 
     @Column(name = "file_remain_size")
     public Long getFileRemainSize() {
@@ -75,11 +77,21 @@ public class Billing extends IdEntity {
         this.conferenceRemain = conferenceRemain;
     }
 
+    @Column(name = "file_total_size")
     public Long getFileTotalSize() {
         return fileTotalSize;
     }
 
     public void setFileTotalSize(Long fileTotalSize) {
         this.fileTotalSize = fileTotalSize;
+    }
+
+    @Column(name = "balance_date")
+    public Date getBalanceDate() {
+        return balanceDate;
+    }
+
+    public void setBalanceDate(Date balanceDate) {
+        this.balanceDate = balanceDate;
     }
 }

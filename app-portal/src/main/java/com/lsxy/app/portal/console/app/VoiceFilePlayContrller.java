@@ -49,7 +49,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         if(response.isSuccess()){
             Billing billing = (Billing)getBilling(request).getData();
             Long fileTotalSize = billing.getFileTotalSize();
-            //TODO 从redis 中取出剩余空间
+            //取出剩余空间
             map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());
             map.put("fileTotalSize",fileTotalSize);
             return RestResponse.success(map);
