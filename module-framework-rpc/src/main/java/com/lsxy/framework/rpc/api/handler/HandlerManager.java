@@ -2,7 +2,7 @@ package com.lsxy.framework.rpc.api.handler;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,10 @@ public class HandlerManager {
         for (Class<? extends RpcRequestHandler> handlerClass : handlerClasss) {
             RpcRequestHandler handler = applicationContext.getBean(handlerClass);
             handlers.put(handler.getEventName(),handler);
-            logger.info("注册消息处理器:{},{}",handler.getEventName(),handler);
+            if(logger.isDebugEnabled()){
+                logger.debug("注册消息处理器:{},{}",handler.getEventName(),handler);
+            }
+
         }
     }
 

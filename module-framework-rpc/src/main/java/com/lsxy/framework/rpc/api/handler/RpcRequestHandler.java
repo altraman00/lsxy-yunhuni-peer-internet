@@ -2,7 +2,7 @@ package com.lsxy.framework.rpc.api.handler;
 
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 
 /**
  * Created by liuws on 2016/8/27.

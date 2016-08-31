@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URLDecoder;
 
 /**
+ * 通过这个类向开发者发送事件通知
  * Created by liuws on 2016/8/30.
  */
 @Component
@@ -34,6 +35,8 @@ public class NotifyCallbackUtil {
     private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
     private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
+
+    private static final String EVENT_NOTIFY_URL = "/yunhuni/event/notify";
 
     private HttpClient client = null;
 
@@ -90,7 +93,7 @@ public class NotifyCallbackUtil {
         int re_times = 0;
         do{
             try{
-                HttpPost post = new HttpPost(url);
+                HttpPost post = new HttpPost(url + EVENT_NOTIFY_URL);
                 post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
                 se.setContentType(CONTENT_TYPE_TEXT_JSON);
