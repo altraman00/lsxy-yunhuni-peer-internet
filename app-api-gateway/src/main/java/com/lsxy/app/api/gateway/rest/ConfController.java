@@ -38,7 +38,7 @@ public class ConfController extends AbstractAPIController{
         }
         String ip = WebUtils.getRemoteAddress(request);
         String callId = confService.create(ip,appId,dto.getMaxDuration(),dto.getMaxParts(),
-                dto.getRecording(),dto.getAutoHangup(),dto.getBgmFile(),dto.getCallbackUrl(),dto.getUserData());
+                dto.getRecording(),dto.getAutoHangup(),dto.getBgmFile(),dto.getUserData());
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         return RestResponse.success(result);

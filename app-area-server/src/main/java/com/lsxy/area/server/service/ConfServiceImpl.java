@@ -54,7 +54,8 @@ public class ConfServiceImpl implements ConfService {
     private BusinessStateService businessStateService;
 
     @Override
-    public String create(String ip, String appId, Integer maxDuration, Integer maxParts, Boolean recording, Boolean autoHangup, String bgmFile, String callBackURL, String userData) throws YunhuniApiException {
+    public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
+                         Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
         App app = appService.findById(appId);
         String tenantId = app.getTenant().getId();
 
@@ -93,7 +94,7 @@ public class ConfServiceImpl implements ConfService {
                 .put("max_parts",maxParts)//最大与会数
                 .put("parts_num",0)//与会数
                 .put("auto_hangup",autoHangup)//会议结束是否自动挂断
-                .put("callback_url",callBackURL)//通知url
+                .put("recording",recording)//是否自动启动录音
                 .build());
         businessStateService.save(state);
         return confId;

@@ -23,7 +23,7 @@ public interface ConfService {
      * @return
      */
     public String create(String ip,String appId,Integer maxDuration,Integer maxParts,
-                         Boolean recording,Boolean autoHangup,String bgmFile,String callBackURL,String userData) throws YunhuniApiException;
+                         Boolean recording,Boolean autoHangup,String bgmFile,String userData) throws YunhuniApiException;
 
     /**
      * 解散会议
