@@ -34,17 +34,18 @@
                                 <table class="table table-striped cost-table-history news-table">
                                     <thead>
                                     <tr>
-                                        <th>消息时间</th>
-                                        <th>消息内容</th>
-                                        <th>操作</th>
+                                        <th width="20%">消息时间</th>
+                                        <th width="70%">消息内容</th>
+                                        <th width="10%">操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
-                                            <td <c:if test="${result.status==0}">class="bg"</c:if>><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd"/></td>
-                                            <td>${result.message.content}</td>
-                                            <td><a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageObj.currentPageNo}">删除</a></td>
+                                            <td <c:if test="${result.status==0}">class="bg"</c:if>><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                            <td>${result.message.title}</td>
+                                            <td><a href="${ctx}/console/message/account_message/detail?id=${result.id}">详情</a>
+                                                <a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageObj.currentPageNo}">删除</a></td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>

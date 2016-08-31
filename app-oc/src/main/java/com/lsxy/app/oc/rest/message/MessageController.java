@@ -76,7 +76,7 @@ public class MessageController extends AbstractRestController {
         return RestResponse.success(message);
     }
     /**
-     * 修改消息 type：1表示活动消息，不需要通知用户 0表示用户消息，status为1是发送消息给用户
+     * 修改消息 type：1表示活动消息，需要通知用户 0表示用户消息，status为1是发送消息给用户
      * @return
      */
     @ApiOperation(value = "修改消息")
@@ -88,7 +88,7 @@ public class MessageController extends AbstractRestController {
         Message message1 = messageService.findById(id);
         boolean isSendMsg = false;
         if(messageVo.getStatus()!=null&&message1.getStatus()!=messageVo.getStatus()){
-            if(messageVo.getType()==Message.MESSAGE_ACCOUNT&&messageVo.getType()==Message.ONLINE) {
+            if(messageVo.getType()==Message.ONLINE) {
                 isSendMsg = true;
             }
         }
@@ -125,7 +125,7 @@ public class MessageController extends AbstractRestController {
                 message.setLineTime(DateUtils.parseDate(messageVo.getLine(), "yyyy-MM-dd HH:mm"));
             }
             message = messageService.save(message);
-            if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
+            if(message.getStatus()!=null&&message.getStatus()==Message.ONLINE) {
                 sendMessage(message);
             }
         } catch (IllegalAccessException e) {
@@ -151,9 +151,8 @@ public class MessageController extends AbstractRestController {
     }
     /**
      * 发送消息给状态正常的用户
-     * @param message
      */
-    private  void sendMessage(@RequestBody Message message){
+    private  void sendMessage( Message message){
         List<Account> list = accountService.findByStatus(Account.STATUS_NORMAL);
         accountMessageService.insertMultiple(list,message);
     }

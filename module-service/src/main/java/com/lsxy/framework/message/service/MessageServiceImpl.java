@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 消息实现类
@@ -95,8 +96,11 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
     }
 
     @Override
-    public void bacthUpdateStatus(Date startTime,Date endTime) {
+    public List<Message> bacthUpdateStatus(Date startTime, Date endTime) {
+        String hql =" from Message  WHERE type=? AND status=?  AND line_time BETWEEN ? and ? ";
+        List list = this.list(hql,Message.MESSAGE_ACTIVITY,Message.NOT,startTime,endTime);
         String sql = "UPDATE db_lsxy_base.tb_base_message SET status=? WHERE deleted=0 AND type=? AND status=?  AND line_time BETWEEN ? and ?  ";
         jdbcTemplate.update(sql,Message.ONLINE,Message.MESSAGE_ACTIVITY,Message.NOT,startTime,endTime);
+        return list;
     }
 }
