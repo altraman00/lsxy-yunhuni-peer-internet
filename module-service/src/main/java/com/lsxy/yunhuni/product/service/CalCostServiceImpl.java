@@ -120,6 +120,16 @@ public class CalCostServiceImpl implements CalCostService{
 
     }
 
+    /**
+     * 插入消费表
+     * @param tenantId
+     * @param appId
+     * @param time
+     * @param dt
+     * @param code
+     * @param remark
+     * @param product
+     */
     private void insertConsume(String tenantId, String appId, Long time, Date dt, String code, String remark,Product product) {
         Tenant tenant = new Tenant();
         tenant.setId(tenantId);

@@ -19,12 +19,12 @@ public interface CalCostService {
     BigDecimal calCost(Product product, String tenantId, Long time);
 
     /**
-     * 消费
-     * @param apiCmd
+     * 消费计算金额及插入消费表，或插入扣量表
+     * @param apiCmd    ProductCode枚举类型中的apiCmd，不对应就则取不到产品
      * @param tenantId
      * @param appId
      * @param time
-     * @param dt
+     * @param dt    cdr中的结束时间
      */
     void consume(String apiCmd, String tenantId, String appId, Long time, Date dt);
 
