@@ -2,15 +2,11 @@ package com.lsxy.area.server.event.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.SessionContext;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.server.Session;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -30,18 +26,6 @@ import java.util.Map;
 public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC.class);
-
-    @Autowired(required = false)
-    private StasticsCounter sc;
-
-    @Autowired
-    private RPCCaller rpcCaller;
-
-    @Autowired(required = false)
-    private TestIncomingZB tzb;
-
-    @Autowired
-    private SessionContext sessionContext;
 
     @Autowired
     private AppService appService;

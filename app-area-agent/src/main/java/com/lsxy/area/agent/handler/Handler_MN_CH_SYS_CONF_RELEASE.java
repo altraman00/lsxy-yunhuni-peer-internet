@@ -3,7 +3,6 @@ package com.lsxy.area.agent.handler;
 import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.app.area.cti.commander.RpcError;
 import com.lsxy.app.area.cti.commander.RpcResultListener;
-import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -36,9 +35,6 @@ public class Handler_MN_CH_SYS_CONF_RELEASE extends RpcRequestHandler{
     @Autowired
     private CTIClientContext cticlientContext;
 
-    @Autowired(required = false)
-    private StasticsCounter sc;
-
     @Override
     public String getEventName() {
         return ServiceConstants.MN_CH_SYS_CONF_RELEASE;
@@ -59,28 +55,33 @@ public class Handler_MN_CH_SYS_CONF_RELEASE extends RpcRequestHandler{
         }
 
         Map<String, Object> params = request.getParamMap();
+        String conf_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
+
         try {
-            cticlient.operateResource(0, 0,res_id, "sys.conf.release", params, new RpcResultListener(){
+            cticlient.operateResource(0, 0, res_id,"sys.conf.release", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
-                    logger.info("sys.conf.release执行成功");
+                    if(logger.isDebugEnabled()){
+                        logger.debug("调用sys.conf.release成功conf_id={},result={}",conf_id,o);
+                    }
                 }
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.info("sys.conf.release执行失败：{}",rpcError);
+                    logger.error("调用sys.conf.release失败conf_id={},result={}",conf_id,rpcError);
                 }
 
                 @Override
                 protected void onTimeout() {
-                    logger.info("sys.conf.release执行超时");
+                    logger.error("调用sys.conf.release超时conf_id={}",conf_id);
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            logger.error("操作CTI资源异常{}",request);
+            e.printStackTrace();
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;
 
