@@ -430,6 +430,7 @@ public class ConfServiceImpl implements ConfService {
                                     .put("voice_mode",voice_mode)
                                     .put("volume",volume)
                                     .put("play_file",play_file)
+                                    .put("user_data",call_id)
                                     .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
         try {
