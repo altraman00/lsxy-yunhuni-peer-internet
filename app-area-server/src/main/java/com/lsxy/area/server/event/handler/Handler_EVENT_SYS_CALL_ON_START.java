@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
  * Created by liuws on 2016/8/29.
  */
@@ -67,19 +65,6 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         }
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
-        }
-        Map<String,Object> businessData = state.getBusinessData();
-        String conf_id = null;
-        if(businessData!=null){
-            conf_id = (String)businessData.get("conf_id");
-        }
-        //如果conf_id不等于null说明该呼叫是通过 会议邀请呼叫发起需要将呼叫加入会议
-        if(conf_id!=null){
-            try {
-                confService.confEnter(call_id,conf_id);
-            } catch (Throwable e) {
-                logger.error("将呼叫加入到会议失败",e);
-            }
         }
         return res;
     }
