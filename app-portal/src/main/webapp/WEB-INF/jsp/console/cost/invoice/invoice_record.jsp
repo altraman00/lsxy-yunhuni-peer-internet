@@ -211,7 +211,12 @@
                                                         <span>申请已提交</span>
                                                     </c:if>
                                                     <c:if test="${result.status == 1}">
-                                                        <span class="success">处理完成，发票已寄出</span>
+                                                        <c:if test="${result.expressNo != null}">
+                                                            <span class="success">处理完成，发票已寄出</span>
+                                                        </c:if>
+                                                        <c:if test="${result.expressNo == null}">
+                                                            <span>申请已提交</span>
+                                                        </c:if>
                                                     </c:if>
                                                     <c:if test="${result.status == 2}">
                                                         <span class="nosuccess" data-toggle="tooltip" title="${result.reason}">
