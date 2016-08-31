@@ -33,9 +33,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,7 +55,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/tenant")
 public class TenantController {
-    public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
+
     @Autowired
     private TenantService tenantService;
 
@@ -525,14 +524,7 @@ public class TenantController {
     public RestResponse apiInvokeStatistic(
             @PathVariable String id,
             @RequestBody RechargeInput input){
-        Billing billing = rechargeService.doRecharge(id,input.getAmount());
-        if(billing!=null){
-            return RestResponse.success(billing);
-        }else{
-            logger.info("充值失败:{}",billing);
-            return RestResponse.failed("0000","充值失败");
-        }
-
+        return RestResponse.success(rechargeService.doRecharge(id,input.getAmount()));
     }
 
     @ApiOperation(value = "租户消费记录")
