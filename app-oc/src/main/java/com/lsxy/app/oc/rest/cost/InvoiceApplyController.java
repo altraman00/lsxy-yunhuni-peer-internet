@@ -11,6 +11,7 @@ import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -239,7 +240,7 @@ public class InvoiceApplyController extends AbstractRestController {
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         Map map = new HashMap();
         map.put("sum",invoiceApply.getAmount());
-        Page<Consume> page =  consumeService.pageList(invoiceApply.getTenant().getId(),pageNo,pageSize,invoiceApply.getStart(),invoiceApply.getEnd());
+        Page<Consume> page =  consumeService.pageList(invoiceApply.getTenant().getId(),pageNo,pageSize,invoiceApply.getStart(),DateUtils.getLastTimeOfMonth(invoiceApply.getEnd()) );
         map.put("list",page);
         return RestResponse.success(map);
     }
