@@ -27,8 +27,8 @@ public class SendMessageTask {
     public void sendMsg(){
         Long startLong = new Date().getTime();
         String start = DateUtils.formatDate(new Date(),"yyyy-MM-dd HH");
-        Date startTime = DateUtils.parseDate(start+"00:00","yyyy-MM-dd HH:mm:ss");
-        Date endTime = DateUtils.parseDate(start+"59:59","yyyy-MM-dd HH:mm:ss");
+        Date startTime = DateUtils.parseDate(start+":00:00","yyyy-MM-dd HH:mm:ss");
+        Date endTime = DateUtils.parseDate(start+":59:59","yyyy-MM-dd HH:mm:ss");
         logger.info("-----------------开始执行上线活动消息动作，时间:{},参数:{}-------------------------",DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"),start);
         messageService.bacthUpdateStatus(startTime,endTime);
         Long endLong = new Date().getTime();
