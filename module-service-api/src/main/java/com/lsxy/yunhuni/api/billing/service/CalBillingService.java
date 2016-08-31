@@ -1,5 +1,7 @@
 package com.lsxy.yunhuni.api.billing.service;
 
+import com.lsxy.yunhuni.api.billing.model.Billing;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -110,4 +112,12 @@ public interface CalBillingService {
      * @param num 条
      */
     void incAddSms(String tenantId, Date date, Long num);
+
+    /**
+     * 获取计算后的实时账务
+     * @param tenantId
+     * @return
+     */
+    Billing getCalBilling(String tenantId);
+
 }

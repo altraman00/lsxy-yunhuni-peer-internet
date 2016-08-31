@@ -1,9 +1,11 @@
 package com.lsxy.app.portal.rest.cost;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,16 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rest/billing")
 @RestController
 public class BillingController extends AbstractRestController {
+//    @Autowired
+//    private BillingService billingService;
     @Autowired
-    private BillingService billingService;
-
+    private CalBillingService calBillingService;
     /**
      * 查找当前用户所属租户的账务
      * @throws Exception
      */
     @RequestMapping("/get")
     public RestResponse getBilling() throws Exception{
-        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
+        Account account = this.getCurrentAccount();
+        Billing billing = calBillingService.getCalBilling(account.getTenant().getId());
+//        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
         return RestResponse.success(billing);
     }
 }
