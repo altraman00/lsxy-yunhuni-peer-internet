@@ -1,7 +1,8 @@
 package com.lsxy.area.agent.handler;
 
 import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.area.agent.StasticsCounter;
+import com.lsxy.app.area.cti.commander.RpcError;
+import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -34,9 +35,6 @@ public class Handler_MN_CH_SYS_CONF_SET_PART_VOICE_MODE extends RpcRequestHandle
     @Autowired
     private CTIClientContext cticlientContext;
 
-    @Autowired(required = false)
-    private StasticsCounter sc;
-
     @Override
     public String getEventName() {
         return ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE;
@@ -57,13 +55,33 @@ public class Handler_MN_CH_SYS_CONF_SET_PART_VOICE_MODE extends RpcRequestHandle
         }
 
         Map<String, Object> params = request.getParamMap();
-        params.put("user_data",request.getParameter("callId"));
+        String call_id = (String)params.get("user_data");
+        String res_id = (String)params.get("res_id");
 
         try {
-            cticlient.createResource(0, 0, "sys.conf.set_part_voice_mode", params, null);
+            cticlient.operateResource(0, 0, res_id,"sys.conf.set_part_voice_mode", params, new RpcResultListener(){
+
+                @Override
+                protected void onResult(Object o) {
+                    if(logger.isDebugEnabled()){
+                        logger.debug("调用sys.conf.set_part_voice_mode成功call_id={},result={}",call_id,o);
+                    }
+                }
+
+                @Override
+                protected void onError(RpcError rpcError) {
+                    logger.error("调用sys.conf.set_part_voice_mode失败call_id={},result={}",call_id,rpcError);
+                }
+
+                @Override
+                protected void onTimeout() {
+                    logger.error("调用sys.conf.set_part_voice_mode超时call_id={}",call_id);
+                }
+            });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            logger.error("操作CTI资源异常{}",request);
+            e.printStackTrace();
+            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;
 

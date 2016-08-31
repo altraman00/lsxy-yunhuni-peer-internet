@@ -86,4 +86,12 @@ public interface ConfService {
      * @return
      */
     public boolean setVoiceMode(String ip,String appId,String confId,String callId,Integer voiceMode) throws YunhuniApiException;
+
+    /**
+     * 将呼叫加入到会议
+     * @param call_id 呼叫业务id
+     * @param conf_id   会议业务id
+     * @return
+     */
+    public boolean confEnter(String call_id,String conf_id) throws YunhuniApiException;
 }

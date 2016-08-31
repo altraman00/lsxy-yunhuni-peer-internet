@@ -20,57 +20,66 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * Created by liuws on 2016/8/29.
+ * Created by liuws on 2016/8/30.
  */
 @Component
-public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
+public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CONF_ON_START.class);
-
-    @Autowired
-    private BusinessStateService businessStateService;
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED.class);
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private BusinessStateService businessStateService;
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_SYS_CONF_ON_START;
+        return Constants.EVENT_SYS_CALL_ON_CONF_COMPLETED;
     }
 
+    /**
+     * 呼叫加入会议结束的事件，需要向开发者发送离开会议通知
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
-        String conf_id = (String)request.getParamMap().get("user_data");
-        String res_id = (String)request.getParamMap().get("res_id");
-        if(StringUtils.isBlank(conf_id)){
-            logger.info("conf_id is null");
+        String call_id = (String)request.getParamMap().get("user_data");
+        if(StringUtils.isBlank(call_id)){
+            logger.info("call_id is null");
             return res;
         }
-        BusinessState state = businessStateService.get(conf_id);
+        BusinessState state = businessStateService.get(call_id);
         if(state == null){
             logger.info("businessstate is null");
             return res;
         }
-        if(res_id!=null){
-            state.setResId(res_id);
-            businessStateService.save(state);
-        }
+
         if(logger.isDebugEnabled()){
-            logger.info("confi_id={},state={}",conf_id,state);
+            logger.info("call_id={},state={}",call_id,state);
         }
+
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
         String callbackUrl = null;
+        String conf_id = null;
         if(businessData!=null){
             callbackUrl = (String)businessData.get("callback_url");
+            conf_id = (String)businessData.get("conf_id");
+        }
+        if(StringUtils.isBlank(conf_id)){
+            logger.info("没有找到对应的会议信息callid={},confid={}",call_id,conf_id);
+            return res;
         }
         if(StringUtils.isBlank(appId)){
             logger.info("没有找到对应的app信息appId={}",appId);
@@ -90,17 +99,19 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         }
         //开始通知开发者
         if(logger.isDebugEnabled()){
-            logger.debug("开始发送会议创建成功通知给开发者");
+            logger.debug("开始发送离开会议通知给开发者");
         }
-        String notify_url = callbackUrl+"/createconfsucc";
+        String notify_url = callbackUrl+"/quitconf";
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-        .put("user_data",user_data)
-        .put("appid",appId)
-        .put("createtime",System.currentTimeMillis())
-        .put("confid",conf_id).build();
+                .put("user_data",user_data)
+                .put("appid",appId)
+                .put("quit_time",System.currentTimeMillis())
+                .put("join_time",System.currentTimeMillis())
+                .put("call_id",call_id)
+                .put("confid",conf_id).build();
         notifyCallbackUtil.postNotify(notify_url,notify_data,3);
         if(logger.isDebugEnabled()){
-            logger.debug("会议创建成功通知发送成功");
+            logger.debug("离开会议通知发送成功");
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
