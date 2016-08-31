@@ -4,13 +4,12 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
 import com.lsxy.framework.rpc.exceptions.ClientConnecException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 
 import java.util.concurrent.ExecutorService;
@@ -190,6 +189,8 @@ public abstract class AbstractClient implements Client{
                 throw new ClientConnecException("区域节点注册时出现异常:"+session.getId());
             }
             if (response.isOk()) {
+                logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
+
                 if (bindCallback != null) {
                     bindCallback.doCallback(session);
                 }
