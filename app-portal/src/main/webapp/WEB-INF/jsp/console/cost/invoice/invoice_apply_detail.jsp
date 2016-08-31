@@ -214,7 +214,6 @@
                                                 <!--<lable class="col-md-9 line34 success">申请已提交</lable>-->
                                                 <!--<lable class="col-md-9 line34 nosuccess">异常</lable>-->
                                                 <c:if test="${apply.status == 1}">
-                                                <c:if test="${apply.status == 1}">
                                                     <c:if test="${apply.expressNo != null}">
                                                         <div class="form-group">
                                                             <lable class="col-md-3 text-right ">快递公司：</lable>
