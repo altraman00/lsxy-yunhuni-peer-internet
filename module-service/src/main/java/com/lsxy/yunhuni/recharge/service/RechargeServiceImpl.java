@@ -10,6 +10,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
@@ -41,6 +42,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
 
     @Autowired
     EntityManager em;
+
+    @Autowired
+    CalBillingService calBillingService;
 
     @Override
     public BaseDaoInterface<Recharge, Serializable> getDao() {
@@ -81,7 +85,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
                 rechargeDao.save(recharge);
                 Tenant tenant = recharge.getTenant();
                 //redis插入今日充值
-                billingService.incRecharge(tenant.getId(),curTime,recharge.getAmount());
+                calBillingService.incRecharge(tenant.getId(),curTime,recharge.getAmount());
             }
         }
         return  recharge;
@@ -127,7 +131,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         Recharge recharge = new Recharge(tenant,amount,RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
         rechargeDao.save(recharge);
         // redis插入今日充值
-        billingService.incRecharge(tenantId,curTime,amount);
+        calBillingService.incRecharge(tenantId,curTime,amount);
         return true;
     }
 

@@ -8,11 +8,10 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
@@ -49,7 +48,7 @@ public class TestResetStasticsCountEventHandler implements MQMessageHandler<Test
         Collection<Session> sessions = sessionContext.sessions();
         for (Session session:sessions) {
             try {
-                rpcCaller.invoke(session,request);
+                rpcCaller.invoke(sessionContext,request);
             } catch (Exception e) {
                 logger.error("重置统计数据失败:{}",e);
                 e.printStackTrace();

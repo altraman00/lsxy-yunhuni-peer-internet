@@ -3,6 +3,7 @@ package com.lsxy.framework.rpc.api;
 import io.netty.util.CharsetUtil;
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * Created by tandy on 16/8/2.
@@ -19,6 +20,21 @@ public class RPCMessage {
 
     //消息体,可以传输任何可序列化为二进制的数据
     private byte[] body;		//BC
+
+    //尝试发送次数  消息发送失败后,会尝试重新发送
+    protected int tryTimes=0;
+
+    //最后一次尝试发送的时间戳
+    protected long lastTryTimestamp = 0L;
+
+
+    /**
+     * 标记一下尝试发送相关标记,用以审计
+     */
+    public void tryWriteMark(){
+        tryTimes ++;
+        lastTryTimestamp = System.currentTimeMillis();
+    }
 
     public String getSessionid() {
         return sessionid;
@@ -121,6 +137,5 @@ public class RPCMessage {
         }
         return result;
     }
-
 
 }

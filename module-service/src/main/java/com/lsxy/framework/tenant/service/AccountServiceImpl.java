@@ -212,6 +212,7 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         billing.setConferenceRemain(0L);
         billing.setFileTotalSize(defaultSize);
         billing.setFileRemainSize(defaultSize);
+        billing.setBalanceDate(new Date());
         billingService.save(billing);
     }
 

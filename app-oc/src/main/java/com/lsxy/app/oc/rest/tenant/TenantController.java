@@ -21,7 +21,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
-import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
@@ -34,7 +34,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,7 +65,7 @@ public class TenantController {
     private ApiCertificateService apiCertificateService;
 
     @Autowired
-    private BillingService billingService;
+    private CalBillingService calBillingService;
 
     @Autowired
     private VoiceCdrMonthService voiceCdrMonthService;
@@ -166,7 +165,7 @@ public class TenantController {
     public RestResponse billing(
             @ApiParam(name = "id",value = "租户id")
             @PathVariable String id){
-        Billing billing = billingService.findBillingByTenantId(id);
+        Billing billing = calBillingService.getCalBilling(id);
         ObjectMapper objectMapper = new ObjectMapper();
         Map map= objectMapper.convertValue(billing,Map.class);
         //余额正数部分
@@ -684,7 +683,7 @@ public class TenantController {
     @RequestMapping(value="/tenants/{tenant}/file/totalSize",method = RequestMethod.GET)
     public RestResponse fileTotalSize(@PathVariable String tenant){
         Map map = new HashMap();
-        Billing billing = billingService.findBillingByTenantId(tenant);
+        Billing billing = calBillingService.getCalBilling(tenant);
         if(billing!=null){
             Long fileTotalSize = billing.getFileTotalSize();
             map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());

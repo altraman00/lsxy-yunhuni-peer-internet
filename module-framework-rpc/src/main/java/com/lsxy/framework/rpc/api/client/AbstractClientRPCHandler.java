@@ -1,24 +1,19 @@
 package com.lsxy.framework.rpc.api.client;
 
 import com.lsxy.framework.rpc.api.*;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by tandy on 16/8/3.
  */
-public abstract class AbstractClientRPCHandler implements RPCHandler {
+public abstract class AbstractClientRPCHandler extends RPCHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractClientRPCHandler.class);
-    
-    //注册的监听
-    protected Map<String,RequestListener> requestListeners = new HashMap<String,RequestListener>();
+
 
 
     @Autowired(required =false)
@@ -31,22 +26,7 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
     @Autowired
     private RPCCaller rpcCaller;
 
-    /**
-     * 注册监听器
-     * @param listener
-     */
-    public void addRequestListener(RequestListener listener){
-        if(requestListeners.get(listener.getSessionId())==null)
-            requestListeners.put(listener.getSessionId(),listener);
-    }
 
-    /**
-     * 移除监听器
-     * @param listener
-     */
-    public void removeRequestListener(RequestListener listener){
-        requestListeners.remove(listener.getSessionId());
-    }
 
 
     /**
@@ -55,6 +35,8 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
      * @param message
      */
     protected void process(Object ctxObject, RPCMessage message) throws SessionWriteException {
+        Session session = getSessionInTheContextObject(ctxObject);
+
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
             if(serviceHandler != null){
@@ -64,7 +46,7 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
                     if(logger.isDebugEnabled()){
                         logger.debug(">>{}",response);
                     }
-                    Session session = getSessionInTheContextObject(ctxObject);
+
                     session.write(response);
                 }
             }else{
@@ -75,21 +57,6 @@ public abstract class AbstractClientRPCHandler implements RPCHandler {
         }else if(message instanceof  RPCResponse){
             RPCResponse response = (RPCResponse) message;
             rpcCaller.receivedResponse(response);
-//            if(logger.isDebugEnabled()){
-//                logger.debug(">>[NM]"+response);
-//            }
-//            rpcCaller.putResponse(response);
-//            RPCRequest request = rpcCaller.getRequest(response.getSessionid());
-//            if(request != null){
-//                if(logger.isDebugEnabled()){
-//                    logger.debug("通知请求对象该醒了:{}",request);
-//                }
-//                synchronized (request){
-//                    request.notify();
-//                }
-//            }else{
-//                logger.error("收到一个匹配不到请求对象的响应对象:{}",response);
-//            }
         }else{
 //            ....
         }

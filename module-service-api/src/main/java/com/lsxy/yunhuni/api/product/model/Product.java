@@ -13,6 +13,9 @@ import javax.persistence.Table;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_product")
 public class Product extends IdEntity {
+
+
+
     public static int CAL_TYPE_NUM = 1;
     public static int CAL_TYPE_TIME = 2;
 
@@ -20,6 +23,7 @@ public class Product extends IdEntity {
     private String code;    //一次写入，不可修改，涉及到编程
     private Integer calType;    //1、按数量，2、按时长
     private Integer timeUnit;   //单位时长(单位秒)
+    private String unit;   //单位
     private String remark;
 
     @Column(name = "name")
@@ -56,6 +60,15 @@ public class Product extends IdEntity {
 
     public void setTimeUnit(Integer timeUnit) {
         this.timeUnit = timeUnit;
+    }
+
+    @Column(name = "unit")
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     @Column(name = "remark")

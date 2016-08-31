@@ -1,29 +1,25 @@
 package com.lsxy.framework.rpc.api.server;
 
+import com.lsxy.framework.rpc.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.*;
+import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by tandy on 16/8/3.
  */
-public abstract class AbstractServerRPCHandler implements RPCHandler {
+public abstract class AbstractServerRPCHandler extends RPCHandler {
 
     @Autowired
     private ServerSessionContext sessionContext;
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractServerRPCHandler.class);
     
-    //注册的监听
-    protected Map<String,RequestListener> requestListeners = new HashMap<String,RequestListener>();
-
-
     @Autowired(required = false)
     private AbstractServiceHandler serviceHandler;
 
@@ -45,22 +41,7 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
         return processRequestCount.longValue();
     }
 
-    /**
-     * 注册监听器
-     * @param listener
-     */
-    public void addRequestListener(RequestListener listener){
-        if(requestListeners.get(listener.getSessionId())==null)
-            requestListeners.put(listener.getSessionId(),listener);
-    }
 
-    /**
-     * 移除监听器
-     * @param listener
-     */
-    public void removeRequestListener(RequestListener listener){
-        requestListeners.remove(listener.getSessionId());
-    }
 
 
     /**
@@ -69,6 +50,7 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
      * @param message
      */
     protected void process(Object ctxObject, RPCMessage message) throws SessionWriteException {
+        Session session = getSessionInTheContextObject(ctxObject);
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
             RPCResponse response = null;
@@ -101,14 +83,13 @@ public abstract class AbstractServerRPCHandler implements RPCHandler {
                     }
                 }
             }
-            if(response != null){
-                Session session = getSessionInTheContextObject(ctxObject);
-                if(session != null)
-                    session.write(response);
+            if(response != null && session != null){
+                session.write(response);
             }
             processRequestCount.incrementAndGet();
 
         }else if(message instanceof  RPCResponse){
+
             RPCResponse response = (RPCResponse) message;
             rpcCaller.receivedResponse(response);
         }else{

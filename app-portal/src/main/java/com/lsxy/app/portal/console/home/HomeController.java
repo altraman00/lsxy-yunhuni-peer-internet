@@ -74,7 +74,7 @@ public class HomeController extends AbstractPortalController {
         //获取账务
         Billing billing = billingResponse.getData();
         if(billing != null){
-            //TODO 从redis里取出套餐剩余数据
+            //取出套餐剩余数据
             //余额正数部分
             int vTemp = billing.getBalance().intValue();
             if(vTemp<0){

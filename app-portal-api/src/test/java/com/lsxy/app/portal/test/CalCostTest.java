@@ -2,6 +2,7 @@ package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.config.Constants;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,10 +26,17 @@ public class CalCostTest {
 
     @Autowired
     private CalCostService calCostService;
-
+    @Autowired
+    private CalBillingService calBillingService;
     @Test
     public void testCalCost(){
-        BigDecimal cost = calCostService.calCost("duo_call", "8a2bc5f656c1194c0156c46a187f0002", 60251L);
-        System.out.println(cost);
+//        BigDecimal cost = calCostService.calCost("duo_call", "8a2bc5f656c1194c0156c46a187f0002", 60251L);
+//        System.out.println(cost);
+    }
+
+    @Test
+    public void testCalBilling(){
+        Long balance = calBillingService.getConference("1");
+        System.out.println(balance);
     }
 }
