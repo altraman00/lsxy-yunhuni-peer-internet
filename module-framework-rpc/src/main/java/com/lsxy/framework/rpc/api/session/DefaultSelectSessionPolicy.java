@@ -10,14 +10,12 @@ import static com.lsxy.framework.rpc.api.server.ServerSessionContext.logger;
  * Created by tandy on 16/8/30.
  */
 public class DefaultSelectSessionPolicy implements SelectSessionPolicy {
+
+    private static DefaultSelectSessionPolicy instance;
     protected SessionContext sessionContext;
 
     //有效会话选择器
     private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
-
-    public DefaultSelectSessionPolicy(SessionContext sessionContext) {
-        this.sessionContext = sessionContext;
-    }
 
     @Override
     public Session select(RPCMessage request) {
@@ -59,5 +57,17 @@ public class DefaultSelectSessionPolicy implements SelectSessionPolicy {
             }
         }
         return session;
+    }
+
+    public static SelectSessionPolicy getInstance(SessionContext sessionContext) {
+        if(instance == null){
+            instance = new DefaultSelectSessionPolicy();
+            instance.setSessionContext(sessionContext);
+        }
+        return instance;
+    }
+
+    public void setSessionContext(SessionContext sessionContext) {
+        this.sessionContext = sessionContext;
     }
 }

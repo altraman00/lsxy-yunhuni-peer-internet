@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -39,7 +40,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class AreaServerMainClass extends AbstractSpringBootStarter {
 
     @Autowired
-    private AreaServerSelectSessionPolicy selectSessionPolicy;
+    private AreaServerSelectSessionPolicy areaServerSelectSessionPolicy;
 
     public static void main(String[] args) throws RemoteServerStartException {
         System.setProperty(Constants.DUBBO_PROPERTIES_KEY,"config.properties");
@@ -47,9 +48,11 @@ public class AreaServerMainClass extends AbstractSpringBootStarter {
     }
 
     @Bean(name = "sessionContext")
+    @DependsOn("areaServerSelectSessionPolicy")
     public SessionContext getSessionContext(){
         SessionContext sessionContext = new ServerSessionContext();
-        sessionContext.setSelectSessionPolicy(selectSessionPolicy);
+        areaServerSelectSessionPolicy.setSessionContext(sessionContext);
+        sessionContext.setSelectSessionPolicy(areaServerSelectSessionPolicy);
         return sessionContext;
     }
 

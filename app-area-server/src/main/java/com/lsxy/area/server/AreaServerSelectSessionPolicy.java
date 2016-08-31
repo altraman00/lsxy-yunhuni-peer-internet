@@ -34,10 +34,6 @@ public class AreaServerSelectSessionPolicy extends DefaultSelectSessionPolicy{
     @Autowired
     private AppService appService;
 
-    public AreaServerSelectSessionPolicy(SessionContext sessionContext) {
-        super(sessionContext);
-    }
-
     @Override
     public Session select(RPCMessage message) {
         Session session = null;
