@@ -2,13 +2,13 @@ package com.lsxy.area.server.mq.handler;
 
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.framework.mq.MQStasticCounter;
-import com.lsxy.framework.mq.events.apigw.test.TestResetStasticsCountEvent;
 import com.lsxy.framework.mq.api.MQMessageHandler;
+import com.lsxy.framework.mq.events.apigw.test.TestResetStasticsCountEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class TestResetStasticsCountEventHandler implements MQMessageHandler<Test
     private RPCCaller rpcCaller;
 
     @Autowired
-    private ServerSessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @Override
     public void handleMessage(TestResetStasticsCountEvent message) throws JMSException {
