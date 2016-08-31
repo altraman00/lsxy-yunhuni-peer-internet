@@ -3,7 +3,6 @@ package com.lsxy.yunhuni.api.recharge.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import java.util.List;
 
@@ -56,7 +55,7 @@ public interface RechargeService extends BaseService<Recharge> {
     /**
      * 人工给租户充值
      */
-    Billing doRecharge(String tenant, BigDecimal amount);
+    boolean doRecharge(String tenant,BigDecimal amount);
 
     List<Recharge> listByTenant(String tenant);
 
