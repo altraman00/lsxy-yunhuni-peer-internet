@@ -31,8 +31,6 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_DUO_CALLBACK.class);
 
-
-
     @Autowired
     private CTIClientContext cticlientContext;
 
