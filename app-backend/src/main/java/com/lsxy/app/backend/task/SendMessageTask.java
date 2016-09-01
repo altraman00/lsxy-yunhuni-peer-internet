@@ -42,6 +42,7 @@ public class SendMessageTask {
             logger.info("-----------------开始执行上线活动消息动作，时间:{},参数:{}-------------------------", DateUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"), start);
             List<Message> message = messageService.bacthUpdateStatus(startTime, endTime);
             List<Account> list = accountService.findByStatus(Account.STATUS_NORMAL);
+            logger.info("-----------------消息体:{}，用户对象:{}-------------------------", message,list);
             for (int i = 0; i < message.size(); i++) {
                 accountMessageService.insertMultiple(list, message.get(i));
             }
