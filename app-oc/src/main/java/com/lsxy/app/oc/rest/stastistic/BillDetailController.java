@@ -62,7 +62,8 @@ public class BillDetailController extends AbstractRestController {
             }else{
                 Map map = voiceCdrService.sumCost(type,uid,time,appId);
                 if(CallSession.TYPE_VOICE_RECORDING == type) {//录音
-                    re.put("total",map.get("size"));
+                    re.put("size",map.get("size"));
+                    re.put("total",map.get("money"));
                 }else{
                     re.put("total",map.get("cost"));
                 }
