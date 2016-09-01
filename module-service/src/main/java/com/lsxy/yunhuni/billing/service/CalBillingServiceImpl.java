@@ -446,9 +446,20 @@ public class CalBillingServiceImpl implements CalBillingService{
         incLong(tenantId,date,num,ADD_SMS_PREFIX);
     }
 
+
     @Override
     public void incUseSms(String tenantId,Date date,Long num){
         incLong(tenantId,date,num, USE_SMS_PREFIX);
     }
 
+    @Override
+    public Billing getCalBilling(String tenantId) {
+        Billing billing = billingService.findBillingByTenantId(tenantId);
+        billing.setBalance(this.getBalance(tenantId));
+        billing.setSmsRemain(this.getSms(tenantId));
+        billing.setConferenceRemain(this.getConference(tenantId));
+        billing.setVoiceRemain(this.getVoice(tenantId));
+        //TODO 从redis 中取出剩余空间
+        return billing;
+    }
 }
