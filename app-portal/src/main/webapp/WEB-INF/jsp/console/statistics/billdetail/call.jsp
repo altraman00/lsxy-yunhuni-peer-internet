@@ -91,7 +91,8 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <form:form action="${ctx}/console/statistics/billdetail/call" method="post" id="mainForm">
                                         <div class="row statistics_row" >
-                                            <input type="hidden" id="appId" name="appId" value="">
+                                                ${appId}
+                                            <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
@@ -99,7 +100,7 @@
                                                 <input type="text" name="time" class="form-control currentDay " value="${time}" />
                                             </div>
                                             <div class="col-md-2">
-                                                <button class="btn btn-primary" type="submit"> 查询</button>
+                                                <button class="btn btn-primary" type="submit" > 查询</button>
                                             </div>
                                         </div>
                                     </form:form>
@@ -134,7 +135,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&time=${time}"></c:set>
+                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/call"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
