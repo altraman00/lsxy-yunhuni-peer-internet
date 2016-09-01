@@ -5,6 +5,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -39,6 +40,10 @@ public class NotifyCallbackUtil {
     private static final String EVENT_NOTIFY_URL = "/yunhuni/event/notify";
 
     private HttpClient client = null;
+
+    //设置请求和传输超时时间
+    private RequestConfig config =
+            RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();
 
     @PostConstruct
     public void init(){
@@ -94,6 +99,7 @@ public class NotifyCallbackUtil {
         do{
             try{
                 HttpPost post = new HttpPost(url + EVENT_NOTIFY_URL);
+                post.setConfig(config);
                 post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
                 se.setContentType(CONTENT_TYPE_TEXT_JSON);

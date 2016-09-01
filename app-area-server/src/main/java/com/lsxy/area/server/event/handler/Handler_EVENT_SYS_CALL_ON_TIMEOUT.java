@@ -38,7 +38,7 @@ public class Handler_EVENT_SYS_CALL_ON_TIMEOUT extends EventHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        logger.info("正在处理{}",getEventName());
+        logger.debug("开始处理{}事件,{}",getEventName(),request);
         return null;
     }
 }

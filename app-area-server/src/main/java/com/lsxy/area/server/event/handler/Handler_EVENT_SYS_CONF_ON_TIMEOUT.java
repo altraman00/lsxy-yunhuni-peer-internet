@@ -45,7 +45,7 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件",getEventName());
+            logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
         String conf_id = (String)request.getParamMap().get("user_data");
