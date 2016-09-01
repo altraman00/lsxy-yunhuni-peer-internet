@@ -28,10 +28,10 @@ public class OnsMQConfig {
     private String producerId;
 
 
-    @Value("${global.mq.ons.ak}")
+    @Value("${global.aliyun.key}")
     private String accessKey;
 
-    @Value("${global.mq.ons.sk}")
+    @Value("${global.aliyun.secret}")
     private String secretKey;
 
 
