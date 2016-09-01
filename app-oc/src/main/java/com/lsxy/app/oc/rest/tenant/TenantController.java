@@ -227,19 +227,52 @@ public class TenantController {
         dto.setSessionTime(preAmongDuration);
         dto.setAvgSessionTime(preAvgTime);
         dto.setConnectedRate(preConnectRate);
-        dto.setCostCoinRate(new BigDecimal(((preConsume-prepreConsume)/(prepreConsume+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setRechargeCoinRate(new BigDecimal(((preRecharge-prepreRecharge)/(prepreRecharge+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setSessionCountRate(new BigDecimal(((preAmongCall-prepreAmongCall)/(prepreAmongCall+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setSessionTimeRate(new BigDecimal(((preAmongDuration-prepreAmongDuration)/(prepreAmongDuration+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setAvgSessionTimeRate(new BigDecimal(((preAvgTime-prepreAvgTime)/(prepreAvgTime+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setConnectedRateRate(new BigDecimal(((preConnectRate-prepreConnectRate)/(prepreConnectRate+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        return RestResponse.success(dto);
+        Map dto1 = new HashMap();
+        dto1.put("costCoin",false);
+        dto1.put("rechargeCoinRate",false);
+        dto1.put("sessionCountRate",false);
+        dto1.put("sessionTimeRate",false);
+        dto1.put("avgSessionTimeRate",false);
+        dto1.put("connectedRateRate",false);
+        if(prepreConsume>0) {
+            dto.setCostCoinRate(new BigDecimal(((preConsume - prepreConsume) / (prepreConsume )) * 100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("costCoin",true);
+
+        }
+        if(prepreRecharge>0) {
+            dto.setRechargeCoinRate(new BigDecimal(((preRecharge - prepreRecharge) / (prepreRecharge )) * 100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("rechargeCoinRate",true);
+
+        }
+        if(prepreAmongCall>0) {
+            dto.setSessionCountRate(new BigDecimal(((preAmongCall - prepreAmongCall) / (prepreAmongCall )) * 100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("sessionCountRate",true);
+
+        }
+        if(prepreAmongDuration>0) {
+            dto.setSessionTimeRate(new BigDecimal(((preAmongDuration - prepreAmongDuration) / (prepreAmongDuration )) * 100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("sessionTimeRate",true);
+
+        }
+        if(prepreAvgTime>0) {
+            dto.setAvgSessionTimeRate(new BigDecimal(((preAvgTime - prepreAvgTime) / (prepreAvgTime )) * 100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("avgSessionTimeRate",true);
+
+        }
+        if(prepreConnectRate>0) {
+            dto.setConnectedRateRate(new BigDecimal(((preConnectRate - prepreConnectRate) / (prepreConnectRate )) * 100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("connectedRateRate",true);
+        }
+        Map map = new HashMap();
+        map.put("dto",dto);
+        map.put("dto1",dto1);
+        return RestResponse.success(map);
     }
 
     @ApiOperation(value = "租户(某月所有天/某年所有月)的（消费额和话务量）统计")

@@ -5,6 +5,7 @@ import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.core.utils.Page;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 消息service
@@ -28,5 +29,5 @@ public interface MessageService extends BaseService<Message> {
      * @param startTime
      * @param endTime
      */
-    void bacthUpdateStatus(Date startTime,Date endTime);
+    List<Message> bacthUpdateStatus(Date startTime, Date endTime);
 }

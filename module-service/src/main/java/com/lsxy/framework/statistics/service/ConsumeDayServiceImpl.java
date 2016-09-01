@@ -62,8 +62,8 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     }
 
     @Override
-    public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt";
+    public List<ConsumeDay> list(Object tenantId, Object appId,Object type,Date startTime, Date endTime) {
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNotNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt";
         List<ConsumeDay>  list = this.list(hql,startTime,endTime);
         return list;
     }
