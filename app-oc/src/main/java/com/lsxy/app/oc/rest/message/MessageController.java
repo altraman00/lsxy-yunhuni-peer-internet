@@ -14,6 +14,8 @@ import com.lsxy.framework.web.rest.RestResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,7 @@ import java.util.List;
 @RequestMapping("/message")
 @RestController
 public class MessageController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
     @Autowired
     MessageService messageService;
     @Autowired
@@ -99,6 +102,9 @@ public class MessageController extends AbstractRestController {
                 message1.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
             }
             message1 = messageService.save(message1);
+            if (logger.isDebugEnabled()){
+                logger.debug("是否需要群发消息:{}",isSendMsg);
+            }
             if(isSendMsg){
                 sendMessage(message1);
             }
@@ -153,6 +159,9 @@ public class MessageController extends AbstractRestController {
      * 发送消息给状态正常的用户
      */
     private  void sendMessage( Message message){
+        if (logger.isDebugEnabled()){
+            logger.debug("群发消息:消息体{}",message);
+        }
         List<Account> list = accountService.findByStatus(Account.STATUS_NORMAL);
         accountMessageService.insertMultiple(list,message);
     }
