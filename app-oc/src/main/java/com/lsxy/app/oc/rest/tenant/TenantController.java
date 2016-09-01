@@ -679,7 +679,7 @@ public class TenantController {
             for (App app : apps) {
                 TenantAppVO vo = new TenantAppVO(app);
                 vo.setConsume(consumeMonthService.getAmongAmountByDateAndApp(preMonth,app.getId()));
-                vo.setAmongDuration(voiceCdrMonthService.getAmongDurationByDateAndApp(preMonth,app.getId()));
+                vo.setAmongDuration(voiceCdrMonthService.getAmongDurationByDateAndApp(preMonth,app.getId())/60);
                 vo.setSessionCount(voiceCdrMonthService.getAmongCallByDateAndApp(preMonth,app.getId()));
                 dto.add(vo);
             }
