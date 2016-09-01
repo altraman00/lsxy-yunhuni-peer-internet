@@ -52,6 +52,9 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
+        if(logger.isDebugEnabled()){
+            logger.debug("开始处理{}事件,{}",getEventName(),request);
+        }
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Client cticlient = cticlientContext.getAvalibleClient();
@@ -59,9 +62,6 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("handler process_MN_CH_SYS_CONF:{}",request);
         }
 
         Map<String, Object> params = request.getParamMap();

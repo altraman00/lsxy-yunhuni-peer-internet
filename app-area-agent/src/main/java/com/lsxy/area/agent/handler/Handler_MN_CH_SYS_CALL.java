@@ -54,7 +54,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){
-            logger.debug("handler process_MN_CH_SYS_CALL:{}",request);
+            logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse response = RPCResponse.buildResponse(request);
 
