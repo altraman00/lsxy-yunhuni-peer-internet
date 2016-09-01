@@ -79,6 +79,38 @@ public class StatisticsUtils {
         map.put("type",type);
         return getSqlIsNull(map);
     }
+    /**
+     * 将租户和应用和类型对为空和非为空时进行处理成sql
+     * @param tenantId 租户id
+     * @param appId 应用id
+     * @param type 类型
+     * @return
+     */
+    public static String getSqlIsNotNull(Object tenantId,Object appId,Object type){
+        Map<String, Object> map = new HashMap<String,Object>();
+        map.put("tenantId",tenantId);
+        map.put("appId",appId);
+        map.put("type",type);
+        String sql = "";
+        for(Map.Entry<String, Object> entry:map.entrySet()){
+            String name = entry.getKey();
+            Object value = entry.getValue();
+            if(value == null || value instanceof String ){
+                if(StringUtil.isEmpty((String)value)){
+                    sql += "obj."+name+" is null and ";
+                }else{
+                    sql += "obj."+name+"='"+value + "' and ";
+                }
+            }else if( value instanceof Boolean){
+                if((Boolean)value){
+                    sql += "obj."+name+" is null and ";
+                }else{
+                    sql += "obj."+name+" is not null and ";
+                }
+            }
+        }
+        return sql;
+    }
 
     /**
      * 将Map中的参数为空和非为空时进行处理成sql
