@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 呼入号码管理
  * Created by zhangxb on 2016/7/1.
@@ -58,7 +60,11 @@ public class ResourcesRentController extends AbstractRestController{
     }
     @RequestMapping("/by_app/{appId}")
     public RestResponse getByAppId(@PathVariable String appId){
-        ResourcesRent rent = resourcesRentService.findByAppId(appId);
+        ResourcesRent rent = null;
+        List<ResourcesRent> rents = resourcesRentService.findByAppId(appId);
+        if(rents != null && rents.size()>0){
+            rent = rents.get(0);
+        }
         return RestResponse.success(rent);
     }
 
