@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -91,7 +92,10 @@ public class MessageController extends AbstractRestController {
         Message message1 = messageService.findById(id);
         boolean isSendMsg = false;
         if(messageVo.getStatus()!=null&&message1.getStatus()!=messageVo.getStatus()){
-            if(messageVo.getType()==Message.ONLINE) {
+            if(messageVo.getType()==Message.MESSAGE_ACCOUNT) {
+                isSendMsg = true;
+            }
+            if(messageVo.getType()==Message.MESSAGE_ACTIVITY&&messageVo.getStatus()==Message.ONLINE){
                 isSendMsg = true;
             }
         }
@@ -134,8 +138,13 @@ public class MessageController extends AbstractRestController {
             if (logger.isDebugEnabled()){
                 logger.debug("是否需要群发消息:{}",message.getStatus()!=null&&message.getStatus()==Message.ONLINE);
             }
-            if(message.getStatus()!=null&&message.getStatus()==Message.ONLINE) {
+            if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
                 sendMessage(message);
+            }
+            if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACTIVITY&&message.getStatus()==Message.ONLINE){
+                if(message.getLineTime().getTime()<=new Date().getTime()){
+                    sendMessage(message);
+                }
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
