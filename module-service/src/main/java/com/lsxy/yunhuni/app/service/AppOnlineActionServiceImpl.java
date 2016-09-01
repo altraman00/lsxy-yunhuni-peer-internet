@@ -385,11 +385,13 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             appService.save(app);
             if(app.getIsIvrService() != null && app.getIsIvrService() ==1){
                 //当应用有ivr功能时，改变IVR号码的租用关系
-                ResourcesRent rent = resourcesRentService.findByAppId(app.getId());
-                if(rent != null){
-                    rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
-                    rent.setApp(null);
-                    resourcesRentService.save(rent);
+                List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
+                if(rents != null && rents.size() >0){
+                    for(ResourcesRent rent:rents){
+                        rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+                        rent.setApp(null);
+                        resourcesRentService.save(rent);
+                    }
                 }
             }
             return app;

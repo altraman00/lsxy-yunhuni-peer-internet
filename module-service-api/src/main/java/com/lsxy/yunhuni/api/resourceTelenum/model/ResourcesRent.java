@@ -24,6 +24,7 @@ public class ResourcesRent extends IdEntity {
     private ResourceTelenum resourceTelenum;//res_id资源对象（号码）
 
     private String resName;//res_name 资源名称,
+    private String resData;//资源数据 号码资源则是号码,
     private String resType;//res_type 1-号码资源 2-线路资源 3-待扩展,
     private Date rentDt;//rent_dt 租用时间,
     private Date rentExpire;//rent_expire到期时间,
@@ -36,6 +37,7 @@ public class ResourcesRent extends IdEntity {
         this.tenant = tenant;
         this.app = app;
         this.resourceTelenum = resourceTelenum;
+        this.resData = resourceTelenum.getTelNumber();
         this.resName = resName;
         this.resType = resType;
         this.rentDt = rentDt;
@@ -59,6 +61,16 @@ public class ResourcesRent extends IdEntity {
     public void setResName(String resName) {
         this.resName = resName;
     }
+
+    @Column(name = "res_data")
+    public String getResData() {
+        return resData;
+    }
+
+    public void setResData(String resData) {
+        this.resData = resData;
+    }
+
     @Column(name = "rent_dt")
     public Date getRentDt() {
         return rentDt;
