@@ -32,7 +32,8 @@ public class SendMessageTask {
     /**
      * 执行上线活动消息动作
      */
-    @Scheduled(cron="0 0 0/1 * * ?")
+//    @Scheduled(cron="0 0 0/1 * * ?")
+    @Scheduled(cron="38 25 16 * * ?")
     public void sendMsg() {
         try {
             Long startLong = new Date().getTime();
