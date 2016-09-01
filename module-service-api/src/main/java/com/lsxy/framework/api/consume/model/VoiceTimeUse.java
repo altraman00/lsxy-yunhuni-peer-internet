@@ -22,6 +22,20 @@ public class VoiceTimeUse extends IdEntity {
     private String appId;
     private String tenantId;
 
+    public VoiceTimeUse() {
+    }
+
+    public VoiceTimeUse(Date dt, String type, Long voiceTime, Long useTime, Integer unitTime, String unit, String appId, String tenantId) {
+        this.dt = dt;
+        this.type = type;
+        this.voiceTime = voiceTime;
+        this.useTime = useTime;
+        this.unitTime = unitTime;
+        this.unit = unit;
+        this.appId = appId;
+        this.tenantId = tenantId;
+    }
+
     @Column(name = "dt")
     public Date getDt() {
         return dt;
