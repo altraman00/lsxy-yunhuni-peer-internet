@@ -112,6 +112,8 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         BusinessState callstate = new BusinessState(tenant.getId(),app.getId(),call_id,"ivr_incoming",null,
                 res_id,new MapBuilder<String,Object>()
                 .put("begin_time",begin_time)
+                .put("from",from)
+                .put("to",to)
                 .build());
         businessStateService.save(callstate);
         ivrActionHandler.doActionIfAccept(call_id);
