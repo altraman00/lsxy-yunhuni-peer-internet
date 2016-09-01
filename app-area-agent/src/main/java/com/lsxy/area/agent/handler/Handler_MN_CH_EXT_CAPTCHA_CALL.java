@@ -22,16 +22,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by liuws on 2016/8/27.
  */
 @Component
-public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
+public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_NOTIFY_CALL.class);
+    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_CAPTCHA_CALL.class);
 
     @Value("${area.agent.client.cti.sip.host}")
     private String ctiHost;
@@ -67,26 +66,26 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
         }
 
         if(logger.isDebugEnabled()){
-            logger.debug("handler process_MN_CH_EXT_NOTIFY_CALL:{}",request);
+            logger.debug("handler process_MN_CH_EXT_CAPTCHA_CALL:{}",request);
         }
 
         Map<String, Object> params = request.getParamMap();
         try {
             if(logger.isDebugEnabled()){
-                logger.debug("调用CTI创建语音外呼资源，参数为{}", JSONUtil.objectToJson(params));
+                logger.debug("调用CTI创建语音验证码资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            String res_id = cticlient.createResource(0, 0, "ext.notify_call", params, new RpcResultListener(){
+            String res_id = cticlient.createResource(0, 0, "ext.captcha_call", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
-                        logger.debug("调用ext.notify_call成功，conf_id={},result={}",params.get("user_data"),o);
+                        logger.debug("调用ext.captcha_call成功，conf_id={},result={}",params.get("user_data"),o);
                     }
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS)
+                                    .put("method", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS)
                                     .put("res_id",params.get("res_id"))
                                     .put("user_data",params.get("user_data"))
                                     .build());
@@ -94,13 +93,13 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS);
                     }
                 }
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.error("调用ext.notify_call失败call_id={},result={}",params.get("user_data"),rpcError);
+                    logger.error("调用ext.captcha_call失败call_id={},result={}",params.get("user_data"),rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)

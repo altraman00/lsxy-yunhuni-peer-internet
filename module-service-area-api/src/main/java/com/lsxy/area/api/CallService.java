@@ -40,5 +40,5 @@ public interface CallService {
      * @param dto
      * @return
      */
-    String captchaCall(String ip, String appId, CaptchaCallDTO dto);
+    String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException;
 }

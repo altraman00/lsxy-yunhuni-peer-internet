@@ -11,8 +11,9 @@ public class CaptchaCallDTO implements Serializable {
     private String to;
     private String custom_from;
     private String custom_to;
-    private String max_call_duration;
-    private String max_dial_duration;
+    private String verify_code;
+    private String max_call_duration;   // 最大接通时间（秒）
+    private String max_dial_duration;   //最大拨号等待时间（秒）
     private String files;
     private String user_data;
 
@@ -46,6 +47,14 @@ public class CaptchaCallDTO implements Serializable {
 
     public void setCustom_to(String custom_to) {
         this.custom_to = custom_to;
+    }
+
+    public String getVerify_code() {
+        return verify_code;
+    }
+
+    public void setVerify_code(String verify_code) {
+        this.verify_code = verify_code;
     }
 
     public String getMax_call_duration() {
