@@ -41,7 +41,7 @@ public class AreaServerSelectSessionPolicy extends DefaultSelectSessionPolicy{
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
             String appid = (String) request.getParameter("appid");
-            if(StringUtil.isEmpty(appid)){
+            if(!StringUtil.isEmpty(appid)){
                 //根据应用所在的区域,找到对应的区域
                 App app = appService.findById(appid);
                 if(app.getStatus().equals(App.STATUS_ONLINE)){
