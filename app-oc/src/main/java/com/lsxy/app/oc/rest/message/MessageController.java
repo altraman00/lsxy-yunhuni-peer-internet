@@ -91,25 +91,20 @@ public class MessageController extends AbstractRestController {
             @RequestBody MessageVo messageVo){
         Message message1 = messageService.findById(id);
         boolean isSendMsg = false;
-        if(messageVo.getStatus()!=null&&message1.getStatus()!=messageVo.getStatus()){
-            if(messageVo.getType()==Message.MESSAGE_ACCOUNT) {
-                isSendMsg = true;
-            }
-            if(messageVo.getType()==Message.MESSAGE_ACTIVITY&&messageVo.getStatus()==Message.ONLINE){
-                isSendMsg = true;
-            }
-        }
+        Integer old = message1.getStatus();
         RestResponse restResponse = null;
         try {
             BeanUtils.copyProperties2(message1,messageVo,false);
             if(StringUtil.isNotEmpty(messageVo.getLine())){
                 message1.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
             }
-            message1 = messageService.save(message1);
-            if (logger.isDebugEnabled()){
-                logger.debug("是否需要群发消息:{}",isSendMsg);
+
+            if(message1.getLineTime().getTime()<=new Date().getTime()){
+                message1.setStatus(Message.ONLINE);
             }
-            if(isSendMsg){
+            message1 = messageService.save(message1);
+            logger.info("是否需要群发消息:{}",isSendMsg);
+            if(old!=message1.getStatus()&&message1.getStatus()==Message.ONLINE){
                 sendMessage(message1);
             }
         }catch (Exception e){
@@ -134,17 +129,15 @@ public class MessageController extends AbstractRestController {
             if(StringUtil.isNotEmpty(messageVo.getLine())) {
                 message.setLineTime(DateUtils.parseDate(messageVo.getLine(), "yyyy-MM-dd HH:mm"));
             }
-            message = messageService.save(message);
-            if (logger.isDebugEnabled()){
-                logger.debug("是否需要群发消息:{}",message.getStatus()!=null&&message.getStatus()==Message.ONLINE);
-            }
-            if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACCOUNT&&message.getStatus()==Message.ONLINE) {
-                sendMessage(message);
-            }
-            if(message.getStatus()!=null&&message.getType()==Message.MESSAGE_ACTIVITY&&message.getStatus()==Message.ONLINE){
+            if(message.getType()==Message.MESSAGE_ACTIVITY){
                 if(message.getLineTime().getTime()<=new Date().getTime()){
-                    sendMessage(message);
+                    message.setStatus(Message.ONLINE);
                 }
+            }
+            message = messageService.save(message);
+            logger.info("是否需要群发消息:{}",message.getStatus()!=null&&message.getStatus()==Message.ONLINE);
+            if(message.getStatus()!=null&&message.getStatus()==Message.ONLINE) {
+                sendMessage(message);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -171,9 +164,7 @@ public class MessageController extends AbstractRestController {
      * 发送消息给状态正常的用户
      */
     private  void sendMessage( Message message){
-        if (logger.isDebugEnabled()){
-            logger.debug("群发消息:消息体{}",message);
-        }
+        logger.info("群发消息:消息体{}",message);
         List<Account> list = accountService.findByStatus(Account.STATUS_NORMAL);
         accountMessageService.insertMultiple(list,message);
     }
