@@ -90,7 +90,7 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <form:form action="${ctx}/console/statistics/billdetail/callback" method="post" id="mainForm">
                                         <div class="row statistics_row" >
-                                            <input type="hidden" id="appId" name="appId" value="">
+                                            <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
@@ -133,7 +133,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&time=${time}"></c:set>
+                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
