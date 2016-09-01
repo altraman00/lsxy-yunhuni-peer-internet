@@ -257,17 +257,17 @@ public class DashboardController {
         dto1.put("rateOfMonth",false);
         dto.setDuration((long)Math.round(yesterday/60));//yesterday单位为秒，转为分
         if(beforeYesterday>0){
-            dto.setRateOfDay(new BigDecimal(((yesterday-beforeYesterday)/(beforeYesterday)) * 100)
+            dto.setRateOfDay(new BigDecimal(((yesterday-beforeYesterday)*0.01)/(beforeYesterday*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
             dto1.put("rateOfDay",true);
         }
         if(before2Week>0){
-            dto.setRateOfWeek(new BigDecimal(((beforeWeek-before2Week)/(before2Week)) * 100)
+            dto.setRateOfWeek(new BigDecimal(((beforeWeek-before2Week)*0.01)/(before2Week*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
             dto1.put("rateOfWeek",true);
         }
         if(before2Month>0){
-            dto.setRateOfMonth(new BigDecimal(((beforeMonth-before2Month)/(before2Month)) * 100)
+            dto.setRateOfMonth(new BigDecimal(((beforeMonth-before2Month)*0.01)/(before2Month*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
             dto1.put("rateOfMonth",true);
         }
@@ -339,17 +339,17 @@ public class DashboardController {
         dto1.put("rateOfWeek",false);
         dto1.put("rateOfMonth",false);
         if(beforeYesterday>0) {
-            dto.setRateOfDay(new BigDecimal(((yesterday - beforeYesterday) / (beforeYesterday)) * 100)
+            dto.setRateOfDay(new BigDecimal(((yesterday - beforeYesterday)*0.01) / (beforeYesterday*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
             dto1.put("rateOfDay", true);
         }
         if(before2Week>0) {
-            dto.setRateOfWeek(new BigDecimal(((beforeWeek - before2Week) / (before2Week)) * 100)
+            dto.setRateOfWeek(new BigDecimal(((beforeWeek - before2Week)*0.01) / (before2Week*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
             dto1.put("rateOfWeek", true);
         }
         if(before2Month>0) {
-            dto.setRateOfMonth(new BigDecimal(((beforeMonth - before2Month) / (before2Month)) * 100)
+            dto.setRateOfMonth(new BigDecimal(((beforeMonth - before2Month)*0.01) / (before2Month*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
             dto1.put("rateOfMonth", true);
         }

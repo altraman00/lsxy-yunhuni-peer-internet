@@ -235,37 +235,39 @@ public class TenantController {
         dto1.put("avgSessionTimeRate",false);
         dto1.put("connectedRateRate",false);
         if(prepreConsume>0) {
-            dto.setCostCoinRate(new BigDecimal(((preConsume - prepreConsume) / (prepreConsume )) * 100)
+            dto.setCostCoinRate(new BigDecimal(((preConsume - prepreConsume)*0.01 )/ (prepreConsume*0.01 ))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
             dto1.put("costCoin",true);
 
         }
         if(prepreRecharge>0) {
-            dto.setRechargeCoinRate(new BigDecimal(((preRecharge - prepreRecharge) / (prepreRecharge )) * 100)
+            dto.setRechargeCoinRate(new BigDecimal(((preRecharge - prepreRecharge)*0.01) / (prepreRecharge *0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
             dto1.put("rechargeCoinRate",true);
 
         }
         if(prepreAmongCall>0) {
-            dto.setSessionCountRate(new BigDecimal(((preAmongCall - prepreAmongCall) / (prepreAmongCall )) * 100)
-                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            double b2 =  new BigDecimal(((preAmongCall - prepreAmongCall)*0.01) / (prepreAmongCall*0.01))
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            dto.setSessionCountRate(b2);
             dto1.put("sessionCountRate",true);
 
         }
         if(prepreAmongDuration>0) {
-            dto.setSessionTimeRate(new BigDecimal(((preAmongDuration - prepreAmongDuration) / (prepreAmongDuration )) * 100)
-                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            double b1 = new BigDecimal(((preAmongDuration - prepreAmongDuration)*0.01) / (prepreAmongDuration*0.01 ))
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            dto.setSessionTimeRate(b1);
             dto1.put("sessionTimeRate",true);
 
         }
         if(prepreAvgTime>0) {
-            dto.setAvgSessionTimeRate(new BigDecimal(((preAvgTime - prepreAvgTime) / (prepreAvgTime )) * 100)
+            dto.setAvgSessionTimeRate(new BigDecimal(((preAvgTime - prepreAvgTime)*0.01) / (prepreAvgTime*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
             dto1.put("avgSessionTimeRate",true);
 
         }
         if(prepreConnectRate>0) {
-            dto.setConnectedRateRate(new BigDecimal(((preConnectRate - prepreConnectRate) / (prepreConnectRate )) * 100)
+            dto.setConnectedRateRate(new BigDecimal(((preConnectRate - prepreConnectRate)*0.01) / (prepreConnectRate*0.01))
                     .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
             dto1.put("connectedRateRate",true);
         }
