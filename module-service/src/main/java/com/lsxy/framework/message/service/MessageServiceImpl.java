@@ -6,6 +6,7 @@ import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.message.dao.MessageDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,10 +37,14 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
         Date date1 = null;
         Date date2 = null;
         try {
-            date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+            if(StringUtil.isNotEmpty(startTime)) {
+                date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+            }
         }catch (Exception e){}
         try {
-            date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            if(StringUtil.isNotEmpty(endTime)) {
+                date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            }
         }catch (Exception e){}
         String hql = "from Message obj ";
         boolean flag = true;
