@@ -51,8 +51,10 @@
                             document.getElementById("commonMsg").innerHTML= html;
                             marqueeId++;
                             marqueeInterval[0]=setInterval("startMarquee()",marqueeDelay);
+                            $('#common-close').click(function(){
+                                $('.common-info').fadeOut()
+                            });
                         }
-
                         //开始滚动
                         function startMarquee() {
                             var str=marqueeContent[marqueeId];
