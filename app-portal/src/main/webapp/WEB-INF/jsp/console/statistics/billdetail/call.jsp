@@ -91,7 +91,6 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <form:form action="${ctx}/console/statistics/billdetail/call" method="post" id="mainForm">
                                         <div class="row statistics_row" >
-                                                ${appId}
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
