@@ -19,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.Date;
 
 /**
@@ -76,7 +74,7 @@ public class CalCostServiceImpl implements CalCostService{
                 }
                 break;
             }
-            case conf_call:{
+            case sys_conf:{
                 //会议
                 Long useTime = calUnitNum(time, product) * product.getTimeUnit();
                 Long conference = calBillingService.getConference(tenantId);
