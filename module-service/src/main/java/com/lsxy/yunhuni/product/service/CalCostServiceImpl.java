@@ -118,6 +118,52 @@ public class CalCostServiceImpl implements CalCostService{
 
     }
 
+    @Override
+    public boolean isCallTimeRemainOrBalanceEnough(String apiCmd, String tenantId) {
+        ProductCode productCode = ProductCode.changeApiCmdToProductCode(apiCmd);
+        switch(productCode){
+            case captcha_call:{
+                Long sms = calBillingService.getSms(tenantId);
+                if(sms > 0){
+                    return true;
+                }else{
+                    return isBalanceEnough(tenantId);
+                }
+            }
+            case conf_call:{
+                Long conference = calBillingService.getConference(tenantId);
+                if(conference > 0){
+                    return true;
+                }else{
+                    return isBalanceEnough(tenantId);
+                }
+            }
+            default:{
+                Long voice = calBillingService.getVoice(tenantId);
+                if(voice > 0){
+                    return true;
+                }else{
+                    return isBalanceEnough(tenantId);
+                }
+            }
+        }
+    }
+
+    /**
+     * 余额是否大于标准线
+     * @param tenantId
+     * @return
+     */
+    private boolean isBalanceEnough(String tenantId) {
+        BigDecimal balance = calBillingService.getBalance(tenantId);
+        //TODO 余额是否充足标准线
+        if(balance.compareTo(new BigDecimal(0)) == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     /**
      * 插入消费表
      * @param tenantId

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by liups on 2016/8/26.
  */
-public class NotifyCallVO implements Serializable {
+public class NotifyCallDTO implements Serializable {
     private String from;        //主叫号码
     private String to;          //被叫号码
     private String[] files;     //通知放音文件(列表)

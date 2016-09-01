@@ -2,10 +2,9 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
-import com.lsxy.area.api.DuoCallbackVO;
+import com.lsxy.area.api.DuoCallbackDTO;
 import com.lsxy.area.api.CallService;
-import com.lsxy.area.api.NotifyCallVO;
-import com.lsxy.area.api.exceptions.InvokeCallException;
+import com.lsxy.area.api.NotifyCallDTO;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -83,28 +82,28 @@ public class CallController extends AbstractAPIController{
     }
 
     @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
-    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id) throws YunhuniApiException {
+    public RestResponse duoCallback(HttpServletRequest request, @RequestBody DuoCallbackDTO duoCallbackDTO, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
 
-        callId = callService.duoCallback(ip,appId, duoCallbackVO);
+        callId = callService.duoCallback(ip,appId, duoCallbackDTO);
 
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
-        result.put("user_data",duoCallbackVO.getUser_data());
+        result.put("user_data", duoCallbackDTO.getUser_data());
         return RestResponse.success(result);
     }
 
     @RequestMapping(value = "/{account_id}/call/notify_call",method = RequestMethod.POST)
-    public RestResponse duoCallback(HttpServletRequest request, @RequestBody NotifyCallVO notifyCallVO, @PathVariable String account_id) throws YunhuniApiException {
+    public RestResponse duoCallback(HttpServletRequest request, @RequestBody NotifyCallDTO notifyCallDTO, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
-        callId = callService.notifyCall(ip,appId, notifyCallVO);
+        callId = callService.notifyCall(ip,appId, notifyCallDTO);
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
-        result.put("user_data",notifyCallVO.getUser_data());
+        result.put("user_data", notifyCallDTO.getUser_data());
         return RestResponse.success(result);
     }
 

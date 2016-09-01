@@ -22,4 +22,8 @@ public class Constants {
     public static final String EVENT_SYS_CONF_ON_PLAY_COMPLETED = "sys.conf.on_play_completed";//会议放音结束事件
     public static final String EVENT_SYS_CONF_ON_RECORD_COMPLETED = "sys.conf.on_play_completed";//会议录音结束事件
 
+
+    /**简单Api相关**/
+    public static final String EVENT_EXT_DUO_CALLBACK_SUCCESS = "EVENT_EXT_DUO_CALLBACK_SUCCESS";
+
 }
