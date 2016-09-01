@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by tandy on 16/8/18.
@@ -351,7 +350,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .put("res_id",conf_state.getResId())
                 .put("max_seconds",maxDuration)
-                .put("record_file",UUID.randomUUID())
+                .put("record_file",UUIDGenerator.uuid())
                 .put("user_data",confId)
                 .build();
 

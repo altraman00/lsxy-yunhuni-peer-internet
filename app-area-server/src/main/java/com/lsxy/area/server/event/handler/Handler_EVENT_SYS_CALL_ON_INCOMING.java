@@ -1,19 +1,26 @@
 package com.lsxy.area.server.event.handler;
 
-import com.lsxy.area.server.StasticsCounter;
+import com.lsxy.area.api.BusinessState;
+import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.test.TestIncomingZB;
-import com.lsxy.framework.rpc.api.RPCCaller;
+import com.lsxy.area.server.util.IVRActionHandler;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
-import com.lsxy.framework.rpc.api.session.SessionContext;
-import org.apache.commons.lang3.RandomUtils;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,96 +31,91 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_INCOMING.class);
 
-    @Autowired(required = false)
-    private StasticsCounter sc;
+    @Autowired
+    private BusinessStateService businessStateService;
 
     @Autowired
-    private RPCCaller rpcCaller;
-
-    @Autowired(required = false)
-    private TestIncomingZB tzb;
+    private AppService appService;
 
     @Autowired
-    private SessionContext sessionContext;
+    private ConfService confService;
+
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private TestNumBindService testNumBindService;
+
+    @Autowired
+    private IVRActionHandler ivrActionHandler;
+
+    //TODO
+    @Value("")
+    private String testNum ="123456789";
 
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_INCOMING;
     }
 
-    @Override
-    public RPCResponse handle(RPCRequest request, Session session) {
-        tzb.receivedIncoming(request);
-        if(sc != null)  sc.getReceivedAreaNodeInComingEventCount().incrementAndGet();
-        if(logger.isDebugEnabled()){
-            logger.debug("<<<<<<INCOMING>>>>>>>");
-        }
-        RPCRequest sendRequest = randomRequest(request);
-        try {
-            if(logger.isDebugEnabled()){
-                logger.debug(">>>>>>>>发送指令到CTI:{}",sendRequest);
-            }
-
-            if(sendRequest!=null){
-                      /*发送给区域的请求次数计数*/
-                if(sc!=null) sc.getSendAreaNodeRequestCount().incrementAndGet();
-                rpcCaller.invoke(sessionContext,sendRequest);
-            }
-
-        } catch (Exception e) {
-            logger.error("发送区域的指令出现异常,指令发送失败:{}",sendRequest);
-        }
-        return null;
-    }
-
     /**
-     * 随机创建拒绝或挂断请求
+     * 呼叫呼入事件处理
      * @param request
+     * @param session
      * @return
      */
-    private RPCRequest randomRequest(RPCRequest request) {
-//        if(logger.isDebugEnabled()){
-//            logger.debug("请求远程接口参数:{}",request.getParamMap());
-//        }
-//
-//        RestResponse<String> response = RestRequest.buildRequest().post("http://101.200.73.13:3000/incoming",request.getParamMap());
-//
-//        RPCRequest requestX = null;
-//        if(response != null && response.isSuccess()){
-//            String param = response.getData();
-//            if(sc != null){
-//                /*接听 挂机  次数计数*/
-//                if(param.indexOf("sys.call.answer")>=0){
-//                    if(sc != null)  sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
-//                }else if(param.indexOf("sys.call.drop")>=0){
-//                    if(sc != null)  sc.getSendAreaNodeSysDropCount().incrementAndGet();
-//                }
-//            }
-//            requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
-//        }else {
-//            logger.error("请求用户接口发生异常,用户接口没有READY!!!!!!!!");
-//        }
+    @Override
+    public RPCResponse handle(RPCRequest request, Session session) {
+        if(logger.isDebugEnabled()){
+            logger.debug("开始处理{}事件,{}",getEventName(),request);
+        }
+        RPCResponse res = null;
+        //TODO incoming事件 cti需要生成一个user_data给我
+        String call_id = (String)request.getParamMap().get("user_data");
+        String res_id = (String)request.getParamMap().get("res_id");
+        String from_uri = (String)request.getParamMap().get("from_uri");//主叫sip地址
+        String to_uri = (String)request.getParamMap().get("to_uri");//被叫号码sip地址
+        String begin_time = (String)request.getParamMap().get("begin_time");
+        String from = null;//主叫号码
+        String to = null;//被叫号码
 
+        if(StringUtils.isBlank(call_id)){
+            logger.info("call_id is null");
+            return res;
+        }
+        Tenant tenant = null;
+        App app = null;
 
-//        int radom = RandomUtils.nextInt(0,100);
-//        String  param = null;
-////        if(radom % 2 == 0){
-////            param = "method=sys.call.drop&res_id="+request.getParameter("res_id")+"&cause=603";
-////            if(logger.isDebugEnabled()){
-////                logger.debug("这个是挂断指令:{}",param);
-////            }
-////        }else{
-////            param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds=5&user_data=1234";
-////            if(logger.isDebugEnabled()){
-////                logger.debug("这个是接通指令:{}",param);
-////            }
-////        }
-        int ansersec = RandomUtils.nextInt(2,20);
-        String   param = "method=sys.call.answer&res_id="+request.getParameter("res_id")+"&max_answer_seconds="+ansersec+"&user_data=1234";
-        /*挂机指令计数*/
-        if(sc != null) sc.getSendAreaNodeSysAnswerCount().incrementAndGet();
-        RPCRequest requestX = RPCRequest.newRequest(ServiceConstants.MN_CH_CTI_API,param);
+        if(testNum.equals(to)){
+            //被叫是公共测试号,根据主叫号查出应用
+            TestNumBind testNumBind = testNumBindService.findByNumber(from);
+            if(testNumBind == null){
+                logger.info("公共测试号={}找不到对应的app，from={}",to,from);
+                return res;
+            }
+            tenant = testNumBind.getTenant();
+            app = testNumBind.getApp();
+        }else{
+            //不是公共测试号，从号码资源池中查出被叫号码的应用
 
-        return requestX;
+        }
+
+        if(tenant == null){
+            logger.info("找不到对应的租户");
+            return res;
+        }
+        if(app == null){
+            logger.info("找不到对应的APP");
+            return res;
+        }
+        //保存业务数据，后续事件要用到
+        BusinessState callstate = new BusinessState(tenant.getId(),app.getId(),call_id,"ivr_incoming",null,
+                res_id,new MapBuilder<String,Object>()
+                .put("begin_time",begin_time)
+                .build());
+        businessStateService.save(callstate);
+        ivrActionHandler.doActionIfAccept(call_id);
+        return res;
     }
+
 }

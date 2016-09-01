@@ -26,7 +26,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/create",method = RequestMethod.POST)
     public RestResponse create(HttpServletRequest request, @PathVariable String accountId,
-                                    @RequestHeader(value = "AppID",required = false) String appId,
+                                    @RequestHeader(value = "AppID") String appId,
                                     @RequestBody ConfCreateInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("创建会议API参数,accountId={},appId={},dto={}",accountId,appId,dto);
@@ -42,7 +42,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/dismiss",method = RequestMethod.POST)
     public RestResponse dismiss(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                               @RequestHeader(value = "AppID",required = false) String appId) throws YunhuniApiException {
+                               @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("解散会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
@@ -53,7 +53,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/invite_call",method = RequestMethod.POST)
     public RestResponse invite(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                                @RequestHeader(value = "AppID",required = false) String appId,
+                                @RequestHeader(value = "AppID") String appId,
                                 @RequestBody ConfInviteCallInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("邀请会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
@@ -69,7 +69,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/join",method = RequestMethod.POST)
     public RestResponse join(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                                   @RequestHeader(value = "AppID",required = false) String appId,
+                                   @RequestHeader(value = "AppID") String appId,
                                    @RequestBody ConfJoinInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("加入会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
@@ -81,7 +81,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/quit",method = RequestMethod.POST)
     public RestResponse quit(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                             @RequestHeader(value = "AppID",required = false) String appId,
+                             @RequestHeader(value = "AppID") String appId,
                              @RequestBody ConfQuitInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("推出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
@@ -93,7 +93,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/start_play",method = RequestMethod.POST)
     public RestResponse play(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                             @RequestHeader(value = "AppID",required = false) String appId,
+                             @RequestHeader(value = "AppID") String appId,
                              @RequestBody ConfPlayInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
@@ -105,7 +105,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/stop_play",method = RequestMethod.POST)
     public RestResponse stopPlay(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                             @RequestHeader(value = "AppID",required = false) String appId) throws YunhuniApiException {
+                             @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("会议停止放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
@@ -116,7 +116,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/start_record",method = RequestMethod.POST)
     public RestResponse record(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                             @RequestHeader(value = "AppID",required = false) String appId,
+                             @RequestHeader(value = "AppID") String appId,
                              @RequestBody ConfRecordInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
@@ -128,7 +128,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/stop_record",method = RequestMethod.POST)
     public RestResponse stopRecord(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                             @RequestHeader(value = "AppID",required = false) String appId) throws YunhuniApiException {
+                             @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("会议停止放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
@@ -139,7 +139,7 @@ public class ConfController extends AbstractAPIController{
 
     @RequestMapping(value = "/{accountId}/conf/{id}/set_voice_mode",method = RequestMethod.POST)
     public RestResponse setVoiceMode(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
-                                   @RequestHeader(value = "AppID",required = false) String appId,
+                                   @RequestHeader(value = "AppID") String appId,
                                    @RequestBody ConfSetVoiceModeInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("设置会议成员录放音模式API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
