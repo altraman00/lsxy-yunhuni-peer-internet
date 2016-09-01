@@ -80,7 +80,7 @@ public class NotifyCallbackUtil {
 
     /**
      *
-     * @param url 请求地址
+     * @param url app设置的回调地址
      * @param data 请求数据
      * @param timeout 超时时间
      * @param retry 重试次数
