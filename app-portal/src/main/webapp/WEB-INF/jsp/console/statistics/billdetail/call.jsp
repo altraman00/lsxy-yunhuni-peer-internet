@@ -134,6 +134,7 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <c:set var="extraParam" value="&time=${time}}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/call"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
