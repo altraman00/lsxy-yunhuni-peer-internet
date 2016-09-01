@@ -15,12 +15,6 @@ public class ConfInviteCallInputDTO implements Serializable{
     @JsonProperty("to")
     private String to;//被叫号码
 
-    @JsonProperty("custom_from")
-    private String customFrom;//自定义主叫号码
-
-    @JsonProperty("custom_to")
-    private String customTo;//自定义被叫号码
-
     @JsonProperty("max_duration")
     private Integer maxDuration;//最大会议时间（秒）
 
@@ -50,22 +44,6 @@ public class ConfInviteCallInputDTO implements Serializable{
 
     public void setTo(String to) {
         this.to = to;
-    }
-
-    public String getCustomFrom() {
-        return customFrom;
-    }
-
-    public void setCustomFrom(String customFrom) {
-        this.customFrom = customFrom;
-    }
-
-    public String getCustomTo() {
-        return customTo;
-    }
-
-    public void setCustomTo(String customTo) {
-        this.customTo = customTo;
     }
 
     public Integer getMaxDuration() {

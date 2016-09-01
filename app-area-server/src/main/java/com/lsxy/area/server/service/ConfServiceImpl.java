@@ -139,8 +139,7 @@ public class ConfServiceImpl implements ConfService {
 
     @Override
     public String invite(String ip, String appId, String confId,
-                         String from, String to, String customFrom,
-                         String customTO, Integer maxDuration, Integer maxDialDuration,
+                         String from, String to, Integer maxDuration, Integer maxDialDuration,
                          Integer dialVoiceStopCond, String playFile, Integer voiceMode) throws YunhuniApiException{
 
         if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
@@ -196,6 +195,7 @@ public class ConfServiceImpl implements ConfService {
                 .put("conf_id",confId)//所属会议
                 .put("play_file",playFile)//加入后在会议播放这个文件
                 .put("voice_mode",voiceMode)//加入后的声音模式
+                .put("dial_voice_stop_cond",dialVoiceStopCond)//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
                 .build());
         businessStateService.save(callstate);
         return callId;

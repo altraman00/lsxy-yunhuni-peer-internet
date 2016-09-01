@@ -1,7 +1,6 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.app.api.gateway.dto.*;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
@@ -9,7 +8,6 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,9 +20,6 @@ import java.util.Map;
 @RestController
 public class ConfController extends AbstractAPIController{
     private static final Logger logger = LoggerFactory.getLogger(ConfController.class);
-
-    @Autowired(required = false)
-    private StasticsCounter sc;
 
     @Reference(timeout=3000)
     private ConfService confService;
@@ -65,8 +60,7 @@ public class ConfController extends AbstractAPIController{
         }
         String ip = WebUtils.getRemoteAddress(request);
         String callId = confService.invite(ip,appId,id,
-                dto.getFrom(),dto.getTo(),dto.getCustomFrom(),dto.getCustomTo(),
-                dto.getMaxDuration(),dto.getMaxDialDuration(),
+                dto.getFrom(),dto.getTo(),dto.getMaxDuration(),dto.getMaxDialDuration(),
                 dto.getDialVoiceStopCond(),dto.getPlayFile(),dto.getVoiceMode());
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
