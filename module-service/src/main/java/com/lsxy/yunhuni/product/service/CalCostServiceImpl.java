@@ -130,7 +130,7 @@ public class CalCostServiceImpl implements CalCostService{
                     return isBalanceEnough(tenantId);
                 }
             }
-            case conf_call:{
+            case sys_conf:{
                 Long conference = calBillingService.getConference(tenantId);
                 if(conference > 0){
                     return true;
