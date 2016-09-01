@@ -23,7 +23,8 @@ public class ServiceConstants {
 	public static final String MN_CH_SYS_CONF_SET_PART_VOICE_MODE = "MN_CH_SYS_CONF_SET_PART_VOICE_MODE";//设置与会者的声音收放模式
 
 	public static final String MN_CH_EXT_DUO_CALLBACK = "MN_CH_EXT_DUO_CALLBACK";  //双向回拔
-	public static final String MN_CH_EXT_NOTIFY_CALL = "MN_CH_EXT_NOTIFY_CALL";  //双向回拔
+	public static final String MN_CH_EXT_NOTIFY_CALL = "MN_CH_EXT_NOTIFY_CALL";  //外呼通知
+	public static final String MN_CH_EXT_CAPTCHA_CALL = "MN_CH_EXT_CAPTCHA_CALL";  //语音验证码
 
 	public static final String CH_MN_CTI_EVENT = "CH_MN_CTI_EVENT" ; 	//CTI 事件通知
 

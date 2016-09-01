@@ -3,6 +3,7 @@ package com.lsxy.area.api;
 import java.io.Serializable;
 
 /**
+ * 通知外呼
  * Created by liups on 2016/8/26.
  */
 public class NotifyCallDTO implements Serializable {

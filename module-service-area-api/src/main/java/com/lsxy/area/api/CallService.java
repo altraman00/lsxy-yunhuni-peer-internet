@@ -32,4 +32,13 @@ public interface CallService {
      * @return
      */
     String notifyCall(String ip, String appId, NotifyCallDTO notifyCallDTO) throws YunhuniApiException;
+
+    /**
+     * 语音验证码
+     * @param ip
+     * @param appId
+     * @param dto
+     * @return
+     */
+    String captchaCall(String ip, String appId, CaptchaCallDTO dto);
 }

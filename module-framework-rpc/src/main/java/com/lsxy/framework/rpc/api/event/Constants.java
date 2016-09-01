@@ -25,5 +25,9 @@ public class Constants {
 
     /**简单Api相关**/
     public static final String EVENT_EXT_DUO_CALLBACK_SUCCESS = "EVENT_EXT_DUO_CALLBACK_SUCCESS";
+    public static final String EVENT_EXT_NOTIFY_CALL_SUCCESS = "EVENT_EXT_NOTIFY_CALL_SUCCESS";
+    public static final String EVENT_EXT_CAPTCHA_CALL_SUCCESS = "EVENT_EXT_CAPTCHA_CALL_SUCCESS";
+    public static final String EVENT_EXT_CALL_ON_FAIL = "EVENT_EXT_CALL_ON_FAIL";
+    public static final String EVENT_EXT_CALL_ON_TIMEOUT = "EVENT_EXT_CALL_ON_TIMEOUT";
 
 }

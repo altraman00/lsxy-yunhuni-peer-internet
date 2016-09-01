@@ -95,23 +95,23 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.error("调用sys.call失败call_id={},result={}",params.get("user_data"),rpcError);
+                    logger.error("调用ext.duo_callback失败call_id={},result={}",params.get("user_data"),rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_SYS_CALL_ON_FAIL)
+                                    .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)
                                     .put("user_data",params.get("user_data"))
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_FAIL);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL);
                     }
                 }
 
                 @Override
                 protected void onTimeout() {
-                    logger.error("调用sys.call超时call_id={}",params.get("user_data"));
+                    logger.error("调用ext.duo_callback超时call_id={}",params.get("user_data"));
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
@@ -121,7 +121,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_TIMEOUT);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT);
                     }
                 }
             });
