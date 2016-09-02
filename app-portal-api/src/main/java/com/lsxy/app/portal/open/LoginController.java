@@ -52,9 +52,6 @@ public class LoginController {
             }
         }catch (AccountNotFoundException e){
             logger.info("用户登录失败:{}:{} \r\n",username,password);
-            if(logger.isDebugEnabled()){
-                logger.error("用户登录失败：",e);
-            }
             return PortalRestResponse.failed(APIErrors.LOGIN_ERROR_ACCOUNT_NOT_FOUND);
         }catch (Exception ex){
             logger.info("用户登录失败:{}:{} \r\n",username,password);
