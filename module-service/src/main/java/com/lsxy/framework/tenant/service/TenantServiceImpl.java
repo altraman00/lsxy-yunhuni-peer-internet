@@ -180,7 +180,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     public int countConsumeTenantDateBetween(Date d1,Date d2){
         String countSQL = "SELECT count(tenant_id) as c FROM " +
-                "(SELECT tenant_id FROM tb_base_consume_day WHERE deleted=0 AND tenant_id IS NOT NULL AND dt between :d1 and :d2 GROUP BY tenant_id) a";
+                "(SELECT tenant_id FROM tb_base_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL AND dt between :d1 and :d2 GROUP BY tenant_id) a";
         Query queryCount = em.createNativeQuery(countSQL);
         queryCount.setParameter("d1", d1);
         queryCount.setParameter("d2", d2);
