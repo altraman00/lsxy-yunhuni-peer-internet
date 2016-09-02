@@ -39,7 +39,7 @@ public class SendMessageTask {
             String start = DateUtils.formatDate(new Date(), "yyyy-MM-dd HH");
             Date startTime = DateUtils.parseDate(start + ":00:00", "yyyy-MM-dd HH:mm:ss");
             Date endTime = DateUtils.parseDate(start + ":59:59", "yyyy-MM-dd HH:mm:ss");
-            logger.info("-----------------开始执行上线活动消息动作，时间:{},参数:{}-------------------------", DateUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"), start);
+            logger.info("-----------------开始执行上线活动消息动作，时间:{},参数:{}，{}-------------------------", DateUtils.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"),  DateUtils.formatDate(startTime, "yyyy-MM-dd HH:mm:ss"), DateUtils.formatDate(endTime, "yyyy-MM-dd HH:mm:ss"));
             List<Message> message = messageService.bacthUpdateStatus(startTime, endTime);
             List<Account> list = accountService.findByStatus(Account.STATUS_NORMAL);
             logger.info("-----------------消息体:{}，用户对象:{}-------------------------", message,list);
