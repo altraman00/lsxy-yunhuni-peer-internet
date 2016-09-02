@@ -14,31 +14,35 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_file_record")
 public class VoiceFileRecord extends IdEntity {
-    private Tenant tenant;//所属租户
-    private App app;//所属应用
-    private CallSession session;//所属会话
-    private String name;//文件名 生成规则yyyyMMddhhmmss-[sessionid]
+    private String tenantId;//所属租户
+    private String appId;//所属应用
+    private String name;//文件名 生成规则uuid
     private String url;//录音文件URL
-    private Long size;//文件大小
+    private String ossUrl;//录音文件URL
     private Long duration;//时长
-    @ManyToOne
-    @JoinColumn(name = "tenant_id")
-    public Tenant getTenant() {
-        return tenant;
+    private Long size;//文件大小
+    private String sessionId;//所属会话 会议、双向回拔或ivr的ID
+    private String sessionCode;//会话类型
+    private Integer status; //状态
+
+    @Column(name="tenant_id")
+    public String getTenantId() {
+        return tenantId;
     }
 
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
-    }
-    @ManyToOne
-    @JoinColumn(name = "app_id")
-    public App getApp() {
-        return app;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
-    public void setApp(App app) {
-        this.app = app;
+    @Column(name="app_id")
+    public String getAppId() {
+        return appId;
     }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
     @Column(name="url")
     public String getUrl() {
         return url;
@@ -64,15 +68,16 @@ public class VoiceFileRecord extends IdEntity {
     public void setName(String name) {
         this.name = name;
     }
-    @OneToOne
-    @JoinColumn(name = "session_id")
-    public CallSession getSession() {
-        return session;
+
+    @Column(name="session_id")
+    public String getSessionId() {
+        return sessionId;
     }
 
-    public void setSession(CallSession session) {
-        this.session = session;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
+
     @Column(name="duration")
     public Long getDuration() {
         return duration;
@@ -80,5 +85,32 @@ public class VoiceFileRecord extends IdEntity {
 
     public void setDuration(Long duration) {
         this.duration = duration;
+    }
+
+    @Column(name="oss_url")
+    public String getOssUrl() {
+        return ossUrl;
+    }
+
+    public void setOssUrl(String ossUrl) {
+        this.ossUrl = ossUrl;
+    }
+
+    @Column(name="session_code")
+    public String getSessionCode() {
+        return sessionCode;
+    }
+
+    public void setSessionCode(String sessionCode) {
+        this.sessionCode = sessionCode;
+    }
+
+    @Column(name="status")
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }
