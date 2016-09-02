@@ -12,6 +12,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.tenant.dao.RealnameCorpDao;
 import com.lsxy.framework.tenant.dao.RealnamePrivateDao;
 import com.lsxy.framework.tenant.dao.TenantDao;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -49,6 +51,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     @Autowired
     private RedisCacheService cacheManager;
+    @Autowired
+    private CalBillingService calBillingService;
 
     @Override
     public BaseDaoInterface<Tenant, Serializable> getDao() {
@@ -274,7 +278,16 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         }
         pageQuery.setMaxResults(pageSize);
         pageQuery.setFirstResult(start);
-        return new Page<>(start,total,pageSize,pageQuery.getResultList());
+        //修改余额取值
+        List<TenantVO> temp = pageQuery.getResultList();
+        List<TenantVO> list = new ArrayList();
+        for(int i=0;i<temp.size();i++){
+            TenantVO tenantVO = temp.get(i);
+            BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
+            tenantVO.setRemainCoin(bigDecimal.doubleValue());
+            list.add(tenantVO);
+        }
+        return new Page<>(start,total,pageSize,list);
     }
     @Override
     public List<Tenant> pageListByUserName(String name) {
