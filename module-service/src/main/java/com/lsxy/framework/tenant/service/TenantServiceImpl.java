@@ -15,6 +15,8 @@ import com.lsxy.framework.tenant.dao.TenantDao;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,7 @@ import java.util.*;
  */
 @Service
 public class TenantServiceImpl extends AbstractService<Tenant> implements TenantService {
+    public static final Logger logger = LoggerFactory.getLogger(TenantServiceImpl.class);
     private static final String INCREASE_TID = "increase_tid";  //保存在redis里的自动增长的租户各识别码，达到9999后重新归0重新计
 
     @Autowired
@@ -281,13 +284,25 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         //修改余额取值
         List<TenantVO> temp = pageQuery.getResultList();
         List<TenantVO> list = new ArrayList();
-        for(int i=0;i<temp.size();i++){
-            TenantVO tenantVO = temp.get(i);
-            BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
-            tenantVO.setRemainCoin(bigDecimal.doubleValue());
-            list.add(tenantVO);
+        try {
+            for (int i = 0; i < temp.size(); i++) {
+                TenantVO tenantVO = temp.get(i);
+                BigDecimal bigDecimal = calBillingService.getBalance(tenantVO.getId());
+                tenantVO.setRemainCoin(bigDecimal.doubleValue());
+                list.add(tenantVO);
+            }
+        }catch (Exception e){
+            new RuntimeException(e);
+            logger.info("转换List出错:{}",e);
         }
-        return new Page<>(start,total,pageSize,list);
+        Page page = null;
+        try {
+            page = new Page<>(start, total, pageSize, list);
+        }catch (Exception e){
+            new RuntimeException(e);
+            logger.info("转换Page出错:{}",e);
+        }
+        return page;
     }
     @Override
     public List<Tenant> pageListByUserName(String name) {
