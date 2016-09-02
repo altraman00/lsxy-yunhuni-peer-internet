@@ -127,6 +127,7 @@ public class CallServiceImpl implements CallService {
 
         //TODO 获取线路IP和端口
         Map<String, Object> params = new HashMap<>();
+        //TODO 增加区域参数
         params.put("from1_uri", dto.getFrom1()+"@"+ctiHost+":"+ctiPort);
         params.put("to1_uri", dto.getTo1()+"@"+ctiHost+":"+ctiPort);
         params.put("from2_uri", dto.getFrom2()+"@"+ctiHost+":"+ctiPort);
@@ -165,8 +166,8 @@ public class CallServiceImpl implements CallService {
     @Override
     public String notifyCall(String ip, String appId, NotifyCallDTO dto) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
-        String to1 = dto.getTo();
-        if(apiGwRedBlankNumService.isRedOrBlankNum(to1)){
+        String to = dto.getTo();
+        if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
@@ -199,6 +200,50 @@ public class CallServiceImpl implements CallService {
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
             BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", dto.getUser_data());
+            businessStateService.save(cache);
+            return callId;
+        }catch(Exception ex){
+            throw new InvokeCallException(ex);
+        }
+    }
+
+    @Override
+    public String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException{
+        String callId = UUIDGenerator.uuid();
+        String to = dto.getTo();
+        if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
+            throw new NumberNotAllowToCallException();
+        }
+        App app = appService.findById(appId);
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(app.getIsVoiceValidate() != 1){
+            throw new AppServiceInvalidException();
+        }
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("captcha_call", app.getTenant().getId());
+        if(!isAmountEnough){
+            throw new BalanceNotEnoughException();
+        }
+
+        //TODO 获取线路IP和端口
+        //TODO 待定
+        Map<String, Object> params = new HashMap<>();
+        params.put("from_uri", dto.getFrom()+"@"+ctiHost+":"+ctiPort);
+        params.put("to_uri", dto.getTo()+"@"+ctiHost+":"+ctiPort);
+        params.put("max_ring_seconds",dto.getMax_dial_duration());
+        params.put("valid_keys",dto.getVerify_code());
+        params.put("user_data",callId);
+
+        try {
+            //找到合适的区域代理
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+            //将数据存到redis
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", dto.getUser_data());
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){

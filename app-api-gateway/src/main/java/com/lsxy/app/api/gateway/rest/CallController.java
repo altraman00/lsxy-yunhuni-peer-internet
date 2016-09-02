@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
+import com.lsxy.area.api.CaptchaCallDTO;
 import com.lsxy.area.api.DuoCallbackDTO;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.NotifyCallDTO;
@@ -104,6 +105,18 @@ public class CallController extends AbstractAPIController{
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         result.put("user_data", notifyCallDTO.getUser_data());
+        return RestResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{account_id}/call/captcha_call",method = RequestMethod.POST)
+    public RestResponse duoCallback(HttpServletRequest request, @RequestBody CaptchaCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+        String callId = null;
+        callId = callService.captchaCall(ip,appId, dto);
+        Map<String,String> result = new HashMap<>();
+        result.put("callId",callId);
+        result.put("user_data", dto.getUser_data());
         return RestResponse.success(result);
     }
 
