@@ -36,8 +36,6 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        WebUtils.logRequestParams((HttpServletRequest) request);
-
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res=(HttpServletResponse)response;
 
