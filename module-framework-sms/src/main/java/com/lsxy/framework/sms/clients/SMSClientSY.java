@@ -35,6 +35,8 @@ public class SMSClientSY implements SMSClient {
             sendmsg.setMsg(msg);
             sendmsg.setPhone(to);
             sendmsg42.setSendmsg(sendmsg);
+            //发短信方法
+            stub.sendmsg(sendmsg42);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
