@@ -20,13 +20,14 @@ APP_NAME=""
 ENV_PROFILE="-Pdevelopment"
 #tomcat还是springboot
 IS_TOMCAT=false
+IS_TOMCAT_DEPLOY=false
 IS_SPRINGBOOT=false
 #是否需要强制安装
 FORCE_INSTALL=false
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
 
-while getopts "A:P:H:STIL" opt; do
+while getopts "A:P:H:STILD" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
@@ -36,6 +37,9 @@ while getopts "A:P:H:STIL" opt; do
       ;;
     T)
       IS_TOMCAT=true;
+      ;;
+    D)
+      IS_TOMCAT_DEPLOY=true;
       ;;
     S)
       IS_SPRINGBOOT=true;
@@ -100,6 +104,9 @@ if [ $IS_TOMCAT = true ]; then
 elif [ $IS_SPRINGBOOT = true ]; then
   echo "starting springboot application...."
   nohup mvn -U $ENV_PROFILE spring-boot:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+elif [ $IS_TOMCAT_DEPLOY = true ]; then
+  echo "deploy war to tomcat...."
+  nohup mvn -U $ENV_PROFILE tomcat7:deploy 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
 fi
 echo "OK";
 
