@@ -5,7 +5,8 @@ package com.lsxy.area.api;
  * 定义异常常量
  */
 public enum ApiReturnCodeEnum {
-    success("000000","请求成功"),
+    Success("000000","请求成功"),
+    UnknownFail("111111","未知错误"),
     AppServiceInvalid("101010","app没开通该服务"),
     BalanceNotEnough("101011","余额不足"),
     InvokeCall("101012","调用失败"),

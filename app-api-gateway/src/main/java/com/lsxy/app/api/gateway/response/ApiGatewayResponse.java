@@ -56,9 +56,9 @@ public class ApiGatewayResponse<T> {
      */
     public static ApiGatewayResponse success(Object data){
         ApiGatewayResponse response = new ApiGatewayResponse();
-        response.setCode(ApiReturnCodeEnum.success.getCode());
+        response.setCode(ApiReturnCodeEnum.Success.getCode());
         response.setData(data);
-        response.setMsg(ApiReturnCodeEnum.success.getMsg());
+        response.setMsg(ApiReturnCodeEnum.Success.getMsg());
         if(logger.isDebugEnabled()){
             logger.debug("输出响应："+response);
         }
