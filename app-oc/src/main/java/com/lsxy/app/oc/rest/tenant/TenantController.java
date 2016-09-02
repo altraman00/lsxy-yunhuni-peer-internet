@@ -227,19 +227,54 @@ public class TenantController {
         dto.setSessionTime(preAmongDuration);
         dto.setAvgSessionTime(preAvgTime);
         dto.setConnectedRate(preConnectRate);
-        dto.setCostCoinRate(new BigDecimal(((preConsume-prepreConsume)/(prepreConsume+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setRechargeCoinRate(new BigDecimal(((preRecharge-prepreRecharge)/(prepreRecharge+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setSessionCountRate(new BigDecimal(((preAmongCall-prepreAmongCall)/(prepreAmongCall+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setSessionTimeRate(new BigDecimal(((preAmongDuration-prepreAmongDuration)/(prepreAmongDuration+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setAvgSessionTimeRate(new BigDecimal(((preAvgTime-prepreAvgTime)/(prepreAvgTime+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dto.setConnectedRateRate(new BigDecimal(((preConnectRate-prepreConnectRate)/(prepreConnectRate+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-        return RestResponse.success(dto);
+        Map dto1 = new HashMap();
+        dto1.put("costCoin",false);
+        dto1.put("rechargeCoinRate",false);
+        dto1.put("sessionCountRate",false);
+        dto1.put("sessionTimeRate",false);
+        dto1.put("avgSessionTimeRate",false);
+        dto1.put("connectedRateRate",false);
+        if(prepreConsume>0) {
+            dto.setCostCoinRate(new BigDecimal(((preConsume - prepreConsume)*0.01 )/ (prepreConsume*0.01 )*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("costCoin",true);
+
+        }
+        if(prepreRecharge>0) {
+            dto.setRechargeCoinRate(new BigDecimal(((preRecharge - prepreRecharge)*0.01) / (prepreRecharge *0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("rechargeCoinRate",true);
+
+        }
+        if(prepreAmongCall>0) {
+            double b2 =  new BigDecimal(((preAmongCall - prepreAmongCall)*0.01) / (prepreAmongCall*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            dto.setSessionCountRate(b2);
+            dto1.put("sessionCountRate",true);
+
+        }
+        if(prepreAmongDuration>0) {
+            double b1 = new BigDecimal(((preAmongDuration - prepreAmongDuration)*0.01) / (prepreAmongDuration*0.01 )*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            dto.setSessionTimeRate(b1);
+            dto1.put("sessionTimeRate",true);
+
+        }
+        if(prepreAvgTime>0) {
+            dto.setAvgSessionTimeRate(new BigDecimal(((preAvgTime - prepreAvgTime)*0.01) / (prepreAvgTime*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("avgSessionTimeRate",true);
+
+        }
+        if(prepreConnectRate>0) {
+            dto.setConnectedRateRate(new BigDecimal(((preConnectRate - prepreConnectRate)*0.01) / (prepreConnectRate*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            dto1.put("connectedRateRate",true);
+        }
+        Map map = new HashMap();
+        map.put("dto",dto);
+        map.put("dto1",dto1);
+        return RestResponse.success(map);
     }
 
     @ApiOperation(value = "租户(某月所有天/某年所有月)的（消费额和话务量）统计")
@@ -567,8 +602,8 @@ public class TenantController {
             if(tenant != null){
                 Integer status = tenant.getIsRealAuth();
                 //未认证，等待审核，已认证，认证失败
-                Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT};//等待审核
-                Integer[] auth_success_status = Tenant.AUTH_STATUS;//已认证
+                Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_UPGRADE_WAIT};//等待审核
+                Integer[] auth_success_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,Tenant.AUTH_ONESELF_SUCCESS,Tenant.AUTH_UPGRADE_WAIT,Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_UPGRADE_FAIL};//已认证
                 Integer[] auth_fail_status = new Integer[]{Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_ONESELF_FAIL};
                 if(Arrays.asList(wait_auth_status).contains(status)){//等待审核
                     info.setStatus("未审核");
@@ -587,11 +622,11 @@ public class TenantController {
 
     private AuthInfoVO getAuthInfo(String tenantId,Integer status,AuthInfoVO info){
         Integer[] privateAuth_status = new Integer[]{Tenant.AUTH_ONESELF_SUCCESS,
-                Tenant.AUTH_WAIT,Tenant.AUTH_UPGRADE_WAIT,
-                Tenant.AUTH_UPGRADE_FAIL,Tenant.AUTH_ONESELF_FAIL};//个人认证
-        
+               Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_ONESELF_FAIL,Tenant.AUTH_UPGRADE_FAIL
+        };//个人认证
         Integer[] companyAuth_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,
-                Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_COMPANY_FAIL};//公司认证
+                Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_WAIT,Tenant.AUTH_UPGRADE_WAIT,
+                Tenant.AUTH_UPGRADE_SUCCESS};//公司认证
         AuthInfoVO authInfo = null;
         if(Arrays.asList(privateAuth_status).contains(status)){
             authInfo = new PrivateAuthInfoVO();
@@ -645,7 +680,7 @@ public class TenantController {
             for (App app : apps) {
                 TenantAppVO vo = new TenantAppVO(app);
                 vo.setConsume(consumeMonthService.getAmongAmountByDateAndApp(preMonth,app.getId()));
-                vo.setAmongDuration(voiceCdrMonthService.getAmongDurationByDateAndApp(preMonth,app.getId()));
+                vo.setAmongDuration(voiceCdrMonthService.getAmongDurationByDateAndApp(preMonth,app.getId())/60);
                 vo.setSessionCount(voiceCdrMonthService.getAmongCallByDateAndApp(preMonth,app.getId()));
                 dto.add(vo);
             }

@@ -90,7 +90,7 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                 <form:form action="${ctx}/console/statistics/billdetail/code" method="post" id="mainForm">
                                      <div class="row statistics_row" >
-                                         <input type="hidden" id="appId" name="appId" value="">
+                                         <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
@@ -106,7 +106,11 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <th colspan="6"><span class="p-money">总条数：${fn:length(pageObj.result)}条</span></th>
+                                                <c:set var="totalCount" value="0"></c:set>
+                                                <c:if test="${pageObj!=null }">
+                                                    <c:set value="${pageObj.totalCount}" var="totalCount"></c:set>
+                                                </c:if>
+                                                <th colspan="6"><span class="p-money">总条数：${totalCount}条</span></th>
                                             </tr>
                                             <tr>
                                                 <th>发送时间</th>
@@ -127,6 +131,7 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/code"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>

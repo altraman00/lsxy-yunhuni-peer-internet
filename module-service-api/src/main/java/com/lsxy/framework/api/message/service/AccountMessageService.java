@@ -6,6 +6,7 @@ import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.Page;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,6 +63,18 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
      * @param accountId
      * @param status
      */
-    void modifyMessageStatus(String accountId,Integer status);
+    void modifyMessageStatus(String accountId,Integer status,Date endTime);
+
+    /**
+     * 获取指定时间内的记录数
+     *
+     * @return
+     */
+     Long countAll(String accountId,Date startTime,Date endTime);
+
+     List listAll(String accountId,Date startTime,Date endTime);
+
+     Page pageAll(String accountId,Date startTime,Date endTime,Integer pageNo,Integer pageSize);
+
 
 }

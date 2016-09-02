@@ -3,6 +3,7 @@ package com.lsxy.app.portal.console.statistics;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -43,8 +44,9 @@ public class BillDetailController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
+        Page pageObj = (Page)getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData();
         mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
+        mav.addObject("pageObj",pageObj);
         mav.setViewName("/console/statistics/billdetail/call");
         return mav;
     }
@@ -192,9 +194,11 @@ public class BillDetailController extends AbstractPortalController {
         Map map = new HashMap();
         List<App> appList = (List<App>)getAppList(request).getData();
         map.put("appList",appList);
-        if(StringUtils.isEmpty(appId)){
-            if(appList.size()>0) {
-                appId = appList.get(0).getId();
+        if(StringUtil.isEmpty(appId)){
+            if(StringUtils.isEmpty(appId)){
+                if(appList.size()>0) {
+                    appId = appList.get(0).getId();
+                }
             }
         }
         map.put("appId",appId);

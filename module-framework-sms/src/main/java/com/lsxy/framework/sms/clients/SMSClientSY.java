@@ -35,6 +35,8 @@ public class SMSClientSY implements SMSClient {
             sendmsg.setMsg(msg);
             sendmsg.setPhone(to);
             sendmsg42.setSendmsg(sendmsg);
+            //发短信方法
+            stub.sendmsg(sendmsg42);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,6 +92,12 @@ public class SMSClientSY implements SMSClient {
         } else {
             throw new java.lang.Exception("Creator not found!");
         }
+    }
+
+    public static void main(String[] args) {
+        SMSClientSY client = new SMSClientSY();
+        boolean result = client.sendsms("13971068693","【云呼你】您的验证码是0000");
+        System.out.println("发送结果 :" + result);
     }
 
 }

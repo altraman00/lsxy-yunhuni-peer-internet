@@ -91,7 +91,7 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <form:form action="${ctx}/console/statistics/billdetail/call" method="post" id="mainForm">
                                         <div class="row statistics_row" >
-                                            <input type="hidden" id="appId" name="appId" value="">
+                                            <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
@@ -99,7 +99,7 @@
                                                 <input type="text" name="time" class="form-control currentDay " value="${time}" />
                                             </div>
                                             <div class="col-md-2">
-                                                <button class="btn btn-primary" type="submit"> 查询</button>
+                                                <button class="btn btn-primary" type="submit" > 查询</button>
                                             </div>
                                         </div>
                                     </form:form>
@@ -107,7 +107,11 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum.cost}" pattern="0.00"></fmt:formatNumber> 元</span></th>
+                                                <c:set var="sum_cost" value="0.00"></c:set>
+                                                <c:if test="${sum!=null && sum.cost!=null}">
+                                                    <c:set value="${sum.cost}" var="sum_cost"></c:set>
+                                                </c:if>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.00"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
@@ -130,6 +134,7 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/call"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
