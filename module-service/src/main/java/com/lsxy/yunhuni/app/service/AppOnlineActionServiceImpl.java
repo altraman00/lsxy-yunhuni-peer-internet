@@ -232,8 +232,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             //如果ivr号码被占用，则抛出异常
             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
         }
-        //绑定应用与区域的关系
-        app.setArea(resourceTelenum.getLine().getArea());
+        //TODO 绑定应用与区域的关系
+//        app.setArea(resourceTelenum.getLine().getArea());
     }
 
     /**

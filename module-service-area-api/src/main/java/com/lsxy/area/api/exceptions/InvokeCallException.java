@@ -1,5 +1,7 @@
 package com.lsxy.area.api.exceptions;
 
+import com.lsxy.area.api.ApiReturnCodeEnum;
+
 /**
  * Created by tandy on 16/8/18.
  */
@@ -13,7 +15,7 @@ public class InvokeCallException extends YunhuniApiException {
     }
 
     @Override
-    public ApiExceptionEnum getApiExceptionEnum() {
-        return ApiExceptionEnum.InvokeCall;
+    public ApiReturnCodeEnum getApiExceptionEnum() {
+        return ApiReturnCodeEnum.InvokeCall;
     }
 }

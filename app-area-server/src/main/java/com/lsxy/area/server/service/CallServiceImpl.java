@@ -128,15 +128,15 @@ public class CallServiceImpl implements CallService {
         //TODO 获取线路IP和端口
         Map<String, Object> params = new HashMap<>();
         //TODO 增加区域参数
-        params.put("from1_uri", dto.getFrom1()+"@"+ctiHost+":"+ctiPort);
-        params.put("to1_uri", dto.getTo1()+"@"+ctiHost+":"+ctiPort);
-        params.put("from2_uri", dto.getFrom2()+"@"+ctiHost+":"+ctiPort);
+        params.put("from1_uri", dto.getFrom1());
+        params.put("to1_uri",dto.getTo1()+"@"+ctiHost+":"+ctiPort);
+        params.put("from2_uri", dto.getFrom2());
         params.put("to2_uri",dto.getTo2()+"@"+ctiHost+":"+ctiPort);
         params.put("max_connect_seconds",dto.getMax_call_duration());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("ring_play_file",dto.getRing_tone());
         params.put("ring_play_mode",dto.getRing_tone_mode());
-        params.put("user_data",duocCallId);
+        params.put("user_data1",duocCallId);
         //录音
         if(dto.getRecording()){
             //TODO 录音文件名称
@@ -151,7 +151,7 @@ public class CallServiceImpl implements CallService {
             try {
                 rpcCaller.invoke(sessionContext, rpcrequest);
                 //将数据存到redis
-                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,"duo_call", dto.getUser_data());
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,"duo_call", app.getUrl(),dto.getUser_data());
                 businessStateService.save(cache);
             } catch (Exception e) {
                 logger.error("消息发送到区域失败:{}", rpcrequest);
@@ -199,7 +199,7 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", dto.getUser_data());
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", app.getUrl(),dto.getUser_data());
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
@@ -243,7 +243,7 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", dto.getUser_data());
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", app.getUrl(),dto.getUser_data());
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){

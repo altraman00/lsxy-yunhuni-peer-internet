@@ -1,5 +1,7 @@
 package com.lsxy.area.api.exceptions;
 
+import com.lsxy.area.api.ApiReturnCodeEnum;
+
 /**
  * Created by liups on 2016/8/23.
  */
@@ -13,8 +15,8 @@ public class AppServiceInvalidException extends YunhuniApiException {
     }
 
     @Override
-    public ApiExceptionEnum getApiExceptionEnum() {
-        return ApiExceptionEnum.AppServiceInvalid;
+    public ApiReturnCodeEnum getApiExceptionEnum() {
+        return ApiReturnCodeEnum.AppServiceInvalid;
     }
 
 }

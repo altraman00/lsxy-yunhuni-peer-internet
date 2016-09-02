@@ -1,4 +1,4 @@
-package com.lsxy.area.server.event.handler;
+package com.lsxy.area.server.event.handler.simplecallevent;
 
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
@@ -17,9 +17,9 @@ import org.springframework.stereotype.Component;
  * Created by liuws on 2016/8/29.
  */
 @Component
-public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
+public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_CALL_ON_TIMEOUT.class);
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_CALL_ON_FAIL.class);
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -32,7 +32,7 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_EXT_CALL_ON_TIMEOUT;
+        return Constants.EVENT_EXT_CALL_ON_FAIL;
     }
 
     @Override
