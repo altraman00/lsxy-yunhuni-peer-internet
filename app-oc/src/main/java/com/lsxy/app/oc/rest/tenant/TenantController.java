@@ -141,12 +141,27 @@ public class TenantController {
             end = DateUtils.getLastTimeOfDate(end);
         }
         Page<TenantVO> list = null;
+        Page<TenantVO> list2 = null;
         try {
             list = tenantService.pageListBySearch(name, begin, end, authStatus, accStatus, pageNo, pageSize);
         }catch (Exception e){
             logger.error("报错:{}",e);
         }
-        return RestResponse.success(list);
+        try{
+            //修改余额取值
+            List<TenantVO> temp = list.getResult();
+            List<TenantVO> list1 = new ArrayList();
+            for(int i=0;i<temp.size();i++){
+                TenantVO tenantVO = temp.get(i);
+                BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
+                tenantVO.setRemainCoin(bigDecimal.doubleValue());
+                list1.add(tenantVO);
+            }
+            list2 = new Page<>(list.getStartIndex(),list.getTotalCount(),list.getPageSize(),list1);
+        }catch (Exception e){
+            logger.error("转换出错{}",e);
+        }
+        return RestResponse.success(list2);
     }
 
     @ApiOperation(value = "租户状态禁用/启用")

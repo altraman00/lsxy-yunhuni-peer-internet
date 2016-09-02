@@ -278,16 +278,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         }
         pageQuery.setMaxResults(pageSize);
         pageQuery.setFirstResult(start);
-        //修改余额取值
-        List<TenantVO> temp = pageQuery.getResultList();
-        List<TenantVO> list = new ArrayList();
-        for(int i=0;i<temp.size();i++){
-            TenantVO tenantVO = temp.get(i);
-            BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
-            tenantVO.setRemainCoin(bigDecimal.doubleValue());
-            list.add(tenantVO);
-        }
-        return new Page<>(start,total,pageSize,list);
+        return new Page<>(start,total,pageSize,pageQuery.getResultList());
     }
     @Override
     public List<Tenant> pageListByUserName(String name) {
