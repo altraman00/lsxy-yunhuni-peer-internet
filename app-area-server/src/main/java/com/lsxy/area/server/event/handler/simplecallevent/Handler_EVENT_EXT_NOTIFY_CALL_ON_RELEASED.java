@@ -1,4 +1,4 @@
-package com.lsxy.area.server.event.handler;
+package com.lsxy.area.server.event.handler.simplecallevent;
 
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
@@ -15,15 +15,15 @@ import org.springframework.stereotype.Component;
  * Created by liups on 2016/8/31.
  */
 @Component
-public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED.class);
+public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED.class);
 
     @Autowired
     private BusinessStateService businessStateService;
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_EXT_DUO_CALLBACK_ON_RELEASED;
+        return Constants.EVENT_EXT_NOTIFY_CALL_ON_RELEASED;
     }
 
     @Override

@@ -13,26 +13,28 @@ public class BusinessState implements Serializable{
     private String type;
     private String userdata;
     private String resId;
+    private String callBackUrl;
     private Map<String,Object> businessData;
 
     public BusinessState() {
     }
 
-    public BusinessState(String tenantId, String appId, String id, String type, String userdata) {
-        this(tenantId,appId,id,type,userdata,null,null);
+    public BusinessState(String tenantId, String appId, String id, String type, String callBackUrl,String userdata) {
+        this(tenantId,appId,id,type,userdata,null,callBackUrl,null);
     }
 
     public BusinessState(String tenantId, String appId, String id, String type, String userdata, Map<String,Object> businessData) {
-        this(tenantId,appId,id,type,userdata,null,businessData);
+        this(tenantId,appId,id,type,userdata,null,null,businessData);
     }
 
-    public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, Map<String,Object> businessData) {
+    public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl,Map<String,Object> businessData) {
         this.tenantId = tenantId;
         this.appId = appId;
         this.id = id;
         this.type = type;
         this.userdata = userdata;
         this.resId = resId;
+        this.callBackUrl = callBackUrl;
         this.businessData = businessData;
     }
 
@@ -90,5 +92,13 @@ public class BusinessState implements Serializable{
 
     public void setBusinessData(Map<String, Object> businessData) {
         this.businessData = businessData;
+    }
+
+    public String getCallBackUrl() {
+        return callBackUrl;
+    }
+
+    public void setCallBackUrl(String callBackUrl) {
+        this.callBackUrl = callBackUrl;
     }
 }
