@@ -4,7 +4,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.IVRActionHandler;
+import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -42,7 +42,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
     private NotifyCallbackUtil notifyCallbackUtil;
 
     @Autowired
-    private IVRActionHandler ivrActionHandler;
+    private IVRActionUtil ivrActionUtil;
 
     @Override
     public String getEventName() {
@@ -106,7 +106,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     .put("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
-            ivrActionHandler.doAction(call_id);
+            ivrActionUtil.doAction(call_id);
         }
         return res;
     }

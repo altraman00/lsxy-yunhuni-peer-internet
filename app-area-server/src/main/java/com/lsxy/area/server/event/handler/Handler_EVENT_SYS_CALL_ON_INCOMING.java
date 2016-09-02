@@ -4,7 +4,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.IVRActionHandler;
+import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -47,7 +47,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     private TestNumBindService testNumBindService;
 
     @Autowired
-    private IVRActionHandler ivrActionHandler;
+    private IVRActionUtil ivrActionUtil;
 
     //TODO
     @Value("")
@@ -116,7 +116,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 .put("to",to)
                 .build());
         businessStateService.save(callstate);
-        ivrActionHandler.doActionIfAccept(call_id);
+        ivrActionUtil.doActionIfAccept(call_id);
         return res;
     }
 

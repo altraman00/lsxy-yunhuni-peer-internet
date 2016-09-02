@@ -68,7 +68,7 @@ public class NotifyCallbackUtil {
      * @return
      */
     public Response postNotify(String url, Object data){
-        return postNotify(url,data,30,0);
+        return postNotify(url,data,null,0);
     }
 
     /**
@@ -80,7 +80,7 @@ public class NotifyCallbackUtil {
      * @return
      */
     public Response postNotify(String url, Object data,int retry){
-        return postNotify(url,data,30,retry);
+        return postNotify(url,data,null,retry);
     }
 
     /**
@@ -91,7 +91,7 @@ public class NotifyCallbackUtil {
      * @param retry 重试次数
      * @return
      */
-    public Response postNotify(String url, Object data,int timeout,int retry){
+    public Response postNotify(String url, Object data,Integer timeout,int retry){
         Response res = new Response();
         boolean res_result = false;
         String res_data = null;
@@ -99,7 +99,12 @@ public class NotifyCallbackUtil {
         do{
             try{
                 HttpPost post = new HttpPost(url + EVENT_NOTIFY_URL);
-                post.setConfig(config);
+                RequestConfig c = this.config;
+                if(timeout != null){
+                    c = RequestConfig.custom().setSocketTimeout(timeout*1000)
+                            .setConnectTimeout(timeout*1000).build();
+                }
+                post.setConfig(c);
                 post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
                 se.setContentType(CONTENT_TYPE_TEXT_JSON);

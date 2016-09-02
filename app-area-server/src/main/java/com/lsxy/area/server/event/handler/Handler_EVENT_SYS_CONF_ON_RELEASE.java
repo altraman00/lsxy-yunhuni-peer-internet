@@ -77,7 +77,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("开始挂断会议与会方{}",member_ids);
             }
-            //TODO会议结束自动挂断与会方
+            //TODO 会议结束自动挂断与会方
         }
         if(StringUtils.isBlank(appId)){
             logger.info("没有找到对应的app信息appId={}",appId);

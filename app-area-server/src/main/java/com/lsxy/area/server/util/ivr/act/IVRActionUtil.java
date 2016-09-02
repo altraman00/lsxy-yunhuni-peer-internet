@@ -1,7 +1,10 @@
-package com.lsxy.area.server.util;
+package com.lsxy.area.server.util.ivr.act;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.util.ivr.act.domain.Action;
+import com.lsxy.area.server.util.ivr.act.handler.ActionHandler;
+import com.lsxy.area.server.util.ivr.act.parser.Parser;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
@@ -14,9 +17,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HTTP;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -27,13 +32,14 @@ import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by liuws on 2016/9/1.
  */
 @Component
-public class IVRActionHandler {
-    private static final Logger logger = LoggerFactory.getLogger(IVRActionHandler.class);
+public class IVRActionUtil {
+    private static final Logger logger = LoggerFactory.getLogger(IVRActionUtil.class);
 
     private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
@@ -43,7 +49,7 @@ public class IVRActionHandler {
     private static final String IFACCEPTURL = "/yunhuni/ivr/accept";
 
     //请求第一步的ivr指令
-    private static final String step1 = "/yunhuni/ivr/start";
+    private static final String STEP1 = "/yunhuni/ivr/start";
 
     private static final int RETRY_TIMES = 3;
 
@@ -59,9 +65,26 @@ public class IVRActionHandler {
     @Autowired
     private AppService appService;
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    private Map<String,ActionHandler> handlers = new HashMap<>();
+
     @PostConstruct
     public void init(){
+        initClient();
+    }
+    private void initClient(){
         client = HttpClientBuilder.create().build();
+    }
+    private void initHandler(){
+        Reflections reflections = new Reflections("com.lsxy.area.server.util.ivr");
+        Set<Class<? extends ActionHandler>> handlerClasss = reflections.getSubTypesOf(ActionHandler.class);
+        for (Class<? extends ActionHandler> handlerClass : handlerClasss) {
+            ActionHandler handler = applicationContext.getBean(handlerClass);
+            handlers.put(handler.getAction(),handler);
+            logger.info("注册IVR动作处理器:{},{}",handler.getAction(),handler);
+        }
     }
     @PreDestroy
     public void destroy(){
@@ -127,17 +150,17 @@ public class IVRActionHandler {
         App app = appService.findById(appId);
         String res = getRequest(app.getUrl()+IFACCEPTURL);
         if(!"accept".equals(res.toLowerCase())){
-            //发送拒接指令
+            //TODO 发送拒接指令
             return true;
         }
-        //发送接收指令
+        //TODO 发送接收指令
         return doAction(call_id);
     }
 
-    //TODO
     public boolean doAction(String call_id){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
+            logger.info("没有找到call_id={}的state",call_id);
             return false;
         }
         Map<String,Object> businessState = state.getBusinessData();
@@ -146,21 +169,25 @@ public class IVRActionHandler {
         }
         Object nextUrl = businessState.get("next");
 
-        if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){// is "" 代表没有next
+        // is "" 代表没有next，null代表第一次
+        if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
+            logger.info("没有后续ivr动作了，call_id={}",call_id);
             return  true;
         }
 
         if(nextUrl == null){//第一次
             String appId = state.getAppId();
             App app = appService.findById(appId);
-            nextUrl = app.getUrl() + step1;
+            nextUrl = app.getUrl() + STEP1;
         }
+
         String resXML = getRequest(nextUrl.toString());
-
-        return true;
-    }
-
-    private Object parseXMLAction(String resXML){
-        return null;
+        Action action = Parser.parse(resXML);
+        ActionHandler  h = handlers.get(action.getAction());
+        if(h == null){
+            logger.info("没有找到对应的ivr动作处理类");
+            return false;
+        }
+        return h.handle(call_id,action);
     }
 }
