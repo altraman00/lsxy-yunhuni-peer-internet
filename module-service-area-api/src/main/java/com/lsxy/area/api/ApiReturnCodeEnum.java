@@ -1,10 +1,11 @@
-package com.lsxy.area.api.exceptions;
+package com.lsxy.area.api;
 
 /**
  * Created by liuws on 2016/8/27.
  * 定义异常常量
  */
-public enum ApiExceptionEnum {
+public enum ApiReturnCodeEnum {
+    success("000000","请求成功"),
     AppServiceInvalid("101010","app没开通该服务"),
     BalanceNotEnough("101011","余额不足"),
     InvokeCall("101012","调用失败"),
@@ -12,17 +13,17 @@ public enum ApiExceptionEnum {
     NumberNotAllowToCall("101014","号码不允许呼叫"),
     ConfNotExists("101015","会议不存在");
 
-    private String errorCode;
-    private String errorMsg;
-    private ApiExceptionEnum(String code, String message){
-        this.errorCode = code;
-        this.errorMsg = message;
+    private String code;
+    private String msg;
+    private ApiReturnCodeEnum(String code, String message){
+        this.code = code;
+        this.msg = message;
     }
     public String getCode() {
-        return errorCode;
+        return code;
     }
 
     public String getMsg() {
-        return errorMsg;
+        return msg;
     }
 }
