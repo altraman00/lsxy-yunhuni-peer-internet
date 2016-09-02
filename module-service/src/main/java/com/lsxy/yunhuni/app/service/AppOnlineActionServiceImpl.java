@@ -11,10 +11,8 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
-import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.service.AreaService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
 import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
@@ -233,7 +231,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
         }
         //绑定应用与区域的关系
-        app.setArea(resourceTelenum.getLine().getArea());
+        //app.setArea(resourceTelenum.getLine().getArea());
     }
 
     /**

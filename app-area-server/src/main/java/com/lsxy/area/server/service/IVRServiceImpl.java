@@ -94,7 +94,11 @@ public class IVRServiceImpl implements IVRService {
         }
         //保存业务数据，后续事件要用到
         BusinessState callstate = new BusinessState(tenantId,app.getId(),callId,"ivr_call",null
-                ,new MapBuilder<String,Object>().build());
+                ,new MapBuilder<String,Object>()
+                .put("begin_time",System.currentTimeMillis())
+                .put("from",from)
+                .put("to",to)
+                .build());
         businessStateService.save(callstate);
         return callId;
     }
