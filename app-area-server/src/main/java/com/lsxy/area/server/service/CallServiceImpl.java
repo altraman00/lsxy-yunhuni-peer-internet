@@ -129,9 +129,11 @@ public class CallServiceImpl implements CallService {
         Map<String, Object> params = new HashMap<>();
         //TODO 增加区域参数
         params.put("from1_uri", dto.getFrom1()+"@"+ctiHost+":"+ctiPort);
-        params.put("to1_uri", dto.getTo1()+"@"+ctiHost+":"+ctiPort);
+//        params.put("to1_uri", dto.getTo1()+"@"+ctiHost+":"+ctiPort);
+        params.put("to1_uri", dto.getTo1()+"@"+"192.168.10.74:5060");
         params.put("from2_uri", dto.getFrom2()+"@"+ctiHost+":"+ctiPort);
-        params.put("to2_uri",dto.getTo2()+"@"+ctiHost+":"+ctiPort);
+//        params.put("to2_uri",dto.getTo2()+"@"+ctiHost+":"+ctiPort);
+        params.put("to2_uri",dto.getTo2()+"@"+"192.168.10.62:5060");
         params.put("max_connect_seconds",dto.getMax_call_duration());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("ring_play_file",dto.getRing_tone());
