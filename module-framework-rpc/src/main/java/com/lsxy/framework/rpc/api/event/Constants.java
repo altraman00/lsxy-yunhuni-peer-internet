@@ -30,4 +30,9 @@ public class Constants {
     public static final String EVENT_EXT_CALL_ON_FAIL = "EVENT_EXT_CALL_ON_FAIL";
     public static final String EVENT_EXT_CALL_ON_TIMEOUT = "EVENT_EXT_CALL_ON_TIMEOUT";
 
+    /**
+     * cdr
+     */
+    public static final String SYS_ON_CHAN_CLOSED = "sys.on_chan_closed";
+
 }
