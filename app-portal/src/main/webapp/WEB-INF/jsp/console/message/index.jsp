@@ -43,7 +43,14 @@
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
                                             <td <c:if test="${result.status==0}">class="bg"</c:if>><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                            <td>${result.message.title}</td>
+                                            <td>
+                                                <c:if test="${result.message.type==0 && result.message.title=='系统通知'}">
+                                                    ${result.message.content}
+                                                </c:if>
+                                                <c:if test="${!(result.message.type==0 && result.message.title=='系统通知')}">
+                                                    ${ result.message.title}
+                                                </c:if>
+                                            </td>
                                             <td><a href="${ctx}/console/message/account_message/detail?id=${result.id}">详情</a>
                                                 <a href="${ctx}/console/message/account_message/delete?id=${result.id}&pageNo=${ pageObj.currentPageNo}">删除</a></td>
                                         </tr>

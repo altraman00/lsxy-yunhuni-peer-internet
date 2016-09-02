@@ -26,7 +26,7 @@ import java.util.Random;
  *
  */
 
-@Profile({"local","development","test"})
+@Profile({"development","local"})
 @Component
 public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
 

@@ -48,8 +48,8 @@ public class AliOSSClientFactoryBean implements FactoryBean<OSSClient>,Initializ
         String endpoint = SystemConfig.getProperty("global.oss.aliyun.endpoint","http://oss-cn-beijing.aliyuncs.com");
 
         // accessKey请登录https://ak-console.aliyun.com/#/查看
-        String accessKeyId = SystemConfig.getProperty("global.oss.aliyun.key","nfgEUCKyOdVMVbqQ");
-        String accessKeySecret = SystemConfig.getProperty("global.oss.aliyun.secret","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW");
+        String accessKeyId = SystemConfig.getProperty("global.aliyun.key","nfgEUCKyOdVMVbqQ");
+        String accessKeySecret = SystemConfig.getProperty("global.aliyun.secret","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW");
         // 创建OSSClient实例
         ossClient =buildOSSClient(accessKeyId,accessKeySecret,endpoint);
         if (logger.isDebugEnabled()){
