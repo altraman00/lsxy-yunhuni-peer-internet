@@ -192,7 +192,7 @@
                                         <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                             <tr>
                                                 <td>
-                                                    <fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm"/>
+                                                    <fmt:formatDate value="${result.applyTime}" pattern="yyyy-MM-dd HH:mm"/>
                                                 </td>
                                                 <td><fmt:formatNumber value="${ result.amount}" pattern="#0.00" /> </td>
                                                 <td>
