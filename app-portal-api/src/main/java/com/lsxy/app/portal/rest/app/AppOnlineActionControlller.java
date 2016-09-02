@@ -65,13 +65,14 @@ public class AppOnlineActionControlller extends AbstractRestController {
         Tenant tenant = tenantService.findTenantByUserName(userName);
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
+            App app = appService.findById(appId);
             //获取用户拥有的空闲号
             String[] ownUnusedNum = resourcesRentService.findOwnUnusedNum(tenant);
             result.put("ownIvr",ownUnusedNum);
             //从号码池中选出5个空闲的号码放到Redis供用户选择(若Redis已有，则直接取Redis中的值)
             String temStr = redisCacheService.get(ALTERNATIVE_IVR_PREFIX + tenant.getId());
             if(StringUtils.isBlank(temStr)) {
-                temStr = getFreeNumber(5);
+                temStr = getFreeNumber(5,app.getArea().getId());
             }
             if(StringUtils.isNotBlank(temStr)){
                 redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
@@ -127,6 +128,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
             AppOnlineAction action = null;
+            App app = appService.findById(appId);
             try {
                 action = appOnlineActionService.actionOfOnline(userName,appId);
                 //将号码池中的号码清掉
@@ -138,7 +140,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
             } catch (TeleNumberBeOccupiedException e) {
                 //号码资源被占用，则清空redis缓存的号码，重新从号码池中取新的号码
                 e.printStackTrace();
-                String temStr = getFreeNumber(5);
+                String temStr = getFreeNumber(5,app.getArea().getId());
                 if(StringUtils.isNotBlank(temStr)){
                     redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
                 }
@@ -205,11 +207,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
      * @param n
      * @return
      */
-    private String getFreeNumber(Integer n){
+    private String getFreeNumber(Integer n,String areaId){
         String result = null;
         //--start
         //从号码池中选出5个空闲的号码
-        List<String> numbers = resourceTelenumService.getFreeTeleNum(5);
+        List<String> numbers = resourceTelenumService.getFreeTeleNum(5,areaId);
         //--end
         //生成字符串
         if(numbers != null && numbers.size()>0){

@@ -28,7 +28,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public List<String> getFreeTeleNum(int count){
+    public List<String> getFreeTeleNum(int count,String areaId){
+        //TODO 根据区域选择空闲的号码
         List<String> result = new ArrayList<>();
         List<ResourceTelenum> telenums = resourceTelenumDao.findFirst50ByStatus(ResourceTelenum.STATUS_FREE);
         if(telenums != null && telenums.size() > 0){
@@ -63,5 +64,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public void cleanExpireResourceTelnum(Date expireTime) {
         resourceTelenumDao.cleanExpireResourceTelnum(expireTime);
+    }
+
+    @Override
+    public String findOneFreeNumber() {
+        ResourceTelenum resourceTelenum = resourceTelenumDao.findFirstByStatus(ResourceTelenum.STATUS_FREE);
+        return resourceTelenum.getTelNumber();
     }
 }

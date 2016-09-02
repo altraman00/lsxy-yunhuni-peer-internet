@@ -62,4 +62,11 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     List<App> getAppsByTenantId(String tenantId);
+
+    /**
+     * 用于呼叫号码选择，有ivr号码则选择绑定的ivr号码，没有则随便给一个可以用的
+     * @param app
+     * @return
+     */
+    String findOneAvailableTelnumber(App app);
 }
