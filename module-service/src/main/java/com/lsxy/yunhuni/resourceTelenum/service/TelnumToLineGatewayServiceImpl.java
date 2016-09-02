@@ -40,7 +40,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
             throw new RuntimeException("数据异常，号码没有关联线路");
         }
         Random random = new Random();
-        Integer ranNum = random.nextInt(telnumToLineGateways.size() - 1);
+        Integer ranNum = random.nextInt(telnumToLineGateways.size());
         String lineId = telnumToLineGateways.get(ranNum).getLineId();
         LineGateway lineGateway = lineGatewayService.findById(lineId);
         return lineGateway.getAreaId();

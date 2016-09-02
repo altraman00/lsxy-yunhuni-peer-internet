@@ -9,7 +9,7 @@ import javax.persistence.Table;
  * Created by liups on 2016/9/2.
  */
 @Entity
-@Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_test_num_bind")
+@Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_yy_telnum_to_linegateway")
 public class TelnumToLineGateway extends IdEntity {
     private String telNumber;
     private String lineId;

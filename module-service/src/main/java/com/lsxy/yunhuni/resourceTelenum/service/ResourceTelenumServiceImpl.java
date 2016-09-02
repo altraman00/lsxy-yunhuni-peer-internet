@@ -43,7 +43,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 List<Integer> ranList = new ArrayList<>();
                 Random random = new Random();
                 for(int i = 0;i< count;i++){
-                    Integer ranNum = random.nextInt(size - 1);
+                    Integer ranNum = random.nextInt(size);
                     if(ranList.contains(ranNum)){
                         i--;
                     }else{

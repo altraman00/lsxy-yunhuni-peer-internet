@@ -71,8 +71,12 @@ public class AppOnlineActionControlller extends AbstractRestController {
             result.put("ownIvr",ownUnusedNum);
             //从号码池中选出5个空闲的号码放到Redis供用户选择(若Redis已有，则直接取Redis中的值)
             String temStr = redisCacheService.get(ALTERNATIVE_IVR_PREFIX + tenant.getId());
+            String areaId = null;
+            if(app.getArea() != null){
+                areaId = app.getArea().getId();
+            }
             if(StringUtils.isBlank(temStr)) {
-                temStr = getFreeNumber(5,app.getArea().getId());
+                temStr = getFreeNumber(5,areaId);
             }
             if(StringUtils.isNotBlank(temStr)){
                 redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
@@ -140,7 +144,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
             } catch (TeleNumberBeOccupiedException e) {
                 //号码资源被占用，则清空redis缓存的号码，重新从号码池中取新的号码
                 e.printStackTrace();
-                String temStr = getFreeNumber(5,app.getArea().getId());
+                String areaId = null;
+                if(app.getArea() != null){
+                    areaId = app.getArea().getId();
+                }
+                String temStr = getFreeNumber(5,areaId);
                 if(StringUtils.isNotBlank(temStr)){
                     redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
                 }
@@ -211,7 +219,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
         String result = null;
         //--start
         //从号码池中选出5个空闲的号码
-        List<String> numbers = resourceTelenumService.getFreeTeleNum(5,areaId);
+        List<String> numbers = resourceTelenumService.getFreeTeleNum(n,areaId);
         //--end
         //生成字符串
         if(numbers != null && numbers.size()>0){
