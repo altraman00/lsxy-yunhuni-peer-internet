@@ -2,7 +2,7 @@ package com.lsxy.area.api;
 
 /**
  * Created by liuws on 2016/8/27.
- * 定义异常常量
+ * 定义返回值常量（成功或各种异常）
  */
 public enum ApiReturnCodeEnum {
     Success("000000","请求成功"),
