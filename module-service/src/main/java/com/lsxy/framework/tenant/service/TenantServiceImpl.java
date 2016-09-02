@@ -51,7 +51,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     @Autowired
     private RedisCacheService cacheManager;
-
+    @Autowired
     private CalBillingService calBillingService;
 
     @Override
