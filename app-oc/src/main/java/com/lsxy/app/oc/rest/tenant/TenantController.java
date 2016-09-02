@@ -33,6 +33,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +56,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/tenant")
 public class TenantController {
-
+    public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Autowired
     private TenantService tenantService;
 
@@ -138,7 +140,12 @@ public class TenantController {
         if(end!=null){
             end = DateUtils.getLastTimeOfDate(end);
         }
-        Page<TenantVO> list = tenantService.pageListBySearch(name,begin,end,authStatus,accStatus,pageNo,pageSize);
+        Page<TenantVO> list = null;
+        try {
+            list = tenantService.pageListBySearch(name, begin, end, authStatus, accStatus, pageNo, pageSize);
+        }catch (Exception e){
+            logger.error("报错:{}",e);
+        }
         return RestResponse.success(list);
     }
 
