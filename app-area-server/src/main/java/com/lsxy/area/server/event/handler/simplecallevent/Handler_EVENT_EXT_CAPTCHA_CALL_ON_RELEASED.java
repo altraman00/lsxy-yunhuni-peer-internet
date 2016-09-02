@@ -74,9 +74,9 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
                 .put("answer",paramMap.get("answer_time"))
                 .put("end_time",paramMap.get("end_time"))
                 .put("keys",paramMap.get("keys"))
-                .put("duration",paramMap.get("keys"))
+                .put("duration",paramMap.get("answer_time"))
                 .put("hangup_by",paramMap.get("dropped_by"))
-                .put("reason",paramMap.get("dropped_by"))
+                .put("reason",paramMap.get("reason"))
                 .put("error",paramMap.get("error"))
                 .put("user_data",user_data)
                 .build();
