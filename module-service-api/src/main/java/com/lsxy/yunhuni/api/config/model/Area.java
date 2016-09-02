@@ -20,7 +20,7 @@ public class Area extends IdEntity {
     private Integer status;
     private String remark;
 
-    private boolean enabled;
+    private Boolean enabled;
 
     @Column(name = "name")
     public String getName() {
@@ -59,11 +59,11 @@ public class Area extends IdEntity {
     }
 
     @Column(name = "enabled")
-    public boolean isEnabled() {
+    public Boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 }

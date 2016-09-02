@@ -25,7 +25,7 @@ public interface InvoiceApplyService extends BaseService<InvoiceApply> {
      * @param pageSize 每一页的数量
      * @return
      */
-    Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize);
+    Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize,Integer operate);
 
     /**
      * 插入新的发票申请

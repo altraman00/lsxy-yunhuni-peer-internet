@@ -157,8 +157,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     @Override
     public int countAuthTenantWeek() {
         Date today = new Date();
-        Date d1 = DateUtils.setStartDay(DateUtils.getFirstDayOfWeek(today));
-        Date d2 = DateUtils.setEndDay(DateUtils.getLastDayOfWeek(today));
+        Date d1 = DateUtils.getFirstDayOfWeek(today);
+        Date d2 = DateUtils.getLastDayOfWeek(today);
         return countAuthTenantDateBetween(d1,d2);
     }
 
@@ -180,7 +180,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     public int countConsumeTenantDateBetween(Date d1,Date d2){
         String countSQL = "SELECT count(tenant_id) as c FROM " +
-                "(SELECT tenant_id FROM tb_base_consume_day WHERE deleted=0 AND tenant_id IS NOT NULL AND dt between :d1 and :d2 GROUP BY tenant_id) a";
+                "(SELECT tenant_id FROM tb_base_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL AND dt between :d1 and :d2 GROUP BY tenant_id) a";
         Query queryCount = em.createNativeQuery(countSQL);
         queryCount.setParameter("d1", d1);
         queryCount.setParameter("d2", d2);
@@ -215,11 +215,11 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                                            Integer authStatus, Integer accStatus, int pageNo, int pageSize) {
         String sql =" FROM db_lsxy_base.tb_base_tenant t" +
                 " LEFT JOIN (SELECT b.tenant_id,b.`status` FROM db_lsxy_base.tb_base_account b GROUP BY b.tenant_id) a ON t.id = a.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app where deleted <> 1 GROUP BY tenant_id) app ON t.id = app.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app where deleted = 0 GROUP BY tenant_id) app ON t.id = app.tenant_id" +
                 " LEFT JOIN db_lsxy_bi_yunhuni.tb_bi_billing billing ON t.id = billing.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum(among_amount) as sum_amount FROM db_lsxy_base.tb_base_consume_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL GROUP BY tenant_id) consume ON t.id = consume.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,sum(among_call) as sum_call,sum(among_duration) as sum_duration  FROM db_lsxy_base.tb_base_voice_cdr_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL ORDER BY tenant_id) cdr ON t.id = cdr.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,sum(among_call) as sum_call,sum(among_duration) as sum_duration  FROM db_lsxy_base.tb_base_voice_cdr_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL GROUP BY tenant_id) cdr ON t.id = cdr.tenant_id" +
                 " WHERE 1=1";
         sql += " AND (a.`status` IN ("+Account.STATUS_NORMAL+","+Account.STATUS_LOCK+"))";
         if(StringUtil.isNotEmpty(name)){

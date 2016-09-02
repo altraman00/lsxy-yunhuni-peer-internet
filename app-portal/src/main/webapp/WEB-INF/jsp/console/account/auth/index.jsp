@@ -102,7 +102,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">持证照片：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="file" id="file"  name="file"  placeholder="" class="form-control input-form limitImageFile"   />
+                                                    <input type="file" id="file"  name="file"  placeholder="" class="form-control-file input-form limitImageFile"   />
                                                     <p class="tips">证件图片大小2m以内，图片格式要求是jpg、jpeg、gif、png、bmp </p>
                                                     <div class="row">
                                                         <div class="">
@@ -175,7 +175,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <input type="file" placeholder="" name="file" class="form-control-file input-form limitImageFile"   />
                                                         <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
@@ -198,7 +198,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"   />
+                                                        <input type="file" placeholder="" name="file" class="form-control-file input-form limitImageFile"   />
                                                         <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
@@ -214,7 +214,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">税务登记证：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"/>
+                                                        <input type="file" placeholder="" name="file" class="form-control-file input-form limitImageFile"/>
                                                         <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>
@@ -228,7 +228,7 @@
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">营业执照：</lable>
                                                     <div class="col-md-4">
-                                                        <input type="file" placeholder="" name="file" class="form-control input-form limitImageFile"/>
+                                                        <input type="file" placeholder="" name="file" class="form-control-file input-form limitImageFile"/>
                                                         <p class="tips">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。</p>
                                                     </div>
                                                 </div>

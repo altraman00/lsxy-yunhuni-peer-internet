@@ -77,7 +77,7 @@ public class InvoiceApplyController extends AbstractRestController {
     @RequestMapping("/page")
     public RestResponse page(Integer pageNo,Integer pageSize){
         Tenant tenant = tenantService.findTenantByUserName(this.getCurrentAccountUserName());
-        Page<InvoiceApply> page = invoiceApplyService.getPage(tenant.getId(),pageNo,pageSize);
+        Page<InvoiceApply> page = invoiceApplyService.getPage(tenant.getId(),pageNo,pageSize,InvoiceApply.OPERATE_DONE);
         return RestResponse.success(page);
     }
 
@@ -118,10 +118,16 @@ public class InvoiceApplyController extends AbstractRestController {
                 throw new RuntimeException("数据异常");
             }
             try {
+                //异常处理操作完成
+                oldApply.setOperate(InvoiceApply.OPERATE_DONE);
+                result = invoiceApplyService.save(oldApply);
+                //生成新纪录
                 EntityUtils.copyProperties(oldApply,apply);
                 oldApply.setStatus(InvoiceApply.STATUS_SUBMIT);
                 oldApply.setApplyTime(new Date());
                 oldApply.setRemark(null);
+                oldApply.setId(null);
+                oldApply.setOperate(null);
                 result = invoiceApplyService.save(oldApply);
             } catch (Exception e) {
                 throw new RuntimeException("数据异常",e);

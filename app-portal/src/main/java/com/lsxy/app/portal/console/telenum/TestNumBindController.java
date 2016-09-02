@@ -28,6 +28,7 @@ import java.util.Map;
 public class TestNumBindController extends AbstractPortalController{
     private static final Logger logger = LoggerFactory.getLogger(TestNumBindController.class);
     private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
+    private static final String testCallNumber = SystemConfig.getProperty("portal.test.call.number");
     private static final String RESULT_SUCESS = "2";//处理结果-成功
     private static final String RESULT_FIAL = "-2";//处理结果-失败
     private static final String IS_TRUE = "1";//表示成功
@@ -42,6 +43,7 @@ public class TestNumBindController extends AbstractPortalController{
         ModelAndView mav = new ModelAndView();
         RestResponse<List<TestNumBind>> restResponse = list(request);
         List<TestNumBind> testNumBindList = restResponse.getData();
+        mav.addObject("testCallNumber",testCallNumber);
         mav.addObject("testNumBindList",testNumBindList);
         mav.setViewName("/console/telenum/bind/index");
         return mav;
