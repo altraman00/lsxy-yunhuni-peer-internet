@@ -31,7 +31,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     public RPCResponse handle(RPCRequest request, Session session) {
         logger.info("正在处理{}",getEventName());
         Object cdr = request.getParamMap().get("args");
-        System.out.println(cdr);
+        if(logger.isDebugEnabled()){
+            logger.info("开始处理CDR数据：{}",cdr);
+        }
         return null;
     }
 }
