@@ -2,9 +2,7 @@ package com.lsxy.area.server.util.ivr.act;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.server.util.ivr.act.domain.Action;
 import com.lsxy.area.server.util.ivr.act.handler.ActionHandler;
-import com.lsxy.area.server.util.ivr.act.parser.Parser;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
@@ -17,6 +15,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.HTTP;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,11 +164,11 @@ public class IVRActionUtil {
             logger.info("没有找到call_id={}的state",call_id);
             return false;
         }
-        Map<String,Object> businessState = state.getBusinessData();
-        if(businessState == null){
-            businessState = new HashMap<>();
+        Map<String,Object> businessDate = state.getBusinessData();
+        if(businessDate == null){
+            businessDate = new HashMap<>();
         }
-        Object nextUrl = businessState.get("next");
+        Object nextUrl = businessDate.get("next");
 
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
@@ -182,12 +183,20 @@ public class IVRActionUtil {
         }
 
         String resXML = getRequest(nextUrl.toString());
-        Action action = Parser.parse(resXML);
-        ActionHandler  h = handlers.get(action.getAction());
-        if(h == null){
-            logger.info("没有找到对应的ivr动作处理类");
-            return false;
+
+        ActionHandler  h = null;
+        Element ele = null;
+        try {
+            Document doc = DocumentHelper.parseText(resXML);
+            ele = doc.getRootElement();
+            h = handlers.get(ele.getName());
+            if(h == null){
+                logger.info("没有找到对应的ivr动作处理类");
+                return false;
+            }
+        } catch (Throwable e) {
+            logger.error("处理ivr动作指令出错",e);
         }
-        return h.handle(call_id,action);
+        return h.handle(call_id,ele);
     }
 }

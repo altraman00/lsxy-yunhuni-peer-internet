@@ -1,6 +1,6 @@
 package com.lsxy.area.server.util.ivr.act.handler;
 
-import com.lsxy.area.server.util.ivr.act.domain.Action;
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +16,6 @@ public abstract class ActionHandler {
      */
     public abstract String getAction();
 
-    public abstract boolean handle(String callId,Action act);
+    public abstract boolean handle(String callId,Element root);
 
 }
