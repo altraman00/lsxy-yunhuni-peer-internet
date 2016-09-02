@@ -8,6 +8,11 @@ import java.math.BigDecimal;
 /**
  * 线路网关
  * Created by liups on 2016/8/24.
+ * 运营商
+ * 品质
+ * 透传
+ * 权值
+ * 容量 并发
  */
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_line_gateway")
