@@ -16,7 +16,6 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -29,12 +28,6 @@ import java.util.Map;
 public class Handler_MN_CH_SYS_CALL_ANSWER extends RpcRequestHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_SYS_CALL_ANSWER.class);
-
-    @Value("${area.agent.client.cti.sip.host}")
-    private String ctiHost;
-
-    @Value("${area.agent.client.cti.sip.port}")
-    private int ctiPort;
 
     @Autowired
     private CTIClientContext cticlientContext;

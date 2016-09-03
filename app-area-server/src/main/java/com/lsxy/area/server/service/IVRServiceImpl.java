@@ -14,7 +14,9 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,9 @@ public class IVRServiceImpl implements IVRService {
     @Autowired
     private BusinessStateService businessStateService;
 
+    @Autowired
+    private LineGatewayService lineGatewayService;
+
 
     @Override
     public String ivrCall(String ip, String appId, String from, String to,
@@ -78,11 +83,15 @@ public class IVRServiceImpl implements IVRService {
         }
 
         String callId = UUIDGenerator.uuid();
+        //TODO
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("to",to)
-                .put("from",from)
-                .put("maxAnswerSec",maxCallDuration)
-                .put("maxRingSec",maxDialDuration)
+                .put("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .put("from_uri",oneTelnumber)
+                .put("max_answer_seconds",maxCallDuration)
+                .put("max_ring_seconds",maxDialDuration)
                 .put("user_data",callId)
                 .build();
 
