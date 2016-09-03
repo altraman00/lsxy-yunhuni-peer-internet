@@ -42,8 +42,8 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse call(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "1.语音呼叫2.双向回拨3.会议服务4.IVR定制服务5.语音验证码6.录音服务")
-            @RequestParam Integer type,
+            @ApiParam(name = "type",value = "voice_call.语音呼叫,duo_call.双向回拨,conf_call.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务")
+            @RequestParam String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
             @ApiParam(name = "appId",value = "应用id")
@@ -53,15 +53,15 @@ public class BillDetailController extends AbstractRestController {
     ){
         Map re = new HashMap();
         RestResponse restResponse = null;
-        if(StringUtil.isNotEmpty(appId)&&type!=0){
+        if(StringUtil.isNotEmpty(appId)&&StringUtil.isNotEmpty(type)){
             //获取分页数据
             Page page = voiceCdrService.pageList(pageNo,pageSize,type,uid,time,appId);
             re.put("page",page);
-            if(CallSession.TYPE_VOICE_VOICECODE == type){//语音验证码
+            if(CallSession.TYPE_VOICE_VOICECODE.equals(type)){//语音验证码
                 re.put("total",page.getTotalCount());
             }else{
                 Map map = voiceCdrService.sumCost(type,uid,time,appId);
-                if(CallSession.TYPE_VOICE_RECORDING == type) {//录音
+                if(CallSession.TYPE_VOICE_RECORDING.equals(type)) {//录音
                     re.put("size",map.get("size"));
                     re.put("total",map.get("money"));
                 }else{
