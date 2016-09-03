@@ -12,7 +12,10 @@ import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.billing.dao.BillingDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -21,6 +24,7 @@ import java.util.Date;
 
 import static com.lsxy.yunhuni.api.billing.service.CalBillingService.AMOUNT_REDIS_MULTIPLE;
 import static com.lsxy.yunhuni.api.billing.service.CalBillingService.USE_BALANCE_PREFIX;
+import static javafx.scene.input.KeyCode.T;
 
 /**
  * Created by liups on 2016/6/28.
@@ -61,4 +65,18 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
         }
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true),
+                    @CacheEvict(value = "billing", key = "'billing_' + #entity.tenant.id", beforeInvocation = true)
+            },
+            put = {
+                    @CachePut(value = "entity", key = "'entity_' + #entity.id",unless = "#entity == null"),
+                    @CachePut(value = "billing", key = "'billing_' + #entity.tenant.id",unless = "#entity == null"),
+            }
+    )
+    @Override
+    public Billing save(Billing entity) {
+        return getDao().save(entity);
+    }
 }
