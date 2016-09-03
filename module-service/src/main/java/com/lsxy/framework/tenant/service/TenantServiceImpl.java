@@ -173,7 +173,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     @Override
     public int countConsumeTenant() {
         String countSQL = "SELECT count(tenant_id) as c FROM " +
-                "(SELECT tenant_id FROM tb_base_consume_day WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id) a";
+                "(SELECT tenant_id FROM tb_base_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id) a";
         Query queryCount = em.createNativeQuery(countSQL);
         return ((BigInteger) queryCount.getSingleResult()).intValue();
     }
