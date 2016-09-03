@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.framework.api.consume.model.Consume;
 import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
@@ -571,8 +572,15 @@ public class TenantController {
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
-        dto.setConsumes(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
-        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+        Page<Consume> page = consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize);
+        dto.setConsumes(page);
+        List<Consume> list  = page.getResult();
+        BigDecimal sum  = new BigDecimal("0.00");
+        for(int i=0;i<list.size();i++){
+            sum  = sum.add(list.get(i).getAmount());
+        }
+       // dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+        dto.setSumAmount(sum);
         return RestResponse.success(dto);
     }
 
