@@ -162,7 +162,6 @@ public class IVRActionUtil {
             return true;
         }
         answer(state.getResId(),call_id);
-        //在应答调用成功的事件中调用doAction(call_id)
         return true;
     }
 

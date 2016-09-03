@@ -51,8 +51,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
-        String conf_id = (String)request.getParamMap().get("user_data");
-        String res_id = (String)request.getParamMap().get("res_id");
+        Map<String,Object> params = request.getParamMap();
+        String conf_id = (String)params.get("user_data");
+        String res_id = (String)params.get("res_id");
         if(StringUtils.isBlank(conf_id)){
             logger.info("conf_id is null");
             return res;

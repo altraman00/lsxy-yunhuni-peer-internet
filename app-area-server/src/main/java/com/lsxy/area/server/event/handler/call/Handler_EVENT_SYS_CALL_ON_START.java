@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * Created by liuws on 2016/8/29.
  */
@@ -48,8 +50,9 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
-        String call_id = (String)request.getParamMap().get("user_data");
-        String res_id = (String)request.getParamMap().get("res_id");
+        Map<String,Object> params = request.getParamMap();
+        String call_id = (String)params.get("user_data");
+        String res_id = (String)params.get("res_id");
         if(StringUtils.isBlank(call_id)){
             logger.info("call_id is null");
             return res;

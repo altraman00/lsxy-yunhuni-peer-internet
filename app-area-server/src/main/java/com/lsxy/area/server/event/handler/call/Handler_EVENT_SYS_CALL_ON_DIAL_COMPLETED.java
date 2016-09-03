@@ -61,9 +61,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
-        String call_id = (String)request.getParamMap().get("user_data");
+        Map<String,Object> params = request.getParamMap();
+        String call_id = (String)params.get("user_data");
         //错误信息。如果拨号失败，该参数记录错误信息。如果拨号成功的被接听，该参数的值是 null。
-        String error = (String)request.getParamMap().get("error");
+        String error = (String)params.get("error");
         if(StringUtils.isNotBlank(error)){
             logger.error(error);
             return res;
@@ -101,8 +102,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .put("event","ivr.dial_end")
                     .put("id",call_id)
-                    .put("begin_time",request.getParamMap().get("begin_time"))
-                    .put("end_time",request.getParamMap().get("end_time"))
+                    .put("begin_time",params.get("begin_time"))
+                    .put("end_time",params.get("end_time"))
                     .put("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
@@ -113,8 +114,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .put("event","ivr.dial_end")
                     .put("id",call_id)
-                    .put("begin_time",request.getParamMap().get("begin_time"))
-                    .put("end_time",request.getParamMap().get("end_time"))
+                    .put("begin_time",params.get("begin_time"))
+                    .put("end_time",params.get("end_time"))
                     .put("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);

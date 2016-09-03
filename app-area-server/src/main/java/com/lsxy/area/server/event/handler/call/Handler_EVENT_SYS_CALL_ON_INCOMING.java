@@ -4,8 +4,8 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * Created by liuws on 2016/8/29.
@@ -76,11 +78,12 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         }
         RPCResponse res = null;
         //TODO incoming事件 cti需要生成一个user_data给我
-        String call_id = (String)request.getParamMap().get("user_data");
-        String res_id = (String)request.getParamMap().get("res_id");
-        String from_uri = (String)request.getParamMap().get("from_uri");//主叫sip地址
-        String to_uri = (String)request.getParamMap().get("to_uri");//被叫号码sip地址
-        String begin_time = (String)request.getParamMap().get("begin_time");
+        Map<String,Object> params = request.getParamMap();
+        String call_id = (String)params.get("user_data");
+        String res_id = (String)params.get("res_id");
+        String from_uri = (String)params.get("from_uri");//主叫sip地址
+        String to_uri = (String)params.get("to_uri");//被叫号码sip地址
+        String begin_time = (String)params.get("begin_time");
         String from = from_uri.substring(0,from_uri.indexOf("@"));//主叫号码
         String to = to_uri.substring(0,to_uri.indexOf("@"));//被叫号码
 
