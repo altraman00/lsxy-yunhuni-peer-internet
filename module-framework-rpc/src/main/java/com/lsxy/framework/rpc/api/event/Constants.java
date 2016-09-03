@@ -25,5 +25,17 @@ public class Constants {
 
     /**简单Api相关**/
     public static final String EVENT_EXT_DUO_CALLBACK_SUCCESS = "EVENT_EXT_DUO_CALLBACK_SUCCESS";
+    public static final String EVENT_EXT_DUO_CALLBACK_ON_RELEASED = "ext.duo_callback.on_released";
+    public static final String EVENT_EXT_NOTIFY_CALL_SUCCESS = "EVENT_EXT_NOTIFY_CALL_SUCCESS";
+    public static final String EVENT_EXT_NOTIFY_CALL_ON_RELEASED = "ext.notify_call.on_released";
+    public static final String EVENT_EXT_CAPTCHA_CALL_SUCCESS = "EVENT_EXT_CAPTCHA_CALL_SUCCESS";
+    public static final String EVENT_EXT_CAPTCHA_CALL_ON_RELEASED = "ext.captcha_call.on_released";
+    public static final String EVENT_EXT_CALL_ON_FAIL = "EVENT_EXT_CALL_ON_FAIL";
+    public static final String EVENT_EXT_CALL_ON_TIMEOUT = "EVENT_EXT_CALL_ON_TIMEOUT";
+
+    /**
+     * cdr
+     */
+    public static final String SYS_ON_CHAN_CLOSED = "sys.on_chan_closed";
 
 }

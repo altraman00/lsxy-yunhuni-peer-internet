@@ -2,12 +2,13 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
+import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
+import com.lsxy.area.api.CaptchaCallDTO;
 import com.lsxy.area.api.DuoCallbackDTO;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.NotifyCallDTO;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.slf4j.Logger;
@@ -49,11 +50,11 @@ public class CallController extends AbstractAPIController{
 //     * @return
 //     */
 //    @RequestMapping("/{accountId}/calltest")
-//    public RestResponse test(@PathVariable String accountId){
-//        return RestResponse.success(accountId);
+//    public ApiGatewayResponse test(@PathVariable String accountId){
+//        return ApiGatewayResponse.Success(accountId);
 //    }
 //@RequestMapping("/{accountId}/call")
-//public DeferredResult<RestResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
+//public DeferredResult<ApiGatewayResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
 
     /**
      *  语音呼叫API
@@ -64,7 +65,7 @@ public class CallController extends AbstractAPIController{
      * @return
      */
     @RequestMapping("/{certId}/call")
-    public RestResponse<String> doCall(@PathVariable String certId, HttpServletResponse response, HttpServletRequest request,String to,String from,int maxAnswerSec,int maxRingSec) throws YunhuniApiException {
+    public ApiGatewayResponse<String> doCall(@PathVariable String certId, HttpServletResponse response, HttpServletRequest request, String to, String from, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             WebUtils.logRequestParams(request);
         }
@@ -72,17 +73,17 @@ public class CallController extends AbstractAPIController{
         if(sc!=null)sc.getSendGWRequestCount().incrementAndGet();
 
         String callid = callService.call(from,to,maxAnswerSec,maxRingSec);
-        return RestResponse.success(callid);
+        return ApiGatewayResponse.success(callid);
 
     }
 
     @RequestMapping("/{accountId}/call/{callId}")
-    public RestResponse getCall(@PathVariable String accountId,@PathVariable String callId){
-        return RestResponse.success(callId);
+    public ApiGatewayResponse getCall(@PathVariable String accountId,@PathVariable String callId){
+        return ApiGatewayResponse.success(callId);
     }
 
     @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
-    public RestResponse duoCallback(HttpServletRequest request, @RequestBody DuoCallbackDTO duoCallbackDTO, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody DuoCallbackDTO duoCallbackDTO, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
@@ -92,11 +93,11 @@ public class CallController extends AbstractAPIController{
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         result.put("user_data", duoCallbackDTO.getUser_data());
-        return RestResponse.success(result);
+        return ApiGatewayResponse.success(result);
     }
 
     @RequestMapping(value = "/{account_id}/call/notify_call",method = RequestMethod.POST)
-    public RestResponse duoCallback(HttpServletRequest request, @RequestBody NotifyCallDTO notifyCallDTO, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody NotifyCallDTO notifyCallDTO, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
@@ -104,24 +105,36 @@ public class CallController extends AbstractAPIController{
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         result.put("user_data", notifyCallDTO.getUser_data());
-        return RestResponse.success(result);
+        return ApiGatewayResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{account_id}/call/captcha_call",method = RequestMethod.POST)
+    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody CaptchaCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+        String callId = null;
+        callId = callService.captchaCall(ip,appId, dto);
+        Map<String,String> result = new HashMap<>();
+        result.put("callId",callId);
+        result.put("user_data", dto.getUser_data());
+        return ApiGatewayResponse.success(result);
     }
 
 //
 //
 //        @RequestMapping("/async/test")
 //        @ResponseBody
-//        public Callable<RestResponse> callable(HttpServletResponse response) {
+//        public Callable<ApiGatewayResponse> callable(HttpServletResponse response) {
 //            if(logger.isDebugEnabled()){
 //                logger.debug("111111111");
 //            }
 //            // 这么做的好处避免web server的连接池被长期占用而引起性能问题，
 //            // 调用后生成一个非web的服务线程来处理，增加web服务器的吞吐量。
-//            return new Callable<RestResponse>() {
+//            return new Callable<ApiGatewayResponse>() {
 //                @Override
-//                public RestResponse call() throws Exception {
+//                public ApiGatewayResponse call() throws Exception {
 //
-//                    return RestResponse.success("中文2");
+//                    return ApiGatewayResponse.Success("中文2");
 //                }
 //            };
 //        }
@@ -131,7 +144,7 @@ public class CallController extends AbstractAPIController{
 //        RestRequest restRequest = RestRequest.buildRequest();
 //        Map<String,Object> hashMap =  new HashedMap();
 //        hashMap.put("res_id","5566778");
-//        RestResponse<String> response = restRequest.post("http://www.yunhuni.cn:3000/incoming",hashMap);
+//        ApiGatewayResponse<String> response = restRequest.post("http://www.yunhuni.cn:3000/incoming",hashMap);
 //        System.out.println(response.getData());
 //    }
 }

@@ -28,7 +28,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public List<String> getFreeTeleNum(int count){
+    public List<String> getFreeTeleNum(int count,String areaId){
+        //TODO 根据区域选择空闲的号码
         List<String> result = new ArrayList<>();
         List<ResourceTelenum> telenums = resourceTelenumDao.findFirst50ByStatus(ResourceTelenum.STATUS_FREE);
         if(telenums != null && telenums.size() > 0){
@@ -42,7 +43,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 List<Integer> ranList = new ArrayList<>();
                 Random random = new Random();
                 for(int i = 0;i< count;i++){
-                    Integer ranNum = random.nextInt(size - 1);
+                    Integer ranNum = random.nextInt(size);
                     if(ranList.contains(ranNum)){
                         i--;
                     }else{
@@ -63,5 +64,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public void cleanExpireResourceTelnum(Date expireTime) {
         resourceTelenumDao.cleanExpireResourceTelnum(expireTime);
+    }
+
+    @Override
+    public String findOneFreeNumber() {
+        ResourceTelenum resourceTelenum = resourceTelenumDao.findFirstByStatus(ResourceTelenum.STATUS_FREE);
+        return resourceTelenum.getTelNumber();
     }
 }
