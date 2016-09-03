@@ -22,6 +22,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.app.dao.AppOnlineActionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Autowired
     ResourcesRentService resourcesRentService;
+
+    @Autowired
+    TelnumToLineGatewayService telnumToLineGatewayService;
 
     @Autowired
     AreaService areaService;
@@ -196,6 +200,17 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     AppOnlineAction newAction = new AppOnlineAction(null,null,null,
                             app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
                     this.save(newAction);
+
+                    //TODO 绑定应用与区域的关系
+                    Area oldArea = app.getArea();
+                    String areaId = telnumToLineGatewayService.getAreaIdByTelnum(action.getTelNumber());
+                    if(oldArea != null && !oldArea.getId().equals(areaId)){
+                        throw new RuntimeException("所选号码区域与应用原来区域不一样，请重新选择号码，或联系客服");
+                    }else{
+                        Area area = new Area();
+                        area.setId(areaId);
+                        app.setArea(area);
+                    }
                     //应用状态改为上线
                     app.setStatus(App.STATUS_ONLINE);
                     appService.save(app);
@@ -232,8 +247,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             //如果ivr号码被占用，则抛出异常
             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
         }
-        //TODO 绑定应用与区域的关系
-//        app.setArea(resourceTelenum.getLine().getArea());
+
     }
 
     /**
@@ -320,7 +334,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 //应用状态改为上线
                 app.setStatus(App.STATUS_ONLINE);
                 //应用绑定区域
-                app.setArea(areaService.getOneAvailableArea());
+                if(app.getArea() == null){
+                    app.setArea(areaService.getOneAvailableArea());
+                }
                 appService.save(app);
                 return newAction;
             }else if(app.getStatus() == App.STATUS_ONLINE ){

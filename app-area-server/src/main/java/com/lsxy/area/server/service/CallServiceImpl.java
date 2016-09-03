@@ -1,7 +1,6 @@
 package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.area.api.*;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
@@ -14,7 +13,10 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -58,6 +60,9 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     BusinessStateService businessStateService;
+
+    @Autowired
+    LineGatewayService lineGatewayService;
 
     @Value("${area.agent.client.cti.sip.host}")
     private String ctiHost;
@@ -124,14 +129,17 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-
         //TODO 获取线路IP和端口
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
         Map<String, Object> params = new HashMap<>();
         //TODO 增加区域参数
+        Area area = app.getArea();
         params.put("from1_uri", dto.getFrom1());
-        params.put("to1_uri",dto.getTo1()+"@"+ctiHost+":"+ctiPort);
+        params.put("to1_uri",dto.getTo1()+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
         params.put("from2_uri", dto.getFrom2());
-        params.put("to2_uri",dto.getTo2()+"@"+ctiHost+":"+ctiPort);
+        params.put("to2_uri",dto.getTo2()+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
         params.put("max_connect_seconds",dto.getMax_call_duration());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("ring_play_file",dto.getRing_tone());

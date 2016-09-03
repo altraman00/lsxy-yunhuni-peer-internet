@@ -816,7 +816,7 @@
             var data =[];
             for(var j=0;j<response.data.result.length;j++){
                 var tempFile = response.data.result[j];
-                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark];
+                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:''];
                 data[j]=temp;
             }
             var html ='';
@@ -824,7 +824,7 @@
             for(var i = 0 ; i<data.length; i++){
                 html +='<tr class="playtr" id="play-'+data[i][0]+'"><td class="voice-format">'+data[i][1]+'</td>';
                 if(data[i][2]==-1){
-                    html+='<td class="nosuccess">审核不通过</td>';
+                    html+='<td class="nosuccess" title="审核不通过原因：'+data[i][5]+'">审核不通过<i class="fa fa-exclamation-triangle"></i></td>';
                 }else if(data[i][2]==1){
                     html+='<td class="success">已审核</td>';
                 }else{
