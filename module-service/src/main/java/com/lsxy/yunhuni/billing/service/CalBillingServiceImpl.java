@@ -1,5 +1,7 @@
 package com.lsxy.yunhuni.billing.service;
 
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.billing.model.Billing;
@@ -22,7 +24,8 @@ public class CalBillingServiceImpl implements CalBillingService{
     BillingService billingService;
     @Autowired
     private RedisCacheService redisCacheService;
-
+    @Autowired
+    TenantService tenantService;
 
     /*
         余额
@@ -54,7 +57,7 @@ public class CalBillingServiceImpl implements CalBillingService{
     }
 
     /**
-     * 获取余额（昨日结算+昨日充值-昨日消费）
+     * 获取余额（结算+充值-消费）
      * @param tenantId
      * @param date
      * @param sumBalance
@@ -67,7 +70,7 @@ public class CalBillingServiceImpl implements CalBillingService{
     }
 
     /**
-     * 获取余额（前日结算+前日充值-前日消费+昨日充值-昨日消费）
+     * 获取余额（结算+充值-消费+前一天充值-前一天消费）
      * @param tenantId
      * @param date
      * @param sumBalance
@@ -461,5 +464,13 @@ public class CalBillingServiceImpl implements CalBillingService{
         billing.setVoiceRemain(this.getVoice(tenantId));
         //TODO 从redis 中取出剩余空间
         return billing;
+    }
+
+    @Override
+    public void calBilling(Date date) {
+        Iterable<Tenant> list = tenantService.list();
+        for(Tenant tenant:list){
+            Billing billing = billingService.findBillingByTenantId(tenant.getId());
+        }
     }
 }

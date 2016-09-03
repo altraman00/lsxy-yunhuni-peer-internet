@@ -120,4 +120,9 @@ public interface CalBillingService {
      */
     Billing getCalBilling(String tenantId);
 
+    /**
+     * 每日统计账务余额
+     * @param date 统计日期
+     */
+    void calBilling(Date date);
 }
