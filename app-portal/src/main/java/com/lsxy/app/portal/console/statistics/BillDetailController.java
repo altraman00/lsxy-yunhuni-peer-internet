@@ -153,7 +153,7 @@ public class BillDetailController extends AbstractPortalController {
      * @param appId 应用id
      * @return
      */
-    private RestResponse sum(HttpServletRequest request,Integer type,String time,String appId){
+    private RestResponse sum(HttpServletRequest request,String type,String time,String appId){
         String token = getSecurityToken(request);
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/sum?type={1}&time={2}&appId={3}";
         return RestRequest.buildSecurityRequest(token).get(uri, Map.class,type,time,appId);
@@ -168,7 +168,7 @@ public class BillDetailController extends AbstractPortalController {
      * @param appId 应用
      * @return
      */
-    private RestResponse getPageList(HttpServletRequest request,Integer pageNo,Integer pageSize,Integer type,String time,String appId){
+    private RestResponse getPageList(HttpServletRequest request,Integer pageNo,Integer pageSize,String type,String time,String appId){
         String token = getSecurityToken(request);
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/plist?pageNo={1}&pageSize={2}&type={3}&time={4}&appId={5}";
         return RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class,pageNo,pageSize,type,time,appId);
