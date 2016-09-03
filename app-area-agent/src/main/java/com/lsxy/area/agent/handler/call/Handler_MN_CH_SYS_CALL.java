@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,21 +50,13 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
         }
         RPCResponse response = RPCResponse.buildResponse(request);
 
-        String to = (String) request.getParameter("to");
-        Integer maxAnswerSec = (Integer) request.getParameter("maxAnswerSec");
-        Integer maxRingSec = (Integer) request.getParameter("maxRingSec");
-
-        assert  to != null;
-        assert maxAnswerSec != null;
-        assert maxRingSec!=null;
-
         Client cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
         }
         try {
-            Map<String, Object> params = new HashMap<>();
+            Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
 
             cticlient.createResource(0, 0, "sys.call", params, new RpcResultListener(){
