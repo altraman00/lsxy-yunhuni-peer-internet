@@ -1,5 +1,6 @@
 package com.lsxy.app.backend.task;
 
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,11 +14,13 @@ import java.util.Date;
  */
 @Component
 public class CalbillingTask {
+
     @Autowired
     CalBillingService calBillingService;
     @Scheduled(cron="0 0 2 * * ?")
     public void calBilling(){
-        calBillingService.calBilling(new Date());
+        Date preDate = DateUtils.getPreDate(new Date());
+        calBillingService.calBilling(preDate);
     }
 
 }

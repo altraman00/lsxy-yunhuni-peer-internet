@@ -468,9 +468,31 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public void calBilling(Date date) {
+        String yyyyMMdd = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(yyyyMMdd,"yyyyMMdd");
         Iterable<Tenant> list = tenantService.list();
         for(Tenant tenant:list){
-            Billing billing = billingService.findBillingByTenantId(tenant.getId());
+            String tenantId = tenant.getId();
+            Billing billing = billingService.findBillingByTenantId(tenantId);
+            Date balanceDate = billing.getBalanceDate();
+            if(balanceDate.getTime() < date.getTime()){
+                //TODO 统计余额
+                BigDecimal balance = this.getBalanceByPreDateSum(tenantId, date, billing.getBalance());
+                billing.setBalance(balance);
+                //TODO 统计语音呼叫
+                Long voice = this.getVoiceByPreDateSum(tenantId, date, billing.getVoiceRemain());
+                billing.setVoiceRemain(voice);
+                //TODO 统计会议
+                Long conference = this.getConferenceByPreDateSum(tenantId, date, billing.getConferenceRemain());
+                billing.setConferenceRemain(conference);
+                //TODO 统计短信
+                Long sms = this.getSmsByPreDateSum(tenantId, date, billing.getSmsRemain());
+                billing.setSmsRemain(sms);
+                //更新结算时间
+                billing.setBalanceDate(date);
+                billingService.save(billing);
+            }
         }
     }
+
 }
