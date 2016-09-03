@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by liuws on 2016/9/2.
  */
 @Component
-public class PlayActionHandler extends ActionHandler{
+public class SendtmfActionHandler extends ActionHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -31,7 +31,7 @@ public class PlayActionHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return "play";
+        return "send_dtmf";
     }
 
     @Override
@@ -39,17 +39,14 @@ public class PlayActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
-        String finish_keys = root.attributeValue("finish_keys");
-        String repeat = root.attributeValue("repeat");
-        String play = root.getTextTrim();
+        String dtmf_code = root.getTextTrim();
         String nextUrl = "";
         Element next = root.element("next");
         if(next!=null){
             nextUrl = next.getTextTrim();
         }
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
-                            getAction(),finish_keys,repeat,play);
+            logger.debug("开始处理ivr[{}]动作，dtmf_code={}",getAction(),dtmf_code);
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
@@ -60,12 +57,11 @@ public class PlayActionHandler extends ActionHandler{
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
-                .put("content",play)
-                .put("finish_keys",finish_keys)
+                .put("keys",dtmf_code)
                 .put("user_data",callId)
                 .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_SEND_DTMF_START, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {

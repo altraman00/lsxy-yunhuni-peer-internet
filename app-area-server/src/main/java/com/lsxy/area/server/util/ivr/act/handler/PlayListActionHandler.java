@@ -10,7 +10,9 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import java.util.List;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ import java.util.Map;
  * Created by liuws on 2016/9/2.
  */
 @Component
-public class PlayActionHandler extends ActionHandler{
+public class PlayListActionHandler extends ActionHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -31,7 +33,7 @@ public class PlayActionHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return "play";
+        return "playlist";
     }
 
     @Override
@@ -41,15 +43,19 @@ public class PlayActionHandler extends ActionHandler{
         }
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
-        String play = root.getTextTrim();
+        List<String> plays = new ArrayList<String>();
+        List<Element> peles = root.elements("play");
         String nextUrl = "";
         Element next = root.element("next");
         if(next!=null){
             nextUrl = next.getTextTrim();
         }
+        for (Element pele: peles) {
+            plays.add(pele.getTextTrim());
+        }
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
-                            getAction(),finish_keys,repeat,play);
+            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},plays={}",
+                            getAction(),finish_keys,repeat,plays);
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
@@ -60,12 +66,12 @@ public class PlayActionHandler extends ActionHandler{
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
-                .put("content",play)
+                .put("content",plays)
                 .put("finish_keys",finish_keys)
                 .put("user_data",callId)
                 .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAYLIST_START, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {

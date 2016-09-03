@@ -42,10 +42,6 @@ import java.util.Set;
 public class IVRActionUtil {
     private static final Logger logger = LoggerFactory.getLogger(IVRActionUtil.class);
 
-    private static final String APPLICATION_JSON = "application/json;charset=utf-8";
-
-    private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
-
     //询问是否接听的url
     private static final String IFACCEPTURL = "/yunhuni/ivr/accept";
 

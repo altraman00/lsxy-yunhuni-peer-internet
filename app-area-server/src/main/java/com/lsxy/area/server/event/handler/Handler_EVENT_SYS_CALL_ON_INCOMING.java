@@ -14,7 +14,9 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -47,6 +49,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     private TestNumBindService testNumBindService;
 
     @Autowired
+    private ResourcesRentService resourcesRentService;
+
+    @Autowired
     private IVRActionUtil ivrActionUtil;
 
     //TODO
@@ -76,8 +81,8 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String from_uri = (String)request.getParamMap().get("from_uri");//主叫sip地址
         String to_uri = (String)request.getParamMap().get("to_uri");//被叫号码sip地址
         String begin_time = (String)request.getParamMap().get("begin_time");
-        String from = null;//主叫号码
-        String to = null;//被叫号码
+        String from = from_uri.substring(0,from_uri.indexOf("@"));//主叫号码
+        String to = to_uri.substring(0,to_uri.indexOf("@"));//被叫号码
 
         if(StringUtils.isBlank(call_id)){
             logger.info("call_id is null");
@@ -97,7 +102,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             app = testNumBind.getApp();
         }else{
             //不是公共测试号，从号码资源池中查出被叫号码的应用
-
+            ResourcesRent rent = resourcesRentService.findByResourceTelenumIdAndStatus(to, ResourcesRent.RENT_STATUS_USING);
+            tenant = rent.getTenant();
+            app = rent.getApp();
         }
 
         if(tenant == null){
