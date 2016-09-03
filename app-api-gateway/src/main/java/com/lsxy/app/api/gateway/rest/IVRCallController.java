@@ -17,6 +17,7 @@ import java.util.Map;
 /**
  * Created by liuws on 2016/9/1.
  */
+@RestController
 public class IVRCallController extends AbstractAPIController{
 
     private static final Logger logger = LoggerFactory.getLogger(IVRCallController.class);
