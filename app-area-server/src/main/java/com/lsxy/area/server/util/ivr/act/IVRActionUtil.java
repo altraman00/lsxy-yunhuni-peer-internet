@@ -3,6 +3,11 @@ package com.lsxy.area.server.util.ivr.act;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.util.ivr.act.handler.ActionHandler;
+import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
@@ -64,6 +69,12 @@ public class IVRActionUtil {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -147,13 +158,42 @@ public class IVRActionUtil {
         App app = appService.findById(appId);
         String res = getRequest(app.getUrl()+IFACCEPTURL);
         if(!"accept".equals(res.toLowerCase())){
-            //TODO 发送拒接指令
+            reject(state.getResId(),call_id);
             return true;
         }
-        //TODO 发送接收指令
-        return doAction(call_id);
+        answer(state.getResId(),call_id);
+        //在应答调用成功的事件中调用doAction(call_id)
+        return true;
     }
 
+    private void reject(String res_id,String call_id){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .put("res_id",res_id)
+                .put("user_data",call_id)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_REJECT,params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
+
+    }
+
+    private void answer(String res_id,String call_id){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .put("res_id",res_id)
+                //TODO 这个时间如何定
+                .put("max_answer_seconds",3600*24)
+                .put("user_data",call_id)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
+    }
     public boolean doAction(String call_id){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
