@@ -29,12 +29,13 @@ public class SMSClientSY implements SMSClient {
     public boolean sendsms(String to, String msg) {
         try {
             SendmsgDocument.Sendmsg sendmsg =  (SendmsgDocument.Sendmsg)getTestObject(SendmsgDocument.Sendmsg.class);;
-            SendmsgDocument sendmsg42 = (SendmsgDocument) getTestObject(SendmsgDocument.class);;
+            SendmsgDocument sendmsg42 = (SendmsgDocument) getTestObject(SendmsgDocument.class);
             sendmsg.setUser(userName);
             sendmsg.setPasswd(password);
             sendmsg.setMsg(msg);
             sendmsg.setPhone(to);
             sendmsg42.setSendmsg(sendmsg);
+            stub.sendmsg(sendmsg42);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
