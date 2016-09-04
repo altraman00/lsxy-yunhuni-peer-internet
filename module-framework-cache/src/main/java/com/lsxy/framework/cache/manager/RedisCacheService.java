@@ -7,6 +7,7 @@ import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
@@ -29,7 +30,9 @@ public class RedisCacheService {
 //    public static final long DEFAULT_TIME_OUT = 3000;
 
 	private final static Log logger = LogFactory.getLog(RedisCacheService.class);
-    @Autowired
+
+//    @Autowired
+	@Qualifier("redisTemplate")
     private RedisTemplate redisTemplate;
     
 	 private static String redisCode = "utf-8"; 

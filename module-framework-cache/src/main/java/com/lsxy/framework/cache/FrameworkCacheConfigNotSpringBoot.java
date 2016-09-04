@@ -1,6 +1,7 @@
 package com.lsxy.framework.cache;
 
 import com.lsxy.framework.config.SystemConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.DependsOn;
@@ -17,6 +18,7 @@ public class FrameworkCacheConfigNotSpringBoot {
     private JedisConnectionFactory jedisConnectionFactory;
 
     @Bean(name="jedisConnectionFactory")
+    @ConditionalOnMissingBean
     public JedisConnectionFactory getJedisConnectionFactory(){
         jedisConnectionFactory = new JedisConnectionFactory();
         jedisConnectionFactory.setPassword(SystemConfig.getProperty("spring.redis.password",""));
