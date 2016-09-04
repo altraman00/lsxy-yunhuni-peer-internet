@@ -55,7 +55,7 @@ public class FrameworkCacheConfig extends CachingConfigurerSupport {
 
 
 
-    @Bean
+    @Bean(name="lsxyRedisTemplate")
     public RedisTemplate<String, String> redisTemplate(
             RedisConnectionFactory factory) {
         final RedisTemplate template = new RedisTemplate();
