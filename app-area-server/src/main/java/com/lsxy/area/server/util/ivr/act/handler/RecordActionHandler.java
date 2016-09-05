@@ -59,11 +59,11 @@ public class RecordActionHandler extends ActionHandler{
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("res_id",res_id)
-                .put("max_seconds",max_duration)
-                .put("beep",beeping)
-                .put("finish_keys",finish_keys)
-                .put("user_data",callId)
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("max_seconds",max_duration)
+                .putIfNotEmpty("beep",beeping)
+                .putIfNotEmpty("finish_keys",finish_keys)
+                .putIfNotEmpty("user_data",callId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECORD_START, params);

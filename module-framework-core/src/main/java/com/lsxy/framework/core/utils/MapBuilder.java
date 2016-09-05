@@ -22,6 +22,22 @@ public class MapBuilder<K,V> {
         map.put(k,v);
         return this;
     }
+
+    public MapBuilder<K,V> put(K k,V v,V defaultValue){
+        if(v == null){
+            v = defaultValue;
+        }
+        map.put(k,v);
+        return this;
+    }
+
+    public MapBuilder<K,V> putIfNotEmpty(K k,V v){
+        if(v != null && !v.toString().trim().equals("")){
+            put(k,v);
+        }
+        return this;
+    }
+
     public Map<K,V> build(){
         return map;
     }

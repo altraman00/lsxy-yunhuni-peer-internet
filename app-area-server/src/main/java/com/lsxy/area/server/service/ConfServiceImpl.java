@@ -81,10 +81,10 @@ public class ConfServiceImpl implements ConfService {
         }
         String confId = UUIDGenerator.uuid();
         Map<String, Object> map = new MapBuilder<String,Object>()
-                                .put("user_data",confId)
-                                .put("max_seconds",maxDuration)
-                                .put("bg_file",bgmFile)
-                                .put("release_threshold",0).build();
+                                .putIfNotEmpty("user_data",confId)
+                                .putIfNotEmpty("max_seconds",maxDuration)
+                                .putIfNotEmpty("bg_file",bgmFile)
+                                .putIfNotEmpty("release_threshold",0).build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -128,8 +128,8 @@ public class ConfServiceImpl implements ConfService {
             throw new ConfNotExistsException();
         }
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("res_id",state.getResId())
-                .put("user_data",confId)
+                .putIfNotEmpty("res_id",state.getResId())
+                .putIfNotEmpty("user_data",confId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
@@ -183,11 +183,11 @@ public class ConfServiceImpl implements ConfService {
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
-                .put("from_uri",oneTelnumber)
-                .put("max_answer_seconds",maxDuration)
-                .put("max_ring_seconds",maxDialDuration)
-                .put("user_data",callId)
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("max_answer_seconds",maxDuration)
+                .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                .putIfNotEmpty("user_data",callId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -256,9 +256,9 @@ public class ConfServiceImpl implements ConfService {
             throw new IllegalArgumentException();
         }
         Map<String,Object> params = new MapBuilder<String,Object>()
-                .put("res_id",call_state.getResId())
-                .put("conf_res_id",conf_state.getResId())
-                .put("user_data",callId)
+                .putIfNotEmpty("res_id",call_state.getResId())
+                .putIfNotEmpty("conf_res_id",conf_state.getResId())
+                .putIfNotEmpty("user_data",callId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
@@ -290,9 +290,9 @@ public class ConfServiceImpl implements ConfService {
         }
 
         Map<String,Object> params = new MapBuilder<String,Object>()
-                .put("res_id",conf_state.getResId())
-                .put("file",StringUtils.join(playFiles,"|"))
-                .put("user_data",confId)
+                .putIfNotEmpty("res_id",conf_state.getResId())
+                .putIfNotEmpty("file",StringUtils.join(playFiles,"|"))
+                .putIfNotEmpty("user_data",confId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
@@ -324,8 +324,8 @@ public class ConfServiceImpl implements ConfService {
         }
 
         Map<String,Object> params = new MapBuilder<String,Object>()
-                .put("res_id",conf_state.getResId())
-                .put("user_data",confId)
+                .putIfNotEmpty("res_id",conf_state.getResId())
+                .putIfNotEmpty("user_data",confId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
@@ -357,10 +357,10 @@ public class ConfServiceImpl implements ConfService {
         }
 
         Map<String,Object> params = new MapBuilder<String,Object>()
-                .put("res_id",conf_state.getResId())
-                .put("max_seconds",maxDuration)
-                .put("record_file",UUIDGenerator.uuid())
-                .put("user_data",confId)
+                .putIfNotEmpty("res_id",conf_state.getResId())
+                .putIfNotEmpty("max_seconds",maxDuration)
+                .putIfNotEmpty("record_file",UUIDGenerator.uuid())
+                .putIfNotEmpty("user_data",confId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
@@ -430,10 +430,10 @@ public class ConfServiceImpl implements ConfService {
             throw new IllegalArgumentException();
         }
         Map<String,Object> params = new MapBuilder<String,Object>()
-                .put("res_id",conf_state.getResId())
-                .put("call_res_id",call_state.getResId())
-                .put("mode",voiceMode)
-                .put("user_data",callId)
+                .putIfNotEmpty("res_id",conf_state.getResId())
+                .putIfNotEmpty("call_res_id",call_state.getResId())
+                .putIfNotEmpty("mode",voiceMode)
+                .putIfNotEmpty("user_data",callId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
@@ -484,13 +484,13 @@ public class ConfServiceImpl implements ConfService {
             }
         }
         Map<String, Object> params = new MapBuilder<String,Object>()
-                                    .put("res_id",call_state.getResId())
-                                    .put("conf_res_id",conf_state.getResId())
-                                    .put("max_seconds",max_seconds)
-                                    .put("voice_mode",voice_mode)
-                                    .put("volume",volume)
-                                    .put("play_file",play_file)
-                                    .put("user_data",call_id)
+                                    .putIfNotEmpty("res_id",call_state.getResId())
+                                    .putIfNotEmpty("conf_res_id",conf_state.getResId())
+                                    .putIfNotEmpty("max_seconds",max_seconds)
+                                    .putIfNotEmpty("voice_mode",voice_mode)
+                                    .putIfNotEmpty("volume",volume)
+                                    .putIfNotEmpty("play_file",play_file)
+                                    .putIfNotEmpty("user_data",call_id)
                                     .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
         try {

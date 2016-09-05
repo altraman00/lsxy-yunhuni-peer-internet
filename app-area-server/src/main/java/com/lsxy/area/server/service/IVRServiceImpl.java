@@ -88,11 +88,11 @@ public class IVRServiceImpl implements IVRService {
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
-                .put("from_uri",oneTelnumber)
-                .put("max_answer_seconds",maxCallDuration)
-                .put("max_ring_seconds",maxDialDuration)
-                .put("user_data",callId)
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("max_answer_seconds",maxCallDuration)
+                .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                .putIfNotEmpty("user_data",callId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);

@@ -67,16 +67,16 @@ public class ReceivedtmfActionHandler extends ActionHandler{
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("res_id",res_id)
-                .put("valid_keys",valid_keys)
-                .put("max_keys",max_keys)
-                .put("finish_keys",finish_keys)
-                .put("first_key_timeout",first_key_timeout)
-                .put("continues_keys_timeout",continues_keys_timeout)
-                .put("play_content",plays)
-                .put("play_repeat",play_repeat)
-                .put("breaking_on_key",if_break_on_key)
-                .put("user_data",callId)
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("valid_keys",valid_keys)
+                .putIfNotEmpty("max_keys",max_keys)
+                .putIfNotEmpty("finish_keys",finish_keys)
+                .putIfNotEmpty("first_key_timeout",first_key_timeout)
+                .putIfNotEmpty("continues_keys_timeout",continues_keys_timeout)
+                .putIfNotEmpty("play_content",plays)
+                .putIfNotEmpty("play_repeat",play_repeat)
+                .putIfNotEmpty("breaking_on_key",if_break_on_key)
+                .putIfNotEmpty("user_data",callId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, params);

@@ -62,10 +62,10 @@ public class PlayActionHandler extends ActionHandler{
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("res_id",res_id)
-                .put("content",plays)
-                .put("finish_keys",finish_keys)
-                .put("user_data",callId)
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("content",plays)
+                .putIfNotEmpty("finish_keys",finish_keys)
+                .putIfNotEmpty("user_data",callId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);

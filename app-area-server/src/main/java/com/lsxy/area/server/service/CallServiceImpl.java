@@ -6,6 +6,7 @@ import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -243,12 +244,12 @@ public class CallServiceImpl implements CallService {
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
-        params.put("from_uri",oneTelnumber);
-        params.put("max_ring_seconds",dto.getMax_dial_duration());
-        params.put("valid_keys",dto.getVerify_code());
-        params.put("user_data",callId);
+        Map<String, Object> params = new MapBuilder<String, Object>()
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("max_ring_seconds",dto.getMax_dial_duration())
+                .putIfNotEmpty("valid_keys",dto.getVerify_code())
+                .putIfNotEmpty("user_data",callId).build();
         if(dto.getFiles() != null && dto.getFiles().size()>0){
             params.put("play_content",new Object[]{new Object[]{7,StringUtils.join(dto.getFiles(),"|"),""}});
         }
