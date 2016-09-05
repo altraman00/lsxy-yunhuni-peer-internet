@@ -5,6 +5,7 @@ import com.lsxy.app.area.cti.commander.RpcError;
 import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -14,6 +15,7 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +61,11 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
 
         Map<String, Object> params = request.getParamMap();
         String call_id = (String)params.get("user_data");
+        String play_content = (String)params.get("play_content");
         try {
+            if(StringUtils.isNotEmpty(play_content)){
+                params.put("play_content", JSONUtil2.fromJson(play_content,(new Object[1][]).getClass()));
+            }
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建语音验证码资源，参数为{}", JSONUtil.objectToJson(params));
             }
