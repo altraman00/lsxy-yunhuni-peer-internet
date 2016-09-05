@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.message;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
@@ -108,6 +109,9 @@ public class MessageController extends AbstractRestController {
             if(old!=message1.getStatus()&&message1.getStatus()==Message.ONLINE){
                 sendMessage(message1);
             }
+            if(message1.getStatus()==Message.OFFLINE){
+                accountMessageService.modifyMessageStatus(message1.getId(), AccountMessage.DELETE);
+            }
         }catch (Exception e){
             restResponse = RestResponse.failed("0","上传内容不符合要求");
         }
@@ -159,6 +163,7 @@ public class MessageController extends AbstractRestController {
     ) throws InvocationTargetException, IllegalAccessException {
         Message message = messageService.findById(id);
         messageService.delete(message);
+        accountMessageService.modifyMessageStatus(message.getId(), AccountMessage.DELETE);
         return RestResponse.success(message);
     }
     /**

@@ -15,7 +15,6 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.core.utils.VelocityUtils;
 import com.lsxy.framework.message.dao.AccountMessageDao;
-import com.lsxy.yunhuni.api.config.model.GlobalConfig;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +149,12 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
     public void modifyMessageStatus(String accountId, Integer status,Date endTime) {
         String sql = " update db_lsxy_base.tb_base_account_message set status='"+status+"' where account_id='"+accountId+"' and deleted='0' and status<>'-1' and last_time<=?";
         jdbcTemplate.update(sql,endTime);
+    }
+
+    @Override
+    public void modifyMessageStatus(String messageId, Integer status) {
+        String sql = " update db_lsxy_base.tb_base_account_message set status='"+status+"' where message_id='"+messageId+"' ";
+        jdbcTemplate.update(sql);
     }
 
     @Override
