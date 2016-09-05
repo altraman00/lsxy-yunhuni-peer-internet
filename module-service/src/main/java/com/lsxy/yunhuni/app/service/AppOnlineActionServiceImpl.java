@@ -260,11 +260,11 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     private void pay(String appId, BigDecimal amount, Tenant tenant) {
         //TODO 支付
         Date curTime = new Date();
-        //Redis中消费增加
-        calBillingService.incConsume(tenant.getId(),curTime,amount);
         //插入消费记录
         Consume consume = new Consume(curTime,Consume.RENT_NUMBER,amount,"号码租用",appId,tenant);
         consumeService.save(consume);
+        //Redis中消费增加
+        calBillingService.incConsume(tenant.getId(),curTime,amount);
     }
 
     /**
