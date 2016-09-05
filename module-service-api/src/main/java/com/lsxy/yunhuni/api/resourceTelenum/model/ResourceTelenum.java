@@ -19,7 +19,7 @@ public class ResourceTelenum extends IdEntity{
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
     private Tenant tenant;//所属租户
-    private LineGateway line;  //所属线路
+//    private LineGateway line;  //所属线路
     private String operator; //运营商
     private String provider;    //供应商
     private String remark;      //备注
@@ -49,16 +49,6 @@ public class ResourceTelenum extends IdEntity{
 
     public void setTelNumber(String telNumber) {
         this.telNumber = telNumber;
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "line_id")
-    public LineGateway getLine() {
-        return line;
-    }
-
-    public void setLine(LineGateway line) {
-        this.line = line;
     }
 
     @Column(name = "operator")

@@ -1,5 +1,7 @@
 package com.lsxy.area.api.exceptions;
 
+import com.lsxy.area.api.ApiReturnCodeEnum;
+
 /**
  * Created by liups on 2016/8/26.
  */
@@ -12,7 +14,7 @@ public abstract class YunhuniApiException extends Exception{
         super();
     }
 
-    public abstract ApiExceptionEnum getApiExceptionEnum();
+    public abstract ApiReturnCodeEnum getApiExceptionEnum();
 
     public final String getCode(){
         return getApiExceptionEnum().getCode();

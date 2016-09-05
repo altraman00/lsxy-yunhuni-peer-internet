@@ -1,9 +1,8 @@
 package com.lsxy.framework.rpc.api;
 
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.core.utils.UUIDGenerator;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.*;
 import com.lsxy.framework.rpc.queue.FixQueue;
 import org.slf4j.Logger;
@@ -55,8 +54,6 @@ public class RPCCaller {
 	public void putResponse(RPCResponse response){
 		logger.debug("putResponse:收到响应【"+response.getSessionid()+"】");
 		responseMap.put(response.getSessionid(), response);
-		logger.debug("responseMap size:"+responseMap.size());
-		logger.debug("this is :"+this);
 	}
 
 	/**
@@ -117,7 +114,7 @@ public class RPCCaller {
 	 */
 	public void invoke(SessionContext sessionContext, RPCRequest request) throws RightSessionNotFoundExcepiton, SessionWriteException {
 		try{
-			Session session = sessionContext.getRightSession();
+			Session session = sessionContext.getRightSession(request);
 			//如果session为空
 			if(session == null) {
 				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}", request);
@@ -142,7 +139,7 @@ public class RPCCaller {
 	 */
 	public void invoke(SessionContext sessionContext, RPCRequest request, RequestListener rqListener) throws RightSessionNotFoundExcepiton, SessionWriteException {
 		try {
-			Session session = sessionContext.getRightSession();
+			Session session = sessionContext.getRightSession(request);
 			//如果session为空
 			if(session == null){
 				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}",request);

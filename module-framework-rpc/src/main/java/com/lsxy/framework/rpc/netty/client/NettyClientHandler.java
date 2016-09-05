@@ -2,9 +2,7 @@ package com.lsxy.framework.rpc.netty.client;
 
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.client.AbstractClientRPCHandler;
-import com.lsxy.framework.rpc.api.client.AbstractClientServiceHandler;
-import com.lsxy.framework.rpc.api.client.ClientSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.netty.NettyCondition;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,7 +10,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;

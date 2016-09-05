@@ -1,21 +1,17 @@
 package com.lsxy.area.server;
 
+import com.lsxy.framework.rpc.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
-import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.handler.HandlerManager;
-import com.lsxy.framework.rpc.api.server.AbstractServiceHandler;
-import com.lsxy.framework.rpc.api.server.ServerSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.service.AreaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 /**
  * Created by tandy on 16/8/8.
@@ -33,7 +29,7 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
     private AreaService areaService;
 
     @Autowired
-    private ServerSessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @Autowired
     private HandlerManager handlerManager;

@@ -2,12 +2,10 @@ package com.lsxy.app.api.gateway.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.Serializable;
-
 /**
  * Created by liuws on 2016/8/24.
  */
-public class ConfCreateInputDTO implements Serializable{
+public class ConfCreateInputDTO extends CommonDTO{
 
     @JsonProperty("max_duration")
     private Integer maxDuration;// 呼叫最大接通时间（秒）
@@ -23,9 +21,6 @@ public class ConfCreateInputDTO implements Serializable{
 
     @JsonProperty("bgm_file")
     private String bgmFile;// 背景音文件
-
-    @JsonProperty("callback_url")
-    private String callbackUrl;// 事件通知地址
 
     @JsonProperty("user_data")
     private String userData;// 用户数据
@@ -70,14 +65,6 @@ public class ConfCreateInputDTO implements Serializable{
 
     public void setBgmFile(String bgmFile) {
         this.bgmFile = bgmFile;
-    }
-
-    public String getCallbackUrl() {
-        return callbackUrl;
-    }
-
-    public void setCallbackUrl(String callbackUrl) {
-        this.callbackUrl = callbackUrl;
     }
 
     public String getUserData() {

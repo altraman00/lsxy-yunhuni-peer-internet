@@ -1,26 +1,16 @@
 package com.lsxy.framework.rpc.netty.client;
 
-import com.lsxy.framework.rpc.api.RPCHandler;
-import com.lsxy.framework.rpc.api.SessionContext;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
-import com.lsxy.framework.rpc.api.client.Client;
-import com.lsxy.framework.rpc.api.client.ClientSessionContext;
-import com.lsxy.framework.rpc.api.server.ServerSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
-import com.lsxy.framework.rpc.netty.NettyCondition;
 import com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder;
 import com.lsxy.framework.rpc.netty.codec.RPCMessageEncoder;
-import com.lsxy.framework.rpc.netty.demo004.HelloClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
@@ -28,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -87,9 +76,7 @@ public class NettyClient extends AbstractClient{
             TimeUnit.SECONDS.sleep(2);
 
             if(f.isSuccess() && f.channel().isActive()){
-                if(logger.isDebugEnabled()){
-                    logger.debug("客户端连接成功,准备发送注册客户端命令");
-                }
+                logger.info("客户端连接成功,准备发送注册客户端命令");
                 session = new NettyClientSession(f.channel(),handler,serverUrl);
                 f.channel().attr(SESSION_ID).set(session.getId());
                 this.doConnect(session);

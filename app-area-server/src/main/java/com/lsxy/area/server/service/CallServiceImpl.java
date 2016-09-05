@@ -1,34 +1,33 @@
 package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lsxy.area.api.CallCacheVO;
-import com.lsxy.area.api.CallService;
-import com.lsxy.area.api.DuoCallbackVO;
-import com.lsxy.area.api.NotifyCallVO;
+import com.lsxy.area.api.*;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
-import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
+import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.server.ServerSessionContext;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -50,7 +49,7 @@ public class CallServiceImpl implements CallService {
     private RPCCaller rpcCaller;
 
     @Autowired
-    private ServerSessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @Autowired
     private ApiGwRedBlankNumService apiGwRedBlankNumService;
@@ -59,10 +58,19 @@ public class CallServiceImpl implements CallService {
     private AppService appService;
 
     @Autowired
-    private BillingService billingService;
+    private CalCostService calCostService;
 
     @Autowired
-    RedisCacheService redisCacheService;
+    BusinessStateService businessStateService;
+
+    @Autowired
+    LineGatewayService lineGatewayService;
+
+    @Value("${area.agent.client.cti.sip.host}")
+    private String ctiHost;
+
+    @Value("${area.agent.client.cti.sip.port}")
+    private int ctiPort;
 
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
@@ -99,11 +107,77 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws YunhuniApiException {
-        String callId = UUIDGenerator.uuid();
-        String to1 = duoCallbackVO.getTo1();
-        String to2 = duoCallbackVO.getTo2();
+    public String duoCallback(String ip,String appId, DuoCallbackDTO dto) throws YunhuniApiException {
+        String duocCallId = UUIDGenerator.uuid();
+        String to1 = dto.getTo1();
+        String to2 = dto.getTo2();
         if(apiGwRedBlankNumService.isRedOrBlankNum(to1) || apiGwRedBlankNumService.isRedOrBlankNum(to2)){
+            throw new NumberNotAllowToCallException();
+        }
+        App app = appService.findById(appId);
+
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(app.getIsVoiceCallback() != 1){
+            throw new AppServiceInvalidException();
+        }
+
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("duo_call", app.getTenant().getId());
+        if(!isAmountEnough){
+            throw new BalanceNotEnoughException();
+        }
+
+        //TODO 获取线路IP和端口
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
+        Map<String, Object> params = new HashMap<>();
+        //TODO 增加区域参数
+        Area area = app.getArea();
+        params.put("from1_uri", dto.getFrom1());
+        params.put("to1_uri",dto.getTo1()+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        params.put("from2_uri", dto.getFrom2());
+        params.put("to2_uri",dto.getTo2()+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        params.put("max_connect_seconds",dto.getMax_call_duration());
+        params.put("max_ring_seconds",dto.getMax_dial_duration());
+        params.put("ring_play_file",dto.getRing_tone());
+        params.put("ring_play_mode",dto.getRing_tone_mode());
+        params.put("user_data1",duocCallId);
+        //录音
+        if(dto.getRecording()){
+            //TODO 录音文件名称
+            params.put("record_file ",duocCallId);
+            params.put("record_mode",dto.getRecord_mode());
+            params.put("record_format ",1);
+        }
+
+        try {
+            //找到合适的区域代理
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+                //将数据存到redis
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,"duo_call", app.getUrl(),dto.getUser_data());
+                businessStateService.save(cache);
+            } catch (Exception e) {
+                logger.error("消息发送到区域失败:{}", rpcrequest);
+                throw new InvokeCallException(e);
+            }
+            return duocCallId;
+        }catch(Exception ex){
+            throw new InvokeCallException(ex);
+        }
+    }
+
+    @Override
+    public String notifyCall(String ip, String appId, NotifyCallDTO dto) throws YunhuniApiException{
+        String callId = UUIDGenerator.uuid();
+        String to = dto.getTo();
+        if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
@@ -116,26 +190,27 @@ public class CallServiceImpl implements CallService {
         if(app.getIsVoiceCallback() != 1){
             throw new AppServiceInvalidException();
         }
-        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
-        //TODO 判断余额是否充足
-        if(balance.compareTo(new BigDecimal(0)) != 1){
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("notify_call", app.getTenant().getId());
+        if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.convertValue(duoCallbackVO, Map.class);
-        map.put("callId",callId);
-        String params = mapToString(map);
+
+        //TODO 获取线路IP和端口
+        Map<String, Object> params = new HashMap<>();
+        params.put("from_uri", dto.getFrom()+"@"+ctiHost+":"+ctiPort);
+        params.put("to_uri", dto.getTo()+"@"+ctiHost+":"+ctiPort);
+        params.put("play_content",JSONUtil.objectToJson(dto.getFiles()));
+        params.put("play_repeat",dto.getRepeat());
+        params.put("max_ring_seconds",dto.getMax_dial_duration());
+        params.put("user_data",callId);
+
         try {
             //找到合适的区域代理
-                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
-                try {
-                    rpcCaller.invoke(sessionContext, rpcrequest);
-                    //将数据存到redis
-                    redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"duo_call",null,duoCallbackVO.getUser_data())),5 * 60 * 60);
-                } catch (Exception e) {
-                    logger.error("消息发送到区域失败:{}", rpcrequest);
-                    throw new InvokeCallException(e);
-                }
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+            //将数据存到redis
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", app.getUrl(),dto.getUser_data());
+            businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);
@@ -143,10 +218,9 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String notifyCall(String ip, String appId, NotifyCallVO notifyCallVO) throws YunhuniApiException{
-        String callId = UUIDGenerator.uuid();
-        String to1 = notifyCallVO.getTo();
-        if(apiGwRedBlankNumService.isRedOrBlankNum(to1)){
+    public String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException{
+        String to = dto.getTo();
+        if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
@@ -156,44 +230,47 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(app.getIsVoiceCallback() != 1){
+        if(app.getIsVoiceValidate() != 1){
             throw new AppServiceInvalidException();
         }
-        BigDecimal balance = billingService.getBalance(app.getTenant().getId());
-        //TODO 判断余额是否充足
-        if(balance.compareTo(new BigDecimal(0)) != 1){
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("captcha_call", app.getTenant().getId());
+        if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> map = mapper.convertValue(notifyCallVO, Map.class);
-        map.put("callId",callId);
-        String params = mapToString(map);
+
+        //TODO 获取线路IP和端口
+        //TODO 待定
+        String callId = UUIDGenerator.uuid();
+        //TODO
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
+        Map<String, Object> params = new MapBuilder<String, Object>()
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("max_ring_seconds",dto.getMax_dial_duration())
+                .putIfNotEmpty("valid_keys",dto.getVerify_code())
+                .putIfNotEmpty("user_data",callId)
+                .build();
+        if(dto.getFiles() != null && dto.getFiles().size()>0){
+            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(dto.getFiles(),"|"),7,""}};
+            params.put("play_content", JSONUtil2.objectToJson(plays));
+        }
         try {
             //找到合适的区域代理
-                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
-                rpcCaller.invoke(sessionContext, rpcrequest);
-                //将数据存到redis
-                redisCacheService.set("call_"+callId,JSONUtil.objectToJson(new CallCacheVO(callId,"notify_call",null,notifyCallVO.getUser_data())),5 * 60 * 60);
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+            //将数据存到redis
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,
+                    "captcha_call", app.getUrl(),dto.getUser_data(),
+                    new MapBuilder<String,Object>()
+                    .put("from",oneTelnumber)
+                    .put("to",to)
+                    .build());
+            businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);
         }
     }
-
-
-    public String mapToString(Map<String,Object> params){
-            List<String> keys = new ArrayList<>(params.keySet());
-            String result = "";
-            for (int i = 0; i < keys.size(); i++) {
-                String key = keys.get(i);
-                String value = params.get(key)+"";
-                if (i == keys.size() - 1) {//拼接时，不包括最后一个&字符
-                    result = result + key + "=" + value;
-                } else {
-                    result = result + key + "=" + value + "&";
-                }
-            }
-            return result;
-    }
-
 }

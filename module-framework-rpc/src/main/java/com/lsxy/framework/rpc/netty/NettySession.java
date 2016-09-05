@@ -1,8 +1,7 @@
 package com.lsxy.framework.rpc.netty;
 
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCHandler;
-import com.lsxy.framework.rpc.api.server.AbstractSession;
+import com.lsxy.framework.rpc.api.AbstractSession;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;

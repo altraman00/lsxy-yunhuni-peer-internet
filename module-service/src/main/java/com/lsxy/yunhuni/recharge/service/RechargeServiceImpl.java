@@ -10,6 +10,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
@@ -42,13 +43,16 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     @Autowired
     EntityManager em;
 
+    @Autowired
+    CalBillingService calBillingService;
+
     @Override
     public BaseDaoInterface<Recharge, Serializable> getDao() {
         return rechargeDao;
     }
 
     @Override
-    public Recharge createRecharge(String username, String type, BigDecimal amount) throws Exception {
+    public Recharge createRecharge(String username, String type, BigDecimal amount){
         Recharge recharge = null;
         //充值类型一定要是规定好的类型,当没有该类型时，枚举类会抛出IllegalArgumentException异常
         RechargeType rechargeType = RechargeType.valueOf(type);
@@ -56,7 +60,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             Tenant tenant = tenantService.findTenantByUserName(username);
             if(tenant != null){
                 String orderId = UUIDGenerator.uuid();
-                recharge = new Recharge(tenant,amount,rechargeType, RechargeStatus.NOTPAID,orderId);
+                recharge = new Recharge(tenant,amount,rechargeType, RechargeStatus.NOTPAID,orderId,null);
                 rechargeDao.save(recharge);
             }
         }
@@ -75,14 +79,13 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             String status = recharge.getStatus();
             //如果充值记录是未支付状态，则将支付状态改成已支付，并将钱加到账务表里
             if(RechargeStatus.NOTPAID.name().equals(status)){
+                Date curTime = new Date();
                 //状态变成已支付
                 recharge.setStatus(RechargeStatus.PAID.name());
-                Tenant tenant = recharge.getTenant();
-                //更新账务表的余额
-                Billing billing = billingService.findBillingByTenantId(tenant.getId());
-                billing.setBalance(billing.getBalance().add(recharge.getAmount()));
                 rechargeDao.save(recharge);
-                billingService.save(billing);
+                Tenant tenant = recharge.getTenant();
+                //redis插入今日充值
+                calBillingService.incRecharge(tenant.getId(),curTime,recharge.getAmount());
             }
         }
         return  recharge;
@@ -124,12 +127,11 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             throw new IllegalArgumentException();
         }
         String orderId = UUIDGenerator.uuid();
-        Recharge recharge = new Recharge(tenant,amount,RechargeType.RENGONG, RechargeStatus.PAID,orderId);
+        Date curTime = new Date();
+        Recharge recharge = new Recharge(tenant,amount,RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
         rechargeDao.save(recharge);
-        //更新账务表的余额
-        Billing billing = billingService.findBillingByTenantId(tenant.getId());
-        billing.setBalance(billing.getBalance().add(recharge.getAmount()));
-        billingService.save(billing);
+        // redis插入今日充值
+        calBillingService.incRecharge(tenantId,curTime,amount);
         return true;
     }
 
@@ -146,4 +148,5 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         page =  this.pageList(hql,pageNo,pageSize,tenant);
         return page;
     }
+
 }

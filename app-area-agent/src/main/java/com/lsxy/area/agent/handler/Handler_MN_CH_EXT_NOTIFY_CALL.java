@@ -1,14 +1,20 @@
 package com.lsxy.area.agent.handler;
 
 import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.commander.RpcError;
+import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
-import com.lsxy.framework.rpc.api.server.Session;
+import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +45,12 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
     @Autowired(required = false)
     private StasticsCounter sc;
 
+    @Autowired
+    private SessionContext sessionContext;
+
+    @Autowired
+    private RPCCaller rpcCaller;
+
     @Override
     public String getEventName() {
         return ServiceConstants.MN_CH_EXT_NOTIFY_CALL;
@@ -57,20 +69,67 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_NOTIFY_CALL:{}",request);
         }
-        //TODO 获取线路IP和端口
-        Map<String, Object> params = new HashMap<>();
-        params.put("from_uri", request.getParameter("from")+"@"+ctiHost+":"+ctiPort);
-        params.put("to_uri", request.getParameter("to")+"@"+ctiHost+":"+ctiPort);
-        params.put("play_content",Integer.parseInt((String) request.getParameter("files")));
-        params.put("play_repeat",Integer.parseInt((String) request.getParameter("repeat")));
-        params.put("max_ring_seconds",request.getParameter("max_dial_duration"));
-        params.put("user_data",request.getParameter("callId"));
 
+        Map<String, Object> params = request.getParamMap();
         try {
             if(logger.isDebugEnabled()){
-                logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
+                logger.debug("调用CTI创建语音外呼资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            String res_id = cticlient.createResource(0, 0, "ext.notify_call", params, null);
+            String res_id = cticlient.createResource(0, 0, "ext.notify_call", params, new RpcResultListener(){
+
+                @Override
+                protected void onResult(Object o) {
+                    Map<String,String> params = (Map<String,String>) o;
+                    if(logger.isDebugEnabled()){
+                        logger.debug("调用ext.notify_call成功，conf_id={},result={}",params.get("user_data"),o);
+                    }
+
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS)
+                                    .put("res_id",params.get("res_id"))
+                                    .put("user_data",params.get("user_data"))
+                                    .build());
+                    try {
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS);
+                    }
+                }
+
+                @Override
+                protected void onError(RpcError rpcError) {
+                    logger.error("调用ext.notify_call失败call_id={},result={}",params.get("user_data"),rpcError);
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)
+                                    .put("user_data",params.get("user_data"))
+                                    .build());
+                    try {
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL);
+                    }
+                }
+
+                @Override
+                protected void onTimeout() {
+                    logger.error("调用ext.notify_call超时call_id={}",params.get("user_data"));
+                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                            new MapBuilder<String,Object>()
+                                    .put("method",Constants.EVENT_EXT_CALL_ON_TIMEOUT)
+                                    .put("user_data",params.get("user_data"))
+                                    .build());
+                    try {
+                        rpcCaller.invoke(sessionContext,req);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT);
+                    }
+                }
+            });
             response.setMessage(RPCResponse.STATE_OK);
             response.setBody(res_id);
         } catch (IOException e) {

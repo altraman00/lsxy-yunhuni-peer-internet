@@ -1,19 +1,12 @@
 package com.lsxy.framework.rpc.api.client;
 
-import com.lsxy.framework.rpc.api.SessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
-import com.lsxy.framework.rpc.mina.client.MinaClientSession;
+import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tandy on 16/7/30.
@@ -21,9 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClientSessionContext extends SessionContext{
 
     private static final Logger logger = LoggerFactory.getLogger(ClientSessionContext.class);
-
-    //有效会话选择器
-    private AtomicInteger sessionSelectCounter = new AtomicInteger(0);
 
     //clientId-serverUrl 作为session
     private ListOrderedMap sessions = new ListOrderedMap();
@@ -35,17 +25,6 @@ public class ClientSessionContext extends SessionContext{
     public void putSession(Session session){
         sessions.put(session.getId(),session);
         sessions.put(session.getServerUrl(),session);
-
-    }
-
-    /**
-     * 根据索引获取会话,获取指定的第几个会话对象
-     * @param idx
-     * @return
-     */
-    public Session getSessionByIndex(int idx){
-        return (Session) sessions.getValue(idx);
-
     }
 
     /**
@@ -66,16 +45,21 @@ public class ClientSessionContext extends SessionContext{
         return (Session) sessions.get(sessionid);
     }
 
-    /**
-     * 根据serverUrl获取会话对象
-     * 提供给后台监控线程,不要重复连接其中一台服务器
-     * 但是断开后从重复尝试连接
-     * @param serverUrl
-     * @return
-     */
-    public Session getSessionByServerUrl(String serverUrl){
-        return (Session) sessions.get(serverUrl);
+    @Override
+    public Session getSession(int idx) {
+        return (Session) this.sessions.getValue(idx);
     }
+//
+//    /**
+//     * 根据serverUrl获取会话对象
+//     * 提供给后台监控线程,不要重复连接其中一台服务器
+//     * 但是断开后从重复尝试连接
+//     * @param serverUrl
+//     * @return
+//     */
+//    public Session getSessionByServerUrl(String serverUrl){
+//        return (Session) sessions.get(serverUrl);
+//    }
 
     /**
      * 根据会话标识清理会话数据
@@ -94,44 +78,5 @@ public class ClientSessionContext extends SessionContext{
         return sessions.values();
     }
 
-
-
-    /**
-     * 获取有效的会话
-     * 负载均衡算法
-     * @return
-     * */
-    @Override
-    public Session getRightSession()  {
-            int idx = 0;    //索引  默认为0
-            int times = 1;  //遍历次数,一次
-            int j = 0;      //当前遍历次数
-            if(size()<=0) {
-                logger.error("没有找到有效的会话");
-                return null;
-            }
-
-            Session session = null;
-            while(j<times && size()>0) {
-                int i = this.sessionSelectCounter.addAndGet(1);
-                //如果总计数器达到整型最大值,重置0
-                if (i >= (Integer.MAX_VALUE - 1)) {
-                    this.sessionSelectCounter.set(0);
-                }
-                int size = size();
-                idx = i % size;
-                //遍历到最后一个表示到了一轮
-                if(idx == (size -1)){
-                    j++;
-                }
-                session = getSessionByIndex(idx);
-                if(session.isValid()){
-                    return session;
-                }else{
-                    continue;
-                }
-            }
-            return session;
-    }
 
 }
