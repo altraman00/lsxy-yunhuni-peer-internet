@@ -10,6 +10,7 @@ import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import com.lsxy.yunhuni.file.dao.VoiceFilePlayDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -22,6 +23,8 @@ import java.util.List;
  */
 @Service
 public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> implements VoiceFilePlayService{
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Autowired
     private VoiceFilePlayDao voiceFilePlayDao;
     @Override
@@ -120,5 +123,27 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
             page = this.pageList(hql,pageNo,pageSize);
         }
         return page;
+    }
+
+    @Override
+    public List<VoiceFilePlay> findNotSync() {
+        String hql = "from VoiceFilePlay obj where obj.sync<>?1 and obj.status=?2 group by obj.lastTime ";
+        List<VoiceFilePlay> list = this.list(hql,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS);
+        return list;
+    }
+
+    @Override
+    public void batchUpdateSync(List<String> ids, Integer sync) {
+        if(ids.size()<=0) {
+            String id = "";
+            for (int i = 0; i < ids.size(); i++) {
+                id += " '" + ids.get(i) + "' ";
+                if (i != (ids.size() - 1)) {
+                    id += ",";
+                }
+            }
+            String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_play set sync=? where  deleted=0 and id in( " + id + " )";
+            jdbcTemplate.update(sql, sync);
+        }
     }
 }

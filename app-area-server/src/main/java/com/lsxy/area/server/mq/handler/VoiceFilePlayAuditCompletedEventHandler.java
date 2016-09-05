@@ -1,13 +1,12 @@
 package com.lsxy.area.server.mq.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.oc.VoiceFilePlayAuditCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
-import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.slf4j.Logger;
@@ -16,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
-
-import static com.sun.corba.se.impl.util.Utility.printStackTrace;
+import java.util.List;
 
 /**
  * Created by tandy on 16/8/29.
@@ -39,9 +37,8 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
 
     @Override
     public void handleMessage(VoiceFilePlayAuditCompletedEvent event) throws JMSException {
-        String param = "fileid="+event.getId();
-        VoiceFilePlay vfp = voiceFilePlayService.findById(event.getId());
-
+        List<VoiceFilePlay> list = voiceFilePlayService.findNotSync();
+        String param = JSON.toJSON(list).toString();
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,param);
         try {
             rpcCaller.invoke(sessionContext,request);

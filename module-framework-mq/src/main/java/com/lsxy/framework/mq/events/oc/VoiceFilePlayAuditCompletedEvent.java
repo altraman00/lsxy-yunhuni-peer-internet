@@ -8,10 +8,8 @@ import com.lsxy.framework.mq.api.AbstractMQEvent;
  */
 public class VoiceFilePlayAuditCompletedEvent extends AbstractMQEvent{
 
-    private String fileId;      //放音文件id
 
-    public VoiceFilePlayAuditCompletedEvent(String fileId){
-        this.fileId = fileId;
+    public VoiceFilePlayAuditCompletedEvent(){
     }
 
     @Override
