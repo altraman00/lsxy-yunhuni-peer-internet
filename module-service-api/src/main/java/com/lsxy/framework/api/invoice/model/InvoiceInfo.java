@@ -13,8 +13,8 @@ import javax.persistence.*;
 @Table(schema = "db_lsxy_base", name = "tb_base_invoice_info")
 public class InvoiceInfo extends IdEntity{
     public static final int TYPE_PERSON_GENERAL = 1; //个人增值税普通发票
-    public static final int TYPE_COM_GENERAL = 2;   //企业增值税普通票
-    public static final int TYPE_COM_SPECIAL = 3;   // 企业增值税专用票
+    public static final int TYPE_COM_GENERAL = 2;   //企业增值税普通发票
+    public static final int TYPE_COM_SPECIAL = 3;   // 企业增值税专用发票
 
     private Tenant tenant;          //租户
     private Integer type;            //发票类型

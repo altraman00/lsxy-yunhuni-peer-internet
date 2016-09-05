@@ -31,12 +31,11 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
-
+    public void dayStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
 
     /**
      * 获取某个时间范围的总的通话时长(话务量)
-     * @param d
+     * @param
      * @return
      */
     public long getAmongDurationBetween(Date d1,Date d2);
@@ -77,12 +76,13 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @param d
      * @return
      */
-    public long getAmongDurationByDateAndTenant(Date d,String tenant);
+    public long getAmongDurationByDateAndTenant(Date d,String tenant,String appId);
 
     /**
      * 获取某个租户某天的通话次数(会话量)
      * @param d
      * @return
      */
-    public long getAmongCallByDateAndTenant(Date d,String tenant);
+    public long getAmongCallByDateAndTenant(Date d,String tenant,String appId);
+
 }

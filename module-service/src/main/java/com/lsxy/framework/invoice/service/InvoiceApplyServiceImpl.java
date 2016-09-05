@@ -25,6 +25,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/7/21.
@@ -58,8 +60,12 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
     }
 
     @Override
-    public Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize) {
-        String hql = "from InvoiceApply obj where obj.tenant.id = ?1 order by obj.createTime desc";
+    public Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize,Integer operate) {
+        String op = "";
+        if(operate!=null){
+            op = "   and ( obj.operate<>'"+operate+"' or obj.operate is null ) ";
+        }
+        String hql = "from InvoiceApply obj where obj.tenant.id = ?1 "+op+"order by obj.createTime desc";
         return this.pageList(hql, pageNo, pageSize, tenantId);
     }
 
@@ -146,7 +152,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         Date date2 = null;
         if(StringUtil.isNotEmpty(endTime)){
             try{
-                date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd");
+                date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             }catch (Exception e){}
         }
         int dateNum = 1;
@@ -206,6 +212,18 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         }
         Page<InvoiceApply> page = this.pageList(hql,pageNo,pageSize);
         return page;
+    }
+
+    @Override
+    public Map getAwaitNum() {
+        String hql = " from InvoiceApply obj where obj.status=?1 ";
+        long await =  this.countByCustom(hql,InvoiceApply.STATUS_SUBMIT);
+        String hql2 = "  from InvoiceApply obj where obj.status=?1  and obj.expressNo is null ";
+        long awaitSend = this.countByCustom(hql2,InvoiceApply.STATUS_DONE);
+        Map map = new HashMap();
+        map.put("await",await);
+        map.put("awaitSend",awaitSend);
+        return map;
     }
 
 }

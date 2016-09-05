@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by tandy on 16/8/10.
  */
 @Component
-@Profile(value={"test"})
+@Profile(value={"no"})
 @EnableScheduling
 public class MQStasticCounter extends AsbstractStatisticCounter {
 

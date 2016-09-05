@@ -86,9 +86,9 @@ public class AuthController extends AbstractRestController {
     @ApiOperation(value = "根据记录id和认证类型获取详情页面")
     @RequestMapping(value = "/member/detail/{id}",method = RequestMethod.GET)
     public RestResponse pageList(
-            @ApiParam(name = "id",value = "消息id")
+            @ApiParam(name = "id",value = "记录id")
             @PathVariable String id,
-            @ApiParam(name = "type",value = "0个人认证 1实名认证 必填")
+            @ApiParam(name = "type",value = "0个人认证 1企业认证 必填")
             @RequestParam Integer type
     ){
         RestResponse restResponse = null;
@@ -198,9 +198,9 @@ public class AuthController extends AbstractRestController {
                     realnamePrivate = realnamePrivateService.save(realnamePrivate);
                     tenant = tenantService.save(tenant);
                     if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_FAIL){
-                        accountMessageService.sendTenantTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_FAIL);
+                        accountMessageService.sendTenantTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_FAIL);
                     }else if(realnamePrivate.getStatus()==Tenant.AUTH_ONESELF_SUCCESS){
-                        accountMessageService.sendTenantTempletMessage(null,tenant.getTenantName(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_SUCCESS);
+                        accountMessageService.sendTenantTempletMessage(null,tenant.getId(), AccountMessage.MESSAGE_TYPE_AUTH_ONESELE_SUCCESS);
                     }
                 }else{
                     restResponse = RestResponse.failed("0","租户不存在");
@@ -246,5 +246,16 @@ public class AuthController extends AbstractRestController {
             restResponse = RestResponse.success(tenant.getIsRealAuth());
         }
         return restResponse;
+    }
+    /**
+     * 等待处理数量
+     * @return
+     */
+    @ApiOperation(value = "等待处理数量,tenant表示会员未处理，voiceFilePlay表示放音文件未处理")
+    @RequestMapping(value = "/await/num",method = RequestMethod.GET)
+    public RestResponse getAwaitNum(){
+        Map map = new HashMap();
+        map.putAll(tenantService.getAwaitNum());
+        return RestResponse.success(map);
     }
 }

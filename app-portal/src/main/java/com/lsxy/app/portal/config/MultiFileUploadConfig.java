@@ -15,7 +15,7 @@ public class MultiFileUploadConfig {
     @Bean
     public CommonsMultipartResolver multipartResolver(){
         CommonsMultipartResolver resolver = new UploadCommonsMultipartResolver();
-        int size = Integer.valueOf( SystemConfig.getProperty("portal.realauth.resource.upload.maxsize"));
+        int size = Integer.valueOf( SystemConfig.getProperty("portal.realauth.resource.upload.maxsize","20"));
         if(size>0) {
             resolver.setMaxUploadSize(size*1024*1024);//此处单位是b,1024*1024=1M
         }

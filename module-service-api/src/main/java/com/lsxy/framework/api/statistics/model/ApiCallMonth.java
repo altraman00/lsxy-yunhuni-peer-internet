@@ -20,7 +20,6 @@ public class ApiCallMonth extends IdEntity {
     private Date dt;//统计时间
     private Integer month;//统计月份1-12
     private Long amongApi;//本时段api调用次数
-    private Long sumApi;//api调用总次数
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
@@ -71,13 +70,5 @@ public class ApiCallMonth extends IdEntity {
 
     public void setAmongApi(Long amongApi) {
         this.amongApi = amongApi;
-    }
-    @Column(name = "sum_api")
-    public Long getSumApi() {
-        return sumApi;
-    }
-
-    public void setSumApi(Long sumApi) {
-        this.sumApi = sumApi;
     }
 }

@@ -36,8 +36,8 @@ public class AppDayServiceImpl extends AbstractService<AppDay> implements AppDay
     }
 
     @Override
-    public void dayStatistics(Date date, int day,String[] select) throws  SQLException{
-        Map<String, String> map = StatisticsUtils.getSqlRequirements(select);
+    public void dayStatistics(Date date, int day,String[] select,String[] all) throws  SQLException{
+        Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");

@@ -8,9 +8,12 @@ import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
 import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.service.AccountMessageService;
+import com.lsxy.framework.api.statistics.model.ConsumeDay;
+import com.lsxy.framework.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +46,8 @@ public class InvoiceApplyController extends AbstractRestController {
     @Autowired
     ConsumeService consumeService;
     @Autowired
+    ConsumeDayService consumeDayService;
+    @Autowired
     AccountMessageService accountMessageService;
     /**
      * 发票申请分页获取
@@ -57,7 +63,7 @@ public class InvoiceApplyController extends AbstractRestController {
     public RestResponse page(
             @ApiParam(name = "status",value = "状态await待寄出auditing已寄出")
             @PathVariable String status,
-            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
+            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通发票3:企业增值税专用发票")
             @RequestParam(required=false)Integer type,
             @ApiParam(name = "name",value = "会员名")
             @RequestParam(required=false)String name,
@@ -109,7 +115,7 @@ public class InvoiceApplyController extends AbstractRestController {
     public RestResponse page(
             @ApiParam(name = "status",value = "状态await待处理auditing审核通过unauth异常")
             @PathVariable String status,
-            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通票3:企业增值税专用票")
+            @ApiParam(name = "type",value = "类型：1个人增值税普通发票2：企业增值税普通发票3:企业增值税专用发票")
             @RequestParam(required=false)Integer type,
             @ApiParam(name = "name",value = "会员名")
             @RequestParam(required=false)String name,
@@ -239,10 +245,35 @@ public class InvoiceApplyController extends AbstractRestController {
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         Map map = new HashMap();
         map.put("sum",invoiceApply.getAmount());
-        Page<Consume> page =  consumeService.pageList(invoiceApply.getTenant().getId(),pageNo,pageSize,invoiceApply.getStart(),invoiceApply.getEnd());
+    //    pageList(String tenantId, String appId,String type,Date startTime, Date endTime,Integer pageNo,Integer pageSize);
+//        Page<Consume> page =  consumeService.pageList(invoiceApply.getTenant().getId(),pageNo,pageSize,invoiceApply.getStart(),DateUtils.getLastTimeOfMonth(invoiceApply.getEnd()) );
+        Page<ConsumeDay> page = consumeDayService.pageList(invoiceApply.getTenant().getId(),null,null,invoiceApply.getStart(),DateUtils.getLastTimeOfMonth(invoiceApply.getEnd()),pageNo,pageSize);
         map.put("list",page);
         return RestResponse.success(map);
     }
-
+    @ApiOperation(value = "查看发票申请信息的消费列表中某天的信息")
+    @RequestMapping(value = "/detail/list/{id}/detail",method = RequestMethod.GET)
+    public RestResponse consumeDetailPageList(
+            @ApiParam(name = "id",value = "发票记录id")
+            @PathVariable String id,
+            @ApiParam(name = "time",value = "yyyy-MM-dd")
+            @RequestParam String time){
+        InvoiceApply invoiceApply = invoiceApplyService.findById(id);
+        Date startTime = DateUtils.parseDate(time,"yyyy-MM-dd");
+        Date endTime = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        List<ConsumeDay> List =  consumeDayService.list(invoiceApply.getTenant().getId(),null,false,startTime,endTime);
+        return RestResponse.success(List);
+    }
+    /**
+     * 等待处理数量
+     * @return
+     */
+    @ApiOperation(value = "等待处理数量,await表示未处理，awaitSend未寄送")
+    @RequestMapping(value = "/await/num",method = RequestMethod.GET)
+    public RestResponse getAwaitNum(){
+        Map map = new HashMap();
+        map.putAll(invoiceApplyService.getAwaitNum());
+        return RestResponse.success(map);
+    }
 
 }

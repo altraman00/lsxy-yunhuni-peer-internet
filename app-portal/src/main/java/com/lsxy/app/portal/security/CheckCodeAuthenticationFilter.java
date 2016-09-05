@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.security;
 
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -34,6 +35,7 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res=(HttpServletResponse)response;
 

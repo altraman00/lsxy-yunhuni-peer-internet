@@ -92,7 +92,7 @@
                                 </div>
                                 <div class="col-md-12 ">
                                     <div class="number_info">
-                                        <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)共三种，个人增值税普通发票的发票抬头修改后可直接保存，企业增值税普通发票和企业增值税专用票则需要用户进行企业认证后才能开具</p>
+                                        <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)共三种，个人增值税普通发票的发票抬头修改后可直接保存，企业增值税普通发票和企业增值税专用发票则需要用户进行企业认证后才能开具</p>
                                         <p>*官方活动赠送金额不计算在开票金额内</p>
                                         <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细确认</p>
                                         <p>*因账务结算原因，每月25号期前提交的开票申请当月受理，之后申请延期至下月受理</p>
@@ -136,10 +136,10 @@
                                                         个人增值税普通发票
                                                     </c:if>
                                                     <c:if test="${apply.type == 2}">
-                                                        企业增值税普通票
+                                                        企业增值税普通发票
                                                     </c:if>
                                                     <c:if test="${apply.type == 3}">
-                                                        企业增值税专用票
+                                                        企业增值税专用发票
                                                     </c:if>
                                                 </lable>
                                                 <input id="type" type="hidden" name="type" value="${apply.type}">
@@ -174,7 +174,7 @@
                                                     <div class="col-md-4">
                                                         <c:set var="defaultImgUrl" value="${(empty apply.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(apply.qualificationUrl))}" />
                                                         <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${apply.qualificationUrl}" data-url="${defaultImgUrl}">
-                                                        <input type="file" class="form-control input-form  limitImageFile"  id="uploadfile"  name="uploadfile">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。
+                                                        <input type="file" class="form-control-file input-form  limitImageFile"  id="uploadfile"  name="uploadfile">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。
                                                         <img src="${defaultImgUrl}" alt="" id="imgPre" width="100" height="80" class="recordimg" />
                                                     </div>
                                                 </div>

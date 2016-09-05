@@ -115,7 +115,7 @@
                                         <div class="caption">
                                             <p><strong>您的资料提交成功，等待审核...</strong> </p>
                                             <p>当前审核状态: <span class="text-success">审核中</span></p>
-                                            <p>正常情况审核周期为24小时内，您也可通过客服电话查询400-9287734988</p>
+                                            <p>正常情况审核周期为24小时内，您也可通过客服电话查询400-002-0048</p>
                                         </div>
                                     </div>
                                 </c:if>
@@ -127,8 +127,10 @@
                                         <div class="caption">
                                             <p><strong>审核结束</strong> </p>
                                             <p>当前审核状态: <span class="text-danger">未通过</span></p>
-                                            <c:if test="${status==-1}"><p>${realnamePrivate.reason}</p></c:if>
-                                            <c:if test="${status==5||status==-2}"><p>${realnameCorp.reason}</p></c:if>
+                                             <p>审核不通过原因:
+                                            <c:if test="${status==-1}">${realnamePrivate.reason}</c:if>
+                                            <c:if test="${status==5||status==-2}">${realnameCorp.reason}</c:if>
+                                             </p>
                                         </div>
                                     </div>
                                 </c:if>

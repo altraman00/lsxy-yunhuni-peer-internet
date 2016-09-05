@@ -5,6 +5,8 @@ import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 
+import java.util.Map;
+
 /**
  * 发票申请Service
  * Created by liups on 2016/7/21.
@@ -23,7 +25,7 @@ public interface InvoiceApplyService extends BaseService<InvoiceApply> {
      * @param pageSize 每一页的数量
      * @return
      */
-    Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize);
+    Page<InvoiceApply> getPage(String tenantId, Integer pageNo, Integer pageSize,Integer operate);
 
     /**
      * 插入新的发票申请
@@ -56,5 +58,9 @@ public interface InvoiceApplyService extends BaseService<InvoiceApply> {
      * @return
      */
     Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, String[] tenantId, Integer status, Integer type,boolean flag);
-
+    /**
+     * 获取未处理的记录数
+     * @return
+     */
+    Map getAwaitNum();
 }

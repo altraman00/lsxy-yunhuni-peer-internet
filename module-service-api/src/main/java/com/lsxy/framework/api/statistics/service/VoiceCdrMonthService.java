@@ -30,8 +30,7 @@ public interface VoiceCdrMonthService extends BaseService<VoiceCdrMonth> {
      * @param day2 前一天是第几天 1-31
      * @param select 组合groupby条件
      */
-    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select) throws SQLException;
-
+    public void monthStatistics(Date date1, int day1, Date date2, int day2, String[] select,String[] all) throws SQLException;
 
     /**
      * 获取某月的总的通话时长(话务量)
@@ -45,14 +44,14 @@ public interface VoiceCdrMonthService extends BaseService<VoiceCdrMonth> {
      * @param d
      * @return
      */
-    public long getAmongDurationByDateAndTenant(Date d,String tenant);
+    public long getAmongDurationByDateAndTenant(Date d,String tenant,String appId);
 
     /**
      * 获取某月的某个租户的通话次数(会话量)
      * @param d
      * @return
      */
-    public long getAmongCallByDateAndTenant(Date d,String tenant);
+    public long getAmongCallByDateAndTenant(Date d,String tenant,String appId);
 
     /**
      * 获取某月的某个租户的连通次数(接通量)
@@ -74,4 +73,5 @@ public interface VoiceCdrMonthService extends BaseService<VoiceCdrMonth> {
      * @return
      */
     public long getAmongCallByDateAndApp(Date d,String app);
+
 }

@@ -24,7 +24,7 @@ public class VoiceCdr extends IdEntity {
     private String tenantId;//所属租户
     private String  appId;//所属应用
     private String lineId;//所属线路
-    private Integer type;//'1.语音呼叫2.双向回拨3.会议4.IVR定制服务5.语音验证码
+    private String type;//'查看产品表code字段或枚举类ProductCode
     private String relevanceId;//根据会话类型关联对应类型的表的记录
     private String recordUrl;//录音文件URL
     private Integer recordSize;//录音文件大小
@@ -108,11 +108,11 @@ public class VoiceCdr extends IdEntity {
         this.lineId = lineId;
     }
     @Column( name = "type")
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
     @Column( name = "relevance_id")

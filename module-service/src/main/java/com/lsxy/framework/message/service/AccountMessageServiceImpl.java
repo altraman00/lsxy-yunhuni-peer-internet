@@ -145,4 +145,45 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         }
         return accountMessage;
     }
+
+    @Override
+    public void modifyMessageStatus(String accountId, Integer status,Date endTime) {
+        String sql = " update db_lsxy_base.tb_base_account_message set status='"+status+"' where account_id='"+accountId+"' and deleted='0' and status<>'-1' and last_time<=?";
+        jdbcTemplate.update(sql,endTime);
+    }
+
+    @Override
+    public Long countAll(String tenantId,  Date startTime, Date endTime) {
+//        Long result = 0l; and obj.status <>-1 order by status asc,create_time desc
+//        String sql = "select sum(f.a) From( " +
+//                "select count(1) as a from db_lsxy_base.tb_base_account_message obj  where obj.deleted=0 and obj.account_id=?  and obj.last_time BETWEEN ? and ? " +
+//                "UNION " +
+//                "select count(1) as a from db_lsxy_base.tb_base_message obj1 where obj1.deleted=0 and obj1.type=? and obj1.status=? and obj1.last_time BETWEEN ? and ? ) f";
+//        result = jdbcTemplate.queryForObject(sql,Long.class,tenantId,startTime,endTime,Message.MESSAGE_ACTIVITY,Message.ONLINE,startTime,endTime);
+        Long result = 0l;
+        String hql = "select count(1) from AccountMessage obj where deleted=0 and obj.account.id=?1 and obj.status <>-1  and obj.lastTime between ?2 and ?3";
+        Query query = this.getEm().createQuery(hql);
+        query.setParameter(1,tenantId);
+        query.setParameter(2,startTime);
+        query.setParameter(3,endTime);
+        Object obj = query.getSingleResult();
+        if(obj instanceof Long){
+            result = (Long) obj;
+        }
+        return result;
+    }
+
+    @Override
+    public List listAll(String tenantId, Date startTime, Date endTime) {
+        String hql = "from AccountMessage obj where obj.account.id=?1 and obj.lastTime between ?2 and ?3  and obj.status <>-1 order by status asc,create_time desc";
+        List list= this.list(hql,tenantId,startTime,endTime);
+        return list;
+    }
+
+    @Override
+    public Page pageAll(String tenantId, Date startTime, Date endTime, Integer pageNo, Integer pageSize) {
+        String hql = "from AccountMessage obj where obj.account.id=?1 and obj.lastTime between ?2 and ?3  and obj.status <>-1 order by status asc,create_time desc";
+        Page page= this.pageList(hql,pageNo,pageSize,tenantId,startTime,endTime);
+        return page;
+    }
 }

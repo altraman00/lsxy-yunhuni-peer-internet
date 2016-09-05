@@ -92,7 +92,7 @@
                                     <div class="row m-l-none m-r-none bg-light lter">
                                         <div class="col-md-12 remove-padding">
                                             <div class="number_info">
-                                                <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)共三种，个人增值税普通发票的发票抬头修改后可直接保存，企业增值税普通发票和企业增值税专用票则需要用户进行企业认证后才能开具</p>
+                                                <p>*开发票类型分为：个人增值税普通发票(100元起)，企业增值税普通发票(100元起)，企业增值税专用发票(1000元起)共三种，个人增值税普通发票的发票抬头修改后可直接保存，企业增值税普通发票和企业增值税专用发票则需要用户进行企业认证后才能开具</p>
                                                 <p>*官方活动赠送金额不计算在开票金额内</p>
                                                 <p>*如果是由于您的开票信息、邮寄信息填写错误导致的发票开具、邮寄错误，将不能退票重开。请您填写发票信息时仔细确认</p>
                                                 <p>*因账务结算原因，每月25号期前提交的开票申请当月受理，之后申请延期至下月受理</p>
@@ -131,18 +131,18 @@
                                                                     <span class="invoice-type"  data-type="1">个人增值税普通发票</span>
                                                                 </c:when>
                                                                 <c:when test='${invoiceType eq "2"}'>
-                                                                    <span class="invoice-type"  data-type="2">企业增值税普通票</span>
+                                                                    <span class="invoice-type"  data-type="2">企业增值税普通发票</span>
                                                                 </c:when>
                                                                 <c:when test='${invoiceType eq "3"}'>
-                                                                    <span class="invoice-type"  data-type="3">企业增值税专用票</span>
+                                                                    <span class="invoice-type"  data-type="3">企业增值税专用发票</span>
                                                                 </c:when>
                                                                 <c:otherwise>
                                                                     <a class="invoice-type" href="${ctx}/console/cost/invoice_info" data-type="0">您还未填写发票信息，请先填写完成</a>
                                                                 </c:otherwise>
                                                             </c:choose>
                                                             <!--<span class="invoice-type"
-                                                                  data-type="2">企业增值税普通票</span>-->
-                                                            <!--<span class="invoice-type" data-type="3">企业增值税专用票</span>-->
+                                                                  data-type="2">企业增值税普通发票</span>-->
+                                                            <!--<span class="invoice-type" data-type="3">企业增值税专用发票</span>-->
                                                         </div>
                                                         <div class="row invoiceapply"  >
                                                             <div>开票时间：
@@ -192,7 +192,7 @@
                                         <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                             <tr>
                                                 <td>
-                                                    <fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm"/>
+                                                    <fmt:formatDate value="${result.applyTime}" pattern="yyyy-MM-dd HH:mm"/>
                                                 </td>
                                                 <td><fmt:formatNumber value="${ result.amount}" pattern="#0.00" /> </td>
                                                 <td>
@@ -200,10 +200,10 @@
                                                         <span>个人增值税普通发票</span>
                                                     </c:if>
                                                     <c:if test="${result.type == 2}">
-                                                        <span>企业增值税普通票</span>
+                                                        <span>企业增值税普通发票</span>
                                                     </c:if>
                                                     <c:if test="${result.type == 3}">
-                                                        <span>企业增值税专用票</span>
+                                                        <span>企业增值税专用发票</span>
                                                     </c:if>
                                                 </td>
                                                 <td>
@@ -211,10 +211,15 @@
                                                         <span>申请已提交</span>
                                                     </c:if>
                                                     <c:if test="${result.status == 1}">
-                                                        <span class="success">处理完成，发票已寄出</span>
+                                                        <c:if test="${result.expressNo != null}">
+                                                            <span class="success">处理完成，发票已寄出</span>
+                                                        </c:if>
+                                                        <c:if test="${result.expressNo == null}">
+                                                            <span>申请已提交</span>
+                                                        </c:if>
                                                     </c:if>
                                                     <c:if test="${result.status == 2}">
-                                                        <span class="nosuccess" data-toggle="tooltip" title="${result.remark}">
+                                                        <span class="nosuccess" data-toggle="tooltip" title="审核不通过原因:${result.reason}">
                                                             异常<i class="fa fa-exclamation-triangle"></i>
                                                         </span>
                                                     </c:if>
