@@ -249,7 +249,9 @@ public class CallServiceImpl implements CallService {
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("valid_keys",dto.getVerify_code());
         params.put("user_data",callId);
-
+        if(dto.getFiles() != null && dto.getFiles().size()>0){
+            params.put("play_content",new Object[]{new Object[]{7,StringUtils.join(dto.getFiles(),"|"),""}});
+        }
         try {
             //找到合适的区域代理
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
@@ -262,5 +264,4 @@ public class CallServiceImpl implements CallService {
             throw new InvokeCallException(ex);
         }
     }
-
 }

@@ -58,6 +58,9 @@ public class Handler_MN_CH_SYS_CALL_PLAY_START extends RpcRequestHandler{
             String call_id = (String)params.get("user_data");
             String res_id = (String)params.get("res_id");
 
+            String content = (String)params.get("content");
+            //TODO 解析content为list
+
             cticlient.operateResource(0, 0,res_id, "sys.call.play_start", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {

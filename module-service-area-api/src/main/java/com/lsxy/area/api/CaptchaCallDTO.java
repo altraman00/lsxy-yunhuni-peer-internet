@@ -1,5 +1,6 @@
 package com.lsxy.area.api;
 
+import java.util.List;
 import java.io.Serializable;
 
 /**
@@ -14,7 +15,7 @@ public class CaptchaCallDTO implements Serializable {
     private String verify_code;
     private String max_call_duration;   // 最大接通时间（秒）
     private String max_dial_duration;   //最大拨号等待时间（秒）
-    private String files;
+    private List<String> files;
     private String user_data;
 
     public String getFrom() {
@@ -73,11 +74,11 @@ public class CaptchaCallDTO implements Serializable {
         this.max_dial_duration = max_dial_duration;
     }
 
-    public String getFiles() {
+    public List<String> getFiles() {
         return files;
     }
 
-    public void setFiles(String files) {
+    public void setFiles(List<String> files) {
         this.files = files;
     }
 

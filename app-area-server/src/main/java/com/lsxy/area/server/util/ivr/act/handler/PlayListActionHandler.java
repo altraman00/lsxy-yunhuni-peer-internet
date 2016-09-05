@@ -71,7 +71,7 @@ public class PlayListActionHandler extends ActionHandler{
                 .put("user_data",callId)
                 .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAYLIST_START, params);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {

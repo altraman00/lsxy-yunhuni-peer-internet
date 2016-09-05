@@ -11,7 +11,9 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +43,8 @@ public class PlayActionHandler extends ActionHandler{
         }
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
-        String play = root.getTextTrim();
+        List<String> plays = new ArrayList<String>();
+        plays.add(root.getTextTrim());
         String nextUrl = "";
         Element next = root.element("next");
         if(next!=null){
@@ -49,7 +52,7 @@ public class PlayActionHandler extends ActionHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
-                            getAction(),finish_keys,repeat,play);
+                            getAction(),finish_keys,repeat,plays);
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
@@ -60,7 +63,7 @@ public class PlayActionHandler extends ActionHandler{
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
-                .put("content",play)
+                .put("content",plays)
                 .put("finish_keys",finish_keys)
                 .put("user_data",callId)
                 .build();
