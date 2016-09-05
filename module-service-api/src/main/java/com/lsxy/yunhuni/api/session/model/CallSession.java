@@ -18,7 +18,7 @@ public class CallSession extends IdEntity {
     //TODO 换成与ProductCode枚举关联
     public static final String TYPE_VOICE_NOTIFY = "notify_call";
     public static final String TYPE_VOICE_CALLBACK = "duo_call";
-    public static final String TYPE_VOICE_MEETING = "conf_call";
+    public static final String TYPE_VOICE_MEETING = "sys_conf";
     public static final String TYPE_VOICE_IVR = "ivr_call";
     public static final String TYPE_VOICE_VOICECODE = "captcha_call";
     public static final String TYPE_VOICE_RECORDING = "voice_recording";
