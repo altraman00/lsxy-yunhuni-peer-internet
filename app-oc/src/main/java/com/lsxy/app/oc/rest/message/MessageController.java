@@ -98,9 +98,10 @@ public class MessageController extends AbstractRestController {
             if(StringUtil.isNotEmpty(messageVo.getLine())){
                 message1.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
             }
-
-            if(message1.getLineTime().getTime()<=new Date().getTime()){
-                message1.setStatus(Message.ONLINE);
+            if(messageVo.getStatus()!=Message.OFFLINE) {
+                if (message1.getLineTime().getTime() <= new Date().getTime()) {
+                    message1.setStatus(Message.ONLINE);
+                }
             }
             message1 = messageService.save(message1);
             logger.info("是否需要群发消息:{}",isSendMsg);
