@@ -80,7 +80,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
                 .build();
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
         if(logger.isDebugEnabled()){
-            logger.debug("语音验证码结束事件");
+            logger.debug("通知外呼结束事件");
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
