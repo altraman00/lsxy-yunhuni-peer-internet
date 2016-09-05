@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.events;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
+import com.lsxy.framework.mq.topic.MQTopicConstants;
 
 /**
  * 重置密码邮箱验证成功的事的事件
@@ -12,7 +13,7 @@ public class ResetPwdVerifySuccessEvent extends AbstractMQEvent {
 
     @Override
     public String getTopicName() {
-        return "topic_framework_account";
+        return MQTopicConstants.TOPIC_FRAMEWORK_ACCOUNT;
     }
 
     public ResetPwdVerifySuccessEvent() {
