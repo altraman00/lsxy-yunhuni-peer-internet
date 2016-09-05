@@ -6,6 +6,7 @@ import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -251,7 +252,8 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("valid_keys",dto.getVerify_code())
                 .putIfNotEmpty("user_data",callId).build();
         if(dto.getFiles() != null && dto.getFiles().size()>0){
-            params.put("play_content",new Object[]{new Object[]{7,StringUtils.join(dto.getFiles(),"|"),""}});
+            Object[][] plays = new Object[][]{new Object[]{7,StringUtils.join(dto.getFiles(),"|"),""}};
+            params.put("play_content", JSONUtil2.objectToJson(plays));
         }
         try {
             //找到合适的区域代理
