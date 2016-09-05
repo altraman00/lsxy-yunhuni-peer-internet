@@ -4,6 +4,7 @@ import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.app.area.cti.commander.RpcError;
 import com.lsxy.app.area.cti.commander.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -11,6 +12,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +61,9 @@ public class Handler_MN_CH_SYS_CALL_PLAY_START extends RpcRequestHandler{
             String res_id = (String)params.get("res_id");
 
             String content = (String)params.get("content");
-            //TODO 解析content为list
+            if(StringUtils.isNotEmpty(content)){
+                params.put("content", JSONUtil2.fromJson(content,(new Object[1][]).getClass()));
+            }
 
             cticlient.operateResource(0, 0,res_id, "sys.call.play_start", params, new RpcResultListener(){
                 @Override

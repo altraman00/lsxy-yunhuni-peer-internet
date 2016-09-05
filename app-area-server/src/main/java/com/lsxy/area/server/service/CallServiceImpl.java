@@ -250,9 +250,10 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_ring_seconds",dto.getMax_dial_duration())
                 .putIfNotEmpty("valid_keys",dto.getVerify_code())
-                .putIfNotEmpty("user_data",callId).build();
+                .putIfNotEmpty("user_data",callId)
+                .build();
         if(dto.getFiles() != null && dto.getFiles().size()>0){
-            Object[][] plays = new Object[][]{new Object[]{7,StringUtils.join(dto.getFiles(),"|"),""}};
+            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(dto.getFiles(),"|"),7,""}};
             params.put("play_content", JSONUtil2.objectToJson(plays));
         }
         try {

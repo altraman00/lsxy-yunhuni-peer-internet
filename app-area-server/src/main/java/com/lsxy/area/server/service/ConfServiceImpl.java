@@ -359,6 +359,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
+                //TODO 文件名如何定
                 .putIfNotEmpty("record_file",UUIDGenerator.uuid())
                 .putIfNotEmpty("user_data",confId)
                 .build();
