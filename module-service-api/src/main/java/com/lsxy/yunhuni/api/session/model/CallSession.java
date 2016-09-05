@@ -27,7 +27,7 @@ public class CallSession extends IdEntity {
     private App app;            //所属APP
     private Tenant tenant;      //所属tenant
     private String relevanceId;//关联标识
-    private String type;//查看产品表code字段或枚举类ProductCode
+    private String type;        //查看产品表code字段或枚举类ProductCode
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
