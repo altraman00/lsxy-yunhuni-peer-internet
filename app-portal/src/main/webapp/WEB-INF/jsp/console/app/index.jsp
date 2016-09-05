@@ -120,7 +120,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form limit300"/>
+                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form limit300 notEmpty"/>
                                             </div>
                                         </div>
                                         <p class="tips"><a href="">回调说明文档</a></p>
