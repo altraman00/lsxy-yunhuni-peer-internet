@@ -38,10 +38,10 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, Integer type,String tenantId, String time, String appId) {
+    public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, String type,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type+"")+ " deleted=0 and   last_time BETWEEN ? and ?";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   last_time BETWEEN ? and ?";
         String sqlCount = "select count(1) "+sql;
         Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{date1,date2});
         sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" limit ?,?";
@@ -64,14 +64,14 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     }
 
     @Override
-    public Map sumCost( Integer type ,String tenantId, String time, String appId) {
+    public Map sumCost( String type ,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         String costType = " SUM(cost) as cost";
-        if(CallSession.TYPE_VOICE_RECORDING==type){
+        if(CallSession.TYPE_VOICE_RECORDING.equals(type)){
             costType = " sum(record_size) as size,sum(cost) as money ";
         }
-        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type+"")+ " deleted=0  and last_time BETWEEN ? and ? ";
+        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0  and last_time BETWEEN ? and ? ";
         Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
         return result;
     }

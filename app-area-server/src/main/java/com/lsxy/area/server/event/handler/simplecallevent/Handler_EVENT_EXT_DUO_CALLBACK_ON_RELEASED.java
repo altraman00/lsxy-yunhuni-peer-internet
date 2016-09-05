@@ -74,13 +74,14 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
                 .put("answer_time1",paramMap.get("answer_time"))
                 .put("answer_time2",paramMap.get("connect_time"))
                 .put("end_time",paramMap.get("end_time"))
+                .put("hangup_by",paramMap.get("hangup_by"))
                 .put("reason",paramMap.get("reason"))
                 .put("error",paramMap.get("error"))
                 .put("user_data",user_data)
                 .build();
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
         if(logger.isDebugEnabled()){
-            logger.debug("语音验证码结束事件");
+            logger.debug("双向回拔结束事件");
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());

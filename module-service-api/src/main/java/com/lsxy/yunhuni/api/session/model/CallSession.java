@@ -15,18 +15,19 @@ public class CallSession extends IdEntity {
     public static final int STATUS_CALLING = 1;
     public static final int STATUS_OVER = 2;
     public static final int STATUS_RINGING = 3;
-    public static final Integer TYPE_VOICE_CALL = 1;
-    public static final Integer TYPE_VOICE_CALLBACK = 2;
-    public static final Integer TYPE_VOICE_MEETING = 3;
-    public static final Integer TYPE_VOICE_IVR = 4;
-    public static final Integer TYPE_VOICE_VOICECODE = 5;
-    public static final Integer TYPE_VOICE_RECORDING = 6;
+    //TODO 换成与ProductCode枚举关联
+    public static final String TYPE_VOICE_CALL = "voice_call";
+    public static final String TYPE_VOICE_CALLBACK = "duo_call";
+    public static final String TYPE_VOICE_MEETING = "conf_call";
+    public static final String TYPE_VOICE_IVR = "ivr_call";
+    public static final String TYPE_VOICE_VOICECODE = "captcha_call";
+    public static final String TYPE_VOICE_RECORDING = "voice_recording";
 
     private Integer status;         //状态
     private App app;            //所属APP
     private Tenant tenant;      //所属tenant
     private String relevanceId;//关联标识
-    private Integer type;//会话类型1.语音呼叫 2.双向回拨 3.会议 4.IVR定制服务  5.语音验证码 6.录音
+    private String type;//查看产品表code字段或枚举类ProductCode
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
@@ -36,11 +37,11 @@ public class CallSession extends IdEntity {
         this.relevanceId = relevanceId;
     }
     @Column(name = "type")
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 
