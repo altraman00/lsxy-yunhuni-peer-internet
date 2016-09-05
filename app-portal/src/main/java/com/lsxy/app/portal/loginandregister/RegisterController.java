@@ -9,6 +9,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -66,6 +67,8 @@ public class RegisterController {
     @RequestMapping(value = "/register",method = RequestMethod.POST)
     @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView register(HttpServletRequest request, String userName, String mobile,String email){
+        WebUtils.logRequestParams(request);
+
         Map<String,String> model = new HashMap<>();
         String erInfo = "erInfo";
         String erPage = "register/fail";
