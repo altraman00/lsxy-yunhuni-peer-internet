@@ -53,7 +53,9 @@ public class ReceivedtmfActionHandler extends ActionHandler{
         String nextUrl = "";
         Element next = root.element("next");
         if(next!=null){
-            nextUrl = next.getTextTrim();
+            if(StringUtils.isNotBlank(next.getTextTrim())){
+                nextUrl = next.getTextTrim();
+            }
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，valid_keys={},max_keys={},finish_keys={}",

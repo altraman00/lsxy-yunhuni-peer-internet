@@ -7,6 +7,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,9 @@ public class SendtmfActionHandler extends ActionHandler{
         String nextUrl = "";
         Element next = root.element("next");
         if(next!=null){
-            nextUrl = next.getTextTrim();
+            if(StringUtils.isNotBlank(next.getTextTrim())){
+                nextUrl = next.getTextTrim();
+            }
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，dtmf_code={}",getAction(),dtmf_code);

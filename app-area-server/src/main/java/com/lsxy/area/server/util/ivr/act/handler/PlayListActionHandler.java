@@ -50,10 +50,14 @@ public class PlayListActionHandler extends ActionHandler{
         String nextUrl = "";
         Element next = root.element("next");
         if(next!=null){
-            nextUrl = next.getTextTrim();
+            if(StringUtils.isNotBlank(next.getTextTrim())){
+                nextUrl = next.getTextTrim();
+            }
         }
         for (Element pele: peles) {
-            plays.add(pele.getTextTrim());
+            if(StringUtils.isNotBlank(pele.getTextTrim())){
+                plays.add(pele.getTextTrim());
+            }
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},plays={}",

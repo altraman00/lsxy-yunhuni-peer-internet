@@ -46,11 +46,15 @@ public class PlayActionHandler extends ActionHandler{
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
-        plays.add(root.getTextTrim());
+        if(StringUtils.isNotBlank(root.getTextTrim())){
+            plays.add(root.getTextTrim());
+        }
         String nextUrl = "";
         Element next = root.element("next");
         if(next!=null){
-            nextUrl = next.getTextTrim();
+            if(StringUtils.isNotBlank(next.getTextTrim())){
+                nextUrl = next.getTextTrim();
+            }
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
