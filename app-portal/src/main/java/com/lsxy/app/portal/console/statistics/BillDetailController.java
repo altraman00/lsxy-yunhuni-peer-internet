@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,15 +38,15 @@ public class BillDetailController extends AbstractPortalController {
      * @param appId 应用id
      * @return
      */
-    @RequestMapping("/call")
+    @RequestMapping("/notify")
     public ModelAndView call(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
-        Page pageObj = (Page)getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData();
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
+        Page pageObj = (Page)getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_NOTIFY,map.get("time"),map.get("appId")).getData();
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_NOTIFY,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",pageObj);
-        mav.setViewName("/console/statistics/billdetail/call");
+        mav.setViewName("/console/statistics/billdetail/notify");
         return mav;
     }
     /**

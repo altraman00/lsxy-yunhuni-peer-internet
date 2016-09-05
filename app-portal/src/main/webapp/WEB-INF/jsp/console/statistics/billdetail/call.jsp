@@ -31,7 +31,7 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/statistics/billdetail/call">语音呼叫</a>
+                                                <a href="${ctx}/console/statistics/billdetail/notify">外呼通知</a>
                                             </div>
                                         </li>
                                         <li>
@@ -89,7 +89,7 @@
                                     </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form:form action="${ctx}/console/statistics/billdetail/call" method="post" id="mainForm">
+                                    <form:form action="${ctx}/console/statistics/billdetail/notify" method="post" id="mainForm">
                                         <div class="row statistics_row" >
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
@@ -135,7 +135,7 @@
                                         </table>
                                     </div>
                                     <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/call"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/notify"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
