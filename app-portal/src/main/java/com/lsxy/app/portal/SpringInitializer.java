@@ -73,6 +73,12 @@ public class SpringInitializer extends AbstractHttpSessionApplicationInitializer
 
             servlet.setLoadOnStartup(1);
             servlet.addMapping("/");
+
+            FilterRegistration.Dynamic characterEncodingFilter = servletContext.addFilter("characterEncodingFilter", new CharacterEncodingFilter());
+            characterEncodingFilter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+            characterEncodingFilter.setInitParameter("encoding", "UTF-8");
+            characterEncodingFilter.setInitParameter("forceEncoding", "true");
+
             SpringContextUtil.setApplicationContext(rootAppContext);
         }
 
@@ -98,22 +104,22 @@ public class SpringInitializer extends AbstractHttpSessionApplicationInitializer
         this.registerFilter(servletContext, true, filterName, springSessionRepositoryFilter);
     }
 
-    private void registerFilters(ServletContext servletContext, boolean insertBeforeOtherFilters, Filter... filters) {
-        Assert.notEmpty(filters, "filters cannot be null or empty");
-        Filter[] var4 = filters;
-        int var5 = filters.length;
-
-        for(int var6 = 0; var6 < var5; ++var6) {
-            Filter filter = var4[var6];
-            if(filter == null) {
-                throw new IllegalArgumentException("filters cannot contain null values. Got " + Arrays.asList(filters));
-            }
-
-            String filterName = Conventions.getVariableName(filter);
-            this.registerFilter(servletContext, insertBeforeOtherFilters, filterName, filter);
-        }
-
-    }
+//    private void registerFilters(ServletContext servletContext, boolean insertBeforeOtherFilters, Filter... filters) {
+//        Assert.notEmpty(filters, "filters cannot be null or empty");
+//        Filter[] var4 = filters;
+//        int var5 = filters.length;
+//
+//        for(int var6 = 0; var6 < var5; ++var6) {
+//            Filter filter = var4[var6];
+//            if(filter == null) {
+//                throw new IllegalArgumentException("filters cannot contain null values. Got " + Arrays.asList(filters));
+//            }
+//
+//            String filterName = Conventions.getVariableName(filter);
+//            this.registerFilter(servletContext, insertBeforeOtherFilters, filterName, filter);
+//        }
+//
+//    }
 
     private void registerFilter(ServletContext servletContext, boolean insertBeforeOtherFilters, String filterName, Filter filter) {
         FilterRegistration.Dynamic registration = servletContext.addFilter(filterName, filter);
