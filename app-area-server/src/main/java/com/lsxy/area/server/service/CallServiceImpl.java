@@ -261,7 +261,12 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", app.getUrl(),dto.getUser_data());
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,
+                    "captcha_call", app.getUrl(),dto.getUser_data(),
+                    new MapBuilder<String,Object>()
+                    .put("from",oneTelnumber)
+                    .put("to",to)
+                    .build());
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){

@@ -15,4 +15,6 @@ public interface CallSessionService extends BaseService<CallSession> {
      */
     Long currentCallSessionCount(String appId);
 
+
+    void updateStatusByRelevanceId(String relevanceId,Integer status);
 }

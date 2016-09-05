@@ -28,6 +28,7 @@ public class CallSession extends IdEntity {
     private Tenant tenant;      //所属tenant
     private String relevanceId;//关联标识
     private String type; //查看产品表code字段或枚举类ProductCode
+    private String resId;//
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
@@ -72,5 +73,14 @@ public class CallSession extends IdEntity {
 
     public void setTenant(Tenant tenant) {
         this.tenant = tenant;
+    }
+
+    @Column(name = "res_id")
+    public String getResId() {
+        return resId;
+    }
+
+    public void setResId(String resId) {
+        this.resId = resId;
     }
 }

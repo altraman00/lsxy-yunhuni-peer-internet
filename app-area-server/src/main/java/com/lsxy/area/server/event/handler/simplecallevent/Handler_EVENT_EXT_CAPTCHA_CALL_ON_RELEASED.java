@@ -9,12 +9,17 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.CaptchaCall;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.CaptchaCallService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -26,6 +31,12 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
 
     @Autowired
     private BusinessStateService businessStateService;
+
+    @Autowired
+    private CallSessionService callSessionService;
+
+    @Autowired
+    private CaptchaCallService captchaCallService;
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
@@ -86,6 +97,17 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
+        }
+
+        //更新会话状态
+        callSessionService.updateStatusByRelevanceId(call_id, CallSession.STATUS_OVER);
+
+        //更新语音验证码记录表状态
+        CaptchaCall captchaCall = captchaCallService.findById(call_id);
+        if(captchaCall!=null){
+            captchaCall.setHangupSide((String)paramMap.get("dropped_by"));
+            captchaCall.setEndTime(new Date());
+            captchaCallService.save(captchaCall);
         }
         return res;
     }
