@@ -3,7 +3,6 @@ package com.lsxy.area.agent.handler;
 import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.app.area.cti.commander.RpcError;
 import com.lsxy.app.area.cti.commander.RpcResultListener;
-import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -18,7 +17,6 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -32,17 +30,8 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_CAPTCHA_CALL.class);
 
-    @Value("${area.agent.client.cti.sip.host}")
-    private String ctiHost;
-
-    @Value("${area.agent.client.cti.sip.port}")
-    private int ctiPort;
-
     @Autowired
     private CTIClientContext cticlientContext;
-
-    @Autowired(required = false)
-    private StasticsCounter sc;
 
     @Autowired
     private SessionContext sessionContext;
@@ -52,11 +41,14 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
 
     @Override
     public String getEventName() {
-        return ServiceConstants.MN_CH_EXT_NOTIFY_CALL;
+        return ServiceConstants.MN_CH_EXT_CAPTCHA_CALL;
     }
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
+        if(logger.isDebugEnabled()){
+            logger.debug("开始处理{}事件,{}",getEventName(),request);
+        }
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Client cticlient = cticlientContext.getAvalibleClient();
@@ -65,11 +57,8 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
             return response;
         }
 
-        if(logger.isDebugEnabled()){
-            logger.debug("handler process_MN_CH_EXT_CAPTCHA_CALL:{}",request);
-        }
-
         Map<String, Object> params = request.getParamMap();
+        String call_id = (String)params.get("user_data");
         try {
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建语音验证码资源，参数为{}", JSONUtil.objectToJson(params));

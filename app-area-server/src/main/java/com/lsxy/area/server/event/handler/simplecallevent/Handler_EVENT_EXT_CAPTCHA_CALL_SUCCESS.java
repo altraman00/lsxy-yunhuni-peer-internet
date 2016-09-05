@@ -25,7 +25,7 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_EXT_DUO_CALLBACK_SUCCESS;
+        return Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS;
     }
 
     @Override

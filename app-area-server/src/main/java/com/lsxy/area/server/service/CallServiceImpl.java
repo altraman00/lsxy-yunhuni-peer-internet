@@ -217,7 +217,6 @@ public class CallServiceImpl implements CallService {
 
     @Override
     public String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException{
-        String callId = UUIDGenerator.uuid();
         String to = dto.getTo();
         if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
             throw new NumberNotAllowToCallException();
@@ -239,9 +238,14 @@ public class CallServiceImpl implements CallService {
 
         //TODO 获取线路IP和端口
         //TODO 待定
+        String callId = UUIDGenerator.uuid();
+        //TODO
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
         Map<String, Object> params = new HashMap<>();
-        params.put("from_uri", dto.getFrom()+"@"+ctiHost+":"+ctiPort);
-        params.put("to_uri", dto.getTo()+"@"+ctiHost+":"+ctiPort);
+        params.put("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        params.put("from_uri",oneTelnumber);
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("valid_keys",dto.getVerify_code());
         params.put("user_data",callId);
