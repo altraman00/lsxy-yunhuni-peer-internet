@@ -183,11 +183,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
                         this.bindIvrToApp(app, action.getTelNumber(), tenant);
                     }
-                    //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
-                    if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
-                        //支付扣费，并插入消费记录
-                        this.pay(appId, action.getAmount(), tenant);
-                    }
+
                     //将上一步设为已支付和完成
                     for(AppOnlineAction a:actionList){
                         a.setStatus(AppOnlineAction.STATUS_DONE);
@@ -214,6 +210,11 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     //应用状态改为上线
                     app.setStatus(App.STATUS_ONLINE);
                     appService.save(app);
+                    //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
+                    if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
+                        //支付扣费，并插入消费记录
+                        this.pay(appId, action.getAmount(), tenant);
+                    }
                     return newAction;
                 }else{
                     throw new NotEnoughMoneyException("余额不足");
