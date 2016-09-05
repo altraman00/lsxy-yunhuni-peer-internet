@@ -16,9 +16,9 @@ public class CallSession extends IdEntity {
     public static final int STATUS_OVER = 2;
     public static final int STATUS_RINGING = 3;
     //TODO 换成与ProductCode枚举关联
-    public static final String TYPE_VOICE_CALL = "voice_call";
+    public static final String TYPE_VOICE_NOTIFY = "notify_call";
     public static final String TYPE_VOICE_CALLBACK = "duo_call";
-    public static final String TYPE_VOICE_MEETING = "conf_call";
+    public static final String TYPE_VOICE_MEETING = "sys_conf";
     public static final String TYPE_VOICE_IVR = "ivr_call";
     public static final String TYPE_VOICE_VOICECODE = "captcha_call";
     public static final String TYPE_VOICE_RECORDING = "voice_recording";
@@ -27,7 +27,7 @@ public class CallSession extends IdEntity {
     private App app;            //所属APP
     private Tenant tenant;      //所属tenant
     private String relevanceId;//关联标识
-    private String type;//查看产品表code字段或枚举类ProductCode
+    private String type; //查看产品表code字段或枚举类ProductCode
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
