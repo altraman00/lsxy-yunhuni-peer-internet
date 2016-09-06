@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -30,7 +29,6 @@ import java.util.Date;
  * Created by liups on 2016/8/27.
  */
 @Service
-@Transactional
 public class CalCostServiceImpl implements CalCostService{
     private static final Logger logger = LoggerFactory.getLogger(CalCostServiceImpl.class);
     @Autowired
