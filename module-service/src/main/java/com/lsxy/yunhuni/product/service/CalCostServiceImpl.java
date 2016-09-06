@@ -16,6 +16,8 @@ import com.lsxy.yunhuni.api.product.service.ProductPriceService;
 import com.lsxy.yunhuni.api.product.service.ProductService;
 import com.lsxy.yunhuni.api.product.service.ProductTenantDiscountService;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ import java.util.Date;
  */
 @Service
 public class CalCostServiceImpl implements CalCostService{
+    private static final Logger logger = LoggerFactory.getLogger(CalCostServiceImpl.class);
     @Autowired
     ProductService productService;
     @Autowired
@@ -131,8 +134,14 @@ public class CalCostServiceImpl implements CalCostService{
             }
             default:{
                 Long useTime = calUnitNum(time, product) * product.getTimeUnit();
+                if(logger.isDebugEnabled()){
+                    logger.info("扣费通话时长：{}",useTime);
+                }
                 //语音
                 Long voice = calBillingService.getVoice(tenantId);
+                if(logger.isDebugEnabled()){
+                    logger.info("剩余语音时长 ：{}",voice);
+                }
                 if(useTime <= voice){
                     calBillingService.incUseVoice(tenantId,dt,useTime);
                     VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
