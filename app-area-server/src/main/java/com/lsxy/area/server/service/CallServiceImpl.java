@@ -159,6 +159,7 @@ public class CallServiceImpl implements CallService {
         params.put("ring_play_file",dto.getRing_tone());
         params.put("ring_play_mode",dto.getRing_tone_mode());
         params.put("user_data1",duocCallId);
+        params.put("user_data2",duocCallId);
         //录音
         if(dto.getRecording()){
             //TODO 录音文件名称
