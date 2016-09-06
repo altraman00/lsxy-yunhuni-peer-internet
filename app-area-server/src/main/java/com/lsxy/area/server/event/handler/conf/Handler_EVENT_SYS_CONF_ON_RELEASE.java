@@ -49,7 +49,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         String conf_id = (String)params.get("user_data");
-        //TODO 会议与会者
+        //TODO 会议与会者list
         String member_ids = (String)params.get("member_ids");
         if(StringUtils.isBlank(conf_id)){
             logger.info("conf_id is null");

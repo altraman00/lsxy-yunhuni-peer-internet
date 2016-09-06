@@ -108,17 +108,6 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
             ivrActionUtil.doAction(call_id);
-        }else if("ivr_incoming".equals(state.getType())){//通过ivr呼入 发起的呼叫
-            App app = appService.findById(state.getAppId());
-            //发送拨号结束通知
-            Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .put("event","ivr.dial_end")
-                    .put("id",call_id)
-                    .put("begin_time",params.get("begin_time"))
-                    .put("end_time",params.get("end_time"))
-                    .put("user_data",state.getUserdata())
-                    .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         }
         return res;
     }

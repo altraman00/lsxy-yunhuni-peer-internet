@@ -84,7 +84,7 @@ public class ConfServiceImpl implements ConfService {
                                 .putIfNotEmpty("user_data",confId)
                                 .putIfNotEmpty("max_seconds",maxDuration)
                                 .putIfNotEmpty("bg_file",bgmFile)
-                                .putIfNotEmpty("release_threshold",0).build();
+                                .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -95,8 +95,9 @@ public class ConfServiceImpl implements ConfService {
         BusinessState state = new BusinessState(tenantId,app.getId(),confId,"sys_conf",
                 userData,new MapBuilder<String,Object>()
                 .put("max_seconds",maxDuration)//会议最大持续时长
+                //TODO 需要判断最大与会数
                 .put("max_parts",maxParts)//最大与会数
-                .put("parts_num",0)//与会数
+                //TODO 需要判断是否自动挂断所有会话
                 .put("auto_hangup",autoHangup)//会议结束是否自动挂断
                 .put("recording",recording)//是否自动启动录音
                 .build());
@@ -199,10 +200,11 @@ public class ConfServiceImpl implements ConfService {
         //保存业务数据，后续事件要用到
         BusinessState callstate = new BusinessState(tenantId,app.getId(),callId,"sys_conf",null
                 ,new MapBuilder<String,Object>()
-                .put("max_seconds",state.getBusinessData().get("max_seconds"))//最大时间,默认与会议一只
+                .put("max_seconds",state.getBusinessData().get("max_seconds"))//最大时间,默认与会议一致
                 .put("conf_id",confId)//所属会议
                 .put("play_file",playFile)//加入后在会议播放这个文件
                 .put("voice_mode",voiceMode)//加入后的声音模式
+                //TODO 这个是什么鬼dial_voice_stop_cond
                 .put("dial_voice_stop_cond",dialVoiceStopCond)//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
                 .build());
         businessStateService.save(callstate);
