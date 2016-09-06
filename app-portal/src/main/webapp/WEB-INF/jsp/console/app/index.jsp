@@ -135,7 +135,7 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>基础语音服务</strong></p>
-                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音呼叫</a>（嵌入CRM、OA、呼叫中心等产品中发起通话）</p>
+                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音呼叫</a>（自动拨打用户电话，并播报自定义的通知内容）</p>
                                                 <p><input type="checkbox" name="isVoiceCallback" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音回拨</a>（以不同的通话方式实现匿名通话功能,保护双方号码隐私）</p>
 
                                             </div>

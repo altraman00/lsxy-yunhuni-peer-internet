@@ -131,11 +131,23 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
         if(StringUtil.isNotEmpty(sqlCount)) {
             Object[] obj = null;
             if(date1!=null&&date2!=null){
-                obj = new Object[]{date1,date2,date1,date2};
+                if(type==null||StringUtil.isEmpty(type+"")) {
+                    obj = new Object[]{date1, date2, date1, date2};
+                }else{
+                    obj = new Object[]{date1, date2};
+                }
             }else if(date1!=null&&date2==null){
-                obj = new Object[]{date1,date1};
+                if(type==null||StringUtil.isEmpty(type+"")) {
+                    obj = new Object[]{date1,date1};
+                }else{
+                    obj = new Object[]{date1};
+                }
             }else if(date1==null&&date2!=null){
-                obj = new Object[]{date2,date2};
+                if(type==null||StringUtil.isEmpty(type+"")) {
+                    obj = new Object[]{date2,date2};
+                }else{
+                    obj = new Object[]{date2};
+                }
             }
             Integer totalCount = jdbcTemplate.queryForObject(sqlCount, Integer.class ,obj);
             sql = sql + " limit ?,?";
