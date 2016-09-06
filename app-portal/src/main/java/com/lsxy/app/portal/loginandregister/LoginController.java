@@ -1,14 +1,20 @@
 package com.lsxy.app.portal.loginandregister;
 
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 /**
  * 登录处理器
@@ -30,5 +36,28 @@ public class LoginController {
             String toUrl = "login";
             return new ModelAndView(toUrl);
         }
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    @RequestMapping("/testsession")
+    @ResponseBody
+    public String testSession(HttpServletRequest request){
+        String sessionid = (String) request.getSession().getAttribute("sessionValue");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("获取SESSION:"+sessionid);
+        }
+        if(StringUtil.isEmpty(sessionid)){
+
+            sessionid = DateUtils.getDate(new Date(),"yyyy-MM-dd HH:mm:ss");
+            request.getSession().setAttribute("sessionValue",sessionid);
+
+            if(logger.isDebugEnabled()){
+                logger.debug("没有拿到SESSION,新创建一个:"+sessionid);
+            }
+        }
+
+        return sessionid;
     }
 }
