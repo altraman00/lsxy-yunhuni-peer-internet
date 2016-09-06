@@ -172,7 +172,6 @@ public class CallServiceImpl implements CallService {
             Area area = app.getArea();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
             try {
-                rpcCaller.invoke(sessionContext, rpcrequest);
                 Map<String,Object> data = new MapBuilder<String,Object>()
                         .put(to1_uri,UUIDGenerator.uuid())
                         .put(to2_uri,UUIDGenerator.uuid())
@@ -188,8 +187,10 @@ public class CallServiceImpl implements CallService {
                 CallSession callSession2 = new CallSession((String) data.get(to2_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
                 callSessionService.save(callSession);
                 callSessionService.save(callSession2);
+                rpcCaller.invoke(sessionContext, rpcrequest);
             } catch (Exception e) {
                 logger.error("消息发送到区域失败:{}", rpcrequest);
+                e.printStackTrace();
                 throw new InvokeCallException(e);
             }
             return duocCallId;
