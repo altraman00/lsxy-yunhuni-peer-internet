@@ -19,6 +19,7 @@ import java.util.Date;
 public class VoiceCdr extends IdEntity {
     public static final Integer COST_TYPE_DEDUCT = 1;
     public static final Integer COST_TYPE_COST = 2;
+    public static final Integer COST_TYPE_COST_DEDUCT = 3;
     private String sessionId;//会话ID
     private String areaId;//所属区域
     private String tenantId;//所属租户

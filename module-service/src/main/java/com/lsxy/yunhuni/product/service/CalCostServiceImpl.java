@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -29,6 +30,7 @@ import java.util.Date;
  * Created by liups on 2016/8/27.
  */
 @Service
+@Transactional
 public class CalCostServiceImpl implements CalCostService{
     private static final Logger logger = LoggerFactory.getLogger(CalCostServiceImpl.class);
     @Autowired
@@ -91,13 +93,13 @@ public class CalCostServiceImpl implements CalCostService{
                     costTimeLong = 0L;
                     cost = new BigDecimal(0);
                     deduct = 1L;
-                    costType = 1;
+                    costType = VoiceCdr.COST_TYPE_DEDUCT;
                 }else{
                     BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
                     costTimeLong = 0L;
                     cost = consume;
                     deduct = 0L;
-                    costType = 2;
+                    costType = VoiceCdr.COST_TYPE_COST;
                 }
                 break;
             }
@@ -112,7 +114,7 @@ public class CalCostServiceImpl implements CalCostService{
                     costTimeLong = useTime;
                     cost = new BigDecimal(0);
                     deduct = useTime;
-                    costType = 1;
+                    costType = VoiceCdr.COST_TYPE_DEDUCT;
                 }else if(conference > 0){
                     //先扣量
                     calBillingService.incUseConference(tenantId,dt,conference);
@@ -123,13 +125,13 @@ public class CalCostServiceImpl implements CalCostService{
                     costTimeLong = useTime;
                     cost = consume;
                     deduct = conference;
-                    costType = 3;
+                    costType = VoiceCdr.COST_TYPE_COST_DEDUCT;
                 } else{
                     BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
                     costTimeLong = useTime;
                     cost = consume;
                     deduct = 0L;
-                    costType = 2;
+                    costType = VoiceCdr.COST_TYPE_COST;
                 }
                 break;
             }
@@ -150,7 +152,7 @@ public class CalCostServiceImpl implements CalCostService{
                     costTimeLong = useTime;
                     cost = new BigDecimal(0);
                     deduct = useTime;
-                    costType = 1;
+                    costType = VoiceCdr.COST_TYPE_DEDUCT;
                 }else if(voice > 0){
                     //先扣量
                     calBillingService.incUseVoice(tenantId,dt,voice);
@@ -161,13 +163,13 @@ public class CalCostServiceImpl implements CalCostService{
                     costTimeLong = useTime;
                     cost = consume;
                     deduct = voice;
-                    costType = 3;
+                    costType = VoiceCdr.COST_TYPE_COST_DEDUCT;
                 } else{
                     BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
                     costTimeLong = useTime;
                     cost = consume;
                     deduct = 0L;
-                    costType = 2;
+                    costType = VoiceCdr.COST_TYPE_COST;
                 }
                 break;
             }
