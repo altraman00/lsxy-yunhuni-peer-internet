@@ -56,6 +56,7 @@ public class CallSession extends IdEntity {
         this.relevanceId = relevanceId;
     }
 
+    @Column(name = "type")
     public String getType() {
         return type;
     }
