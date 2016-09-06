@@ -37,27 +37,4 @@ public class LoginController {
             return new ModelAndView(toUrl);
         }
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-
-    @RequestMapping("/testsession")
-    @ResponseBody
-    public String testSession(HttpServletRequest request){
-        String sessionid = (String) request.getSession().getAttribute("sessionValue");
-
-        if(logger.isDebugEnabled()){
-            logger.debug("获取SESSION:"+sessionid);
-        }
-        if(StringUtil.isEmpty(sessionid)){
-
-            sessionid = DateUtils.getDate(new Date(),"yyyy-MM-dd HH:mm:ss");
-            request.getSession().setAttribute("sessionValue",sessionid);
-
-            if(logger.isDebugEnabled()){
-                logger.debug("没有拿到SESSION,新创建一个:"+sessionid);
-            }
-        }
-
-        return sessionid;
-    }
 }

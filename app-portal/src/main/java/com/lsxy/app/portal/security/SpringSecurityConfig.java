@@ -21,7 +21,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 /**
  * Created by Tandy on 2016/6/7.
  */
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
@@ -60,11 +60,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //                    .exceptionHandling().accessDeniedPage("/exception/403");
 
 
-                //CharacterEncodingFilter 过滤器如果碰到Security，必须添加在Security前面，否则会出现乱码问题
-                CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-                characterEncodingFilter.setEncoding("UTF-8");
-                characterEncodingFilter.setForceEncoding(true);
-//                http.addFilterBefore(characterEncodingFilter,CsrfFilter.class);
+        //CharacterEncodingFilter 过滤器如果碰到Security，必须添加在Security前面，否则会出现乱码问题
+        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding("UTF-8");
+        characterEncodingFilter.setForceEncoding(true);
+
+        //将转码放在最前面 将springsession过滤器放最前面,转码必须在最前面
         http.addFilterBefore(springSessionRepositoryFilter, WebAsyncManagerIntegrationFilter.class);
         http.addFilterBefore(characterEncodingFilter,SessionRepositoryFilter.class);
     }
