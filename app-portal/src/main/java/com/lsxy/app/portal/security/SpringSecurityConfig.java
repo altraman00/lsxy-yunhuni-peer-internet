@@ -74,13 +74,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         return new PortalAuthenticationSuccessHandler();
     }
 
-//    @Bean
-//    public FilterRegistrationBean registerRequestLogFilter(SessionRepositoryFilter filter) {
-//        FilterRegistrationBean reg = new FilterRegistrationBean(filter);
-//        reg.setOrder(1);
-//        return reg;
-//    }
-
 
     /**
      * 配置加密机制,以及加密盐值
