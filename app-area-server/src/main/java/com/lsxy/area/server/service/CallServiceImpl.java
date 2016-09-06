@@ -134,8 +134,6 @@ public class CallServiceImpl implements CallService {
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Map<String, Object> params = new HashMap<>();
-        //TODO 增加区域参数
-        Area area = app.getArea();
         params.put("from1_uri", dto.getFrom1());
         params.put("to1_uri",dto.getTo1()+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
         params.put("from2_uri", dto.getFrom2());
@@ -154,12 +152,13 @@ public class CallServiceImpl implements CallService {
         }
 
         try {
-            //找到合适的区域代理
+            //TODO 增加区域参数 选择合适的会话
+            Area area = app.getArea();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
             try {
                 rpcCaller.invoke(sessionContext, rpcrequest);
                 //将数据存到redis
-                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,"duo_call", app.getUrl(),dto.getUser_data());
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,"duo_call", app.getUrl(),area.getId(),lineGateway.getId(),dto.getUser_data());
                 businessStateService.save(cache);
             } catch (Exception e) {
                 logger.error("消息发送到区域失败:{}", rpcrequest);
@@ -207,7 +206,7 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", app.getUrl(),dto.getUser_data());
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", app.getUrl(),null,null,dto.getUser_data());
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
@@ -251,7 +250,7 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", app.getUrl(),dto.getUser_data());
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", app.getUrl(),null,null,dto.getUser_data());
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){

@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.session.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 
 import javax.persistence.*;
 
@@ -16,11 +17,11 @@ public class CallSession extends IdEntity {
     public static final int STATUS_OVER = 2;
     public static final int STATUS_RINGING = 3;
     //TODO 换成与ProductCode枚举关联
-    public static final String TYPE_VOICE_NOTIFY = "notify_call";
-    public static final String TYPE_VOICE_CALLBACK = "duo_call";
-    public static final String TYPE_VOICE_MEETING = "sys_conf";
-    public static final String TYPE_VOICE_IVR = "ivr_call";
-    public static final String TYPE_VOICE_VOICECODE = "captcha_call";
+    public static final String TYPE_VOICE_NOTIFY = ProductCode.notify_call.name();
+    public static final String TYPE_VOICE_CALLBACK = ProductCode.duo_call.name();
+    public static final String TYPE_VOICE_MEETING = ProductCode.sys_conf.name();
+    public static final String TYPE_VOICE_IVR = ProductCode.ivr_call.name();
+    public static final String TYPE_VOICE_VOICECODE = ProductCode.captcha_call.name();
     public static final String TYPE_VOICE_RECORDING = "voice_recording";
 
     private Integer status;         //状态
@@ -28,6 +29,10 @@ public class CallSession extends IdEntity {
     private Tenant tenant;      //所属tenant
     private String relevanceId;//关联标识
     private String type; //查看产品表code字段或枚举类ProductCode
+    private String fromNum; //发起方
+    private String toNum; //接收方
+
+
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;
@@ -72,5 +77,23 @@ public class CallSession extends IdEntity {
 
     public void setTenant(Tenant tenant) {
         this.tenant = tenant;
+    }
+
+    @Column(name = "from_num")
+    public String getFromNum() {
+        return fromNum;
+    }
+
+    public void setFromNum(String fromNum) {
+        this.fromNum = fromNum;
+    }
+
+    @Column(name = "to_num")
+    public String getToNum() {
+        return toNum;
+    }
+
+    public void setToNum(String toNum) {
+        this.toNum = toNum;
     }
 }

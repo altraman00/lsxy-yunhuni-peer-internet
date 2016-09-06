@@ -15,6 +15,7 @@ import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.product.service.ProductPriceService;
 import com.lsxy.yunhuni.api.product.service.ProductService;
 import com.lsxy.yunhuni.api.product.service.ProductTenantDiscountService;
+import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,9 +59,23 @@ public class CalCostServiceImpl implements CalCostService{
     }
 
     @Override
-    public void consume(String apiCmd, String tenantId, String appId, Long time, Date dt) {
-        ProductCode productCode = ProductCode.changeApiCmdToProductCode(apiCmd);
+    public void callConsume(VoiceCdr cdr) {
+        ProductCode productCode = ProductCode.valueOf(cdr.getType());
+        String tenantId = cdr.getTenantId();
+        String appId = cdr.getAppId();
+        Long time = cdr.getCallTimeLong();
+        Date dt = cdr.getCallEndDt();
         Product product = productService.getProductByCode(productCode.name());
+        //计量单位
+        String unit = product.getUnit();
+        //扣费时长
+        Long costTimeLong;
+        //消费金额
+        BigDecimal cost;
+        //扣量
+        Long deduct;
+        //1.扣量2.扣费3.扣量加扣费
+        Integer costType;
         switch (productCode){
             case captcha_call:{
                 //短信

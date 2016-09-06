@@ -14,13 +14,15 @@ public class BusinessState implements Serializable{
     private String userdata;
     private String resId;
     private String callBackUrl;
+    private String areaId;
+    private String lineGatewayId;
     private Map<String,Object> businessData;
 
     public BusinessState() {
     }
 
-    public BusinessState(String tenantId, String appId, String id, String type, String callBackUrl,String userdata) {
-        this(tenantId,appId,id,type,userdata,null,callBackUrl,null);
+    public BusinessState(String tenantId, String appId, String id, String type, String callBackUrl,String areaId, String lineGatewayId, String userdata) {
+        this(tenantId,appId,id,type,userdata,null,callBackUrl,areaId,lineGatewayId,null);
     }
 
     public BusinessState(String tenantId, String appId, String id, String type, String userdata, Map<String,Object> businessData) {
@@ -28,6 +30,10 @@ public class BusinessState implements Serializable{
     }
 
     public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl,Map<String,Object> businessData) {
+        this(tenantId,appId,id,type,userdata,resId,callBackUrl,null,null,businessData);
+    }
+
+    public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl, String areaId, String lineGatewayId, Map<String, Object> businessData) {
         this.tenantId = tenantId;
         this.appId = appId;
         this.id = id;
@@ -35,6 +41,8 @@ public class BusinessState implements Serializable{
         this.userdata = userdata;
         this.resId = resId;
         this.callBackUrl = callBackUrl;
+        this.areaId = areaId;
+        this.lineGatewayId = lineGatewayId;
         this.businessData = businessData;
     }
 
@@ -100,5 +108,21 @@ public class BusinessState implements Serializable{
 
     public void setCallBackUrl(String callBackUrl) {
         this.callBackUrl = callBackUrl;
+    }
+
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getLineGatewayId() {
+        return lineGatewayId;
+    }
+
+    public void setLineGatewayId(String lineGatewayId) {
+        this.lineGatewayId = lineGatewayId;
     }
 }
