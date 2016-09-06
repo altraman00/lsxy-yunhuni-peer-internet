@@ -64,7 +64,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
                 characterEncodingFilter.setEncoding("UTF-8");
                 characterEncodingFilter.setForceEncoding(true);
-                http.addFilterBefore(characterEncodingFilter,CsrfFilter.class);
+//                http.addFilterBefore(characterEncodingFilter,CsrfFilter.class);
         http.addFilterBefore(springSessionRepositoryFilter, WebAsyncManagerIntegrationFilter.class);
         http.addFilterBefore(characterEncodingFilter,SessionRepositoryFilter.class);
     }
