@@ -66,67 +66,50 @@ public class RegisterController {
      * 用户注册
      */
     @RequestMapping(value = "/register",method = RequestMethod.POST)
-//    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
+    @AvoidDuplicateSubmission(needRemoveToken = true) //需要检验token防止重复提交的方法用这个
     public ModelAndView register(HttpServletRequest request, String userName, String mobile,String email){
-        try {
-            request.setCharacterEncoding("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        Map<String,String> model = new HashMap<>();
+        String erInfo = "erInfo";
+        String erPage = "register/fail";
+        String successPage = "register/success";
+        //在此再进行一次用户名的正则校验（因为有些非法用户名会导致账号异常，如手机号，邮箱）
+        if(StringUtils.isNotBlank(userName)){
+            String regEx="^[0-9]*$|[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+            Pattern p = Pattern.compile(regEx);
+            boolean m = p.matcher(userName).find();
+            if(m){
+                throw new RuntimeException("非法用户名");
+            }
+        }else{
+            throw new RuntimeException("用户名为空");
         }
-        try {
-            String xxx = request.getParameter("userName");
-            System.out.println(xxx);
-            String xx = new String(userName.getBytes("iso-8859-1"),"UTF-8");
-            System.out.println(xx);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        //获取手机验证码
+        MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
+        if(checker != null){
+            if(checker.getMobile().equals(mobile) && checker.isPass()){
+                try {
+                    //调用创建账号方法
+                    createAccount(userName,mobile,email);
+                } catch (RegisterException e) {
+                    model.put(erInfo,e.getMessage());
+                    return new ModelAndView(erPage,model);
+                }
+                //将手机验证码删除
+                MobileCodeUtils.removeMobileCodeChecker(request);
+
+                //返回页面，通知查收邮件激活账号
+                model.put("email",email);
+                return new ModelAndView(successPage,model);
+            }else{
+                //提示信息：手机验证没通过
+                model.put(erInfo,"手机验证没通过");
+                return new ModelAndView(erPage,model);
+            }
+        }else{
+            //提示信息：手机验证码过期
+            model.put(erInfo,"手机验证码过期");
+            return new ModelAndView(erPage,model);
         }
-        WebUtils.logRequestParams(request);
-
-        return null;
-//        Map<String,String> model = new HashMap<>();
-//        String erInfo = "erInfo";
-//        String erPage = "register/fail";
-//        String successPage = "register/success";
-//        //在此再进行一次用户名的正则校验（因为有些非法用户名会导致账号异常，如手机号，邮箱）
-//        if(StringUtils.isNotBlank(userName)){
-//            String regEx="^[0-9]*$|[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
-//            Pattern p = Pattern.compile(regEx);
-//            boolean m = p.matcher(userName).find();
-//            if(m){
-//                throw new RuntimeException("非法用户名");
-//            }
-//        }else{
-//            throw new RuntimeException("用户名为空");
-//        }
-//        //获取手机验证码
-//        MobileCodeChecker checker = MobileCodeUtils.getMobileCodeChecker(request);
-//        if(checker != null){
-//            if(checker.getMobile().equals(mobile) && checker.isPass()){
-//                try {
-//                    //调用创建账号方法
-//                    createAccount(userName,mobile,email);
-//                } catch (RegisterException e) {
-//                    model.put(erInfo,e.getMessage());
-//                    return new ModelAndView(erPage,model);
-//                }
-//                //将手机验证码删除
-//                MobileCodeUtils.removeMobileCodeChecker(request);
-//
-//                //返回页面，通知查收邮件激活账号
-//                model.put("email",email);
-//                return new ModelAndView(successPage,model);
-//            }else{
-//                //提示信息：手机验证没通过
-//                model.put(erInfo,"手机验证没通过");
-//                return new ModelAndView(erPage,model);
-//            }
-//        }else{
-//            //提示信息：手机验证码过期
-//            model.put(erInfo,"手机验证码过期");
-//            return new ModelAndView(erPage,model);
-//        }
-
     }
 
     /**

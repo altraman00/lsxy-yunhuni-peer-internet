@@ -1,26 +1,15 @@
 package com.lsxy.app.portal;
 
-import ch.qos.logback.core.joran.spi.JoranException;
 import com.lsxy.app.portal.config.SpringStartupConfig;
-import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.core.web.SpringContextUtil;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.Conventions;
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
-import org.springframework.util.Assert;
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.*;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Set;
 
 /**
  * Created by Tandy on 2016/6/6.
@@ -70,14 +59,8 @@ public class SpringInitializer extends AbstractHttpSessionApplicationInitializer
             servletContext.addListener(new ContextLoaderListener(rootAppContext));
 
             ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatcher", new DispatcherServlet(rootAppContext));
-
             servlet.setLoadOnStartup(1);
             servlet.addMapping("/");
-
-            FilterRegistration.Dynamic characterEncodingFilter = servletContext.addFilter("characterEncodingFilter", new CharacterEncodingFilter());
-            characterEncodingFilter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
-            characterEncodingFilter.setInitParameter("encoding", "UTF-8");
-            characterEncodingFilter.setInitParameter("forceEncoding", "true");
 
             SpringContextUtil.setApplicationContext(rootAppContext);
         }
@@ -101,7 +84,7 @@ public class SpringInitializer extends AbstractHttpSessionApplicationInitializer
             springSessionRepositoryFilter.setContextAttribute(contextAttribute);
         }
 
-        this.registerFilter(servletContext, true, filterName, springSessionRepositoryFilter);
+        this.registerFilter(servletContext, false, filterName, springSessionRepositoryFilter);
     }
 
 //    private void registerFilters(ServletContext servletContext, boolean insertBeforeOtherFilters, Filter... filters) {
@@ -120,6 +103,12 @@ public class SpringInitializer extends AbstractHttpSessionApplicationInitializer
 //        }
 //
 //    }
+
+
+    @Override
+    protected String getDispatcherWebApplicationContextSuffix() {
+        return "dispatcher";
+    }
 
     private void registerFilter(ServletContext servletContext, boolean insertBeforeOtherFilters, String filterName, Filter filter) {
         FilterRegistration.Dynamic registration = servletContext.addFilter(filterName, filter);
