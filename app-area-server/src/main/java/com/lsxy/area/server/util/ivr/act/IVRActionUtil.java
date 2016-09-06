@@ -14,11 +14,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.protocol.HTTP;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -39,6 +38,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 /**
  * Created by liuws on 2016/9/1.
@@ -55,7 +55,7 @@ public class IVRActionUtil {
 
     private static final int RETRY_TIMES = 3;
 
-    private HttpClient client = null;
+    private CloseableHttpAsyncClient client = null;
 
     //设置请求和传输超时时间
     private RequestConfig config =
@@ -83,7 +83,8 @@ public class IVRActionUtil {
         initClient();
     }
     private void initClient(){
-        client = HttpClientBuilder.create().build();
+        client = HttpAsyncClients.createDefault();
+        client.start();
     }
     private void initHandler(){
         Reflections reflections = new Reflections("com.lsxy.area.server.util.ivr");
@@ -96,12 +97,10 @@ public class IVRActionUtil {
     }
     @PreDestroy
     public void destroy(){
-        if(client instanceof CloseableHttpClient){
-            try {
-                ((CloseableHttpClient)client).close();
-            } catch (IOException e) {
-                logger.info("关闭httpclient",e);
-            }
+        try {
+            client.close();
+        } catch (IOException e) {
+            logger.info("关闭httpclient",e);
         }
     }
 
@@ -113,7 +112,8 @@ public class IVRActionUtil {
             try{
                 HttpGet get = new HttpGet(url);
                 get.setConfig(config);
-                HttpResponse response = client.execute(get);
+                Future<HttpResponse> future = client.execute(get,null);
+                HttpResponse response = future.get();
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
                     result = true;
@@ -218,7 +218,9 @@ public class IVRActionUtil {
         }
 
         String resXML = getRequest(nextUrl.toString());
-
+        if(StringUtils.isBlank(resXML)){
+            return false;
+        }
         ActionHandler  h = null;
         Element ele = null;
         try {
