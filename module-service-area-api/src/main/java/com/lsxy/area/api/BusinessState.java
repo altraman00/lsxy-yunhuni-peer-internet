@@ -21,7 +21,7 @@ public class BusinessState implements Serializable{
     public BusinessState() {
     }
 
-    public BusinessState(String tenantId, String appId, String id, String type, String callBackUrl,String areaId, String lineGatewayId, String userdata,Map<String,Object> map) {
+    public BusinessState(String tenantId, String appId, String id, String type,String userdata, String callBackUrl,String areaId, String lineGatewayId, Map<String,Object> map) {
         this(tenantId,appId,id,type,userdata,null,callBackUrl,areaId,lineGatewayId,map);
     }
 

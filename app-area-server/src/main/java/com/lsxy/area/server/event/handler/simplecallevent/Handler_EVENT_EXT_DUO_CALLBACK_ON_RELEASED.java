@@ -113,7 +113,6 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
                 .build();
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
 
-
         if(logger.isDebugEnabled()){
             logger.debug("双向回拔结束事件");
         }
