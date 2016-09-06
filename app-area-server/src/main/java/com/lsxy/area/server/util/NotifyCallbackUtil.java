@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 通过这个类向开发者发送事件通知
@@ -182,7 +180,7 @@ public class NotifyCallbackUtil {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         NotifyCallbackUtil a = new NotifyCallbackUtil();
         a.init();
         long s1=System.currentTimeMillis();
@@ -192,5 +190,5 @@ public class NotifyCallbackUtil {
         data.put("code","nc7y");
         Response res = a.postNotify("http://google.com/",data,3);
         System.out.println((System.currentTimeMillis()-s1));
-    }
+    }*/
 }
