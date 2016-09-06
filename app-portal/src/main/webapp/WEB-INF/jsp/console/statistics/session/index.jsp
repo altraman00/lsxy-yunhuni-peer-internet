@@ -296,7 +296,11 @@
                     name: '会话(次)',
                     max: xyMax,
                     min: 0,
-                    boundaryGap: [0.2, 0.2]
+                    boundaryGap: [0.2, 0.2],
+                    nameGap:32,
+                    nameTextStyle:{
+                        color:'#999',
+                    }
                 },
                 {
                     type: 'value',
@@ -304,7 +308,11 @@
                     name: '消费额(元)',
                     max: xdMax,
                     min: 0,
-                    boundaryGap: [0.2, 0.2]
+                    boundaryGap: [0.2, 0.2],
+                    nameGap:32,
+                    nameTextStyle:{
+                        color:'#999',
+                    }
                 }
             ],
             series: [
