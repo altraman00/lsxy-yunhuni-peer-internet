@@ -133,9 +133,6 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(recording == null || !(Boolean)recording){
             return;
         }
-        int times = 0;
-        int max_retry = 3;
-        boolean success = false;
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
                 .putIfNotEmpty("max_seconds",businessData.get("max_seconds"))
@@ -143,15 +140,11 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
                 .putIfNotEmpty("record_file", UUIDGenerator.uuid())
                 .putIfNotEmpty("user_data",conf_id)
                 .build();
-        do{
-            try {
-                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
-                rpcCaller.invoke(sessionContext, rpcrequest);
-                success = true;
-            } catch (Exception e) {
-                logger.error("会议创建自动录音：",e);
-                times++;
-            }
-        }while (!success && times<=max_retry);
+        try {
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            logger.error("会议创建自动录音：",e);
+        }
     }
 }

@@ -91,7 +91,7 @@ public class IVRActionUtil {
         for (Class<? extends ActionHandler> handlerClass : handlerClasss) {
             ActionHandler handler = applicationContext.getBean(handlerClass);
             handlers.put(handler.getAction(),handler);
-            logger.info("注册IVR动作处理器:{},{}",handler.getAction(),handler);
+            logger.info("注册IVR动作处理器:{},{}",handler.getAction().toLowerCase(),handler);
         }
     }
     @PreDestroy
@@ -224,13 +224,14 @@ public class IVRActionUtil {
         try {
             Document doc = DocumentHelper.parseText(resXML);
             ele = doc.getRootElement();
-            h = handlers.get(ele.getName());
-            if(h == null){
-                logger.info("没有找到对应的ivr动作处理类");
-                return false;
-            }
+            h = handlers.get(ele.getName().toLowerCase());
         } catch (Throwable e) {
             logger.error("处理ivr动作指令出错",e);
+            return false;
+        }
+        if(h == null){
+            logger.info("没有找到对应的ivr动作处理类");
+            return false;
         }
         return h.handle(call_id,ele);
     }
