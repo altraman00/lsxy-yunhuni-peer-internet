@@ -2,6 +2,7 @@ package com.lsxy.app.portal.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,6 +13,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.session.web.http.SessionRepositoryFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
@@ -22,6 +24,8 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
 
+    @Autowired
+    private SessionRepositoryFilter springSessionRepositoryFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -59,6 +63,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 filter.setEncoding("UTF-8");
                 filter.setForceEncoding(true);
                 http.addFilterBefore(filter,CsrfFilter.class);
+
+        http.addFilterAfter(springSessionRepositoryFilter,CharacterEncodingFilter.class);
     }
 
     @Bean
