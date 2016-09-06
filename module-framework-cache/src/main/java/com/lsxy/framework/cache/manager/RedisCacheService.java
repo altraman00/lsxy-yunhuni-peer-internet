@@ -43,7 +43,6 @@ public class RedisCacheService {
 
 	@PostConstruct
 	public void init(){
-		System.out.println(redisTemplate);
 	}
 
 	    /**
