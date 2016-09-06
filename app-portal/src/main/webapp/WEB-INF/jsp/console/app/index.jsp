@@ -101,7 +101,7 @@
                                             <lable class="col-md-3 text-right">所属行业：</lable>
                                             <div class="col-md-4 ">
                                                 <select name="industry" class="form-control notEmpty" >
-                                                    <option value="">请选择所属行业</option></select><select name="industry" class="form-control notEmpty" >
+                                                    <option value="">请选择所属行业</option>
                                                     <c:set var="industry" value="${app.industry}"></c:set>
                                                     <%@ include file="/inc/industry.jsp"%>
                                                 </select>
@@ -120,7 +120,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form limit300 notEmpty"/>
+                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form  notEmpty" maxlength="300"/>
                                             </div>
                                         </div>
                                         <p class="tips"><a href="">回调说明文档</a></p>
