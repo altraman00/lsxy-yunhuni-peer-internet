@@ -7,6 +7,7 @@ import com.lsxy.framework.api.consume.service.CaptchaUseService;
 import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.consume.service.VoiceTimeUseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.Product;
@@ -240,6 +241,9 @@ public class CalCostServiceImpl implements CalCostService{
         BigDecimal cost = this.calCost(product, tenantId, time);
         calBillingService.incConsume(tenantId,dt,cost);
         Consume consume = new Consume(dt,code,cost,remark,appId,tenant);
+        if(logger.isDebugEnabled()){
+            logger.info("插入消费记录：{}", JSONUtil.objectToJson(consume));
+        }
         consumeService.save(consume);
         return cost;
     }
