@@ -21,9 +21,9 @@ public interface CalCostService {
 
     /**
      * 消费计算金额及插入消费表，或插入扣量表
-     * @param cdr cdr数据
+     * @param cdr cdr数据 传入的cdr数据将会被继续完善相关消费信息
      */
-    void callConsume(VoiceCdr cdr);
+    VoiceCdr callConsume(VoiceCdr cdr);
 
     /**
      * 判断是否有剩余呼叫时间或者余额是否充足

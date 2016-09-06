@@ -29,9 +29,23 @@ public class CallSession extends IdEntity {
     private Tenant tenant;      //所属tenant
     private String relevanceId;//关联标识
     private String type; //查看产品表code字段或枚举类ProductCode
+    private String resId; //资源ID
     private String fromNum; //发起方
     private String toNum; //接收方
 
+    public CallSession() {
+    }
+
+    public CallSession(String id,Integer status, App app, Tenant tenant, String relevanceId, String type, String fromNum, String toNum) {
+        this.id = id;
+        this.status = status;
+        this.app = app;
+        this.tenant = tenant;
+        this.relevanceId = relevanceId;
+        this.type = type;
+        this.fromNum = fromNum;
+        this.toNum = toNum;
+    }
 
     @Column(name = "relevance_id")
     public String getRelevanceId() {
@@ -41,13 +55,22 @@ public class CallSession extends IdEntity {
     public void setRelevanceId(String relevanceId) {
         this.relevanceId = relevanceId;
     }
-    @Column(name = "type")
+
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Column(name = "res_id")
+    public String getResId() {
+        return resId;
+    }
+
+    public void setResId(String resId) {
+        this.resId = resId;
     }
 
     @Column(name = "status")

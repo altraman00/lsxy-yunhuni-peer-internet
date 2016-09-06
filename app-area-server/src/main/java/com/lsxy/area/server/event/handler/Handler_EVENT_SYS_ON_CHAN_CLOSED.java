@@ -9,7 +9,9 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
+import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by liuws on 2016/8/29.
@@ -28,7 +31,10 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
-
+    @Autowired
+    CalCostService calCostService;
+    @Autowired
+    VoiceCdrService voiceCdrService;
     @Override
     public String getEventName() {
         return Constants.SYS_ON_CHAN_CLOSED;
@@ -50,6 +56,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setTenantId(businessState.getTenantId());
         voiceCdr.setAppId(businessState.getAppId());
         voiceCdr.setLineId(businessState.getLineGatewayId());
+        //产品编码，可根据些判断此cdr是哪个产品的cdr
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(businessState.getType());
         voiceCdr.setType(productCode.name());
         voiceCdr.setRelevanceId(businessState.getId());
@@ -63,6 +70,29 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setCallEndDt(getCallDate(voiceCdr.getCdr_callendtime()));
         voiceCdr.setCallTimeLong(Long.parseLong(voiceCdr.getCdr_talkduration()));
         //扣费
+        calCostService.callConsume(voiceCdr);
+        //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
+        switch (productCode){
+            case duo_call:{
+                Map<String, Object> data = businessState.getBusinessData();
+                String sessionId = (String) data.get(voiceCdr.getToNum());
+                voiceCdr.setSessionId(sessionId);
+                break;
+            }
+            case sys_conf:{
+                break;
+            }
+            case ivr_call:{
+                break;
+            }
+            case captcha_call:{
+                break;
+            }
+            case notify_call:{
+                break;
+            }
+        }
+        voiceCdrService.save(voiceCdr);
         return null;
     }
 

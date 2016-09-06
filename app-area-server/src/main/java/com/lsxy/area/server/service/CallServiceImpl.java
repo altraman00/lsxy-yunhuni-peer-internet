@@ -6,6 +6,7 @@ import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -17,7 +18,12 @@ import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceCallback;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceCallbackService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +33,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.sun.corba.se.impl.util.RepositoryId.cache;
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
 
 /**
  * Created by tandy on 16/8/18.
@@ -63,6 +72,12 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     LineGatewayService lineGatewayService;
+
+    @Autowired
+    VoiceCallbackService voiceCallbackService;
+
+    @Autowired
+    CallSessionService callSessionService;
 
     @Value("${area.agent.client.cti.sip.host}")
     private String ctiHost;
@@ -129,15 +144,19 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        //TODO 获取线路IP和端口
+        //TODO 获取号码
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        dto.setFrom1(oneTelnumber);
+        dto.setFrom2(oneTelnumber);
+        //TODO 获取线路IP和端口
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-
+        String to1_uri = dto.getTo1()+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
+        String to2_uri = dto.getTo2()+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
         Map<String, Object> params = new HashMap<>();
         params.put("from1_uri", dto.getFrom1());
-        params.put("to1_uri",dto.getTo1()+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        params.put("to1_uri",to1_uri);
         params.put("from2_uri", dto.getFrom2());
-        params.put("to2_uri",dto.getTo2()+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        params.put("to2_uri",to2_uri);
         params.put("max_connect_seconds",dto.getMax_call_duration());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("ring_play_file",dto.getRing_tone());
@@ -157,9 +176,21 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
             try {
                 rpcCaller.invoke(sessionContext, rpcrequest);
+                Map<String,Object> data = new MapBuilder<String,Object>()
+                        .put(to1_uri,UUIDGenerator.uuid())
+                        .put(to2_uri,UUIDGenerator.uuid())
+                        .build();
+                String apiCmd = "duo_call";
                 //将数据存到redis
-                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,"duo_call", app.getUrl(),area.getId(),lineGateway.getId(),dto.getUser_data());
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,apiCmd,dto.getUser_data(), app.getUrl(),area.getId(),lineGateway.getId(),data);
                 businessStateService.save(cache);
+                //保存双向回拔表
+                VoiceCallback voiceCallback = new VoiceCallback(duocCallId,to1_uri,to2_uri);
+                voiceCallbackService.save(voiceCallback);
+                CallSession callSession = new CallSession((String) data.get(to1_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
+                CallSession callSession2 = new CallSession((String) data.get(to2_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
+                callSessionService.save(callSession);
+                callSessionService.save(callSession2);
             } catch (Exception e) {
                 logger.error("消息发送到区域失败:{}", rpcrequest);
                 throw new InvokeCallException(e);
@@ -206,7 +237,7 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", app.getUrl(),null,null,dto.getUser_data());
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"notify_call", app.getUrl(),null,null,dto.getUser_data(),null);
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
@@ -250,7 +281,7 @@ public class CallServiceImpl implements CallService {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", app.getUrl(),null,null,dto.getUser_data());
+            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", app.getUrl(),null,null,dto.getUser_data(),null);
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){

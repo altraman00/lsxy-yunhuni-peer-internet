@@ -59,7 +59,7 @@ public class CalCostServiceImpl implements CalCostService{
     }
 
     @Override
-    public void callConsume(VoiceCdr cdr) {
+    public VoiceCdr callConsume(VoiceCdr cdr) {
         ProductCode productCode = ProductCode.valueOf(cdr.getType());
         String tenantId = cdr.getTenantId();
         String appId = cdr.getAppId();
@@ -84,8 +84,16 @@ public class CalCostServiceImpl implements CalCostService{
                     calBillingService.incUseSms(tenantId,dt,1L);
                     CaptchaUse captchaUse = new CaptchaUse(dt,productCode.name(),appId,tenantId);
                     captchaUseService.save(captchaUse);
+                    costTimeLong = 0L;
+                    cost = new BigDecimal(0);
+                    deduct = 1L;
+                    costType = 1;
                 }else{
-                    insertConsume(tenantId, appId, time, dt, productCode.name(),productCode.getRemark(), product);
+                    BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
+                    costTimeLong = 0L;
+                    cost = consume;
+                    deduct = 0L;
+                    costType = 2;
                 }
                 break;
             }
@@ -97,15 +105,27 @@ public class CalCostServiceImpl implements CalCostService{
                     calBillingService.incUseConference(tenantId,dt,useTime);
                     VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
+                    costTimeLong = useTime;
+                    cost = new BigDecimal(0);
+                    deduct = useTime;
+                    costType = 1;
                 }else if(conference > 0){
                     //先扣量
                     calBillingService.incUseConference(tenantId,dt,conference);
                     VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,conference,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
                     //再扣费
-                    insertConsume(tenantId, appId, useTime - conference, dt, productCode.name(),productCode.getRemark(), product);
+                    BigDecimal consume = insertConsume(tenantId, appId, useTime - conference, dt, productCode.name(), productCode.getRemark(), product);
+                    costTimeLong = useTime;
+                    cost = consume;
+                    deduct = conference;
+                    costType = 3;
                 } else{
-                    insertConsume(tenantId, appId, time, dt, productCode.name(),productCode.getRemark(), product);
+                    BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
+                    costTimeLong = useTime;
+                    cost = consume;
+                    deduct = 0L;
+                    costType = 2;
                 }
                 break;
             }
@@ -117,20 +137,36 @@ public class CalCostServiceImpl implements CalCostService{
                     calBillingService.incUseVoice(tenantId,dt,useTime);
                     VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
+                    costTimeLong = useTime;
+                    cost = new BigDecimal(0);
+                    deduct = useTime;
+                    costType = 1;
                 }else if(voice > 0){
                     //先扣量
                     calBillingService.incUseVoice(tenantId,dt,voice);
                     VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,voice,product.getTimeUnit(),product.getUnit(),appId,tenantId);
                     voiceTimeUseService.save(use);
                     //再扣费
-                    insertConsume(tenantId, appId, useTime - voice, dt, productCode.name(),productCode.getRemark(), product);
+                    BigDecimal consume = insertConsume(tenantId, appId, useTime - voice, dt, productCode.name(), productCode.getRemark(), product);
+                    costTimeLong = useTime;
+                    cost = consume;
+                    deduct = voice;
+                    costType = 3;
                 } else{
-                    insertConsume(tenantId, appId, time, dt, productCode.name(),productCode.getRemark(), product);
+                    BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
+                    costTimeLong = useTime;
+                    cost = consume;
+                    deduct = 0L;
+                    costType = 2;
                 }
                 break;
             }
         }
-
+        cdr.setCostTimeLong(costTimeLong);
+        cdr.setCost(cost);
+        cdr.setDeduct(deduct);
+        cdr.setCostType(costType);
+        return cdr;
     }
 
     @Override
@@ -189,13 +225,14 @@ public class CalCostServiceImpl implements CalCostService{
      * @param remark
      * @param product
      */
-    private void insertConsume(String tenantId, String appId, Long time, Date dt, String code, String remark,Product product) {
+    private BigDecimal insertConsume(String tenantId, String appId, Long time, Date dt, String code, String remark,Product product) {
         Tenant tenant = new Tenant();
         tenant.setId(tenantId);
         BigDecimal cost = this.calCost(product, tenantId, time);
         calBillingService.incConsume(tenantId,dt,cost);
         Consume consume = new Consume(dt,code,cost,remark,appId,tenant);
         consumeService.save(consume);
+        return cost;
     }
 
     /**
