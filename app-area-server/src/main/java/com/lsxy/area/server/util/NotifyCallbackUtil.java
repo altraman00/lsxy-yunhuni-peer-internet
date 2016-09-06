@@ -36,7 +36,7 @@ public class NotifyCallbackUtil {
 
     private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
 
-    private static final String EVENT_NOTIFY_URL = "/yunhuni/event/notify";
+//    private static final String EVENT_NOTIFY_URL = "/yunhuni/event/notify";
 
     private HttpClient client = null;
 
@@ -93,7 +93,7 @@ public class NotifyCallbackUtil {
         int re_times = 0;
         do{
             try{
-                HttpPost post = new HttpPost(url + EVENT_NOTIFY_URL);
+                HttpPost post = new HttpPost(url);
                 post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
                 se.setContentType(CONTENT_TYPE_TEXT_JSON);
