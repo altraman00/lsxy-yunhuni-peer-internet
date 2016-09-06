@@ -109,14 +109,12 @@ public class CallController extends AbstractAPIController{
     }
 
     @RequestMapping(value = "/{account_id}/call/captcha_call",method = RequestMethod.POST)
-    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody CaptchaCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse captcha_call(HttpServletRequest request, @RequestBody CaptchaCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
-        String callId = null;
-        callId = callService.captchaCall(ip,appId, dto);
+        String callId = callService.captchaCall(ip,appId, dto);
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
-        result.put("user_data", dto.getUser_data());
         return ApiGatewayResponse.success(result);
     }
 

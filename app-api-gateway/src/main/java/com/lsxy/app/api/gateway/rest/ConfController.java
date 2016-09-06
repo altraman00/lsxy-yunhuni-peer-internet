@@ -32,10 +32,10 @@ public class ConfController extends AbstractAPIController{
             logger.debug("创建会议API参数,accountId={},appId={},dto={}",accountId,appId,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        String callId = confService.create(ip,appId,dto.getMaxDuration(),dto.getMaxParts(),
+        String confId = confService.create(ip,appId,dto.getMaxDuration(),dto.getMaxParts(),
                 dto.getRecording(),dto.getAutoHangup(),dto.getBgmFile(),dto.getUserData());
         Map<String,String> result = new HashMap<>();
-        result.put("callId",callId);
+        result.put("confId",confId);
         return ApiGatewayResponse.success(result);
     }
 
