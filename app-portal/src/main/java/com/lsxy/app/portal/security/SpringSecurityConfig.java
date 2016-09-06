@@ -3,6 +3,7 @@ package com.lsxy.app.portal.security;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,7 +20,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 /**
  * Created by Tandy on 2016/6/7.
  */
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
@@ -64,13 +65,21 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 filter.setForceEncoding(true);
                 http.addFilterBefore(filter,CsrfFilter.class);
 
-        http.addFilterAfter(springSessionRepositoryFilter,CharacterEncodingFilter.class);
+//        http.addFilterAfter(springSessionRepositoryFilter,CharacterEncodingFilter.class);
     }
 
     @Bean
     protected AuthenticationSuccessHandler getPortalAuthenticationSuccessHandler(){
         return new PortalAuthenticationSuccessHandler();
     }
+
+    @Bean
+    public FilterRegistrationBean registerRequestLogFilter(SessionRepositoryFilter filter) {
+        FilterRegistrationBean reg = new FilterRegistrationBean(filter);
+        reg.setOrder(1);
+        return reg;
+    }
+
 
     /**
      * 配置加密机制,以及加密盐值
