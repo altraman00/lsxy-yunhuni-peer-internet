@@ -1,8 +1,9 @@
 package com.lsxy.area.agent;
 
+import com.lsxy.framework.oss.FrameworkOSSConfig;
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
-import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication
 @ComponentScan
-@Import(FrameworkRPCConfig.class)
+@Import(value = {FrameworkRPCConfig.class, FrameworkOSSConfig.class})
 @EnableScheduling
 public class AreaAgentMainClass extends AbstractSpringBootWebStarter {
 

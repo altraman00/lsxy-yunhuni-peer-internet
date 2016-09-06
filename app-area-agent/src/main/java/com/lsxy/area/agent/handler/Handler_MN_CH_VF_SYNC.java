@@ -4,14 +4,14 @@ package com.lsxy.area.agent.handler;
 import com.alibaba.fastjson.JSON;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.oc.VoiceFilePlaySyncOkEvent;
 import com.lsxy.framework.oss.OSSService;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,12 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
     //文件保存地址
     private static final String path = "/data/prd/p/0";
     @Autowired
-    private OSSService ossService;
+    private OSSService ossService ;
     @Autowired
-    private MQService mqService;
+    private SessionContext sessionContext;
+
+    @Autowired
+    private RPCCaller rpcCaller;
     @Override
     public String getEventName() {
         return ServiceConstants.MN_CH_VF_SYNC;
@@ -61,8 +64,13 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
             vfp.put("sync",result+"");
             rList.add(vfp);
         }
-        VoiceFilePlaySyncOkEvent vfpse = new VoiceFilePlaySyncOkEvent(rList);
-        mqService.publish(vfpse);
+        String param = JSON.toJSON(rList).toString();
+        RPCRequest request1 = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC_OK,param);
+        try {
+            rpcCaller.invoke(sessionContext,request1);
+        } catch (Exception ex) {
+            logger.error("发送放音文件指令失败:"+request1,ex);
+        }
         return null;
     }
 
