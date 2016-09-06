@@ -4,4 +4,5 @@
     <property name="APP_NAME" value="app-backend" />
     <include resource="logback-yunhuni.xml"/>
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
+
 </configuration>

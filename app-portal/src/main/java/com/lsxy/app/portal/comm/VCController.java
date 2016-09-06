@@ -1,5 +1,8 @@
 package com.lsxy.app.portal.comm;
 
+import com.lsxy.framework.web.utils.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -18,6 +21,8 @@ import java.util.Random;
 @RequestMapping("/vc")
 @Controller
 public class VCController {
+
+    private static final Logger logger = LoggerFactory.getLogger(VCController.class);
     /**
      * 获取随机验证码
      * @return
@@ -76,6 +81,9 @@ public class VCController {
             if(i==3){
                 g.drawString(pStr,55,24);
             }
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("客户端 {} 生成图形验证码:{}", WebUtils.getRemoteAddress(request),sRand);
         }
         //将认证码存入session
         request.getSession().setAttribute(PortalConstants.VC_KEY,sRand);

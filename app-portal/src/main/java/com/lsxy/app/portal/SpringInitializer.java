@@ -1,18 +1,16 @@
 package com.lsxy.app.portal;
 
-import ch.qos.logback.core.joran.spi.JoranException;
 import com.lsxy.app.portal.config.SpringStartupConfig;
-import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.core.web.SpringContextUtil;
+import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import java.io.IOException;
+import javax.servlet.*;
+import java.util.EnumSet;
 
 /**
  * Created by Tandy on 2016/6/6.
@@ -42,7 +40,7 @@ return new String[] { "/" };
 
 }
  */
-public class SpringInitializer implements WebApplicationInitializer{
+public class SpringInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext container) throws ServletException {
