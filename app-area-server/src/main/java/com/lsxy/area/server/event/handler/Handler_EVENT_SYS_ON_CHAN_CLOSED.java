@@ -4,6 +4,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -91,6 +92,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             case notify_call:{
                 break;
             }
+        }
+        if(logger.isDebugEnabled()){
+            logger.info("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
         }
         voiceCdrService.save(voiceCdr);
         return null;
