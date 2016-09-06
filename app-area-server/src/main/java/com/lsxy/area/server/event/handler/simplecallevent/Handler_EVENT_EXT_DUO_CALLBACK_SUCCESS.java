@@ -55,7 +55,7 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_SUCCESS extends EventHandler {
             logger.error("businessstate is null");
             return res;
         }
-        if(resId!=null){
+        if(StringUtils.isNotBlank(resId)){
             state.setResId(resId);
             businessStateService.save(state);
             VoiceCallback duoCall = voiceCallbackService.findById(callId);

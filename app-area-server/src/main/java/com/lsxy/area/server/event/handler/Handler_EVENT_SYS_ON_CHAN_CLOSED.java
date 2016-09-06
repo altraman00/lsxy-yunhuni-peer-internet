@@ -90,6 +90,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                 break;
             }
             case notify_call:{
+                Map<String, Object> data = businessState.getBusinessData();
+                String sessionId = (String) data.get(voiceCdr.getToNum());
+                voiceCdr.setSessionId(sessionId);
                 break;
             }
         }
