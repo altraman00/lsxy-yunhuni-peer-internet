@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,13 +63,35 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
             logger.info("businessstate is null");
             return res;
         }
+        //处理返回数据的各个时间
+        Date beginTime = null;
+        String begin_time = (String) paramMap.get("begin_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            beginTime = new Date(Long.parseLong(begin_time) * 1000);
+        }
+        Date answerTime = null;
+        String answer_time = (String) paramMap.get("answer_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            answerTime = new Date(Long.parseLong(answer_time) * 1000);
+        }
+        Date connectTime = null;
+        String connect_time = (String) paramMap.get("connect_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            connectTime = new Date(Long.parseLong(connect_time) * 1000);
+        }
+        Date endTime = null;
+        String end_time = (String) paramMap.get("end_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            endTime = new Date(Long.parseLong(end_time) * 1000);
+        }
+
         //处理双向回拔表数据
         VoiceCallback duoCall = voiceCallbackService.findById(callId);
         if(duoCall != null){
-            duoCall.setStartTime(DateUtils.parseDate((String) paramMap.get("begin_time")));
-            duoCall.setAnswerTime(DateUtils.parseDate((String) paramMap.get("answer_time")));
-            duoCall.setConnectTime(DateUtils.parseDate((String) paramMap.get("connect_time")));
-            duoCall.setEndTime(DateUtils.parseDate((String) paramMap.get("end_time")));
+            duoCall.setStartTime(beginTime);
+            duoCall.setAnswerTime(answerTime);
+            duoCall.setConnectTime(connectTime);
+            duoCall.setEndTime(endTime);
             voiceCallbackService.save(duoCall);
         }
         //处理会话表数据
@@ -102,10 +125,10 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .put("event","duo_callback.end")
                 .put("id",callId)
-                .put("begin_time",paramMap.get("begin_time"))
-                .put("answer_time1",paramMap.get("answer_time"))
-                .put("answer_time2",paramMap.get("connect_time"))
-                .put("end_time",paramMap.get("end_time"))
+                .put("begin_time",beginTime.getTime())
+                .put("answer_time1",answerTime.getTime())
+                .put("answer_time2",connectTime.getTime())
+                .put("end_time",endTime.getTime())
                 .put("hangup_by",paramMap.get("hangup_by"))
                 .put("reason",paramMap.get("reason"))
                 .put("error",paramMap.get("error"))
