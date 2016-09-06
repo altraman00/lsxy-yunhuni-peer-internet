@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.web.http.SessionRepositoryFilter;
@@ -64,8 +65,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 filter.setEncoding("UTF-8");
                 filter.setForceEncoding(true);
                 http.addFilterBefore(filter,CsrfFilter.class);
-
-//        http.addFilterAfter(springSessionRepositoryFilter,CharacterEncodingFilter.class);
+        http.addFilterBefore(springSessionRepositoryFilter, WebAsyncManagerIntegrationFilter.class);
     }
 
     @Bean
@@ -73,12 +73,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         return new PortalAuthenticationSuccessHandler();
     }
 
-    @Bean
-    public FilterRegistrationBean registerRequestLogFilter(SessionRepositoryFilter filter) {
-        FilterRegistrationBean reg = new FilterRegistrationBean(filter);
-        reg.setOrder(1);
-        return reg;
-    }
+//    @Bean
+//    public FilterRegistrationBean registerRequestLogFilter(SessionRepositoryFilter filter) {
+//        FilterRegistrationBean reg = new FilterRegistrationBean(filter);
+//        reg.setOrder(1);
+//        return reg;
+//    }
 
 
     /**
