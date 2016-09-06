@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -31,10 +32,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -137,14 +135,7 @@ public class IVRActionUtil {
         if(entity.getContent() == null){
             return null;
         }
-        BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
-        String line;
-        StringBuilder sb = new StringBuilder("");
-        while((line = br.readLine())!=null){
-            sb.append(line);
-        }
-        String reqBody = sb.toString();
-        return URLDecoder.decode(reqBody, HTTP.UTF_8);
+        return EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
     }
 
     /**

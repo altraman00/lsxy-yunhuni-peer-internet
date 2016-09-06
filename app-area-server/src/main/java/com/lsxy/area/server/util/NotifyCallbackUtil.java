@@ -1,6 +1,7 @@
 package com.lsxy.area.server.util;
 
 import com.lsxy.framework.core.utils.JSONUtil2;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
@@ -11,17 +12,14 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
 
 /**
  * 通过这个类向开发者发送事件通知
@@ -148,15 +146,18 @@ public class NotifyCallbackUtil {
         return res;
     }
 
-    private String receiveResponse(InputStream inputStream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        StringBuilder sb = new StringBuilder();
-        while((line = br.readLine())!=null){
-            sb.append(line);
+    private String receiveResponse(HttpResponse response) throws IOException {
+        if(response == null){
+            return null;
         }
-        String reqBody = sb.toString();
-        return URLDecoder.decode(reqBody, HTTP.UTF_8);
+        final HttpEntity entity = response.getEntity();
+        if(entity == null){
+            return null;
+        }
+        if(entity.getContent() == null){
+            return null;
+        }
+        return EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
     }
 
     public class Response{
