@@ -122,6 +122,7 @@
                                             <div class="col-md-4">
                                                 <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form notEmpty" maxlength="300"/>
                                             </div>
+                                            <span class="span-required">*</span>
                                         </div>
                                         <p class="tips"><a href="">回调说明文档</a></p>
                                         <p class="tips">
