@@ -30,7 +30,7 @@ import java.util.Map;
 @RequestMapping("/console/statistics/billdetail")
 public class BillDetailController extends AbstractPortalController {
     /**
-     * 语音呼叫
+     * 语音通知
      * @param request
      * @param pageNo 第几页
      * @param pageSize 每页记录数

@@ -16,7 +16,7 @@ import java.util.Date;
 public class VoiceCdrHour extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
-    private Integer type;//会话类型1.语音呼叫2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
+    private Integer type;//会话类型1.语音通知2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
     private String operatorId;//操作类型
     private String areaId;//区域
     private Date dt;//统计时间

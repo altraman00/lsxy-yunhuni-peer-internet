@@ -57,7 +57,7 @@ public class CallController extends AbstractAPIController{
 //public DeferredResult<ApiGatewayResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
 
     /**
-     *  语音呼叫API
+     *  语音通知API
      *  api.dev.yunhuni.com/v1/account/1234567/call?to=13971068693&maxAnswerSec=10&maxRingSec=20
      * @param certId   鉴权账号
      * @param response

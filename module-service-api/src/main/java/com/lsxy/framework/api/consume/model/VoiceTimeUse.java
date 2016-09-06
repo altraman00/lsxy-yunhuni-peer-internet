@@ -14,7 +14,7 @@ import java.util.Date;
 @Table(schema="db_lsxy_base",name = "tb_base_voice_time_use")
 public class VoiceTimeUse extends IdEntity {
     private Date dt;
-    private String type;    //1.语音呼叫2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
+    private String type;    //1.语音通知2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
     private Long voiceTime; //通话时长
     private Long useTime;   //扣量时长
     private Integer unitTime;   //单位时长

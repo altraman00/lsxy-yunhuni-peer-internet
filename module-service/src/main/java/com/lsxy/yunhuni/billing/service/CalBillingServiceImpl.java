@@ -479,7 +479,7 @@ public class CalBillingServiceImpl implements CalBillingService{
                 //TODO 统计余额
                 BigDecimal balance = this.getBalanceByPreDateSum(tenantId, date, billing.getBalance());
                 billing.setBalance(balance);
-                //TODO 统计语音呼叫
+                //TODO 统计语音通知
                 Long voice = this.getVoiceByPreDateSum(tenantId, date, billing.getVoiceRemain());
                 billing.setVoiceRemain(voice);
                 //TODO 统计会议
