@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -50,14 +51,14 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
             logger.debug("响应VF SYNC:{}",request);
         }
         String jsonList = (String) request.getParameter(ServiceConstants.MN_CH_VF_SYNC);
-        List<VoiceFilePlay> list = JSON.parseArray(jsonList, VoiceFilePlay.class);
-        List<VoiceFilePlay> rList = new ArrayList<VoiceFilePlay>();
+        List<Map> list = JSON.parseArray(jsonList, Map.class);
+        List<Map> rList = new ArrayList<Map>();
         for(int i=0;i<list.size();i++){
-            VoiceFilePlay vfp = list.get(i);
-            String type = vfp.getName().substring(vfp.getName().lastIndexOf(".")+1, vfp.getName().length());
-            String saveFilePath = path+"/"+vfp.getTenant().getId()+"/"+vfp.getApp().getId()+"/"+vfp.getId()+type;
-            Integer result = downFile(vfp.getFileKey(),saveFilePath);
-            vfp.setSync(result);
+            Map<String,String> vfp = list.get(i);
+            String type = vfp.get("name").substring(vfp.get("name").lastIndexOf(".")+1, vfp.get("name").length());
+            String saveFilePath = path+"/"+vfp.get("tenantId")+"/"+vfp.get("appId")+"/"+vfp.get("id")+type;
+            Integer result = downFile(vfp.get("fileKey"),saveFilePath);
+            vfp.put("sync",result+"");
             rList.add(vfp);
         }
         VoiceFilePlaySyncOkEvent vfpse = new VoiceFilePlaySyncOkEvent(rList);

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.JMSException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tandy on 16/8/29.
@@ -27,15 +28,15 @@ public class VoiceFilePlaySyncOkEventHandler implements MQMessageHandler<VoiceFi
 
     @Override
     public void handleMessage(VoiceFilePlaySyncOkEvent event) throws JMSException {
-        List<VoiceFilePlay> list = event.getFiles();
+        List<Map> list = event.getFiles();
         List<String> success = new ArrayList<>();
         List<String> fail = new ArrayList<>();
         for(int i=0;i<list.size();i++){
-            VoiceFilePlay vfp = list.get(i);
-            if(VoiceFilePlay.STATUS_SUCCESS==vfp.getSync()){
-                success.add(vfp.getId());
-            }else if(VoiceFilePlay.SYNC_FAIL==vfp.getSync()){
-                fail.add(vfp.getId());
+            Map<String,String> vfp = list.get(i);
+            if(VoiceFilePlay.STATUS_SUCCESS==Integer.valueOf(vfp.get("sync"))){
+                success.add(vfp.get("id"));
+            }else if(VoiceFilePlay.SYNC_FAIL==Integer.valueOf(vfp.get("sync"))){
+                fail.add(vfp.get("id"));
             }
         }
         voiceFilePlayService.batchUpdateSync(success,VoiceFilePlay.SYNC_SUCCESS);

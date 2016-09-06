@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tandy on 16/8/29.
@@ -38,7 +41,17 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
     @Override
     public void handleMessage(VoiceFilePlayAuditCompletedEvent event) throws JMSException {
         List<VoiceFilePlay> list = voiceFilePlayService.findNotSync();
-        String param = JSON.toJSON(list).toString();
+        List<Map<String,Object>> list1 = new ArrayList<>();
+        for(int i=0;i<list.size();i++) {
+            Map<String, Object> map = new HashMap();
+            map.put("id",list.get(i).getId());
+            map.put("appId",list.get(i).getApp().getId());
+            map.put("tenantId",list.get(i).getTenant().getId());
+            map.put("name",list.get(i).getName());
+            map.put("fileKey",list.get(i).getFileKey());
+            list1.add(map);
+        }
+        String param = JSON.toJSON(list1).toString();
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,param);
         try {
             rpcCaller.invoke(sessionContext,request);
