@@ -61,11 +61,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
                 //CharacterEncodingFilter 过滤器如果碰到Security，必须添加在Security前面，否则会出现乱码问题
-                CharacterEncodingFilter filter = new CharacterEncodingFilter();
-                filter.setEncoding("UTF-8");
-                filter.setForceEncoding(true);
-                http.addFilterBefore(filter,CsrfFilter.class);
+                CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+                characterEncodingFilter.setEncoding("UTF-8");
+                characterEncodingFilter.setForceEncoding(true);
+                http.addFilterBefore(characterEncodingFilter,CsrfFilter.class);
         http.addFilterBefore(springSessionRepositoryFilter, WebAsyncManagerIntegrationFilter.class);
+        http.addFilterBefore(characterEncodingFilter,SessionRepositoryFilter.class);
     }
 
     @Bean
