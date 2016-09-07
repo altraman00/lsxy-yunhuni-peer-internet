@@ -3,6 +3,7 @@ package com.lsxy.area.server.util.ivr.act;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.util.ivr.act.handler.ActionHandler;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -16,8 +17,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
@@ -45,11 +49,9 @@ import java.util.concurrent.Future;
 public class IVRActionUtil {
     private static final Logger logger = LoggerFactory.getLogger(IVRActionUtil.class);
 
-    //询问是否接听的url
-    private static final String IFACCEPTURL = "/yunhuni/ivr/accept";
+    private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
-    //请求第一步的ivr指令
-    private static final String STEP1 = "/yunhuni/ivr/start";
+    private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
 
     private static final int RETRY_TIMES = 3;
 
@@ -79,6 +81,7 @@ public class IVRActionUtil {
     @PostConstruct
     public void init(){
         initClient();
+        initHandler();
     }
     private void initClient(){
         client = HttpAsyncClients.createDefault();
@@ -102,9 +105,87 @@ public class IVRActionUtil {
         }
     }
 
-    private String getRequest(String url){
+    /**
+     * 调用接口询问是否接受该呼叫
+     * @param url
+     * @param from
+     * @return
+     */
+    public boolean getAcceptRequest(final String url, final String from){
+        boolean res = false;
+        boolean success = false;
+        int re_times = 0;
+        do{
+            try{
+                HttpPost post = new HttpPost(url);
+                Map<String,Object> data = new HashMap<>();
+                data.put("action","accept_ivr");
+                data.put("from",from);
+                post.setConfig(config);
+                post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
+                se.setContentType(CONTENT_TYPE_TEXT_JSON);
+                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
+                post.setEntity(se);
+                Future<HttpResponse> future = client.execute(post,null);
+                HttpResponse response = future.get();
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    String result = receiveResponse(response);
+                    if(result!=null && result.equalsIgnoreCase("accept")){
+                        res=true;
+                    }
+                    success = true;
+                }
+            }catch (Throwable t){
+                logger.error("调用{}失败",url);
+            }
+            re_times++;
+        }while (!success && re_times<=RETRY_TIMES);
+        return res;
+    }
+
+    /**
+     * 调用接口询问ivr第一步干嘛
+     * @param url
+     * @return
+     */
+    public String getFirstIvr(final String url){
         String res = null;
-        boolean result = false;
+        boolean success = false;
+        int re_times = 0;
+        do{
+            try{
+                HttpPost post = new HttpPost(url);
+                Map<String,Object> data = new HashMap<>();
+                data.put("action","ivr_first_step");
+                post.setConfig(config);
+                post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
+                se.setContentType(CONTENT_TYPE_TEXT_JSON);
+                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
+                post.setEntity(se);
+                Future<HttpResponse> future = client.execute(post,null);
+                HttpResponse response = future.get();
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    res = receiveResponse(response);
+                    success = true;
+                }
+            }catch (Throwable t){
+                logger.error("调用{}失败",url);
+            }
+            re_times++;
+        }while (!success && re_times<=RETRY_TIMES);
+        return res;
+    }
+
+    /**
+     * 调用next
+     * @param url
+     * @return
+     */
+    private String getNextRequest(String url){
+        String res = null;
+        boolean success = false;
         int re_times = 0;
         do{
             try{
@@ -114,13 +195,13 @@ public class IVRActionUtil {
                 HttpResponse response = future.get();
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
-                    result = true;
+                    success = true;
                 }
             }catch (Throwable t){
                 logger.error("调用{}失败",url);
             }
             re_times++;
-        }while (!result && re_times<=RETRY_TIMES);
+        }while (!success && re_times<=RETRY_TIMES);
         return res;
     }
 
@@ -147,8 +228,13 @@ public class IVRActionUtil {
         BusinessState state = businessStateService.get(call_id);
         String appId = state.getAppId();
         App app = appService.findById(appId);
-        String res = getRequest(app.getUrl()+IFACCEPTURL);
-        if(!"accept".equals(res.toLowerCase())){
+        Map<String,Object> businessData = state.getBusinessData();
+        String from = null;
+        if(businessData!=null){
+            from = (String)businessData.get("from");
+        }
+        boolean accept = getAcceptRequest(app.getUrl(),from);
+        if(!accept){
             reject(state.getResId(),call_id);
             return true;
         }
@@ -201,14 +287,14 @@ public class IVRActionUtil {
             logger.info("没有后续ivr动作了，call_id={}",call_id);
             return  true;
         }
-
+        String resXML = null;
         if(nextUrl == null){//第一次
             String appId = state.getAppId();
             App app = appService.findById(appId);
-            nextUrl = app.getUrl() + STEP1;
+            resXML = getFirstIvr(app.getUrl());
+        }else{
+            resXML = getNextRequest(nextUrl.toString());
         }
-
-        String resXML = getRequest(nextUrl.toString());
         if(StringUtils.isBlank(resXML)){
             return false;
         }

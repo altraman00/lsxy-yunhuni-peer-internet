@@ -1,7 +1,6 @@
 package com.lsxy.area.server.util;
 
 import com.lsxy.framework.core.utils.JSONUtil2;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
@@ -12,7 +11,6 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * 通过这个类向开发者发送事件通知
@@ -33,8 +32,6 @@ public class NotifyCallbackUtil {
     private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
     private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
-
-    private static final String EVENT_NOTIFY_URL = "/yunhuni/event/notify";
 
     private CloseableHttpAsyncClient client = null;
 
@@ -64,8 +61,8 @@ public class NotifyCallbackUtil {
      * 30秒超时，不重试
      * @return
      */
-    public Response postNotify(String url, Object data){
-        return postNotify(url,data,null,0);
+    public void postNotify(String url, Map<String,Object> data){
+        postNotify(url,data,null,0);
     }
 
     /**
@@ -76,8 +73,8 @@ public class NotifyCallbackUtil {
      * @param retry 重试次数
      * @return
      */
-    public Response postNotify(String url, Object data,int retry){
-        return postNotify(url,data,null,retry);
+    public void postNotify(String url, Map<String,Object> data,int retry){
+        postNotify(url,data,null,retry);
     }
 
     /**
@@ -88,15 +85,15 @@ public class NotifyCallbackUtil {
      * @param retry 重试次数
      * @return
      */
-    public Response postNotify(final String url, final Object data,final Integer timeout,final int retry){
-        Response res = new Response();
+    public void postNotify(final String url, final Map<String,Object> data,final Integer timeout,final int retry){
         try{
-            HttpPost post = new HttpPost(url + EVENT_NOTIFY_URL);
+            HttpPost post = new HttpPost(url);
             RequestConfig c = this.config;
             if(timeout != null){
                 c = RequestConfig.custom().setSocketTimeout(timeout*1000)
                         .setConnectTimeout(timeout*1000).build();
             }
+            data.put("action","event_notify");
             post.setConfig(c);
             post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
             StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -142,42 +139,6 @@ public class NotifyCallbackUtil {
         }catch (Throwable t){
             logger.error("调用{}失败",url);
             t.printStackTrace();
-        }
-        return res;
-    }
-
-    private String receiveResponse(HttpResponse response) throws IOException {
-        if(response == null){
-            return null;
-        }
-        final HttpEntity entity = response.getEntity();
-        if(entity == null){
-            return null;
-        }
-        if(entity.getContent() == null){
-            return null;
-        }
-        return EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
-    }
-
-    public class Response{
-        private boolean result;
-        private String data;
-
-        public boolean isResult() {
-            return result;
-        }
-
-        public void setResult(boolean result) {
-            this.result = result;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public void setData(String data) {
-            this.data = data;
         }
     }
 
