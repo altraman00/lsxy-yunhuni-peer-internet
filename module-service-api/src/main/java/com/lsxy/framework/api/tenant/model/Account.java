@@ -12,10 +12,6 @@ import javax.persistence.*;
 @Entity
 @Table(schema = "db_lsxy_base", name = "tb_base_account")
 public class Account extends IdEntity {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
 
 	public static final int STATUS_NOT_ACTIVE = 0; 	//账号未激活
 	public static final int STATUS_LOCK = 1; 		//账号锁定
