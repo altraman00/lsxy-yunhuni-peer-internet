@@ -24,6 +24,9 @@ public class OssFileController extends AbstractPortalController {
     @RequestMapping("/img")
     public void getImg(HttpServletResponse response, String uri){
         String type = uri.substring(uri.lastIndexOf(".")+1, uri.length()).toLowerCase();
+        if("jpg".equals(type)){
+            type = "jpeg";
+        }
         response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
         InputStream in = null;
         ServletOutputStream out = null;
