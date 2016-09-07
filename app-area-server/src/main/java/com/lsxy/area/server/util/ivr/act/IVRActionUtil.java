@@ -119,7 +119,7 @@ public class IVRActionUtil {
             try{
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new HashMap<>();
-                data.put("action","accept_ivr");
+                data.put("action","ivr_incoming");
                 data.put("from",from);
                 post.setConfig(config);
                 post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
@@ -157,7 +157,7 @@ public class IVRActionUtil {
             try{
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new HashMap<>();
-                data.put("action","ivr_first_step");
+                data.put("action","ivr_start");
                 post.setConfig(config);
                 post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
