@@ -9,13 +9,19 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.NotifyCall;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.NotifyCallService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by liups on 2016/8/31.
@@ -30,6 +36,10 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
+    @Autowired
+    NotifyCallService notifyCallService;
+    @Autowired
+    CallSessionService callSessionService;
     @Override
     public String getEventName() {
         return Constants.EVENT_EXT_NOTIFY_CALL_ON_RELEASED;
@@ -42,16 +52,55 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
         }
         RPCResponse res = null;
         Map<String, Object> paramMap = request.getParamMap();
-        String call_id = (String)paramMap.get("user_data");
-        if(StringUtils.isBlank(call_id)){
+        String callId = (String)paramMap.get("user_data");
+        if(StringUtils.isBlank(callId)){
             logger.info("call_id is null");
             return res;
         }
-        BusinessState state = businessStateService.get(call_id);
+        BusinessState state = businessStateService.get(callId);
         if(state == null){
             logger.info("businessstate is null");
             return res;
         }
+
+        //处理返回数据的各个时间
+        Date beginTime = null;
+        String begin_time = (String) paramMap.get("begin_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            beginTime = new Date(Long.parseLong(begin_time) * 1000);
+        }
+        Date answerTime = null;
+        String answer_time = (String) paramMap.get("answer_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            answerTime = new Date(Long.parseLong(answer_time) * 1000);
+        }
+        Date endTime = null;
+        String end_time = (String) paramMap.get("end_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            endTime = new Date(Long.parseLong(end_time) * 1000);
+        }
+        //处理语音通知表数据
+        NotifyCall notifyCall = notifyCallService.findById(callId);
+        if(notifyCall != null){
+            notifyCall.setStartTime(beginTime);
+            notifyCall.setAnswerTime(answerTime);
+            notifyCall.setEndTime(endTime);
+            notifyCallService.save(notifyCall);
+        }
+        //处理会话表数据
+        Map<String, Object> data = state.getBusinessData();
+        Set<Map.Entry<String, Object>> entries = data.entrySet();
+        for(Map.Entry entry:entries){
+            String sessionId = (String) entry.getValue();
+            CallSession callSession = callSessionService.findById(sessionId);
+            if(callSession != null){
+                callSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.save(callSession);
+            }
+        }
+
+        //释放资源
+        businessStateService.delete(callId);
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         if(StringUtils.isBlank(appId)){
@@ -69,10 +118,10 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
         }
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .put("event","duo_callback.end")
-                .put("id",call_id)
-                .put("begin_time",paramMap.get("begin_time"))
-                .put("answer_time",paramMap.get("answer_time"))
-                .put("end_time",paramMap.get("end_time"))
+                .put("id",callId)
+                .put("begin_time",beginTime.getTime())
+                .put("answer_time",answerTime.getTime())
+                .put("end_time",endTime.getTime())
                 .put("dropped_by",paramMap.get("dropped_by"))
                 .put("reason",paramMap.get("reason"))
                 .put("error",paramMap.get("error"))

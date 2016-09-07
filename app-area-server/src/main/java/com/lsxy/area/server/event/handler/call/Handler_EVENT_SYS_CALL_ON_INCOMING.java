@@ -14,6 +14,8 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
@@ -56,9 +58,11 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     @Autowired
     private IVRActionUtil ivrActionUtil;
 
-    //TODO
-    @Value("")
-    private String testNum ="123456789";
+    @Autowired
+    private LineGatewayService lineGatewayService;
+
+    @Value("${portal.test.call.number}")
+    private String testNum;
 
     @Override
     public String getEventName() {
@@ -118,13 +122,24 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.info("找不到对应的APP");
             return res;
         }
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
         //保存业务数据，后续事件要用到
-        BusinessState callstate = new BusinessState(tenant.getId(),app.getId(),call_id,"ivr_incoming",null,
-                res_id,new MapBuilder<String,Object>()
-                .put("begin_time",begin_time)
-                .put("from",from)
-                .put("to",to)
-                .build());
+        BusinessState callstate = new BusinessState.Builder()
+                .setTenantId(tenant.getId())
+                .setAppId(app.getId())
+                .setId(call_id)
+                .setType("ivr_incoming")
+                .setAreaId(app.getArea().getId())
+                .setLineGatewayId(lineGateway.getId())
+                .setBusinessData(new MapBuilder<String,Object>()
+                        .put("begin_time",begin_time)
+                        .put("from",from)
+                        .put("to",to)
+                        .build())
+                .build();
+        callstate.setResId(res_id);
         businessStateService.save(callstate);
         ivrActionUtil.doActionIfAccept(call_id);
         return res;

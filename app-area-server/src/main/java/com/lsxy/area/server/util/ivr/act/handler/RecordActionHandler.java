@@ -67,6 +67,7 @@ public class RecordActionHandler extends ActionHandler{
                 .putIfNotEmpty("beep",beeping)
                 .putIfNotEmpty("finish_keys",finish_keys)
                 .putIfNotEmpty("user_data",callId)
+                .put("appid",state.getAppId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECORD_START, params);

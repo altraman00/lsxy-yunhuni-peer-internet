@@ -235,17 +235,18 @@ public class IVRActionUtil {
         }
         boolean accept = getAcceptRequest(app.getUrl(),from);
         if(!accept){
-            reject(state.getResId(),call_id);
+            reject(state.getAppId(),state.getResId(),call_id);
             return true;
         }
-        answer(state.getResId(),call_id);
+        answer(state.getAppId(),state.getResId(),call_id);
         return true;
     }
 
-    private void reject(String res_id,String call_id){
+    private void reject(String appId,String res_id,String call_id){
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
                 .put("user_data",call_id)
+                .put("appid",appId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_REJECT,params);
         try {
@@ -256,12 +257,13 @@ public class IVRActionUtil {
 
     }
 
-    private void answer(String res_id,String call_id){
+    private void answer(String appId,String res_id,String call_id){
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
                 //TODO 这个时间如何定
                 .put("max_answer_seconds",3600*24)
                 .put("user_data",call_id)
+                .put("appid",appId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
