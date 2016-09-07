@@ -36,9 +36,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lsxy.yunhuni.api.app.model.App.STATUS_ONLINE;
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
-
 /**
  * Created by tandy on 16/8/18.
  */
