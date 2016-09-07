@@ -34,7 +34,7 @@ public class FrameworkCacheConfigNotSpringBoot {
     }
 
     @Bean(name="lsxyRedisTemplate")
-    public RedisTemplate<String, String> redisTemplate(
+    public RedisTemplate redisTemplate(
             RedisConnectionFactory factory) {
         final RedisTemplate template = new RedisTemplate();
         template.setKeySerializer(template.getStringSerializer());
@@ -48,15 +48,6 @@ public class FrameworkCacheConfigNotSpringBoot {
         template.setValueSerializer(jackson2JsonRedisSerializer);
         template.setConnectionFactory(factory);
         return template;
-    }
-
-
-    @Bean
-    @DependsOn("jedisConnectionFactory")
-    public RedisTemplate getRedisTemplate(){
-        RedisTemplate redisTemplate = new RedisTemplate();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory);
-        return redisTemplate;
     }
 
 
