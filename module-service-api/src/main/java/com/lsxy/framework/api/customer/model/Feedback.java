@@ -13,8 +13,8 @@ import javax.persistence.*;
 @Entity
 @Table(schema="db_lsxy_base",name = "tb_base_customer_feedback")
 public class Feedback extends IdEntity {
-    public  static final Integer  READ = 1;
-    public  static final Integer UNREAD = 0;
+    public  static final int  READ = 1;
+    public  static final int UNREAD = 0;
     private String content;// 内容
     private Integer status;//状态 '0未处理;1已处理',
     Tenant tenant;//所属租户

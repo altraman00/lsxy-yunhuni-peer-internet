@@ -36,7 +36,7 @@
                                 </div>
                                 <div class="row">
                                 <lable class="col-md-2 text-right line34"><strong>消息内容：</strong></lable>
-                                <lable class="col-md-9 line34 "> ${message.message.content}</lable>
+                                <lable class="col-md-9 font16"> ${message.message.content}</lable>
                                 </div>
                                 <c:if test="${message.message.lineTime!=null}">
                                     <div class="row">
