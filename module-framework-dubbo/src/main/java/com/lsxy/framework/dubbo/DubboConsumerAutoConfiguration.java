@@ -4,6 +4,8 @@ import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.spring.ReferenceBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import java.util.Map;
 @Configuration
 @AutoConfigureAfter(DubboAutoConfiguration.class)
 public class DubboConsumerAutoConfiguration extends DubboBasedAutoConfiguration implements ApplicationContextAware {
+    private static final Logger logger = LoggerFactory.getLogger(DubboConsumerAutoConfiguration.class);
     private Map<String, Object> dubboReferences = new HashMap<>();
     private ApplicationContext applicationContext;
     @Autowired
@@ -63,7 +66,7 @@ public class DubboConsumerAutoConfiguration extends DubboBasedAutoConfiguration 
                                 consumerBean.afterPropertiesSet();
                                 dubboReferences.put(id, consumerBean.getObject());
                             } catch (Exception e) {
-                                throw new BeanCreationException(beanName, e);
+                                logger.error("Not found reference:"+consumerBean,e);
                             }
                         }
                         try {
@@ -71,6 +74,7 @@ public class DubboConsumerAutoConfiguration extends DubboBasedAutoConfiguration 
                             field.set(bean, dubboReferences.get(id));
                             field.setAccessible(false);
                         } catch (Exception e) {
+                            logger.error("BeanCreationException:"+beanName,e);
                             throw new BeanCreationException(beanName, e);
                         }
 
