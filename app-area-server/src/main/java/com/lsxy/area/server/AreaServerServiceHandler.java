@@ -6,6 +6,7 @@ import com.lsxy.framework.rpc.api.handler.HandlerManager;
 import com.lsxy.framework.rpc.AbstractServiceHandler;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.service.AreaService;
 import org.slf4j.Logger;
@@ -27,10 +28,6 @@ public class AreaServerServiceHandler extends AbstractServiceHandler {
 
     @Autowired
     private AreaService areaService;
-
-    @Autowired
-    private ServerSessionContext sessionContext;
-
     @Autowired
     private HandlerManager handlerManager;
 
