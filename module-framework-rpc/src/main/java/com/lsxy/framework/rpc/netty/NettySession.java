@@ -1,8 +1,7 @@
 package com.lsxy.framework.rpc.netty;
 
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCHandler;
-import com.lsxy.framework.rpc.api.server.AbstractSession;
+import com.lsxy.framework.rpc.api.AbstractSession;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -29,19 +28,8 @@ public abstract class NettySession extends AbstractSession {
     }
 
     @Override
-    public void write(Object object) throws SessionWriteException {
-
-        if(this.isValid()){
-            if(logger.isDebugEnabled()){
-                logger.debug("[{}]>>{}",this.getId(),object);
-            }
-            channel.writeAndFlush(object);
-        }else {
-            if(logger.isDebugEnabled()){
-                logger.debug("channel is not writable or invalid , drop object {}",object);
-            }
-            throw new SessionWriteException("通道无效,无法写入对象");
-        }
+    public void concreteWrite(Object object) throws SessionWriteException {
+        channel.writeAndFlush(object);
     }
 
     @Override

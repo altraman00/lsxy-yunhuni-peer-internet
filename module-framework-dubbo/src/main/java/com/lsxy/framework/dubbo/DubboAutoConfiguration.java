@@ -21,12 +21,15 @@ public class DubboAutoConfiguration {
     @Autowired
     private DubboProperties properties;
 
+    @Autowired
+    private String systemId;
+
     @Bean
     @ConditionalOnMissingBean
     public ApplicationConfig dubboApplicationConfig() {
         System.setProperty("dubbo.application.logger","slf4j");
         ApplicationConfig appConfig = new ApplicationConfig();
-        appConfig.setName(properties.getApp());
+        appConfig.setName(systemId);
         return appConfig;
     }
 

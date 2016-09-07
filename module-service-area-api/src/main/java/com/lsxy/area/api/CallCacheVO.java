@@ -9,14 +9,16 @@ public class CallCacheVO implements Serializable{
     private String callId;
     private String callType;
     private String userdata;
+    private String resId;
 
     public CallCacheVO() {
     }
 
-    public CallCacheVO(String callId, String callType, String userdata) {
+    public CallCacheVO(String callId, String callType, String resId,String userdata) {
         this.callId = callId;
         this.callType = callType;
         this.userdata = userdata;
+        this.resId = resId;
     }
 
     public String getCallId() {
@@ -41,5 +43,13 @@ public class CallCacheVO implements Serializable{
 
     public void setUserdata(String userdata) {
         this.userdata = userdata;
+    }
+
+    public String getResId() {
+        return resId;
+    }
+
+    public void setResId(String resId) {
+        this.resId = resId;
     }
 }
