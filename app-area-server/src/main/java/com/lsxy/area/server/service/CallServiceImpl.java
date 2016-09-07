@@ -252,7 +252,8 @@ public class CallServiceImpl implements CallService {
         params.put("user_data",callId);
 
         try {
-            //TODO 增加区域参数 选择合适的会话
+            //增加区域参数 选择合适的会话(传入appid即可)
+            params.put("appid ",app.getId());
             Area area = app.getArea();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             Map<String,Object> data = new MapBuilder<String,Object>()
