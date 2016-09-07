@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.lsxy.yunhuni.api.app.model.App.STATUS_ONLINE;
 import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
 
 /**
@@ -125,14 +126,17 @@ public class CallServiceImpl implements CallService {
 
     @Override
     public String duoCallback(String ip,String appId, DuoCallbackDTO dto) throws YunhuniApiException {
+        String apiCmd = "duo_call";
         String duocCallId = UUIDGenerator.uuid();
         String to1 = dto.getTo1();
         String to2 = dto.getTo2();
-        if(apiGwRedBlankNumService.isRedOrBlankNum(to1) || apiGwRedBlankNumService.isRedOrBlankNum(to2)){
+        if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
-
+        if(app.getStatus() != app.STATUS_ONLINE){
+            throw new AppOffLineException();
+        }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
             if(!whiteList.contains(ip)){
@@ -143,7 +147,7 @@ public class CallServiceImpl implements CallService {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("duo_call", app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
@@ -176,17 +180,16 @@ public class CallServiceImpl implements CallService {
         }
 
         try {
-            //TODO 增加区域参数 选择合适的会话
-            Area area = app.getArea();
+            //增加区域参数 选择合适的会话(传入appid即可)
+            params.put("appid ",app.getId());
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
             try {
                 Map<String,Object> data = new MapBuilder<String,Object>()
                         .put(to1_uri,UUIDGenerator.uuid())
                         .put(to2_uri,UUIDGenerator.uuid())
                         .build();
-                String apiCmd = "duo_call";
                 //将数据存到redis
-                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,apiCmd,dto.getUser_data(), app.getUrl(),area.getId(),lineGateway.getId(),data);
+                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,apiCmd,dto.getUser_data(), app.getUrl(),app.getArea().getId(),lineGateway.getId(),data);
                 businessStateService.save(cache);
                 //保存双向回拔表
                 VoiceCallback voiceCallback = new VoiceCallback(duocCallId,dto.getFrom1(),dto.getFrom2(),to1_uri,to2_uri);
@@ -209,12 +212,16 @@ public class CallServiceImpl implements CallService {
 
     @Override
     public String notifyCall(String ip, String appId, NotifyCallDTO dto) throws YunhuniApiException{
+        String apiCmd = "notify_call";
         String callId = UUIDGenerator.uuid();
         String to = dto.getTo();
-        if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
+        if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
+        if(app.getStatus() != app.STATUS_ONLINE){
+            throw new AppOffLineException();
+        }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
             if(!whiteList.contains(ip)){
@@ -224,7 +231,7 @@ public class CallServiceImpl implements CallService {
         if(app.getIsVoiceCallback() != 1){
             throw new AppServiceInvalidException();
         }
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("notify_call", app.getTenant().getId());
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
@@ -245,7 +252,6 @@ public class CallServiceImpl implements CallService {
         params.put("user_data",callId);
 
         try {
-            String apiCmd = "notify_call";
             //TODO 增加区域参数 选择合适的会话
             Area area = app.getArea();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);

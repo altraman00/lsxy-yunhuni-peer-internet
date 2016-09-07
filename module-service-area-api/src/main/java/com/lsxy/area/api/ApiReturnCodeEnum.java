@@ -12,7 +12,8 @@ public enum ApiReturnCodeEnum {
     InvokeCall("101012","调用失败"),
     IPNotInWhiteList("101013","IP不在白名单内"),
     NumberNotAllowToCall("101014","号码不允许呼叫"),
-    ConfNotExists("101015","会议不存在");
+    ConfNotExists("101015","会议不存在"),
+    AppOffLine("101016","应用没上线");
 
     private String code;
     private String msg;
