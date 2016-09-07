@@ -7,13 +7,17 @@ import com.lsxy.framework.config.SystemConfig;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,24 +38,6 @@ import java.util.Map;
 public class FrameworkCacheConfig extends CachingConfigurerSupport {
 
     public static final Logger logger = LoggerFactory.getLogger(FrameworkCacheConfig.class);
-    @Bean
-    public CacheManager cacheManager(RedisTemplate redisTemplate) {
-        RedisCacheManager rcm = new RedisCacheManager(redisTemplate);
-//        rcm.setExpires();
-
-        Map<String,String> expires = SystemConfig.getMapProperty("cache.redis.expires");
-        Map<String,Long> expiresLong = new HashedMap();
-        for (String key:expires.keySet()) {
-            Long expireValue = Long.parseLong(expires.get(key));
-            if (logger.isDebugEnabled()){
-                    logger.debug("设置缓存过期时间->{}:{}",key,expireValue);
-             }
-            expiresLong.put(key,expireValue);
-        }
-        rcm.setExpires(expiresLong);
-
-        return rcm;
-    }
 
 
 
@@ -71,4 +57,24 @@ public class FrameworkCacheConfig extends CachingConfigurerSupport {
         template.setConnectionFactory(factory);
         return template;
     }
+
+    @Bean
+    public CacheManager cacheManager(@Qualifier("lsxyRedisTemplate") RedisTemplate lsxyRedisTemplate) {
+        RedisCacheManager rcm = new RedisCacheManager(lsxyRedisTemplate);
+
+        Map<String,String> expires = SystemConfig.getMapProperty("cache.redis.expires");
+        Map<String,Long> expiresLong = new HashedMap();
+        for (String key:expires.keySet()) {
+            Long expireValue = Long.parseLong(expires.get(key));
+            if (logger.isDebugEnabled()){
+                    logger.debug("设置缓存过期时间->{}:{}",key,expireValue);
+             }
+            expiresLong.put(key,expireValue);
+        }
+        rcm.setExpires(expiresLong);
+
+        return rcm;
+    }
+
+
 }
