@@ -1,6 +1,6 @@
 package com.lsxy.area.api;
 
-import com.lsxy.area.api.exceptions.InvokeCallException;
+import com.lsxy.area.api.exceptions.YunhuniApiException;
 
 /**
  * Created by tandy on 16/8/17.
@@ -13,7 +13,7 @@ public interface CallService {
      * @param to
      * @return
      */
-    String call(String from, String to, int maxAnswerSec, int maxRingSec) throws InvokeCallException;
+    String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException;
 
     /**
      * 双向回拔
@@ -22,5 +22,14 @@ public interface CallService {
      * @param duoCallbackVO 双向回拔数据
      * @return
      */
-    String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws InvokeCallException;
+    String duoCallback(String ip,String appId, DuoCallbackVO duoCallbackVO) throws YunhuniApiException;
+
+    /**
+     * 外呼通知
+     * @param ip
+     * @param appId
+     * @param notifyCallVO
+     * @return
+     */
+    String notifyCall(String ip, String appId, NotifyCallVO notifyCallVO) throws YunhuniApiException;
 }

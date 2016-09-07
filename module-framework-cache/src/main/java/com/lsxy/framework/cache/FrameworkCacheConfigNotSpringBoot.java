@@ -1,11 +1,17 @@
 package com.lsxy.framework.cache;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.framework.config.SystemConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
@@ -17,6 +23,7 @@ public class FrameworkCacheConfigNotSpringBoot {
     private JedisConnectionFactory jedisConnectionFactory;
 
     @Bean(name="jedisConnectionFactory")
+    @ConditionalOnMissingBean
     public JedisConnectionFactory getJedisConnectionFactory(){
         jedisConnectionFactory = new JedisConnectionFactory();
         jedisConnectionFactory.setPassword(SystemConfig.getProperty("spring.redis.password",""));
@@ -26,13 +33,21 @@ public class FrameworkCacheConfigNotSpringBoot {
         return jedisConnectionFactory;
     }
 
+    @Bean(name="lsxyRedisTemplate")
+    public RedisTemplate redisTemplate(
+            RedisConnectionFactory factory) {
+        final RedisTemplate template = new RedisTemplate();
+        template.setKeySerializer(template.getStringSerializer());
+        template.setHashKeySerializer(template.getStringSerializer());
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper(om);
 
-    @Bean
-    @DependsOn("jedisConnectionFactory")
-    public RedisTemplate getRedisTemplate(){
-        RedisTemplate redisTemplate = new RedisTemplate();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory);
-        return redisTemplate;
+        template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setConnectionFactory(factory);
+        return template;
     }
 
 

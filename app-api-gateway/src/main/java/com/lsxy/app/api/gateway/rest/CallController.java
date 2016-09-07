@@ -4,7 +4,9 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.area.api.DuoCallbackVO;
 import com.lsxy.area.api.CallService;
+import com.lsxy.area.api.NotifyCallVO;
 import com.lsxy.area.api.exceptions.InvokeCallException;
+import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.utils.WebUtils;
@@ -25,7 +27,7 @@ import java.util.Map;
  */
 @RestController
 public class CallController extends AbstractAPIController{
-private static final Logger logger = LoggerFactory.getLogger(CallController.class);
+    private static final Logger logger = LoggerFactory.getLogger(CallController.class);
 
     @Autowired
     private MQService mqService;
@@ -63,20 +65,16 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
      * @return
      */
     @RequestMapping("/{certId}/call")
-    public RestResponse<String> doCall(@PathVariable String certId, HttpServletResponse response, HttpServletRequest request,String to,String from,int maxAnswerSec,int maxRingSec){
+    public RestResponse<String> doCall(@PathVariable String certId, HttpServletResponse response, HttpServletRequest request,String to,String from,int maxAnswerSec,int maxRingSec) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             WebUtils.logRequestParams(request);
         }
-
         /*发送请求次数计数*/
         if(sc!=null)sc.getSendGWRequestCount().incrementAndGet();
 
-        try {
-            String callid = callService.call(from,to,maxAnswerSec,maxRingSec);
-            return RestResponse.success(callid);
-        } catch (InvokeCallException e) {
-            return RestResponse.failed("0000x",e.getMessage());
-        }
+        String callid = callService.call(from,to,maxAnswerSec,maxRingSec);
+        return RestResponse.success(callid);
+
     }
 
     @RequestMapping("/{accountId}/call/{callId}")
@@ -85,20 +83,31 @@ private static final Logger logger = LoggerFactory.getLogger(CallController.clas
     }
 
     @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
-    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id) {
+    public RestResponse duoCallback(HttpServletRequest request,@RequestBody DuoCallbackVO duoCallbackVO,@PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         String callId = null;
-        try {
-            callId = callService.duoCallback(ip,appId, duoCallbackVO);
-        } catch (InvokeCallException e) {
-            return RestResponse.failed("0000x",e.getMessage());
-        }
+
+        callId = callService.duoCallback(ip,appId, duoCallbackVO);
+
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         result.put("user_data",duoCallbackVO.getUser_data());
         return RestResponse.success(result);
     }
+
+    @RequestMapping(value = "/{account_id}/call/notify_call",method = RequestMethod.POST)
+    public RestResponse duoCallback(HttpServletRequest request, @RequestBody NotifyCallVO notifyCallVO, @PathVariable String account_id) throws YunhuniApiException {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+        String callId = null;
+        callId = callService.notifyCall(ip,appId, notifyCallVO);
+        Map<String,String> result = new HashMap<>();
+        result.put("callId",callId);
+        result.put("user_data",notifyCallVO.getUser_data());
+        return RestResponse.success(result);
+    }
+
 //
 //
 //        @RequestMapping("/async/test")

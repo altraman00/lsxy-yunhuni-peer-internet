@@ -9,8 +9,7 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RequestWriteException;
+import com.lsxy.framework.rpc.api.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +20,12 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Set;
 
-import static com.lsxy.framework.web.utils.WebUtils.logger;
-
 /**
  * Created by tandy on 16/8/5.
  * CTI 客户端启动器  需要配合JNI使用
  */
 @Component
-@Profile(value={"test","production","development"})
+@Profile(value={"test","production","development","localdev"})
 public class CTIClient implements RpcEventListener{
 
 
@@ -102,16 +99,15 @@ public class CTIClient implements RpcEventListener{
                 sc.getReceivedCTIDialFailedEventCount().incrementAndGet();
             }
         }
-        rpcRequest.getParams().put("method",rpcRequest.getMethod());
-        //收到事件,向中心报告所有事件
-        RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
-        Session session = sessionContext.getAvalibleSession();
         try {
+            rpcRequest.getParams().put("method",rpcRequest.getMethod());
+            //收到事件,向中心报告所有事件
+            RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
             assert rpcCaller!=null;
             /*发送区域管理器请求次数计数*/
             if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
 
-            rpcCaller.invoke(session,areaRPCRequest);
+            rpcCaller.invoke(sessionContext,areaRPCRequest);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());

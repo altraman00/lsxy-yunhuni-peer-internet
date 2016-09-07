@@ -1,10 +1,6 @@
 package com.lsxy.framework.rpc.api;
 
-import com.lsxy.framework.rpc.api.server.Session;
-import org.apache.mina.core.service.IoHandlerAdapter;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.lsxy.framework.rpc.api.session.Session;
 
 
 /**
@@ -12,24 +8,15 @@ import java.util.Map;
  * @author Administrator
  *
  */
-public interface RPCHandler {
+public abstract class RPCHandler {
 
-	/**
-	 * 注册监听器
-	 * @param listener
-	 */
-	public void addRequestListener(RequestListener listener);
-
-	/**
-	 * 移除监听器
-	 * @param listener
-	 */
-	public void removeRequestListener(RequestListener listener);
 
 
 	/**
 	 * 根据环境获取对应的session对象
 	 * @param ctxObject
 	 */
-	Session getSessionInTheContextObject(Object ctxObject);
+	public abstract Session getSessionInTheContextObject(Object ctxObject);
+
+
 }

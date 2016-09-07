@@ -2,6 +2,8 @@ package com.lsxy.app.portal.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,18 +12,22 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.session.web.http.SessionRepositoryFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
  * Created by Tandy on 2016/6/7.
  */
-@EnableWebSecurity
+@EnableWebSecurity(debug = false)
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
 
+    @Autowired
+    private SessionRepositoryFilter springSessionRepositoryFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -54,17 +60,21 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //                    .exceptionHandling().accessDeniedPage("/exception/403");
 
 
-                //CharacterEncodingFilter 过滤器如果碰到Security，必须添加在Security前面，否则会出现乱码问题
-                CharacterEncodingFilter filter = new CharacterEncodingFilter();
-                filter.setEncoding("UTF-8");
-                filter.setForceEncoding(true);
-                http.addFilterBefore(filter,CsrfFilter.class);
+        //CharacterEncodingFilter 过滤器如果碰到Security，必须添加在Security前面，否则会出现乱码问题
+        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding("UTF-8");
+        characterEncodingFilter.setForceEncoding(true);
+
+        //将转码放在最前面 将springsession过滤器放最前面,转码必须在最前面
+        http.addFilterBefore(springSessionRepositoryFilter, WebAsyncManagerIntegrationFilter.class);
+        http.addFilterBefore(characterEncodingFilter,SessionRepositoryFilter.class);
     }
 
     @Bean
     protected AuthenticationSuccessHandler getPortalAuthenticationSuccessHandler(){
         return new PortalAuthenticationSuccessHandler();
     }
+
 
     /**
      * 配置加密机制,以及加密盐值

@@ -155,7 +155,6 @@ public class RestRequest {
      * @param <T>              返回对象类型
      * @return
      */
-
     public <T> RestResponse<T> post(String url, Map<String, Object> params, Class<T> responseDataType, String... uriparams) {
         return exchange(url,HttpMethod.POST,params,responseDataType,uriparams);
     }
@@ -164,12 +163,11 @@ public class RestRequest {
      * rest api post request method
      *
      * @param url              目标地址
-     * @param params           请求post 参数
+     * @param payload           请求post 参数
      * @param responseDataType 返回对象类型
      * @param <T>              返回对象类型
      * @return
      */
-
     public <T> RestResponse<T> post(String url, String payload, Class<T> responseDataType, String... uriparams) {
         return exchange(url,HttpMethod.POST,payload,responseDataType,uriparams);
     }

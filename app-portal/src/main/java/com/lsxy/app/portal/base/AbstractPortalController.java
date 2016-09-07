@@ -8,6 +8,8 @@ import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,6 +23,7 @@ import java.util.Map;
  */
 public abstract class AbstractPortalController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractPortalController.class);
     /**
      * 对Controller层统一的异常处理
      * @param request
@@ -53,6 +56,9 @@ public abstract class AbstractPortalController {
     public String getSecurityToken(HttpServletRequest request){
         String token = null;
         Object obj = request.getSession().getAttribute(PortalConstants.SSO_TOKEN);
+        if(logger.isDebugEnabled()){
+            logger.debug("get security token is : {}" , obj);
+        }
         if(obj != null && obj instanceof String){
             token = (String) obj;
         }
