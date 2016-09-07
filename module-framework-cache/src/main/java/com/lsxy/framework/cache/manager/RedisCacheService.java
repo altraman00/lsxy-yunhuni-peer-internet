@@ -45,6 +45,33 @@ public class RedisCacheService {
 	public void init(){
 	}
 
+	/**
+	 * 执行设置值，如果由于并发导致设置标记位导致设置失败，丢出TransactionExecFailedException异常
+	 * @param key
+	 * @param value
+	 * @throws TransactionExecFailedException
+	 */
+	public void setTransactionFlag(final String key, final String value,final long expire)
+			throws TransactionExecFailedException {
+		boolean result = (boolean) redisTemplate
+				.execute(new RedisCallback() {
+					@Override
+					public Object doInRedis(RedisConnection connection)
+							throws DataAccessException {
+						logger.debug("ready to set nx:"+key+">>>>"+ value);
+						boolean ret = connection.setNX(key.getBytes(), value.getBytes());
+						//默认缓存2天
+						connection.expire(key.getBytes(), expire);
+						logger.debug("set nx result:"+ret);
+						return ret;
+					}
+
+				});
+		//如果结果为空表示设置失败了
+		if(result == false)
+			throw new TransactionExecFailedException();
+	}
+
 	    /**
 	     * @param keys
 	     */
