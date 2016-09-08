@@ -1,6 +1,7 @@
 package com.lsxy.area.agent.handler;
 
-import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.BusAddress;
+import com.lsxy.app.area.cti.Commander;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -49,7 +50,7 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
         if(logger.isDebugEnabled()){
             logger.debug("响应CTI API:{}",request);
         }
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         String resId = (String) request.getParameter("res_id");
         String method = (String) request.getParameter("method");
         Map<String, Object> params = new HashMap<>();
@@ -75,7 +76,7 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
                 logger.debug("开始操作资源:{}{}",method,resId);
             }
 
-            cticlient.operateResource(0,1,resId,method,params,null);
+            cticlient.operateResource(new BusAddress((byte)0,(byte)1),resId,method,params,null);
 
             /*发送请求给CTI次数计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();

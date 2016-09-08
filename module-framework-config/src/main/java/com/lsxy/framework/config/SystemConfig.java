@@ -6,10 +6,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 读取系统配置的工具方法
@@ -19,6 +16,9 @@ import java.util.Properties;
 public class SystemConfig {
 
 	private static Log logger=LogFactory.getLog(SystemConfig.class);
+
+	//系统唯一标识，用于标记应用节点的唯一性，用于区分相同应用的不同节点、互斥执行
+	public static final String id = UUID.randomUUID().toString();
 
 	private static Properties pp = new Properties();
 	static{

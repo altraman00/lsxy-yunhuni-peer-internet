@@ -3,6 +3,7 @@ package com.lsxy.third.gateway.rest;
 import com.alipay.config.AlipayConfig;
 import com.alipay.util.AlipayNotify;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.model.ThirdPayRecord;
@@ -37,6 +38,7 @@ public class AliPayController extends AbstractAPIController{
 
     @RequestMapping("/notify")
     public String aliPayNotify(HttpServletRequest request,String trade_status) throws Exception {
+        WebUtils.logRequestParams(request);
         return handleAliPayResult(request, trade_status);
     }
 
