@@ -29,20 +29,20 @@ import java.util.Map;
 public class CallController extends AbstractAPIController{
     private static final Logger logger = LoggerFactory.getLogger(CallController.class);
 
-    @Autowired
-    private MQService mqService;
-
-    @Autowired(required = false)
-    private StasticsCounter sc;
-
     @Reference(timeout=3000)
     private CallService callService;
 
-    @Autowired
-    private AsyncRequestContext asyncRequestContext;
-
-    @Autowired
-    private AppService appService;
+//    @Autowired
+//    private MQService mqService;
+//
+//    @Autowired(required = false)
+//    private StasticsCounter sc;
+//
+//    @Autowired
+//    private AsyncRequestContext asyncRequestContext;
+//
+//    @Autowired
+//    private AppService appService;
 
 //    /**
 //     * 自动化测试用例使用
@@ -56,31 +56,31 @@ public class CallController extends AbstractAPIController{
 //@RequestMapping("/{accountId}/call")
 //public DeferredResult<ApiGatewayResponse> doCall(@PathVariable String accountId, HttpServletResponse response, HttpServletRequest request){
 
-    /**
-     *  语音呼叫API
-     *  api.dev.yunhuni.com/v1/account/1234567/call?to=13971068693&maxAnswerSec=10&maxRingSec=20
-     * @param certId   鉴权账号
-     * @param response
-     * @param request
-     * @return
-     */
-    @RequestMapping("/{certId}/call")
-    public ApiGatewayResponse<String> doCall(@PathVariable String certId, HttpServletResponse response, HttpServletRequest request, String to, String from, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
-        if(logger.isDebugEnabled()){
-            WebUtils.logRequestParams(request);
-        }
-        /*发送请求次数计数*/
-        if(sc!=null)sc.getSendGWRequestCount().incrementAndGet();
-
-        String callid = callService.call(from,to,maxAnswerSec,maxRingSec);
-        return ApiGatewayResponse.success(callid);
-
-    }
-
-    @RequestMapping("/{accountId}/call/{callId}")
-    public ApiGatewayResponse getCall(@PathVariable String accountId,@PathVariable String callId){
-        return ApiGatewayResponse.success(callId);
-    }
+//    /**
+//     *  语音呼叫API
+//     *  api.dev.yunhuni.com/v1/account/1234567/call?to=13971068693&maxAnswerSec=10&maxRingSec=20
+//     * @param certId   鉴权账号
+//     * @param response
+//     * @param request
+//     * @return
+//     */
+//    @RequestMapping("/{certId}/call")
+//    public ApiGatewayResponse<String> doCall(@PathVariable String certId, HttpServletResponse response, HttpServletRequest request, String to, String from, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
+//        if(logger.isDebugEnabled()){
+//            WebUtils.logRequestParams(request);
+//        }
+//        /*发送请求次数计数*/
+//        if(sc!=null)sc.getSendGWRequestCount().incrementAndGet();
+//
+//        String callid = callService.call(from,to,maxAnswerSec,maxRingSec);
+//        return ApiGatewayResponse.success(callid);
+//
+//    }
+//
+//    @RequestMapping("/{accountId}/call/{callId}")
+//    public ApiGatewayResponse getCall(@PathVariable String accountId,@PathVariable String callId){
+//        return ApiGatewayResponse.success(callId);
+//    }
 
     @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
     public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody DuoCallbackDTO duoCallbackDTO, @PathVariable String account_id) throws YunhuniApiException {
