@@ -30,6 +30,17 @@ public class AppController extends AbstractRestController {
     private TenantService tenantService;
     @Autowired
     AppOnlineActionService appOnlineActionService;
+
+    /**
+     * 根据应用名字查找应用数
+     * @param name 应用名字
+     * @return
+     */
+    @RequestMapping("/count/{name}")
+    public RestResponse countByTenantIdAndName(@PathVariable String name){
+        long re = appService.countByTenantIdAndName(getCurrentAccount().getTenant().getId(),name);
+        return RestResponse.success(re);
+    }
     /**
      * 查找当前用户的应用
      * @throws Exception

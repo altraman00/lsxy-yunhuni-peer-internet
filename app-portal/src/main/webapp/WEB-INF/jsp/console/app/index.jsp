@@ -71,7 +71,8 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
+                                                <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20" onchange="countName(this)"/>
+                                                <small class="help-block"data-bv-for="limit20" style="color: red" id="checkNameByCountName"></small>
                                             </div>
                                             <span class="span-required">*</span>
                                         </div>
@@ -209,7 +210,27 @@
         }
 
     });
-
+    function countName(t){
+        var value = t.value;
+        if(value.trim().length>0){
+            ajaxsync(ctx + "/console/app/count/name/"+value,{},function(response){
+                if(response.success){
+                    $('#checkNameByCountName').html('');
+                    $('#checkNameByCountName').hide();
+                }else{
+                    $('#checkNameByCountName').html('应用名称已存在');
+                    $('#checkNameByCountName').show();
+                }
+            },"post").fail(function(){
+                $('#checkNameByCountName').html('');
+                $('#checkNameByCountName').hide();
+            });
+        }
+    }
+    $(function () {
+        $('#checkNameByCountName').html('');
+        $('#checkNameByCountName').hide();
+    })
 </script>
 
 </body>

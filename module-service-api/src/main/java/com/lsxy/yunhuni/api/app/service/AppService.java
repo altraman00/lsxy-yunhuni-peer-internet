@@ -12,6 +12,7 @@ import java.util.List;
  * Created by liups on 2016/6/29.
  */
 public interface AppService extends BaseService<App> {
+    long countByTenantIdAndName(String tenantId,String name);
     /**
      * 获取记录的集合
      * @param tenantId 租户id
