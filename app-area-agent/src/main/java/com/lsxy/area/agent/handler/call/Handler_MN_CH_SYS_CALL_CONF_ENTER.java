@@ -1,8 +1,9 @@
 package com.lsxy.area.agent.handler.call;
 
-import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.app.area.cti.commander.RpcError;
-import com.lsxy.app.area.cti.commander.RpcResultListener;
+import com.lsxy.app.area.cti.BusAddress;
+import com.lsxy.app.area.cti.Commander;
+import com.lsxy.app.area.cti.RpcError;
+import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -50,7 +51,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
         }
         RPCResponse response = RPCResponse.buildResponse(request);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -61,7 +62,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
         String call_id = (String)params.get("user_data");
 
         try {
-            cticlient.operateResource(0, 0,res_id, "sys.call.conf_enter", params, new RpcResultListener(){
+            cticlient.operateResource(new BusAddress((byte)0,(byte)1),res_id, "sys.call.conf_enter", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;
