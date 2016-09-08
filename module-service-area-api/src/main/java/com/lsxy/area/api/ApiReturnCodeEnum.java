@@ -15,7 +15,7 @@ public enum ApiReturnCodeEnum {
     NumberNotAllowToCall("101014","号码不允许呼叫"),
     ConfNotExists("101015","会议不存在"),
     CallNotExists("101016","呼叫不存在"),
-    AppOffLine("101017","应用没上线");
+    AppOffLine("101017","应用没上线"),
     DuoCallbackNumIsSample("101018","双向回拔的号码不能是同一号码");
 
     private String code;
