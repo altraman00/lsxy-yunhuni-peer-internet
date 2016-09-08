@@ -36,6 +36,8 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.lsxy.area.api.ApiReturnCodeEnum.DuoCallbackNumIsSample;
+
 /**
  * Created by tandy on 16/8/18.
  */
@@ -121,6 +123,9 @@ public class CallServiceImpl implements CallService {
         String duocCallId = UUIDGenerator.uuid();
         String to1 = dto.getTo1();
         String to2 = dto.getTo2();
+        if(StringUtils.isBlank(to1) || StringUtils.isBlank(to2)||to1.equals(to2)){
+            throw new DuoCallbackNumIsSampleException();
+        }
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
             throw new NumberNotAllowToCallException();
         }
