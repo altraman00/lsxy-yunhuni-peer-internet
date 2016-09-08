@@ -2,12 +2,10 @@ package com.lsxy.app.api.gateway.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.io.Serializable;
-
 /**
  * Created by liuws on 2016/8/24.
  */
-public class ConfSetVoiceModeInputDTO implements Serializable{
+public class ConfSetVoiceModeInputDTO extends CommonDTO{
 
     @JsonProperty("call_id")
     private String callId;

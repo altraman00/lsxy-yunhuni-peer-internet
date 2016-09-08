@@ -2,9 +2,10 @@ package com.lsxy.yunhuni.api.session.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 会议
@@ -13,17 +14,11 @@ import java.util.List;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_meeting")
 public class Meeting  extends IdEntity {
-    private List<CallSession> sessions;//所属会议
     private String fromNum;//发起人
     private Date startTime;//发起时间
-    @OneToMany
-    @JoinColumn(name = "session_id")
-    public List<CallSession> getSessions() {
-        return sessions;
-    }
-    public void setSessions(List<CallSession> sessions) {
-        this.sessions = sessions;
-    }
+    private Date endTime;
+    private String resId;
+
     @Column(name = "from_num")
     public String getFromNum() {
         return fromNum;
@@ -33,8 +28,6 @@ public class Meeting  extends IdEntity {
         this.fromNum = fromNum;
     }
 
-
-
     @Column(name = "start_time")
     public Date getStartTime() {
         return startTime;
@@ -42,5 +35,23 @@ public class Meeting  extends IdEntity {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    @Column(name = "end_time")
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    @Column(name = "res_id")
+    public String getResId() {
+        return resId;
+    }
+
+    public void setResId(String resId) {
+        this.resId = resId;
     }
 }

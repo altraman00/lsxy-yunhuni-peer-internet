@@ -21,18 +21,6 @@ public class BusinessState implements Serializable{
     public BusinessState() {
     }
 
-    public BusinessState(String tenantId, String appId, String id, String type,String userdata, String callBackUrl,String areaId, String lineGatewayId, Map<String,Object> map) {
-        this(tenantId,appId,id,type,userdata,null,callBackUrl,areaId,lineGatewayId,map);
-    }
-
-    public BusinessState(String tenantId, String appId, String id, String type, String userdata, Map<String,Object> businessData) {
-        this(tenantId,appId,id,type,userdata,null,null,businessData);
-    }
-
-    public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl,Map<String,Object> businessData) {
-        this(tenantId,appId,id,type,userdata,resId,callBackUrl,null,null,businessData);
-    }
-
     public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl, String areaId, String lineGatewayId, Map<String, Object> businessData) {
         this.tenantId = tenantId;
         this.appId = appId;
@@ -124,5 +112,76 @@ public class BusinessState implements Serializable{
 
     public void setLineGatewayId(String lineGatewayId) {
         this.lineGatewayId = lineGatewayId;
+    }
+
+
+    public static class Builder{
+
+        private String tenantId;
+        private String appId;
+        private String id;
+        private String type;
+        private String userdata;
+        private String resId;
+        private String callBackUrl;
+        private String areaId;
+        private String lineGatewayId;
+        private Map<String,Object> businessData;
+
+        public Builder(){}
+
+        public Builder setId(String id){
+            this.id=id;
+            return this;
+        }
+
+        public Builder setTenantId(String tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder setAppId(String appId) {
+            this.appId = appId;
+            return this;
+        }
+
+        public Builder setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder setUserdata(String userdata) {
+            this.userdata = userdata;
+            return this;
+        }
+
+        public Builder setResId(String resId) {
+            this.resId = resId;
+            return this;
+        }
+
+        public Builder setCallBackUrl(String callBackUrl) {
+            this.callBackUrl = callBackUrl;
+            return this;
+        }
+
+        public Builder setAreaId(String areaId) {
+            this.areaId = areaId;
+            return this;
+        }
+
+        public Builder setLineGatewayId(String lineGatewayId) {
+            this.lineGatewayId = lineGatewayId;
+            return this;
+        }
+
+        public Builder setBusinessData(Map<String, Object> businessData) {
+            this.businessData = businessData;
+            return this;
+        }
+
+        public BusinessState build(){
+            return new BusinessState(tenantId,appId,id,type,userdata,resId,callBackUrl,areaId,lineGatewayId,businessData);
+        }
     }
 }

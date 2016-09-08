@@ -6,6 +6,7 @@ import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -186,7 +187,18 @@ public class CallServiceImpl implements CallService {
                         .put(to2_uri,UUIDGenerator.uuid())
                         .build();
                 //将数据存到redis
-                BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),duocCallId,apiCmd,dto.getUser_data(), app.getUrl(),app.getArea().getId(),lineGateway.getId(),data);
+                BusinessState cache = new BusinessState.Builder()
+                                        .setTenantId(app.getTenant().getId())
+                                        .setAppId(appId)
+                                        .setId(duocCallId)
+                                        .setType(apiCmd)
+                                        .setUserdata(dto.getUser_data())
+                                        .setCallBackUrl(app.getUrl())
+                                        .setAreaId(app.getArea().getId())
+                                        .setLineGatewayId(lineGateway.getId())
+                                        .setBusinessData(data)
+                                        .build();
+
                 businessStateService.save(cache);
                 //保存双向回拔表
                 VoiceCallback voiceCallback = new VoiceCallback(duocCallId,dto.getFrom1(),dto.getFrom2(),to1_uri,to2_uri);
@@ -257,7 +269,17 @@ public class CallServiceImpl implements CallService {
                     .put(to_uri,UUIDGenerator.uuid())
                     .build();
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,apiCmd,dto.getUser_data(), app.getUrl(),area.getId(),lineGateway.getId(),data);
+            BusinessState cache = new BusinessState.Builder()
+                                    .setTenantId(app.getTenant().getId())
+                                    .setAppId(app.getId())
+                                    .setId(callId)
+                                    .setType(apiCmd)
+                                    .setUserdata(dto.getUser_data())
+                                    .setCallBackUrl(app.getUrl())
+                                    .setAreaId(area.getId())
+                                    .setLineGatewayId(lineGateway.getId())
+                                    .setBusinessData(data)
+                                    .build();
             businessStateService.save(cache);
             //保存语音通知
             NotifyCall notifyCall = new NotifyCall(dto.getFrom(),to_uri);
@@ -274,12 +296,16 @@ public class CallServiceImpl implements CallService {
 
     @Override
     public String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException{
-        String callId = UUIDGenerator.uuid();
         String to = dto.getTo();
-        if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
+        if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
+
+        if(app.getStatus() != app.STATUS_ONLINE){
+            throw new AppOffLineException();
+        }
+
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
             if(!whiteList.contains(ip)){
@@ -289,31 +315,54 @@ public class CallServiceImpl implements CallService {
         if(app.getIsVoiceValidate() != 1){
             throw new AppServiceInvalidException();
         }
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough("captcha_call", app.getTenant().getId());
+
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
 
         //TODO 获取线路IP和端口
         //TODO 待定
-        Map<String, Object> params = new HashMap<>();
-        params.put("from_uri", dto.getFrom()+"@"+ctiHost+":"+ctiPort);
-        params.put("to_uri", dto.getTo()+"@"+ctiHost+":"+ctiPort);
-        params.put("max_ring_seconds",dto.getMax_dial_duration());
-        params.put("valid_keys",dto.getVerify_code());
-        params.put("user_data",callId);
+        String callId = UUIDGenerator.uuid();
+        //TODO
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
+        Map<String, Object> params = new MapBuilder<String, Object>()
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("max_ring_seconds",dto.getMax_dial_duration())
+                .putIfNotEmpty("valid_keys",dto.getVerify_code())
+                .putIfNotEmpty("user_data",callId)
+                .put("appid ",app.getId())
+                .build();
+        if(dto.getFiles() != null && dto.getFiles().size()>0){
+            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(dto.getFiles(),"|"),7,""}};
+            params.put("play_content", JSONUtil2.objectToJson(plays));
+        }
         try {
             //找到合适的区域代理
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
             //将数据存到redis
-            BusinessState cache = new BusinessState(app.getTenant().getId(),app.getId(),callId,"captcha_call", app.getUrl(),null,null,dto.getUser_data(),null);
+            BusinessState cache = new BusinessState.Builder()
+                    .setTenantId(app.getTenant().getId())
+                    .setAppId(app.getId())
+                    .setId(callId)
+                    .setType("captcha_call")
+                    .setCallBackUrl(app.getUrl())
+                    .setUserdata(dto.getUser_data())
+                    .setAreaId(app.getArea().getId())
+                    .setLineGatewayId(lineGateway.getId())
+                    .setBusinessData(new MapBuilder<String,Object>()
+                            .put("from",oneTelnumber)
+                            .put("to",to)
+                            .build())
+                    .build();
             businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);
         }
     }
-
 }
