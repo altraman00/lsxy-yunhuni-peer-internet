@@ -1,4 +1,4 @@
-package com.lsxy.area.server.event.handler.simplecallevent;
+package com.lsxy.area.server.event.handler.simplecall;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;

@@ -91,6 +91,14 @@ public class CallController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
+    @RequestMapping(value = "/{account_id}/call/duo_callback/cancel",method = RequestMethod.POST)
+    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody Map params, @PathVariable String account_id) throws YunhuniApiException {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+        callService.duoCallbackCancel(ip,appId, (String)params.get("callId"));
+        return ApiGatewayResponse.success();
+    }
+
     @RequestMapping(value = "/{account_id}/call/notify_call",method = RequestMethod.POST)
     public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody NotifyCallDTO notifyCallDTO, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");

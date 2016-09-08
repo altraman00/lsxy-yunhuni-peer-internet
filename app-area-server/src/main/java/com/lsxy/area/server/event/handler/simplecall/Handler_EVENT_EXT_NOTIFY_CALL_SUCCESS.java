@@ -1,4 +1,4 @@
-package com.lsxy.area.server.event.handler.simplecallevent;
+package com.lsxy.area.server.event.handler.simplecall;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
@@ -8,9 +8,9 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.session.model.CallSession;
-import com.lsxy.yunhuni.api.session.model.VoiceCallback;
+import com.lsxy.yunhuni.api.session.model.NotifyCall;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
-import com.lsxy.yunhuni.api.session.service.VoiceCallbackService;
+import com.lsxy.yunhuni.api.session.service.NotifyCallService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +24,14 @@ import java.util.Set;
  * Created by liups on 2016/8/31.
  */
 @Component
-public class Handler_EVENT_EXT_DUO_CALLBACK_SUCCESS extends EventHandler {
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_DUO_CALLBACK_SUCCESS.class);
+public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS.class);
 
     @Autowired
     private BusinessStateService businessStateService;
+
     @Autowired
-    VoiceCallbackService voiceCallbackService;
+    NotifyCallService notifyCallService;
     @Autowired
     CallSessionService callSessionService;
     @Override
@@ -58,10 +59,10 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_SUCCESS extends EventHandler {
         if(StringUtils.isNotBlank(resId)){
             state.setResId(resId);
             businessStateService.save(state);
-            VoiceCallback duoCall = voiceCallbackService.findById(callId);
-            if(duoCall != null){
-                duoCall.setResId(resId);
-                voiceCallbackService.save(duoCall);
+            NotifyCall notifyCall = notifyCallService.findById(callId);
+            if(notifyCall != null){
+                notifyCall.setResId(resId);
+                notifyCallService.save(notifyCall);
             }
             Map<String, Object> data = state.getBusinessData();
             Set<Map.Entry<String, Object>> entries = data.entrySet();

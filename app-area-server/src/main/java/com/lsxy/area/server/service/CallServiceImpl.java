@@ -170,46 +170,72 @@ public class CallServiceImpl implements CallService {
             params.put("record_format ",1);
         }
 
+        //增加区域参数 选择合适的会话(传入appid即可)
+        params.put("appid ",app.getId());
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
         try {
-            //增加区域参数 选择合适的会话(传入appid即可)
-            params.put("appid ",app.getId());
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
-            try {
-                Map<String,Object> data = new MapBuilder<String,Object>()
-                        .put(to1_uri,UUIDGenerator.uuid())
-                        .put(to2_uri,UUIDGenerator.uuid())
-                        .build();
-                //将数据存到redis
-                BusinessState cache = new BusinessState.Builder()
-                                        .setTenantId(app.getTenant().getId())
-                                        .setAppId(appId)
-                                        .setId(duocCallId)
-                                        .setType(apiCmd)
-                                        .setUserdata(dto.getUser_data())
-                                        .setCallBackUrl(app.getUrl())
-                                        .setAreaId(app.getArea().getId())
-                                        .setLineGatewayId(lineGateway.getId())
-                                        .setBusinessData(data)
-                                        .build();
+            Map<String,Object> data = new MapBuilder<String,Object>()
+                    .put(to1_uri,UUIDGenerator.uuid())
+                    .put(to2_uri,UUIDGenerator.uuid())
+                    .build();
+            //将数据存到redis
+            BusinessState cache = new BusinessState.Builder()
+                                    .setTenantId(app.getTenant().getId())
+                                    .setAppId(appId)
+                                    .setId(duocCallId)
+                                    .setType(apiCmd)
+                                    .setUserdata(dto.getUser_data())
+                                    .setCallBackUrl(app.getUrl())
+                                    .setAreaId(app.getArea().getId())
+                                    .setLineGatewayId(lineGateway.getId())
+                                    .setBusinessData(data)
+                                    .build();
 
-                businessStateService.save(cache);
-                //保存双向回拔表
-                VoiceCallback voiceCallback = new VoiceCallback(duocCallId,dto.getFrom1(),dto.getFrom2(),to1_uri,to2_uri);
-                voiceCallbackService.save(voiceCallback);
-                CallSession callSession = new CallSession((String) data.get(to1_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
-                CallSession callSession2 = new CallSession((String) data.get(to2_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
-                callSessionService.save(callSession);
-                callSessionService.save(callSession2);
-                rpcCaller.invoke(sessionContext, rpcrequest);
-            } catch (Exception e) {
-                logger.error("消息发送到区域失败:{}", rpcrequest);
-                e.printStackTrace();
-                throw new InvokeCallException(e);
-            }
+            businessStateService.save(cache);
+            //保存双向回拔表
+            VoiceCallback voiceCallback = new VoiceCallback(duocCallId,dto.getFrom1(),dto.getFrom2(),to1_uri,to2_uri);
+            voiceCallbackService.save(voiceCallback);
+            CallSession callSession = new CallSession((String) data.get(to1_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
+            CallSession callSession2 = new CallSession((String) data.get(to2_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
+            callSessionService.save(callSession);
+            callSessionService.save(callSession2);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+
             return duocCallId;
-        }catch(Exception ex){
-            throw new InvokeCallException(ex);
+        }catch(Exception e){
+            logger.error("消息发送到区域失败:{}", rpcrequest);
+            e.printStackTrace();
+            throw new InvokeCallException(e);
         }
+    }
+
+    @Override
+    public void duoCallbackCancel(String ip, String appId, String callId) throws YunhuniApiException{
+        App app = appService.findById(appId);
+        if(app.getStatus() != app.STATUS_ONLINE){
+            throw new AppOffLineException();
+        }
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        BusinessState businessState = businessStateService.get(callId);
+        Map<String, Object> params = new MapBuilder<String, Object>()
+                .put("res_id",businessState.getResId())
+                .put("user_data ",businessState.getId())
+                .put("appid ",app.getId())
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK_CANCEL, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        }catch(Exception e){
+            logger.error("消息发送到区域失败:{}", rpcrequest);
+            e.printStackTrace();
+            throw new InvokeCallException(e);
+        }
+
     }
 
     @Override
