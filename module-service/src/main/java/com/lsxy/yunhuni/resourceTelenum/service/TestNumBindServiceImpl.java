@@ -50,4 +50,14 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
         List<TestNumBind> list = this.findByCustomWithParams(hql, tenant,appId);
         return list;
     }
+
+    @Override
+    public TestNumBind findByNumber(String number)  {
+        String hql = "from TestNumBind obj where obj.number=?1 ";
+        List<TestNumBind> list = this.findByCustomWithParams(hql, number);
+        if(list!=null && list.size()> 0){
+            return list.get(0);
+        }
+        return null;
+    }
 }

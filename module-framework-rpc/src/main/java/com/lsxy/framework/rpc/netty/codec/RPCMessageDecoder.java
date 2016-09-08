@@ -73,7 +73,13 @@ public class RPCMessageDecoder extends ByteToMessageDecoder{
             switch (part){
                 case PART_SESSIONID:{
                     startDecodeTime = System.currentTimeMillis();
-                    decodeSessionIdPart(in);
+                    try {
+                        decodeSessionIdPart(in);
+                    }catch (Exception ex){
+                        logger.error("解析失败,关闭连接:{}",ctx.channel());
+                        ctx.close();
+                        throw ex;
+                    }
                     break;
                 }
                 case PART_HEADER: {

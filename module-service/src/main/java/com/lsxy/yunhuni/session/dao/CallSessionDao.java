@@ -3,6 +3,9 @@ package com.lsxy.yunhuni.session.dao;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.session.model.CallSession;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
 
@@ -18,4 +21,8 @@ public interface CallSessionDao extends BaseDaoInterface<CallSession, Serializab
      * @return 条数
      */
     Long countByStatusAndApp(int status,App app);
+
+    @Modifying
+    @Query("update CallSession call set call.status=:status where relevanceId=:relevanceId")
+    public void updateStatusByRelevanceId(@Param("relevanceId") String relevanceId, @Param("status") Integer status);
 }

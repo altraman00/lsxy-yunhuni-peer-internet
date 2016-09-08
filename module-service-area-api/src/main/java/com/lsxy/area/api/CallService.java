@@ -23,7 +23,14 @@ public interface CallService {
      * @return
      */
     String duoCallback(String ip,String appId, DuoCallbackDTO duoCallbackDTO) throws YunhuniApiException;
-
+    /**
+     * 取消双向回拔
+     * @param ip
+     * @param appId
+     * @param callId
+     * @return
+     */
+    void duoCallbackCancel(String ip, String appId, String callId) throws YunhuniApiException;
     /**
      * 外呼通知
      * @param ip
@@ -41,4 +48,5 @@ public interface CallService {
      * @return
      */
     String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException;
+
 }
