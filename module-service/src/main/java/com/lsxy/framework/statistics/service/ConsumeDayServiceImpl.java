@@ -85,8 +85,9 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
         Date start = DateUtils.parseDate(startTime,"yyyy-MM");
         Date end = DateUtils.parseDate(nextMonth,"yyyy-MM");
-        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenant.getId(),appId, null)+" obj.dt>=?1 and obj.dt<?2";
-        return getPageList(hql, pageNo -1, pageSize, start, end);
+        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenant.getId(),appId, null)+" obj.dt>=?1 and obj.dt<?2 ";
+        return this.pageListGroupBy(hql,pageNo,pageSize," group by obj.dt ",start,end).getResult();
+       // return getPageList(hql, pageNo -1, pageSize, start, end);
     }
 
     @Override
