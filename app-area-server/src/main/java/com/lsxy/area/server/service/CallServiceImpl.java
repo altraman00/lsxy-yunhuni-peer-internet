@@ -31,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -81,12 +80,6 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     CallSessionService callSessionService;
-
-    @Value("${area.agent.client.cti.sip.host}")
-    private String ctiHost;
-
-    @Value("${area.agent.client.cti.sip.port}")
-    private int ctiPort;
 
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
@@ -255,11 +248,14 @@ public class CallServiceImpl implements CallService {
         Map<String, Object> params = new HashMap<>();
         params.put("from_uri", dto.getFrom());
         params.put("to_uri", to_uri);
-        params.put("play_content",JSONUtil.objectToJson(dto.getFiles()));
+//        params.put("play_content",JSONUtil.objectToJson(dto.getFiles()));
         params.put("play_repeat",dto.getRepeat());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("user_data",callId);
-
+        if(dto.getFiles() != null && dto.getFiles().size()>0){
+            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(dto.getFiles(),"|"),7,""}};
+            params.put("play_content", JSONUtil2.objectToJson(plays));
+        }
         try {
             //增加区域参数 选择合适的会话(传入appid即可)
             params.put("appid ",app.getId());
