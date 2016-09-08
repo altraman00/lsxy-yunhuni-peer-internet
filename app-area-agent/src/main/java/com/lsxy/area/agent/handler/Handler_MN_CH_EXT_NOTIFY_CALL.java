@@ -1,6 +1,7 @@
 package com.lsxy.area.agent.handler;
 
-import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.BusAddress;
+import com.lsxy.app.area.cti.Commander;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
@@ -48,7 +49,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
     public RPCResponse handle(RPCRequest request, Session session) {
         RPCResponse response = RPCResponse.buildResponse(request);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -70,7 +71,9 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            String res_id = cticlient.createResource(0, 0, "ext.notify_call", params, null);
+            //此处临时固定单实例CTI,后期需要抽象CTI路由
+            BusAddress ba = new BusAddress((byte)0, (byte)0);
+            String res_id = cticlient.createResource(ba, "ext.notify_call", params, null);
             response.setMessage(RPCResponse.STATE_OK);
             response.setBody(res_id);
         } catch (IOException e) {
