@@ -10,11 +10,9 @@ import java.io.Serializable;
 public class CaptchaCallDTO implements Serializable {
     private String from;
     private String to;
-    private String custom_from;
-    private String custom_to;
     private String verify_code;
-    private String max_call_duration;   // 最大接通时间（秒）
-    private String max_dial_duration;   //最大拨号等待时间（秒）
+    private Integer max_dial_duration;   //最大拨号等待时间（秒）
+    private Integer max_keys;
     private List<String> files;
     private String user_data;
 
@@ -34,22 +32,6 @@ public class CaptchaCallDTO implements Serializable {
         this.to = to;
     }
 
-    public String getCustom_from() {
-        return custom_from;
-    }
-
-    public void setCustom_from(String custom_from) {
-        this.custom_from = custom_from;
-    }
-
-    public String getCustom_to() {
-        return custom_to;
-    }
-
-    public void setCustom_to(String custom_to) {
-        this.custom_to = custom_to;
-    }
-
     public String getVerify_code() {
         return verify_code;
     }
@@ -58,20 +40,20 @@ public class CaptchaCallDTO implements Serializable {
         this.verify_code = verify_code;
     }
 
-    public String getMax_call_duration() {
-        return max_call_duration;
-    }
-
-    public void setMax_call_duration(String max_call_duration) {
-        this.max_call_duration = max_call_duration;
-    }
-
-    public String getMax_dial_duration() {
+    public Integer getMax_dial_duration() {
         return max_dial_duration;
     }
 
-    public void setMax_dial_duration(String max_dial_duration) {
+    public void setMax_dial_duration(Integer max_dial_duration) {
         this.max_dial_duration = max_dial_duration;
+    }
+
+    public Integer getMax_keys() {
+        return max_keys;
+    }
+
+    public void setMax_keys(Integer max_keys) {
+        this.max_keys = max_keys;
     }
 
     public List<String> getFiles() {

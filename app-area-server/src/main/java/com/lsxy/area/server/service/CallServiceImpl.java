@@ -333,6 +333,7 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_ring_seconds",dto.getMax_dial_duration())
                 .putIfNotEmpty("valid_keys",dto.getVerify_code())
+                .putIfNotEmpty("max_keys",dto.getMax_keys())
                 .putIfNotEmpty("user_data",callId)
                 .put("appid ",app.getId())
                 .build();

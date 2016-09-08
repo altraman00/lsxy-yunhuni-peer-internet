@@ -2,6 +2,7 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.ApiReturnCodeEnum;
+import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @RequestMapping("/${api.gateway.version}/account/")
 public class AbstractAPIController {
+    public static final int MAX_INTPUT_STR_LEN = 128;
     /**
      * 对Controller层统一的异常处理
      * @param request
@@ -32,5 +34,11 @@ public class AbstractAPIController {
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.UnknownFail.getCode(), ApiReturnCodeEnum.UnknownFail.getMsg());
         }
         return JSONUtil2.objectToJson(failed);
+    }
+
+    public void checkInputLen(String input) throws RequestIllegalArgumentException {
+        if(input != null && input.length()>MAX_INTPUT_STR_LEN){
+            throw new RequestIllegalArgumentException();
+        }
     }
 }

@@ -7,10 +7,12 @@ import com.lsxy.area.api.CaptchaCallDTO;
 import com.lsxy.area.api.DuoCallbackDTO;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.NotifyCallDTO;
+import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +114,21 @@ public class CallController extends AbstractAPIController{
     public ApiGatewayResponse captcha_call(HttpServletRequest request, @RequestBody CaptchaCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
+
+        //参数校验
+        checkInputLen(dto.getFrom());
+        if(StringUtils.isBlank(dto.getTo())){
+            throw new RequestIllegalArgumentException();
+        }
+        if(dto.getMax_dial_duration() !=null && dto.getMax_dial_duration() <=0){
+            throw new RequestIllegalArgumentException();
+        }
+        checkInputLen(dto.getVerify_code());
+        if(dto.getMax_keys()!=null && dto.getMax_keys() <=0){
+            throw new RequestIllegalArgumentException();
+        }
+        checkInputLen(dto.getUser_data());
+
         String callId = callService.captchaCall(ip,appId, dto);
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);

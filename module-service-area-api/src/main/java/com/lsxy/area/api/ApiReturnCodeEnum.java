@@ -6,6 +6,7 @@ package com.lsxy.area.api;
  */
 public enum ApiReturnCodeEnum {
     Success("000000","请求成功"),
+    IllegalArgument("100001","参数错误"),
     UnknownFail("111111","未知错误"),
     AppServiceInvalid("101010","app没开通该服务"),
     BalanceNotEnough("101011","余额不足"),
