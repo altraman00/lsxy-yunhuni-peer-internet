@@ -1,8 +1,9 @@
 package com.lsxy.area.agent.handler.simplecall;
 
-import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.app.area.cti.commander.RpcError;
-import com.lsxy.app.area.cti.commander.RpcResultListener;
+import com.lsxy.app.area.cti.BusAddress;
+import com.lsxy.app.area.cti.Commander;
+import com.lsxy.app.area.cti.RpcError;
+import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
@@ -53,7 +54,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
         }
         RPCResponse response = RPCResponse.buildResponse(request);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -69,7 +70,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建语音验证码资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.createResource(0, 0, "ext.captcha_call", params, new RpcResultListener(){
+            cticlient.createResource(new BusAddress((byte)0,(byte)1), "ext.captcha_call", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {

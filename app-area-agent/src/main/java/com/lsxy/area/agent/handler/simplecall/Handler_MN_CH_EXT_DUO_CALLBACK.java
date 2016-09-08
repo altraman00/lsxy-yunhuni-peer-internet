@@ -1,9 +1,9 @@
 package com.lsxy.area.agent.handler.simplecall;
 
-import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.app.area.cti.commander.RpcError;
-import com.lsxy.app.area.cti.commander.RpcResultListener;
-import com.lsxy.area.agent.StasticsCounter;
+import com.lsxy.app.area.cti.BusAddress;
+import com.lsxy.app.area.cti.Commander;
+import com.lsxy.app.area.cti.RpcError;
+import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -49,7 +49,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
     public RPCResponse handle(RPCRequest request, Session session) {
         RPCResponse response = RPCResponse.buildResponse(request);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -65,7 +65,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.createResource(0, 0, "ext.duo_callback", params,new RpcResultListener(){
+            cticlient.createResource(new BusAddress((byte)0,(byte)1), "ext.duo_callback", params,new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
