@@ -17,6 +17,83 @@
         <section id="content">
             <section class="hbox stretch">
                 <aside>
+                    <script language="JavaScript" type="text/javascript">
+                        var marqueeContent = new Array();
+                        window.onload = function() {
+                            var param = {};
+                            ajaxsync(ctx + "/console/message/account_message/list", param, function (result) {
+                                for (var i = 0; i < result.data.length; i++) {
+                                    console.info(result.data[i].message.title);
+                                    if(result.data[i].message.type=='0'&&result.data[i].message.title=='系统通知'){
+                                        var sr = new String(result.data[i].message.content).substring(0,40);
+                                        marqueeContent[i]="<span >"+sr+"</span>";
+                                    }else{
+                                        marqueeContent[i]="<span >"+result.data[i].message.title+"</span>";
+                                    }
+                                }
+                                if(result.data.length>0){
+                                    initMarquee();
+                                }
+                            });
+                        }
+//                        marqueeContent[0]="<span >云呼你有新的讯息1</span>";
+//                        marqueeContent[1]="<span >云呼你有新的讯息2</span>";
+//                        marqueeContent[2]="<span >云呼你有新的讯息3云呼你有新的讯息3</span>";
+//                        marqueeContent[3]="<span >云呼你有新的讯息4</span>";
+                        var marqueeInterval=new Array();
+                        var marqueeId=0;
+                        var marqueeDelay=2000;
+                        var marqueeHeight=20;
+                        //初始化
+                        function initMarquee() {
+                            var str = '';
+                            if(marqueeContent.length>0){
+                                 str=marqueeContent[0];
+                            }
+
+
+                            var html = '<div class="common-info" ><div id="marqueeBox" style="overflow:hidden;float:left;height:'+marqueeHeight+'px" onmouseover="clearInterval(marqueeInterval[0])" onmouseout="marqueeInterval[0]=setInterval(\'startMarquee()\',marqueeDelay)"><div>'+str+'</div></div><a href="'+ctx+'/console/message/account_message/index">查看详情</a><span class="close" id="common-close"></span></div>';
+                            document.getElementById("commonMsg").innerHTML= html;
+                            marqueeId++;
+                            marqueeInterval[0]=setInterval("startMarquee()",marqueeDelay);
+                            $('#common-close').click(function(){
+                                $('.common-info').fadeOut()
+                            });
+                        }
+                        //开始滚动
+                        function startMarquee() {
+                            var str=marqueeContent[marqueeId];
+                            marqueeId++;
+                            if(marqueeId>=marqueeContent.length) marqueeId=0;
+                            if(document.getElementById("marqueeBox").childNodes.length==1) {
+                                var nextLine=document.createElement('DIV');
+                                nextLine.innerHTML=str;
+                                document.getElementById("marqueeBox").appendChild(nextLine);
+                            }
+                            else {
+                                document.getElementById("marqueeBox").childNodes[0].innerHTML=str;
+                                document.getElementById("marqueeBox").appendChild(document.getElementById("marqueeBox").childNodes[0]);
+                                document.getElementById("marqueeBox").scrollTop=0;
+                            }
+                            clearInterval(marqueeInterval[1]);
+                            marqueeInterval[1]=setInterval("scrollMarquee()",20);
+                        }
+
+                        //
+                        function scrollMarquee() {
+                            document.getElementById("marqueeBox").scrollTop++;
+                            if(document.getElementById("marqueeBox").scrollTop%marqueeHeight==(marqueeHeight-1)){
+                                clearInterval(marqueeInterval[1]);
+                            }
+                        }
+
+
+
+                    </script>
+                    <div id="commonMsg">
+
+                    </div>
+
                     <section class="vbox xbox">
                         <!-- 如果没有三级导航 这段代码注释-->
                         <!-- <div class="head&#45;box"> <a href="#subNav" data&#45;toggle="class:hide"> <i class="fa fa&#45;angle&#45;left text"></i> <i class="fa fa&#45;angle&#45;right text&#45;active"></i> </a> </div> -->

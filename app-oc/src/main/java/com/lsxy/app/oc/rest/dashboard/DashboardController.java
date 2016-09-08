@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -253,14 +251,30 @@ public class DashboardController {
         long beforeMonth = getDurationIndicantOfBeforeMonth();
         long before2Month = getDurationIndicantOfBefore2Month();
         //分母加0.1是为了防止分母为0
+        Map dto1 = new HashMap();
+        dto1.put("rateOfDay",false);
+        dto1.put("rateOfWeek",false);
+        dto1.put("rateOfMonth",false);
         dto.setDuration((long)Math.round(yesterday/60));//yesterday单位为秒，转为分
-        dto.setRateOfDay(new BigDecimal(((yesterday-beforeYesterday)/(beforeYesterday+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
-        dto.setRateOfWeek(new BigDecimal(((beforeWeek-before2Week)/(before2Week+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
-        dto.setRateOfMonth(new BigDecimal(((beforeMonth-before2Month)/(before2Month+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
-        return RestResponse.success(dto);
+        if(beforeYesterday>0){
+            dto.setRateOfDay(new BigDecimal(((yesterday-beforeYesterday)*0.01)/(beforeYesterday*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
+            dto1.put("rateOfDay",true);
+        }
+        if(before2Week>0){
+            dto.setRateOfWeek(new BigDecimal(((beforeWeek-before2Week)*0.01)/(before2Week*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
+            dto1.put("rateOfWeek",true);
+        }
+        if(before2Month>0){
+            dto.setRateOfMonth(new BigDecimal(((beforeMonth-before2Month)*0.01)/(before2Month*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
+            dto1.put("rateOfMonth",true);
+        }
+        Map map = new HashMap();
+        map.put("dto",dto);
+        map.put("dto1",dto1);
+        return RestResponse.success(map);
     }
 
     //获取前天话务量
@@ -320,13 +334,29 @@ public class DashboardController {
         double before2Month = getComsumeIndicantOfBefore2Month().doubleValue();
         //分母加0.1是为了防止分母为0
         dto.setConsume(yesterday);
-        dto.setRateOfDay(new BigDecimal(((yesterday-beforeYesterday)/(beforeYesterday+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
-        dto.setRateOfWeek(new BigDecimal(((beforeWeek-before2Week)/(before2Week+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
-        dto.setRateOfMonth(new BigDecimal(((beforeMonth-before2Month)/(before2Month+0.1)) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
-        return RestResponse.success(dto);
+        Map dto1 = new HashMap();
+        dto1.put("rateOfDay", false);
+        dto1.put("rateOfWeek",false);
+        dto1.put("rateOfMonth",false);
+        if(beforeYesterday>0) {
+            dto.setRateOfDay(new BigDecimal(((yesterday - beforeYesterday)*0.01) / (beforeYesterday*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//日增长率
+            dto1.put("rateOfDay", true);
+        }
+        if(before2Week>0) {
+            dto.setRateOfWeek(new BigDecimal(((beforeWeek - before2Week)*0.01) / (before2Week*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
+            dto1.put("rateOfWeek", true);
+        }
+        if(before2Month>0) {
+            dto.setRateOfMonth(new BigDecimal(((beforeMonth - before2Month)*0.01) / (before2Month*0.01)*100)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());//周增长率
+            dto1.put("rateOfMonth", true);
+        }
+        Map map = new HashMap();
+        map.put("dto",dto);
+        map.put("dto1",dto1);
+        return RestResponse.success(map);
     }
 
     //获取前天消费额

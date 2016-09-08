@@ -95,10 +95,10 @@
                                                 <span class="hr text-label" ><strong>测试呼入号码</strong></span>
                                             </div>
 
-                                            <p>应用上线前测试阶段呼入使用同一的测试号码进行IVR或呼入功能调试</p>
+                                            <p>应用上线前测试阶段呼入使用统一的测试号码进行IVR或呼入功能调试</p>
 
                                             <div class="number_on">
-                                                <a>0898-77887748858</a>
+                                                <a>${testCallNumber}</a>
                                             </div>
 
                                         </form>

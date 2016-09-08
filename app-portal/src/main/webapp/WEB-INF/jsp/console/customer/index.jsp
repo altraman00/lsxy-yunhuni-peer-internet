@@ -39,7 +39,7 @@
                                 <div class="row">
                                     <form:form role="form" action="${ctx}/console/customer/edit" method="post" class="register-form" id="customForm" >
                                         <p class="number_info ">
-                                            非常感谢您提供宝贵的意见和建议，我们将全力为您提供最优质的服务，如有任何疑问，可联系我们的客服人员，客服号码：020-85654875
+                                            非常感谢您提供宝贵的意见和建议，我们将全力为您提供最优质的服务，如有任何疑问，可联系我们的客服人员，客服号码：400-002-0048
                                         </p>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">反馈意见：</lable>

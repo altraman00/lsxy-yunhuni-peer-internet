@@ -197,7 +197,7 @@
                         <div class="defulatTips">IVR功能使用费：100元/月</div>
                     </div>
                 </div>
-                <div class="ivrserver"><input type="checkbox" name="readcheckbox" id="readbook" />已阅读<a target="_blank" href="ivragreement.html" >IVR服务协议</a></div>
+                <div class="ivrserver"><input type="checkbox" name="readcheckbox" id="readbook" />已阅读<a target="_blank" href="ivragreement.html" >IVR服务说明</a></div>
                 <div class="input text-center mt-0" >
                     <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="4" data-fun="pay()" id="payButton">确认支付</a>
                     <a type="button"  class="btn btn-primary btn-box" onclick="resetIVR()">重新选择</a>

@@ -31,7 +31,7 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a ">
-                                                <a href="${ctx}/console/statistics/billdetail/call">语音呼叫</a>
+                                                <a href="${ctx}/console/statistics/billdetail/notify">语音通知</a>
                                             </div>
                                         </li>
                                         <li>
@@ -90,7 +90,7 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <form:form action="${ctx}/console/statistics/billdetail/recording" method="post" id="mainForm">
                                         <div class="row statistics_row" >
-                                            <input type="hidden" id="appId" name="appId" value="">
+                                            <input type="hidden" id="appId" name="appId" value="${appId}">
                                             <div class="col-md-1">
                                                 日期
                                             </div>
@@ -106,7 +106,17 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum.money}" pattern="0.00"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：<fmt:formatNumber value="${sum.size}" pattern="0.00"></fmt:formatNumber> M</span></th>
+                                                <c:set var="sum_money" value="0.00"></c:set>
+                                                <c:set var="sum_size" value="0"></c:set>
+                                                <c:if test="${sum!=null}">
+                                                    <c:if test="${ sum.money!=null}">
+                                                        <c:set value="${sum.money}" var="sum_money"></c:set>
+                                                    </c:if>
+                                                    <c:if test="${ sum.size!=null}">
+                                                        <c:set value="${sum.size}" var="sum_size"></c:set>
+                                                    </c:if>
+                                                </c:if>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_money}" pattern="0.00"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：<fmt:formatNumber value="${sum_size}" pattern="0.00"></fmt:formatNumber> M</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
@@ -131,6 +141,7 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
                                     <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/recording"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>

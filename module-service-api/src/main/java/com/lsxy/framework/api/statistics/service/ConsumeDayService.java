@@ -51,7 +51,7 @@ public interface ConsumeDayService extends BaseService<ConsumeDay> {
      * @param endTime 结束时间
      * @return
      */
-    public List<ConsumeDay> list(String tenantId, String appId,String type,Date startTime, Date endTime);
+    public List<ConsumeDay> list(Object tenantId, Object appId,Object type,Date startTime, Date endTime);
 
     /**
      * 获取一定时间的统计数据的总数 时间为月份 yyyy-MM
