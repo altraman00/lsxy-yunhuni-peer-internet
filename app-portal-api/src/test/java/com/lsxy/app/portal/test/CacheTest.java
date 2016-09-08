@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -28,6 +29,11 @@ import org.springframework.util.Assert;
 @SpringApplicationConfiguration(classes = MainClass.class)
 @WebIntegrationTest("server.port:0")
 public class CacheTest {
+
+    static {
+        //将 spring boot 的默认配置文件设置为系统配置文件
+        System.setProperty("spring.config.location","classpath:"+ Constants.DEFAULT_CONFIG_FILE);
+    }
 
     @Autowired
     private RedisCacheService redisCacheService;
