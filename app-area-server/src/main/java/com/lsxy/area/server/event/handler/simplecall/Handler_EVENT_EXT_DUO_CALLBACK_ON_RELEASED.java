@@ -1,10 +1,9 @@
-package com.lsxy.area.server.event.handler.simplecallevent;
+package com.lsxy.area.server.event.handler.simplecall;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -71,17 +70,17 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
         }
         Date answerTime = null;
         String answer_time = (String) paramMap.get("answer_time");
-        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+        if(StringUtils.isNotBlank(answer_time) && !"null".equals(answer_time)){
             answerTime = new Date(Long.parseLong(answer_time) * 1000);
         }
         Date connectTime = null;
         String connect_time = (String) paramMap.get("connect_time");
-        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+        if(StringUtils.isNotBlank(connect_time) && !"null".equals(connect_time)){
             connectTime = new Date(Long.parseLong(connect_time) * 1000);
         }
         Date endTime = null;
         String end_time = (String) paramMap.get("end_time");
-        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+        if(StringUtils.isNotBlank(end_time) && !"null".equals(end_time)){
             endTime = new Date(Long.parseLong(end_time) * 1000);
         }
 

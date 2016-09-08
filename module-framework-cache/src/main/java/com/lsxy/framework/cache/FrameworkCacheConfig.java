@@ -7,13 +7,17 @@ import com.lsxy.framework.config.SystemConfig;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,10 +38,29 @@ import java.util.Map;
 public class FrameworkCacheConfig extends CachingConfigurerSupport {
 
     public static final Logger logger = LoggerFactory.getLogger(FrameworkCacheConfig.class);
+
+
+
+    @Bean(name="lsxyRedisTemplate")
+    public RedisTemplate<String, String> redisTemplate(
+            RedisConnectionFactory factory) {
+        final RedisTemplate template = new RedisTemplate();
+        template.setKeySerializer(template.getStringSerializer());
+        template.setHashKeySerializer(template.getStringSerializer());
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        jackson2JsonRedisSerializer.setObjectMapper(om);
+
+        template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setConnectionFactory(factory);
+        return template;
+    }
+
     @Bean
-    public CacheManager cacheManager(RedisTemplate redisTemplate) {
-        RedisCacheManager rcm = new RedisCacheManager(redisTemplate);
-//        rcm.setExpires();
+    public CacheManager cacheManager(@Qualifier("lsxyRedisTemplate") RedisTemplate lsxyRedisTemplate) {
+        RedisCacheManager rcm = new RedisCacheManager(lsxyRedisTemplate);
 
         Map<String,String> expires = SystemConfig.getMapProperty("cache.redis.expires");
         Map<String,Long> expiresLong = new HashedMap();
@@ -54,21 +77,4 @@ public class FrameworkCacheConfig extends CachingConfigurerSupport {
     }
 
 
-
-    @Bean
-    public RedisTemplate<String, String> redisTemplate(
-            RedisConnectionFactory factory) {
-        final RedisTemplate template = new RedisTemplate();
-        template.setKeySerializer(template.getStringSerializer());
-        template.setHashKeySerializer(template.getStringSerializer());
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        ObjectMapper om = new ObjectMapper();
-        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(om);
-
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setConnectionFactory(factory);
-        return template;
-    }
 }

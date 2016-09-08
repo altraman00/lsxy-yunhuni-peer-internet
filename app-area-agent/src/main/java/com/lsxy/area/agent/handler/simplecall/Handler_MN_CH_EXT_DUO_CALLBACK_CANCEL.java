@@ -1,4 +1,4 @@
-package com.lsxy.area.agent.handler;
+package com.lsxy.area.agent.handler.simplecall;
 
 import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.app.area.cti.commander.RpcError;
@@ -18,32 +18,21 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by liuws on 2016/8/27.
+ * Created by liups on 2016/9/8.
  */
 @Component
-public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
+public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_NOTIFY_CALL.class);
-
-    @Value("${area.agent.client.cti.sip.host}")
-    private String ctiHost;
-
-    @Value("${area.agent.client.cti.sip.port}")
-    private int ctiPort;
+    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL.class);
 
     @Autowired
     private CTIClientContext cticlientContext;
-
-    @Autowired(required = false)
-    private StasticsCounter sc;
 
     @Autowired
     private SessionContext sessionContext;
@@ -53,7 +42,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
 
     @Override
     public String getEventName() {
-        return ServiceConstants.MN_CH_EXT_NOTIFY_CALL;
+        return ServiceConstants.MN_CH_EXT_DUO_CALLBACK_CANCEL;
     }
 
     @Override
@@ -67,40 +56,28 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
         }
 
         if(logger.isDebugEnabled()){
-            logger.debug("handler process_MN_CH_EXT_NOTIFY_CALL:{}",request);
+            logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK_CANCEL:{}",request);
         }
 
         Map<String, Object> params = request.getParamMap();
+
         try {
             if(logger.isDebugEnabled()){
-                logger.debug("调用CTI创建语音外呼资源，参数为{}", JSONUtil.objectToJson(params));
+                logger.debug("调用CTI取消双向回拔，参数为{}", JSONUtil.objectToJson(params));
             }
-            String res_id = cticlient.createResource(0, 0, "ext.notify_call", params, new RpcResultListener(){
+            cticlient.operateResource(0, 0, (String) params.get("res_id"),"ext.duo_callback.cancel", params,new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
-                    Map<String,String> params = (Map<String,String>) o;
+                    Map<String,String> result = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
-                        logger.debug("调用ext.notify_call成功，conf_id={},result={}",params.get("user_data"),o);
-                    }
-
-                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
-                            new MapBuilder<String,Object>()
-                                    .put("method", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS)
-                                    .put("res_id",params.get("res_id"))
-                                    .put("user_data",params.get("user_data"))
-                                    .build());
-                    try {
-                        rpcCaller.invoke(sessionContext,req);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS);
+                        logger.debug("调用ext.duo_callback.cancel成功，call_id={},result={}",params.get("user_data"),result);
                     }
                 }
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.error("调用ext.notify_call失败call_id={},result={}",params.get("user_data"),rpcError);
+                    logger.error("调用ext.duo_callback失败call_id={},result={}",params.get("user_data"),rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)
@@ -116,10 +93,10 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
 
                 @Override
                 protected void onTimeout() {
-                    logger.error("调用ext.notify_call超时call_id={}",params.get("user_data"));
+                    logger.error("调用ext.duo_callback超时call_id={}",params.get("user_data"));
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_EXT_CALL_ON_TIMEOUT)
+                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
                                     .put("user_data",params.get("user_data"))
                                     .build());
                     try {
@@ -131,7 +108,6 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);
-            response.setBody(res_id);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
             e.printStackTrace();

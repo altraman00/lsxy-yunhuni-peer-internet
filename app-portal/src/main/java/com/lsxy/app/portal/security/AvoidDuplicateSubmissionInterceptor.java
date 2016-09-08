@@ -53,7 +53,7 @@ public class AvoidDuplicateSubmissionInterceptor extends HandlerInterceptorAdapt
     }
 
     private boolean isRepeatSubmit(HttpServletRequest request) {
-        String serverToken = (String) request.getSession(false).getAttribute(SUBMISSION_TOKEN);
+        String serverToken = (String) request.getSession().getAttribute(SUBMISSION_TOKEN);
         if (serverToken == null) {
             return true;
         }

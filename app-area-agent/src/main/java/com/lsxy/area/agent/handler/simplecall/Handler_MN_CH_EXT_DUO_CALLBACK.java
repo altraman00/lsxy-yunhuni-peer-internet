@@ -1,11 +1,11 @@
-package com.lsxy.area.agent.handler;
+package com.lsxy.area.agent.handler.simplecall;
 
 import com.lsxy.app.area.cti.commander.Client;
 import com.lsxy.app.area.cti.commander.RpcError;
 import com.lsxy.app.area.cti.commander.RpcResultListener;
+import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -15,7 +15,6 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,9 @@ import java.util.Map;
  * Created by liuws on 2016/8/27.
  */
 @Component
-public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
+public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_CAPTCHA_CALL.class);
+    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_EXT_DUO_CALLBACK.class);
 
     @Autowired
     private CTIClientContext cticlientContext;
@@ -43,14 +42,11 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
 
     @Override
     public String getEventName() {
-        return ServiceConstants.MN_CH_EXT_CAPTCHA_CALL;
+        return ServiceConstants.MN_CH_EXT_DUO_CALLBACK;
     }
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Client cticlient = cticlientContext.getAvalibleClient();
@@ -59,28 +55,28 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
             return response;
         }
 
+        if(logger.isDebugEnabled()){
+            logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK:{}",request);
+        }
+
         Map<String, Object> params = request.getParamMap();
-        String call_id = (String)params.get("user_data");
-        String play_content = (String)params.get("play_content");
+
         try {
-            if(StringUtils.isNotEmpty(play_content)){
-                params.put("play_content", JSONUtil2.fromJson(play_content,(new Object[1][]).getClass()));
-            }
             if(logger.isDebugEnabled()){
-                logger.debug("调用CTI创建语音验证码资源，参数为{}", JSONUtil.objectToJson(params));
+                logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.createResource(0, 0, "ext.captcha_call", params, new RpcResultListener(){
+            cticlient.createResource(0, 0, "ext.duo_callback", params,new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
-                        logger.debug("调用ext.captcha_call成功，conf_id={},result={}",params.get("user_data"),o);
+                        logger.debug("调用ext.duo_callback成功，callId={},result={}",params.get("user_data"),o);
                     }
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS)
+                                    .put("method",Constants.EVENT_EXT_DUO_CALLBACK_SUCCESS)
                                     .put("res_id",params.get("res_id"))
                                     .put("user_data",params.get("user_data"))
                                     .build());
@@ -88,17 +84,17 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_DUO_CALLBACK_SUCCESS);
                     }
                 }
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.error("调用ext.captcha_call失败call_id={},result={}",call_id,rpcError);
+                    logger.error("调用ext.duo_callback失败call_id={},result={}",params.get("user_data"),rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)
-                                    .put("user_data",call_id)
+                                    .put("user_data",params.get("user_data"))
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
@@ -110,11 +106,11 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
 
                 @Override
                 protected void onTimeout() {
-                    logger.error("调用ext.captcha_call超时call_id={}",call_id);
+                    logger.error("调用ext.duo_callback超时call_id={}",params.get("user_data"));
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_EXT_CALL_ON_TIMEOUT)
-                                    .put("user_data",call_id)
+                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("user_data",params.get("user_data"))
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
@@ -126,9 +122,10 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
+            logger.error("操作CTI资源异常{}",request);
             e.printStackTrace();
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
+
         return response;
     }
 }
