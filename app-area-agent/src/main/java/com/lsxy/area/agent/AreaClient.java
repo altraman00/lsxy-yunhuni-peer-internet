@@ -28,7 +28,8 @@ public class AreaClient {
     @Value("${area.agent.areaid}")
     private String areaid;
 
-    @Value("${area.agent.nodeid}")
+    //由于需要通过设置环境变量设置该值,需要适用下划线,不支持"."
+    @Value("${area_agent_nodeid:1}")
     private String nodeid;
 
     @Autowired
