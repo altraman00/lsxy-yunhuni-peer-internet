@@ -66,7 +66,7 @@ public class Handler_MN_CH_SYS_CALL_PLAY_START extends RpcRequestHandler{
                 params.put("content", JSONUtil2.fromJson(content,(new Object[1][]).getClass()));
             }
 
-            cticlient.operateResource(new BusAddress((byte)0,(byte)1),res_id, "sys.call.play_start", params, new RpcResultListener(){
+            cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.play_start", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     if(logger.isDebugEnabled()){

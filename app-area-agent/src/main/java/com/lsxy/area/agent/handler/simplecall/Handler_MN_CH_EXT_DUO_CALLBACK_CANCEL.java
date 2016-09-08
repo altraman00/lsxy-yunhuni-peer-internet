@@ -65,7 +65,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI取消双向回拔，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.operateResource(new BusAddress((byte)0,(byte)1), (String) params.get("res_id"),"ext.duo_callback.cancel", params,new RpcResultListener(){
+            cticlient.operateResource(new BusAddress((byte)0,(byte)0), (String) params.get("res_id"),"ext.duo_callback.cancel", params,new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
