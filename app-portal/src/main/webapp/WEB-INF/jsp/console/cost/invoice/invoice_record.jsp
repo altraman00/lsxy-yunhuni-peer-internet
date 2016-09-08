@@ -192,7 +192,7 @@
                                         <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                             <tr>
                                                 <td>
-                                                    <fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm"/>
+                                                    <fmt:formatDate value="${result.applyTime}" pattern="yyyy-MM-dd HH:mm"/>
                                                 </td>
                                                 <td><fmt:formatNumber value="${ result.amount}" pattern="#0.00" /> </td>
                                                 <td>
@@ -211,10 +211,15 @@
                                                         <span>申请已提交</span>
                                                     </c:if>
                                                     <c:if test="${result.status == 1}">
-                                                        <span class="success">处理完成，发票已寄出</span>
+                                                        <c:if test="${result.expressNo != null}">
+                                                            <span class="success">处理完成，发票已寄出</span>
+                                                        </c:if>
+                                                        <c:if test="${result.expressNo == null}">
+                                                            <span>申请已提交</span>
+                                                        </c:if>
                                                     </c:if>
                                                     <c:if test="${result.status == 2}">
-                                                        <span class="nosuccess" data-toggle="tooltip" title="${result.remark}">
+                                                        <span class="nosuccess" data-toggle="tooltip" title="审核不通过原因:${result.reason}">
                                                             异常<i class="fa fa-exclamation-triangle"></i>
                                                         </span>
                                                     </c:if>

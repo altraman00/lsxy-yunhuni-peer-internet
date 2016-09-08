@@ -6,12 +6,15 @@ import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.message.dao.MessageDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 消息实现类
@@ -19,7 +22,8 @@ import java.util.Date;
  */
 @Service
 public class MessageServiceImpl extends AbstractService<Message> implements MessageService{
-
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     @Autowired
     MessageDao messageDao;
     @Override
@@ -33,10 +37,14 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
         Date date1 = null;
         Date date2 = null;
         try {
-            date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+            if(StringUtil.isNotEmpty(startTime)) {
+                date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+            }
         }catch (Exception e){}
         try {
-            date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            if(StringUtil.isNotEmpty(endTime)) {
+                date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            }
         }catch (Exception e){}
         String hql = "from Message obj ";
         boolean flag = true;
@@ -90,5 +98,14 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
             page = this.pageList(hql,pageNo,pageSize);
         }
         return page;
+    }
+
+    @Override
+    public List<Message> bacthUpdateStatus(Date startTime, Date endTime) {
+        String hql =" from Message obj WHERE obj.type=? AND obj.status=?  AND obj.lineTime BETWEEN ? and ? ";
+        List list = this.list(hql,Message.MESSAGE_ACTIVITY,Message.NOT,startTime,endTime);
+        String sql = "UPDATE db_lsxy_base.tb_base_message SET status=? WHERE deleted=0 AND type=? AND status=?  AND line_time BETWEEN ? and ?  ";
+        jdbcTemplate.update(sql,Message.ONLINE,Message.MESSAGE_ACTIVITY,Message.NOT,startTime,endTime);
+        return list;
     }
 }

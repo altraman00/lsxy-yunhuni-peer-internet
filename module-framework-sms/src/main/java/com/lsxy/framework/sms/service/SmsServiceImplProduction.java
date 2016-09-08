@@ -23,9 +23,10 @@ import java.util.Random;
  * Created by Tandy on 2016/6/29.
  * 生产环境使用
  * 生成环境，先短信网关发短信，然后异步执行入库处理
+ * 测试环境为保证功能正确性,可使用网关进行发送
  */
 
-@Profile({"production"})
+@Profile({"production","test"})
 @Component
 public class SmsServiceImplProduction  extends AbstractSmsServiceImpl {
 

@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.events;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
+import com.lsxy.framework.mq.topic.MQTopicConstants;
 
 /**
  * 修改邮件完成
@@ -20,7 +21,7 @@ public class ModifyEmailSuccessEvent extends AbstractMQEvent {
 
     @Override
     public String getTopicName() {
-        return "topic_framework_account";
+        return MQTopicConstants.TOPIC_FRAMEWORK_ACCOUNT;
     }
 
     public String getAccountId() {

@@ -144,7 +144,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     @Override
     public Page<Recharge> pageListByTenant(String tenant, Integer pageNo, Integer pageSize) {
         Page<Recharge> page = null;
-        String hql = "from Recharge obj where obj.tenant.id=?1 order by obj.createTime desc";
+        String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' order by obj.createTime desc";
         page =  this.pageList(hql,pageNo,pageSize,tenant);
         return page;
     }

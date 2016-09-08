@@ -3,6 +3,7 @@ package com.lsxy.app.portal.console.statistics;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,14 +38,15 @@ public class BillDetailController extends AbstractPortalController {
      * @param appId 应用id
      * @return
      */
-    @RequestMapping("/call")
-    public ModelAndView call(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    @RequestMapping("/notify")
+    public ModelAndView notify(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALL,map.get("time"),map.get("appId")).getData());
-        mav.setViewName("/console/statistics/billdetail/call");
+        Page pageObj = (Page)getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_NOTIFY,map.get("time"),map.get("appId")).getData();
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_NOTIFY,map.get("time"),map.get("appId")).getData());
+        mav.addObject("pageObj",pageObj);
+        mav.setViewName("/console/statistics/billdetail/notify");
         return mav;
     }
     /**
@@ -151,7 +152,7 @@ public class BillDetailController extends AbstractPortalController {
      * @param appId 应用id
      * @return
      */
-    private RestResponse sum(HttpServletRequest request,Integer type,String time,String appId){
+    private RestResponse sum(HttpServletRequest request,String type,String time,String appId){
         String token = getSecurityToken(request);
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/sum?type={1}&time={2}&appId={3}";
         return RestRequest.buildSecurityRequest(token).get(uri, Map.class,type,time,appId);
@@ -166,7 +167,7 @@ public class BillDetailController extends AbstractPortalController {
      * @param appId 应用
      * @return
      */
-    private RestResponse getPageList(HttpServletRequest request,Integer pageNo,Integer pageSize,Integer type,String time,String appId){
+    private RestResponse getPageList(HttpServletRequest request,Integer pageNo,Integer pageSize,String type,String time,String appId){
         String token = getSecurityToken(request);
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/plist?pageNo={1}&pageSize={2}&type={3}&time={4}&appId={5}";
         return RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class,pageNo,pageSize,type,time,appId);
@@ -192,9 +193,11 @@ public class BillDetailController extends AbstractPortalController {
         Map map = new HashMap();
         List<App> appList = (List<App>)getAppList(request).getData();
         map.put("appList",appList);
-        if(StringUtils.isEmpty(appId)){
-            if(appList.size()>0) {
-                appId = appList.get(0).getId();
+        if(StringUtil.isEmpty(appId)){
+            if(StringUtils.isEmpty(appId)){
+                if(appList.size()>0) {
+                    appId = appList.get(0).getId();
+                }
             }
         }
         map.put("appId",appId);
