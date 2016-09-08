@@ -92,7 +92,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 return res;
             }
             try {
-                confService.confEnter(call_id,conf_id);
+                confService.confEnter(call_id,conf_id,null,null,null);
             } catch (Throwable e) {
                 logger.error("将呼叫加入到会议失败",e);
             }

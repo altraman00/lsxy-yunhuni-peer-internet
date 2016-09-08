@@ -65,7 +65,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建语音外呼资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            String res_id = cticlient.createResource(new BusAddress((byte)0,(byte)1), "ext.notify_call", params, new RpcResultListener(){
+            String res_id = cticlient.createResource(new BusAddress((byte)0,(byte)0), "ext.notify_call", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {

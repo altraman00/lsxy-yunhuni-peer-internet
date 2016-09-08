@@ -62,7 +62,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
         String conf_id = (String)params.get("user_data");
 
         try {
-            cticlient.createResource(new BusAddress((byte)0,(byte)1), "sys.conf", params, new RpcResultListener(){
+            cticlient.createResource(new BusAddress((byte)0,(byte)0), "sys.conf", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;

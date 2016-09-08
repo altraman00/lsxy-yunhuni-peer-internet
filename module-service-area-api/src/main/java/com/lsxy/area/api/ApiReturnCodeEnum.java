@@ -14,8 +14,9 @@ public enum ApiReturnCodeEnum {
     IPNotInWhiteList("101013","IP不在白名单内"),
     NumberNotAllowToCall("101014","号码不允许呼叫"),
     ConfNotExists("101015","会议不存在"),
-    AppOffLine("101016","应用没上线"),
-    DuoCallbackNumIsSample("101017","双向回拔的号码不能是同一号码");
+    CallNotExists("101016","呼叫不存在"),
+    AppOffLine("101017","应用没上线");
+    DuoCallbackNumIsSample("101018","双向回拔的号码不能是同一号码");
 
     private String code;
     private String msg;

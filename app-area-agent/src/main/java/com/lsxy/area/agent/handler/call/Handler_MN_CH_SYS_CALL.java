@@ -60,7 +60,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
 
-            cticlient.createResource(new BusAddress((byte)0,(byte)1), "sys.call", params, new RpcResultListener(){
+            cticlient.createResource(new BusAddress((byte)0,(byte)0), "sys.call", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;

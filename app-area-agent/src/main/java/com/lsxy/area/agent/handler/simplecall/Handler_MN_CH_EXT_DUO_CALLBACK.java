@@ -65,7 +65,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建双向回拔资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.createResource(new BusAddress((byte)0,(byte)1), "ext.duo_callback", params,new RpcResultListener(){
+            cticlient.createResource(new BusAddress((byte)0,(byte)0), "ext.duo_callback", params,new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {

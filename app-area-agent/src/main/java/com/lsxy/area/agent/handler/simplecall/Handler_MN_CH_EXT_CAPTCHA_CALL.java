@@ -70,7 +70,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("调用CTI创建语音验证码资源，参数为{}", JSONUtil.objectToJson(params));
             }
-            cticlient.createResource(new BusAddress((byte)0,(byte)1), "ext.captcha_call", params, new RpcResultListener(){
+            cticlient.createResource(new BusAddress((byte)0,(byte)0), "ext.captcha_call", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {

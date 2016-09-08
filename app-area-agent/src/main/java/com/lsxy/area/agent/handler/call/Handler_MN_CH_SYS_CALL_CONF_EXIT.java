@@ -52,7 +52,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_EXIT extends RpcRequestHandler{
         String call_id = (String)params.get("user_data");
 
         try {
-            cticlient.operateResource(new BusAddress((byte)0,(byte)1), res_id,"sys.call.conf_exit", params, new RpcResultListener(){
+            cticlient.operateResource(new BusAddress((byte)0,(byte)0), res_id,"sys.call.conf_exit", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
