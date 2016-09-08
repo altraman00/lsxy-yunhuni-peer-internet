@@ -130,6 +130,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 .setTenantId(tenant.getId())
                 .setAppId(app.getId())
                 .setId(call_id)
+                .setResId(res_id)
                 .setType("ivr_incoming")
                 .setAreaId(app.getArea().getId())
                 .setLineGatewayId(lineGateway.getId())
@@ -139,7 +140,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         .put("to",to)
                         .build())
                 .build();
-        callstate.setResId(res_id);
         businessStateService.save(callstate);
         ivrActionUtil.doActionIfAccept(call_id);
         return res;
