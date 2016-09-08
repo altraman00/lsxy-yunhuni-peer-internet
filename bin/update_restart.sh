@@ -10,6 +10,7 @@
 #-L 代表执行tail 输出日志信息 配置到CI的时候不要带这个参数
 #-P 代表执行环境 可设置为local development production
 #-A 代表应用模块名称,对应到程序主目录下的模块目录名
+#-O 代表扩展选项  可以设置一些JVM参数等等 比如 -D 参数
 #
 ###
 #update and restrt
@@ -26,8 +27,9 @@ IS_SPRINGBOOT=false
 FORCE_INSTALL=false
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
+VM_OPTIONS=""
 
-while getopts "A:P:H:STILD" opt; do
+while getopts "A:P:H:STILDO" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
@@ -52,6 +54,9 @@ while getopts "A:P:H:STILD" opt; do
       ;;
     H)
       YUNHUNI_HOME="$OPTARG"
+      ;;
+    O)
+      VM_OPTIONS="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG"   
@@ -99,14 +104,14 @@ cd $YUNHUNI_HOME/$APP_NAME
 echo "判断是否是TOMCAT:$IS_TOMCAT"
 if [ $IS_TOMCAT = true ]; then
   echo "starting  tomcat ..."
-  nohup mvn -U $ENV_PROFILE clean tomcat7:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+  nohup mvn -U $ENV_PROFILE clean tomcat7:run  $VM_OPTIONS 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
   #mvn -U $ENV_PROFILE clean tomcat7:run
 elif [ $IS_SPRINGBOOT = true ]; then
   echo "starting springboot application...."
-  nohup mvn -U $ENV_PROFILE spring-boot:run 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+  nohup mvn -U $ENV_PROFILE spring-boot:run  $VM_OPTIONS 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
 elif [ $IS_TOMCAT_DEPLOY = true ]; then
   echo "deploy war to tomcat...."
-  nohup mvn -U $ENV_PROFILE tomcat7:redeploy 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+  nohup mvn -U $ENV_PROFILE tomcat7:redeploy $VM_OPTIONS 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
 fi
 echo "OK";
 
