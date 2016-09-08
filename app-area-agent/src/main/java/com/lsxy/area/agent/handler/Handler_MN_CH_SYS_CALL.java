@@ -1,6 +1,7 @@
 package com.lsxy.area.agent.handler;
 
-import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.BusAddress;
+import com.lsxy.app.area.cti.Commander;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -61,7 +62,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
         Integer iMaxAnswerSec = Integer.parseInt(maxAnswerSec);
         Integer iMaxRingSec = Integer.parseInt(maxRingSec);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -77,8 +78,9 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("呼叫API调用参数:{}",params);
             }
-
-            cticlient.createResource(0, 0, "sys.call", params, null);
+            //此处临时固定单实例CTI,后期需要抽象CTI路由
+            BusAddress ba = new BusAddress((byte)0, (byte)0);
+            cticlient.createResource(ba, "sys.call", params, null);
 
             /*给CTI发送请求计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();

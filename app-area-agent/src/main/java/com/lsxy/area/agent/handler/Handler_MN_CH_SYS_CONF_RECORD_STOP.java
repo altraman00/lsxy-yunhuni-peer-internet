@@ -1,6 +1,7 @@
 package com.lsxy.area.agent.handler;
 
-import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.BusAddress;
+import com.lsxy.app.area.cti.Commander;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -46,7 +47,7 @@ public class Handler_MN_CH_SYS_CONF_RECORD_STOP extends RpcRequestHandler{
     public RPCResponse handle(RPCRequest request, Session session) {
         RPCResponse response = RPCResponse.buildResponse(request);
 
-        Client cticlient = cticlientContext.getAvalibleClient();
+        Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
@@ -60,7 +61,9 @@ public class Handler_MN_CH_SYS_CONF_RECORD_STOP extends RpcRequestHandler{
         params.put("user_data",request.getParameter("callId"));
 
         try {
-            cticlient.createResource(0, 0, "sys.conf.record_stop", params, null);
+            //此处临时固定单实例CTI,后期需要抽象CTI路由
+            BusAddress ba = new BusAddress((byte)0, (byte)0);
+            cticlient.createResource(ba, "sys.conf.record_stop", params, null);
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);

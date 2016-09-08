@@ -1,16 +1,11 @@
 package com.lsxy.area.agent.cti;
 
-import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.app.area.cti.commander.RpcEventListener;
-import com.lsxy.app.area.cti.commander.RpcRequest;
-import com.lsxy.app.area.cti.commander.Unit;
+import com.lsxy.app.area.cti.*;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
-import com.lsxy.framework.rpc.api.server.Session;
-import com.lsxy.framework.rpc.exceptions.RequestWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +15,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Set;
-
-import static com.lsxy.framework.web.utils.WebUtils.logger;
 
 /**
  * Created by tandy on 16/8/5.
@@ -116,4 +109,5 @@ public class CTIClient implements RpcEventListener{
             logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());
         }
     }
+
 }
