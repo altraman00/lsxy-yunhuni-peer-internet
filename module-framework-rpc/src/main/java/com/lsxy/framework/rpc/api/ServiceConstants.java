@@ -11,6 +11,13 @@ public class ServiceConstants {
 	public static final String CH_MN_CONNECT = "CH_MN_CONNECT"; // 渠道连接渠道管理器
 
 	public static final String MN_CH_SYS_CALL = "MN_CH_SYS_CALL";  //呼叫业务
+	public static final String MN_CH_SYS_CALL_PLAY_START = "MN_CH_SYS_CALL_PLAY_START";  //呼叫放音
+	public static final String MN_CH_SYS_CALL_RECORD_START = "MN_CH_SYS_CALL_RECORD_START";  //呼叫录音
+	public static final String MN_CH_SYS_CALL_SEND_DTMF_START = "MN_CH_SYS_CALL_SEND_DTMF_START";  //开始发送 DTMF 码
+	public static final String MN_CH_SYS_CALL_RECEIVE_DTMF_START = "MN_CH_SYS_CALL_RECEIVE_DTMF_START";//开始接收DTMF码
+	public static final String MN_CH_SYS_CALL_ANSWER = "MN_CH_SYS_CALL_ANSWER";//应答
+	public static final String MN_CH_SYS_CALL_DROP = "MN_CH_SYS_CALL_DROP";//挂断
+	public static final String MN_CH_SYS_CALL_REJECT = "MN_CH_SYS_CALL_REJECT";//拒接
 
 	public static final String MN_CH_SYS_CALL_CONF_ENTER = "MN_CH_SYS_CALL_CONF_ENTER";//将呼叫加入会议
 	public static final String MN_CH_SYS_CALL_CONF_EXIT = "MN_CH_SYS_CALL_CONF_EXIT";//将呼叫退出会议
@@ -23,6 +30,7 @@ public class ServiceConstants {
 	public static final String MN_CH_SYS_CONF_SET_PART_VOICE_MODE = "MN_CH_SYS_CONF_SET_PART_VOICE_MODE";//设置与会者的声音收放模式
 
 	public static final String MN_CH_EXT_DUO_CALLBACK = "MN_CH_EXT_DUO_CALLBACK";  //双向回拔
+	public static final String MN_CH_EXT_DUO_CALLBACK_CANCEL = "MN_CH_EXT_DUO_CALLBACK_CANCEL";  //取消双向回拔
 	public static final String MN_CH_EXT_NOTIFY_CALL = "MN_CH_EXT_NOTIFY_CALL";  //外呼通知
 	public static final String MN_CH_EXT_CAPTCHA_CALL = "MN_CH_EXT_CAPTCHA_CALL";  //语音验证码
 
@@ -35,5 +43,6 @@ public class ServiceConstants {
 	public static final String MN_CH_TEST_ECHO= "MN_CH_TEST_ECHO";//压力测试使用
 
 	public static final String CH_MN_HEARTBEAT_ECHO = "CH_MN_HEARTBEAT_ECHO ";		//心跳请求
+
 
 }

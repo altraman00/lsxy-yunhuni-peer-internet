@@ -2,12 +2,10 @@ package com.lsxy.app.api.gateway.dto;
 
 import java.util.List;
 
-import java.io.Serializable;
-
 /**
  * Created by liuws on 2016/8/26.
  */
-public class ConfPlayInputDTO implements Serializable {
+public class ConfPlayInputDTO extends CommonDTO{
 
     private List<String> files;
 

@@ -1,6 +1,7 @@
 package com.lsxy.area.api;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 通知外呼
@@ -9,7 +10,7 @@ import java.io.Serializable;
 public class NotifyCallDTO implements Serializable {
     private String from;        //主叫号码
     private String to;          //被叫号码
-    private String[] files;     //通知放音文件(列表)
+    private List<String> files;     //通知放音文件(列表)
     private Integer repeat;     //重复播放次数
     private Integer max_dial_duration;  //最大拨号等待时间（秒）
     private String user_data;
@@ -30,11 +31,11 @@ public class NotifyCallDTO implements Serializable {
         this.to = to;
     }
 
-    public String[] getFiles() {
+    public List<String> getFiles() {
         return files;
     }
 
-    public void setFiles(String[] files) {
+    public void setFiles(List<String> files) {
         this.files = files;
     }
 

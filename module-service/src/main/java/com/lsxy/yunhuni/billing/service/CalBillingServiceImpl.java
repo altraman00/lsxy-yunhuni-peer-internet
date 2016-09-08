@@ -324,8 +324,8 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getVoiceByPrePreDateSum(String tenantId, Date date, Long sumVoice) {
-        Long useVoice = getUseConference(tenantId, date);
-        Long addVoice = getAddConference(tenantId, date);
+        Long useVoice = getUseVoice(tenantId, date);
+        Long addVoice = getAddVoice(tenantId, date);
         Date preDate = DateUtils.getPreDate(date);
         Long preUseVoice = getUseVoice(tenantId, preDate);
         Long preAddVoice = getAddVoice(tenantId, preDate);

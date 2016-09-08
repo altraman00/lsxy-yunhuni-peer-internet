@@ -1,15 +1,10 @@
 package com.lsxy.area.agent.cti;
 
-import com.lsxy.app.area.cti.commander.Client;
+import com.lsxy.app.area.cti.Commander;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-
-import static javax.xml.bind.JAXBIntrospector.getValue;
 
 /**
  * Created by tandy on 16/8/5.
@@ -21,8 +16,8 @@ public class CTIClientContext {
     public ListOrderedMap clients = new ListOrderedMap();
 
 
-    public void add(Byte clientid,Client client) {
-        clients.put(clientid,client);
+    public void add(Byte clientid, Commander client) {
+        clients.put(clientid, client);
     }
 
     /**
@@ -31,13 +26,13 @@ public class CTIClientContext {
      *
      * @return
      */
-    public Client getAvalibleClient() {
+    public Commander getAvalibleClient() {
         //TODO 选择CTI客户端的规则
-        Client client = null;
-        try{
+        Commander client = null;
+        try {
 
-            client = (Client) clients.getValue(0);
-        }catch(Exception ex){
+            client = (Commander) clients.getValue(0);
+        } catch (Exception ex) {
             logger.error("没有找到一个有效的CTI客户端");
         }
         return client;
