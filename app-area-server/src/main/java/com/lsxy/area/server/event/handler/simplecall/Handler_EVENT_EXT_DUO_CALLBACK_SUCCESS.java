@@ -44,7 +44,7 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_SUCCESS extends EventHandler {
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
-        String callId = (String)request.getParamMap().get("user_data");
+        String callId = (String)request.getParamMap().get("user_data1");
         String resId = (String)request.getParamMap().get("res_id");
         if(StringUtils.isBlank(callId)){
             logger.error("call_id is null");
