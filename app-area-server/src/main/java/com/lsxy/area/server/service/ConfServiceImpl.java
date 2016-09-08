@@ -13,7 +13,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
@@ -48,9 +47,6 @@ public class ConfServiceImpl implements ConfService {
 
     @Autowired
     private AppService appService;
-
-    @Autowired
-    private CalBillingService calBillingService;
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -239,7 +235,7 @@ public class ConfServiceImpl implements ConfService {
                                     .setAreaId(app.getArea().getId())
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(new MapBuilder<String,Object>()
-                                        .put("max_seconds",state.getBusinessData().get("max_seconds"))//最大时间,默认与会议一致
+                                        .put("max_seconds",maxDuration)//最大时间
                                         .put("conf_id",confId)//所属会议
                                         .put("play_file",playFile)//加入后在会议播放这个文件
                                         .put("voice_mode",voiceMode)//加入后的声音模式
@@ -272,7 +268,8 @@ public class ConfServiceImpl implements ConfService {
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
-        return this.confEnter(callId,confId);
+
+        return this.confEnter(callId,confId,maxDuration,playFile,voiceMode);
     }
 
     @Override
@@ -427,7 +424,13 @@ public class ConfServiceImpl implements ConfService {
         if(conf_state == null || conf_state.getResId() == null){
             throw new IllegalArgumentException();
         }
-
+        Map<String,Object> businessData = conf_state.getBusinessData();
+        if(maxDuration == null && businessData!=null){
+            Object duration = businessData.get("max_seconds");
+            if(duration!=null){
+                maxDuration = (int)duration;
+            }
+        }
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
@@ -535,7 +538,7 @@ public class ConfServiceImpl implements ConfService {
     }
 
     @Override
-    public boolean confEnter(String call_id, String conf_id) throws YunhuniApiException {
+    public boolean confEnter(String call_id, String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(call_id);
         BusinessState conf_state = businessStateService.get(conf_id);
         if(call_state == null || call_state.getResId() == null){
@@ -552,32 +555,29 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> call_business=call_state.getBusinessData();
         Map<String,Object> conf_business=call_state.getBusinessData();
 
-        Integer max_seconds = 0;
-        Integer voice_mode = 1;
-        Integer volume = 100;
-        String play_file = "";
-        if(call_business!=null){
-            if(call_business.get("max_seconds")!=null){
-                max_seconds = (Integer)call_business.get("max_seconds");
-            }else if(conf_business.get("max_seconds")!=null){
-                max_seconds = (Integer)conf_business.get("max_seconds");
-            }
-            if(call_business.get("voice_mode")!=null){
-                voice_mode = (Integer) call_business.get("voice_mode");
-            }
-            if(call_business.get("volume")!=null){
-                volume = (Integer) call_business.get("volume");
-            }
-            if(call_business.get("play_file")!=null){
-                play_file = (String) call_business.get("play_file");
-            }
+        Integer max_seconds = maxDuration == null ? 0 : maxDuration;
+        Integer voice_mode = voiceMode == null ? 1 : voiceMode;
+        String play_file = playFile == null ? "" : playFile;
+
+        if(call_business != null && call_business.get("max_seconds")!=null){
+            max_seconds = (Integer)call_business.get("max_seconds");
+        }else if(conf_business != null && conf_business.get("max_seconds")!=null){
+            max_seconds = (Integer)conf_business.get("max_seconds");
         }
+
+        if(call_business != null && call_business.get("voice_mode")!=null){
+            voice_mode = (Integer) call_business.get("voice_mode");
+        }
+
+        if(call_business != null && call_business.get("play_file")!=null){
+            play_file = (String) call_business.get("play_file");
+        }
+
         Map<String, Object> params = new MapBuilder<String,Object>()
                                     .putIfNotEmpty("res_id",call_state.getResId())
                                     .putIfNotEmpty("conf_res_id",conf_state.getResId())
                                     .putIfNotEmpty("max_seconds",max_seconds)
                                     .putIfNotEmpty("voice_mode",voice_mode)
-                                    .putIfNotEmpty("volume",volume)
                                     .putIfNotEmpty("play_file",play_file)
                                     .putIfNotEmpty("user_data",call_id)
                                     .put("appid", conf_state.getAppId())
