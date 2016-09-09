@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import static org.aspectj.bridge.Version.getTime;
+
 /**
  * Created by liups on 2016/8/31.
  */
@@ -124,10 +126,10 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .put("event","duo_callback.end")
                 .put("id",callId)
-                .put("begin_time",beginTime.getTime())
-                .put("answer_time1",answerTime.getTime())
-                .put("answer_time2",connectTime.getTime())
-                .put("end_time",endTime.getTime())
+                .put("begin_time",beginTime==null?null:beginTime.getTime())
+                .put("answer_time1",answerTime==null?null:answerTime.getTime())
+                .put("answer_time2",connectTime==null?null:connectTime.getTime())
+                .put("end_time",endTime==null?null:endTime.getTime())
                 .put("hangup_by",paramMap.get("hangup_by"))
                 .put("reason",paramMap.get("reason"))
                 .put("error",paramMap.get("error"))
