@@ -72,6 +72,20 @@ public class StatisticsUtils {
      * @param type 类型
      * @return
      */
+    public static String getNativeSqlIsNull(String tenantId,String appId,String type){
+        Map<String, String> map = new HashMap<String,String>();
+        map.put("tenant_id",tenantId);
+        map.put("app_id",appId);
+        map.put("type",type);
+        return getSqlIsNull(map);
+    }
+    /**
+     * 将租户和应用和类型对为空和非为空时进行处理成sql
+     * @param tenantId 租户id
+     * @param appId 应用id
+     * @param type 类型
+     * @return
+     */
     public static String getSqlIsNull(String tenantId,String appId,String type){
         Map<String, String> map = new HashMap<String,String>();
         map.put("tenantId",tenantId);

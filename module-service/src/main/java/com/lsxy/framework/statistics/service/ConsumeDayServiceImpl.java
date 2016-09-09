@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -83,11 +84,27 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
     public List<ConsumeDay> pageListByTime(String userName, String appId, String startTime, String endTime, Integer pageNo, Integer pageSize) {
         Tenant tenant = tenantService.findTenantByUserName(userName);
         String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
-        Date start = DateUtils.parseDate(startTime,"yyyy-MM");
-        Date end = DateUtils.parseDate(nextMonth,"yyyy-MM");
-        String hql = "from ConsumeDay obj where "+StatisticsUtils.getSqlIsNull(tenant.getId(),appId, null)+" obj.dt>=?1 and obj.dt<?2 ";
-        return this.pageListGroupBy(hql,pageNo,pageSize," group by obj.dt ",start,end).getResult();
-       // return getPageList(hql, pageNo -1, pageSize, start, end);
+        Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
+        Date date2 = DateUtils.parseDate(nextMonth,"yyyy-MM");
+        String sql = " FRPM db_lsxy_base.tb_base_consume_day WHERE "+StatisticsUtils.getNativeSqlIsNull(tenant.getId(),appId, null)+" obj.deleted=0 AND obj.dt>=:date1 AND obj.dt<:date2 ";
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" group by obj.create_time desc";
+        Query pageQuery = em.createNativeQuery(pageSql,ConsumeDay.class);
+        countQuery.setParameter("date1",date1);
+        pageQuery.setParameter("date1",date1);
+        countQuery.setParameter("date2",date2);
+        pageQuery.setParameter("date2",date2);
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return null;
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return list;
     }
 
     @Override

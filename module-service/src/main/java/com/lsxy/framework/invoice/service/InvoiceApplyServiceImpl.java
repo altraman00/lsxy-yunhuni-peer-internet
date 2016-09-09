@@ -21,11 +21,16 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +47,8 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
     TenantService tenantService;
     @Autowired
     ConsumeMonthService consumeMonthService;
-
+    @PersistenceContext
+    private EntityManager em;
     @Override
     public BaseDaoInterface<InvoiceApply, Serializable> getDao() {
         return this.invoiceApplyDao;
@@ -107,33 +113,14 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
 
     @Override
     public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, Integer type, String[] tenantId, Integer status, String startTime, String endTime) {
-        String hql = " from InvoiceApply obj  ";
-        boolean isWhere = true;
+        String sql = " FROM db_lsxy_base.tb_base_invoice_apply obj WHERE obj.deleted=0 ";
         if(type!=null){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql+=" obj.type = "+type+" ";
+            sql +=" AND obj.type = "+type+" ";
         }
         if(status!=null){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql+=" obj.status= '"+status+"' ";
+            sql +=" AND obj.status= '"+status+"' ";
         }
         if(tenantId!=null&& tenantId.length>0){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
             String tenantIds = "";
             for(int i=0;i<tenantId.length;i++){
                 tenantIds += " '"+tenantId[i]+"' ";
@@ -141,7 +128,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
                     tenantIds+=",";
                 }
             }
-            hql+=" obj.tenant.id in("+tenantIds+") ";
+            sql +=" AND obj.tenant_id in("+tenantIds+") ";
         }
         Date date1 = null;
         if(StringUtil.isNotEmpty(startTime)){
@@ -155,50 +142,46 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
                 date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             }catch (Exception e){}
         }
-        int dateNum = 1;
         if(date1!=null){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql += " obj.createTime>=?"+dateNum;
-            dateNum++;
+            sql += " AND obj.create_time>= :date1 ";
         }
         if(date2!=null){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql += " obj.createTime<=?"+dateNum;
-            dateNum++;
+            sql += " AND obj.create_time<= :date2 ";
         }
-        Page<InvoiceApply> page =null;
-        if(date1!=null&&date2!=null){
-            page  = this.pageList(hql,pageNo,pageSize,date1,date2);
-        }else if(date1!=null){
-            page = this.pageList(hql,pageNo,pageSize,date1);
-        }else if(date2!=null){
-            page = this.pageList(hql,pageNo,pageSize,date2);
-        }else{
-            page = this.pageList(hql,pageNo,pageSize);
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" group by obj.apply_time desc";
+        Query pageQuery = em.createNativeQuery(pageSql,InvoiceApply.class);
+        if(date1!=null){
+            countQuery.setParameter("date1",date1);
+            pageQuery.setParameter("date1",date1);
         }
-        return page;
+        if(date2!=null){
+            countQuery.setParameter("date2",date2);
+            pageQuery.setParameter("date2",date2);
+        }
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
     }
 
     @Override
     public Page<InvoiceApply> pageList(Integer pageNo, Integer pageSize, String[] tenantId, Integer status, Integer type,boolean flag) {
-        String hql = " from InvoiceApply obj  where obj.status='"+status+"' ";
+        String sql = " FROM db_lsxy_base.tb_base_invoice_apply obj WHERE obj.deleted=0 AND obj.status='"+status+"' ";
         if(type!=null){
-            hql+=" and obj.type = "+type+" ";
+            sql +=" AND obj.type = "+type+" ";
         }
         if(flag){
-            hql+=" and  obj.expressNo is not null ";
+            sql+=" AND  obj.express_no is not null ";
         }else{
-            hql+=" and  obj.expressNo is  null ";
+            sql +=" AND  obj.express_no is  null ";
         }
         if(tenantId!=null&& tenantId.length>0){
             String tenantIds = "";
@@ -208,10 +191,22 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
                     tenantIds+=",";
                 }
             }
-            hql+=" and obj.tenant.id in("+tenantIds+") ";
+            sql +=" AND obj.tenant_id in("+tenantIds+") ";
         }
-        Page<InvoiceApply> page = this.pageList(hql,pageNo,pageSize);
-        return page;
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" group by obj.apply_time desc";
+        Query pageQuery = em.createNativeQuery(pageSql,InvoiceApply.class);
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
     }
 
     @Override

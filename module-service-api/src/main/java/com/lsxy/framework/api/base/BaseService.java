@@ -27,8 +27,6 @@ public interface BaseService<T>{
 
 	public Page pageList(String hql, int pageNo, int pageSize, Object... params);
 
-	public Page pageListGroupBy(String hql, int pageNo, int pageSize, String groupBy,Object... params);
-	
 	public T findUnique(String hql, Object... params) throws MatchMutiEntitiesException;
 	
 }

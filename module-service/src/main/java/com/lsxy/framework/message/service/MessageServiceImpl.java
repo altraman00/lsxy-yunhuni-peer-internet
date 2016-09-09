@@ -12,7 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +30,8 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
     JdbcTemplate jdbcTemplate;
     @Autowired
     MessageDao messageDao;
+    @PersistenceContext
+    private EntityManager em;
     @Override
     public BaseDaoInterface<Message, Serializable> getDao() {
         return messageDao;
@@ -33,7 +39,7 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
 
     @Override
     public Page<Message> pageList(Integer type,Integer status, String startTime, String endTime, Integer pageNo, Integer pageSize) {
-
+        String sql = " FROM db_lsxy_base.tb_base_message obj WHERE obj.deleted=0 ";
         Date date1 = null;
         Date date2 = null;
         try {
@@ -46,58 +52,40 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
                 date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
             }
         }catch (Exception e){}
-        String hql = "from Message obj ";
-        boolean flag = true;
-        int i=1;
         if(date1!=null){
-            if(flag){
-                hql +=" where ";
-                flag=false;
-            }else{
-                hql +=" and ";
-            }
-            hql +=" obj.lineTime>=?"+i;
-            i++;
+            sql +=" AND obj.line_time>= :date1 ";
         }
         if(date2!=null){
-            if(flag){
-                hql +=" where ";
-                flag=false;
-            }else{
-                hql +=" and ";
-            }
-            hql +=" obj.lineTime<=?"+i;
-            i++;
+            sql +=" AND obj.line_time<= :date2 ";
         }
         if(type!=null){
-            if(flag){
-                hql +=" where ";
-                flag=false;
-            }else{
-                hql +=" and ";
-            }
-            hql+=" obj.type='"+type+"' ";
+            sql +=" AND obj.type='"+type+"' ";
         }
         if(status!=null){
-            if(flag){
-                hql +=" where ";
-                flag=false;
-            }else{
-                hql +=" and ";
-            }
-            hql+=" obj.status='"+status+"' ";
+            sql +=" AND obj.status='"+status+"' ";
         }
-        Page<Message> page = null;
-        if(date1!=null&&date2!=null){
-            page = this.pageList(hql,pageNo,pageSize,date1,date2);
-        }else if(date1!=null&&date2==null){
-            page = this.pageList(hql,pageNo,pageSize,date1);
-        }else if(date1==null&&date2!=null){
-            page = this.pageList(hql,pageNo,pageSize,date2);
-        }else{
-            page = this.pageList(hql,pageNo,pageSize);
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" group by obj.create_time desc";
+        Query pageQuery = em.createNativeQuery(pageSql,Message.class);
+        if(date1!=null){
+            countQuery.setParameter("date1",date1);
+            pageQuery.setParameter("date1",date1);
         }
-        return page;
+        if(date2!=null){
+            countQuery.setParameter("date2",date2);
+            pageQuery.setParameter("date2",date2);
+        }
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
     }
 
     @Override
