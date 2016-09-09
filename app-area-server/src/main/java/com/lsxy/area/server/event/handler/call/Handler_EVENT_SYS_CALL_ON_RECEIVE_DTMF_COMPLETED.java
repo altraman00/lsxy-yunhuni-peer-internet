@@ -12,6 +12,7 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,10 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
         }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
+        if(MapUtils.isEmpty(params)){
+            logger.error("request params is null");
+            return res;
+        }
         String call_id = (String)params.get("user_data");
 
         if(StringUtils.isBlank(call_id)){
@@ -68,13 +73,21 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
             logger.info("call_id={},state={}",call_id,state);
         }
         App app = appService.findById(state.getAppId());
+        Long begin_time = null;
+        Long end_time = null;
+        if(params.get("begin_time") != null){
+            begin_time = ((long)params.get("begin_time")) * 1000;
+        }
+        if(params.get("end_time") != null){
+            end_time = ((long)params.get("end_time")) * 1000;
+        }
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","ivr.get_end")
-                .put("id",call_id)
-                .put("begin_time",params.get("begin_time"))
-                .put("end_time",params.get("end_time"))
-                .put("error",params.get("error"))
-                .put("keys",params.get("keys"))
+                .putIfNotEmpty("event","ivr.get_end")
+                .putIfNotEmpty("id",call_id)
+                .putIfNotEmpty("begin_time",begin_time)
+                .putIfNotEmpty("end_time",end_time)
+                .putIfNotEmpty("error",params.get("error"))
+                .putIfNotEmpty("keys",params.get("keys"))
                 .build();
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         return res;
