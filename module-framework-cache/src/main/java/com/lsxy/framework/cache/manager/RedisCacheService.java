@@ -7,11 +7,15 @@ import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Redis操作方法
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@DependsOn("lsxyRedisTemplate")
 @SuppressWarnings({"unchecked","rawtypes"})
 public class RedisCacheService {
 	
@@ -29,10 +34,43 @@ public class RedisCacheService {
 //    public static final long DEFAULT_TIME_OUT = 3000;
 
 	private final static Log logger = LogFactory.getLog(RedisCacheService.class);
-    @Autowired
+
+	@Autowired
+	@Qualifier("lsxyRedisTemplate")
     private RedisTemplate redisTemplate;
     
-	 private static String redisCode = "utf-8"; 
+	 private static String redisCode = "utf-8";
+
+	@PostConstruct
+	public void init(){
+	}
+
+	/**
+	 * 执行设置值，如果由于并发导致设置标记位导致设置失败，丢出TransactionExecFailedException异常
+	 * @param key
+	 * @param value
+	 * @throws TransactionExecFailedException
+	 */
+	public void setTransactionFlag(final String key, final String value,final long expire)
+			throws TransactionExecFailedException {
+		boolean result = (boolean) redisTemplate
+				.execute(new RedisCallback() {
+					@Override
+					public Object doInRedis(RedisConnection connection)
+							throws DataAccessException {
+						logger.debug("ready to set nx:"+key+">>>>"+ value);
+						boolean ret = connection.setNX(key.getBytes(), value.getBytes());
+						//默认缓存2天
+						connection.expire(key.getBytes(), expire);
+						logger.debug("set nx result:"+ret);
+						return ret;
+					}
+
+				});
+		//如果结果为空表示设置失败了
+		if(result == false)
+			throw new TransactionExecFailedException();
+	}
 
 	    /**
 	     * @param keys

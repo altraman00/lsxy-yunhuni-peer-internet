@@ -22,9 +22,9 @@ import java.util.Map;
  * Created by liuws on 2016/8/27.
  */
 @Component
-public class Handler_MN_CH_SYS_CALL_CONF_EXIT extends RpcRequestHandler{
+public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_SYS_CALL_CONF_EXIT.class);
+    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_SYS_CALL_CONF_ENTER.class);
 
     @Value("${area.agent.client.cti.sip.host}")
     private String ctiHost;
@@ -40,7 +40,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_EXIT extends RpcRequestHandler{
 
     @Override
     public String getEventName() {
-        return ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT;
+        return ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER;
     }
 
     @Override
@@ -48,13 +48,14 @@ public class Handler_MN_CH_SYS_CALL_CONF_EXIT extends RpcRequestHandler{
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Commander cticlient = cticlientContext.getAvalibleClient();
+
         if(cticlient == null) {
             response.setMessage(RPCResponse.STATE_EXCEPTION);
             return response;
         }
 
         if(logger.isDebugEnabled()){
-            logger.debug("handler process_MN_CH_SYS_CALL_CONF_EXIT:{}",request);
+            logger.debug("handler process_MN_CH_SYS_CALL_CONF_ENTER:{}",request);
         }
 
         Map<String, Object> params = request.getParamMap();
@@ -63,11 +64,12 @@ public class Handler_MN_CH_SYS_CALL_CONF_EXIT extends RpcRequestHandler{
         try {
             //此处临时固定单实例CTI,后期需要抽象CTI路由
             BusAddress ba = new BusAddress((byte)0, (byte)0);
-            cticlient.createResource(ba, "sys.call.conf_exit", params, null);
+            cticlient.createResource(ba, "sys.call.conf_enter", params, null);
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("操作CTI资源异常{}",request);
         }
         return response;
+
     }
 }
