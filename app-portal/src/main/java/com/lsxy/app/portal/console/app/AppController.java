@@ -168,15 +168,8 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/update")
     @ResponseBody
     public RestResponse update(HttpServletRequest request, App app){
-        long count = (Long)countName(request,app.getName()).getData();
-        RestResponse restResponse = null;
-        if(count==0) {
-            updateApp(request, app);
-            restResponse = RestResponse.success();
-        }else{
-            restResponse = RestResponse.failed("0000","用户名已存在");
-        }
-        return  restResponse;
+        updateApp(request, app);
+        return RestResponse.success();
     }
     /**
      * 新建应用
