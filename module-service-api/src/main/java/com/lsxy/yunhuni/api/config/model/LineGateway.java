@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.config.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
  * 容量 并发
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_line_gateway")
 public class LineGateway extends IdEntity {
     private String areaId;          //区域

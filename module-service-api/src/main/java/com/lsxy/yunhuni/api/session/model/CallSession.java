@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
  * Created by liups on 2016/6/29.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_session")
 public class CallSession extends IdEntity {
     public static final int STATUS_CALLING = 1;

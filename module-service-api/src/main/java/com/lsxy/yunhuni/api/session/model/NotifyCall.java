@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.session.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import java.util.Date;
  * Created by liups on 2016/9/6.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_notify_call")
 public class NotifyCall extends IdEntity {
     private Date startTime;//发起时间

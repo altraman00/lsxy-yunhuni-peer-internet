@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
  * Created by zhangxb on 2016/7/2.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_test_num_bind")
 public class TestNumBind extends IdEntity {
     private String number;//测试号码

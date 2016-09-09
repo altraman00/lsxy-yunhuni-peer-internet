@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.session.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import java.util.Date;
  * Created by zhangxb on 2016/7/19.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_cdr")
 public class VoiceCdr extends IdEntity {
     public static final Integer COST_TYPE_DEDUCT = 1;

@@ -2,6 +2,7 @@ package com.lsxy.framework.api.tenant.model;
 
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
  * 实名认证-企业
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_realname_corp")
 public class RealnameCorp extends IdEntity {
     private Tenant tenant;//所属租户

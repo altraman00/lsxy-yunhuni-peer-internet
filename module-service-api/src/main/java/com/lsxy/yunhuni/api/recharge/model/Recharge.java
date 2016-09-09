@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.util.Date;
  * Created by liups on 2016/7/1.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_base", name = "tb_base_recharge")
 public class Recharge  extends IdEntity {
 
