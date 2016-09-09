@@ -1,9 +1,9 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.api.gateway.dto.VerifyCallInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.CallService;
-import com.lsxy.area.api.CaptchaCallDTO;
 import com.lsxy.area.api.DuoCallbackDTO;
 import com.lsxy.area.api.NotifyCallDTO;
 import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
@@ -113,7 +113,47 @@ public class CallController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{account_id}/call/captcha_call",method = RequestMethod.POST)
+    @RequestMapping(value = "/{account_id}/call/verify_call",method = RequestMethod.POST)
+    public ApiGatewayResponse verify_call(HttpServletRequest request, @RequestBody VerifyCallInputDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+        String appId = request.getHeader("AppID");
+        String ip = WebUtils.getRemoteAddress(request);
+
+        //参数校验
+        checkInputLen(dto.getFrom());
+        if(StringUtils.isBlank(dto.getTo())){
+            throw new RequestIllegalArgumentException();
+        }
+
+        if(dto.getMaxDialDuration() !=null && dto.getMaxDialDuration() <=0){
+            throw new RequestIllegalArgumentException();
+        }
+
+        if(StringUtils.isBlank(dto.getPlayFile()) && StringUtils.isBlank(dto.getVerifyCode())){
+            throw new RequestIllegalArgumentException();
+        }
+
+        if(StringUtils.isNotBlank(dto.getVerifyCode())
+                || dto.getVerifyCode().length()>12
+                || !StringUtils.isNumeric(dto.getVerifyCode())){
+            throw new RequestIllegalArgumentException();
+        }
+
+        if(dto.getRepeat() != null && dto.getRepeat()<0){
+            throw new RequestIllegalArgumentException();
+        }
+
+        checkInputLen(dto.getUserData());
+
+        String callId = callService.verifyCall(ip,appId, dto.getFrom(),dto.getTo(),dto.getMaxDialDuration(),dto.getVerifyCode(),dto.getPlayFile(),dto.getRepeat(),dto.getUserData());
+        Map<String,String> result = new HashMap<>();
+        result.put("callId",callId);
+        return ApiGatewayResponse.success(result);
+    }
+
+    /**
+     * 高级版语音验证码，接受用户输入验证码
+     */
+    /*@RequestMapping(value = "/{account_id}/call/captcha_call",method = RequestMethod.POST)
     public ApiGatewayResponse captcha_call(HttpServletRequest request, @RequestBody CaptchaCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
@@ -136,7 +176,7 @@ public class CallController extends AbstractAPIController{
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         return ApiGatewayResponse.success(result);
-    }
+    }*/
 
 //
 //
