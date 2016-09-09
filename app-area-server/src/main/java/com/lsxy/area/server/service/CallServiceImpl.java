@@ -409,8 +409,7 @@ public class CallServiceImpl implements CallService {
             playFile.add("");
             dtos.add(0,playFile);
         }
-        List<List<Object>> playContent = new ArrayList<>();
-        return JSONUtil.objectToJson(playContent);
+        return JSONUtil.objectToJson(dtos);
     }
 
 }
