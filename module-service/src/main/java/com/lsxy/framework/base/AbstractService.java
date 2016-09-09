@@ -157,23 +157,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
     public Page pageList(String hql, int pageNo, int pageSize, Object... params) {
         return this.findByCustom(hql,true, pageNo, pageSize,params);
     }
-    @Override
-    public Page pageListGroupBy(String hql,int pageNo,int pageSize,String groupBy,Object... params){
-        long totalCount = countByCustom(hql, true,params);
-        pageNo--;
-        hql = HqlUtil.addCondition(hql, "deleted", 0,HqlUtil.LOGIC_AND,HqlUtil.TYPE_NUMBER);
-        hql += groupBy;
-        Query query = this.em.createQuery(hql);
-        for (int i = 0; i < params.length; i++) {
-            Object object = params[i];
-            query.setParameter(i+1, object);
-        }
-        query.setMaxResults(pageSize);
-        query.setFirstResult(pageNo*pageSize);
-        List list= query.getResultList();
-        Page page = new Page((pageNo)*pageSize+1,totalCount,pageSize,list);
-        return page;
-    }
+
     @Override
     public T findUnique(String hql, Object ... params)
             throws MatchMutiEntitiesException {

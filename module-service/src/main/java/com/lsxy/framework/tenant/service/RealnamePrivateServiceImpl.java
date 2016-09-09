@@ -1,6 +1,7 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.customer.model.Feedback;
 import com.lsxy.framework.api.tenant.model.RealnamePrivate;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.RealnamePrivateService;
@@ -16,7 +17,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.jdbc.Sql;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +38,8 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private RealnamePrivateDao realnamePrivaateDao;
-
+    @Autowired
+    private EntityManager em;
     @Override
     public BaseDaoInterface<RealnamePrivate, Serializable> getDao() {
         return realnamePrivaateDao;
@@ -70,9 +75,8 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
 
     @Override
     public Page pageListAuthInfo(Integer authStatus, String startTime, String endTime, Integer type, String search, Integer pageNo, Integer pageSize) {
-
-        String sql  = " SELECT e.id as uid,e.create_time as date,e.tenant_name as name ,e.tenant_id as tenantId,e.email as email,e.mobile as phone, e.type as type FROM ( ";
-        String sqlCount = " SELECT COUNT(1) FROM ( ";
+        String pageSql  = " SELECT e.id as uid,e.create_time as date,e.tenant_name as name ,e.tenant_id as tenantId,e.email as email,e.mobile as phone, e.type as type FROM ( ";
+        String countSql = " SELECT COUNT(1) FROM ( ";
         String corp = " (SELECT c.id,c.create_time,c.tenant_name,c.tenant_id,d.email,d.mobile, 1 as type FROM (SELECT a.id,a.create_time,a.tenant_id,b.tenant_name,b.reg_user_id from  db_lsxy_base.tb_base_realname_corp  a LEFT JOIN tb_base_tenant b on a.tenant_id = b.id where a.deleted=0 ";
         String oneself = " (SELECT c.id,c.create_time,c.tenant_name,c.tenant_id,d.email,d.mobile, 0 as type FROM (SELECT a.id,a.create_time,a.tenant_id,b.tenant_name,b.reg_user_id from  db_lsxy_base.tb_base_realname_private  a LEFT JOIN tb_base_tenant b on a.tenant_id = b.id where a.deleted=0";
         if(authStatus==1){
@@ -93,8 +97,8 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
         if(StringUtil.isNotEmpty(startTime)){
             try {
                 date1 = new Timestamp(DateUtils.parseDate(startTime, "yyyy-MM-dd").getTime());
-                corp += " and a.create_time>=? ";
-                oneself += " and a.create_time>=? ";
+                corp += " and a.create_time>=:date1 ";
+                oneself += " and a.create_time>=date1 ";
             }catch (Exception e){
 
             }
@@ -103,68 +107,49 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
         if(StringUtil.isNotEmpty(endTime)) {
             try {
                 date2 = new Timestamp(DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss").getTime());
-                corp += " and a.create_time<=? ";
-                oneself += " and a.create_time<=? ";
+                corp += " and a.create_time<=:date2 ";
+                oneself += " and a.create_time<=date2 ";
             }catch (Exception e){
 
             }
         }
         String three = " )c LEFT JOIN tb_base_account d ON c.reg_user_id=d.id ) ";
         String and = " UNION ";
-        String end = " ) e ORDER BY e.create_time ";
+        String end = " ) e ORDER BY e.create_time DESC ";
         if(type==null||StringUtil.isEmpty(type+"")){//查询全部
-            sqlCount +=   corp  + three + and + oneself + three + end;
-            sql +=   corp + three+ and + oneself + three + end;
+            countSql +=   corp  + three + and + oneself + three + end;
+            pageSql +=   corp + three+ and + oneself + three + end;
         }else{//个人或企业认证查询
             if(Tenant.AUTH_COMPANY==type){//公司
-                sqlCount +=  corp +  three + end;
-                sql += corp +  three  + end;
+                countSql +=  corp +  three + end;
+                pageSql += corp +  three  + end;
             }else if(Tenant.AUTH_ONESELF==type){//个人
-                sqlCount +=  oneself + three + end;
-                sql +=  oneself +  three  + end;
+                countSql +=  oneself + three + end;
+                pageSql +=  oneself +  three  + end;
             }else{
-                sqlCount += null;
-                sql += null;
+                countSql += null;
+                pageSql += null;
             }
         }
-        Page page = null;
-        if(StringUtil.isNotEmpty(sqlCount)) {
-            Object[] obj = null;
-            if(date1!=null&&date2!=null){
-                if(type==null||StringUtil.isEmpty(type+"")) {
-                    obj = new Object[]{date1, date2, date1, date2};
-                }else{
-                    obj = new Object[]{date1, date2};
-                }
-            }else if(date1!=null&&date2==null){
-                if(type==null||StringUtil.isEmpty(type+"")) {
-                    obj = new Object[]{date1,date1};
-                }else{
-                    obj = new Object[]{date1};
-                }
-            }else if(date1==null&&date2!=null){
-                if(type==null||StringUtil.isEmpty(type+"")) {
-                    obj = new Object[]{date2,date2};
-                }else{
-                    obj = new Object[]{date2};
-                }
-            }
-            Integer totalCount = jdbcTemplate.queryForObject(sqlCount, Integer.class ,obj);
-            sql = sql + " limit ?,?";
-            pageNo--;
-            Object[] obj2 = null;
-            if(obj!=null){
-                obj2 = new Object[obj.length+2];
-                System.arraycopy(obj,0,obj2,0,obj.length);
-                obj2[obj.length]=pageNo * pageSize;
-                obj2[obj.length+1]=pageSize;
-            }else{
-                obj2 = new Object[]{ pageNo * pageSize, pageSize};
-            }
-            List rows = jdbcTemplate.queryForList(sql, obj2);
-            page = new Page((pageNo) * pageSize + 1, totalCount, pageSize, rows);
+        Query countQuery = em.createNativeQuery(countSql);
+        Query pageQuery = em.createNativeQuery(pageSql,"authResult");
+        if(date1!=null){
+            countQuery.setParameter("date1",date1);
+            pageQuery.setParameter("date1",date1);
         }
-        return page;
+        if(date2!=null){
+            countQuery.setParameter("date2",date2);
+            pageQuery.setParameter("date2",date2);
+        }
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
     }
     @Override
     public RealnamePrivate findByTenantIdNewest(String tenantId) {
