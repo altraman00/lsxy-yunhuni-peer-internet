@@ -71,7 +71,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
-                        logger.debug("调用ext.duo_callback成功，callId={},result={}",params.get("user_data"),o);
+                        logger.debug("调用ext.duo_callback成功，callId={},result={}",params.get("user_data1"),o);
                     }
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
@@ -91,7 +91,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.error("调用ext.duo_callback失败call_id={},result={}",params.get("user_data"),rpcError);
+                    logger.error("调用ext.duo_callback失败call_id={},result={}",params.get("user_data1"),rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)
@@ -108,7 +108,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
 
                 @Override
                 protected void onTimeout() {
-                    logger.error("调用ext.duo_callback超时call_id={}",params.get("user_data"));
+                    logger.error("调用ext.duo_callback超时call_id={}",params.get("user_data1"));
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
