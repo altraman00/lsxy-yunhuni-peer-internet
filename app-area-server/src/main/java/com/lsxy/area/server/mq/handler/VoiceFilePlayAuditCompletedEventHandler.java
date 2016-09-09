@@ -58,7 +58,7 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,param);
         try {
             rpcCaller.invoke(sessionContext,request);
-            logger.error("发送放音文件指令成功");
+            logger.info("发送放音文件指令成功");
         } catch (Exception ex) {
             logger.error("发送放音文件指令失败:"+request,ex);
         }
