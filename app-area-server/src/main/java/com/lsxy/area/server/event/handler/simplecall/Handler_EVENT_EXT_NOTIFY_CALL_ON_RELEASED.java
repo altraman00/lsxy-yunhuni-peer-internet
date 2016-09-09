@@ -113,15 +113,15 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
         }
 
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","captcha_call.end")
-                .put("id",call_id)
-                .put("begin_time",beginTime.getTime())
-                .put("answer",answerTime.getTime())
-                .put("end_time",endTime.getTime())
-                .put("hangup_by",paramMap.get("dropped_by"))
-                .put("reason",paramMap.get("reason"))
-                .put("error",paramMap.get("error"))
-                .put("user_data",user_data)
+                .put("event","verify_call.end")
+                .putIfNotEmpty("id",call_id)
+                .putIfNotEmpty("begin_time",beginTime.getTime())
+                .putIfNotEmpty("answer",answerTime.getTime())
+                .putIfNotEmpty("end_time",endTime.getTime())
+                .putIfNotEmpty("hangup_by",paramMap.get("dropped_by"))
+                .putIfNotEmpty("reason",paramMap.get("reason"))
+                .putIfNotEmpty("error",paramMap.get("error"))
+                .putIfNotEmpty("user_data",user_data)
                 .build();
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
         if(logger.isDebugEnabled()){
@@ -141,6 +141,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             captchaCall.setEndTime(new Date());
             captchaCallService.save(captchaCall);
         }
+        businessStateService.delete(call_id);
         return res;
     }
 
