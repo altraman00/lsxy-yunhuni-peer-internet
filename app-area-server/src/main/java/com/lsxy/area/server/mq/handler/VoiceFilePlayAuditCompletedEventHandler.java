@@ -40,6 +40,9 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
 
     @Override
     public void handleMessage(VoiceFilePlayAuditCompletedEvent event) throws JMSException {
+        if(logger.isDebugEnabled()){
+            logger.debug("放音文件同步开启");
+        }
         List<VoiceFilePlay> list = voiceFilePlayService.findNotSync();
         List<Map<String,Object>> list1 = new ArrayList<>();
         for(int i=0;i<list.size();i++) {
@@ -55,6 +58,7 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,param);
         try {
             rpcCaller.invoke(sessionContext,request);
+            logger.info("发送放音文件指令成功");
         } catch (Exception ex) {
             logger.error("发送放音文件指令失败:"+request,ex);
         }
