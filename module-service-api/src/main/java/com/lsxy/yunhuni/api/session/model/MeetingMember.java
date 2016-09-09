@@ -19,6 +19,8 @@ public class MeetingMember extends IdEntity {
     private Integer joinType;//加入类型1.邀请加入2.呼入加入
     private Meeting meeting;//所属会议
     private CallSession session;//关联会话
+    private String resId;
+
     @Column( name = "number" )
     public String getNumber() {
         return number;
@@ -60,5 +62,15 @@ public class MeetingMember extends IdEntity {
 
     public void setSession(CallSession session) {
         this.session = session;
+    }
+
+
+    @Column( name = "res_id" )
+    public String getResId() {
+        return resId;
+    }
+
+    public void setResId(String resId) {
+        this.resId = resId;
     }
 }

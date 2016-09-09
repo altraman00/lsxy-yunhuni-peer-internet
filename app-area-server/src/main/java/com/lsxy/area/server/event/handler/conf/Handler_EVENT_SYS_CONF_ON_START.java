@@ -6,12 +6,17 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +45,12 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_START;
@@ -52,6 +63,10 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
+        if(MapUtils.isEmpty(params)){
+            logger.error("request params is null");
+            return res;
+        }
         String conf_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
         if(StringUtils.isBlank(conf_id)){
@@ -93,10 +108,10 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             logger.debug("开始发送会议创建成功通知给开发者");
         }
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","conf.create.fail")
-                .put("id",conf_id)
-                .put("begin_time",System.currentTimeMillis())
-                .put("user_data",user_data)
+                .putIfNotEmpty("event","conf.create.succ")
+                .putIfNotEmpty("id",conf_id)
+                .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                .putIfNotEmpty("user_data",user_data)
                 .build();
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         if(logger.isDebugEnabled()){
@@ -105,12 +120,37 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        if(businessData.get("recording")!=null){
-            //会议创建成功自动录音
-            if((Boolean)businessData.get("recording")){
-                //TODO
-            }
-        }
+        ifAutoRecording(state.getAppId(),businessData,res_id,conf_id);
         return res;
+    }
+
+    /**
+     * 创建会议是否自动录音
+     * @param businessData
+     * @param res_id
+     * @param conf_id
+     */
+    private void ifAutoRecording(String appId,Map<String,Object> businessData,String res_id,String conf_id){
+        if(businessData == null){
+            return;
+        }
+        Object recording = businessData.get("recording");
+        if(recording == null || !(Boolean)recording){
+            return;
+        }
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("max_seconds",businessData.get("max_seconds"))
+                //TODO 文件名如何定
+                .putIfNotEmpty("record_file", UUIDGenerator.uuid())
+                .putIfNotEmpty("user_data",conf_id)
+                .put("appid",appId)
+                .build();
+        try {
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            logger.error("会议创建自动录音：",e);
+        }
     }
 }

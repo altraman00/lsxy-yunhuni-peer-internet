@@ -76,6 +76,7 @@ public class PlayListActionHandler extends ActionHandler{
                     .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}}))
                     .putIfNotEmpty("finish_keys",finish_keys)
                     .putIfNotEmpty("user_data",callId)
+                    .put("appid",state.getAppId())
                     .build();
 
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);

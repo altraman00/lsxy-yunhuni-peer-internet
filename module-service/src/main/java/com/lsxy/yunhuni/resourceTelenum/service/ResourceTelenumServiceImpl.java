@@ -67,7 +67,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public String findOneFreeNumber() {
+    public String findOneFreeNumber(String areaId) {
+        //TODO 根据区域获取一个空闲的号码
         ResourceTelenum resourceTelenum = resourceTelenumDao.findFirstByStatus(ResourceTelenum.STATUS_FREE);
         return resourceTelenum.getTelNumber();
     }

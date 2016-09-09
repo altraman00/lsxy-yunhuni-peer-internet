@@ -4,8 +4,8 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -13,6 +13,7 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
+        if(MapUtils.isEmpty(params)){
+            logger.error("request params is null");
+            return res;
+        }
         String call_id = (String)params.get("user_data");
         //错误信息。如果拨号失败，该参数记录错误信息。如果拨号成功的被接听，该参数的值是 null。
         String error = (String)params.get("error");
@@ -88,40 +93,35 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 conf_id = (String)businessData.get("conf_id");
             }
             if(conf_id == null){
-                logger.info("将呼叫加入到会议失败conf_is为null");
+                logger.info("将呼叫加入到会议失败conf_id为null");
                 return res;
             }
             try {
-                confService.confEnter(call_id,conf_id);
+                confService.confEnter(call_id,conf_id,null,null,null);
             } catch (Throwable e) {
                 logger.error("将呼叫加入到会议失败",e);
             }
         }else if("ivr_call".equals(state.getType())){//通过ivr呼出api 发起的呼叫
             App app = appService.findById(state.getAppId());
             //发送拨号结束通知
+            Long begin_time = null;
+            Long end_time = null;
+            if(params.get("begin_time") != null){
+                begin_time = ((long)params.get("begin_time")) * 1000;
+            }
+            if(params.get("end_time") != null){
+                end_time = ((long)params.get("end_time")) * 1000;
+            }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .put("event","ivr.dial_end")
-                    .put("id",call_id)
-                    .put("begin_time",params.get("begin_time"))
-                    .put("end_time",params.get("end_time"))
-                    .put("user_data",state.getUserdata())
+                    .putIfNotEmpty("event","ivr.dial_end")
+                    .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("begin_time",begin_time)
+                    .putIfNotEmpty("end_time",end_time)
+                    .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
             ivrActionUtil.doAction(call_id);
-        }else if("ivr_incoming".equals(state.getType())){//通过ivr呼入 发起的呼叫
-            App app = appService.findById(state.getAppId());
-            //发送拨号结束通知
-            Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .put("event","ivr.dial_end")
-                    .put("id",call_id)
-                    .put("begin_time",params.get("begin_time"))
-                    .put("end_time",params.get("end_time"))
-                    .put("user_data",state.getUserdata())
-                    .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         }
         return res;
     }
-
-
 }

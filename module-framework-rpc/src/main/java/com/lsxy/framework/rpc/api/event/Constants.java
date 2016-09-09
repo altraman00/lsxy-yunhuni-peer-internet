@@ -36,6 +36,7 @@ public class Constants {
     public static final String EVENT_EXT_NOTIFY_CALL_ON_RELEASED = "ext.notify_call.on_released";
     public static final String EVENT_EXT_CAPTCHA_CALL_SUCCESS = "EVENT_EXT_CAPTCHA_CALL_SUCCESS";
     public static final String EVENT_EXT_CAPTCHA_CALL_ON_RELEASED = "ext.captcha_call.on_released";
+    public static final String EVENT_EXT_VERIFY_CALL_SUCCESS = "EVENT_EXT_VERIFY_CALL_SUCCESS";
     public static final String EVENT_EXT_CALL_ON_FAIL = "EVENT_EXT_CALL_ON_FAIL";
     public static final String EVENT_EXT_CALL_ON_TIMEOUT = "EVENT_EXT_CALL_ON_TIMEOUT";
 

@@ -104,7 +104,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
             ResourcesRent resourcesRent = resourcesRents.get(0);
             return resourcesRent.getResData();
         }else{
-            return resourceTelenumService.findOneFreeNumber();
+            return resourceTelenumService.findOneFreeNumber(app.getArea().getId());
         }
     }
 

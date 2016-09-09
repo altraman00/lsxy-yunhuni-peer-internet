@@ -14,10 +14,13 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +59,11 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     @Autowired
     private IVRActionUtil ivrActionUtil;
 
-    //TODO
-    @Value("")
-    private String testNum ="123456789";
+    @Autowired
+    private LineGatewayService lineGatewayService;
+
+    @Value("${portal.test.call.number}")
+    private String testNum;
 
     @Override
     public String getEventName() {
@@ -79,6 +84,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         RPCResponse res = null;
         //TODO incoming事件 cti需要生成一个user_data给我
         Map<String,Object> params = request.getParamMap();
+        if(MapUtils.isEmpty(params)){
+            logger.error("request params is null");
+            return res;
+        }
         String call_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
         String from_uri = (String)params.get("from_uri");//主叫sip地址
@@ -118,14 +127,25 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.info("找不到对应的APP");
             return res;
         }
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
         //保存业务数据，后续事件要用到
-        BusinessState callstate = new BusinessState(tenant.getId(),app.getId(),call_id,"ivr_incoming",null,
-                res_id,new MapBuilder<String,Object>()
-                .put("begin_time",begin_time)
-                .put("from",from)
-                .put("to",to)
-                .build());
-        businessStateService.save(callstate);
+        BusinessState state = new BusinessState.Builder()
+                .setTenantId(tenant.getId())
+                .setAppId(app.getId())
+                .setId(call_id)
+                .setResId(res_id)
+                .setType("ivr_incoming")
+                .setAreaId(app.getArea().getId())
+                .setLineGatewayId(lineGateway.getId())
+                .setBusinessData(new MapBuilder<String,Object>()
+                        .put("begin_time",begin_time)
+                        .put("from",from)
+                        .put("to",to)
+                        .build())
+                .build();
+        businessStateService.save(state);
         ivrActionUtil.doActionIfAccept(call_id);
         return res;
     }

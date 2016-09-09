@@ -17,12 +17,17 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     @Autowired
     private RedisCacheService redisCacheService;
 
+    private int EXPIRE_START = 60 * 60 * 12;
+
+    private int EXPIRE_RELEASE = 60 * 30;
+
     private String getKey(String id){
         return "business_state_" + id;
     }
+
     @Override
     public void save(BusinessState state) {
-        redisCacheService.set(getKey(state.getId()), JSONUtil.objectToJson(state),5 * 60 * 60);
+        redisCacheService.set(getKey(state.getId()), JSONUtil.objectToJson(state),EXPIRE_START);
     }
 
     @Override
@@ -33,7 +38,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     @Override
     public void delete(String id) {
         try{
-            redisCacheService.del(getKey(id));
+            redisCacheService.expire(getKey(id),EXPIRE_RELEASE);
         }catch (Throwable t){
         }
     }

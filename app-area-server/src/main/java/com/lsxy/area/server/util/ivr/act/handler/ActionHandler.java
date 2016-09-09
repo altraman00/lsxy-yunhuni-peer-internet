@@ -11,7 +11,7 @@ public abstract class ActionHandler {
     public static final Logger logger = LoggerFactory.getLogger(ActionHandler.class);
 
     /**
-     * 处理哪个动作就返回哪个，全小写
+     * 忽略大小写
      * @return
      */
     public abstract String getAction();

@@ -92,5 +92,5 @@ public interface ConfService {
      * @param conf_id   会议业务id
      * @return
      */
-    public boolean confEnter(String call_id,String conf_id) throws YunhuniApiException;
+    public boolean confEnter(String call_id,String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException;
 }

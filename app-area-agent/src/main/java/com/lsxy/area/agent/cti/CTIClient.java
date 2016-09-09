@@ -5,7 +5,7 @@ import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.client.ClientSessionContext;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class CTIClient implements RpcEventListener{
     private RPCCaller rpcCaller;
 
     @Autowired
-    private ClientSessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @PostConstruct
     public void start() {

@@ -8,7 +8,7 @@ public enum ProductCode {
     duo_call("duo_call1","双向回拔"),
     sys_conf("sys_conf","语音会议"),
     ivr_call("ivr_call,ivr_incoming","语音IVR"),
-    captcha_call("captcha_call","语音验证码"),
+    captcha_call("captcha_call,verify_call","语音验证码"),
     notify_call("notify_call","语音通知");
 
     private String apiCmd;  //产品和api的对应关系，一个产品可以对应多个apiCmd，多个apiCmd用“,”号隔开，如 sys_conf("sys_conf,sys_conf,conf_XXXX","语音会议"),

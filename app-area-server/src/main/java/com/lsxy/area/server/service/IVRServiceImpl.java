@@ -17,13 +17,14 @@ import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -56,15 +57,21 @@ public class IVRServiceImpl implements IVRService {
     @Autowired
     private LineGatewayService lineGatewayService;
 
+    @Autowired
+    private CalCostService calCostService;
+
 
     @Override
     public String ivrCall(String ip, String appId, String from, String to,
                           Integer maxDialDuration, Integer maxCallDuration, String userData) throws YunhuniApiException {
-        if(apiGwRedBlankNumService.isRedOrBlankNum(to)){
+        if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
         String tenantId = app.getTenant().getId();
+        if(app.getStatus() != app.STATUS_ONLINE){
+            throw new AppOffLineException();
+        }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
@@ -76,9 +83,8 @@ public class IVRServiceImpl implements IVRService {
             throw new AppServiceInvalidException();
         }
 
-        BigDecimal balance = calBillingService.getBalance(app.getTenant().getId());
-        //TODO 判断余额是否充足
-        if(balance.compareTo(new BigDecimal(0)) != 1){
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.ivr_call.getApiCmd(), app.getTenant().getId());
+        if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
 
@@ -93,6 +99,7 @@ public class IVRServiceImpl implements IVRService {
                 .putIfNotEmpty("max_answer_seconds",maxCallDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
+                .put("appid ",app.getId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -102,12 +109,19 @@ public class IVRServiceImpl implements IVRService {
             throw new InvokeCallException(e);
         }
         //保存业务数据，后续事件要用到
-        BusinessState callstate = new BusinessState(tenantId,app.getId(),callId,"ivr_call",null
-                ,new MapBuilder<String,Object>()
-                .put("begin_time",System.currentTimeMillis())
-                .put("from",from)
-                .put("to",to)
-                .build());
+        BusinessState callstate = new BusinessState.Builder()
+                                    .setTenantId(tenantId)
+                                    .setAppId(appId)
+                                    .setId(callId)
+                                    .setType("ivr_call")
+                                    .setAreaId(app.getArea().getId())
+                                    .setLineGatewayId(lineGateway.getId())
+                                    .setBusinessData(new MapBuilder<String,Object>()
+                                            .put("begin_time",System.currentTimeMillis())
+                                            .put("from",from)
+                                            .put("to",to)
+                                            .build())
+                                    .build();
         businessStateService.save(callstate);
         return callId;
     }

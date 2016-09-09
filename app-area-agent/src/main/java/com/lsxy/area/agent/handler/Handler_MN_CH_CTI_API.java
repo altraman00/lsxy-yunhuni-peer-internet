@@ -76,7 +76,7 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
                 logger.debug("开始操作资源:{}{}",method,resId);
             }
 
-            cticlient.operateResource(new BusAddress((byte)0,(byte)1),resId,method,params,null);
+            cticlient.operateResource(new BusAddress((byte)0,(byte)0),resId,method,params,null);
 
             /*发送请求给CTI次数计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
