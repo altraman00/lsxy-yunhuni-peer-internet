@@ -14,12 +14,12 @@ import java.util.Date;
 @Entity
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_file_play")
 public class VoiceFilePlay extends IdEntity {
-    public static Integer STATUS_FAIL = -1;
-    public static Integer STATUS_WAIT = 0;
-    public static Integer STATUS_SUCCESS =1;
-    public static Integer SYNC_SUCCESS = 1;
-    public static Integer SYNC_WAIT = 0;
-    public static Integer SYNC_FAIL = -1;
+    public static int STATUS_FAIL = -1;
+    public static int STATUS_WAIT = 0;
+    public static int STATUS_SUCCESS =1;
+    public static int SYNC_SUCCESS = 1;
+    public static int SYNC_WAIT = 0;
+    public static int SYNC_FAIL = -1;
     private Tenant tenant;//所属租户
     private App app;//所属应用
     private String name;//文件名
