@@ -105,8 +105,11 @@ public class CallController extends AbstractAPIController{
     public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody NotifyCallDTO notifyCallDTO, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
-        String callId = null;
-        callId = callService.notifyCall(ip,appId, notifyCallDTO);
+        //参数校验
+        if(StringUtils.isBlank(notifyCallDTO.getTo())){
+            throw new RequestIllegalArgumentException();
+        }
+        String callId = callService.notifyCall(ip,appId, notifyCallDTO);
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         result.put("user_data", notifyCallDTO.getUser_data());
