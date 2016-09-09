@@ -17,13 +17,17 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     @Autowired
     private RedisCacheService redisCacheService;
 
+    private int EXPIRE_START = 60 * 60 * 12;
+
+    private int EXPIRE_RELEASE = 60 * 30;
+
     private String getKey(String id){
         return "business_state_" + id;
     }
+
     @Override
     public void save(BusinessState state) {
-        //TODO 配置
-        redisCacheService.set(getKey(state.getId()), JSONUtil.objectToJson(state),5 * 60 * 60);
+        redisCacheService.set(getKey(state.getId()), JSONUtil.objectToJson(state),EXPIRE_START);
     }
 
     @Override
@@ -34,8 +38,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     @Override
     public void delete(String id) {
         try{
-            //TODO 配置，不能立刻删除，因为有多个事件返回，顺序不确定，所以有个5分钟的延迟，待定
-            redisCacheService.expire(getKey(id),5*60);
+            redisCacheService.expire(getKey(id),EXPIRE_RELEASE);
         }catch (Throwable t){
         }
     }

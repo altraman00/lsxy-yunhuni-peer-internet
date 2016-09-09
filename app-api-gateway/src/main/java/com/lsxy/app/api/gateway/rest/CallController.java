@@ -141,7 +141,7 @@ public class CallController extends AbstractAPIController{
             throw new RequestIllegalArgumentException();
         }
 
-        if(dto.getRepeat() != null && dto.getRepeat()<0){
+        if(dto.getRepeat() != null && dto.getRepeat()<0 && dto.getRepeat()>MAX_REPEAT_TIMES){
             throw new RequestIllegalArgumentException();
         }
 
