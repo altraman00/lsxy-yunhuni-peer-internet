@@ -88,10 +88,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             return res;
         }
         String callBackUrl = state.getCallBackUrl();
-        if(StringUtils.isBlank(callBackUrl)){
-            logger.info("回调地址callBackUrl为空");
-            return res;
-        }
+
         //开始通知开发者
         if(logger.isDebugEnabled()){
             logger.debug("用户回调结束事件");
@@ -112,18 +109,20 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             endTime = new Date(Long.parseLong(end_time) * 1000);
         }
 
-        Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","verify_call.end")
-                .putIfNotEmpty("id",call_id)
-                .putIfNotEmpty("begin_time",beginTime.getTime())
-                .putIfNotEmpty("answer",answerTime.getTime())
-                .putIfNotEmpty("end_time",endTime.getTime())
-                .putIfNotEmpty("hangup_by",paramMap.get("dropped_by"))
-                .putIfNotEmpty("reason",paramMap.get("reason"))
-                .putIfNotEmpty("error",paramMap.get("error"))
-                .putIfNotEmpty("user_data",user_data)
-                .build();
-        notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
+        if(StringUtils.isNotBlank(callBackUrl)){
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","verify_call.end")
+                    .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("begin_time",beginTime.getTime())
+                    .putIfNotEmpty("answer",answerTime.getTime())
+                    .putIfNotEmpty("end_time",endTime.getTime())
+                    .putIfNotEmpty("hangup_by",paramMap.get("dropped_by"))
+                    .putIfNotEmpty("reason",paramMap.get("reason"))
+                    .putIfNotEmpty("error",paramMap.get("error"))
+                    .putIfNotEmpty("user_data",user_data)
+                    .build();
+            notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
+        }
         if(logger.isDebugEnabled()){
             logger.debug("语音验证码结束事件");
         }
