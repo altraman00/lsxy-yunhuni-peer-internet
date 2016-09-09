@@ -73,16 +73,19 @@
 <script type="text/javascript">
     $('#validateBtn').click(function(){
         $('#customForm').bootstrapValidator('validate');
+        $(this).attr('disabled',true);
         var result = $('#customForm').data('bootstrapValidator').isValid();
         if(result){
             ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
                 if(data.success){
-                    $('#text1').val('');
-                    showtoast("提交成功");
+                    showtoast("提交成功",ctx+"/console/customer/index");
                 }else{
                     showtoast(data.errorMsg);
+                    $(this).removeAttrs('disabled');
                 }
             },"post");
+        }else{
+            $(this).removeAttrs('disabled');
         }
     });
 </script>
