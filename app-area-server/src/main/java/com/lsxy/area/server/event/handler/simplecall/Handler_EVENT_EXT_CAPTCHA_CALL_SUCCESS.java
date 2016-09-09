@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -62,14 +63,16 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
             return res;
         }
         BusinessState state = businessStateService.get(call_id);
-        Map<String,Object> busniessData = state.getBusinessData();
         if(state == null){
             logger.error("businessstate is null");
             return res;
         }
+        Map<String,Object> busniessData = state.getBusinessData();
+        if(busniessData == null){
+            busniessData = new HashMap<>();
+            state.setBusinessData(busniessData);
+        }
         if(res_id!=null){
-            state.setResId(res_id);
-            businessStateService.save(state);
 
             //保存会话记录
             CallSession callSession = new CallSession();
@@ -79,7 +82,7 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
             callSession.setRelevanceId(call_id);
             callSession.setType(CallSession.TYPE_VOICE_VOICECODE);
             callSession.setResId(res_id);
-            callSessionService.save(callSession);
+            callSession = callSessionService.save(callSession);
 
             CaptchaCall captchaCall = new CaptchaCall();
             captchaCall.setId(call_id);
@@ -90,6 +93,10 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
             captchaCall.setHangupSide(null);
             captchaCall.setResId(res_id);
             captchaCallService.save(captchaCall);
+
+            state.setResId(res_id);
+            busniessData.put("sessionid",callSession.getId());
+            businessStateService.save(state);
         }
         return res;
     }
