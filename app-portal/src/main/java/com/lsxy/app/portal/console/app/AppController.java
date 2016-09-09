@@ -132,9 +132,14 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/create")
     @ResponseBody
     public RestResponse create(HttpServletRequest request, App app){
-        app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
-        createApp(request,app);
-        return RestResponse.success();
+        long count = (Long)countName(request,app.getName()).getData();
+        if(count==0) {
+            app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
+            createApp(request, app);
+            return RestResponse.success();
+        }else{
+            return RestResponse.failed("0000","当前应用名已存在,创建应用失败");
+        }
 //        Map map = new HashMap();
 //        map.put("msg","新建应用成功");
 //        return map;
