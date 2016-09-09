@@ -38,9 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.lsxy.area.api.ApiReturnCodeEnum.DuoCallbackNumIsSample;
-import static org.bouncycastle.asn1.ua.DSTU4145NamedCurves.params;
-
 /**
  * Created by tandy on 16/8/18.
  */
@@ -286,7 +283,7 @@ public class CallServiceImpl implements CallService {
         params.put("play_repeat",dto.getRepeat());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("user_data",callId);
-        params.put("play_content",getPlayContent(dto.getFiles(),dto.getPlay_content()));
+        params.put("play_content",getPlayContent(dto.getPlay_file(),dto.getPlay_content()));
 
         try {
             //增加区域参数 选择合适的会话(传入appid即可)
@@ -397,28 +394,22 @@ public class CallServiceImpl implements CallService {
 
     /**
      * 转换成cti接口要的二维数组字符串
-     * @param files 播放文件列表
+     * @param play_file 播放文件列表
      * @param dtos 播放文件内容
      * @return
      */
-    public static String getPlayContent(List<String> files,List<PlayContentDTO> dtos){
+    public static String getPlayContent(String play_file,List<List<Object>> dtos){
         if(dtos == null){
             dtos = new ArrayList<>();
         }
-        if(files != null && files.size()>0){
-            PlayContentDTO filesPlayContent = new PlayContentDTO();
-            filesPlayContent.setContent(StringUtils.join(files,"|"));
-            filesPlayContent.setType(7);
-            dtos.add(0,filesPlayContent);
+        if(StringUtils.isNotBlank(play_file)){
+            List<Object> playFile = new ArrayList<>();
+            playFile.add(play_file);
+            playFile.add(7);
+            playFile.add("");
+            dtos.add(0,playFile);
         }
         List<List<Object>> playContent = new ArrayList<>();
-        for(PlayContentDTO d:dtos){
-            List<Object> playA = new ArrayList<>();
-            playA.add(d.getContent());
-            playA.add(d.getType());
-            playA.add("");
-            playContent.add(playA);
-        }
         return JSONUtil.objectToJson(playContent);
     }
 
