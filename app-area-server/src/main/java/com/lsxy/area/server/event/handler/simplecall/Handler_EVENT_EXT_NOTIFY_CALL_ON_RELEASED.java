@@ -10,8 +10,10 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.CaptchaCall;
 import com.lsxy.yunhuni.api.session.model.NotifyCall;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.CaptchaCallService;
 import com.lsxy.yunhuni.api.session.service.NotifyCallService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -40,6 +42,10 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
     NotifyCallService notifyCallService;
     @Autowired
     CallSessionService callSessionService;
+
+    @Autowired
+    private CaptchaCallService captchaCallService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_EXT_NOTIFY_CALL_ON_RELEASED;
@@ -63,7 +69,83 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             return res;
         }
 
-        //处理返回数据的各个时间
+        if(state.getType().equalsIgnoreCase("notify_call")){
+            return notifyCall(callId,paramMap,state);
+        }
+
+        if(state.getType().equalsIgnoreCase("verify_call")){
+            return verifyCall(callId,paramMap,state);
+        }
+        return res;
+    }
+
+    private RPCResponse verifyCall(String call_id, Map<String, Object> paramMap, BusinessState state) {
+        RPCResponse res = null;
+        String appId = state.getAppId();
+        String user_data = state.getUserdata();
+        if(StringUtils.isBlank(appId)){
+            logger.info("appId为空");
+            return res;
+        }
+        String callBackUrl = state.getCallBackUrl();
+
+        //开始通知开发者
+        if(logger.isDebugEnabled()){
+            logger.debug("用户回调结束事件");
+        }
+        Date beginTime = null;
+        Date answerTime = null;
+        Date endTime = null;
+        String begin_time = (String) paramMap.get("begin_time");
+        if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){
+            beginTime = new Date(Long.parseLong(begin_time) * 1000);
+        }
+        String answer_time = (String) paramMap.get("answer_time");
+        if(StringUtils.isNotBlank(answer_time) && !"null".equals(answer_time)){
+            answerTime = new Date(Long.parseLong(answer_time) * 1000);
+        }
+        String end_time = (String) paramMap.get("end_time");
+        if(StringUtils.isNotBlank(end_time) && !"null".equals(end_time)){
+            endTime = new Date(Long.parseLong(end_time) * 1000);
+        }
+
+        if(StringUtils.isNotBlank(callBackUrl)){
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","verify_call.end")
+                    .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("begin_time",beginTime==null?null:beginTime.getTime())
+                    .putIfNotEmpty("answer",answerTime==null?null:answerTime.getTime())
+                    .putIfNotEmpty("end_time",endTime==null?null:endTime.getTime())
+                    .putIfNotEmpty("hangup_by",paramMap.get("dropped_by"))
+                    .putIfNotEmpty("reason",paramMap.get("reason"))
+                    .putIfNotEmpty("error",paramMap.get("error"))
+                    .putIfNotEmpty("user_data",user_data)
+                    .build();
+            notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("语音验证码结束事件");
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("处理{}事件完成",getEventName());
+        }
+
+        //更新会话状态
+        callSessionService.updateStatusByRelevanceId(call_id, CallSession.STATUS_OVER);
+
+        //更新语音验证码记录表状态
+        CaptchaCall captchaCall = captchaCallService.findById(call_id);
+        if(captchaCall!=null){
+            captchaCall.setHangupSide((String)paramMap.get("dropped_by"));
+            captchaCall.setEndTime(new Date());
+            captchaCallService.save(captchaCall);
+        }
+        businessStateService.delete(call_id);
+        return res;
+    }
+
+    private RPCResponse notifyCall(String callId,Map<String, Object> paramMap,BusinessState state){
+        RPCResponse res = null;
         Date beginTime = null;
         String begin_time = (String) paramMap.get("begin_time");
         if(StringUtils.isNotBlank(begin_time) && !"null".equals(begin_time)){

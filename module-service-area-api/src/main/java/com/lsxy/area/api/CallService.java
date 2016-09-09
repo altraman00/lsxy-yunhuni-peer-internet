@@ -41,7 +41,7 @@ public interface CallService {
     String notifyCall(String ip, String appId, NotifyCallDTO notifyCallDTO) throws YunhuniApiException;
 
     /**
-     * 语音验证码
+     * 语音验证码/高级版 有收码功能
      * @param ip
      * @param appId
      * @param dto
@@ -49,4 +49,18 @@ public interface CallService {
      */
     String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException;
 
+    /**
+     * 语音验证码/拨通电话 告诉用户验证码
+     * @param ip
+     * @param appId
+     * @param from
+     * @param to
+     * @param maxDialDuration
+     * @param verifyCode
+     * @param playFile
+     * @param userData
+     * @return
+     */
+    String verifyCall(String ip, String appId, String from, String to, Integer maxDialDuration,
+                      String verifyCode, String playFile,Integer repeat, String userData) throws YunhuniApiException;
 }

@@ -17,6 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/${api.gateway.version}/account/")
 public class AbstractAPIController {
     public static final int MAX_INTPUT_STR_LEN = 128;
+
+    public static final int MAX_DURATION_SEC = 60 * 60 * 6;
+
+    public static final int MAX_REPEAT_TIMES = 10;
+
     /**
      * 对Controller层统一的异常处理
      * @param request

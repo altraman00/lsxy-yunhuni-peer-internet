@@ -58,8 +58,13 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setAppId(businessState.getAppId());
         voiceCdr.setLineId(businessState.getLineGatewayId());
         //产品编码，可根据些判断此cdr是哪个产品的cdr
+
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(businessState.getType());
+        if(businessState.getBusinessData().get("conf_id") != null){
+            productCode = ProductCode.sys_conf;
+        }
         voiceCdr.setType(productCode.name());
+
         voiceCdr.setRelevanceId(businessState.getId());
         //TODO 录音文件路径跟大小
         voiceCdr.setRecordUrl(null);
@@ -73,27 +78,19 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         //扣费
         calCostService.callConsume(voiceCdr);
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
-        switch (productCode){
-            case duo_call:{
-                Map<String, Object> data = businessState.getBusinessData();
-                String sessionId = (String) data.get(voiceCdr.getToNum());
-                voiceCdr.setSessionId(sessionId);
-                break;
-            }
-            case sys_conf:{
-                break;
-            }
-            case ivr_call:{
-                break;
-            }
-            case captcha_call:{
-                break;
-            }
-            case notify_call:{
-                Map<String, Object> data = businessState.getBusinessData();
-                String sessionId = (String) data.get(voiceCdr.getToNum());
-                voiceCdr.setSessionId(sessionId);
-                break;
+        Map<String, Object> data = businessState.getBusinessData();
+        if(data != null){
+            switch (productCode){
+                case duo_call:{
+                    String sessionId = (String) data.get(voiceCdr.getToNum());
+                    voiceCdr.setSessionId(sessionId);
+                    break;
+                }
+                default:{
+                    String sessionId = (String) data.get("sessionid");
+                    voiceCdr.setSessionId(sessionId);
+                    break;
+                }
             }
         }
         if(logger.isDebugEnabled()){

@@ -17,6 +17,9 @@ public class VoiceFilePlay extends IdEntity {
     public static int STATUS_FAIL = -1;
     public static int STATUS_WAIT = 0;
     public static int STATUS_SUCCESS =1;
+    public static int SYNC_SUCCESS = 1;
+    public static int SYNC_WAIT = 0;
+    public static int SYNC_FAIL = -1;
     private Tenant tenant;//所属租户
     private App app;//所属应用
     private String name;//文件名
@@ -28,6 +31,16 @@ public class VoiceFilePlay extends IdEntity {
     private String checker;//审核人
     private Date checkTime;//审核时间
     private String reason;//不通过原因
+    private Integer sync;//文件是否已同步:1已同步0未同步-1同步失败
+    @Column(name = "sync")
+    public Integer getSync() {
+        return sync;
+    }
+
+    public void setSync(Integer sync) {
+        this.sync = sync;
+    }
+
     @Column(name = "reason")
     public String getReason() {
         return reason;

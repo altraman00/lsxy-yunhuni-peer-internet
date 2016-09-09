@@ -7,6 +7,8 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.oc.VoiceFilePlayAuditCompletedEvent;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
@@ -37,7 +39,8 @@ public class VoiceFilePlayController extends AbstractRestController {
     TenantService tenantService;
     @Autowired
     AccountMessageService accountMessageService;
-
+    @Autowired
+    private MQService mqService;
 
     /**
      * 根据id修改备注
@@ -65,6 +68,8 @@ public class VoiceFilePlayController extends AbstractRestController {
                         accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_VOICE_PLAY_FAIL );
                     }else if(voiceFilePlay.getStatus()==VoiceFilePlay.STATUS_SUCCESS){
                         accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_VOICE_PLAY_SUCCESS);
+                        VoiceFilePlayAuditCompletedEvent vfpace = new VoiceFilePlayAuditCompletedEvent();
+                        mqService.publish(vfpace);
                     }
                 } else {
                     restResponse = RestResponse.failed("0", "参数id无效");

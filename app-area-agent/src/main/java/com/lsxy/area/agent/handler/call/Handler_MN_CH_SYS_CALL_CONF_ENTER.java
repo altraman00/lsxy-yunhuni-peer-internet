@@ -62,7 +62,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
         String call_id = (String)params.get("user_data");
 
         try {
-            cticlient.operateResource(new BusAddress((byte)0,(byte)1),res_id, "sys.call.conf_enter", params, new RpcResultListener(){
+            cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.conf_enter", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;

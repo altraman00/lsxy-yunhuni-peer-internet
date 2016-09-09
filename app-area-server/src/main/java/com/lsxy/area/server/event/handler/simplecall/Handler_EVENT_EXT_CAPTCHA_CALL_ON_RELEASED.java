@@ -13,6 +13,7 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.CaptchaCall;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.CaptchaCallService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,10 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
         }
         RPCResponse res = null;
         Map<String, Object> paramMap = request.getParamMap();
+        if(MapUtils.isEmpty(paramMap)){
+            logger.info("request.params is null");
+            return res;
+        }
         String call_id = (String)paramMap.get("user_data");
         if(StringUtils.isBlank(call_id)){
             logger.info("call_id is null");
@@ -70,28 +75,38 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
             return res;
         }
         String callBackUrl = state.getCallBackUrl();
-        if(StringUtils.isBlank(callBackUrl)){
-            logger.info("回调地址callBackUrl为空");
-            return res;
-        }
         //开始通知开发者
         if(logger.isDebugEnabled()){
             logger.debug("用户回调结束事件");
         }
-        Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","captcha_call.end")
-                .put("id",call_id)
-                .put("begin_time",paramMap.get("begin_time"))
-                .put("answer",paramMap.get("answer_time"))
-                .put("end_time",paramMap.get("end_time"))
-                .put("keys",paramMap.get("keys"))
-                .put("duration",paramMap.get("answer_time"))
-                .put("hangup_by",paramMap.get("dropped_by"))
-                .put("reason",paramMap.get("reason"))
-                .put("error",paramMap.get("error"))
-                .put("user_data",user_data)
-                .build();
-        notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
+        if(StringUtils.isNotBlank(callBackUrl)){
+            Long begin_time = null;
+            Long end_time = null;
+            Long answer_time = null;
+            if(paramMap.get("begin_time") != null){
+                begin_time = ((long)paramMap.get("begin_time")) * 1000;
+            }
+            if(paramMap.get("end_time") != null){
+                end_time = ((long)paramMap.get("end_time")) * 1000;
+            }
+            if(paramMap.get("answer_time") != null){
+                answer_time = ((long)paramMap.get("answer_time")) * 1000;
+            }
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","captcha_call.end")
+                    .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("begin_time",begin_time)
+                    .putIfNotEmpty("answer_time",answer_time)
+                    .putIfNotEmpty("end_time",end_time)
+                    .putIfNotEmpty("keys",paramMap.get("keys"))
+                    .putIfNotEmpty("duration",paramMap.get("answer_time"))
+                    .putIfNotEmpty("hangup_by",paramMap.get("dropped_by"))
+                    .putIfNotEmpty("reason",paramMap.get("reason"))
+                    .putIfNotEmpty("error",paramMap.get("error"))
+                    .putIfNotEmpty("user_data",user_data)
+                    .build();
+            notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
+        }
         if(logger.isDebugEnabled()){
             logger.debug("语音验证码结束事件");
         }

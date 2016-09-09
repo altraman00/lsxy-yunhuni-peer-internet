@@ -52,7 +52,7 @@ public class Handler_MN_CH_SYS_CONF_SET_PART_VOICE_MODE extends RpcRequestHandle
         String res_id = (String)params.get("res_id");
 
         try {
-            cticlient.operateResource(new BusAddress((byte)0,(byte)1), res_id,"sys.conf.set_part_voice_mode", params, new RpcResultListener(){
+            cticlient.operateResource(new BusAddress((byte)0,(byte)0), res_id,"sys.conf.set_part_voice_mode", params, new RpcResultListener(){
 
                 @Override
                 protected void onResult(Object o) {
