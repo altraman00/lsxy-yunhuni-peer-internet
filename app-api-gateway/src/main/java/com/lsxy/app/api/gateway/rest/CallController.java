@@ -138,9 +138,8 @@ public class CallController extends AbstractAPIController{
             throw new RequestIllegalArgumentException();
         }
 
-        if(StringUtils.isNotBlank(dto.getVerifyCode())
-                || dto.getVerifyCode().length()>12
-                || !StringUtils.isNumeric(dto.getVerifyCode())){
+        if(StringUtils.isNotBlank(dto.getVerifyCode()) && (dto.getVerifyCode().length()>12
+                || !StringUtils.isNumeric(dto.getVerifyCode()))){
             throw new RequestIllegalArgumentException();
         }
 
