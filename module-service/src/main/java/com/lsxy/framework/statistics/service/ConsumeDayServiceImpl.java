@@ -86,7 +86,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
         Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
         Date date2 = DateUtils.parseDate(nextMonth,"yyyy-MM");
-        String sql = " FRPM db_lsxy_base.tb_base_consume_day WHERE "+StatisticsUtils.getNativeSqlIsNull(tenant.getId(),appId, null)+" obj.deleted=0 AND obj.dt>=:date1 AND obj.dt<:date2 ";
+        String sql = " FROM db_lsxy_base.tb_base_consume_day obj WHERE "+StatisticsUtils.getNativeSqlIsNull(tenant.getId(),appId, null)+" obj.deleted=0 AND obj.dt>=:date1 AND obj.dt<:date2 ";
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
