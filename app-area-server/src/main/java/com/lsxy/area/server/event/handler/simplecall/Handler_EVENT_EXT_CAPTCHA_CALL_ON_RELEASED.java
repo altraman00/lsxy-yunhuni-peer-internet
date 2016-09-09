@@ -80,12 +80,24 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
             logger.debug("用户回调结束事件");
         }
         if(StringUtils.isNotBlank(callBackUrl)){
+            Long begin_time = null;
+            Long end_time = null;
+            Long answer_time = null;
+            if(paramMap.get("begin_time") != null){
+                begin_time = ((long)paramMap.get("begin_time")) * 1000;
+            }
+            if(paramMap.get("end_time") != null){
+                end_time = ((long)paramMap.get("end_time")) * 1000;
+            }
+            if(paramMap.get("answer_time") != null){
+                answer_time = ((long)paramMap.get("answer_time")) * 1000;
+            }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","captcha_call.end")
                     .putIfNotEmpty("id",call_id)
-                    .putIfNotEmpty("begin_time",paramMap.get("begin_time"))
-                    .putIfNotEmpty("answer",paramMap.get("answer_time"))
-                    .putIfNotEmpty("end_time",paramMap.get("end_time"))
+                    .putIfNotEmpty("begin_time",begin_time)
+                    .putIfNotEmpty("answer_time",answer_time)
+                    .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("keys",paramMap.get("keys"))
                     .putIfNotEmpty("duration",paramMap.get("answer_time"))
                     .putIfNotEmpty("hangup_by",paramMap.get("dropped_by"))
