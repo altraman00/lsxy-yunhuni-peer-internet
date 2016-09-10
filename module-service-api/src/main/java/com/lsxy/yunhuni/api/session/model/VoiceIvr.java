@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.session.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import java.util.Date;
  * Created by liuws on 2016/9/7.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_ivr")
 public class VoiceIvr extends IdEntity {
     public static final Integer IVR_TYPE_INCOMING = 1;

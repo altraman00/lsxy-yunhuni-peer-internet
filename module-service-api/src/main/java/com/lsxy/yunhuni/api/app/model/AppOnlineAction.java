@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.app.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
  * Created by liups on 2016/7/15.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app_online_action")
 public class AppOnlineAction extends IdEntity {
     public static final int TYPE_ONLINE = 1;  //上线

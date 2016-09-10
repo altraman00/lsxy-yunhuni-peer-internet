@@ -11,6 +11,7 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,12 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
-        String conf_id = (String)request.getParamMap().get("user_data");
+        Map<String,Object> params = request.getParamMap();
+        if(MapUtils.isEmpty(params)){
+            logger.error("request params is null");
+            return res;
+        }
+        String conf_id = (String)params.get("user_data");
         if(StringUtils.isBlank(conf_id)){
             logger.info("conf_id is null");
             return res;
@@ -91,13 +97,21 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议录音结束通知给开发者");
         }
+        Long begin_time = null;
+        Long end_time = null;
+        if(params.get("begin_time") != null){
+            begin_time = ((long)params.get("begin_time")) * 1000;
+        }
+        if(params.get("end_time") != null){
+            end_time = ((long)params.get("end_time")) * 1000;
+        }
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","conf.record_end")
-                .put("id",conf_id)
-                .put("begin_time",System.currentTimeMillis())
-                .put("end_time",System.currentTimeMillis())
-                .put("record_file",null)
-                .put("user_data",user_data)
+                .putIfNotEmpty("event","conf.record_end")
+                .putIfNotEmpty("id",conf_id)
+                .putIfNotEmpty("begin_time",begin_time)
+                .putIfNotEmpty("end_time",end_time)
+                .putIfNotEmpty("record_file",null)
+                .putIfNotEmpty("user_data",user_data)
                 .build();
 
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);

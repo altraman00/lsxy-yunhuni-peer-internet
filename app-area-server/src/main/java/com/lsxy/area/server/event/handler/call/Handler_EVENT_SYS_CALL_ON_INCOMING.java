@@ -20,6 +20,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +84,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         RPCResponse res = null;
         //TODO incoming事件 cti需要生成一个user_data给我
         Map<String,Object> params = request.getParamMap();
+        if(MapUtils.isEmpty(params)){
+            logger.error("request params is null");
+            return res;
+        }
         String call_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
         String from_uri = (String)params.get("from_uri");//主叫sip地址
@@ -126,7 +131,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         //保存业务数据，后续事件要用到
-        BusinessState callstate = new BusinessState.Builder()
+        BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenant.getId())
                 .setAppId(app.getId())
                 .setId(call_id)
@@ -140,7 +145,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                         .put("to",to)
                         .build())
                 .build();
-        businessStateService.save(callstate);
+        businessStateService.save(state);
         ivrActionUtil.doActionIfAccept(call_id);
         return res;
     }

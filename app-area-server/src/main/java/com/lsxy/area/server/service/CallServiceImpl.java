@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -158,8 +160,10 @@ public class CallServiceImpl implements CallService {
         params.put("to2_uri",to2_uri);
         params.put("max_connect_seconds",dto.getMax_call_duration());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
-        params.put("ring_play_file",dto.getRing_tone());
-        params.put("ring_play_mode",dto.getRing_tone_mode());
+        if(StringUtils.isNotBlank(dto.getRing_tone())){
+            params.put("ring_play_file",dto.getRing_tone());
+            params.put("ring_play_mode",dto.getRing_tone_mode());
+        }
         params.put("user_data1",duocCallId);
         params.put("user_data2",duocCallId);
         //录音
@@ -274,14 +278,10 @@ public class CallServiceImpl implements CallService {
         Map<String, Object> params = new HashMap<>();
         params.put("from_uri", dto.getFrom());
         params.put("to_uri", to_uri);
-//        params.put("play_content",JSONUtil.objectToJson(dto.getFiles()));
         params.put("play_repeat",dto.getRepeat());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("user_data",callId);
-        if(dto.getFiles() != null && dto.getFiles().size()>0){
-            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(dto.getFiles(),"|"),7,""}};
-            params.put("play_content", JSONUtil2.objectToJson(plays));
-        }
+        params.put("play_content",getPlayContent(dto.getPlay_file(),dto.getPlay_content()));
         try {
             //增加区域参数 选择合适的会话(传入appid即可)
             params.put("appid ",app.getId());
@@ -388,4 +388,104 @@ public class CallServiceImpl implements CallService {
             throw new InvokeCallException(ex);
         }
     }
+
+    @Override
+    public String verifyCall(String ip, String appId, String from, String to, Integer maxDialDuration, String verifyCode, String playFile, Integer repeat, String userData) throws YunhuniApiException {
+
+        if(apiGwRedBlankNumService.isRedNum(to)){
+            throw new NumberNotAllowToCallException();
+        }
+        App app = appService.findById(appId);
+
+        if(app.getStatus() != app.STATUS_ONLINE){
+            throw new AppOffLineException();
+        }
+
+        String whiteList = app.getWhiteList();
+        if(StringUtils.isNotBlank(whiteList.trim())){
+            if(!whiteList.contains(ip)){
+                throw new IPNotInWhiteListException();
+            }
+        }
+        if(app.getIsVoiceValidate() != 1){
+            throw new AppServiceInvalidException();
+        }
+
+        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
+        if(!isAmountEnough){
+            throw new BalanceNotEnoughException();
+        }
+
+        //TODO 获取线路IP和端口
+        //TODO 待定
+        String callId = UUIDGenerator.uuid();
+        //TODO
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
+        Map<String, Object> params = new MapBuilder<String, Object>()
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                .putIfNotEmpty("play_repeat",repeat)
+                .putIfNotEmpty("user_data",callId)
+                .put("appid ",app.getId())
+                .build();
+        if(StringUtils.isNotBlank(playFile) && StringUtils.isNotBlank(verifyCode)){
+            Object[][] plays = new Object[][]{new Object[]{playFile,0,""},new Object[]{verifyCode,1,""}};
+            params.put("play_content", JSONUtil2.objectToJson(plays));
+        }else if(StringUtils.isNotBlank(playFile)){
+            Object[][] plays = new Object[][]{new Object[]{playFile,0,""}};
+            params.put("play_content", JSONUtil2.objectToJson(plays));
+        }else if(StringUtils.isNotBlank(verifyCode)){
+            Object[][] plays = new Object[][]{new Object[]{verifyCode,1,""}};
+            params.put("play_content", JSONUtil2.objectToJson(plays));
+        }
+
+        try {
+            //找到合适的区域代理
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_VERIFY_CALL, params);
+            rpcCaller.invoke(sessionContext, rpcrequest);
+            //将数据存到redis
+            BusinessState cache = new BusinessState.Builder()
+                    .setTenantId(app.getTenant().getId())
+                    .setAppId(app.getId())
+                    .setId(callId)
+                    .setType("verify_call")
+                    .setCallBackUrl(app.getUrl())
+                    .setUserdata(userData)
+                    .setAreaId(app.getArea().getId())
+                    .setLineGatewayId(lineGateway.getId())
+                    .setBusinessData(new MapBuilder<String,Object>()
+                            .put("from",oneTelnumber)
+                            .put("to",to)
+                            .build())
+                    .build();
+            businessStateService.save(cache);
+            return callId;
+        }catch(Exception ex){
+            throw new InvokeCallException(ex);
+        }
+    }
+
+    /**
+     * 转换成cti接口要的二维数组字符串
+     * @param play_file 播放文件列表
+     * @param dtos 播放文件内容
+     * @return
+     */
+    public static String getPlayContent(String play_file,List<List<Object>> dtos){
+        if(dtos == null){
+            dtos = new ArrayList<>();
+        }
+        if(StringUtils.isNotBlank(play_file)){
+            List<Object> playFile = new ArrayList<>();
+            playFile.add(play_file);
+            playFile.add(7);
+            playFile.add("");
+            dtos.add(0,playFile);
+        }
+        return JSONUtil.objectToJson(dtos);
+    }
+
 }

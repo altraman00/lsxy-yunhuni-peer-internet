@@ -28,8 +28,8 @@ import java.util.Map;
  * Created by liups on 2016/8/31.
  */
 @Component
-public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS.class);
+public class Handler_EVENT_EXT_VERIFY_CALL_SUCCESS extends EventHandler {
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_EXT_VERIFY_CALL_SUCCESS.class);
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -48,7 +48,7 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS;
+        return Constants.EVENT_EXT_VERIFY_CALL_SUCCESS;
     }
 
     @Override

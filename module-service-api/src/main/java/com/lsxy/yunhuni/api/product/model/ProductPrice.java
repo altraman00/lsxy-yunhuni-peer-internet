@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.product.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
  * Created by liups on 2016/8/27.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_product_price")
 public class ProductPrice extends IdEntity {
     public static int STATUS_VALID = 1;

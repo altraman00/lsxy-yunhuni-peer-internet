@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.tenant.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
  * Created by liups on 2016/6/29.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_tenant_service")
 public class TenantServiceSwitch extends IdEntity {
 

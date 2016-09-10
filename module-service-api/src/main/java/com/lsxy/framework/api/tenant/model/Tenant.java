@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.tenant.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.Table;
  * 
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_tenant")
 public class Tenant extends IdEntity {
 	public static final int AUTH_COMPANY=1;//认证类型-企业认证

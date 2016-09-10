@@ -10,6 +10,7 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,10 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
+        if(MapUtils.isEmpty(params)){
+            logger.error("request params is null");
+            return res;
+        }
         String call_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
         if(StringUtils.isBlank(call_id)){
