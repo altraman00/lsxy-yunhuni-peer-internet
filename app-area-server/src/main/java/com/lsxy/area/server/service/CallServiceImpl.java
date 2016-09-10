@@ -5,6 +5,7 @@ import com.lsxy.area.api.*;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
+import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -82,6 +83,9 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     CallSessionService callSessionService;
+
+    @Autowired
+    private PlayFileUtil playFileUtil;
 
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
@@ -434,6 +438,9 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("user_data",callId)
                 .put("appid ",app.getId())
                 .build();
+
+        playFile = playFileUtil.convertArray(app.getTenant().getId(),appId,playFile);
+
         if(StringUtils.isNotBlank(playFile) && StringUtils.isNotBlank(verifyCode)){
             Object[][] plays = new Object[][]{new Object[]{playFile,0,""},new Object[]{verifyCode,1,""}};
             params.put("play_content", JSONUtil2.objectToJson(plays));

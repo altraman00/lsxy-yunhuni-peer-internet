@@ -17,4 +17,12 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      * @return
      */
     public Page<VoiceFilePlay> pageList(Integer pageNo,Integer pageSize,String name,String appId,String[] tenantId,Integer status,String startTime,String endTime);
+
+    /**
+     * 根据文件名获取应用已审核的文件
+     * @param appId
+     * @param name
+     * @return
+     */
+    public String getVerifiedFile(String appId,String name);
 }

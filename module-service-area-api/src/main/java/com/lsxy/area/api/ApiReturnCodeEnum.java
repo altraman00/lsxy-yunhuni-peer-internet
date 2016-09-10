@@ -16,11 +16,12 @@ public enum ApiReturnCodeEnum {
     ConfNotExists("101015","会议不存在"),
     CallNotExists("101016","呼叫不存在"),
     AppOffLine("101017","应用没上线"),
-    DuoCallbackNumIsSample("101018","双向回拔的号码不能是同一号码");
+    DuoCallbackNumIsSample("101018","双向回拔的号码不能是同一号码"),
+    PlayFileNotExists("101019","放音文件不存在或未审核");
 
     private String code;
     private String msg;
-    private ApiReturnCodeEnum(String code, String message){
+    ApiReturnCodeEnum(String code, String message){
         this.code = code;
         this.msg = message;
     }
