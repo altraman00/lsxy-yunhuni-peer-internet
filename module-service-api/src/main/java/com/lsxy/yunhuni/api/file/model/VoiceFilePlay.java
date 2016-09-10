@@ -3,6 +3,9 @@ package com.lsxy.yunhuni.api.file.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,6 +15,7 @@ import java.util.Date;
  * Created by zhangxb on 2016/7/21.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_file_play")
 public class VoiceFilePlay extends IdEntity {
     public static int STATUS_FAIL = -1;
@@ -51,6 +55,7 @@ public class VoiceFilePlay extends IdEntity {
     }
 
     @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
@@ -61,6 +66,7 @@ public class VoiceFilePlay extends IdEntity {
     }
     @ManyToOne
     @JoinColumn(name = "app_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     public App getApp() {
         return app;
     }
