@@ -2,6 +2,8 @@ package com.lsxy.area.server.util.ivr.act.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -31,6 +33,9 @@ public class ReceivedtmfActionHandler extends ActionHandler{
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private PlayFileUtil playFileUtil;
 
     @Override
     public String getAction() {
@@ -68,22 +73,24 @@ public class ReceivedtmfActionHandler extends ActionHandler{
         }
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
-        Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("res_id",res_id)
-                .putIfNotEmpty("valid_keys",valid_keys)
-                .putIfNotEmpty("max_keys",max_keys)
-                .putIfNotEmpty("finish_keys",finish_keys)
-                .putIfNotEmpty("first_key_timeout",first_key_timeout)
-                .putIfNotEmpty("continues_keys_timeout",continues_keys_timeout)
-                .putIfNotEmpty("play_content",plays)
-                .putIfNotEmpty("play_repeat",play_repeat)
-                .putIfNotEmpty("breaking_on_key",if_break_on_key)
-                .putIfNotEmpty("user_data",callId)
-                .put("appid",state.getAppId())
-                .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, params);
         try {
+            plays = playFileUtil.convertArray(state.getTenantId(),state.getAppId(),plays);
+            Map<String, Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("res_id",res_id)
+                    .putIfNotEmpty("valid_keys",valid_keys)
+                    .putIfNotEmpty("max_keys",max_keys)
+                    .putIfNotEmpty("finish_keys",finish_keys)
+                    .putIfNotEmpty("first_key_timeout",first_key_timeout)
+                    .putIfNotEmpty("continues_keys_timeout",continues_keys_timeout)
+                    .putIfNotEmpty("play_content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}}))
+                    .putIfNotEmpty("play_repeat",play_repeat)
+                    .putIfNotEmpty("breaking_on_key",if_break_on_key)
+                    .putIfNotEmpty("user_data",callId)
+                    .put("appid",state.getAppId())
+                    .build();
+
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {
             logger.error("调用失败",e);
