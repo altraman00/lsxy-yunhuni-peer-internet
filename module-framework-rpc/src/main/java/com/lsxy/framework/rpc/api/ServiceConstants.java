@@ -45,5 +45,6 @@ public class ServiceConstants {
 
 	public static final String CH_MN_HEARTBEAT_ECHO = "CH_MN_HEARTBEAT_ECHO ";		//心跳请求
 
-
+	public static final String MN_CH_VF_SYNC = "MN_CH_VF_SYNC ";		//放音文件同步指令
+	public static final String MN_CH_VF_SYNC_OK = "MN_CH_VF_SYNC_OK ";		//放音文件同步成功指令
 }
