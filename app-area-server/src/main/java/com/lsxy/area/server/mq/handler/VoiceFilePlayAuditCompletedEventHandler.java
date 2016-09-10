@@ -55,6 +55,9 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
             list1.add(map);
         }
         String param = JSON.toJSON(list1).toString();
+        if(logger.isDebugEnabled()){
+            logger.debug("本次同步文件信息:{}",param);
+        }
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,param);
         try {
             rpcCaller.invoke(sessionContext,request);
