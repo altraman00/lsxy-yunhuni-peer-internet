@@ -285,7 +285,8 @@ public class CallServiceImpl implements CallService {
         params.put("play_repeat",dto.getRepeat());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("user_data",callId);
-        params.put("play_content",getPlayContent(dto.getPlay_file(),dto.getPlay_content()));
+        params.put("play_content",this.getPlayContent(app.getTenant().getId(),appId,dto.getPlay_file(),dto.getPlay_content()));
+
         try {
             //增加区域参数 选择合适的会话(传入appid即可)
             params.put("appid ",app.getId());
@@ -477,11 +478,14 @@ public class CallServiceImpl implements CallService {
 
     /**
      * 转换成cti接口要的二维数组字符串
+     * @param tenantId
+     * @param appId
      * @param play_file 播放文件列表
      * @param dtos 播放文件内容
      * @return
      */
-    public static String getPlayContent(String play_file,List<List<Object>> dtos){
+    public String getPlayContent(String tenantId,String appId,String play_file,List<List<Object>> dtos) throws PlayFileNotExistsException {
+        play_file = playFileUtil.convertArray(tenantId, appId, play_file);
         if(dtos == null){
             dtos = new ArrayList<>();
         }
@@ -491,6 +495,11 @@ public class CallServiceImpl implements CallService {
             playFile.add(7);
             playFile.add("");
             dtos.add(0,playFile);
+        }
+        for(List<Object> play:dtos){
+            if(play.get(1).equals(0)){
+                play.set(0,playFileUtil.convertArray(tenantId, appId, (String) play.get(0)));
+            }
         }
         return JSONUtil.objectToJson(dtos);
     }
