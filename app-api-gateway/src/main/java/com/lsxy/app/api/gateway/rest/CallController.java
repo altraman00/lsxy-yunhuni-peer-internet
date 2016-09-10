@@ -6,6 +6,7 @@ import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.DuoCallbackDTO;
 import com.lsxy.area.api.NotifyCallDTO;
+import com.lsxy.area.api.exceptions.DuoCallbackNumIsSampleException;
 import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.framework.web.utils.WebUtils;
@@ -80,16 +81,31 @@ public class CallController extends AbstractAPIController{
 //    }
 
     @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
-    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody DuoCallbackDTO duoCallbackDTO, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody DuoCallbackDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
-        String callId = null;
+        String callId;
+        String to1 = dto.getTo1();
+        String to2 = dto.getTo2();
+        if(StringUtils.isBlank(to1)){
+            throw new RequestIllegalArgumentException();
+        }else if(StringUtils.isBlank(to2)){
+            throw new RequestIllegalArgumentException();
+        }else if(to1.equals(to2)){
+            throw new DuoCallbackNumIsSampleException();
+        }
+        if(dto.getMax_dial_duration() == null){
+            throw new RequestIllegalArgumentException();
+        }
+        if(dto.getMax_call_duration() == null){
+            throw new RequestIllegalArgumentException();
+        }
 
-        callId = callService.duoCallback(ip,appId, duoCallbackDTO);
+        callId = callService.duoCallback(ip,appId, dto);
 
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
-        result.put("user_data", duoCallbackDTO.getUser_data());
+        result.put("user_data", dto.getUser_data());
         return ApiGatewayResponse.success(result);
     }
 
@@ -102,17 +118,21 @@ public class CallController extends AbstractAPIController{
     }
 
     @RequestMapping(value = "/{account_id}/call/notify_call",method = RequestMethod.POST)
-    public ApiGatewayResponse notifyCall(HttpServletRequest request, @RequestBody NotifyCallDTO notifyCallDTO, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse notifyCall(HttpServletRequest request, @RequestBody NotifyCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         //参数校验
-        if(StringUtils.isBlank(notifyCallDTO.getTo())){
+        if(StringUtils.isBlank(dto.getTo())){
             throw new RequestIllegalArgumentException();
         }
-        String callId = callService.notifyCall(ip,appId, notifyCallDTO);
+        if(dto.getMax_dial_duration() == null){
+            throw new RequestIllegalArgumentException();
+        }
+
+        String callId = callService.notifyCall(ip,appId, dto);
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
-        result.put("user_data", notifyCallDTO.getUser_data());
+        result.put("user_data", dto.getUser_data());
         return ApiGatewayResponse.success(result);
     }
 

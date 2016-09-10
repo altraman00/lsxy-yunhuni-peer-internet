@@ -123,9 +123,6 @@ public class CallServiceImpl implements CallService {
         String duocCallId = UUIDGenerator.uuid();
         String to1 = dto.getTo1();
         String to2 = dto.getTo2();
-        if(StringUtils.isBlank(to1) || StringUtils.isBlank(to2)||to1.equals(to2)){
-            throw new DuoCallbackNumIsSampleException();
-        }
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
             throw new NumberNotAllowToCallException();
         }
@@ -163,8 +160,10 @@ public class CallServiceImpl implements CallService {
         params.put("to2_uri",to2_uri);
         params.put("max_connect_seconds",dto.getMax_call_duration());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
-        params.put("ring_play_file",dto.getRing_tone());
-        params.put("ring_play_mode",dto.getRing_tone_mode());
+        if(StringUtils.isNotBlank(dto.getRing_tone())){
+            params.put("ring_play_file",dto.getRing_tone());
+            params.put("ring_play_mode",dto.getRing_tone_mode());
+        }
         params.put("user_data1",duocCallId);
         params.put("user_data2",duocCallId);
         //录音
@@ -279,12 +278,10 @@ public class CallServiceImpl implements CallService {
         Map<String, Object> params = new HashMap<>();
         params.put("from_uri", dto.getFrom());
         params.put("to_uri", to_uri);
-//        params.put("play_content",JSONUtil.objectToJson(dto.getFiles()));
         params.put("play_repeat",dto.getRepeat());
         params.put("max_ring_seconds",dto.getMax_dial_duration());
         params.put("user_data",callId);
         params.put("play_content",getPlayContent(dto.getPlay_file(),dto.getPlay_content()));
-
         try {
             //增加区域参数 选择合适的会话(传入appid即可)
             params.put("appid ",app.getId());

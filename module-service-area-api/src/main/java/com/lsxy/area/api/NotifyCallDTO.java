@@ -13,7 +13,7 @@ public class NotifyCallDTO implements Serializable {
     private String to;          //被叫号码
     private String play_file;     //通知放音文件(列表)
     private List<List<Object>> play_content; //话音文件播放内容
-    private Integer repeat;     //重复播放次数
+    private Integer repeat = 1;     //重复播放次数
     private Integer max_dial_duration;  //最大拨号等待时间（秒）
     private String user_data;
 
