@@ -115,6 +115,12 @@ public class AppController extends AbstractRestController {
         boolean flag = appService.isAppBelongToUser(userName, app.getId());
         if(flag){
             App resultApp = appService.findById(app.getId());
+            if(!resultApp.getName().equals(app.getName())){
+                long re = appService.countByTenantIdAndName(getCurrentAccount().getTenant().getId(),app.getName());
+                if(re>0){
+                    return RestResponse.failed("0000","该应用名已经存在");
+                }
+            }
             EntityUtils.copyProperties(resultApp,app);
             resultApp = appService.save(resultApp);
             //应用修改后，将其上线步骤清空

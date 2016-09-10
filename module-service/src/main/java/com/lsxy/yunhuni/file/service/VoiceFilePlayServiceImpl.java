@@ -104,7 +104,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
 
     @Override
     public List<VoiceFilePlay> findNotSync() {
-        String hql = "from VoiceFilePlay obj where obj.sync<>?1 and obj.status=?2 group by obj.lastTime ";
+        String hql = "from VoiceFilePlay obj where ( obj.sync<>?1 or obj.sync is null )and obj.status=?2 group by obj.lastTime ";
         List<VoiceFilePlay> list = this.list(hql,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS);
         return list;
     }
