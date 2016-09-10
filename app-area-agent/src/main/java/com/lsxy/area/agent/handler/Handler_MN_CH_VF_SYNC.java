@@ -53,7 +53,8 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
         if(logger.isDebugEnabled()){
             logger.debug("响应VF SYNC:{}",request);
         }
-        String jsonList = (String) request.getParameter(ServiceConstants.MN_CH_VF_SYNC);
+        String jsonList = request.getBodyAsString();
+//        String jsonList = (String) request.getParameter(ServiceConstants.MN_CH_VF_SYNC);
         List<Map> list = JSON.parseArray(jsonList, Map.class);
         List<Map> rList = new ArrayList<Map>();
         for(int i=0;i<list.size();i++){
