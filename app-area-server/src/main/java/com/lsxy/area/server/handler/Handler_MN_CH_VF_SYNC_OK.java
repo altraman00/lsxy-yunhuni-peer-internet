@@ -39,7 +39,8 @@ public class Handler_MN_CH_VF_SYNC_OK extends RpcRequestHandler {
         if(logger.isDebugEnabled()){
             logger.debug("响应VF SYNC OK:{}",request);
         }
-        String jsonList = (String) request.getParameter(ServiceConstants.MN_CH_VF_SYNC_OK);
+        String jsonList = request.getBodyAsString();
+        //String jsonList = (String) request.getParameter(ServiceConstants.MN_CH_VF_SYNC_OK);
         List<Map> list = JSON.parseArray(jsonList, Map.class);
         List<String> success = new ArrayList<>();
         List<String> fail = new ArrayList<>();

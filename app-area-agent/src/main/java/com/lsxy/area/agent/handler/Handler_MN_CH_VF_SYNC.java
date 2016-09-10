@@ -67,7 +67,8 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
             rList.add(vfp);
         }
         String param = JSON.toJSON(rList).toString();
-        RPCRequest request1 = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC_OK,param);
+        RPCRequest request1 = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC_OK,"");
+        request.setBody(param.getBytes());
         try {
             rpcCaller.invoke(sessionContext,request1);
         } catch (Exception ex) {
