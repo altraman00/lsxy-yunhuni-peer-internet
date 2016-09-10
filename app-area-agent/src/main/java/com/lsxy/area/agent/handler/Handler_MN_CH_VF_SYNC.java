@@ -58,7 +58,8 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
         List<Map> rList = new ArrayList<Map>();
         for(int i=0;i<list.size();i++){
             Map<String,String> vfp = list.get(i);
-            String type = vfp.get("name").substring(vfp.get("name").lastIndexOf(".")+1, vfp.get("name").length());
+            //后缀名同意一小写
+            String type = vfp.get("name").substring(vfp.get("name").lastIndexOf(".")+1, vfp.get("name").length()).toLowerCase();
             String saveFilePath = path+"/"+vfp.get("tenantId")+"/"+vfp.get("appId")+"/"+vfp.get("id")+type;
             Integer result = downFile(vfp.get("fileKey"),saveFilePath);
             vfp.put("sync",result+"");
@@ -87,32 +88,30 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
         long start = new Date().getTime();
         //先判断文件是否存在，如果存在则不下载
         if(newFile.exists()){
-            logger.info("文件已存在不用下载，文件:{},下载信息:{}",path,uri);
+            logger.info("文件已存在，覆盖原文件:{},下载信息:{}",path,uri);
+        }
+        //补充文件夹
+        new File(path.substring(0,path.lastIndexOf("/"))).mkdirs();
+        //开始写文件
+        InputStream in = null;
+        FileOutputStream out = null;
+        try {
+            in = ossService.getFileStream(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
+            out = new FileOutputStream(newFile);
+            byte[] buffer = new byte[8 * 1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
             result = 1;
-        }else{
-            //补充文件夹
-            new File(path.substring(0,path.lastIndexOf("/"))).mkdirs();
-            //开始写文件
-            InputStream in = null;
-            FileOutputStream out = null;
+        } catch (Exception e) {
+            logger.error("文件流输出异常,{]", e);
+        }finally {
             try {
-                in = ossService.getFileStream(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
-                out = new FileOutputStream(newFile);
-                byte[] buffer = new byte[8 * 1024];
-                int length;
-                while ((length = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, length);
-                }
-                result = 1;
-            } catch (Exception e) {
-                logger.error("文件流输出异常,{]", e);
-            }finally {
-                try {
-                    in.close();
-                    out.close();
-                } catch (IOException e) {
-                    logger.error("文件流关闭异常，{}", e);
-                }
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                logger.error("文件流关闭异常，{}", e);
             }
         }
         logger.error("文件下载结束{}---->{},结果:{},时间:{},花费时间{}",uri,path,result, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"),new Date().getTime()-start);
