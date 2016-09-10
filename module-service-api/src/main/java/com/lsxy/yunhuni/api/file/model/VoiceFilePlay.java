@@ -3,6 +3,8 @@ package com.lsxy.yunhuni.api.file.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -53,6 +55,7 @@ public class VoiceFilePlay extends IdEntity {
     }
 
     @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
@@ -63,6 +66,7 @@ public class VoiceFilePlay extends IdEntity {
     }
     @ManyToOne
     @JoinColumn(name = "app_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     public App getApp() {
         return app;
     }

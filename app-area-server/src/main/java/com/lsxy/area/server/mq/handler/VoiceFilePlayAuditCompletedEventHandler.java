@@ -46,13 +46,15 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         List<VoiceFilePlay> list = voiceFilePlayService.findNotSync();
         List<Map<String,Object>> list1 = new ArrayList<>();
         for(int i=0;i<list.size();i++) {
-            Map<String, Object> map = new HashMap();
-            map.put("id",list.get(i).getId());
-            map.put("appId",list.get(i).getApp().getId());
-            map.put("tenantId",list.get(i).getTenant().getId());
-            map.put("name",list.get(i).getName());
-            map.put("fileKey",list.get(i).getFileKey());
-            list1.add(map);
+            if(list.get(i).getApp()!=null) {
+                Map<String, Object> map = new HashMap();
+                map.put("id", list.get(i).getId());
+                map.put("appId", list.get(i).getApp().getId());
+                map.put("tenantId", list.get(i).getTenant().getId());
+                map.put("name", list.get(i).getName());
+                map.put("fileKey", list.get(i).getFileKey());
+                list1.add(map);
+            }
         }
         String param = JSON.toJSON(list1).toString();
         if(logger.isDebugEnabled()){
