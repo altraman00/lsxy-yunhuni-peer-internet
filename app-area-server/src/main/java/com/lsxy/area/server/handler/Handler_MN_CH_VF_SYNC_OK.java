@@ -1,4 +1,4 @@
-package com.lsxy.area.server.mq.handler;
+package com.lsxy.area.server.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.lsxy.framework.rpc.api.RPCRequest;
