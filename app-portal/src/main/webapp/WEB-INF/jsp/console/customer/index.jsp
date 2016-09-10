@@ -53,7 +53,7 @@
 
                                         <div class="form-group">
                                             <div class="col-md-3 text-left remove-padding">
-                                                <button type="button" id="validateBtn" class=" btn btn-primary  btn-form">提交</button>
+                                                <button type="button" id="validateBtn" class="btn btn-primary btn-form">提交</button>
                                             </div>
                                         </div>
                                     </form:form>
@@ -73,19 +73,20 @@
 <script type="text/javascript">
     $('#validateBtn').click(function(){
         $('#customForm').bootstrapValidator('validate');
-        $(this).attr('disabled',true);
+        $('#validateBtn').attr('disabled',true);
         var result = $('#customForm').data('bootstrapValidator').isValid();
-        if(result){
+        var text = $('#text1').val();
+        if(result&&text.length>0){
             ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
                 if(data.success){
                     showtoast("提交成功",ctx+"/console/customer/index");
                 }else{
                     showtoast(data.errorMsg);
-                    $(this).removeAttrs('disabled');
+                    $('#validateBtn').removeAttr('disabled');
                 }
             },"post");
         }else{
-            $(this).removeAttrs('disabled');
+            $('#validateBtn').removeAttr('disabled');
         }
     });
 </script>
