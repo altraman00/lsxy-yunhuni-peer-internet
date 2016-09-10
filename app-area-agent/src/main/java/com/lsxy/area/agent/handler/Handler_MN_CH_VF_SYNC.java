@@ -60,15 +60,18 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
         for(int i=0;i<list.size();i++){
             Map<String,String> vfp = list.get(i);
             //后缀名同意一小写
-            String type = vfp.get("name").substring(vfp.get("name").lastIndexOf(".")+1, vfp.get("name").length()).toLowerCase();
+            String type = vfp.get("name").substring(vfp.get("name").lastIndexOf("."), vfp.get("name").length()).toLowerCase();
             String saveFilePath = path+"/"+vfp.get("tenantId")+"/"+vfp.get("appId")+"/"+vfp.get("id")+type;
             Integer result = downFile(vfp.get("fileKey"),saveFilePath);
             vfp.put("sync",result+"");
             rList.add(vfp);
         }
         String param = JSON.toJSON(rList).toString();
+        if(logger.isDebugEnabled()){
+            logger.debug("同步结果C:{}",param);
+        }
         RPCRequest request1 = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC_OK,"");
-        request.setBody(param);
+        request1.setBody(param);
         try {
             rpcCaller.invoke(sessionContext,request1);
         } catch (Exception ex) {
