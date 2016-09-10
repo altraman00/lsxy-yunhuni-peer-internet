@@ -40,7 +40,7 @@ public class IVRCallController extends AbstractAPIController{
         if(StringUtils.isBlank(dto.getTo())){
             throw new RequestIllegalArgumentException();
         }
-        if(dto.getMaxCallDuration() == null || dto.getMaxCallDuration()<= 0 ){
+        if(dto.getMaxCallDuration() == null || dto.getMaxCallDuration()<= 0 || dto.getMaxCallDuration()> MAX_DURATION_SEC){
             throw new RequestIllegalArgumentException();
         }
         if(dto.getMaxDialDuration() != null && dto.getMaxDialDuration() <= 0){
