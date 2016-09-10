@@ -57,6 +57,8 @@ public class IVRActionUtil {
 
     private CloseableHttpAsyncClient client = null;
 
+    private int MAX_DURATION_SEC = 60 * 60 * 6;
+
     //设置请求和传输超时时间
     private RequestConfig config =
             RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();
@@ -260,8 +262,7 @@ public class IVRActionUtil {
     private void answer(String appId,String res_id,String call_id){
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
-                //TODO 这个时间如何定
-                .put("max_answer_seconds",3600*24)
+                .put("max_answer_seconds",MAX_DURATION_SEC)
                 .put("user_data",call_id)
                 .put("appid",appId)
                 .build();

@@ -35,7 +35,7 @@ public class ConfController extends AbstractAPIController{
         }
         String ip = WebUtils.getRemoteAddress(request);
         //参数校验
-        if(dto.getMaxDuration() == null || dto.getMaxDuration() <= 0){
+        if(dto.getMaxDuration() == null || dto.getMaxDuration() <= 0 || dto.getMaxDuration()> MAX_DURATION_SEC){
             throw new RequestIllegalArgumentException();
         }
         if(dto.getMaxParts() != null && dto.getMaxParts() <= 0){
@@ -77,7 +77,7 @@ public class ConfController extends AbstractAPIController{
         if(StringUtils.isBlank(dto.getTo())){
             throw new RequestIllegalArgumentException();
         }
-        if(dto.getMaxDuration() == null || dto.getMaxDuration()<= 0){
+        if(dto.getMaxDuration() == null || dto.getMaxDuration()<= 0 || dto.getMaxDuration() > MAX_DURATION_SEC){
             throw new RequestIllegalArgumentException();
         }
         if(dto.getMaxDialDuration() != null && dto.getMaxDialDuration() <= 0){
@@ -104,7 +104,7 @@ public class ConfController extends AbstractAPIController{
         if(StringUtils.isBlank(dto.getCallId())){
             throw new RequestIllegalArgumentException();
         }
-        if(dto.getMaxDuration() == null || dto.getMaxDuration() <= 0){
+        if(dto.getMaxDuration() == null || dto.getMaxDuration() <= 0 || dto.getMaxDuration() > MAX_DURATION_SEC){
             throw new RequestIllegalArgumentException();
         }
 

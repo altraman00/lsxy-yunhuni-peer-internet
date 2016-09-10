@@ -10,4 +10,5 @@ import java.io.Serializable;
  * Created by zhangxb on 2016/7/21.
  */
 public interface VoiceFilePlayDao extends BaseDaoInterface<VoiceFilePlay,Serializable> {
+
 }
