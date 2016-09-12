@@ -8,4 +8,6 @@ import com.lsxy.yunhuni.api.config.model.ApiGwRedBlankNum;
  */
 public interface ApiGwRedBlankNumService  extends BaseService<ApiGwRedBlankNum> {
     boolean isRedOrBlankNum(String number);
+    boolean isRedNum(String number);
+    boolean isBlankNum(String number);
 }

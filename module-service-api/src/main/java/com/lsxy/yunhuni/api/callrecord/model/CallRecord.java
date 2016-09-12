@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.callrecord.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.Date;
  * Created by liups on 2016/6/29.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_record")
 public class CallRecord extends IdEntity {
     private String areaId;      //所属区域ID

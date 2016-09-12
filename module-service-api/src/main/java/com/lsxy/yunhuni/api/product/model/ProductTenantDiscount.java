@@ -1,0 +1,58 @@
+package com.lsxy.yunhuni.api.product.model;
+
+import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+/**
+ * 租户产品折扣表
+ * Created by liups on 2016/8/27.
+ */
+@Entity
+@Where(clause = "deleted=0")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_product_tenant_discount")
+public class ProductTenantDiscount  extends IdEntity {
+    private String tenantId;
+    private String productId;
+    private Double discount;    //小数点后两位数字
+    private String remark;
+
+    @Column(name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    @Column(name = "product_id")
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    @Column(name = "discount")
+    public Double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Double discount) {
+        this.discount = discount;
+    }
+
+    @Column(name = "remark")
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+}

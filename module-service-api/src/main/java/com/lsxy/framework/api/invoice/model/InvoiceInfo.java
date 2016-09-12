@@ -2,6 +2,7 @@ package com.lsxy.framework.api.invoice.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
  * Created by liups on 2016/7/14.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_base", name = "tb_base_invoice_info")
 public class InvoiceInfo extends IdEntity{
     public static final int TYPE_PERSON_GENERAL = 1; //个人增值税普通发票

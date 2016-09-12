@@ -23,7 +23,7 @@ public interface ConfService {
      * @return
      */
     public String create(String ip,String appId,Integer maxDuration,Integer maxParts,
-                         Boolean recording,Boolean autoHangup,String bgmFile,String callBackURL,String userData) throws YunhuniApiException;
+                         Boolean recording,Boolean autoHangup,String bgmFile,String userData) throws YunhuniApiException;
 
     /**
      * 解散会议
@@ -35,8 +35,7 @@ public interface ConfService {
      * @return
      */
     public String invite(String ip,String appId,String confId,
-                         String from,String to,String customFrom,String customTO,
-                         Integer maxDuration,Integer maxDialDuration,
+                         String from,String to,Integer maxDuration,Integer maxDialDuration,
                          Integer dialVoiceStopCond,String playFile,Integer voiceMode) throws YunhuniApiException;
 
     /**
@@ -86,4 +85,12 @@ public interface ConfService {
      * @return
      */
     public boolean setVoiceMode(String ip,String appId,String confId,String callId,Integer voiceMode) throws YunhuniApiException;
+
+    /**
+     * 将呼叫加入到会议
+     * @param call_id 呼叫业务id
+     * @param conf_id   会议业务id
+     * @return
+     */
+    public boolean confEnter(String call_id,String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException;
 }

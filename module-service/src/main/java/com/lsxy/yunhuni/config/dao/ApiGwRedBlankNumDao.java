@@ -10,4 +10,5 @@ import java.io.Serializable;
  */
 public interface ApiGwRedBlankNumDao extends BaseDaoInterface<ApiGwRedBlankNum, Serializable> {
     ApiGwRedBlankNum findByNumberAndStatus(String number, int status);
+    ApiGwRedBlankNum findByNumberAndTypeAndStatus(String number,int type, int status);
 }
