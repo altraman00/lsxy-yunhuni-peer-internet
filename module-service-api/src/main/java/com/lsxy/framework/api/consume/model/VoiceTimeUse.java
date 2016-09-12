@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.consume.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import java.util.Date;
  * Created by liups on 2016/8/30.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_voice_time_use")
 public class VoiceTimeUse extends IdEntity {
     private Date dt;

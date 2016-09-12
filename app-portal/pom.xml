@@ -17,6 +17,7 @@
     <build>
         <finalName>portal</finalName>
         <plugins>
+<!--
           <plugin>
             <groupId>org.apache.tomcat.maven</groupId>
             <artifactId>tomcat7-maven-plugin</artifactId>
@@ -27,6 +28,28 @@
                   <path>/</path>
               </configuration>
           </plugin>
+-->
+
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <url>http://127.0.0.1:8080/manager/text</url>
+                    <server>tomcat7</server>
+                    <path>/</path>
+                    <contextReloadable>false</contextReloadable>
+                    <username>hero</username>
+                    <password>rg4yy2</password>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.3.11.v20160721</version>
+            </plugin>
+
+
             <!-- 加入maven deploy插件，当在deploy时，忽略些model-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -86,6 +109,11 @@
             <artifactId>module-framework-oss</artifactId>
         </dependency>
 
+            <dependency>
+                <groupId>org.springframework.session</groupId>
+                <artifactId>spring-session</artifactId>
+                <version>1.2.1.RELEASE</version>
+            </dependency>
 
     </dependencies>
 </project>

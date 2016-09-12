@@ -1,14 +1,11 @@
 package com.lsxy.framework.rpc.api;
 
-import java.io.UnsupportedEncodingException;
+import com.lsxy.framework.core.utils.UUIDGenerator;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.UUIDGenerator;
-import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -124,7 +121,8 @@ public class RPCRequest extends  RPCMessage{
 	public static RPCRequest newRequest(String name,Map<String,Object> params) {
 		StringBuffer sb = new StringBuffer();
 		for (String key:params.keySet() ) {
-			sb.append(key + "=" + params.get(key) + "&");
+			Object value = params.get(key);
+			sb.append(key + "=" + (value == null?"":value) + "&");
 		}
 		if(sb.length() > 0){
 			sb.subSequence(0,sb.length()-1);

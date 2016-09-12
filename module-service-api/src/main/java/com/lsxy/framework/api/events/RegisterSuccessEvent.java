@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.events;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
+import com.lsxy.framework.mq.topic.MQTopicConstants;
 
 /**
  * 用户注册，创建用户成功后的事件
@@ -18,7 +19,7 @@ public class RegisterSuccessEvent extends AbstractMQEvent {
 
     @Override
     public String getTopicName() {
-        return "topic_framework_account";
+        return MQTopicConstants.TOPIC_FRAMEWORK_ACCOUNT;
     }
 
     public String getAccountId() {

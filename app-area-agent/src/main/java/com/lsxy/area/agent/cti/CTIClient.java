@@ -1,9 +1,6 @@
 package com.lsxy.area.agent.cti;
 
-import com.lsxy.app.area.cti.commander.Client;
-import com.lsxy.app.area.cti.commander.RpcEventListener;
-import com.lsxy.app.area.cti.commander.RpcRequest;
-import com.lsxy.app.area.cti.commander.Unit;
+import com.lsxy.app.area.cti.*;
 import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -30,7 +27,6 @@ public class CTIClient implements RpcEventListener{
 
     private static final Logger logger = LoggerFactory.getLogger(CTIClient.class);
 
-
     @Autowired(required = false)
     private StasticsCounter sc;
 
@@ -50,39 +46,38 @@ public class CTIClient implements RpcEventListener{
     private SessionContext sessionContext;
 
     @PostConstruct
-    public void start(){
-        if(logger.isDebugEnabled()){
-            logger.debug("开始启动CTI客户端,初始化UnitID:{}",localUnitID);
+    public void start() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("开始启动CTI客户端,初始化UnitID:{}", localUnitID);
         }
 
         Unit.initiate(localUnitID);
         try {
-            Set<CTIClientConfigFactory.CTIClientConfig>  configs = ctiClientConfigFactory.getConfigs();
-            for (CTIClientConfigFactory.CTIClientConfig config:configs ) {
-                Client client = Unit.createClient(config.clientId, config.ctiHost, this);
-                if(logger.isDebugEnabled()){
-                    logger.debug("client id {} create invoke complete, connect to {}" , config.clientId,config.ctiHost);
+            Set<CTIClientConfigFactory.CTIClientConfig> configs = ctiClientConfigFactory.getConfigs();
+            for (CTIClientConfigFactory.CTIClientConfig config : configs) {
+                Commander commander = Unit.createCommander(config.clientId, config.ctiHost, this);
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("client id {} create invoke complete, connect to {}", config.clientId, config.ctiHost);
                 }
-                clientContext.add(config.clientId,client);
+                clientContext.add(config.clientId, commander);
             }
 
-        }catch(Exception ex){
-            logger.error("CTI客户端启动失败:{}",ex.getMessage());
+        } catch (Exception ex) {
+            logger.error("CTI客户端启动失败:{}", ex.getMessage());
             ex.printStackTrace();
         }
     }
 
     @Override
-    public void onEvent(RpcRequest rpcRequest) {
+    public void onEvent(BusAddress busAddress, RpcRequest rpcRequest) {
+        /*收到CTI事件计数*/
 
-
-        if(logger.isDebugEnabled()){
-            logger.debug("收到事件通知:{}-{}",rpcRequest.getMethod(),rpcRequest.getParams());
+        if (logger.isDebugEnabled()) {
+            logger.debug("收到事件通知:{}-{}", rpcRequest.getMethod(), rpcRequest.getParams());
         }
-        if(sc != null) {
-            /*收到CTI事件计数*/
+        if (sc != null) {
             sc.getReceivedCTIEventCount().incrementAndGet();
-
             if (rpcRequest.getMethod().equals("sys.call.on_incoming")) {
                 sc.getReceivedCTIIncomingEventCount().incrementAndGet();
             }
@@ -106,7 +101,7 @@ public class CTIClient implements RpcEventListener{
             RPCRequest areaRPCRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,rpcRequest.getParams());
             assert rpcCaller!=null;
             /*发送区域管理器请求次数计数*/
-            if(sc!=null) sc.getSendAreaServerRequestCount().incrementAndGet();
+            if (sc != null) sc.getSendAreaServerRequestCount().incrementAndGet();
 
             rpcCaller.invoke(sessionContext,areaRPCRequest);
         } catch (Exception e) {
@@ -114,4 +109,5 @@ public class CTIClient implements RpcEventListener{
             logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());
         }
     }
+
 }

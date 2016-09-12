@@ -1,6 +1,8 @@
 package com.lsxy.area.api;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 通知外呼
@@ -9,8 +11,9 @@ import java.io.Serializable;
 public class NotifyCallDTO implements Serializable {
     private String from;        //主叫号码
     private String to;          //被叫号码
-    private String[] files;     //通知放音文件(列表)
-    private Integer repeat;     //重复播放次数
+    private String play_file;     //通知放音文件(列表)
+    private List<List<Object>> play_content; //话音文件播放内容
+    private Integer repeat = 1;     //重复播放次数
     private Integer max_dial_duration;  //最大拨号等待时间（秒）
     private String user_data;
 
@@ -30,12 +33,20 @@ public class NotifyCallDTO implements Serializable {
         this.to = to;
     }
 
-    public String[] getFiles() {
-        return files;
+    public String getPlay_file() {
+        return play_file;
     }
 
-    public void setFiles(String[] files) {
-        this.files = files;
+    public void setPlay_file(String play_file) {
+        this.play_file = play_file;
+    }
+
+    public List<List<Object>> getPlay_content() {
+        return play_content;
+    }
+
+    public void setPlay_content(List<List<Object>> play_content) {
+        this.play_content = play_content;
     }
 
     public Integer getRepeat() {

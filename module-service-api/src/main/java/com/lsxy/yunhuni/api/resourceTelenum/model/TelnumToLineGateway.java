@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.resourceTelenum.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -9,6 +10,7 @@ import javax.persistence.Table;
  * Created by liups on 2016/9/2.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_yy_telnum_to_linegateway")
 public class TelnumToLineGateway extends IdEntity {
     private String telNumber;

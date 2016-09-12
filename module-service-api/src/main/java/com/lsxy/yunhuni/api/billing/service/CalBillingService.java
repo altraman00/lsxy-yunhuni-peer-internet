@@ -18,6 +18,8 @@ public interface CalBillingService {
     String ADD_VOICE_PREFIX = "avoice";              //语音本日购买增加量
     String USE_SMS_PREFIX = "usms";                 //短信本日使用量
     String ADD_SMS_PREFIX = "asms";             //短信本日购买增加量
+    String ADD_SIZE_PREFIX = "asize";             //容量本日增加量（包括删除文件）
+    String USE_SIZE_PREFIX = "usize";             //容量本日使用量
 
     /**
      * 获取余额
@@ -112,6 +114,31 @@ public interface CalBillingService {
      * @param num 条
      */
     void incAddSms(String tenantId, Date date, Long num);
+
+
+    /**
+     * 获取剩余容量
+     * @param tenantId
+     * @return
+     */
+    Long getSize(String tenantId);
+
+    /**
+     * redis中的剩余容量使用量增加
+     * @param tenantId 租户ID
+     * @param date 日期
+     * @param size byte
+     */
+    void incUseSize(String tenantId, Date date, Long size);
+
+    /**
+     * redis中的剩余容量增加
+     * @param tenantId 租户ID
+     * @param date 日期
+     * @param size byte
+     */
+    void incAddSize(String tenantId, Date date, Long size);
+
 
     /**
      * 获取计算后的实时账务

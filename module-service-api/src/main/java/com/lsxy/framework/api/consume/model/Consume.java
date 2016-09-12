@@ -2,6 +2,7 @@ package com.lsxy.framework.api.consume.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.Date;
  * Created by zhangxb on 2016/7/8.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_consume")
 public class Consume extends IdEntity {
     public static String RENT_NUMBER = "rent_number";  //租用号码的消费类型

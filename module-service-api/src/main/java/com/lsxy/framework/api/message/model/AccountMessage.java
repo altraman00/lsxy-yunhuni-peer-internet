@@ -2,6 +2,7 @@ package com.lsxy.framework.api.message.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Account;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
  * Created by zhangxb on 2016/7/4.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_account_message")
 public class AccountMessage extends IdEntity {
     public static final String MESSAGE_TYPE_AUTH_ONESELE_SUCCESS = "message-templates/01_message_type_auth_onesele_success.vm";

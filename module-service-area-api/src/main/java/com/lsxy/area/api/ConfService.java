@@ -35,8 +35,7 @@ public interface ConfService {
      * @return
      */
     public String invite(String ip,String appId,String confId,
-                         String from,String to,String customFrom,String customTO,
-                         Integer maxDuration,Integer maxDialDuration,
+                         String from,String to,Integer maxDuration,Integer maxDialDuration,
                          Integer dialVoiceStopCond,String playFile,Integer voiceMode) throws YunhuniApiException;
 
     /**
@@ -93,5 +92,5 @@ public interface ConfService {
      * @param conf_id   会议业务id
      * @return
      */
-    public boolean confEnter(String call_id,String conf_id) throws YunhuniApiException;
+    public boolean confEnter(String call_id,String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException;
 }
