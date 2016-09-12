@@ -19,9 +19,9 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_cdr")
 public class VoiceCdr extends IdEntity {
-    public static final Integer COST_TYPE_DEDUCT = 1;
-    public static final Integer COST_TYPE_COST = 2;
-    public static final Integer COST_TYPE_COST_DEDUCT = 3;
+    public static final int COST_TYPE_DEDUCT = 1;
+    public static final int COST_TYPE_COST = 2;
+    public static final int COST_TYPE_COST_DEDUCT = 3;
     private String sessionId;//会话ID
     private String areaId;//所属区域
     private String tenantId;//所属租户

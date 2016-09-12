@@ -168,8 +168,7 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/update")
     @ResponseBody
     public RestResponse update(HttpServletRequest request, App app){
-        updateApp(request, app);
-        return RestResponse.success();
+        return updateApp(request, app);
     }
     /**
      * 新建应用
