@@ -1,6 +1,7 @@
 package com.lsxy.framework.message.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
@@ -190,5 +191,14 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         String hql = "from AccountMessage obj where obj.account.id=?1 and obj.lastTime between ?2 and ?3  and obj.status <>-1 order by status asc,create_time desc";
         Page page= this.pageList(hql,pageNo,pageSize,tenantId,startTime,endTime);
         return page;
+    }
+
+    @Override
+    public Map getAwaitNum() {
+        String hql = "  FROM InvoiceApply obj WHERE （obj.status=?1）OR (obj.status=?2  and obj.expressNo is null) ";
+        long awaitSend = this.countByCustom(hql,InvoiceApply.STATUS_SUBMIT,InvoiceApply.STATUS_DONE);
+        Map map = new HashMap();
+        map.put("awaitSend",awaitSend);
+        return map;
     }
 }

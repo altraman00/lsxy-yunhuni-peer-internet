@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.Page;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户消息service
@@ -81,6 +82,11 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
      List listAll(String accountId,Date startTime,Date endTime);
 
      Page pageAll(String accountId,Date startTime,Date endTime,Integer pageNo,Integer pageSize);
-
+    /**
+     * 运营中心首页左边导航栏使用
+     * 获取未处理的记录数
+     * @return
+     */
+    Map getAwaitNum();
 
 }
