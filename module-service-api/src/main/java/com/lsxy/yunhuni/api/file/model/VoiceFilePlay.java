@@ -3,6 +3,8 @@ package com.lsxy.yunhuni.api.file.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -16,9 +18,12 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_file_play")
 public class VoiceFilePlay extends IdEntity {
-    public static Integer STATUS_FAIL = -1;
-    public static Integer STATUS_WAIT = 0;
-    public static Integer STATUS_SUCCESS =1;
+    public static int STATUS_FAIL = -1;
+    public static int STATUS_WAIT = 0;
+    public static int STATUS_SUCCESS =1;
+    public static int SYNC_SUCCESS = 1;
+    public static int SYNC_WAIT = 0;
+    public static int SYNC_FAIL = -1;
     private Tenant tenant;//所属租户
     private App app;//所属应用
     private String name;//文件名
@@ -30,6 +35,16 @@ public class VoiceFilePlay extends IdEntity {
     private String checker;//审核人
     private Date checkTime;//审核时间
     private String reason;//不通过原因
+    private Integer sync;//文件是否已同步:1已同步0未同步-1同步失败
+    @Column(name = "sync")
+    public Integer getSync() {
+        return sync;
+    }
+
+    public void setSync(Integer sync) {
+        this.sync = sync;
+    }
+
     @Column(name = "reason")
     public String getReason() {
         return reason;
@@ -40,6 +55,7 @@ public class VoiceFilePlay extends IdEntity {
     }
 
     @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
@@ -50,6 +66,7 @@ public class VoiceFilePlay extends IdEntity {
     }
     @ManyToOne
     @JoinColumn(name = "app_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     public App getApp() {
         return app;
     }

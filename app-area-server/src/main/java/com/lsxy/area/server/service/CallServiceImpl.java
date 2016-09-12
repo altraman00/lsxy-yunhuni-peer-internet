@@ -364,6 +364,9 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("user_data",callId)
                 .put("appid ",app.getId())
                 .build();
+
+        dto.setFiles(playFileUtil.convertArray(app.getTenant().getId(),appId,dto.getFiles()));
+
         if(dto.getFiles() != null && dto.getFiles().size()>0){
             Object[][] plays = new Object[][]{new Object[]{StringUtils.join(dto.getFiles(),"|"),7,""}};
             params.put("play_content", JSONUtil2.objectToJson(plays));
