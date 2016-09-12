@@ -134,7 +134,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
 
     @Override
     public void batchUpdateSync(List<String> ids, Integer sync) {
-        if(ids.size()<=0) {
+        if(ids.size()>0) {
             String id = "";
             for (int i = 0; i < ids.size(); i++) {
                 id += " '" + ids.get(i) + "' ";

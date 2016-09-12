@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +53,26 @@ public class Handler_MN_CH_VF_SYNC_OK extends RpcRequestHandler {
                 fail.add(vfp.get("id"));
             }
         }
-        voiceFilePlayService.batchUpdateSync(success,VoiceFilePlay.SYNC_SUCCESS);
-        voiceFilePlayService.batchUpdateSync(fail,VoiceFilePlay.SYNC_FAIL);
+        if(success.size()>0) {
+            if(logger.isDebugEnabled()){
+                logger.debug("同步放音文件，更新成功记录:{}",success.toString());
+            }
+            voiceFilePlayService.batchUpdateSync(success, VoiceFilePlay.SYNC_SUCCESS);
+        }else{
+            if(logger.isDebugEnabled()){
+                logger.debug("同步放音文件，没有更新成功记录");
+            }
+        }
+        if(fail.size()>0) {
+            if(logger.isDebugEnabled()){
+                logger.debug("同步放音文件，更新失败记录:{}", fail.toString());
+            }
+            voiceFilePlayService.batchUpdateSync(fail, VoiceFilePlay.SYNC_FAIL);
+        }else{
+            if(logger.isDebugEnabled()){
+                logger.debug("同步放音文件，没有更新失败记录");
+            }
+        }
         return null;
     }
 }
