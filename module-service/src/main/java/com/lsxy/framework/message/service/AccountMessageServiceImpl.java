@@ -1,6 +1,7 @@
 package com.lsxy.framework.message.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.customer.model.Feedback;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
@@ -195,10 +196,19 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
 
     @Override
     public Map getAwaitNum() {
-        String hql = "  FROM InvoiceApply obj WHERE （obj.status=?1）OR (obj.status=?2  and obj.expressNo is null) ";
-        long awaitSend = this.countByCustom(hql,InvoiceApply.STATUS_SUBMIT,InvoiceApply.STATUS_DONE);
+        //客服中心
+        String serviceHql = "  FROM Feedback obj WHERE obj.status=?1 ";
+        long awaitService = this.countByCustom(serviceHql, Feedback.UNREAD);
+        //财务中心
+        String invoiceHql = "  FROM InvoiceApply obj WHERE （obj.status=?1）OR (obj.status=?2  and obj.expressNo is null) ";
+        long awaitInvoice = this.countByCustom(invoiceHql,InvoiceApply.STATUS_SUBMIT,InvoiceApply.STATUS_DONE);
+        //审核中心
+        String demandHql = "  FROM Tenant obj WHERE obj.isRealAuth in('"+Tenant.AUTH_WAIT+"','"+Tenant.AUTH_ONESELF_WAIT+"','"+Tenant.AUTH_UPGRADE_WAIT+"') ";
+        long awaitDemand = this.countByCustom(demandHql);
         Map map = new HashMap();
-        map.put("awaitSend",awaitSend);
+        map.put("awaitService",awaitService);
+        map.put("awaitInvoice",awaitInvoice);
+        map.put("awaitDemand",awaitDemand);
         return map;
     }
 }
