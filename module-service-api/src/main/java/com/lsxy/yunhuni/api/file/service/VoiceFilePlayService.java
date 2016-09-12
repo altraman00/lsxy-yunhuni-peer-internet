@@ -29,15 +29,36 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
     public String getVerifiedFile(String appId,String name);
 
     /**
-     * 根据未同步和同步失败的记录
+     * 获取未同步和同步失败的记录
      * @return
      */
     List<VoiceFilePlay> findNotSync();
-
+    /**
+     * 根据appId查找对应的文件
+     * @return
+     */
+    List<VoiceFilePlay> findByAppId(String appId);
     /**
      * 批量更新
      * @param ids 记录id
      * @param sync 同步状态
      */
     void batchUpdateSync(List<String> ids,Integer sync);
+    /**
+     * 批量根据key更新value
+     * @param ids 记录id
+     * @param key 更新的字段
+     * @param value 更新的结果
+     */
+    void batchUpdateValueByKey(List<String> ids,String key,Object value);
+
+    /**
+     * 根据appid更新deleted字段
+     * @param appId
+     */
+    void updateDeletedByAppId(String appId);
+
+    void updateDeletedStautsByAppId(String appId,Object status);
+
+    void updateDeletedStautsByid(String id,Object status);
 }

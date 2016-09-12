@@ -133,6 +133,12 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     }
 
     @Override
+    public List<VoiceFilePlay> findByAppId(String appId) {
+        return voiceFilePlayDao.findByAppId(appId);
+    }
+
+
+    @Override
     public void batchUpdateSync(List<String> ids, Integer sync) {
         if(ids.size()>0) {
             String id = "";
@@ -142,8 +148,41 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
                     id += ",";
                 }
             }
-            String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_play set sync=? where  deleted=0 and id in( " + id + " )";
+            String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET sync=? WHERE  deleted=0 AND id IN( " + id + " )";
             jdbcTemplate.update(sql, sync);
         }
+    }
+
+    @Override
+    public void batchUpdateValueByKey(List<String> ids, String key, Object value) {
+        if(ids.size()>0) {
+            String id = "";
+            for (int i = 0; i < ids.size(); i++) {
+                id += " '" + ids.get(i) + "' ";
+                if (i != (ids.size() - 1)) {
+                    id += ",";
+                }
+            }
+            String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET "+key+"=? WHERE id IN( " + id + " )";
+            jdbcTemplate.update(sql, value);
+        }
+    }
+
+    @Override
+    public void updateDeletedByAppId(String appId) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET deleted=1,oss_deleted=-1,aa_deleted=-1 WHERE app_id=? ";
+        jdbcTemplate.update(sql, appId);
+    }
+
+    @Override
+    public void updateDeletedStautsByAppId(String appId, Object status) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET aa_deleted=? WHERE app_id=? ";
+        jdbcTemplate.update(sql,status, appId);
+    }
+
+    @Override
+    public void updateDeletedStautsByid(String id, Object status) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET aa_deleted=? WHERE id=? ";
+        jdbcTemplate.update(sql, status, id);
     }
 }
