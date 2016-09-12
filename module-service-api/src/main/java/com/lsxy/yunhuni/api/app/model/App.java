@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.app.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.config.model.Area;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
  * Created by liups on 2016/6/29.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app")
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线

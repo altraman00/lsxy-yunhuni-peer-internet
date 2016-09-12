@@ -2,6 +2,7 @@ package com.lsxy.framework.api.message.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Account;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -10,6 +11,7 @@ import javax.persistence.*;
  * Created by zhangxb on 2016/7/4.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_account_message")
 public class AccountMessage extends IdEntity {
     public static final String MESSAGE_TYPE_AUTH_ONESELE_SUCCESS = "message-templates/01_message_type_auth_onesele_success.vm";
@@ -22,9 +24,9 @@ public class AccountMessage extends IdEntity {
     public static final String MESSAGE_TYPE_INVOCE_APPLY_FAIL = "message-templates/08_message_type_invoce_apply_fail.vm";
     public static final String MESSAGE_TYPE_ARREARS= "message-templates/09_message_type_arrears.vm";
     public static final String MESSAGE_TYPE_FEEDBACK= "message-templates/10_message_type_feedback.vm";
-    public  static final Integer READ = 1;
-    public static final Integer DELETE = -1;
-    public static final Integer NOT = 0;
+    public  static final int READ = 1;
+    public static final int DELETE = -1;
+    public static final int NOT = 0;
     private Message message;//对于消息
     private Account account;//所属用户
     private Integer status;//消息状态 '0未处理;1已读;-1已删除'

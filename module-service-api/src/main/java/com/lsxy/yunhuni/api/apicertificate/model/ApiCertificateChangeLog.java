@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.apicertificate.model;
 
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
  * Created by liups on 2016/6/29.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_api_cert_changelog")
 public class ApiCertificateChangeLog extends IdEntity {
     private ApiCertificate apiCertificate;  //对应的鉴权账号（凭证）

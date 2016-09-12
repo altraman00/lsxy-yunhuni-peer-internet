@@ -3,6 +3,7 @@ package com.lsxy.framework.api.customer.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -11,10 +12,11 @@ import javax.persistence.*;
  * Created by zhangxb on 2016/7/4.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_customer_feedback")
 public class Feedback extends IdEntity {
-    public  static final Integer  READ = 1;
-    public  static final Integer UNREAD = 0;
+    public  static final int  READ = 1;
+    public  static final int UNREAD = 0;
     private String content;// 内容
     private Integer status;//状态 '0未处理;1已处理',
     Tenant tenant;//所属租户

@@ -26,6 +26,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -206,11 +207,12 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         Billing billing = new Billing();
         billing.setTenant(tenant);
         billing.setBalance(new BigDecimal(0.00));
-        billing.setSmsRemain(0);
-        billing.setVoiceRemain(0);
-        billing.setConferenceRemain(0);
+        billing.setSmsRemain(0L);
+        billing.setVoiceRemain(0L);
+        billing.setConferenceRemain(0L);
         billing.setFileTotalSize(defaultSize);
         billing.setFileRemainSize(defaultSize);
+        billing.setBalanceDate(new Date());
         billingService.save(billing);
     }
 
@@ -247,6 +249,13 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
         Date limitTime = new Date(System.currentTimeMillis() - expireTime * 60 * 60 * 1000);
         accountDao.cleanExpireRegisterAccount(Account.STATUS_EXPIRE,Account.STATUS_NOT_ACTIVE,limitTime);
+    }
+
+    @Override
+    public List<Account> list() {
+        String hql = " from Account obj where obj.status=?1 ";
+        List<Account> list =  this.list(hql,Account.STATUS_NORMAL);
+        return list;
     }
 
     @Override

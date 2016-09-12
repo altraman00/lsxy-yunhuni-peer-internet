@@ -12,6 +12,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.tenant.dao.RealnameCorpDao;
 import com.lsxy.framework.tenant.dao.RealnamePrivateDao;
 import com.lsxy.framework.tenant.dao.TenantDao;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -49,6 +51,8 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     @Autowired
     private RedisCacheService cacheManager;
+    @Autowired
+    private CalBillingService calBillingService;
 
     @Override
     public BaseDaoInterface<Tenant, Serializable> getDao() {
@@ -173,7 +177,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
     @Override
     public int countConsumeTenant() {
         String countSQL = "SELECT count(tenant_id) as c FROM " +
-                "(SELECT tenant_id FROM tb_base_consume_day WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id) a";
+                "(SELECT tenant_id FROM tb_base_consume_hour WHERE deleted=0 AND tenant_id IS NOT NULL GROUP BY tenant_id) a";
         Query queryCount = em.createNativeQuery(countSQL);
         return ((BigInteger) queryCount.getSingleResult()).intValue();
     }
@@ -249,6 +253,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                 "consume.sum_amount 'costCoin',recharge.amount 'totalCoin'," +
                 "cdr.sum_call 'sessionCount',cdr.sum_duration 'sessionTime'" + sql;
         Query countQuery = em.createNativeQuery(countSql);
+        pageSql += " group by regDate desc ";
         Query pageQuery = em.createNativeQuery(pageSql,"tenantResult");
         if(StringUtil.isNotEmpty(name)){
             countQuery.setParameter("name","%"+name+"%");

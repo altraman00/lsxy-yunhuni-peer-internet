@@ -6,6 +6,8 @@ import com.lsxy.framework.core.utils.Page;
 
 import java.util.List;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
 
     /**
@@ -29,8 +31,6 @@ public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
      */
     public RealnamePrivate findByTenantIdAndStatus(String tenantId,int status);
 
-    public RealnamePrivate findByTenantIdNewest(String tenantId);
-
 
     /**
      * 查找用户下的分页信息
@@ -44,4 +44,6 @@ public interface RealnamePrivateService extends BaseService<RealnamePrivate> {
      * @return
      */
     Page pageListAuthInfo(Integer authStatus,String startTime, String endTime, Integer type, String search, Integer pageNo, Integer pageSize);
+
+    public RealnamePrivate findByTenantIdNewest(String tenantId);
 }

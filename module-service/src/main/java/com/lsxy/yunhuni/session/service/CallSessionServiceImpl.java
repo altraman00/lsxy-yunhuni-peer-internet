@@ -32,4 +32,15 @@ public class CallSessionServiceImpl extends AbstractService<CallSession> impleme
 
         return callSessionDao.countByStatusAndApp(CallSession.STATUS_CALLING,app);
     }
+
+    @Override
+    public void updateStatusByRelevanceId(String relevanceId, Integer status) {
+        if(relevanceId == null){
+            return ;
+        }
+        if(status == null){
+            return;
+        }
+        callSessionDao.updateStatusByRelevanceId(relevanceId,status);
+    }
 }

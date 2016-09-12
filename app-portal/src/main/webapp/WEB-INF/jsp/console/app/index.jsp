@@ -71,7 +71,8 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20"/>
+                                                <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20" onchange="countName(this)"/>
+                                                <small class="help-block"data-bv-for="limit20" style="color: red" id="checkNameByCountName"></small>
                                             </div>
                                             <span class="span-required">*</span>
                                         </div>
@@ -100,7 +101,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">所属行业：</lable>
                                             <div class="col-md-4 ">
-                                                <select name="industry"  class="form-control notEmpty">
+                                                <select name="industry" class="form-control notEmpty" >
                                                     <option value="">请选择所属行业</option>
                                                     <c:set var="industry" value="${app.industry}"></c:set>
                                                     <%@ include file="/inc/industry.jsp"%>
@@ -120,8 +121,9 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">回调URL：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form limit300"/>
+                                                <input type="text" name="url" value="${app.url}" placeholder="" class="form-control input-form notEmpty" maxlength="300"/>
                                             </div>
+                                            <span class="span-required">*</span>
                                         </div>
                                         <p class="tips"><a href="">回调说明文档</a></p>
                                         <p class="tips">
@@ -134,7 +136,7 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>基础语音服务</strong></p>
-                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音呼叫</a>（嵌入CRM、OA、呼叫中心等产品中发起通话）</p>
+                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音通知</a>（自动拨打用户电话，并播报自定义的通知内容）</p>
                                                 <p><input type="checkbox" name="isVoiceCallback" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="">语音回拨</a>（以不同的通话方式实现匿名通话功能,保护双方号码隐私）</p>
 
                                             </div>
@@ -208,7 +210,27 @@
         }
 
     });
-
+    function countName(t){
+        var value = t.value;
+        if(value.trim().length>0){
+            ajaxsync(ctx + "/console/app/count/name/"+value,{},function(response){
+                if(response.success){
+                    $('#checkNameByCountName').html('');
+                    $('#checkNameByCountName').hide();
+                }else{
+                    $('#checkNameByCountName').html('应用名称已存在');
+                    $('#checkNameByCountName').show();
+                }
+            },"post").fail(function(){
+                $('#checkNameByCountName').html('');
+                $('#checkNameByCountName').hide();
+            });
+        }
+    }
+    $(function () {
+        $('#checkNameByCountName').html('');
+        $('#checkNameByCountName').hide();
+    })
 </script>
 
 </body>

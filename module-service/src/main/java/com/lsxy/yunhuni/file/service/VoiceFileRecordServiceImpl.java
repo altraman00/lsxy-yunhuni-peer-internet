@@ -33,7 +33,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize,String appId,String tenantId) {
-        String hql = " from VoiceFileRecord obj where obj.app.id=?1 and obj.tenant.id=?2 ";
+        String hql = " from VoiceFileRecord obj where obj.app_id=?1 and obj.tenant_id=?2 ";
         Page<VoiceFileRecord> page = this.pageList(hql,pageNo,pageSize,appId,tenantId);
         return page;
     }
@@ -60,7 +60,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public List<VoiceFileRecord> list(String appid, String tenantId, Date startTime, Date endTime) {
-        String hql = " from VoiceFileRecord obj where obj.app.id=?1 and obj.tenant.id=?2 and obj.createTime<=?3 and obj.createTime>=?4";
+        String hql = " from VoiceFileRecord obj where obj.app_id=?1 and obj.tenant_id=?2 and obj.createTime<=?3 and obj.createTime>=?4";
         List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
         return list;
     }

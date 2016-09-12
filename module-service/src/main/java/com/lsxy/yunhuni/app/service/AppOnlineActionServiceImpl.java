@@ -13,6 +13,7 @@ import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.service.AreaService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
@@ -21,6 +22,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.app.dao.AppOnlineActionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +60,13 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     ResourcesRentService resourcesRentService;
 
     @Autowired
+    TelnumToLineGatewayService telnumToLineGatewayService;
+
+    @Autowired
     AreaService areaService;
+
+    @Autowired
+    CalBillingService calBillingService;
 
     @Override
     public BaseDaoInterface<AppOnlineAction, Serializable> getDao() {
@@ -168,18 +176,14 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             if(action.getAction() == AppOnlineAction.ACTION_PAYING){
                 //当上一步是应用正在支付中时，如果余额足够，则生成新的动作--上线
                 Tenant tenant = tenantService.findTenantByUserName(userName);
-                Billing billing = billingService.findBillingByTenantId(tenant.getId());
-                if(billing.getBalance().compareTo(action.getAmount()) >= 0){
+                //调用获取余额接口
+                if(calBillingService.getBalance(tenant.getId()).compareTo(action.getAmount()) >= 0){
                     //当应用有ivr功能时，绑定IVR号码绑定
                     //判断ivr号码是否被占用
                     if(app.getIsIvrService() != null && app.getIsIvrService() == 1){
                         this.bindIvrToApp(app, action.getTelNumber(), tenant);
                     }
-                    //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
-                    if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
-                        //支付扣费，并插入消费记录
-                        this.pay(appId, action.getAmount(), tenant, billing);
-                    }
+
                     //将上一步设为已支付和完成
                     for(AppOnlineAction a:actionList){
                         a.setStatus(AppOnlineAction.STATUS_DONE);
@@ -192,9 +196,25 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     AppOnlineAction newAction = new AppOnlineAction(null,null,null,
                             app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
                     this.save(newAction);
+
+                    //TODO 绑定应用与区域的关系
+                    Area oldArea = app.getArea();
+                    String areaId = telnumToLineGatewayService.getAreaIdByTelnum(action.getTelNumber());
+                    if(oldArea != null && !oldArea.getId().equals(areaId)){
+                        throw new RuntimeException("所选号码区域与应用原来区域不一样，请重新选择号码，或联系客服");
+                    }else{
+                        Area area = new Area();
+                        area.setId(areaId);
+                        app.setArea(area);
+                    }
                     //应用状态改为上线
                     app.setStatus(App.STATUS_ONLINE);
                     appService.save(app);
+                    //当支付金额为0时，既上线不用支付，就不用插入消费记录，否则插入消费记录
+                    if(action.getAmount().compareTo(new BigDecimal(0)) == 1){
+                        //支付扣费，并插入消费记录
+                        this.pay(appId, action.getAmount(), tenant);
+                    }
                     return newAction;
                 }else{
                     throw new NotEnoughMoneyException("余额不足");
@@ -228,8 +248,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             //如果ivr号码被占用，则抛出异常
             throw new TeleNumberBeOccupiedException("IVR号码已被占用");
         }
-        //绑定应用与区域的关系
-        app.setArea(resourceTelenum.getLine().getArea());
+
     }
 
     /**
@@ -237,15 +256,15 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
      * @param appId
      * @param amount
      * @param tenant
-     * @param billing
      */
-    private void pay(String appId, BigDecimal amount, Tenant tenant, Billing billing) {
-        //TODO 调用扣费接口
-        billing.setBalance(billing.getBalance().subtract(amount));
-        billingService.save(billing);
+    private void pay(String appId, BigDecimal amount, Tenant tenant) {
+        //TODO 支付
+        Date curTime = new Date();
         //插入消费记录
-        Consume consume = new Consume(new Date(),"应用上线",amount,"应用上线",appId,tenant);
+        Consume consume = new Consume(curTime,Consume.RENT_NUMBER,amount,"号码租用",appId,tenant);
         consumeService.save(consume);
+        //Redis中消费增加
+        calBillingService.incConsume(tenant.getId(),curTime,amount);
     }
 
     /**
@@ -316,7 +335,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 //应用状态改为上线
                 app.setStatus(App.STATUS_ONLINE);
                 //应用绑定区域
-                app.setArea(areaService.getOneAvailableArea());
+                if(app.getArea() == null){
+                    app.setArea(areaService.getOneAvailableArea());
+                }
                 appService.save(app);
                 return newAction;
             }else if(app.getStatus() == App.STATUS_ONLINE ){
@@ -381,11 +402,13 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             appService.save(app);
             if(app.getIsIvrService() != null && app.getIsIvrService() ==1){
                 //当应用有ivr功能时，改变IVR号码的租用关系
-                ResourcesRent rent = resourcesRentService.findByAppId(app.getId());
-                if(rent != null){
-                    rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
-                    rent.setApp(null);
-                    resourcesRentService.save(rent);
+                List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());
+                if(rents != null && rents.size() >0){
+                    for(ResourcesRent rent:rents){
+                        rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+                        rent.setApp(null);
+                        resourcesRentService.save(rent);
+                    }
                 }
             }
             return app;

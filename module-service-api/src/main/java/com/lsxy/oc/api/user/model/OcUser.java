@@ -1,6 +1,7 @@
 package com.lsxy.oc.api.user.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.persistence.Table;
  * Created by liups on 2016/8/9.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_oc", name = "tb_oc_user")
 public class OcUser extends IdEntity {
     public static final int STATUS_NOT_ACTIVE = 0; 	//账号未激活

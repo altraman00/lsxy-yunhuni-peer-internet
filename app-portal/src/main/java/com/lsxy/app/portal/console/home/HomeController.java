@@ -74,7 +74,7 @@ public class HomeController extends AbstractPortalController {
         //获取账务
         Billing billing = billingResponse.getData();
         if(billing != null){
-            //TODO 从redis里取出套餐剩余数据
+            //取出套餐剩余数据
             //余额正数部分
             int vTemp = billing.getBalance().intValue();
             if(vTemp<0){
@@ -87,11 +87,11 @@ public class HomeController extends AbstractPortalController {
             String format = df.format(billing.getBalance());
             vo.setBalanceDec(format.substring(format.indexOf('.') + 1, format.length()));
             //语音剩余量
-            vo.setVoiceRemain(billing.getVoiceRemain());
+            vo.setVoiceRemain(billing.getVoiceRemain()/60);
             //短信剩余量
             vo.setSmsRemain(billing.getSmsRemain());
             //会议剩余量
-            vo.setConferenceRemain(billing.getConferenceRemain());
+            vo.setConferenceRemain(billing.getConferenceRemain()/60);
 
             Long fileTotalSize = billing.getFileTotalSize()/(1024 * 1024);
             Long fileRemainSize = billing.getFileRemainSize()/(1024 * 1024);

@@ -5,7 +5,7 @@ import com.lsxy.area.agent.StasticsCounter;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.client.ClientSessionContext;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import java.util.Set;
  * CTI 客户端启动器  需要配合JNI使用
  */
 @Component
-@Profile(value={"test","production","development","localdev"})
+@Profile(value={"test","production", "development","localdev"})
 public class CTIClient implements RpcEventListener{
 
 
@@ -44,7 +44,7 @@ public class CTIClient implements RpcEventListener{
     private RPCCaller rpcCaller;
 
     @Autowired
-    private ClientSessionContext sessionContext;
+    private SessionContext sessionContext;
 
     @PostConstruct
     public void start() {
@@ -73,12 +73,12 @@ public class CTIClient implements RpcEventListener{
     @Override
     public void onEvent(BusAddress busAddress, RpcRequest rpcRequest) {
         /*收到CTI事件计数*/
-        sc.getReceivedCTIEventCount().incrementAndGet();
 
         if (logger.isDebugEnabled()) {
             logger.debug("收到事件通知:{}-{}", rpcRequest.getMethod(), rpcRequest.getParams());
         }
         if (sc != null) {
+            sc.getReceivedCTIEventCount().incrementAndGet();
             if (rpcRequest.getMethod().equals("sys.call.on_incoming")) {
                 sc.getReceivedCTIIncomingEventCount().incrementAndGet();
             }

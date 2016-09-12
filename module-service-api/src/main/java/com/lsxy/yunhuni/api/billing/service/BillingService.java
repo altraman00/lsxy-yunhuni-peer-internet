@@ -5,12 +5,15 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 账务相关接口
  * Created by liups on 2016/6/28.
  */
 public interface BillingService extends BaseService<Billing> {
+
+
     /**
      * 根据用户名查找账务
      * @param username 用户名
@@ -25,10 +28,4 @@ public interface BillingService extends BaseService<Billing> {
      */
     Billing findBillingByTenantId(String tenantId);
 
-    /**
-     * 获取余额
-     * @param tenantId
-     * @return
-     */
-    BigDecimal getBalance(String tenantId);
 }

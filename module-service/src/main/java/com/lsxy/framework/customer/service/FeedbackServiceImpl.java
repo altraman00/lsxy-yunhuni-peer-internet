@@ -6,13 +6,19 @@ import com.lsxy.framework.api.customer.service.FeedbackService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.customer.dao.FeedbackDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 反馈信息实现
@@ -22,6 +28,8 @@ import java.util.Date;
 public class FeedbackServiceImpl extends AbstractService<Feedback> implements FeedbackService {
     @Autowired
     FeedbackDao feedbackDao;
+    @PersistenceContext
+    private EntityManager em;
     @Override
     public BaseDaoInterface<Feedback, Serializable> getDao() {
         return feedbackDao;
@@ -38,49 +46,43 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
         try {
             date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
         }catch (Exception e){}
-        String hql = "from Feedback obj  ";
-        boolean flag = true;
-        int i=1;
+
+        String sql = " FROM db_lsxy_base.tb_base_customer_feedback obj WHERE obj.deleted=0 ";
         if(date1!=null){
-            if(flag){
-                hql +=" where ";
-                flag=false;
-            }else{
-                hql +=" and ";
-            }
-            hql +=" obj.createTime>=?"+i;
-            i++;
+            sql +=" AND obj.create_time >= :date1 ";
         }
         if(date2!=null){
-            if(flag){
-                hql +=" where ";
-                flag=false;
-            }else{
-                hql +=" and ";
-            }
-            hql +=" obj.createTime<=?"+i;
-            i++;
+            sql +=" AND obj.create_time <= :date2 ";
         }
         if(status!=null){
-            if(flag){
-                hql +=" where ";
-                flag=false;
-            }else{
-                hql +=" and ";
-            }
-            hql+="  obj.status='"+status+"' ";
+            sql +=" AND obj.status = :status ";
         }
-        Page<Feedback> page = null;
-        if(date1!=null&&date2!=null){
-            page = this.pageList(hql,pageNo,pageSize,date1,date2);
-        }else if(date1!=null&&date2==null){
-            page = this.pageList(hql,pageNo,pageSize,date1);
-        }else if(date1==null&&date2!=null){
-            page = this.pageList(hql,pageNo,pageSize,date2);
-        }else{
-            page = this.pageList(hql,pageNo,pageSize);
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" GROUP BY obj.create_time DESC";
+        Query pageQuery = em.createNativeQuery(pageSql,Feedback.class);
+        if(date1!=null){
+            countQuery.setParameter("date1",date1);
+            pageQuery.setParameter("date1",date1);
         }
-        return page;
+        if(date2!=null){
+            countQuery.setParameter("date2",date2);
+            pageQuery.setParameter("date2",date2);
+        }
+        if(status!=null){
+            countQuery.setParameter("status",status);
+            pageQuery.setParameter("status",status);
+        }
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+           return  new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.lsxy.framework.api.invoice.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -13,12 +14,13 @@ import java.util.Date;
  * Created by liups on 2016/7/21.
  */
 @Entity
+@Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_base", name = "tb_base_invoice_apply")
 public class InvoiceApply extends IdEntity {
-    public static Integer STATUS_SUBMIT = 0;    //申请已提交
-    public static Integer STATUS_DONE = 1;      //处理完成，发票已寄出
-    public static Integer STATUS_EXCEPTION = 2; //异常，这种状态一般为用户填写的资料有误，运营中心驳回申请
-    public static Integer OPERATE_DONE = 1;//异常已处理
+    public static int STATUS_SUBMIT = 0;    //申请已提交
+    public static int STATUS_DONE = 1;      //处理完成，发票已寄出
+    public static int STATUS_EXCEPTION = 2; //异常，这种状态一般为用户填写的资料有误，运营中心驳回申请
+    public static int OPERATE_DONE = 1;//异常已处理
     private String reason;//原因
     private Integer operate;//异常操作步骤 1表示已操作
     private BigDecimal amount;      //金额
