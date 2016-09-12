@@ -40,12 +40,12 @@ public class RechargeDayServiceImpl extends AbstractService<RechargeDay> impleme
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
-        String sql = "insert into db_lsxy_base.tb_base_recharge_day("+selects+"dt,day,among_amount,among_num,create_time,last_time,deleted,sortno,version)" +
+        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_recharge_day("+selects+"dt,day,among_amount,among_num,create_time,last_time,deleted,sortno,version)" +
                 " select "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " IFNULL(sum(among_num),0) as among_num, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += " from db_lsxy_base.tb_base_recharge_hour a where tenant_id is not null and a.dt between ? AND ? " +groupbys;
+        sql += " from db_lsxy_bi_yunhuni.tb_bi_recharge_hour a where tenant_id is not null and a.dt between ? AND ? " +groupbys;
         //拼装条件
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();

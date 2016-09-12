@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.config.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +14,8 @@ import static org.aspectj.weaver.tools.cache.SimpleCacheFactory.enabled;
  * Created by liups on 2016/8/24.
  */
 @Entity
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_area")
+@Where(clause = "deleted=0")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_area")
 public class Area extends IdEntity {
     private String name;
     private String ip;

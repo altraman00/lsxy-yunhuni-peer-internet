@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.statistics.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,11 +13,12 @@ import java.util.Date;
  * Created by zhangxb on 2016/8/1.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_voice_cdr_hour")
+@Where(clause = "deleted=0")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_cdr_hour")
 public class VoiceCdrHour extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
-    private Integer type;//会话类型1.语音呼叫2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
+    private Integer type;//会话类型1.语音通知2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音
     private String operatorId;//操作类型
     private String areaId;//区域
     private Date dt;//统计时间

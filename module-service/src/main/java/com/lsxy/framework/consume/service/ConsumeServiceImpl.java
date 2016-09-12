@@ -64,14 +64,14 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         Page<Consume>  page = this.pageList(hql,pageNo,pageSize,tenantId,date1,date2);
 //        int start = (pageNo-1)*pageSize;
 //        String db_name = "db_lsxy_base";//year +"-" + month;
-//        String countsql = "select count(1) from "+db_name+".tb_base_consume where tenant_id=:tenant AND BETWEEN dt ? AND ? ";
+//        String countsql = "select count(1) from "+db_name+".tb_bi_consume where tenant_id=:tenant AND BETWEEN dt ? AND ? ";
 //        Query countQuery = em.createNativeQuery(countsql);
 //        countQuery.setParameter("tenant",tenantId);
 //        long total = ((BigInteger)countQuery.getSingleResult()).longValue();
 //        if(total == 0){
 //            return new Page<>(start,total,pageSize,null);
 //        }
-//        String pagesql = "select * from "+db_name+".tb_base_consume where tenant_id=:tenant AND BETWEEN dt ? AND ? ";
+//        String pagesql = "select * from "+db_name+".tb_bi_consume where tenant_id=:tenant AND BETWEEN dt ? AND ? ";
 //        Query pageQuery = em.createNativeQuery(pagesql,Consume.class);
 //        pageQuery.setParameter("tenant",tenantId);
 //        pageQuery.setMaxResults(pageSize);
@@ -79,4 +79,5 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
 //        return new Page<>(start,total,pageSize,pageQuery.getResultList());
         return page;
     }
+
 }

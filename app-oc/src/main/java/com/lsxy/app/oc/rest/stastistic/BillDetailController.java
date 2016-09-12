@@ -42,7 +42,7 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse call(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "voice_call.语音呼叫,duo_call.双向回拨,conf_call.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务")
+            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,conf_call.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务")
             @RequestParam String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,

@@ -320,10 +320,18 @@
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
-                data: Xdata
+                data: Xdata,
+                nameGap:32,
+                nameTextStyle:{
+                    color:'#999',
+                }
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                nameGap:32,
+                nameTextStyle:{
+                    color:'#999',
+                }
             },
             series: series
         };

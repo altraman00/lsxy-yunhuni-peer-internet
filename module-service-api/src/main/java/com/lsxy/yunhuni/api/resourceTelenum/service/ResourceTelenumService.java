@@ -14,9 +14,10 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
     /**
      * 从号码池中获取闲置的号码
      * @param count
+     * @param areaId 区域ID
      * @return
      */
-    List<String> getFreeTeleNum(int count);
+    List<String> getFreeTeleNum(int count,String areaId);
 
     /**
      * 根据号码从号码池中获取号资源
@@ -30,4 +31,12 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @param expireTime 过期时间
      */
     void cleanExpireResourceTelnum(Date expireTime);
+
+    /**
+     * 获取一个空闲的，没有绑定租户的号码
+     * @return
+     */
+    String findOneFreeNumber(String areaId);
+
+
 }

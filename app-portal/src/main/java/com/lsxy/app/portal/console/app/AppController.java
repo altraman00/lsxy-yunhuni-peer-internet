@@ -11,6 +11,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -131,14 +132,34 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/create")
     @ResponseBody
     public RestResponse create(HttpServletRequest request, App app){
-        app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
-        createApp(request,app);
-        return RestResponse.success();
+        long count = (Long)countName(request,app.getName()).getData();
+        if(count==0) {
+            app.setStatus(App.STATUS_OFFLINE);//设置状态为未上线
+            createApp(request, app);
+            return RestResponse.success();
+        }else{
+            return RestResponse.failed("0000","当前应用名已存在,创建应用失败");
+        }
 //        Map map = new HashMap();
 //        map.put("msg","新建应用成功");
 //        return map;
     }
-
+    /**
+     * 用户名是否存在
+     * @return
+     */
+    @RequestMapping("/count/name/{name}")
+    @ResponseBody
+    public RestResponse count(HttpServletRequest request, @PathVariable String name) {
+        long count = (Long) countName(request, name).getData();
+        RestResponse restResponse = null;
+        if(count==0) {
+            restResponse = RestResponse.success();
+        }else{
+            restResponse = RestResponse.failed("0000","用户名已存在");
+        }
+        return  restResponse;
+    }
     /**
      * 更新应用
      * @param request
@@ -147,11 +168,7 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/update")
     @ResponseBody
     public RestResponse update(HttpServletRequest request, App app){
-        updateApp(request,app);
-        return RestResponse.success();
-//        Map map = new HashMap();
-//        map.put("msg","应用修改成功");
-//        return map;
+        return updateApp(request, app);
     }
     /**
      * 新建应用
@@ -178,5 +195,16 @@ public class AppController extends AbstractPortalController {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(app, Map.class);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
+    }
+    /**
+     * 根据应用名字查找应用数量
+     * @param request
+     * @param name 应用名字
+     * @return
+     */
+    private RestResponse countName(HttpServletRequest request,String name){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app/count/{1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, Long.class,name);
     }
 }

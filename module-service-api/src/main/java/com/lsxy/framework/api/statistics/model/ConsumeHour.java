@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.statistics.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +14,8 @@ import java.util.Date;
  * Created by zhangxb on 2016/7/6.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_consume_hour")
+@Where(clause = "deleted=0")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_consume_hour")
 public class ConsumeHour extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用,

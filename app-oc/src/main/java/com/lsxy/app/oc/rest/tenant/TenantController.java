@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.framework.api.consume.model.Consume;
 import com.lsxy.framework.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
@@ -21,7 +22,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.billing.model.Billing;
-import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
@@ -33,8 +34,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +57,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/tenant")
 public class TenantController {
-
+    public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Autowired
     private TenantService tenantService;
 
@@ -66,7 +68,7 @@ public class TenantController {
     private ApiCertificateService apiCertificateService;
 
     @Autowired
-    private BillingService billingService;
+    private CalBillingService calBillingService;
 
     @Autowired
     private VoiceCdrMonthService voiceCdrMonthService;
@@ -139,8 +141,28 @@ public class TenantController {
         if(end!=null){
             end = DateUtils.getLastTimeOfDate(end);
         }
-        Page<TenantVO> list = tenantService.pageListBySearch(name,begin,end,authStatus,accStatus,pageNo,pageSize);
-        return RestResponse.success(list);
+        Page<TenantVO> list = null;
+        Page<TenantVO> list2 = null;
+        try {
+            list = tenantService.pageListBySearch(name, begin, end, authStatus, accStatus, pageNo, pageSize);
+        }catch (Exception e){
+            logger.error("报错:{}",e);
+        }
+        try{
+            //修改余额取值
+            List<TenantVO> temp = list.getResult();
+            List<TenantVO> list1 = new ArrayList();
+            for(int i=0;i<temp.size();i++){
+                TenantVO tenantVO = temp.get(i);
+                BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
+                tenantVO.setRemainCoin(bigDecimal.doubleValue());
+                list1.add(tenantVO);
+            }
+            list2 = new Page<>(list.getStartIndex(),list.getTotalCount(),list.getPageSize(),list1);
+        }catch (Exception e){
+            logger.error("转换出错{}",e);
+        }
+        return RestResponse.success(list2);
     }
 
     @ApiOperation(value = "租户状态禁用/启用")
@@ -166,7 +188,7 @@ public class TenantController {
     public RestResponse billing(
             @ApiParam(name = "id",value = "租户id")
             @PathVariable String id){
-        Billing billing = billingService.findBillingByTenantId(id);
+        Billing billing = calBillingService.getCalBilling(id);
         ObjectMapper objectMapper = new ObjectMapper();
         Map map= objectMapper.convertValue(billing,Map.class);
         //余额正数部分
@@ -571,8 +593,15 @@ public class TenantController {
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
-        dto.setConsumes(consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize));
-        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+        Page<Consume> page = consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize);
+        dto.setConsumes(page);
+        List<Consume> list  = page.getResult();
+        BigDecimal sum  = new BigDecimal("0.00");
+        for(int i=0;i<list.size();i++){
+            sum  = sum.add(list.get(i).getAmount());
+        }
+       // dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+        dto.setSumAmount(sum);
         return RestResponse.success(dto);
     }
 
@@ -719,7 +748,7 @@ public class TenantController {
     @RequestMapping(value="/tenants/{tenant}/file/totalSize",method = RequestMethod.GET)
     public RestResponse fileTotalSize(@PathVariable String tenant){
         Map map = new HashMap();
-        Billing billing = billingService.findBillingByTenantId(tenant);
+        Billing billing = calBillingService.getCalBilling(tenant);
         if(billing!=null){
             Long fileTotalSize = billing.getFileTotalSize();
             map.put("fileRemainSize",fileTotalSize-billing.getFileRemainSize());

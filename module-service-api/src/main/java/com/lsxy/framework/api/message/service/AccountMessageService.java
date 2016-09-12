@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.Page;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户消息service
@@ -59,11 +60,17 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
     public AccountMessage sendMessage(String originator,String accountId,String title,String content);
 
     /**
-     * 修改状态为已读
-     * @param accountId
-     * @param status
+     * 根据用户id和时间，修改状态
+     * @param accountId 用户id
+     * @param status 时间
      */
     void modifyMessageStatus(String accountId,Integer status,Date endTime);
+    /**
+     * 根据消息id修改消息状态
+     * @param messageId 消息id
+     * @param status 状态
+     */
+    void modifyMessageStatus(String messageId,Integer status);
 
     /**
      * 获取指定时间内的记录数
@@ -75,6 +82,11 @@ public interface AccountMessageService extends BaseService<AccountMessage> {
      List listAll(String accountId,Date startTime,Date endTime);
 
      Page pageAll(String accountId,Date startTime,Date endTime,Integer pageNo,Integer pageSize);
-
+    /**
+     * 运营中心首页左边导航栏使用
+     * 获取未处理的记录数
+     * @return
+     */
+    Map getAwaitNum();
 
 }

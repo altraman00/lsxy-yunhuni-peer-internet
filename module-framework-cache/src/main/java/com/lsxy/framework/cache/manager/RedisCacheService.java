@@ -284,6 +284,26 @@ public class RedisCacheService {
 		}
 
 		/**
+		 * 针对redis INCRBY，实现指定key的值的增长
+		 * @param key 	key值
+		 * @param incr 增长的值
+		 * @return
+		 *  自增长后的值
+		 */
+		public long incrBy(final String key,Long incr) {
+			long result = (long) redisTemplate
+					.execute(new RedisCallback() {
+						@Override
+						public Object doInRedis(RedisConnection connection)
+								throws DataAccessException {
+							return connection.incrBy(key.getBytes(),incr);
+						}
+
+					});
+			return result;
+		}
+
+		/**
 		 * 获取缓存的值，之后迅速删除掉
 		 * @param key
 		 * 	缓存key

@@ -1,5 +1,7 @@
 package com.lsxy.area.api.exceptions;
 
+import com.lsxy.area.api.ApiReturnCodeEnum;
+
 /**
  * Created by liups on 2016/8/23.
  */
@@ -13,7 +15,7 @@ public class IPNotInWhiteListException extends YunhuniApiException{
     }
 
     @Override
-    public ApiExceptionEnum getApiExceptionEnum() {
-        return ApiExceptionEnum.IPNotInWhiteList;
+    public ApiReturnCodeEnum getApiExceptionEnum() {
+        return ApiReturnCodeEnum.IPNotInWhiteList;
     }
 }

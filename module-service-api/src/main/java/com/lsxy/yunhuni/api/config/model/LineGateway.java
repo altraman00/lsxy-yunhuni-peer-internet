@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.config.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,9 +16,10 @@ import java.math.BigDecimal;
  * 容量 并发
  */
 @Entity
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_line_gateway")
+@Where(clause = "deleted=0")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_line_gateway")
 public class LineGateway extends IdEntity {
-    private Area area;          //区域
+    private String areaId;          //区域
     private String lineNumber;  //线路网关编码
     private BigDecimal lingPrice;   //线路网关单价
     private String ip;          //ip
@@ -25,14 +27,13 @@ public class LineGateway extends IdEntity {
     private String provider;    //线路网关提供商
     private String remark;
 
-    @ManyToOne
-    @JoinColumn(name = "area_id")
-    public Area getArea() {
-        return area;
+    @Column(name = "area_id")
+    public String getAreaId() {
+        return areaId;
     }
 
-    public void setArea(Area area) {
-        this.area = area;
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
     }
 
     @Column(name = "line_number")

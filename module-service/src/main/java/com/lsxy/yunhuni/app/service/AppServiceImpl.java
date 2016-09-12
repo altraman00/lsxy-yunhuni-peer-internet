@@ -7,6 +7,9 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +29,20 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     @Autowired
     private TenantService tenantService;
 
+    @Autowired
+    private ResourcesRentService resourcesRentService;
+
+    @Autowired
+    private ResourceTelenumService resourceTelenumService;
+
     @Override
     public BaseDaoInterface<App, Serializable> getDao() {
         return this.appDao;
+    }
+
+    @Override
+    public long countByTenantIdAndName(String tenantId, String name) {
+        return appDao.countByTenantIdAndName(tenantId,name);
     }
 
     @Override
@@ -86,6 +100,17 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         String hql = "from App obj where deleted != 1 and obj.tenant.id=?1 order by obj.status";
         List<App> list = this.findByCustomWithParams(hql, tenantId);
         return list;
+    }
+
+    @Override
+    public String findOneAvailableTelnumber(App app) {
+        if(app.getIsIvrService()==1){
+            List<ResourcesRent> resourcesRents = resourcesRentService.findByAppId(app.getId());
+            ResourcesRent resourcesRent = resourcesRents.get(0);
+            return resourcesRent.getResData();
+        }else{
+            return resourceTelenumService.findOneFreeNumber(app.getArea().getId());
+        }
     }
 
 

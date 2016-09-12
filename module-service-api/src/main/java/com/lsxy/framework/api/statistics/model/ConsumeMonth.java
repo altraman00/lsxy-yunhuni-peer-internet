@@ -1,6 +1,7 @@
 package com.lsxy.framework.api.statistics.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +14,8 @@ import java.util.Date;
  * Created by zhangxb on 2016/7/6.
  */
 @Entity
-@Table(schema="db_lsxy_base",name = "tb_base_consume_month")
+@Where(clause = "deleted=0")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_consume_month")
 public class ConsumeMonth extends IdEntity {
     private Date dt;//统计时间
     private Integer month;//统计月 区间1-12

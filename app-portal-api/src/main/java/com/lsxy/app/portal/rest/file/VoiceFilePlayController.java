@@ -9,8 +9,8 @@ import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.slf4j.Logger;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 
 /**
  * 放音文件
@@ -37,6 +38,8 @@ public class VoiceFilePlayController extends AbstractRestController {
     private BillingService billingService;
     @Autowired
     private OSSService ossService;
+    @Autowired
+    private CalBillingService calBillingService;
     /**
      * 根据放音文件id删除放音文件
      * @param id
@@ -51,9 +54,11 @@ public class VoiceFilePlayController extends AbstractRestController {
             //删除OSS文件成功，删除数据库记录
             voiceFilePlayService.delete(voiceFilePlay);
             //删除记录成功,更新剩余存储容量大小
-            Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
-            billing.setFileRemainSize(billing.getFileRemainSize()+voiceFilePlay.getSize());
-            billingService.save(billing);
+//            Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
+//            billing.setFileRemainSize(billing.getFileRemainSize()+voiceFilePlay.getSize());
+//            billingService.save(billing);
+            Account account = getCurrentAccount();
+            calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         }catch(Exception e){
             logger.error("删除OSS文件：{1}失败，异常{2}",voiceFilePlay.getFileKey(),e);
             return RestResponse.failed("0000","OSS删除失败");
@@ -77,9 +82,10 @@ public class VoiceFilePlayController extends AbstractRestController {
         voiceFilePlay.setStatus(VoiceFilePlay.STATUS_WAIT);
         voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
         //更新账户表
-        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
-        billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
-        billingService.save(billing);
+//        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
+//        billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
+//        billingService.save(billing);
+        calBillingService.incUseFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         return RestResponse.success(voiceFilePlay);
     }
     /**
