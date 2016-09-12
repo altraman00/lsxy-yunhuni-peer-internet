@@ -5,6 +5,7 @@ import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -12,6 +13,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +60,10 @@ public class Handler_MN_CH_SYS_CALL_RECEIVE_DTMF_START extends RpcRequestHandler
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
             String res_id = (String)params.get("res_id");
-
+            String play_content = (String)params.get("play_content");
+            if(StringUtils.isNotEmpty(play_content)){
+                params.put("play_content", JSONUtil2.fromJson(play_content,(new Object[1][]).getClass()));
+            }
             cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.receive_dtmf_start", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {

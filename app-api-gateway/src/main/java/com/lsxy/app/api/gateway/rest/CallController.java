@@ -141,6 +141,9 @@ public class CallController extends AbstractAPIController{
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
 
+        if(logger.isDebugEnabled()){
+            logger.debug("VERIFY CALL API参数,appId={},dto={}",appId,dto);
+        }
         //参数校验
         checkInputLen(dto.getFrom());
         if(StringUtils.isBlank(dto.getTo())){
@@ -155,9 +158,8 @@ public class CallController extends AbstractAPIController{
             throw new RequestIllegalArgumentException();
         }
 
-        if(StringUtils.isNotBlank(dto.getVerifyCode())
-                || dto.getVerifyCode().length()>12
-                || !StringUtils.isNumeric(dto.getVerifyCode())){
+        if(StringUtils.isNotBlank(dto.getVerifyCode()) && (dto.getVerifyCode().length()>12
+                || !StringUtils.isNumeric(dto.getVerifyCode()))){
             throw new RequestIllegalArgumentException();
         }
 

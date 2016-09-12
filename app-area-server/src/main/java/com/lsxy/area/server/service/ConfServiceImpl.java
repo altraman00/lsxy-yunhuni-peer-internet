@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.*;
+import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -57,6 +58,9 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private CalCostService calCostService;
 
+    @Autowired
+    private PlayFileUtil playFileUtil;
+
     @Override
     public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
@@ -87,6 +91,7 @@ public class ConfServiceImpl implements ConfService {
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         String confId = UUIDGenerator.uuid();
+        bgmFile = playFileUtil.convert(tenantId,appId,bgmFile);
         Map<String, Object> map = new MapBuilder<String,Object>()
                                 .putIfNotEmpty("user_data",confId)
                                 .putIfNotEmpty("max_seconds",maxDuration)
@@ -342,7 +347,7 @@ public class ConfServiceImpl implements ConfService {
         if(conf_state == null || conf_state.getResId() == null){
             throw new IllegalArgumentException();
         }
-
+        playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("file",StringUtils.join(playFiles,"|"))
@@ -572,6 +577,8 @@ public class ConfServiceImpl implements ConfService {
         if(call_business != null && call_business.get("play_file")!=null){
             play_file = (String) call_business.get("play_file");
         }
+
+        play_file = playFileUtil.convert(conf_state.getTenantId(),conf_state.getAppId(),play_file);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
                                     .putIfNotEmpty("res_id",call_state.getResId())

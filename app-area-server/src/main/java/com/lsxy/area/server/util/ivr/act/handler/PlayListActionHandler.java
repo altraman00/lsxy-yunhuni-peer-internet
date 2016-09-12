@@ -2,6 +2,8 @@ package com.lsxy.area.server.util.ivr.act.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.exceptions.PlayFileNotExistsException;
+import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -32,6 +34,9 @@ public class PlayListActionHandler extends ActionHandler{
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private PlayFileUtil playFileUtil;
 
     @Override
     public String getAction() {
@@ -71,16 +76,17 @@ public class PlayListActionHandler extends ActionHandler{
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         if(plays!=null && plays.size()>0){
-            Map<String, Object> params = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("res_id",res_id)
-                    .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}}))
-                    .putIfNotEmpty("finish_keys",finish_keys)
-                    .putIfNotEmpty("user_data",callId)
-                    .put("appid",state.getAppId())
-                    .build();
-
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
             try {
+                plays = playFileUtil.convertArray(state.getTenantId(),state.getAppId(),plays);
+                Map<String, Object> params = new MapBuilder<String,Object>()
+                        .putIfNotEmpty("res_id",res_id)
+                        .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}}))
+                        .putIfNotEmpty("finish_keys",finish_keys)
+                        .putIfNotEmpty("user_data",callId)
+                        .put("appid",state.getAppId())
+                        .build();
+
+                RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
                 rpcCaller.invoke(sessionContext, rpcrequest);
             } catch (Throwable e) {
                 logger.error("调用失败",e);

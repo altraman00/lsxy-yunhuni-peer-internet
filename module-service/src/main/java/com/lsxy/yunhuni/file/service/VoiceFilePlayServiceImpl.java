@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.file.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -9,7 +10,10 @@ import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import com.lsxy.yunhuni.file.dao.VoiceFilePlayDao;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +31,9 @@ import java.util.List;
  */
 @Service
 public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> implements VoiceFilePlayService{
+
+    private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayServiceImpl.class);
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -100,6 +107,22 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
         pageQuery.setFirstResult(start);
         List list = pageQuery.getResultList();
         return new Page<>(start,total,pageSize,list);
+    }
+
+    @Override
+    @Cacheable(value="entity",key="'entity_'+#appId+'_'+#name",unless = "#result == null")
+    public String getVerifiedFile(String appId, String name) {
+        String hql = " from VoiceFilePlay obj  where obj.appId = ?1 and obj.status = ?2 and obj.name= ?3";
+        VoiceFilePlay file = null;
+        try {
+            file = this.findUnique(hql,appId,name,1);
+        } catch (MatchMutiEntitiesException e) {
+            logger.error("app放音文件重复",e);
+        }
+        if(file == null){
+            return null;
+        }
+        return file.getId();
     }
 
     @Override
