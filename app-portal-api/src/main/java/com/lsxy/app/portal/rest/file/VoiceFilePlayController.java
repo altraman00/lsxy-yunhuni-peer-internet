@@ -9,7 +9,6 @@ import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
@@ -59,7 +58,7 @@ public class VoiceFilePlayController extends AbstractRestController {
 //            billing.setFileRemainSize(billing.getFileRemainSize()+voiceFilePlay.getSize());
 //            billingService.save(billing);
             Account account = getCurrentAccount();
-            calBillingService.incAddSize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
+            calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         }catch(Exception e){
             logger.error("删除OSS文件：{1}失败，异常{2}",voiceFilePlay.getFileKey(),e);
             return RestResponse.failed("0000","OSS删除失败");
@@ -86,7 +85,7 @@ public class VoiceFilePlayController extends AbstractRestController {
 //        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
 //        billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
 //        billingService.save(billing);
-        calBillingService.incUseSize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
+        calBillingService.incUseFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         return RestResponse.success(voiceFilePlay);
     }
     /**
