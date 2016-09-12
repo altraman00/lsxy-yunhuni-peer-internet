@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.message;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.framework.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
 import com.lsxy.framework.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
@@ -21,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/8/10.
@@ -98,14 +101,18 @@ public class MessageController extends AbstractRestController {
             if(StringUtil.isNotEmpty(messageVo.getLine())){
                 message1.setLineTime(DateUtils.parseDate(messageVo.getLine(),"yyyy-MM-dd HH:mm"));
             }
-
-            if(message1.getLineTime().getTime()<=new Date().getTime()){
-                message1.setStatus(Message.ONLINE);
+            if(messageVo.getStatus()!=Message.OFFLINE) {
+                if (message1.getLineTime().getTime() <= new Date().getTime()) {
+                    message1.setStatus(Message.ONLINE);
+                }
             }
             message1 = messageService.save(message1);
             logger.info("是否需要群发消息:{}",isSendMsg);
             if(old!=message1.getStatus()&&message1.getStatus()==Message.ONLINE){
                 sendMessage(message1);
+            }
+            if(message1.getStatus()==Message.OFFLINE){
+                accountMessageService.modifyMessageStatus(message1.getId(), AccountMessage.DELETE);
             }
         }catch (Exception e){
             restResponse = RestResponse.failed("0","上传内容不符合要求");
@@ -158,6 +165,7 @@ public class MessageController extends AbstractRestController {
     ) throws InvocationTargetException, IllegalAccessException {
         Message message = messageService.findById(id);
         messageService.delete(message);
+        accountMessageService.modifyMessageStatus(message.getId(), AccountMessage.DELETE);
         return RestResponse.success(message);
     }
     /**
@@ -167,6 +175,17 @@ public class MessageController extends AbstractRestController {
         logger.info("群发消息:消息体{}",message);
         List<Account> list = accountService.findByStatus(Account.STATUS_NORMAL);
         accountMessageService.insertMultiple(list,message);
+    }
+    /**
+     * 等待处理数量
+     * @return
+     */
+    @ApiOperation(value = "等待处理数量,客服中心awaitService财务中心awaitInvoice审核中心awaitDemand")
+    @RequestMapping(value = "/await/num",method = RequestMethod.GET)
+    public RestResponse getAwaitNum(){
+        Map map = new HashMap();
+        map.putAll(accountMessageService.getAwaitNum());
+        return RestResponse.success(map);
     }
 
 }

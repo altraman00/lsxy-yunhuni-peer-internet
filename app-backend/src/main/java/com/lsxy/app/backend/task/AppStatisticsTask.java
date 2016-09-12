@@ -181,7 +181,7 @@ public class AppStatisticsTask {
     /**
      *每个小时的执行一次
      */
-    @Scheduled(cron="0 30 0/1 * * ?")
+    @Scheduled(cron="0 0 2 1 * ? ")
     public void hour(){
 
         String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName();

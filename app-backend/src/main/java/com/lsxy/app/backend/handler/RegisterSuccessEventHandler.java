@@ -38,6 +38,9 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
     @Override
     public void handleMessage(RegisterSuccessEvent message) throws JMSException {
         try {
+            if(logger.isDebugEnabled()){
+                logger.debug("接收到MQ：发邮件事件：{}",message);
+            }
             String accountId = message.getAccountId();
             Account account = accountService.findById(accountId);
             // 发送激活邮件
@@ -64,8 +67,10 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
             cacheManager.set("account_mactive_" + account.getId() ,uuid,expireTime * 60 * 60);
         } catch (MailConfigNotEnabledException e) {
             e.printStackTrace();
+            logger.error("邮箱发送失败，原因：{}",e);
         } catch (MailContentNullException e) {
             e.printStackTrace();
+            logger.error("邮箱发送失败，原因：{}",e);
         }
     }
 }

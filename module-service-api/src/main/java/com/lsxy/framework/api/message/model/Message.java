@@ -16,11 +16,11 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_base",name = "tb_base_message")
 public class Message extends IdEntity {
-    public static final Integer ONLINE = 1;//已上线
-    public static final Integer OFFLINE = -1;//已下线
-    public static final Integer NOT = 0;//未上线
-    public static final Integer MESSAGE_ACCOUNT = 0;//用户消息
-    public static final Integer MESSAGE_ACTIVITY = 1;//活动消息
+    public static final int ONLINE = 1;//已上线
+    public static final int OFFLINE = -1;//已下线
+    public static final int NOT = 0;//未上线
+    public static final int MESSAGE_ACCOUNT = 0;//用户消息
+    public static final int MESSAGE_ACTIVITY = 1;//活动消息
     private Integer type;//消息类型
     private Integer status;//状态
     private String content;//消息内容

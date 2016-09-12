@@ -12,4 +12,5 @@ import java.util.Date;
  */
 public interface AppDao extends BaseDaoInterface<App, Serializable> {
     int countByDeletedAndCreateTimeBetween(boolean deleted, Date d1, Date d2);
+    long countByTenantIdAndName(String tenantId,String name);
 }

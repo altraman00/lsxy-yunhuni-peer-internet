@@ -14,10 +14,6 @@ import javax.persistence.*;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_base", name = "tb_base_account")
 public class Account extends IdEntity {
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
 
 	public static final int STATUS_NOT_ACTIVE = 0; 	//账号未激活
 	public static final int STATUS_LOCK = 1; 		//账号锁定
@@ -179,9 +175,8 @@ public class Account extends IdEntity {
 
 	@Override
 	public String toString() {
-		return "Account{" +
+		String account =  "Account{" +
 				"userName='" + userName + '\'' +
-				", tenant=" + tenant.toString() +
 				", mobile='" + mobile + '\'' +
 				", email='" + email + '\'' +
 				", password='" + password + '\'' +
@@ -193,7 +188,11 @@ public class Account extends IdEntity {
 				", business='" + business + '\'' +
 				", url='" + url + '\'' +
 				", province='" + province + '\'' +
-				", city='" + city + '\'' +
-				'}';
+				", city='" + city + '\'' ;
+		if(tenant!=null){
+			account+=",tenatn='"+tenant.toString()+"'";
+		}
+		account+='}';
+		return account;
 	}
 }

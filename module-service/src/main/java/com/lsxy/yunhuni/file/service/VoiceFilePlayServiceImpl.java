@@ -17,7 +17,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +38,8 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private VoiceFilePlayDao voiceFilePlayDao;
+    @PersistenceContext
+    private EntityManager em;
     @Override
     public BaseDaoInterface<VoiceFilePlay, Serializable> getDao() {
         return voiceFilePlayDao;
@@ -41,33 +47,14 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
 
     @Override
     public Page<VoiceFilePlay> pageList(Integer pageNo, Integer pageSize, String name,String appId,String[] tenantId,Integer status,String startTime,String endTime) {
-        String hql = " from VoiceFilePlay obj  ";
-        boolean isWhere = true;
+        String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_play obj WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(name)){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql+=" obj.name like '%"+name+"%' ";
+            sql += " AND obj.name like '%"+name+"%' ";
         }
         if(StringUtil.isNotEmpty(appId)){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql+=" obj.app.id= '"+appId+"' ";
+            sql +=" AND obj.app_id= '"+appId+"' ";
         }
         if(tenantId!=null&& tenantId.length>0){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
             String tenantIds = "";
             for(int i=0;i<tenantId.length;i++){
                 tenantIds += " '"+tenantId[i]+"' ";
@@ -75,16 +62,10 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
                     tenantIds+=",";
                 }
             }
-            hql+=" obj.tenant.id in("+tenantIds+") ";
+            sql +=" AND obj.tenant_id in("+tenantIds+") ";
         }
         if(status!=null){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql+=" obj.status=  '"+status+"' ";
+            sql += " AND obj.status='"+status+"' ";
         }
         Date date1 = null;
         if(StringUtil.isNotEmpty(startTime)){
@@ -98,38 +79,34 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
                 date2 = DateUtils.parseDate(endTime+" 23:59:59","yyyy-MM-dd HH:mm:ss");
             }catch (Exception e){}
         }
-        int dateNum = 1;
         if(date1!=null){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql += " obj.createTime>=?"+dateNum;
-            dateNum++;
+            sql += " AND obj.createTime>= :date1 ";
         }
         if(date2!=null){
-            if(isWhere){
-                hql += " where ";
-                isWhere = false;
-            }else{
-                hql +=  " and ";
-            }
-            hql += " obj.createTime<=?"+dateNum;
-            dateNum++;
+            sql += " AND obj.createTime<= :date2";
         }
-        Page<VoiceFilePlay> page =null;
-        if(date1!=null&&date2!=null){
-            page  = this.pageList(hql,pageNo,pageSize,date1,date2);
-        }else if(date1!=null){
-            page = this.pageList(hql,pageNo,pageSize,date1);
-        }else if(date2!=null){
-            page = this.pageList(hql,pageNo,pageSize,date2);
-        }else{
-            page = this.pageList(hql,pageNo,pageSize);
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" GROUP BY obj.create_time DESC";
+        Query pageQuery = em.createNativeQuery(pageSql,VoiceFilePlay.class);
+        if(date1!=null){
+            countQuery.setParameter("date1",date1);
+            pageQuery.setParameter("date1",date1);
         }
-        return page;
+        if(date2!=null){
+            countQuery.setParameter("date2",date2);
+            pageQuery.setParameter("date2",date2);
+        }
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
     }
 
     @Override

@@ -24,9 +24,9 @@ public class AccountMessage extends IdEntity {
     public static final String MESSAGE_TYPE_INVOCE_APPLY_FAIL = "message-templates/08_message_type_invoce_apply_fail.vm";
     public static final String MESSAGE_TYPE_ARREARS= "message-templates/09_message_type_arrears.vm";
     public static final String MESSAGE_TYPE_FEEDBACK= "message-templates/10_message_type_feedback.vm";
-    public  static final Integer READ = 1;
-    public static final Integer DELETE = -1;
-    public static final Integer NOT = 0;
+    public  static final int READ = 1;
+    public static final int DELETE = -1;
+    public static final int NOT = 0;
     private Message message;//对于消息
     private Account account;//所属用户
     private Integer status;//消息状态 '0未处理;1已读;-1已删除'

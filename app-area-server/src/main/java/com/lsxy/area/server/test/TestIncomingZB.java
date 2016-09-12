@@ -23,7 +23,7 @@ public class TestIncomingZB {
     public void doCallZB(String to, RPCRequest rpcrequest) {
         long timestamp = rpcrequest.getTimestamp();
         if(logger.isDebugEnabled()){
-            logger.debug("请求语音呼叫指令,存入REDIS:{} - {}  - " ,to,timestamp);
+            logger.debug("请求语音通知指令,存入REDIS:{} - {}  - " ,to,timestamp);
         }
         redisCacheService.set(to,timestamp+"");
     }

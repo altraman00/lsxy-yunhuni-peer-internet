@@ -41,6 +41,11 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
+    public long countByTenantIdAndName(String tenantId, String name) {
+        return appDao.countByTenantIdAndName(tenantId,name);
+    }
+
+    @Override
     public List<App> findAppByUserName(String tenantId){
         String hql = "from App obj where obj.tenant.id=?1 order by obj.status";
         List<App> list = this.findByCustomWithParams(hql, tenantId);

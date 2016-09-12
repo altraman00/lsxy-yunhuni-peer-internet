@@ -41,7 +41,7 @@ public class UserRestToken {
     public static UserRestToken newOcUserToken(){
         String token = UUIDGenerator.uuid();
         UserRestToken urt = new UserRestToken();
-        urt.setToken("token_oc_" + token);
+        urt.setToken("token_oc_" + token );
         return urt;
     }
 

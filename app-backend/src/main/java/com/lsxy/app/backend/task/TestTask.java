@@ -2,6 +2,8 @@ package com.lsxy.app.backend.task;
 
 import com.lsxy.framework.core.utils.DateUtils;
 import org.junit.Test;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.Date;
