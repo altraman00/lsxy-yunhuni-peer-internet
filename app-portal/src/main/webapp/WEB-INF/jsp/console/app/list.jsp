@@ -210,7 +210,7 @@
                     <p>上线成功</p>
                 </div>
                 <div class="input text-center" >
-                    <a href="" type="button"  class="btn btn-primary btn-box tabModalBtn">上线成功</a>
+                    <a href="" type="button"  class="btn btn-primary btn-box tabModalBtn" data-fun="refreshPage()" >上线成功</a>
                 </div>
             </div>
             <div class="input">
@@ -270,7 +270,7 @@
                     <p>上线成功</p>
                 </div>
                 <div class="input text-center" >
-                    <a href="" class="btn btn-primary btn-box tabModalBtn"  data-fun="" >上线成功</a>
+                    <a href="" class="btn btn-primary btn-box tabModalBtn"  data-fun="refreshPage()" >上线成功</a>
                 </div>
             </div>
             <div class="input">
@@ -587,9 +587,8 @@
 
 
 
-    //监听支付状态 返回true success
-    function syncpay(){
-        return true;
+    function refreshPage(){
+        location.reload();
     }
 
     $("#ownIvr").change(function(){
