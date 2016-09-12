@@ -11,6 +11,8 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.session.model.Meeting;
+import com.lsxy.yunhuni.api.session.service.MeetingService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -36,6 +39,9 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private MeetingService meetingService;
 
     @Override
     public String getEventName() {
@@ -126,6 +132,12 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
+        }
+
+        Meeting meeting = meetingService.findById(conf_id);
+        if(meeting!=null){
+            meeting.setEndTime(new Date());
+            meetingService.save(meeting);
         }
         return res;
     }

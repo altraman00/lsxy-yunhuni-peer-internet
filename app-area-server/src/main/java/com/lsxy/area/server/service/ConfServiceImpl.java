@@ -240,6 +240,8 @@ public class ConfServiceImpl implements ConfService {
                                     .setAreaId(app.getArea().getId())
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(new MapBuilder<String,Object>()
+                                        .put("from",oneTelnumber)
+                                        .put("to",to)
                                         .put("max_seconds",maxDuration)//最大时间
                                         .put("conf_id",confId)//所属会议
                                         .put("play_file",playFile)//加入后在会议播放这个文件

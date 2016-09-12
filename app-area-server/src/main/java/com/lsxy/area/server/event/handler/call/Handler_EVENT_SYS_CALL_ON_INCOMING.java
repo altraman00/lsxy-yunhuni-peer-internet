@@ -20,6 +20,10 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -28,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -64,6 +69,12 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
 
     @Value("${portal.test.call.number}")
     private String testNum;
+
+    @Autowired
+    private CallSessionService callSessionService;
+
+    @Autowired
+    private VoiceIvrService voiceIvrService;
 
     @Override
     public String getEventName() {
@@ -141,11 +152,31 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 .setLineGatewayId(lineGateway.getId())
                 .setBusinessData(new MapBuilder<String,Object>()
                         .put("begin_time",begin_time)
-                        .put("from",from)
-                        .put("to",to)
+                        //incoming事件from 和 to是相反的
+                        .put("from",to)
+                        .put("to",from)
                         .build())
                 .build();
+
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_CALLING);
+        callSession.setApp(app);
+        callSession.setTenant(tenant);
+        callSession.setRelevanceId(call_id);
+        callSession.setType(CallSession.TYPE_VOICE_IVR);
+        callSession.setResId(state.getResId());
+        callSession = callSessionService.save(callSession);
+        state.getBusinessData().put("sessionid",callSession.getId());
         businessStateService.save(state);
+
+        VoiceIvr voiceIvr = new VoiceIvr();
+        voiceIvr.setId(call_id);
+        voiceIvr.setFromNum(from);
+        voiceIvr.setToNum(to);
+        voiceIvr.setStartTime(new Date());
+        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+        voiceIvrService.save(voiceIvr);
+
         ivrActionUtil.doActionIfAccept(call_id);
         return res;
     }

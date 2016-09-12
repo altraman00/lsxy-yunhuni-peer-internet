@@ -6,6 +6,7 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -13,6 +14,10 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -20,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,6 +51,15 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Autowired
     private IVRActionUtil ivrActionUtil;
+
+    @Autowired
+    private CallSessionService callSessionService;
+
+    @Autowired
+    private TenantService tenantService;
+
+    @Autowired
+    private VoiceIvrService voiceIvrService;
 
     @Override
     public String getEventName() {
@@ -119,9 +135,38 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
+
+            VoiceIvr voiceIvr = new VoiceIvr();
+            voiceIvr.setId(call_id);
+            voiceIvr.setFromNum((String)businessData.get("from"));
+            voiceIvr.setToNum((String)businessData.get("to"));
+            voiceIvr.setStartTime(new Date());
+            voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
+            voiceIvrService.save(voiceIvr);
+
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
             ivrActionUtil.doAction(call_id);
         }
+
+        //保存会话信息
+        if(businessData == null){
+            businessData = new HashMap<>();
+            state.setBusinessData(businessData);
+        }
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_CALLING);
+        callSession.setApp(appService.findById(state.getAppId()));
+        callSession.setTenant(tenantService.findById(state.getTenantId()));
+        callSession.setRelevanceId(call_id);
+        if(state.getType().equalsIgnoreCase("sys_conf")){
+            callSession.setType(CallSession.TYPE_VOICE_MEETING);
+        }else if(state.getType().equalsIgnoreCase("ivr_call")){
+            callSession.setType(CallSession.TYPE_VOICE_IVR);
+        }
+        callSession.setResId(state.getResId());
+        callSession = callSessionService.save(callSession);
+        businessData.put("sessionid",callSession.getId());
+        businessStateService.save(state);
         return res;
     }
 }
