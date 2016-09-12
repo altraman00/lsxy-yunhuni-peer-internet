@@ -14,10 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 放音文件
@@ -28,6 +30,8 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
 
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayServiceImpl.class);
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Autowired
     private VoiceFilePlayDao voiceFilePlayDao;
     @Override
@@ -142,5 +146,27 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
             return null;
         }
         return file.getId();
+    }
+
+    @Override
+    public List<VoiceFilePlay> findNotSync() {
+        String hql = "from VoiceFilePlay obj where ( obj.sync<>?1 or obj.sync is null )and obj.status=?2 and obj.app.deleted='0' group by obj.lastTime ";
+        List<VoiceFilePlay> list = this.list(hql,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS);
+        return list;
+    }
+
+    @Override
+    public void batchUpdateSync(List<String> ids, Integer sync) {
+        if(ids.size()<=0) {
+            String id = "";
+            for (int i = 0; i < ids.size(); i++) {
+                id += " '" + ids.get(i) + "' ";
+                if (i != (ids.size() - 1)) {
+                    id += ",";
+                }
+            }
+            String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_play set sync=? where  deleted=0 and id in( " + id + " )";
+            jdbcTemplate.update(sql, sync);
+        }
     }
 }

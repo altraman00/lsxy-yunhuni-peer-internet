@@ -72,12 +72,12 @@ public class CTIClient implements RpcEventListener{
     @Override
     public void onEvent(BusAddress busAddress, RpcRequest rpcRequest) {
         /*收到CTI事件计数*/
-        sc.getReceivedCTIEventCount().incrementAndGet();
 
         if (logger.isDebugEnabled()) {
             logger.debug("收到事件通知:{}-{}", rpcRequest.getMethod(), rpcRequest.getParams());
         }
         if (sc != null) {
+            sc.getReceivedCTIEventCount().incrementAndGet();
             if (rpcRequest.getMethod().equals("sys.call.on_incoming")) {
                 sc.getReceivedCTIIncomingEventCount().incrementAndGet();
             }
