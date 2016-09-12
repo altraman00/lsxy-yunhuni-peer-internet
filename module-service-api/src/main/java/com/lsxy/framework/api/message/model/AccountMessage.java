@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_account_message")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_account_message")
 public class AccountMessage extends IdEntity {
     public static final String MESSAGE_TYPE_AUTH_ONESELE_SUCCESS = "message-templates/01_message_type_auth_onesele_success.vm";
     public static final String MESSAGE_TYPE_AUTH_ONESELE_FAIL = "message-templates/02_message_type_auth_onesele_fail.vm";

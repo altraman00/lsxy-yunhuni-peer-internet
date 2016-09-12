@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_product_tenant_discount")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_tenant_discount")
 public class ProductTenantDiscount  extends IdEntity {
     private String tenantId;
     private String productId;

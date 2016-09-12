@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_num_redblacklist")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_num_redblacklist")
 public class ApiGwRedBlankNum extends IdEntity {
     public static final int STATUS_ENABLED = 1;//启用状态
     public static final int STATUS_DISABLED = 2; //禁用状态

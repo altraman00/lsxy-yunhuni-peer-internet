@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_consume")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_consume")
 public class Consume extends IdEntity {
     public static String RENT_NUMBER = "rent_number";  //租用号码的消费类型
 

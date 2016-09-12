@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_api_call_month")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_api_call_month")
 public class ApiCallMonth extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
