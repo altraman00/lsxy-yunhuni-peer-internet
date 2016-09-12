@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_api_log")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_api_log")
 public class ApiInvokeLog extends IdEntity {
     private String uri;
     private String appid;

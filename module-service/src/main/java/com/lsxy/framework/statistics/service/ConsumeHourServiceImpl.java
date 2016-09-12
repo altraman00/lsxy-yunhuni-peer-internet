@@ -41,11 +41,11 @@ public class ConsumeHourServiceImpl extends AbstractService<ConsumeHour> impleme
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
        //拼装sql
-        String sql = "insert into db_lsxy_base.tb_base_consume_hour("+selects+" dt,hour,among_amount,create_time,last_time,deleted,sortno,version )" +
+        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_consume_hour("+selects+" dt,hour,among_amount,create_time,last_time,deleted,sortno,version )" +
                 " select "+selects+" ? as dt,? as hour, "+
                 " IFNULL(sum(amount),0) as among_amount, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_base.tb_base_consume a where dt BETWEEN ? AND ? "+groupbys;
+                " from db_lsxy_bi_yunhuni.tb_bi_consume a where dt BETWEEN ? AND ? "+groupbys;
        //拼装参数
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();

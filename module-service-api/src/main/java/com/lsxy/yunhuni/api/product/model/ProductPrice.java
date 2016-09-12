@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_product_price")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_price")
 public class ProductPrice extends IdEntity {
     public static int STATUS_VALID = 1;
     public static int STATUS_INVALID = 0;

@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_app_hour")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app_hour")
 public class AppHour extends IdEntity {
     private String tenantId;//所属租户
     private Date dt;//统计时间

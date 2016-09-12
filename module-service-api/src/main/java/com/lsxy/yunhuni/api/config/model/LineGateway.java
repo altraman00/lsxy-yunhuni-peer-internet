@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_line_gateway")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_line_gateway")
 public class LineGateway extends IdEntity {
     private String areaId;          //区域
     private String lineNumber;  //线路网关编码
