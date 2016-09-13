@@ -11,7 +11,7 @@ public class MQTopicConstants {
     //账号相关MQ的topic
     public static final String TOPIC_APP_PORTAL = SystemConfig.getProperty("global.mq.topic.app.portal","topic_app_portal");
     public static final String TOPIC_APP_OC = SystemConfig.getProperty("global.mq.topic.app.oc","topic_app_oc");
-
+    public static final String TOPIC_AGENT_SERVER = SystemConfig.getProperty("global.mq.topic.agent.server","topic_agent_server");
 
     //测试相关topic
     public static final String TOPIC_TEST=SystemConfig.getProperty("global.mq.topic.test","yunhuni_topic_test");

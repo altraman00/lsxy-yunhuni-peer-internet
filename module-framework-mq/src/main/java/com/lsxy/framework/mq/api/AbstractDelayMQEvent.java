@@ -18,6 +18,14 @@ public abstract class AbstractDelayMQEvent extends AbstractMQEvent{
 	 */
 	private Integer delay;
 
+	public AbstractDelayMQEvent(){
+
+	}
+
+	public AbstractDelayMQEvent(Integer delay){
+		this.delay = delay;
+	}
+
 	public Integer getDelay() {
 		return delay;
 	}
