@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.rest.account;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.events.ModifyEmailSuccessEvent;
+import com.lsxy.framework.mq.events.portal.ModifyEmailSuccessEvent;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
