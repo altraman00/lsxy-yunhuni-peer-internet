@@ -306,9 +306,10 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         resourceTelenumService.save(resourceTelenum);
         // 保存号码租用关系
         Date date = new Date();
-        String nextMonth = DateUtils.getNextMonth(DateUtils.getDate(date, "yyyy-MM"), "yyyy-MM");
-        Date expireDateTem = DateUtils.parseDate(nextMonth, "yyyy-MM");    //号码到期时间
-        Date expireDate = new Date(expireDateTem.getTime() -1);    //号码到期时间设为下个月一号的时间戳减1
+//        String nextMonth = DateUtils.getNextMonth(DateUtils.getDate(date, "yyyy-MM"), "yyyy-MM");
+//        Date expireDateTem = DateUtils.parseDate(nextMonth, "yyyy-MM");    //号码到期时间
+//        Date expireDate = new Date(expireDateTem.getTime() -1);    //号码到期时间设为下个月一号的时间戳减1
+        Date expireDate = DateUtils.getLastTimeOfMonth(date);
         ResourcesRent resourcesRent = new ResourcesRent(tenant,app,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_USING);
         resourcesRentService.save(resourcesRent);
     }
