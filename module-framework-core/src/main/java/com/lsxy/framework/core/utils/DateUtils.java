@@ -561,7 +561,7 @@ public class DateUtils {
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
-        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return cal.getTime();
     }
 
