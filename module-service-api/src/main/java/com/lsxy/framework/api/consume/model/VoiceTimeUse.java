@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_voice_time_use")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_time_use")
 public class VoiceTimeUse extends IdEntity {
     private Date dt;
     private String type;    //1.语音通知2.双向回拨3.会议4.IVR定制服务5.语音验证码6.录音

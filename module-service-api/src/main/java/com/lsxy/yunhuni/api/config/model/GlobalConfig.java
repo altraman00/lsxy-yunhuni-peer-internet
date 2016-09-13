@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_yy_config_global")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_global")
 public class GlobalConfig extends IdEntity {
     private String type;//配置项类型
     private String name;//配置项名称

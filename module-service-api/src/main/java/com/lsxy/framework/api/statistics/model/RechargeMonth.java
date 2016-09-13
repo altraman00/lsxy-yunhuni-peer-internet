@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_recharge_month")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_recharge_month")
 public class RechargeMonth extends IdEntity {
     private String tenantId;//所属租户
     private Date dt;//统计时间

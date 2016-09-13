@@ -41,7 +41,7 @@ public class RechargeHourServiceImpl extends AbstractService<RechargeHour> imple
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql = " insert into db_lsxy_base.tb_base_recharge_hour("+selects+"dt,hour,among_amount,among_num,create_time,last_time,deleted,sortno,version ) " +
+        String sql = " insert into db_lsxy_bi_yunhuni.tb_bi_recharge_hour("+selects+"dt,hour,among_amount,among_num,create_time,last_time,deleted,sortno,version ) " +
                 " select "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(amount),0) as among_amount," +
                 " COUNT(1) as among_num, " +

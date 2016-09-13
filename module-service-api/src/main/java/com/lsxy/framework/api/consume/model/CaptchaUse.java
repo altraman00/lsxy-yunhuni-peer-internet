@@ -13,7 +13,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_captcha_use")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_captcha_use")
 public class CaptchaUse extends IdEntity {
     private Date dt;
     private String type;

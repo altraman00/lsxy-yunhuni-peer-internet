@@ -86,7 +86,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String nextMonth = DateUtils.getNextMonth(endTime, "yyyy-MM");
         Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
         Date date2 = DateUtils.parseDate(nextMonth,"yyyy-MM");
-        String sql = " FROM db_lsxy_base.tb_base_consume_day obj WHERE "+StatisticsUtils.getNativeSqlIsNull(tenant.getId(),appId, null)+" obj.deleted=0 AND obj.dt>=:date1 AND obj.dt<:date2 ";
+        String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_consume_day obj WHERE "+StatisticsUtils.getNativeSqlIsNull(tenant.getId(),appId, null)+" obj.deleted=0 AND obj.dt>=:date1 AND obj.dt<:date2 ";
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
@@ -114,11 +114,11 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
         //拼装sql
-        String sql = "insert into db_lsxy_base.tb_base_consume_day("+selects+" dt,day,among_amount,create_time,last_time,deleted,sortno,version )" +
+        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_consume_day("+selects+" dt,day,among_amount,create_time,last_time,deleted,sortno,version )" +
                 " SELECT "+selects+" ? as dt,? as day, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
-                " from db_lsxy_base.tb_base_consume_hour a where tenant_id is not null and app_id is not null and type is not null and dt BETWEEN ? AND ? "+groupbys;
+                " from db_lsxy_bi_yunhuni.tb_bi_consume_hour a where tenant_id is not null and app_id is not null and type is not null and dt BETWEEN ? AND ? "+groupbys;
         //拼装参数
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
@@ -186,7 +186,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
 //        String hql = "from ConsumeDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY obj.sumAmount DESC";
 //        List<ConsumeDay> list = this.getTopList(hql,false,top);
 //        return getTops(list,"sumAmount");
-        String sql = "select FORMAT(sum(among_amount),2) as value ,tenant_id as id ,b.tenant_name as name from db_lsxy_base.tb_base_consume_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null group by a.tenant_id ORDER BY sum(a.among_amount) DESC limit 0,?";
+        String sql = "select FORMAT(sum(among_amount),2) as value ,tenant_id as id ,b.tenant_name as name from db_lsxy_bi_yunhuni.tb_bi_consume_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null group by a.tenant_id ORDER BY sum(a.among_amount) DESC limit 0,?";
         List list = jdbcTemplate.queryForList(sql,top);
         return list;
     }
@@ -230,7 +230,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         }
         Date startTime = DateUtils.parseDate(time,"yyyy-MM");
         Date endTime = DateUtils.getLastTimeOfMonth(startTime);
-        String sql = "select sum(among_amount) from tb_base_consume_day where tenant_id=:tenant and app_id is null and type is null and dt BETWEEN :start AND :end ";
+        String sql = "select sum(among_amount) from db_lsxy_bi_yunhuni.tb_bi_consume_day where tenant_id=:tenant and app_id is null and type is null and dt BETWEEN :start AND :end ";
         Query query = em.createNativeQuery(sql);
         query.setParameter("tenant",tenantId);
         query.setParameter("start",startTime);

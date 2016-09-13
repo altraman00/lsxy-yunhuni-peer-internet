@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_consume_day")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_consume_day")
 public class ConsumeDay extends IdEntity{
     private Date dt;//统计时间
     private Integer day;//统计日 区间1-31
