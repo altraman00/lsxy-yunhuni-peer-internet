@@ -59,7 +59,7 @@ public class Handler_MN_CH_VF_DELETED extends RpcRequestHandler {
             logger.debug("删除放音文件结果:{}",flag);
         }
         String param = JSON.toJSON(map).toString();
-        RPCRequest request1 = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC_OK,"");
+        RPCRequest request1 = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_DELETED_OK,"");
         request1.setBody(param);
         try {
             logger.error("发送删除放音文件成功指令成功:");
