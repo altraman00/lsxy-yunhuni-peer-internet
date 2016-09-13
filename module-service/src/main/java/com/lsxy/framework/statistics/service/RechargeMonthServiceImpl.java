@@ -42,8 +42,8 @@ public class RechargeMonthServiceImpl extends AbstractService<RechargeMonth> imp
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
-        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_recharge_month("+selects+"dt,month,among_amount,among_num,create_time,last_time,deleted,sortno,version)" +
-                " select "+selects+" ? as dt,? as day, "+
+        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_recharge_month("+selects+" id,dt,month,among_amount,among_num,create_time,last_time,deleted,sortno,version)" +
+                " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " IFNULL(sum(among_num),0) as  among_num, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";

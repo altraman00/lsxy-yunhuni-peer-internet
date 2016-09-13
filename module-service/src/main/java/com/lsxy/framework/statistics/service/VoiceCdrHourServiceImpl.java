@@ -40,8 +40,8 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour("+selects+"dt,hour,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
-                " select "+selects+" ? as dt,? as day, "+
+        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour("+selects+" id,dt,hour,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
+                " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
                 " IFNULL(sum(call_time_long),0) as among_duration," +
                 " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+"  c1.call_ack_dt is not null ) as among_connect," +
                 " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+" c1.call_ack_dt is null ) as  among_not_connect ," +

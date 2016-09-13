@@ -116,8 +116,8 @@ public class ConsumeMonthServiceImpl extends AbstractService<ConsumeMonth> imple
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
         //拼装sql
-        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_consume_month("+selects+" dt,month,among_amount,create_time,last_time,deleted,sortno,version )" +
-                " SELECT "+selects+" ? as dt,? as month, "+
+        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_consume_month("+selects+" id,dt,month,among_amount,create_time,last_time,deleted,sortno,version )" +
+                " SELECT "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as month, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
                 " from db_lsxy_bi_yunhuni.tb_bi_consume_day a where tenant_id is not null and app_id is not null and type is not null and dt BETWEEN ? AND ? "+groupbys;
