@@ -114,8 +114,8 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
         //拼装sql
-        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_consume_day("+selects+" dt,day,among_amount,create_time,last_time,deleted,sortno,version )" +
-                " SELECT "+selects+" ? as dt,? as day, "+
+        String sql = "insert into db_lsxy_bi_yunhuni.tb_bi_consume_day("+selects+" id, dt,day,among_amount,create_time,last_time,deleted,sortno,version )" +
+                " SELECT "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
                 " IFNULL(sum(among_amount),0) as among_amount, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
                 " from db_lsxy_bi_yunhuni.tb_bi_consume_hour a where tenant_id is not null and app_id is not null and type is not null and dt BETWEEN ? AND ? "+groupbys;
