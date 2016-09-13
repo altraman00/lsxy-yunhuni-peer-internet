@@ -113,9 +113,13 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
             logger.error("文件流输出异常,{]", e);
         }finally {
             try {
-                in.close();
-                out.close();
-            } catch (IOException e) {
+                if(in!=null) {
+                    in.close();
+                }
+                if(out!=null) {
+                    out.close();
+                }
+            } catch (Exception e) {
                 logger.error("文件流关闭异常，{}", e);
             }
         }
