@@ -1,10 +1,12 @@
 package com.lsxy.app.portal.rest.file;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.events.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -41,6 +43,8 @@ public class VoiceFilePlayController extends AbstractRestController {
     private OSSService ossService;
     @Autowired
     private CalBillingService calBillingService;
+    @Autowired
+    private MQService mqService;
     /**
      * 根据放音文件id删除放音文件
      * @param id
