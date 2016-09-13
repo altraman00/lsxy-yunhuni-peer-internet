@@ -56,7 +56,7 @@ public class CacheTest {
                 j2j.setObjectMapper(om);
                 result = (Account) j2j.deserialize(json.getBytes());
             }catch(Exception ex){
-                logger.error("反序列化失败：",ex);
+                logger.error("测试-反序列化失败：",ex);
             }
         }
         return result;
