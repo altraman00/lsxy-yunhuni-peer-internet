@@ -5,7 +5,7 @@ import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.framework.api.consume.model.Consume;
 import com.lsxy.framework.api.consume.service.ConsumeService;
-import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
+import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.statistics.model.ConsumeMonth;
 import com.lsxy.framework.api.statistics.service.*;
 import com.lsxy.framework.api.tenant.model.*;

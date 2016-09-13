@@ -1,4 +1,4 @@
-package com.lsxy.framework.api.events;
+package com.lsxy.framework.mq.events.portal;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.topic.MQTopicConstants;
@@ -13,7 +13,7 @@ public class ResetPwdVerifySuccessEvent extends AbstractMQEvent {
 
     @Override
     public String getTopicName() {
-        return MQTopicConstants.TOPIC_FRAMEWORK_ACCOUNT;
+        return MQTopicConstants.TOPIC_APP_PORTAL;
     }
 
     public ResetPwdVerifySuccessEvent() {
