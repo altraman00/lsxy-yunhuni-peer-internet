@@ -18,6 +18,7 @@ public class ServiceConstants {
 	public static final String MN_CH_SYS_CALL_ANSWER = "MN_CH_SYS_CALL_ANSWER";//应答
 	public static final String MN_CH_SYS_CALL_DROP = "MN_CH_SYS_CALL_DROP";//挂断
 	public static final String MN_CH_SYS_CALL_REJECT = "MN_CH_SYS_CALL_REJECT";//拒接
+	public static final String MN_CH_SYS_CALL_CONNECT_START = "MN_CH_SYS_CALL_CONNECT_START";//双通道拨号
 
 	public static final String MN_CH_SYS_CALL_CONF_ENTER = "MN_CH_SYS_CALL_CONF_ENTER";//将呼叫加入会议
 	public static final String MN_CH_SYS_CALL_CONF_EXIT = "MN_CH_SYS_CALL_CONF_EXIT";//将呼叫退出会议

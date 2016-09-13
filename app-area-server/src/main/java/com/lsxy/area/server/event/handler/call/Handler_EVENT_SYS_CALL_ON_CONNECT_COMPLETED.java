@@ -4,7 +4,6 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -22,28 +21,25 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * Created by liuws on 2016/8/29.
+ * Created by liuws on 2016/9/13.
  */
 @Component
-public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
+public class Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED extends EventHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_RELEASE.class);
-
-    @Autowired
-    private AppService appService;
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED.class);
 
     @Autowired
     private BusinessStateService businessStateService;
 
     @Autowired
-    private NotifyCallbackUtil notifyCallbackUtil;
+    private AppService appService;
 
     @Autowired
-    private IVRActionUtil ivrActionUtil;
+    private NotifyCallbackUtil notifyCallbackUtil;
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_SYS_CALL_ON_RELEASE;
+        return Constants.EVENT_SYS_CALL_ON_CONNECT_COMPLETED;
     }
 
     @Override
@@ -58,57 +54,62 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             return res;
         }
         String call_id = (String)params.get("user_data");
-
         if(StringUtils.isBlank(call_id)){
             logger.info("call_id is null");
             return res;
         }
-
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
             logger.info("businessstate is null");
             return res;
         }
+
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
+
+        String appId = state.getAppId();
+        if(StringUtils.isBlank(appId)){
+            logger.info("没有找到对应的app信息appId={}",appId);
+            return res;
+        }
         App app = appService.findById(state.getAppId());
+        if(app == null){
+            logger.info("没有找到对应的app信息appId={}",appId);
+            return res;
+        }
+        if(StringUtils.isBlank(app.getUrl())){
+            logger.info("没有找到appId={}的回调地址",appId);
+            return res;
+        }
+        //开始通知开发者
+        if(logger.isDebugEnabled()){
+            logger.debug("开始发送双通道连接结束通知给开发者");
+        }
         Long begin_time = null;
         Long end_time = null;
-        Long answer_time = null;
         if(params.get("begin_time") != null){
             begin_time = ((long)params.get("begin_time")) * 1000;
         }
         if(params.get("end_time") != null){
             end_time = ((long)params.get("end_time")) * 1000;
         }
-        if(params.get("answer_time") != null){
-            answer_time = ((long)params.get("answer_time")) * 1000;
-        }
 
-        //通过ivr 拨号发起的呼叫在被叫方结束后 要继续ivr
-        if(state.getType().equalsIgnoreCase("ivr_dial")){
-            String ivr_call_id = null;
-            if(state.getBusinessData() != null){
-                ivr_call_id = (String)state.getBusinessData().get("ivr_call_id");
-            }
-            if(StringUtils.isNotBlank(ivr_call_id)){
-                ivrActionUtil.doAction(ivr_call_id);
-            }
-        }
-
-        //发送呼叫结束通知
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .putIfNotEmpty("event","ivr.call_end")
+                .putIfNotEmpty("event","connect_end")
                 .putIfNotEmpty("id",call_id)
                 .putIfNotEmpty("begin_time",begin_time)
-                .putIfNotEmpty("answer_time",answer_time)
                 .putIfNotEmpty("end_time",end_time)
-                .putIfNotEmpty("end_by",params.get("dropped_by"))
-                .putIfNotEmpty("cause",params.get("cause"))
-                .putIfNotEmpty("user_data",state.getUserdata())
+                .putIfNotEmpty("error",params.get("error"))
                 .build();
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+        if(logger.isDebugEnabled()){
+            logger.debug("双通道连接结束通知发送成功");
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("处理{}事件完成",getEventName());
+        }
         return res;
     }
+
 }

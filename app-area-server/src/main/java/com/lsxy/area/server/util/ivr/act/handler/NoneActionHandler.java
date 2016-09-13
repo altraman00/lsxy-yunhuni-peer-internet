@@ -2,24 +2,19 @@ package com.lsxy.area.server.util.ivr.act.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.agentserver.IVRPauseActionEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import org.apache.commons.lang.StringUtils;
-import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by liuws on 2016/9/2.
  */
 @Component
-public class PauseActionHandler extends ActionHandler{
+public class NoneActionHandler extends ActionHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -30,12 +25,9 @@ public class PauseActionHandler extends ActionHandler{
     @Autowired
     private SessionContext sessionContext;
 
-    @Autowired
-    private MQService mqService;
-
     @Override
     public String getAction() {
-        return "pause";
+        return "none";
     }
 
     @Override
@@ -52,25 +44,7 @@ public class PauseActionHandler extends ActionHandler{
             return false;
         }
         String nextUrl = "";
-        Integer duration = null;
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
-        }
-        Attribute attr = root.attribute("duration");
-        if(attr != null){
-            String duration_str = root.attribute("duration").getValue();
-            if(StringUtils.isNotBlank(duration_str) && StringUtils.isNumeric(duration_str)){
-                duration = Integer.parseInt(duration_str);
-            }
-        }
-        mqService.publish(new IVRPauseActionEvent(callId,duration));
         Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
         businessData.put("next",nextUrl);
         state.setBusinessData(businessData);
         businessStateService.save(state);

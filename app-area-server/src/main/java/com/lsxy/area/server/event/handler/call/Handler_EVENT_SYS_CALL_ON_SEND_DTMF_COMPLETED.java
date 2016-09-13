@@ -42,7 +42,7 @@ public class Handler_EVENT_SYS_CALL_ON_SEND_DTMF_COMPLETED extends EventHandler{
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED;
+        return Constants.EVENT_SYS_CALL_ON_SEND_DTMF_COMPLETED;
     }
 
     @Override

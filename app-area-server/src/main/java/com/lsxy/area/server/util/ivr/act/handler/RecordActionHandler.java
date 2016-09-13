@@ -40,6 +40,13 @@ public class RecordActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
+
+        BusinessState state = businessStateService.get(callId);
+        if(state == null){
+            logger.info("没有找到call_id={}的state",callId);
+            return false;
+        }
+
         String max_duration = root.attributeValue("max_duration");
         String beeping = root.attributeValue("beeping");
         String finish_keys = root.attributeValue("finish_keys");
@@ -52,13 +59,9 @@ public class RecordActionHandler extends ActionHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，max_duration={},beeping={},finish_keys={}",
-                            getAction(),max_duration,beeping,finish_keys);
+                    getAction(),max_duration,beeping,finish_keys);
         }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
+
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()

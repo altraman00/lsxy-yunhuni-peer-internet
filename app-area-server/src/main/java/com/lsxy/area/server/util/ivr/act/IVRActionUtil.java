@@ -66,7 +66,7 @@ public class IVRActionUtil {
 
     private CloseableHttpAsyncClient client = null;
 
-    private int MAX_DURATION_SEC = 60 * 60 * 6;
+    public static final int MAX_DURATION_SEC = 60 * 60 * 6;
 
     //设置请求和传输超时时间
     private RequestConfig config =

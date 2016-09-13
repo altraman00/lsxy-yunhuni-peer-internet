@@ -39,7 +39,6 @@ public class HangupActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
-        String nextUrl = "";
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作",getAction());
         }
@@ -48,6 +47,7 @@ public class HangupActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
+        String nextUrl = "";
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()

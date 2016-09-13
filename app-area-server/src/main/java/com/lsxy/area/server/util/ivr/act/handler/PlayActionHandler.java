@@ -47,6 +47,11 @@ public class PlayActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
+        BusinessState state = businessStateService.get(callId);
+        if(state == null){
+            logger.info("没有找到call_id={}的state",callId);
+            return false;
+        }
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
@@ -62,12 +67,7 @@ public class PlayActionHandler extends ActionHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
-                            getAction(),finish_keys,repeat,plays);
-        }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
+                    getAction(),finish_keys,repeat,plays);
         }
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();

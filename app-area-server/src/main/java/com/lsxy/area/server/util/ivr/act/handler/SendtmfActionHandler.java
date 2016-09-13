@@ -40,6 +40,13 @@ public class SendtmfActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
+
+        BusinessState state = businessStateService.get(callId);
+        if(state == null){
+            logger.info("没有找到call_id={}的state",callId);
+            return false;
+        }
+
         String dtmf_code = root.getTextTrim();
         String nextUrl = "";
         Element next = root.element("next");
@@ -51,11 +58,7 @@ public class SendtmfActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，dtmf_code={}",getAction(),dtmf_code);
         }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
+
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
