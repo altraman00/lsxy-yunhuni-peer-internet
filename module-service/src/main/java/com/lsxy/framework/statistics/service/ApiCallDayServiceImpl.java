@@ -38,8 +38,8 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
     @Override
     public void dayStatistics(Date date1, int day1,Date date2,int day2,String[] select,String[] all) throws  SQLException{
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
-        String sql = " insert into db_lsxy_bi_yunhuni.tb_bi_api_call_day("+map.get("selects")+"dt,day,among_api,create_time,last_time,deleted,sortno,version ) " +
-                " select "+map.get("selects")+" ? as dt,? as day, "+
+        String sql = " insert into db_lsxy_bi_yunhuni.tb_bi_api_call_day("+map.get("selects")+" id,dt,day,among_api,create_time,last_time,deleted,sortno,version ) " +
+                " select "+map.get("selects")+" REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
                 " count(1) as among_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
         sql += " from db_lsxy_bi_yunhuni.tb_bi_api_call_hour a where tenant_id is not null and app_id is not null and type is not null and a.dt BETWEEN ? AND ?  "+map.get("groupbys");
