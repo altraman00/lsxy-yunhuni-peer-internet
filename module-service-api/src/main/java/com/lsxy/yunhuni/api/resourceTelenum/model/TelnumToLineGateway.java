@@ -11,7 +11,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_yy_telnum_to_linegateway")
+@Table(schema = "db_lsxy_bi_yunhuni",name="tb_oc_telnum_to_linegateway")
 public class TelnumToLineGateway extends IdEntity {
     private String telNumber;
     private String lineId;
