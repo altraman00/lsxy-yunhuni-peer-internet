@@ -24,6 +24,8 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.app.dao.AppOnlineActionDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,7 @@ import java.util.List;
  */
 @Service
 public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction> implements AppOnlineActionService {
+    Logger logger = LoggerFactory.getLogger(AppOnlineActionServiceImpl.class);
     @Autowired
     AppOnlineActionDao appOnlineActionDao;
 
@@ -310,6 +313,9 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 //        Date expireDateTem = DateUtils.parseDate(nextMonth, "yyyy-MM");    //号码到期时间
 //        Date expireDate = new Date(expireDateTem.getTime() -1);    //号码到期时间设为下个月一号的时间戳减1
         Date expireDate = DateUtils.getLastTimeOfMonth(date);
+        if(logger.isDebugEnabled()){
+            logger.debug("号码租用过期时间：{}",DateUtils.formatDate(expireDate,"yyyy-MM-dd HH:mm:ss"));
+        }
         ResourcesRent resourcesRent = new ResourcesRent(tenant,app,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),expireDate,ResourcesRent.RENT_STATUS_USING);
         resourcesRentService.save(resourcesRent);
     }
