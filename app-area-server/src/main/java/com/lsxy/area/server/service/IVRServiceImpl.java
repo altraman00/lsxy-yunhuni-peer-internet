@@ -117,7 +117,6 @@ public class IVRServiceImpl implements IVRService {
                                     .setAreaId(app.getArea().getId())
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(new MapBuilder<String,Object>()
-                                            .put("begin_time",System.currentTimeMillis())
                                             .put("from",from)
                                             .put("to",to)
                                             .build())

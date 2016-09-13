@@ -3,14 +3,22 @@ package com.lsxy.area.server.util.ivr.act;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.util.ivr.act.handler.ActionHandler;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,6 +45,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -77,6 +86,15 @@ public class IVRActionUtil {
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private LineGatewayService lineGatewayService;
+
+    @Autowired
+    private CallSessionService callSessionService;
+
+    @Autowired
+    private VoiceIvrService voiceIvrService;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -223,25 +241,55 @@ public class IVRActionUtil {
 
     /**
      * 询问是否接受，然后执行action
-     * @param call_id
      * @return
      */
-    public boolean doActionIfAccept(String call_id){
-        BusinessState state = businessStateService.get(call_id);
-        String appId = state.getAppId();
-        App app = appService.findById(appId);
-        Map<String,Object> businessData = state.getBusinessData();
-        String from = null;
-        if(businessData!=null){
-            from = (String)businessData.get("from");
-        }
+    public boolean doActionIfAccept(App app, Tenant tenant,String res_id, String from, String to){
+        String call_id = UUIDGenerator.uuid();
         boolean accept = getAcceptRequest(app.getUrl(),from);
         if(!accept){
-            reject(state.getAppId(),state.getResId(),call_id);
-            return true;
+            reject(app.getId(),res_id,call_id);
+        }else{
+            answer(app.getId(),res_id,call_id);
         }
-        answer(state.getAppId(),state.getResId(),call_id);
+        saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         return true;
+    }
+
+    private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to){
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        //保存业务数据，后续事件要用到
+        BusinessState state = new BusinessState.Builder()
+                .setTenantId(tenant.getId())
+                .setAppId(app.getId())
+                .setId(call_id)
+                .setResId(res_id)
+                .setType("ivr_incoming")
+                .setAreaId(app.getArea().getId())
+                .setLineGatewayId(lineGateway.getId())
+                .setBusinessData(new MapBuilder<String,Object>()
+                        //incoming事件from 和 to是相反的
+                        .put("from",to)
+                        .put("to",from)
+                        .build())
+                .build();
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_CALLING);
+        callSession.setApp(app);
+        callSession.setTenant(tenant);
+        callSession.setRelevanceId(call_id);
+        callSession.setType(CallSession.TYPE_VOICE_IVR);
+        callSession.setResId(state.getResId());
+        callSession = callSessionService.save(callSession);
+        state.getBusinessData().put("sessionid",callSession.getId());
+        businessStateService.save(state);
+        VoiceIvr voiceIvr = new VoiceIvr();
+        voiceIvr.setId(call_id);
+        voiceIvr.setFromNum(from);
+        voiceIvr.setToNum(to);
+        voiceIvr.setStartTime(new Date());
+        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+        voiceIvrService.save(voiceIvr);
     }
 
     private void reject(String appId,String res_id,String call_id){

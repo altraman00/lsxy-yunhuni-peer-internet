@@ -1,38 +1,31 @@
 package com.lsxy.area.server.event.handler.call;
 
-import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
-import com.lsxy.yunhuni.api.session.model.CallSession;
-import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -93,13 +86,11 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
         RPCResponse res = null;
-        //TODO incoming事件 cti需要生成一个user_data给我
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
             logger.error("request params is null");
             return res;
         }
-        String call_id = (String)params.get("user_data");
         String res_id = (String)params.get("res_id");
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
@@ -107,10 +98,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String from = from_uri.substring(0,from_uri.indexOf("@"));//主叫号码
         String to = to_uri.substring(0,to_uri.indexOf("@"));//被叫号码
 
-        if(StringUtils.isBlank(call_id)){
-            logger.info("call_id is null");
-            return res;
-        }
         Tenant tenant = null;
         App app = null;
 
@@ -138,46 +125,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.info("找不到对应的APP");
             return res;
         }
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-
-        //保存业务数据，后续事件要用到
-        BusinessState state = new BusinessState.Builder()
-                .setTenantId(tenant.getId())
-                .setAppId(app.getId())
-                .setId(call_id)
-                .setResId(res_id)
-                .setType("ivr_incoming")
-                .setAreaId(app.getArea().getId())
-                .setLineGatewayId(lineGateway.getId())
-                .setBusinessData(new MapBuilder<String,Object>()
-                        .put("begin_time",begin_time)
-                        //incoming事件from 和 to是相反的
-                        .put("from",to)
-                        .put("to",from)
-                        .build())
-                .build();
-
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_CALLING);
-        callSession.setApp(app);
-        callSession.setTenant(tenant);
-        callSession.setRelevanceId(call_id);
-        callSession.setType(CallSession.TYPE_VOICE_IVR);
-        callSession.setResId(state.getResId());
-        callSession = callSessionService.save(callSession);
-        state.getBusinessData().put("sessionid",callSession.getId());
-        businessStateService.save(state);
-
-        VoiceIvr voiceIvr = new VoiceIvr();
-        voiceIvr.setId(call_id);
-        voiceIvr.setFromNum(from);
-        voiceIvr.setToNum(to);
-        voiceIvr.setStartTime(new Date());
-        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
-        voiceIvrService.save(voiceIvr);
-
-        ivrActionUtil.doActionIfAccept(call_id);
+        ivrActionUtil.doActionIfAccept(app,tenant,res_id,from,to);
         return res;
     }
 
