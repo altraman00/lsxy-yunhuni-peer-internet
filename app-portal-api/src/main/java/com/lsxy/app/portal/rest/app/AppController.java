@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.rest.app;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.events.VoiceFilePlayDeleteEvent;
+import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.config.SystemConfig;

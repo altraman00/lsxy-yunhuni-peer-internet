@@ -1,7 +1,7 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.alibaba.fastjson.JSON;
-import com.lsxy.framework.api.events.VoiceFilePlayDeleteEvent;
+import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.rpc.api.RPCCaller;

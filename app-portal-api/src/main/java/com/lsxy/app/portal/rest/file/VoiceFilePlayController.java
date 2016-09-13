@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.rest.file;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.events.VoiceFilePlayDeleteEvent;
+import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
@@ -11,7 +11,6 @@ import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
