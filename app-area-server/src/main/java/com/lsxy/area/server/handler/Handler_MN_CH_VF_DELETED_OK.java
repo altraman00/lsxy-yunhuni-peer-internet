@@ -12,12 +12,14 @@ import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/9/12.
  */
+@Component
 public class Handler_MN_CH_VF_DELETED_OK extends RpcRequestHandler {
     private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_VF_DELETED_OK.class);
 
