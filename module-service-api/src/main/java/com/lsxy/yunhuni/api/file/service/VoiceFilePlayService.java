@@ -27,12 +27,16 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      * @return
      */
     public String getVerifiedFile(String appId,String name);
-
     /**
      * 获取未同步和同步失败的记录
      * @return
      */
-    List<VoiceFilePlay> findNotSync();
+    List<String> findNotSyncApp();
+    /**
+     * 获取未同步和同步失败的记录
+     * @return
+     */
+    List<VoiceFilePlay> findNotSyncByApp(String app);
     /**
      * 根据appId查找对应的文件
      * @return

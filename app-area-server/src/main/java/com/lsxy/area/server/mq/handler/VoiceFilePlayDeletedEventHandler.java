@@ -74,7 +74,8 @@ public class VoiceFilePlayDeletedEventHandler implements MQMessageHandler<VoiceF
             if(logger.isDebugEnabled()){
                 logger.debug("本次删除文件/文件夹信息:{}",param);
             }
-            String params = "";
+            Map<String, Object> params = new HashMap<>();
+            params.put("appid ",event.getAppId());
             RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_DELETED,params);
             request.setBody(param);
             try {

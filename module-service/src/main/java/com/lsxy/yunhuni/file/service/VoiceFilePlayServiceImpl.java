@@ -126,9 +126,16 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     }
 
     @Override
-    public List<VoiceFilePlay> findNotSync() {
-        String hql = "from VoiceFilePlay obj where ( obj.sync<>?1 or obj.sync is null )and obj.status=?2 and obj.app.deleted='0' group by obj.lastTime ";
-        List<VoiceFilePlay> list = this.list(hql,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS);
+    public List<String> findNotSyncApp() {
+        String sql = "SELECT app_id AS appId FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_play obj where ( obj.sync<>? or obj.sync is null )and obj.status=?  group by obj.lastTime ";
+        List<String> list = jdbcTemplate.queryForList(sql,String.class,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS);
+        return list;
+    }
+
+    @Override
+    public List<VoiceFilePlay> findNotSyncByApp(String app) {
+        String hql = "from VoiceFilePlay obj where ( obj.sync<>?1 or obj.sync is null )and obj.status=?2 and obj.app.id=?3  group by obj.lastTime ";
+        List<VoiceFilePlay> list = this.list(hql,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS,app);
         return list;
     }
 
