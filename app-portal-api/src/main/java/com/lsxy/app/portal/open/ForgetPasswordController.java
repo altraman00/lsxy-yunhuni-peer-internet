@@ -1,6 +1,6 @@
 package com.lsxy.app.portal.open;
 
-import com.lsxy.framework.api.events.ResetPwdVerifySuccessEvent;
+import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;

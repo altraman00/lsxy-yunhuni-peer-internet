@@ -9,7 +9,9 @@ import com.lsxy.framework.config.SystemConfig;
 public class MQTopicConstants {
 
     //账号相关MQ的topic
-    public static final String TOPIC_FRAMEWORK_ACCOUNT= SystemConfig.getProperty("global.mq.topic.framework.account","topic_framework_account");
+    public static final String TOPIC_APP_PORTAL = SystemConfig.getProperty("global.mq.topic.app.portal","topic_app_portal");
+    public static final String TOPIC_APP_OC = SystemConfig.getProperty("global.mq.topic.app.oc","topic_app_oc");
+
 
     //测试相关topic
     public static final String TOPIC_TEST=SystemConfig.getProperty("global.mq.topic.test","yunhuni_topic_test");
