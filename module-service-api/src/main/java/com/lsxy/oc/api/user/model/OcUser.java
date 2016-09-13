@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema = "db_lsxy_oc", name = "tb_oc_user")
+@Table(schema = "db_lsxy_bi_yunhuni", name = "tb_oc_user")
 public class OcUser extends IdEntity {
     public static final int STATUS_NOT_ACTIVE = 0; 	//账号未激活
     public static final int STATUS_LOCK = 1; 		//账号锁定

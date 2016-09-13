@@ -1,16 +1,15 @@
 package com.lsxy.app.portal.rest.file;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.events.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.billing.service.BillingService;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
@@ -33,11 +32,9 @@ import java.util.Date;
 public class VoiceFilePlayController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayController.class);
     @Autowired
-    private VoiceFilePlayService voiceFilePlayService;
+    VoiceFilePlayService voiceFilePlayService;
     @Autowired
-    private AppService appService;
-    @Autowired
-    private MQService mqService;
+    AppService appService;
     @Autowired
     private BillingService billingService;
     @Autowired
@@ -74,7 +71,7 @@ public class VoiceFilePlayController extends AbstractRestController {
 //            billing.setFileRemainSize(billing.getFileRemainSize()+voiceFilePlay.getSize());
 //            billingService.save(billing);
         Account account = getCurrentAccount();
-        calBillingService.incAddSize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
+        calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         return RestResponse.success(voiceFilePlay);
     }
 
@@ -97,7 +94,7 @@ public class VoiceFilePlayController extends AbstractRestController {
 //        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
 //        billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
 //        billingService.save(billing);
-        calBillingService.incUseSize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
+        calBillingService.incUseFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         return RestResponse.success(voiceFilePlay);
     }
     /**

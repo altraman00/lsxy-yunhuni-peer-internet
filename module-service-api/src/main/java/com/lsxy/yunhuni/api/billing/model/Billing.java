@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_billing")
+@Table(schema="db_lsxy_base",name = "tb_base_billing")
 public class Billing extends IdEntity {
 
     private Tenant tenant;                //所属租户

@@ -13,7 +13,7 @@ import javax.persistence.*;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema = "db_lsxy_bi_yunhuni",name="tb_bi_yy_resource_telenum")
+@Table(schema = "db_lsxy_bi_yunhuni",name="tb_oc_resource_telenum")
 public class ResourceTelenum extends IdEntity{
     public static final int STATUS_RENTED = 1; //已被租用
     public static final int STATUS_FREE = 0;    //未被租用

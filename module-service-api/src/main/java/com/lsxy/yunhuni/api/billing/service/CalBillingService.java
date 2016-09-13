@@ -18,8 +18,8 @@ public interface CalBillingService {
     String ADD_VOICE_PREFIX = "avoice";              //语音本日购买增加量
     String USE_SMS_PREFIX = "usms";                 //短信本日使用量
     String ADD_SMS_PREFIX = "asms";             //短信本日购买增加量
-    String ADD_SIZE_PREFIX = "asize";             //容量本日增加量（包括删除文件）
-    String USE_SIZE_PREFIX = "usize";             //容量本日使用量
+    String ADD_FSIZE_PREFIX = "afsize";             //容量本日增加量（包括删除文件）
+    String USE_FSIZE_PREFIX = "ufsize";             //容量本日使用量
 
     /**
      * 获取余额
@@ -121,7 +121,7 @@ public interface CalBillingService {
      * @param tenantId
      * @return
      */
-    Long getSize(String tenantId);
+    Long getFsize(String tenantId);
 
     /**
      * redis中的剩余容量使用量增加
@@ -129,7 +129,7 @@ public interface CalBillingService {
      * @param date 日期
      * @param size byte
      */
-    void incUseSize(String tenantId, Date date, Long size);
+    void incUseFsize(String tenantId, Date date, Long size);
 
     /**
      * redis中的剩余容量增加
@@ -137,7 +137,7 @@ public interface CalBillingService {
      * @param date 日期
      * @param size byte
      */
-    void incAddSize(String tenantId, Date date, Long size);
+    void incAddFsize(String tenantId, Date date, Long size);
 
 
     /**

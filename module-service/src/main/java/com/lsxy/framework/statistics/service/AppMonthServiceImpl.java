@@ -43,7 +43,7 @@ public class AppMonthServiceImpl extends AbstractService<AppMonth> implements Ap
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql =" insert into db_lsxy_base.tb_base_app_month("+selects+"dt,month,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version) ";
+        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_app_month("+selects+"dt,month,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version) ";
         sql +=" select "+selects+" ? as dt,? as month, ";
         sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+wheres+" status=1) as sum_on_line, ";
         sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+wheres+" status=2) as sum_line, ";

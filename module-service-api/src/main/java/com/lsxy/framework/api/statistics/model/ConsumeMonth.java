@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_base",name = "tb_base_consume_month")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_consume_month")
 public class ConsumeMonth extends IdEntity {
     private Date dt;//统计时间
     private Integer month;//统计月 区间1-12
