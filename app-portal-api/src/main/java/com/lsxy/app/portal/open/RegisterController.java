@@ -1,6 +1,6 @@
 package com.lsxy.app.portal.open;
 
-import com.lsxy.framework.api.events.RegisterSuccessEvent;
+import com.lsxy.framework.mq.events.portal.RegisterSuccessEvent;
 import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;

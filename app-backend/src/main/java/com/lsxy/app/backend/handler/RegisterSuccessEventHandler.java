@@ -1,6 +1,6 @@
 package com.lsxy.app.backend.handler;
 
-import com.lsxy.framework.api.events.RegisterSuccessEvent;
+import com.lsxy.framework.mq.events.portal.RegisterSuccessEvent;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
