@@ -37,8 +37,8 @@ public class ApiCallHourServiceImpl extends AbstractService<ApiCallHour> impleme
     @Override
     public void hourStatistics(Date date1, int hour1,Date date2,int hour2,String[] select,String[] all) throws  SQLException{
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
-        String sql = " insert into db_lsxy_bi_yunhuni.tb_bi_api_call_hour("+map.get("selects")+"dt,hour,among_api,create_time,last_time,deleted,sortno,version ) " +
-                " select "+map.get("selects")+" ? as dt,? as hour, "+
+        String sql = " insert into db_lsxy_bi_yunhuni.tb_bi_api_call_hour("+map.get("selects")+" id,dt,hour,among_api,create_time,last_time,deleted,sortno,version ) " +
+                " select "+map.get("selects")+" REPLACE(UUID(), '-', '') as id, ? as dt,? as hour, "+
                 " count(1) as among_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
         sql += "from db_lsxy_bi_yunhuni.tb_bi_api_call_log a where a.call_dt BETWEEN ? AND ?"+map.get("groupbys");

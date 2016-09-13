@@ -37,8 +37,8 @@ public class AppHourServiceImpl extends AbstractService<AppHour> implements AppH
     @Override
     public void hourStatistics(Date date, int hour,String[] select,String[] all) throws  SQLException{
         Map<String, String> map = StatisticsUtils.getSqlRequirements(select,all);
-        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_app_hour("+map.get("selects")+"dt,hour,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version) ";
-        sql +=" select "+map.get("selects")+" ? as dt,? as hour, ";
+        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_app_hour("+map.get("selects")+"id,dt,hour,sum_on_line,sum_line,sum_app_num,create_time,last_time,deleted,sortno,version) ";
+        sql +=" select "+map.get("selects")+" REPLACE(UUID(), '-', '') as id, ? as dt,? as hour, ";
         sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+map.get("wheres")+" status=1) as sum_on_line, ";
         sql +=" (select count(1) from db_lsxy_bi_yunhuni.tb_bi_app where "+map.get("wheres")+" status=2) as sum_line, ";
         sql +=" COUNT(1) as sum_app_num ,";
