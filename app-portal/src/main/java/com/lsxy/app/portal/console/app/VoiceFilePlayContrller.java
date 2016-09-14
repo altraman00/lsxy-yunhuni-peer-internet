@@ -165,7 +165,9 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                                 new BufferedOutputStream(new FileOutputStream(newFile));
                         buffStream.write(bytes);
                         buffStream.close();
-                    }catch (Exception e){}
+                    }catch (Exception e){
+                        logger.error("文件上传异常",e);
+                    }
                     //file.transferTo(newFile);
                     int re = newFile.exists()?1:0;
 //                    int re = downFile(file,filePlayPath +"/"+fileKey);
