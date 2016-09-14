@@ -133,15 +133,33 @@
                                     <div class="col-md-1 remove-padding width-130">
                                         绑定测试号：
                                     </div>
-                                    <div class="col-md-3 " id="testNumBind">
+                                    <c:set var="tempTestNum" value="0"></c:set>
+                                    <c:forEach items="${testNumBindList}" var="testNumBind">
+                                        <c:if test="${testNumBind.app.id==app.id}">
+                                            <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
+                                        </c:if>
+                                    </c:forEach>
+                                    <div class="col-md-3 " id="testNumBind"
+                                            <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
+                                                hidden
+                                            </c:if>
+                                    >
                                         <c:forEach items="${testNumBindList}" var="testNumBind">
                                             <c:if test="${testNumBind.app.id==app.id}">
                                                 <span name="testNum">${testNumBind.number} </span>
                                             </c:if>
                                         </c:forEach>
                                     </div>
+
                                     <div class="col-md-4 " >
-                                        <a class="modalShow" data-id="one">绑定交互测试号</a>
+                                        <a
+                                                <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
+                                                    class="modalShow" data-id="one"
+                                                </c:if>
+                                                <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
+                                                    onclick="showtoast('当前没有测试号码')"
+                                                </c:if>
+                                        >绑定交互测试号</a>
                                     </div>
                                 </div>
                                 <div class="row ">
@@ -155,8 +173,6 @@
                                         </p>
                                     </div>
                                 </div>
-
-
                                 <div class="row border-block"></div>
                             </section>
                             <section class="panel panel-default pos-rlt clearfix application-tab">
@@ -503,6 +519,11 @@
         }
         ajaxsync(ctx + "/console/telenum/bind/update_app_number",{ 'numbers':numbers,'appId':appId,csrfParameterName:csrfToken},function(response){
             $('#testNumBind').html(testNumBindHtml);
+            if(testNumBindHtml.length>0){
+                $('#testNumBind').show();
+            }else{
+                $('#testNumBind').hide();
+            }
             hideModal(id);
             showtoast("应用绑定号码更新成功");
         },"post");

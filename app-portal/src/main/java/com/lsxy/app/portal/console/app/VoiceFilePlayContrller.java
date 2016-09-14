@@ -143,6 +143,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     String type = name.substring(name.lastIndexOf("."),name.length());
                     long size = file.getSize();
                     String fileKey = getFileKey(tenantId,appId,ymd,type);
+
                     boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name,repository,fileKey);
                     if(flag){//文件保存成功，将对象保存数据库
                         RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);

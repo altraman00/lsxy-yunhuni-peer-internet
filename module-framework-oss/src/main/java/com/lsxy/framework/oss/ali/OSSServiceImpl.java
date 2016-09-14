@@ -39,17 +39,23 @@ public class OSSServiceImpl implements OSSService{
 
     @Override
     public boolean uploadFileStream(InputStream inputStream, long fileLength, String orignalFileName, String repository, String fileKey) {
+        if (logger.isDebugEnabled()){
+            logger.debug("开始上传OSS文件{}({})",orignalFileName,fileKey);
+        }
         long starttime = System.currentTimeMillis();
         try {
             OSSClient client = afb.getObject();
             client.putObject(repository, fileKey, inputStream);
         } catch (Exception e) {
+            if (logger.isDebugEnabled()){
+                logger.debug("上传OSS文件{}({})失败，花费时间{} ms，原因{}",orignalFileName,fileKey,(System.currentTimeMillis()-starttime),e);
+            }
             e.printStackTrace();
             return false;
         }
         long endtime = System.currentTimeMillis();
         if (logger.isDebugEnabled()){
-                logger.debug("upload file {}({}) total spend {} ms",orignalFileName,fileKey,(endtime-starttime));
+                logger.debug("上传OSS文件{}({})成功 花费时间 {} ms",orignalFileName,fileKey,(endtime-starttime));
          }
         return true;
     }
