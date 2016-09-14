@@ -122,9 +122,7 @@ public class ConfServiceImpl implements ConfService {
                                 .setLineGatewayId(lineGateway.getId())
                                 .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
-                                        //TODO 需要判断最大与会数
                                         .put("max_parts",maxParts,ConfUtil.MAX_PARTS)//最大与会数
-                                        //TODO 需要判断是否自动挂断所有会话
                                         .putIfNotEmpty("auto_hangup",autoHangup)//会议结束是否自动挂断
                                         .putIfNotEmpty("recording",recording)//是否自动启动录音
                                         .build())

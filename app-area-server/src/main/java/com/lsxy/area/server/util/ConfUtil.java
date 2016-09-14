@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,6 +59,11 @@ public class ConfUtil {
         String key = key(confId);
         redisTemplate.opsForSet().remove(key,callId);
         redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+    }
+
+    public List<String> getParts(String confId){
+        String key = key(confId);
+        return (List<String>)redisTemplate.opsForSet().members(key);
     }
 }
 
