@@ -10,6 +10,7 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
+import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -150,24 +153,23 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     long size = file.getSize();//文件大小
                     String type = name.substring(name.lastIndexOf("."),name.length());
                     //如果文件夹不存在，则创建文件夹
-                    String folder = getFolder(tenantId,appId,ymd);
-                    new File(filePlayPath+"/"+folder).mkdirs();
+//                    String folder = getFolder(tenantId,appId,ymd);
+//                    new File(filePlayPath+"/"+folder).mkdirs();
                     String fileKey = getFileKey(tenantId,appId,ymd,type);
-                    File newFile = new File(filePlayPath +"/"+fileKey);
-                    file.transferTo(newFile);
-                    //文件保存成功，将对象保存数据库
-                    if(logger.isDebugEnabled()) {
-                        logger.debug("开始调用创建放音文件的方法，应用{}，记录{}", appId,fileKey);
-                    }
-                    restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
-                    if(logger.isDebugEnabled()) {
-                        logger.debug("调用创建放音文件的方法，返回结果{}", restResponse);
-                    }
-                    if(!restResponse.isSuccess()){
-                        logger.info("上传成功，保存失败：{}",name);
-                        //将本地文件删除
-                        newFile.delete();
-                        restResponse = RestResponse.failed("0000","上传失败");
+//                    File newFile = new File(filePlayPath +"/"+fileKey);
+//                    file.transferTo(newFile);
+                    int re = downFile(file,filePlayPath +"/"+fileKey);
+                    if(re==1) {
+                        //文件保存成功，将对象保存数据库
+                        restResponse = createVoiceFilePlay(request, name, size, fileKey, appId);
+                        if (!restResponse.isSuccess()) {
+                            logger.info("上传成功，保存失败：{}", name);
+                            //将本地文件删除
+                            new File(filePlayPath + "/" + fileKey).delete();
+                            restResponse = RestResponse.failed("0000", "上传失败");
+                        }
+                    }else{
+                        restResponse = RestResponse.failed("0000", "上传失败");
                     }
                 }
             }
@@ -257,6 +259,51 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     private String getFolder(String tenantId,String appId,String ymd){
         String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd;
+        return result;
+    }
+    /**
+     * 下载文件
+     * @param path 保存文件地址
+     * @return
+     */
+    private Integer downFile(MultipartFile file,String path){
+        Integer result = -1;
+        logger.error("文件下载开始---->{},时间:{}",path, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        File newFile = new File(path);
+        long start = new Date().getTime();
+        //先判断文件是否存在，如果存在则不下载
+        if(newFile.exists()){
+            logger.info("文件已存在，覆盖原文件:{}",path);
+        }
+        //补充文件夹
+        new File(path.substring(0,path.lastIndexOf("/"))).mkdirs();
+        //开始写文件
+        InputStream in = null;
+        FileOutputStream out = null;
+        try {
+            in = file.getInputStream();
+            out = new FileOutputStream(newFile);
+            byte[] buffer = new byte[8 * 1024];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
+            }
+            result = 1;
+        } catch (Exception e) {
+            logger.error("文件流输出异常,{]", e);
+        }finally {
+            try {
+                if(in!=null) {
+                    in.close();
+                }
+                if(out!=null) {
+                    out.close();
+                }
+            } catch (Exception e) {
+                logger.error("文件流关闭异常，{}", e);
+            }
+        }
+        logger.error("文件下载结束---->{},结果:{},时间:{},花费时间{}",path,result, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"),new Date().getTime()-start);
         return result;
     }
 }
