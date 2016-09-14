@@ -10,6 +10,7 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.tenant.dao.AccountDao;
@@ -212,7 +213,8 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         billing.setConferenceRemain(0L);
         billing.setFileTotalSize(defaultSize);
         billing.setFileRemainSize(defaultSize);
-        billing.setBalanceDate(new Date());
+        //由于余额计算的规则限制，把结算日期设为前一天
+        billing.setBalanceDate(DateUtils.getPreDate(new Date()));
         billingService.save(billing);
     }
 
