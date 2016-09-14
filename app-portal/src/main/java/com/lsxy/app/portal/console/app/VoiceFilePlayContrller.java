@@ -156,7 +156,13 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     File newFile = new File(filePlayPath +"/"+fileKey);
                     file.transferTo(newFile);
                     //文件保存成功，将对象保存数据库
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("开始调用创建放音文件的方法，应用{}，记录{}", appId,fileKey);
+                    }
                     restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("调用创建放音文件的方法，返回结果{}", restResponse);
+                    }
                     if(!restResponse.isSuccess()){
                         logger.info("上传成功，保存失败：{}",name);
                         //将本地文件删除
