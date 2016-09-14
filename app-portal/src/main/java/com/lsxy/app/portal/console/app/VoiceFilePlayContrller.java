@@ -153,12 +153,15 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     long size = file.getSize();//文件大小
                     String type = name.substring(name.lastIndexOf("."),name.length());
                     //如果文件夹不存在，则创建文件夹
-//                    String folder = getFolder(tenantId,appId,ymd);
-//                    new File(filePlayPath+"/"+folder).mkdirs();
+                    String folder = getFolder(tenantId,appId,ymd);
+                    new File(filePlayPath+"/"+folder).mkdirs();
                     String fileKey = getFileKey(tenantId,appId,ymd,type);
-//                    File newFile = new File(filePlayPath +"/"+fileKey);
-//                    file.transferTo(newFile);
-                    int re = downFile(file,filePlayPath +"/"+fileKey);
+                    File newFile = new File(filePlayPath +"/"+fileKey);
+                    try {
+                        file.transferTo(newFile);
+                    }catch (Exception e){}
+                    int re = newFile.exists()?1:0;
+//                    int re = downFile(file,filePlayPath +"/"+fileKey);
                     if(re==1) {
                         //文件保存成功，将对象保存数据库
                         restResponse = createVoiceFilePlay(request, name, size, fileKey, appId);

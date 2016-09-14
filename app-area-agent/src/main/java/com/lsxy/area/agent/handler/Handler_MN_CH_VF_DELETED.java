@@ -81,7 +81,7 @@ public class Handler_MN_CH_VF_DELETED extends RpcRequestHandler {
         if (file.isFile() && file.exists()) {
             file.delete();
             flag = true;
-        }else if(!file.isFile()){//文件不存在也成功
+        }else if(!file.exists()){//文件不存在也成功
             flag = true;
         }
         return flag;
