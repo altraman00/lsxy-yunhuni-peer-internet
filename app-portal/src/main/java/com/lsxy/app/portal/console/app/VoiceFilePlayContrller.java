@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,9 @@ import java.util.Map;
 @RequestMapping("/console/app/file/play")
 public class VoiceFilePlayContrller extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayContrller.class);
-    private  String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
+    private static String repository = SystemConfig.getProperty("global.oss.aliyun.bucket");
+    private static String filePlayPath = SystemConfig.getProperty("portal.file.play");
+
     @Autowired
     private OSSService ossService;
 
@@ -122,6 +125,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/billing/get";
         return RestRequest.buildSecurityRequest(token).get(uri, Billing.class);
     }
+
+
+
+
     /**
      * 上传文件（支持多文件）
      * @param multipartfiles
@@ -133,40 +140,80 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     public RestResponse uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
-        String msg = "";
+        RestResponse restResponse = null;
         try {
             if (null != multipartfiles && multipartfiles.length > 0) {
                 //遍历并保存文件
                 for (int i=0;i< multipartfiles.length;i++) {
                     MultipartFile file  = multipartfiles[i];
                     String name = file.getOriginalFilename();//文件名
+                    long size = file.getSize();//文件大小
                     String type = name.substring(name.lastIndexOf("."),name.length());
-                    long size = file.getSize();
+                    //如果文件夹不存在，则创建文件夹
+                    String folder = getFolder(tenantId,appId,ymd);
+                    new File(filePlayPath+"/"+folder).mkdirs();
                     String fileKey = getFileKey(tenantId,appId,ymd,type);
-
-                    boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name,repository,fileKey);
-                    if(flag){//文件保存成功，将对象保存数据库
-                        RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
-                        if(restResponse.isSuccess()){
-                            logger.info("文件上传成功：{}",name);
-                           // oss.setStatus(oss.getStatus()+name+"文件上传成功");
-                        }else{
-                            logger.info("上传成功，保存失败：{}",name);
-                            ossService.deleteObject(repository, fileKey);
-                            msg+=name+"文件上传失败；";
-                        }
-                    }else{
-                        logger.info("上创失败",name);
-                        msg+=name+"文件上传失败；";
+                    File newFile = new File(filePlayPath +"/"+fileKey);
+                    file.transferTo(newFile);
+                    //文件保存成功，将对象保存数据库
+                    restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
+                    if(!restResponse.isSuccess()){
+                        logger.info("上传成功，保存失败：{}",name);
+                        //将本地文件删除
+                        newFile.delete();
+                        restResponse = RestResponse.failed("0000","上传失败");
                     }
                 }
             }
         }catch (Exception e){
             logger.info("文件上传异常：{}",e);
+            restResponse = RestResponse.failed("0000","上传失败");
         }
-        return RestResponse.success();
+        return restResponse;
     }
-
+    /**
+     * 上传文件（支持多文件）--直接上传OSS版本
+     * @param multipartfiles
+     * @param request
+     * @return
+     */
+//    @RequestMapping("/upload")
+//    @ResponseBody
+//    public RestResponse uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
+//        String tenantId = this.getCurrentUser(request).getTenantId();
+//        String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
+//        String msg = "";
+//        try {
+//            if (null != multipartfiles && multipartfiles.length > 0) {
+//                //遍历并保存文件
+//                for (int i=0;i< multipartfiles.length;i++) {
+//                    MultipartFile file  = multipartfiles[i];
+//                    String name = file.getOriginalFilename();//文件名
+//                    String type = name.substring(name.lastIndexOf("."),name.length());
+//                    long size = file.getSize();
+//                    String fileKey = getFileKey(tenantId,appId,ymd,type);
+//                    boolean flag = ossService.uploadFileStream(file.getInputStream(),size,name,repository,fileKey);
+//                    if(flag){//文件保存成功，将对象保存数据库
+//                        RestResponse restResponse = createVoiceFilePlay(request,name,size,fileKey,appId);
+//                        if(restResponse.isSuccess()){
+//                            logger.info("文件上传成功：{}",name);
+//                            // oss.setStatus(oss.getStatus()+name+"文件上传成功");
+//                        }else{
+//                            logger.info("上传成功，保存失败：{}",name);
+//                            ossService.deleteObject(repository, fileKey);
+//                            msg+=name+"文件上传失败；";
+//                        }
+//                    }else{
+//                        logger.info("上创失败",name);
+//                        msg+=name+"文件上传失败；";
+//                    }
+//                }
+//            }
+//        }catch (Exception e){
+//            logger.info("文件上传异常：{}",e);
+//        }
+//        return RestResponse.success();
+//    }
     /**
      * 创建上传文件记录
      * @param request
@@ -192,6 +239,18 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     private String getFileKey(String tenantId,String appId,String ymd,String type){
         String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd+"/"+ UUIDGenerator.uuid()+type;
+        return result;
+    }
+
+    /**
+     * 获得本地文件夹
+     * @param tenantId
+     * @param appId
+     * @param ymd
+     * @return
+     */
+    private String getFolder(String tenantId,String appId,String ymd){
+        String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd;
         return result;
     }
 }
