@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -157,9 +158,15 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     new File(filePlayPath+"/"+folder).mkdirs();
                     String fileKey = getFileKey(tenantId,appId,ymd,type);
                     File newFile = new File(filePlayPath +"/"+fileKey);
+                    //不直接操纵流
                     try {
-                        file.transferTo(newFile);
+                        byte[] bytes = file.getBytes();
+                        BufferedOutputStream buffStream =
+                                new BufferedOutputStream(new FileOutputStream(newFile));
+                        buffStream.write(bytes);
+                        buffStream.close();
                     }catch (Exception e){}
+                    //file.transferTo(newFile);
                     int re = newFile.exists()?1:0;
 //                    int re = downFile(file,filePlayPath +"/"+fileKey);
                     if(re==1) {
