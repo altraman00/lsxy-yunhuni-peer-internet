@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
+import com.lsxy.framework.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/8/29.
@@ -28,6 +30,8 @@ public class CalCostTest {
     private CalCostService calCostService;
     @Autowired
     private CalBillingService calBillingService;
+    @Autowired
+    VoiceCdrHourService voiceCdrHourService;
 
     @Test
     public void testCalCost(){
@@ -39,5 +43,12 @@ public class CalCostTest {
     public void testCalBilling(){
         Long balance = calBillingService.getConference("1");
         System.out.println(balance);
+    }
+
+    @Test
+    public void calAverageCall(){
+        Map<String, Object> map = voiceCdrHourService.calAverageCall("1");
+        System.out.println(map.get("lineAverageCallTime"));
+        System.out.println(map.get("lineLinkRate"));
     }
 }

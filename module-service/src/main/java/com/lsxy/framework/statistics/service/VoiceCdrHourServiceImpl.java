@@ -13,10 +13,12 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -69,6 +71,29 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
                 }
             }
         });
+    }
+
+    @Override
+    public Map<String,Object> calAverageCall(String tenantId){
+        Object[] argus = {tenantId};
+        String sql = "SELECT IFNULL(SUM(cdr.among_duration),0) duration,IFNULL(SUM(cdr.among_connect),0) connect_num,IFNULL(SUM(cdr.among_call),0) call_num " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour cdr WHERE cdr.tenant_id = ? AND cdr.app_id IS NULL AND cdr.type IS NULL";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, argus);
+        Map<String,Object> result = new HashMap<>();
+        //lineAverageCallTime lineLinkRate
+        if(new BigDecimal(0).compareTo((BigDecimal)map.get("connect_num")) == -1){
+            BigDecimal divide = ((BigDecimal) map.get("duration")).divide((BigDecimal) map.get("connect_num"),0, BigDecimal.ROUND_UP).divide(new BigDecimal(60), 0, BigDecimal.ROUND_UP);
+            result.put("lineAverageCallTime",divide.longValue());
+        }else{
+            result.put("lineAverageCallTime",0);
+        }
+        if(new BigDecimal(0).compareTo((BigDecimal)map.get("connect_num")) == -1){
+            BigDecimal divide = ((BigDecimal) map.get("connect_num")).divide((BigDecimal) map.get("call_num"), 4, BigDecimal.ROUND_UP).multiply(new BigDecimal(100));
+            result.put("lineLinkRate",divide.doubleValue());
+        }else{
+            result.put("lineLinkRate",0.0);
+        }
+        return result;
     }
 
 }

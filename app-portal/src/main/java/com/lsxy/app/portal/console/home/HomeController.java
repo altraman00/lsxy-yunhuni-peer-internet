@@ -101,14 +101,16 @@ public class HomeController extends AbstractPortalController {
 
         //TODO 获取当前线路状况，从redis里取
         //当前线路情况(暂时给个数字)
-        vo.setLineNum(10);
-        vo.setLineAverageCallTime(6);
-        vo.setLineLinkRate(98.00D);
+        vo.setLineNum(1);
+        //获取通话状况
+        Map callStatus = getCallStatus(token);
+        vo.setLineAverageCallTime((Integer) callStatus.get("lineAverageCallTime"));
+        vo.setLineLinkRate((Double) callStatus.get("lineLinkRate"));
 
         //此处调用鉴权账号（凭证）RestApi
         ApiCertificate cert = getApiCertificate(token);
         if(cert != null){
-            vo.setRestApi(CERT_REST_PREFIX + "/" + cert.getCertId() + "/");
+            vo.setRestApi(CERT_REST_PREFIX + "/v1/account/" + cert.getCertId() + "/");
             vo.setCertId(cert.getCertId());
             vo.setSecretKey(cert.getSecretKey());
         }
@@ -140,6 +142,11 @@ public class HomeController extends AbstractPortalController {
         }
         vo.setAppStateVOs(appStateVOs);
         return vo;
+    }
+
+    private Map getCallStatus(String token){
+        String url = PortalConstants.REST_PREFIX_URL +   "/rest/voice_cdr_hour/call_status";
+        return RestRequest.buildSecurityRequest(token).get(url, Map.class).getData();
     }
 
     private ResourcesRent getIvrNumber(String token, String appId) {

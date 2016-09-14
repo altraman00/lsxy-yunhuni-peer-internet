@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_cdr_hour")
+@Table(schema="db_lsxy_bi_yunhuni",name = "")
 public class VoiceCdrHour extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用

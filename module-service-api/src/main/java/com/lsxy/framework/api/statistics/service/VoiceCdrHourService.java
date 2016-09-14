@@ -5,6 +5,7 @@ import com.lsxy.framework.api.statistics.model.VoiceCdrHour;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 通话记录统计（session统计）小时统计service
@@ -20,4 +21,11 @@ public interface VoiceCdrHourService extends BaseService<VoiceCdrHour> {
      * @param select 组合groupby条件
      */
     public void hourStatistics(Date date1, int hour1, Date date2, int hour2, String[] select,String[] all) throws SQLException;
+
+    /**
+     * 获取通话状况
+     * @param tenantId
+     * @return
+     */
+    Map<String,Object> calAverageCall(String tenantId);
 }
