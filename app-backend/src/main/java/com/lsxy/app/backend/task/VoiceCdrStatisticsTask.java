@@ -37,8 +37,9 @@ public class VoiceCdrStatisticsTask {
      */
     @Scheduled(cron="0 0 2 1 * ? ")
     public void month(){
-
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName();
+        Date date=new Date();
+        String month = DateUtils.formatDate(date, "yyyy-MM");
+        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + month;
         //执行互斥处理消息
         String flagValue = redisCacheService.get("scheduled_" + cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
@@ -50,7 +51,7 @@ public class VoiceCdrStatisticsTask {
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
                 }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,28*24*60*60);
+                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,30*24*60*60);
                 String currentCacheValue = redisCacheService.get(cacheKey);
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
@@ -60,7 +61,6 @@ public class VoiceCdrStatisticsTask {
                         logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
                     }
                     //执行语句
-                    Date date=new Date();
                     monthStatistics(date);
                 }else{
                     if(logger.isDebugEnabled()){
@@ -111,14 +111,13 @@ public class VoiceCdrStatisticsTask {
     }
 
     /**
-     * 每天02：00：00触发执行
+     * 每天01：00：00触发执行
      */
     @Scheduled(cron="0 0 1 * * ?")
     public void day(){
-
-
-
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName();
+        Date date=new Date();
+        String day = DateUtils.formatDate(date, "yyyy-MM-dd");
+        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
         //执行互斥处理消息
         String flagValue = redisCacheService.get("scheduled_" + cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
@@ -130,7 +129,7 @@ public class VoiceCdrStatisticsTask {
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
                 }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,22*60*60);
+                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,24*60*60);
                 String currentCacheValue = redisCacheService.get(cacheKey);
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
@@ -140,7 +139,6 @@ public class VoiceCdrStatisticsTask {
                         logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
                     }
                     //执行语句
-                    Date date=new Date();
                     dayStatistics(date);
                 }else{
                     if(logger.isDebugEnabled()){
@@ -194,10 +192,10 @@ public class VoiceCdrStatisticsTask {
      */
     @Scheduled(cron="0 30 0/1 * * ?")
     public void hour(){
+        Date date=new Date();
+        String hour = DateUtils.formatDate(date, "yyyy-MM-dd HH");
+        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName()+ " " + hour;
 
-
-
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName();
         //执行互斥处理消息
         String flagValue = redisCacheService.get("scheduled_" + cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
@@ -209,7 +207,7 @@ public class VoiceCdrStatisticsTask {
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
                 }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,50*60);
+                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,60*60);
                 String currentCacheValue = redisCacheService.get(cacheKey);
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
@@ -219,7 +217,6 @@ public class VoiceCdrStatisticsTask {
                         logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
                     }
                     //执行语句
-                    Date date=new Date();
                     hourStatistics(date);
                 }else{
                     if(logger.isDebugEnabled()){
