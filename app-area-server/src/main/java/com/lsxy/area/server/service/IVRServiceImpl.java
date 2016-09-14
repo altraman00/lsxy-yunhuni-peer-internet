@@ -99,7 +99,7 @@ public class IVRServiceImpl implements IVRService {
                 .putIfNotEmpty("max_answer_seconds",maxCallDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid ",app.getId())
+                .putIfNotEmpty("appid ",app.getId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -117,8 +117,8 @@ public class IVRServiceImpl implements IVRService {
                                     .setAreaId(app.getArea().getId())
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(new MapBuilder<String,Object>()
-                                            .put("from",from)
-                                            .put("to",to)
+                                            .putIfNotEmpty("from",from)
+                                            .putIfNotEmpty("to",to)
                                             .build())
                                     .build();
         businessStateService.save(callstate);

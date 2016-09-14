@@ -281,7 +281,12 @@ public class IVRActionUtil {
         callSession.setType(CallSession.TYPE_VOICE_IVR);
         callSession.setResId(state.getResId());
         callSession = callSessionService.save(callSession);
-        state.getBusinessData().put("sessionid",callSession.getId());
+        Map<String,Object> businessData = state.getBusinessData();
+        if(businessData == null){
+            businessData = new HashMap<>();
+            state.setBusinessData(businessData);
+        }
+        businessData.put("sessionid",callSession.getId());
         businessStateService.save(state);
         VoiceIvr voiceIvr = new VoiceIvr();
         voiceIvr.setId(call_id);

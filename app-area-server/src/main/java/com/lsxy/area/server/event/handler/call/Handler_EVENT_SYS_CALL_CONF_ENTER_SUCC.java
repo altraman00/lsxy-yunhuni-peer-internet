@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.util.ConfUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -52,6 +53,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     @Autowired
     private CallSessionService callSessionService;
 
+    @Autowired
+    private ConfUtil confUtil;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_CONF_ENTER_SUCC;
@@ -100,6 +104,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             logger.info("没有找到对应的会议信息callid={},confid={}",call_id,conf_id);
             return res;
         }
+        //会议成员增加
+        confUtil.incrPart(conf_id,call_id);
+
         if(StringUtils.isBlank(appId)){
             logger.info("没有找到对应的app信息appId={}",appId);
             return res;
