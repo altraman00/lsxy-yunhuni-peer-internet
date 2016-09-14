@@ -18,7 +18,6 @@
 
 	String rootUrl = SystemConfig.getProperty("portal.system.root.url");
 	String devModel = SystemConfig.getProperty("system.developModel","true");
-	String officialWebsiteUrl = SystemConfig.getProperty("global.official.website.url");
 	SecurityUser currentUser = (SecurityUser)request.getSession().getAttribute("currentUser");
 	String userName = null;
 	if(currentUser != null){

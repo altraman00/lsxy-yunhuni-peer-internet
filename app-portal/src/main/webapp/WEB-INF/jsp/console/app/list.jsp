@@ -86,7 +86,7 @@
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
-                                                <a onclick="delapp('${result.id}','${result.status}')" >删除</a> <span ></span>
+                                                <a onclick="delapp('${result.id}')" >删除</a> <span ></span>
                                                 <c:if test="${result.status==2}"> <a onclick="tabtarget('${result.id}','${result.isIvrService==1?1:0}')" >申请上线</a></c:if>
                                                 <c:if test="${result.status==1}"> <span class="apply" id="trb-${result.id}"><a onclick="offline('${result.id}','${result.isIvrService}')">下线</a></span></c:if>
                                             </td>
@@ -435,12 +435,12 @@
      * 应用id
      * status 该应用状态
      */
-    function delapp(id,status){
+    function delapp(id){
         bootbox.setLocale("zh_CN");
-        if(status==1){
-            bootbox.alert("当前应用正在运营中，请将其下线后进行删除", function(result) {}); return;
-        }
-        if(status==2){
+//        if(status==1){
+//            bootbox.alert("当前应用正在运营中，请将其下线后进行删除", function(result) {}); return;
+//        }
+//        if(status==2){
             bootbox.confirm("删除应用：将会使该操作即时生效，除非您非常清楚该操作带来的后续影响", function(result) {
                 if(result){
                     ajaxsync(ctx + "/console/app/delete",{'id':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
@@ -453,7 +453,11 @@
                             }
                             showtoast("删除成功！",pageObj.pageUrl+"?pageNo="+pageObj.currentPageNo+"&pageSize="+pageObj.pageSize,1000);
                         }else{
-                            showtoast("删除失败！" + response.errorMsg);
+                            if(response.errorCode=='0011'){
+                                bootbox.alert("当前应用正在运营中，请将其下线后进行删除", function(result) {}); return;
+                            }else{
+                                showtoast("删除成功！"+response.errorMsg);
+                            }
                         }
                     },"post");
 
@@ -461,7 +465,7 @@
                     //showtoast('取消');
                 }
             });
-        }
+//        }
     }
 
 
