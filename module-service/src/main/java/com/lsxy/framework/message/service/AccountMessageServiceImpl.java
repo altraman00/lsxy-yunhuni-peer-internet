@@ -200,7 +200,7 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         String serviceHql = "  FROM Feedback obj WHERE obj.status=?1 ";
         long awaitService = this.countByCustom(serviceHql, Feedback.UNREAD);
         //财务中心
-        String invoiceHql = "  FROM InvoiceApply obj WHERE （obj.status=?1）OR (obj.status=?2  and obj.expressNo is null) ";
+        String invoiceHql = "  FROM InvoiceApply obj WHERE (obj.status=?1) OR (obj.status=?2  and obj.expressNo is null) ";
         long awaitInvoice = this.countByCustom(invoiceHql,InvoiceApply.STATUS_SUBMIT,InvoiceApply.STATUS_DONE);
         //审核中心
         String demandHql = "  FROM Tenant obj WHERE obj.isRealAuth in('"+Tenant.AUTH_WAIT+"','"+Tenant.AUTH_ONESELF_WAIT+"','"+Tenant.AUTH_UPGRADE_WAIT+"') ";

@@ -29,8 +29,9 @@ public class CalbillingTask {
 
     @Scheduled(cron="0 0 2 * * ?")
     public void calBilling(){
-
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName();
+        Date date=new Date();
+        String day = DateUtils.formatDate(date, "yyyy-MM-dd");
+        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
         //执行互斥处理消息
         String flagValue = redisCacheService.get("scheduled_" + cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
@@ -42,7 +43,7 @@ public class CalbillingTask {
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
                 }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,22*60*60);
+                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,24*60*60);
                 String currentCacheValue = redisCacheService.get(cacheKey);
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
@@ -52,7 +53,7 @@ public class CalbillingTask {
                         logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
                     }
                     //执行语句
-                    Date preDate = DateUtils.getPreDate(new Date());
+                    Date preDate = DateUtils.getPreDate(date);
                     calBillingService.calBilling(preDate);
                 }else{
                     if(logger.isDebugEnabled()){

@@ -5,7 +5,7 @@ package com.lsxy.yunhuni.api.product.enums;
  * Created by liups on 2016/8/30.
  */
 public enum ProductCode {
-    duo_call("duo_call1","双向回拔"),
+    duo_call("duo_call1","语音回拔"),
     sys_conf("sys_conf","语音会议"),
     ivr_call("ivr_call,ivr_incoming","语音IVR"),
     captcha_call("captcha_call,verify_call","语音验证码"),
