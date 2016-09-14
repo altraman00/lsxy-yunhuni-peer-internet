@@ -74,7 +74,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             return res;
         }
         String conf_id = (String)params.get("user_data");
-        //TODO 会议与会者list
+        //TODO 会议与会者list,已改成直接用redis获取
         String member_ids = (String)params.get("member_ids");
         if(StringUtils.isBlank(conf_id)){
             logger.info("conf_id is null");
