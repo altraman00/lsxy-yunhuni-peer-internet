@@ -51,4 +51,15 @@ public class VoiceCdrController extends AbstractRestController {
         Map map = voiceCdrService.sumCost(type,getCurrentAccount().getTenant().getId(),time,appId);
         return RestResponse.success(map);
     }
+
+    /**
+     * 查找应用当前呼叫数据
+     * @throws Exception
+     */
+    @RequestMapping("/current_record_statistics")
+    public RestResponse currentRecordStatistics(String appId) throws Exception{
+        Map statistics= voiceCdrService.currentRecordStatistics(appId);
+        return RestResponse.success(statistics);
+    }
+
 }

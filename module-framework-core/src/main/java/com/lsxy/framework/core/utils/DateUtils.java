@@ -492,6 +492,18 @@ public class DateUtils {
 		return  result;
 	}
 
+    /**
+     * 获取某个日期的上个小时
+     * @param date
+     * @return
+     */
+    public static Date  getPrevHour(Date date){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.HOUR, -1);
+        return  calendar.getTime();
+    }
+
 	/**
 	 * 功能说明:得到指定月份的第一天,精确到时分秒(2015-01-01 00:00:00)
 	 */

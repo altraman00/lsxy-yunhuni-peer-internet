@@ -85,4 +85,12 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      */
     public long getAmongCallByDateAndTenant(Date d,String tenant,String appId);
 
+    /**
+     * 获取某个应用某一天的统计记录
+     * @param appId
+     * @param currentDay
+     * @return
+     */
+    VoiceCdrDay findByAppIdAndTime(String appId, Date currentDay);
+
 }
