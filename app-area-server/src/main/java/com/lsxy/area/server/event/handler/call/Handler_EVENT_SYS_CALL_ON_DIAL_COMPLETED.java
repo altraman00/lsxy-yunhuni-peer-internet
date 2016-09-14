@@ -199,12 +199,18 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 Integer max_seconds = (Integer) businessData.get("max_seconds");
                 String res_id_two = state.getResId();
                 Integer connect_mode = (Integer) businessData.get("connect_mode");
+                Boolean recording = (Boolean)businessData.get("recording");
                 String record_file = null;
                 Integer local_volume = (Integer) businessData.get("volume1");
                 Integer remote_volume = (Integer) businessData.get("volume2");
                 Long schedule_play_time=(Long) businessData.get("play_time");
                 String schedule_play_file = (String) businessData.get("play_file");
                 Integer schedule_play_loop = (Integer) businessData.get("play_repeat");
+
+                if(recording!=null && recording){
+                    //TODO 录音文件名如何定
+                    record_file = "";
+                }
 
                 try {
                     schedule_play_file = playFileUtil.convert(state.getTenantId(),state.getAppId(),schedule_play_file);

@@ -109,6 +109,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+
+        businessStateService.delete(call_id);
         return res;
     }
 }
