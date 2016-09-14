@@ -28,4 +28,12 @@ public interface VoiceCdrHourService extends BaseService<VoiceCdrHour> {
      * @return
      */
     Map<String,Object> calAverageCall(String tenantId);
+
+    /**
+     * 根据应用和小时获取统计数据
+     * @param appId
+     * @param currentHour
+     * @return
+     */
+    VoiceCdrHour findByAppIdAndTime(String appId, Date currentHour);
 }

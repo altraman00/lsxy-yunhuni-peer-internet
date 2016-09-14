@@ -25,4 +25,10 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      * @return
      */
     public Map sumCost(String type, String tenantId, String time, String appId);
+    /**
+     * 获取应用呼叫状况
+     * @param appId
+     * @return
+     */
+    Map currentRecordStatistics(String appId);
 }

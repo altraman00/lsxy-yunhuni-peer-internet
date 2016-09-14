@@ -96,4 +96,9 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         return result;
     }
 
+    @Override
+    public VoiceCdrHour findByAppIdAndTime(String appId, Date currentHour) {
+        return voiceCdrHourDao.findFirstByAppIdAndDtAndTenantIdIsNullAndTypeIsNull(appId,currentHour);
+    }
+
 }

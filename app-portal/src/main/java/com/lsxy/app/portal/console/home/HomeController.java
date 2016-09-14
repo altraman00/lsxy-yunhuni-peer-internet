@@ -181,7 +181,7 @@ public class HomeController extends AbstractPortalController {
      */
     private Map getStatistics(String token, App app) {
         //获取当前App的统计数据
-        String appStatisticsUrl = PortalConstants.REST_PREFIX_URL + "/rest/callrecord/current_record_statistics?appId={1}";
+        String appStatisticsUrl = PortalConstants.REST_PREFIX_URL + "/rest/voice_cdr/current_record_statistics?appId={1}";
         RestResponse<Map> statisticsResponse = RestRequest.buildSecurityRequest(token).get(appStatisticsUrl, Map.class,app.getId());
         return statisticsResponse.getData();
     }
