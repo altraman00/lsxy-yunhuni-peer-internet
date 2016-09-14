@@ -43,7 +43,7 @@ public class PlayActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
@@ -58,13 +58,7 @@ public class PlayActionHandler extends ActionHandler{
         if(StringUtils.isNotBlank(root.getTextTrim())){
             plays.add(root.getTextTrim());
         }
-        String nextUrl = "";
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
-        }
+
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
                     getAction(),finish_keys,repeat,plays);
@@ -92,7 +86,7 @@ public class PlayActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;

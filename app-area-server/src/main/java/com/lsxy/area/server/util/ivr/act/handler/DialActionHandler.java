@@ -69,7 +69,7 @@ public class DialActionHandler extends ActionHandler{
      * @return
      */
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
@@ -80,13 +80,6 @@ public class DialActionHandler extends ActionHandler{
         if(state == null){
             logger.info("没有找到call_id={}的state",callId);
             return false;
-        }
-        String nextUrl = "";
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
         }
         boolean dialSucc = false;
         try{
@@ -100,7 +93,7 @@ public class DialActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
 
@@ -131,8 +124,8 @@ public class DialActionHandler extends ActionHandler{
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         //解析xml
-        String ring_play_file = root.elementText("play");
-        String to = root.elementText("number");
+        String ring_play_file = root.elementTextTrim("play");
+        String to = root.elementTextTrim("number");
         Integer maxCallDuration=parseInt(root.attributeValue("max_call_duration"));
         Integer maxDialDuration=parseInt(root.attributeValue("max_dial_duration"));
         Integer dialVoiceStopCond = parseInt(root.attributeValue("dial_voice_stop_cond"));
@@ -155,7 +148,7 @@ public class DialActionHandler extends ActionHandler{
             play_time = parseLong(connectEle.attributeValue("play_time"));
             Element playEle = connectEle.element("play");
             if(playEle != null){
-                play_file = playEle.elementText("play_time");
+                play_file = playEle.getTextTrim();
                 play_repeat = parseInt(playEle.attributeValue("repeat"));
             }
         }

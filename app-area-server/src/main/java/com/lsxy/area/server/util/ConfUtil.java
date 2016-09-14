@@ -61,6 +61,11 @@ public class ConfUtil {
         redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
     }
 
+    /**
+     * 获取会议成员的call_id
+     * @param confId
+     * @return
+     */
     public List<String> getParts(String confId){
         String key = key(confId);
         return (List<String>)redisTemplate.opsForSet().members(key);

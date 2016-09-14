@@ -39,7 +39,7 @@ public class PauseActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
@@ -51,14 +51,8 @@ public class PauseActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        String nextUrl = "";
         Integer duration = null;
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
-        }
+
         Attribute attr = root.attribute("duration");
         if(attr != null){
             String duration_str = root.attribute("duration").getValue();
@@ -71,7 +65,7 @@ public class PauseActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;

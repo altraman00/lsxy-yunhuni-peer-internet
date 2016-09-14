@@ -31,7 +31,7 @@ public class NoneActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
@@ -43,9 +43,8 @@ public class NoneActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        String nextUrl = "";
         Map<String,Object> businessData = state.getBusinessData();
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;
