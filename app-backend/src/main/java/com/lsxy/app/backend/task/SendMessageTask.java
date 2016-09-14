@@ -38,9 +38,11 @@ public class SendMessageTask {
     /**
      * 执行上线活动消息动作
      */
-    @Scheduled(cron="0 1 0/1 * * ?")
+    @Scheduled(cron="0 5 0/1 * * ?")
     public void sendMsg() {
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName();
+        Date date=new Date();
+        String hour = DateUtils.formatDate(date, "yyyy-MM-dd HH");
+        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName()+ " " + hour;
         //执行互斥处理消息
         String flagValue = redisCacheService.get("scheduled_" + cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
@@ -52,7 +54,7 @@ public class SendMessageTask {
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
                 }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,50*60);
+                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,60*60);
                 String currentCacheValue = redisCacheService.get(cacheKey);
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
