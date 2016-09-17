@@ -56,6 +56,7 @@ public class CalCostTest {
     }
     @Test
     public void testResourcesRent(){
+
         resourcesRentService.resourcesRentTask();
     }
 }
