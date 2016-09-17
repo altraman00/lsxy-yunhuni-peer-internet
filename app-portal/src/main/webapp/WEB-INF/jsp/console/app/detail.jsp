@@ -427,7 +427,7 @@
                         var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
                         var result=  re.test(filename);
                         if(result){
-                            if(data.files[0].size < (5* 1024 * 1024)) {
+                            if(data.files[0].size <= (5* 1024 * 1024)) {
                                 ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
                                     if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
                                         $('#progress').show();
