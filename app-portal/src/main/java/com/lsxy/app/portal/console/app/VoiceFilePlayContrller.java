@@ -10,7 +10,6 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
-import org.aspectj.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +35,6 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayContrller.class);
     private static String repository = SystemConfig.getProperty("global.oss.aliyun.bucket");
     private static String filePlayPath = SystemConfig.getProperty("portal.file.play");
-    private static String filePlayTempPath = SystemConfig.getProperty("portal.file.play.temp");
     @Autowired
     private OSSService ossService;
 
@@ -156,15 +151,12 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     //如果文件夹不存在，则创建文件夹
                     String folder = getFolder(tenantId,appId,ymd);
                     new File(filePlayPath+"/"+folder).mkdirs();
-                    new File(filePlayTempPath+"/"+folder).mkdirs();
                     String fileKey = getFileKey(tenantId,appId,ymd,type);
-                    File newTempFile = new File(filePlayTempPath +"/"+fileKey);
                     File newFile = new File(filePlayPath +"/"+fileKey);
                     //保存在临时文件夹
                     boolean flag = false;
                     try {
-                        file.transferTo(newTempFile);
-                        FileUtil.copyFile(newTempFile, newFile);
+                        file.transferTo(newFile);
                         flag = true;
                     }catch (Exception e){
                         logger.error("上传放音文件-保存文件过程出错,{}",e);
