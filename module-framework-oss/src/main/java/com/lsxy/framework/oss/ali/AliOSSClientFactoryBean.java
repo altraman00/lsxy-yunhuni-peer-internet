@@ -9,6 +9,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,11 +17,12 @@ import org.springframework.stereotype.Component;
  * 阿里云OSSClient工厂类
  */
 @Component
+@ConditionalOnMissingBean(AliOSSClientFactoryBean.class)
 public class AliOSSClientFactoryBean implements FactoryBean<OSSClient>,InitializingBean,DisposableBean {
 
     public static final Logger logger = LoggerFactory.getLogger(AliOSSClientFactoryBean.class);
     
-    private OSSClient ossClient;
+    protected OSSClient ossClient;
 
     @Override
     public OSSClient getObject() throws Exception {
@@ -39,11 +41,14 @@ public class AliOSSClientFactoryBean implements FactoryBean<OSSClient>,Initializ
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        initClient();
+    }
 
+    protected void initClient(){
         if (logger.isDebugEnabled()){
-                logger.debug("创建ALI OSS链接客户端");
-         }
-    // endpoint以杭州为例，其它region请按实际情况填写
+            logger.debug("创建ALI OSS链接客户端");
+        }
+        // endpoint以杭州为例，其它region请按实际情况填写
 //        String endpoint = "http://oss-cn-beijing-internal.aliyuncs.com";
         String endpoint = SystemConfig.getProperty("global.oss.aliyun.endpoint","http://oss-cn-beijing.aliyuncs.com");
 
@@ -53,10 +58,9 @@ public class AliOSSClientFactoryBean implements FactoryBean<OSSClient>,Initializ
         // 创建OSSClient实例
         ossClient =buildOSSClient(accessKeyId,accessKeySecret,endpoint);
         if (logger.isDebugEnabled()){
-                logger.debug("链接客户端成功：");
-         }
+            logger.debug("链接客户端成功：");
+        }
     }
-
     @Override
     public void destroy() throws Exception {
         if(ossClient != null){
@@ -73,7 +77,7 @@ public class AliOSSClientFactoryBean implements FactoryBean<OSSClient>,Initializ
      * @param key
      * @return
      */
-    private static OSSClient buildOSSClient(String key, String secret, String endpoint){
+    protected static OSSClient buildOSSClient(String key, String secret, String endpoint){
         // 创建ClientConfiguration实例
         ClientConfiguration conf = new ClientConfiguration();
         // 设置HTTP最大连接数为10
@@ -101,5 +105,4 @@ public class AliOSSClientFactoryBean implements FactoryBean<OSSClient>,Initializ
         OSSClient client = new OSSClient(endpoint, key, secret,conf);
         return client;
     }
-
 }

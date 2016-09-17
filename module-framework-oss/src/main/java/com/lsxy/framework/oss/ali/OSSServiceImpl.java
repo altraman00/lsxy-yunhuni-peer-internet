@@ -83,7 +83,6 @@ public class OSSServiceImpl implements OSSService{
         InputStream objectContent = object.getObjectContent();
         return objectContent;
     }
-
     @Override
     public File downLoadFile(String repository, String fileKey, String destFile) throws Exception {
         OSSClient ossClient = this.afb.getObject();
