@@ -1,6 +1,10 @@
 package com.lsxy.yunhuni.session.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.statistics.model.VoiceCdrDay;
+import com.lsxy.framework.api.statistics.model.VoiceCdrHour;
+import com.lsxy.framework.api.statistics.service.VoiceCdrDayService;
+import com.lsxy.framework.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -9,6 +13,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.utils.StatisticsUtils;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import com.lsxy.yunhuni.session.dao.VoiceCdrDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhangxb on 2016/7/19.
@@ -35,6 +37,12 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     }
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private CallSessionService callSessionService;
+    @Autowired
+    private VoiceCdrHourService voiceCdrHourService;
+    @Autowired
+    private VoiceCdrDayService voiceCdrDayService;
 
     @Override
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, String type,String tenantId, String time, String appId) {
@@ -74,4 +82,35 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
         return result;
     }
+
+
+    @Override
+    public Map currentRecordStatistics(String appId){
+        VoiceCdrHour voiceCdrHour = null;
+        VoiceCdrDay voiceCdrDay = null;
+        Date date = new Date();
+        Long currentSession = callSessionService.currentCallSessionCount(appId);
+        String currentHourStr = DateUtils.formatDate(date, "yyyy-MM-dd HH");
+        Date currentHour = DateUtils.parseDate(currentHourStr, "yyyy-MM-dd HH");
+        voiceCdrHour = voiceCdrHourService.findByAppIdAndTime(appId,currentHour);
+        if(voiceCdrHour == null){
+            Date lastHour = DateUtils.getPrevHour(currentHour);
+            voiceCdrHour = voiceCdrHourService.findByAppIdAndTime(appId,lastHour);
+        }
+
+        String currentDayStr = DateUtils.formatDate(date, "yyyy-MM-dd");
+        Date currentDay = DateUtils.parseDate(currentDayStr, "yyyy-MM-dd");
+        voiceCdrDay = voiceCdrDayService.findByAppIdAndTime(appId,currentDay);
+        if(voiceCdrDay == null){
+            Date lastDay = DateUtils.getPreDate(currentDay);
+            voiceCdrHour = voiceCdrHourService.findByAppIdAndTime(appId,lastDay);
+        }
+
+        Map result = new HashMap();
+        result.put("dayCount",voiceCdrHour == null ? 0 : voiceCdrHour.getAmongCall());
+        result.put("hourCount",voiceCdrDay == null ? 0 : voiceCdrDay.getAmongCall());
+        result.put("currentSession",currentSession);
+        return result;
+    }
+
 }
