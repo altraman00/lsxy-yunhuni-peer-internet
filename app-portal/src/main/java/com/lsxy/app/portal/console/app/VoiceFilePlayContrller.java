@@ -39,7 +39,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(VoiceFilePlayContrller.class);
     private static String repository = SystemConfig.getProperty("global.oss.aliyun.bucket");
     private static String filePlayPath = SystemConfig.getProperty("portal.file.play");
-
+    private static String filePlayTempPath = SystemConfig.getProperty("portal.file.play.temp");
     @Autowired
     private OSSService ossService;
 
@@ -156,19 +156,13 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     //如果文件夹不存在，则创建文件夹
                     String folder = getFolder(tenantId,appId,ymd);
                     new File(filePlayPath+"/"+folder).mkdirs();
+                    new File(filePlayTempPath+"/"+folder).mkdirs();
                     String fileKey = getFileKey(tenantId,appId,ymd,type);
+                    File newTempFile = new File(filePlayTempPath +"/"+fileKey);
                     File newFile = new File(filePlayPath +"/"+fileKey);
-                    //不直接操纵流
-                    try {
-                        byte[] bytes = file.getBytes();
-                        BufferedOutputStream buffStream =
-                                new BufferedOutputStream(new FileOutputStream(newFile));
-                        buffStream.write(bytes);
-                        buffStream.close();
-                    }catch (Exception e){
-                        logger.error("文件上传异常",e);
-                    }
-                    //file.transferTo(newFile);
+                    //保存在临时文件夹
+                    file.transferTo(newTempFile);
+                    FileUtil.copyFile(newTempFile,newFile);
                     int re = newFile.exists()?1:0;
 //                    int re = downFile(file,filePlayPath +"/"+fileKey);
                     if(re==1) {
@@ -271,51 +265,6 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      */
     private String getFolder(String tenantId,String appId,String ymd){
         String result = "tenant_res/"+tenantId+"/play_voice/"+appId+"/"+ymd;
-        return result;
-    }
-    /**
-     * 下载文件
-     * @param path 保存文件地址
-     * @return
-     */
-    private Integer downFile(MultipartFile file,String path){
-        Integer result = -1;
-        logger.error("文件下载开始---->{},时间:{}",path, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
-        File newFile = new File(path);
-        long start = new Date().getTime();
-        //先判断文件是否存在，如果存在则不下载
-        if(newFile.exists()){
-            logger.info("文件已存在，覆盖原文件:{}",path);
-        }
-        //补充文件夹
-        new File(path.substring(0,path.lastIndexOf("/"))).mkdirs();
-        //开始写文件
-        InputStream in = null;
-        FileOutputStream out = null;
-        try {
-            in = file.getInputStream();
-            out = new FileOutputStream(newFile);
-            byte[] buffer = new byte[8 * 1024];
-            int length;
-            while ((length = in.read(buffer)) > 0) {
-                out.write(buffer, 0, length);
-            }
-            result = 1;
-        } catch (Exception e) {
-            logger.error("文件流输出异常,{]", e);
-        }finally {
-            try {
-                if(in!=null) {
-                    in.close();
-                }
-                if(out!=null) {
-                    out.close();
-                }
-            } catch (Exception e) {
-                logger.error("文件流关闭异常，{}", e);
-            }
-        }
-        logger.error("文件下载结束---->{},结果:{},时间:{},花费时间{}",path,result, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"),new Date().getTime()-start);
         return result;
     }
 }
