@@ -3,6 +3,8 @@ package com.lsxy.yunhuni.api.resourceTelenum.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -20,6 +22,7 @@ public class ResourcesRent extends IdEntity {
     public static final int RENT_STATUS_USING = 1;      //正在使用
     public static final int RENT_STATUS_UNUSED = 2;     //没在使用，但号码归属于租户
     public static final int RENT_STATUS_RELEASE = 3;    //被释放，号码不属于租户
+
 
     private Tenant tenant;//tenant_id所属租户
     private App app;//app_id 关联应用
@@ -98,8 +101,9 @@ public class ResourcesRent extends IdEntity {
         this.rentStatus = rentStatus;
     }
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "res_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     public ResourceTelenum getResourceTelenum() {
         return resourceTelenum;
     }
@@ -108,7 +112,7 @@ public class ResourcesRent extends IdEntity {
         this.resourceTelenum = resourceTelenum;
     }
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "app_id")
     public App getApp() {
         return app;
