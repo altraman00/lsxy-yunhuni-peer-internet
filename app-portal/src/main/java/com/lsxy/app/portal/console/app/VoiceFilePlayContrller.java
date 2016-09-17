@@ -161,11 +161,16 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                     File newTempFile = new File(filePlayTempPath +"/"+fileKey);
                     File newFile = new File(filePlayPath +"/"+fileKey);
                     //保存在临时文件夹
-                    file.transferTo(newTempFile);
-                    FileUtil.copyFile(newTempFile,newFile);
-                    int re = newFile.exists()?1:0;
+                    boolean flag = false;
+                    try {
+                        file.transferTo(newTempFile);
+                        FileUtil.copyFile(newTempFile, newFile);
+                        flag = true;
+                    }catch (Exception e){
+                        logger.error("上传放音文件-保存文件过程出错,{}",e);
+                    }
 //                    int re = downFile(file,filePlayPath +"/"+fileKey);
-                    if(re==1) {
+                    if(flag) {
                         //文件保存成功，将对象保存数据库
                         restResponse = createVoiceFilePlay(request, name, size, fileKey, appId);
                         if (!restResponse.isSuccess()) {
