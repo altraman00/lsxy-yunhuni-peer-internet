@@ -16,6 +16,8 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.session.model.Meeting;
+import com.lsxy.yunhuni.api.session.service.MeetingService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -50,6 +53,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private MeetingService meetingService;
 
     @Override
     public String getEventName() {
@@ -152,5 +158,10 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         } catch (Exception e) {
             logger.error("会议创建自动录音：",e);
         }
+        Meeting meeting = new Meeting();
+        meeting.setId(conf_id);
+        meeting.setResId(res_id);
+        meeting.setStartTime(new Date());
+        meetingService.save(meeting);
     }
 }

@@ -7,7 +7,6 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,29 +35,26 @@ public class RecordActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
-        String max_duration = root.attributeValue("max_duration");
-        String beeping = root.attributeValue("beeping");
-        String finish_keys = root.attributeValue("finish_keys");
-        String nextUrl = "";
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，max_duration={},beeping={},finish_keys={}",
-                            getAction(),max_duration,beeping,finish_keys);
-        }
+
         BusinessState state = businessStateService.get(callId);
         if(state == null){
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
+
+        String max_duration = root.attributeValue("max_duration");
+        String beeping = root.attributeValue("beeping");
+        String finish_keys = root.attributeValue("finish_keys");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("开始处理ivr[{}]动作，max_duration={},beeping={},finish_keys={}",
+                    getAction(),max_duration,beeping,finish_keys);
+        }
+
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
@@ -79,7 +75,7 @@ public class RecordActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;

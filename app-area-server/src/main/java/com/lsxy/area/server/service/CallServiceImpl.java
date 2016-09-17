@@ -437,7 +437,7 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("play_repeat",repeat)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid ",app.getId())
+                .putIfNotEmpty("appid ",app.getId())
                 .build();
 
         playFile = playFileUtil.convertArray(app.getTenant().getId(),appId,playFile);
@@ -468,8 +468,8 @@ public class CallServiceImpl implements CallService {
                     .setAreaId(app.getArea().getId())
                     .setLineGatewayId(lineGateway.getId())
                     .setBusinessData(new MapBuilder<String,Object>()
-                            .put("from",oneTelnumber)
-                            .put("to",to)
+                            .putIfNotEmpty("from",oneTelnumber)
+                            .putIfNotEmpty("to",to)
                             .build())
                     .build();
             businessStateService.save(cache);
