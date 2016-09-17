@@ -6,21 +6,21 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.oss.OSSService;
-import java.io.IOException;
-import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Created by Tandy on 2016/7/14.
@@ -39,17 +39,23 @@ public class OSSServiceImpl implements OSSService{
 
     @Override
     public boolean uploadFileStream(InputStream inputStream, long fileLength, String orignalFileName, String repository, String fileKey) {
+        if (logger.isDebugEnabled()){
+            logger.debug("开始上传OSS文件{}({})",orignalFileName,fileKey);
+        }
         long starttime = System.currentTimeMillis();
         try {
             OSSClient client = afb.getObject();
             client.putObject(repository, fileKey, inputStream);
         } catch (Exception e) {
+            if (logger.isDebugEnabled()){
+                logger.debug("上传OSS文件{}({})失败，花费时间{} ms，原因{}",orignalFileName,fileKey,(System.currentTimeMillis()-starttime),e);
+            }
             e.printStackTrace();
             return false;
         }
         long endtime = System.currentTimeMillis();
         if (logger.isDebugEnabled()){
-                logger.debug("upload file {}({}) total spend {} ms",orignalFileName,fileKey,(endtime-starttime));
+                logger.debug("上传OSS文件{}({})成功 花费时间 {} ms",orignalFileName,fileKey,(endtime-starttime));
          }
         return true;
     }
@@ -119,6 +125,35 @@ public class OSSServiceImpl implements OSSService{
         }catch (Exception ex){
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public List<String> deleteObjects(String repository,List<String> keys) throws Exception {
+        OSSClient client = afb.getObject();
+        List<String> deletedObjects = new ArrayList<>();
+        if(keys.size()>1000) {
+            List<String> list = new ArrayList<>();
+            for (int i = 0; i < keys.size(); i++) {
+                list.add(keys.get(i));
+                if (list.size() % 1000 == 0) {//每1000个文件删除一次
+                    list = new ArrayList();
+                    DeleteObjectsResult deleteObjectsResult = client.deleteObjects(new DeleteObjectsRequest(repository).withKeys(list));
+                    List<String> re = deleteObjectsResult.getDeletedObjects();
+                    deletedObjects.addAll(re);
+                }
+            }
+            if (list.size() > 0) {//最后剩下的不足1000个文件也删除一次
+                DeleteObjectsResult deleteObjectsResult = client.deleteObjects(new DeleteObjectsRequest(repository).withKeys(list));
+                List<String> re = deleteObjectsResult.getDeletedObjects();
+                deletedObjects.addAll(re);
+            }
+        }else {
+            //文件少于1000个文件时直接删除
+            DeleteObjectsResult deleteObjectsResult = client.deleteObjects(new DeleteObjectsRequest(repository).withKeys(keys));
+            List<String> re = deleteObjectsResult.getDeletedObjects();
+            deletedObjects.addAll(re);
+        }
+        return deletedObjects;
     }
 
 

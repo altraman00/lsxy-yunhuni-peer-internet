@@ -34,8 +34,8 @@ import java.util.Map;
 public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_VF_SYNC.class);
-    //文件保存地址
-    private static final String path = "/data/prd/p/0";
+    //文件保存地址 area.agent.file.play "/data/prd/p/0"
+    private static final String path = SystemConfig.getProperty("area.agent.file.play");
     @Autowired
     private OSSService ossService ;
     @Autowired
@@ -113,9 +113,13 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
             logger.error("文件流输出异常,{]", e);
         }finally {
             try {
-                in.close();
-                out.close();
-            } catch (IOException e) {
+                if(in!=null) {
+                    in.close();
+                }
+                if(out!=null) {
+                    out.close();
+                }
+            } catch (Exception e) {
                 logger.error("文件流关闭异常，{}", e);
             }
         }

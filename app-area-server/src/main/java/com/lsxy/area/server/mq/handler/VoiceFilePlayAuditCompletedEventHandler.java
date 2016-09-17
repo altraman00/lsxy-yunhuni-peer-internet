@@ -43,32 +43,35 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         if(logger.isDebugEnabled()){
             logger.debug("放音文件同步开启");
         }
-        List<VoiceFilePlay> list = voiceFilePlayService.findNotSync();
-        List<Map<String,Object>> list1 = new ArrayList<>();
-        for(int i=0;i<list.size();i++) {
-            if(list.get(i).getApp()!=null) {
-                Map<String, Object> map = new HashMap();
-                map.put("id", list.get(i).getId());
-                map.put("appId", list.get(i).getApp().getId());
-                map.put("tenantId", list.get(i).getTenant().getId());
-                map.put("name", list.get(i).getName());
-                map.put("fileKey", list.get(i).getFileKey());
-                list1.add(map);
+        List<String> apps = voiceFilePlayService.findNotSyncApp();
+        for(int j=0;j<apps.size();j++){
+            List<VoiceFilePlay> list = voiceFilePlayService.findNotSyncByApp(apps.get(j));
+            List<Map<String,Object>> list1 = new ArrayList<>();
+            for(int i=0;i<list.size();i++) {
+                if(list.get(i).getApp()!=null) {
+                    Map<String, Object> map = new HashMap();
+                    map.put("id", list.get(i).getId());
+                    map.put("appId", list.get(i).getApp().getId());
+                    map.put("tenantId", list.get(i).getTenant().getId());
+                    map.put("name", list.get(i).getName());
+                    map.put("fileKey", list.get(i).getFileKey());
+                    list1.add(map);
+                }
+            }
+            String param = JSON.toJSON(list1).toString();
+            if(logger.isDebugEnabled()){
+                logger.debug("本次同步文件信息:{}",param);
+            }
+            Map<String, Object> params = new HashMap<>();
+            params.put("appid ",apps.get(j));
+            RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
+            request.setBody(param);
+            try {
+                rpcCaller.invoke(sessionContext,request);
+                logger.info("发送放音文件指令成功");
+            } catch (Exception ex) {
+                logger.error("发送放音文件指令失败:"+request,ex);
             }
         }
-        String param = JSON.toJSON(list1).toString();
-        if(logger.isDebugEnabled()){
-            logger.debug("本次同步文件信息:{}",param);
-        }
-        String params = "";
-        RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
-        request.setBody(param);
-        try {
-            rpcCaller.invoke(sessionContext,request);
-            logger.info("发送放音文件指令成功");
-        } catch (Exception ex) {
-            logger.error("发送放音文件指令失败:"+request,ex);
-        }
-
     }
 }

@@ -116,12 +116,16 @@ public class AppController extends AbstractPortalController {
     @RequestMapping("/delete")
     @ResponseBody
     public RestResponse delete(HttpServletRequest request,String id){
-
-        //Rest删除应用
-        String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/delete?id={1}";
-        RestResponse<App> response = RestRequest.buildSecurityRequest(token).get(uri, App.class, id);
-        return response;
+        App app = (App)findById(request,id).getData();
+        if(App.STATUS_OFFLINE==app.getStatus()) {
+            //Rest删除应用
+            String token = getSecurityToken(request);
+            String uri = restPrefixUrl + "/rest/app/delete?id={1}";
+            RestResponse<App> response = RestRequest.buildSecurityRequest(token).get(uri, App.class, id);
+            return response;
+        }else{
+            return RestResponse.failed("0011","当前应用正在运营中，请将其下线后进行删除");
+        }
 
     }
     /**

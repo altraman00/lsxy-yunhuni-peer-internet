@@ -33,7 +33,7 @@ public class ModifyEmailController {
             Map map = JSONUtil.parseObject(re);
             if(code.equals(map.get("code"))){//验证成功，进行邮箱修改
                 String email = (String)map.get("email");
-                String url = PortalConstants.REST_PREFIX_URL + "/modify/email?id={1}&email={2}";
+                String url = PortalConstants.REST_PREFIX_URL + "/modify_email_bind?id={1}&email={2}";
                 RestResponse restResponse = RestRequest.buildRequest().get(url,String.class,id,email);
                 if(restResponse.isSuccess()){//修改成功
                     mav.addObject("info","邮箱已经激活");
