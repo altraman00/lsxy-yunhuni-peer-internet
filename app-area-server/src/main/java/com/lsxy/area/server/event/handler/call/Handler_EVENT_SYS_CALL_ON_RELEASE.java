@@ -85,6 +85,18 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         if(params.get("answer_time") != null){
             answer_time = ((long)params.get("answer_time")) * 1000;
         }
+
+        //通过ivr 拨号发起的呼叫在被叫方结束后 要继续ivr
+        if(state.getType().equalsIgnoreCase("ivr_dial")){
+            String ivr_call_id = null;
+            if(state.getBusinessData() != null){
+                ivr_call_id = (String)state.getBusinessData().get("ivr_call_id");
+            }
+            if(StringUtils.isNotBlank(ivr_call_id)){
+                ivrActionUtil.doAction(ivr_call_id);
+            }
+        }
+
         //发送呼叫结束通知
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","ivr.call_end")
@@ -97,6 +109,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+
+        businessStateService.delete(call_id);
         return res;
     }
 }

@@ -2,7 +2,6 @@ package com.lsxy.area.server.util.ivr.act.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.exceptions.PlayFileNotExistsException;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -14,10 +13,10 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import java.util.List;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,21 +43,22 @@ public class PlayListActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
+
+        BusinessState state = businessStateService.get(callId);
+        if(state == null){
+            logger.info("没有找到call_id={}的state",callId);
+            return false;
+        }
+
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
         List<Element> peles = root.elements("play");
-        String nextUrl = "";
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
-        }
+
         for (Element pele: peles) {
             if(StringUtils.isNotBlank(pele.getTextTrim())){
                 plays.add(pele.getTextTrim());
@@ -66,13 +66,9 @@ public class PlayListActionHandler extends ActionHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},plays={}",
-                            getAction(),finish_keys,repeat,plays);
+                    getAction(),finish_keys,repeat,plays);
         }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
+
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         if(plays!=null && plays.size()>0){
@@ -95,7 +91,7 @@ public class PlayListActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;

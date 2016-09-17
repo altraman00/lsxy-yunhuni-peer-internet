@@ -55,6 +55,9 @@ public class HandlerManager {
 
     public RPCResponse fire(RPCRequest request, Session session){
         RpcRequestHandler handler = handlers.get(request.getName());
+        if(handler == null){
+            return null;
+        }
         return handler.handle(request,session);
     }
 }
