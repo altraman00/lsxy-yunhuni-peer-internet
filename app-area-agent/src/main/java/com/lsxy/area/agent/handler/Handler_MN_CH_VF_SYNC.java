@@ -79,7 +79,6 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
         }
         return null;
     }
-
     /**
      * 下载文件
      * @param uri 文件对于的oss地址
@@ -98,32 +97,59 @@ public class Handler_MN_CH_VF_SYNC extends RpcRequestHandler{
         //补充文件夹
         new File(path.substring(0,path.lastIndexOf("/"))).mkdirs();
         //开始写文件
-        InputStream in = null;
-        FileOutputStream out = null;
         try {
-            in = ossService.getFileStream(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
-            out = new FileOutputStream(newFile);
-            byte[] buffer = new byte[8 * 1024];
-            int length;
-            while ((length = in.read(buffer)) > 0) {
-                out.write(buffer, 0, length);
-            }
+            ossService.downLoadFile(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri,path);
             result = 1;
         } catch (Exception e) {
             logger.error("文件流输出异常,{]", e);
-        }finally {
-            try {
-                if(in!=null) {
-                    in.close();
-                }
-                if(out!=null) {
-                    out.close();
-                }
-            } catch (Exception e) {
-                logger.error("文件流关闭异常，{}", e);
-            }
         }
         logger.error("文件下载结束{}---->{},结果:{},时间:{},花费时间{}",uri,path,result, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"),new Date().getTime()-start);
         return result;
     }
+//    /**
+//     * 下载文件
+//     * @param uri 文件对于的oss地址
+//     * @param path 保存文件地址
+//     * @return
+//     */
+//    private Integer downFile(String uri,String path){
+//        Integer result = -1;
+//        logger.error("文件下载开始{}---->{},时间:{}",uri,path, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+//        File newFile = new File(path);
+//        long start = new Date().getTime();
+//        //先判断文件是否存在，如果存在则不下载
+//        if(newFile.exists()){
+//            logger.info("文件已存在，覆盖原文件:{},下载信息:{}",path,uri);
+//        }
+//        //补充文件夹
+//        new File(path.substring(0,path.lastIndexOf("/"))).mkdirs();
+//        //开始写文件
+//        InputStream in = null;
+//        FileOutputStream out = null;
+//        try {
+//            in = ossService.getFileStream(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
+//            out = new FileOutputStream(newFile);
+//            byte[] buffer = new byte[8 * 1024];
+//            int length;
+//            while ((length = in.read(buffer)) > 0) {
+//                out.write(buffer, 0, length);
+//            }
+//            result = 1;
+//        } catch (Exception e) {
+//            logger.error("文件流输出异常,{]", e);
+//        }finally {
+//            try {
+//                if(in!=null) {
+//                    in.close();
+//                }
+//                if(out!=null) {
+//                    out.close();
+//                }
+//            } catch (Exception e) {
+//                logger.error("文件流关闭异常，{}", e);
+//            }
+//        }
+//        logger.error("文件下载结束{}---->{},结果:{},时间:{},花费时间{}",uri,path,result, DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"),new Date().getTime()-start);
+//        return result;
+//    }
 }
