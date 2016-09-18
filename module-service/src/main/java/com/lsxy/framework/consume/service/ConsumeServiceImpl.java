@@ -9,6 +9,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.consume.dao.ConsumeDao;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,9 +40,23 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
 
     @Override
     public Page<Consume> pageList(String userName,Integer pageNo, Integer pageSize,String startTime,String endTime) {
+        Date startDate = null;
+        Date endDate = null;
+        if(StringUtils.isNotBlank(startTime)){
+            startDate = DateUtils.parseDate(startTime, "yyyy-MM");
+        }
+        if(StringUtils.isNotBlank(endTime)){
+            endDate = DateUtils.parseDate(endTime, "yyyy-MM");
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(endDate);
+            //当前月＋1，即下个月
+            cal.add(Calendar.MONTH,1);
+            endDate = cal.getTime();
+        }
+
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from Consume obj where obj.tenant.id=?1 and ( DATE_FORMAT(obj.dt,'%Y-%m')<=?2 and DATE_FORMAT(obj.dt,'%Y-%m')>=?3 )  ORDER BY obj.dt";
-        Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime,startTime);
+        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<?2 and obj.dt>=?3 ORDER BY obj.dt";
+        Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endDate,startDate);
         return page;
     }
 
