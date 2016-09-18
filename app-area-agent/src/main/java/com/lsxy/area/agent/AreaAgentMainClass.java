@@ -1,6 +1,8 @@
 package com.lsxy.area.agent;
 
+import com.lsxy.area.agent.oss.OSSClientFactory;
 import com.lsxy.framework.oss.FrameworkOSSConfig;
+import com.lsxy.framework.oss.ali.AliOSSClientFactoryBean;
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.session.SessionContext;
@@ -22,10 +24,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class AreaAgentMainClass extends AbstractSpringBootWebStarter {
 
+
+
     public static void main(String[] args) throws RemoteServerStartException {
         SpringApplication.run(AreaAgentMainClass.class);
     }
 
+    @Bean
+    public AliOSSClientFactoryBean getAliOSSClientFactoryBean(){
+        AliOSSClientFactoryBean aliOSSClientFactoryBean = new OSSClientFactory();
+        return aliOSSClientFactoryBean;
+    }
 
     @Bean(name="sessionContext")
     public SessionContext getSessionContext(){

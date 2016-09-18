@@ -1,6 +1,7 @@
 package com.lsxy.area.server.mq.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.oc.VoiceFilePlayAuditCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -43,35 +44,54 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         if(logger.isDebugEnabled()){
             logger.debug("放音文件同步开启");
         }
-        List<String> apps = voiceFilePlayService.findNotSyncApp();
-        for(int j=0;j<apps.size();j++){
-            List<VoiceFilePlay> list = voiceFilePlayService.findNotSyncByApp(apps.get(j));
-            List<Map<String,Object>> list1 = new ArrayList<>();
-            for(int i=0;i<list.size();i++) {
-                if(list.get(i).getApp()!=null) {
-                    Map<String, Object> map = new HashMap();
-                    map.put("id", list.get(i).getId());
-                    map.put("appId", list.get(i).getApp().getId());
-                    map.put("tenantId", list.get(i).getTenant().getId());
-                    map.put("name", list.get(i).getName());
-                    map.put("fileKey", list.get(i).getFileKey());
-                    list1.add(map);
+        if(StringUtil.isEmpty(event.getKey())){
+            List<String> apps = voiceFilePlayService.findNotSyncApp();
+            for(int j=0;j<apps.size();j++){
+                List<VoiceFilePlay> list = voiceFilePlayService.findNotSyncByApp(apps.get(j));
+                List<Map<String,Object>> list1 = new ArrayList<>();
+                for(int i=0;i<list.size();i++) {
+                    if(list.get(i).getApp()!=null) {
+                        Map<String, Object> map = getStringObjectMap(list.get(i));
+                        list1.add(map);
+                    }
                 }
+                initRequest(list1,apps.get(j));
             }
-            String param = JSON.toJSON(list1).toString();
-            if(logger.isDebugEnabled()){
-                logger.debug("本次同步文件信息:{}",param);
-            }
-            Map<String, Object> params = new HashMap<>();
-            params.put("appid ",apps.get(j));
-            RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
-            request.setBody(param);
-            try {
-                rpcCaller.invoke(sessionContext,request);
-                logger.info("发送放音文件指令成功");
-            } catch (Exception ex) {
-                logger.error("发送放音文件指令失败:"+request,ex);
+        }else{
+            VoiceFilePlay voiceFilePlay = voiceFilePlayService.findById(event.getKey());
+            if(voiceFilePlay!=null) {
+                List<Map<String, Object>> list1 = new ArrayList<>();
+                Map<String, Object> map = getStringObjectMap(voiceFilePlay);
+                list1.add(map);
+                initRequest(list1, voiceFilePlay.getApp().getId());
             }
         }
+    }
+
+    private void initRequest(List<Map<String, Object>> list1,String appId) {
+        String param = JSON.toJSON(list1).toString();
+        if(logger.isDebugEnabled()){
+            logger.debug("本次同步文件信息:{}",param);
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("appid ",appId);
+        RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
+        request.setBody(param);
+        try {
+            rpcCaller.invoke(sessionContext,request);
+            logger.info("发送放音文件指令成功");
+        } catch (Exception ex) {
+            logger.error("发送放音文件指令失败:"+request,ex);
+        }
+    }
+
+    private Map<String, Object> getStringObjectMap(VoiceFilePlay obj) {
+        Map<String, Object> map = new HashMap();
+        map.put("id", obj.getId());
+        map.put("appId", obj.getApp().getId());
+        map.put("tenantId", obj.getTenant().getId());
+        map.put("name", obj.getName());
+        map.put("fileKey", obj.getFileKey());
+        return map;
     }
 }
