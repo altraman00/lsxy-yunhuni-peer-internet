@@ -837,7 +837,7 @@
             var data =[];
             for(var j=0;j<response.data.result.length;j++){
                 var tempFile = response.data.result[j];
-                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:''];
+                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
                 data[j]=temp;
             }
             var html ='';
@@ -846,7 +846,7 @@
                 html +='<tr class="playtr" id="play-'+data[i][5]+'"><td class="voice-format">'+data[i][1]+'</td>';
                 if(data[i][2]==-1){
                     html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
-                }else if(data[i][2]==1){
+                }else if(data[i][2]==1&&data[i][7]==1){
                     html+='<td ><span class="success">已审核</span></td>';
                 }else{
                     html+='<td>待审核</td>';

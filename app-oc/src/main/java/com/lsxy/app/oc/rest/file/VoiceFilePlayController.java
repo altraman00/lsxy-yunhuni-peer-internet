@@ -68,7 +68,7 @@ public class VoiceFilePlayController extends AbstractRestController {
                         accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_VOICE_PLAY_FAIL );
                     }else if(voiceFilePlay.getStatus()==VoiceFilePlay.STATUS_SUCCESS){
                         accountMessageService.sendTenantTempletMessage(null,voiceFilePlay.getTenant().getId(),AccountMessage.MESSAGE_TYPE_VOICE_PLAY_SUCCESS);
-                        VoiceFilePlayAuditCompletedEvent vfpace = new VoiceFilePlayAuditCompletedEvent();
+                        VoiceFilePlayAuditCompletedEvent vfpace = new VoiceFilePlayAuditCompletedEvent(voiceFilePlay.getId());
                         mqService.publish(vfpace);
                     }
                 } else {
