@@ -26,8 +26,6 @@ public class RegisterController {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private MQService mqService;
     /**
      * 用户注册信息检查
      * @param userName 用户名
