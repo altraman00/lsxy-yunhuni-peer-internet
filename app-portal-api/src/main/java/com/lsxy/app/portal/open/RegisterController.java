@@ -93,7 +93,7 @@ public class RegisterController {
     }
 
     /**
-     * 获取账号
+     *  获取账号
      * @param accountId
      * @return
      */
