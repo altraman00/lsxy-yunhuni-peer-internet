@@ -16,8 +16,6 @@ import org.springframework.stereotype.Component;
  * Created by Tandy on 2016/7/14.
  * 阿里云OSSClient工厂类
  */
-@Component
-@ConditionalOnMissingBean(AliOSSClientFactoryBean.class)
 public class AliOSSClientFactoryBean implements FactoryBean<OSSClient>,InitializingBean,DisposableBean {
 
     public static final Logger logger = LoggerFactory.getLogger(AliOSSClientFactoryBean.class);

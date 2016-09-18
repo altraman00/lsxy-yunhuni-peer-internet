@@ -29,7 +29,6 @@ import java.util.List;
  *
  */
 @Service
-@Lazy(true)
 public class OSSServiceImpl implements OSSService{
 
     public static final Logger logger = LoggerFactory.getLogger(OSSServiceImpl.class);
