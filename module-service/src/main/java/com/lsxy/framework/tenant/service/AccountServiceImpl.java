@@ -13,6 +13,8 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.portal.RegisterSuccessEvent;
 import com.lsxy.framework.tenant.dao.AccountDao;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
@@ -54,7 +56,8 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
 
     @Autowired
     BillingService billingService;
-
+    @Autowired
+    private MQService mqService;
 
 
     @Override
@@ -145,13 +148,33 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     @Override
     public Account createAccount(String userName, String mobile, String email) {
 
-        Account account = new Account();
-        account.setUserName(userName);
-        account.setMobile(mobile);
-        account.setEmail(email);
-        account.setStatus(Account.STATUS_NOT_ACTIVE);
-//        account.setTenant(tenant);
-        return this.save(account);
+        int result = this.checkRegInfo(userName,mobile,email);
+        if(logger.isDebugEnabled()){
+            logger.debug("checkRegInfo：{} "+result);
+        }
+        if(result == AccountService.REG_CHECK_PASS){
+            Account account = new Account();
+            account.setUserName(userName);
+            account.setMobile(mobile);
+            account.setEmail(email);
+            account.setStatus(Account.STATUS_NOT_ACTIVE);
+            this.save(account);
+            if(logger.isDebugEnabled()){
+                logger.debug("RegisterSuccessEvent-start;{}"+account);
+            }
+            RegisterSuccessEvent event = new RegisterSuccessEvent(account.getId());
+            mqService.publish(event);
+            if(logger.isDebugEnabled()){
+                logger.debug("RegisterSuccessEvent-end;{},{}"+account,event);
+            }
+            return account;
+        }else{
+            return null;
+
+        }
+
+
+
     }
 
     @Override

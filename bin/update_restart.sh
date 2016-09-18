@@ -24,6 +24,8 @@ IS_TOMCAT_DEPLOY=false
 IS_SPRINGBOOT=false
 #是否需要强制安装
 FORCE_INSTALL=false
+#是否需要强制清除安装
+FORCE_CLEAN=true
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
 
@@ -46,6 +48,9 @@ while getopts "A:P:H:STILD" opt; do
       ;;
     I)
       FORCE_INSTALL=true;
+      ;;
+    C)
+      FORCE_CLEAN=false;
       ;;
     L)
       TAIL_LOG=true;
@@ -82,9 +87,14 @@ if [ "$pull_ret"x = "Already up-to-date."x ]; then
         echo "已经是最新代码了 不用INSTALL了";
     fi
 else
-    echo "安装模块代码"
-    cd $YUNHUNI_HOME
-    mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
+    #是否需要强制安装模块
+    if [ $FORCE_CLEAN = true ]; then
+        echo "清除安装模块代码"
+        cd $YUNHUNI_HOME
+        mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
+    else
+        echo "已经是最新代码了 不用CLEAN INSTALL了";
+    fi
 fi
 
 
