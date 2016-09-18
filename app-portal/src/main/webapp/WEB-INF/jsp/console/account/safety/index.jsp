@@ -102,7 +102,7 @@
                                             <div class="col-md-1 account-icon  "><i class="personal-password-icon"></i>
                                             </div>
                                             <div class="col-md-9 ">
-                                                    <span class="help-block"><a href="javascript:return false;">登录密码</a><br/>
+                                                    <span class="help-block"><font style="color: #428bca;">登录密码</font><br/>
                                                         <small class="help-small">安全性高的密码可以使账号更安全，设置一个由字母符号或数字组成的密码</small>
                                                     </span>
                                             </div>
@@ -120,7 +120,7 @@
                                             <div class="col-md-1 account-icon "><i class="personal-phone-icon"></i>
                                             </div>
                                             <div class="col-md-9 ">
-                                                    <span class="help-block"><a href="javascript:return false;">手机绑定</a><br/>
+                                                    <span class="help-block"><font style="color: #428bca;">手机绑定</font><br/>
                                                         <c:if test="${ safetyVo.isMobile==1}" > <small class="help-small" id="mobileOld">您已经绑定了手机  ${ safetyVo.mobile}</small></c:if>
                                                     </span>
                                             </div>
@@ -135,7 +135,7 @@
                                             <div class="col-md-1 account-icon "><i class="personal-email-icon"></i>
                                             </div>
                                             <div class="col-md-9 ">
-                                                    <span class="help-block"><a href="javascript:return false;">邮箱绑定</a> <c:if test="${ safetyVo.isEmail==0}" ><i class="fa fa-exclamation-triangle"></i>变更邮箱[${modifyEmail}]的过程中，只有新邮箱被重新认证才能启用，未验证之前请使用旧邮箱登录</span></c:if><br/>
+                                                    <span class="help-block"><font style="color: #428bca;">邮箱绑定</font> <c:if test="${ safetyVo.isEmail==0}" ><i class="fa fa-exclamation-triangle"></i>变更邮箱[${modifyEmail}]的过程中，只有新邮箱被重新认证才能启用，未验证之前请使用旧邮箱登录</span></c:if><br/>
                                                         <c:if test="${ safetyVo.isEmail!=-1}" ><small class="help-small">您已经绑定了邮箱  ${ safetyVo.email}</small></c:if>
                                                         <c:if test="${ safetyVo.isEmail==-1}" ><small class="help-small">您可以绑定邮箱地址，绑定邮箱地址后，可使用邮箱地址登陆，并可接受来自云呼你相关邮件通知</small></c:if>
                                                     </span>

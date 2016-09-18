@@ -44,6 +44,15 @@
 
 
 <title><%=SystemConfig.getProperty("portal.system.title") %></title>
+<script>
+	var _hmt = _hmt || [];
+	(function() {
+		var hm = document.createElement("script");
+		hm.src = "//hm.baidu.com/hm.js?0c61ac734b9dde2e0b1841e2750ec7bd";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hm, s);
+	})();
+</script>
 <script language="JavaScript" type="text/javascript">
 	var flag = true;
 	if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 || window.navigator.userAgent.indexOf("MSIE 9.0")>0) {flag = false;} } if(!flag){

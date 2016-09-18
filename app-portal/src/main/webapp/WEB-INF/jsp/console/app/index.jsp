@@ -71,7 +71,7 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">应用名称：</lable>
                                             <div class="col-md-4">
-                                                <input type="text" name="name" value="${app.name}" placeholder="" class="form-control input-form limit20" onchange="countName(this)"/>
+                                                <input type="text" name="name"  value="${app.name}" placeholder="" class="form-control input-form limit20" onchange="countName(this)" id="checkNameByCountNameInput"/>
                                                 <small class="help-block"data-bv-for="limit20" style="color: red" id="checkNameByCountName"></small>
                                             </div>
                                             <span class="span-required">*</span>
@@ -136,8 +136,8 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>基础语音服务</strong></p>
-                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="javascript:return false;">语音通知</a>（自动拨打用户电话，并播报自定义的通知内容）</p>
-                                                <p><input type="checkbox" name="isVoiceCallback" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<a href="javascript:return false;">语音回拨</a>（以不同的通话方式实现匿名通话功能,保护双方号码隐私）</p>
+                                                <p><input type="checkbox" name="isVoiceDirectly" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceDirectly=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音通知</font>（自动拨打用户电话，并播报自定义的通知内容）</p>
+                                                <p><input type="checkbox" name="isVoiceCallback" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceCallback=='1'}">checked='checked'</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音回拨</font>（以不同的通话方式实现匿名通话功能,保护双方号码隐私）</p>
 
                                             </div>
                                         </div>
@@ -145,10 +145,10 @@
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><strong>高级语音定制服务</strong></p>
-                                                <p><input type="checkbox" name="isSessionService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a href="javascript:return false;">语音会议</a>（可与互联网会议、视频会议融合参会，提供丰富的会议管理功能）</p>
-                                                <p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a  href="javascript:return false;">通话录音</a>（提供通话录音、录音存储管理等功能）</p>
-                                                <p><input type="checkbox" name="isVoiceValidate" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a  href="javascript:return false;">语音验证码</a>（通过电话直呼到用户手机并语音播报验证码）</p>
-                                                <p><input type="checkbox" name="isIvrService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<a  href="javascript:return false;">自定义IVR</a>（即互动式语音应答可以根据用户输入的内容播放有关的信息）</p>
+                                                <p><input type="checkbox" name="isSessionService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音会议</font>（可与互联网会议、视频会议融合参会，提供丰富的会议管理功能）</p>
+                                                <p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">通话录音</font>（提供通话录音、录音存储管理等功能）</p>
+                                                <p><input type="checkbox" name="isVoiceValidate" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音验证码</font>（通过电话直呼到用户手机并语音播报验证码）</p>
+                                                <p><input type="checkbox" name="isIvrService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">自定义IVR</font>（即互动式语音应答可以根据用户输入的内容播放有关的信息）</p>
                                                 <div class="tips ml-36">
                                                     <p class="app-tips ">开启后，该应用将产生1000的号码租用费以及100元/月的功能费，上线时开始收取，多个应用开启并上线会叠加收费</p>
                                                 </div>
@@ -217,13 +217,16 @@
                 if(response.success){
                     $('#checkNameByCountName').html('');
                     $('#checkNameByCountName').hide();
+                    document.getElementById("checkNameByCountNameInput").style.borderColor="#468847";
                 }else{
                     $('#checkNameByCountName').html('应用名称已存在');
                     $('#checkNameByCountName').show();
+                    document.getElementById("checkNameByCountNameInput").style.borderColor="#b94a48";
                 }
             },"post").fail(function(){
                 $('#checkNameByCountName').html('');
                 $('#checkNameByCountName').hide();
+                document.getElementById("checkNameByCountNameInput").style.borderColor="#468847";
             });
         }
     }
