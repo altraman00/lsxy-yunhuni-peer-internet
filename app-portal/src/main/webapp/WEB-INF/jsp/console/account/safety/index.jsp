@@ -103,7 +103,7 @@
                                             </div>
                                             <div class="col-md-9 ">
                                                     <span class="help-block"><font style="color: #428bca;">登录密码</font><br/>
-                                                        <small class="help-small">安全性高的密码可以使账号更安全，设置一个由字母符号或数字组成的密码</small>
+                                                        <small class="help-small">安全性高的密码可以使账号更安全，设置一个由字母、符号或数字组成的密码</small>
                                                     </span>
                                             </div>
                                             <div class="col-md-2 right">
