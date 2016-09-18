@@ -29,7 +29,7 @@ FORCE_CLEAN=true
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
 
-while getopts "A:P:H:STILD" opt; do
+while getopts "A:P:H:STILDC" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
