@@ -46,4 +46,10 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * 清除过期号资源和租户的关系
      */
     void cleanExpireTelnumResourceRent();
+
+    /**
+     * 号码租用自动扣费任务
+     */
+    void resourcesRentTask();
+
 }
