@@ -5,6 +5,8 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.IVRService;
 import com.lsxy.area.api.exceptions.*;
+import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
+import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -60,6 +62,25 @@ public class IVRServiceImpl implements IVRService {
     @Autowired
     private CalCostService calCostService;
 
+    @Autowired
+    private TenantServiceSwitchService tenantServiceSwitchService;
+
+    private boolean isEnableIVRService(String tenantId,String appId){
+        try {
+            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
+            if(serviceSwitch.getIsIvrService() == null || serviceSwitch.getIsIvrService() != 1){
+                return false;
+            }
+            App app = appService.findById(appId);
+            if(app.getIsIvrService() == null || app.getIsIvrService() != 1){
+                return false;
+            }
+        } catch (Throwable e) {
+            logger.error("判断是否开启service失败",e);
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public String ivrCall(String ip, String appId, String from, String to,
@@ -79,7 +100,7 @@ public class IVRServiceImpl implements IVRService {
             }
         }
 
-        if(app.getIsIvrService() == null || app.getIsIvrService() != 1){
+        if(!isEnableIVRService(tenantId,appId)){
             throw new AppServiceInvalidException();
         }
 

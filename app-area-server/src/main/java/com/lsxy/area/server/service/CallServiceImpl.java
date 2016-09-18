@@ -6,6 +6,8 @@ import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
+import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -87,6 +89,61 @@ public class CallServiceImpl implements CallService {
     @Autowired
     private PlayFileUtil playFileUtil;
 
+    @Autowired
+    private TenantServiceSwitchService tenantServiceSwitchService;
+
+    private boolean isEnableDuoCallService(String tenantId,String appId){
+        try {
+            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
+            if(serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1){
+                return false;
+            }
+            App app = appService.findById(appId);
+            if(app.getIsVoiceCallback() == null || app.getIsVoiceCallback() != 1){
+                return false;
+            }
+        } catch (Throwable e) {
+            logger.error("判断是否开启service失败",e);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isEnableVoiceCallbackService(String tenantId,String appId){
+        try {
+            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
+            if(serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1){
+                return false;
+            }
+            App app = appService.findById(appId);
+            if(app.getIsVoiceCallback() == null || app.getIsVoiceCallback() != 1){
+                return false;
+            }
+        } catch (Throwable e) {
+            logger.error("判断是否开启service失败",e);
+            return false;
+        }
+        return true;
+    }
+
+
+    private boolean isEnableVoiceValidateService(String tenantId,String appId){
+        try {
+            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
+            if(serviceSwitch.getIsVoiceValidate() == null || serviceSwitch.getIsVoiceValidate() != 1){
+                return false;
+            }
+            App app = appService.findById(appId);
+            if(app.getIsVoiceValidate() == null || app.getIsVoiceValidate() != 1){
+                return false;
+            }
+        } catch (Throwable e) {
+            logger.error("判断是否开启service失败",e);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
 
@@ -140,7 +197,7 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(app.getIsVoiceCallback() != 1){
+        if(!isEnableDuoCallService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -264,9 +321,11 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(app.getIsVoiceCallback() != 1){
+
+        if(!isEnableVoiceCallbackService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
+
         boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(apiCmd, app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
@@ -339,7 +398,7 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(app.getIsVoiceValidate() != 1){
+        if(!isEnableVoiceValidateService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -415,7 +474,8 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(app.getIsVoiceValidate() != 1){
+
+        if(!isEnableVoiceValidateService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 

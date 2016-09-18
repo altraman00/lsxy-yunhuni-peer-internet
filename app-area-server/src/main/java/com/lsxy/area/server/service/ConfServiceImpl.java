@@ -7,6 +7,8 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.util.ConfUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
+import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -65,6 +67,26 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private ConfUtil confUtil;
 
+    @Autowired
+    private TenantServiceSwitchService tenantServiceSwitchService;
+
+    private boolean isEnableConfService(String tenantId,String appId){
+        try {
+            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
+            if(serviceSwitch.getIsSessionService() == null || serviceSwitch.getIsSessionService() != 1){
+                return false;
+            }
+            App app = appService.findById(appId);
+            if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+                return false;
+            }
+        } catch (Throwable e) {
+            logger.error("判断是否开启service失败",e);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
@@ -82,7 +104,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(tenantId,appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -144,7 +166,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -198,7 +220,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(tenantId,appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -276,7 +298,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -305,7 +327,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
         BusinessState call_state = businessStateService.get(callId);
@@ -348,7 +370,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -392,7 +414,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -430,7 +452,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -482,7 +504,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
         BusinessState conf_state = businessStateService.get(confId);
@@ -519,7 +541,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
