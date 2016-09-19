@@ -28,7 +28,7 @@ public class OSSClientFactory extends AliOSSClientFactoryBean {
         // 创建OSSClient实例
         ossClient =buildOSSClient(accessKeyId,accessKeySecret,endpoint);
         if (logger.isDebugEnabled()){
-            logger.debug("OSSClientFactory链接客户端成功：");
+            logger.debug("OSSClientFactory链接客户端成功;");
         }
     }
 }
