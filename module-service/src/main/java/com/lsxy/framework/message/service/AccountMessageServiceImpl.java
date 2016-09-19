@@ -138,7 +138,6 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
             message.setTitle(title);
             message.setContent(content);
             message.setName(originator);
-            message.setLineTime(new Date());
             message = messageService.save(message);//发送消息记录
             accountMessage = new AccountMessage();
             accountMessage.setMessage(message);
