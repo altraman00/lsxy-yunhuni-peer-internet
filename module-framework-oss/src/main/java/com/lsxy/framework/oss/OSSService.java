@@ -1,10 +1,11 @@
 package com.lsxy.framework.oss;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Created by Tandy on 2016/7/14.
@@ -66,6 +67,14 @@ public interface OSSService {
      * @throws UnsupportedOperationException
      */
     public void deleteObject(String repository,String path) throws UnsupportedOperationException;
+
+    /**
+     * 删除多文件，返回删除成功的文件
+     * @param keys
+     * @return
+     * @throws Exception
+     */
+    public List<String> deleteObjects(String repository,List<String> keys) throws Exception;
 
   /**
    * 上传表单提交的文件

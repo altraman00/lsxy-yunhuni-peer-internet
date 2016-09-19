@@ -133,15 +133,33 @@
                                     <div class="col-md-1 remove-padding width-130">
                                         绑定测试号：
                                     </div>
-                                    <div class="col-md-3 " id="testNumBind">
+                                    <c:set var="tempTestNum" value="0"></c:set>
+                                    <c:forEach items="${testNumBindList}" var="testNumBind">
+                                        <c:if test="${testNumBind.app.id==app.id}">
+                                            <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
+                                        </c:if>
+                                    </c:forEach>
+                                    <div class="col-md-3 " id="testNumBind"
+                                            <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
+                                                hidden
+                                            </c:if>
+                                    >
                                         <c:forEach items="${testNumBindList}" var="testNumBind">
                                             <c:if test="${testNumBind.app.id==app.id}">
                                                 <span name="testNum">${testNumBind.number} </span>
                                             </c:if>
                                         </c:forEach>
                                     </div>
+
                                     <div class="col-md-4 " >
-                                        <a class="modalShow" data-id="one">绑定交互测试号</a>
+                                        <a
+                                                <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
+                                                    class="modalShow" data-id="one"
+                                                </c:if>
+                                                <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
+                                                    onclick="showtoast('当前没有测试号码')"
+                                                </c:if>
+                                        >绑定交互测试号</a>
                                     </div>
                                 </div>
                                 <div class="row ">
@@ -155,8 +173,6 @@
                                         </p>
                                     </div>
                                 </div>
-
-
                                 <div class="row border-block"></div>
                             </section>
                             <section class="panel panel-default pos-rlt clearfix application-tab">
@@ -503,6 +519,11 @@
         }
         ajaxsync(ctx + "/console/telenum/bind/update_app_number",{ 'numbers':numbers,'appId':appId,csrfParameterName:csrfToken},function(response){
             $('#testNumBind').html(testNumBindHtml);
+            if(testNumBindHtml.length>0){
+                $('#testNumBind').show();
+            }else{
+                $('#testNumBind').hide();
+            }
             hideModal(id);
             showtoast("应用绑定号码更新成功");
         },"post");
@@ -730,6 +751,9 @@
                             if(pagePlay.nowPage>pagePlay.totalPage){
                                 pagePlay.nowPage=pagePlay.totalPage;
                             }
+                            if(pagePlay.nowPage<=0){
+                                pagePlay.nowPage=1;
+                            }
                             $('#page'+pagePlay.nowPage+pagePlay.obj).click();
                         }
                     }else{
@@ -811,21 +835,21 @@
     var playTable = function(nowPage,listRows)
     {
         var name = $('#name').val();
-
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
             var data =[];
             for(var j=0;j<response.data.result.length;j++){
                 var tempFile = response.data.result[j];
-                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:''];
+                var temp = [tempFile.id,tempFile.name,tempFile.status,resultFileSize(tempFile.size),tempFile.remark,tempFile.reason?tempFile.reason:'',tempFile.sync];
                 data[j]=temp;
             }
             var html ='';
             //数据列表
             for(var i = 0 ; i<data.length; i++){
                 html +='<tr class="playtr" id="play-'+data[i][5]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                console.info(data[i]);
                 if(data[i][2]==-1){
                     html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
-                }else if(data[i][2]==1){
+                }else if(data[i][2]==1&&data[i][6]==1){
                     html+='<td ><span class="success">已审核</span></td>';
                 }else{
                     html+='<td>待审核</td>';

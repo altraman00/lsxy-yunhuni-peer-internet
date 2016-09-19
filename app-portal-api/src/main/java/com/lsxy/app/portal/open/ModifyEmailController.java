@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by zhangxb on 2016/7/29.
  */
 @RestController
-@RequestMapping("/modify_email_bind/")
+@RequestMapping("/modify_email_bind")
 public class ModifyEmailController  {
     @Autowired
     private AccountService accountService;

@@ -41,7 +41,7 @@ public class ApiCallHourServiceImpl extends AbstractService<ApiCallHour> impleme
                 " select "+map.get("selects")+" REPLACE(UUID(), '-', '') as id, ? as dt,? as hour, "+
                 " count(1) as among_api, " +
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version ";
-        sql += "from db_lsxy_bi_yunhuni.tb_bi_api_call_log a where a.call_dt BETWEEN ? AND ?"+map.get("groupbys");
+        sql += "from db_lsxy_bi_yunhuni.tb_bi_api_log a where a.last_time BETWEEN ? AND ?"+map.get("groupbys");
 
         Timestamp sqlDate1 = new Timestamp(date1.getTime());
         long times = new Date().getTime();
