@@ -1,8 +1,9 @@
 package com.lsxy.framework.config;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +16,7 @@ import java.util.*;
  */
 public class SystemConfig {
 
-	private static Log logger=LogFactory.getLog(SystemConfig.class);
-
+private static final Logger logger = LoggerFactory.getLogger(SystemConfig.class);
 	//系统唯一标识，用于标记应用节点的唯一性，用于区分相同应用的不同节点、互斥执行
 	public static final String id = UUID.randomUUID().toString();
 
@@ -116,6 +116,9 @@ public class SystemConfig {
 			value = value.trim();
 		}else{
 			value = defaultValue;
+		}
+		if(logger.isDebugEnabled()){
+		    logger.debug("get system config {}:{}",name,value);
 		}
 		return value;
 	}
