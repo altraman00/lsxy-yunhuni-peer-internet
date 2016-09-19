@@ -1,19 +1,19 @@
 package com.lsxy.framework.rpc.mina.server;
 
 import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.rpc.api.*;
-import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.AbstractServiceHandler;
+import com.lsxy.framework.rpc.api.RPCMessage;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
 import com.lsxy.framework.rpc.api.session.Session;
-import com.lsxy.framework.rpc.mina.MinaCondition;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.net.InetSocketAddress;
  *
  */
 @Component
-@Conditional(MinaCondition.class)
+@ConditionalOnProperty(value = "global.rpc.provider", havingValue = "mina", matchIfMissing = false)
 public class MinaServerHandler extends AbstractServerRPCHandler {
 
 

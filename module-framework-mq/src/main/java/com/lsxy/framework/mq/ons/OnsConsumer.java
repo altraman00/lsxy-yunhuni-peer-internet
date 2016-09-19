@@ -1,7 +1,6 @@
 package com.lsxy.framework.mq.ons;
 
 import com.aliyun.openservices.ons.api.*;
-import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.mq.api.AbstractMQConsumer;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQMessageHandler;
@@ -12,8 +11,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +24,7 @@ import java.util.Set;
 
 @Component
 @Lazy(value = true)
-@Conditional(OnsCondition.class)
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "ons", matchIfMissing = false)
 public class OnsConsumer extends AbstractMQConsumer implements MessageListener,InitializingBean,DisposableBean{
 
 	private static final Log logger = LogFactory.getLog(OnsConsumer.class);

@@ -3,7 +3,6 @@ package com.lsxy.framework.rpc.netty.server;
 import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
-import com.lsxy.framework.rpc.netty.NettyCondition;
 import com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder;
 import com.lsxy.framework.rpc.netty.codec.RPCMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -15,17 +14,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Tandy on 2016/8/1.
  * Netty Remote Server
  */
 @Component
-@Conditional(NettyCondition.class)
+@ConditionalOnProperty(value = "global.rpc.provider", havingValue = "netty", matchIfMissing = false)
 @ConditionalOnClass(name="com.lsxy.area.server.AreaServer")
 public class NettyRemoteServer implements RemoteServer {
 
