@@ -42,7 +42,7 @@
                                     <tbody>
                                     <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                         <tr>
-                                            <td <c:if test="${result.status==0}">class="bg"</c:if>><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                                            <td <c:if test="${result.status==0}">class="bg"</c:if>><fmt:formatDate value="${result.lineTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
                                             <td>
                                                 <c:if test="${result.message.type==0 && result.message.title=='系统通知'}">
                                                     ${result.message.content}
