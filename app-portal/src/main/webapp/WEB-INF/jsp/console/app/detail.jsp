@@ -751,6 +751,9 @@
                             if(pagePlay.nowPage>pagePlay.totalPage){
                                 pagePlay.nowPage=pagePlay.totalPage;
                             }
+                            if(pagePlay.nowPage<=0){
+                                pagePlay.nowPage=1;
+                            }
                             $('#page'+pagePlay.nowPage+pagePlay.obj).click();
                         }
                     }else{
@@ -832,7 +835,6 @@
     var playTable = function(nowPage,listRows)
     {
         var name = $('#name').val();
-
         ajaxsync(ctx + "/console/app/file/play/list",{'name':name,'appId':appId,'pageNo':nowPage,'pageSize':listRows,csrfParameterName:csrfToken},function(response){
             var data =[];
             for(var j=0;j<response.data.result.length;j++){
@@ -844,9 +846,10 @@
             //数据列表
             for(var i = 0 ; i<data.length; i++){
                 html +='<tr class="playtr" id="play-'+data[i][5]+'"><td class="voice-format">'+data[i][1]+'</td>';
+                console.info(data[i]);
                 if(data[i][2]==-1){
                     html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
-                }else if(data[i][2]==1&&data[i][7]==1){
+                }else if(data[i][2]==1&&data[i][6]==1){
                     html+='<td ><span class="success">已审核</span></td>';
                 }else{
                     html+='<td>待审核</td>';
