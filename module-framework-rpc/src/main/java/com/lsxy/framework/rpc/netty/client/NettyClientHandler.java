@@ -3,7 +3,6 @@ package com.lsxy.framework.rpc.netty.client;
 import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.client.AbstractClientRPCHandler;
 import com.lsxy.framework.rpc.api.session.Session;
-import com.lsxy.framework.rpc.netty.NettyCondition;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -11,7 +10,7 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-@Conditional(NettyCondition.class)
+@ConditionalOnProperty(value = "global.rpc.provider", havingValue = "netty", matchIfMissing = false)
 @ConditionalOnBean(NettyClient.class)
 public class NettyClientHandler extends AbstractClientRPCHandler {
 

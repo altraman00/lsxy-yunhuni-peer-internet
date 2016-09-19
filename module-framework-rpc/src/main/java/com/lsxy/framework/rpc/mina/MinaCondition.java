@@ -8,9 +8,9 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 /**
  * Created by tandy on 16/7/29.
  */
-public class MinaCondition implements Condition {
-    @Override
-    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return SystemConfig.getProperty("global.rpc.provider","mina").equals("mina");
-    }
-}
+//public class MinaCondition implements Condition {
+//    @Override
+//    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+//        return SystemConfig.getProperty("global.rpc.provider","mina").equals("mina");
+//    }
+//}

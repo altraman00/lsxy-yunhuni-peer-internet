@@ -2,6 +2,7 @@ package com.lsxy.framework.mq.actmq;
 
 import com.lsxy.framework.config.SystemConfig;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ import javax.jms.ConnectionFactory;
 
 @Component
 @Configuration
-@Conditional(ActMQCondition.class)
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "actmq", matchIfMissing = false)
 public class ActMQConfig {
 
 
