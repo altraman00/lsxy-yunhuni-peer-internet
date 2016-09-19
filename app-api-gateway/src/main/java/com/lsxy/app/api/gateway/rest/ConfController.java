@@ -4,15 +4,14 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.dto.*;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.ConfService;
-import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.framework.web.utils.WebUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,20 +28,11 @@ public class ConfController extends AbstractAPIController{
     @RequestMapping(value = "/{accountId}/conf/create",method = RequestMethod.POST)
     public ApiGatewayResponse create(HttpServletRequest request, @PathVariable String accountId,
                                     @RequestHeader(value = "AppID") String appId,
-                                    @RequestBody ConfCreateInputDTO dto) throws YunhuniApiException {
+                                    @Valid @RequestBody ConfCreateInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("创建会议API参数,accountId={},appId={},dto={}",accountId,appId,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        //参数校验
-        if(dto.getMaxDuration() == null || dto.getMaxDuration() <= 0 || dto.getMaxDuration()> MAX_DURATION_SEC){
-            throw new RequestIllegalArgumentException();
-        }
-        if(dto.getMaxParts() != null && dto.getMaxParts() <= 0){
-            throw new RequestIllegalArgumentException();
-        }
-        checkInputLen(dto.getUserData());
-
         String confId = confService.create(ip,appId,dto.getMaxDuration(),dto.getMaxParts(),
                 dto.getRecording(),dto.getAutoHangup(),dto.getBgmFile(),dto.getUserData());
         Map<String,String> result = new HashMap<>();
@@ -58,8 +48,6 @@ public class ConfController extends AbstractAPIController{
             logger.debug("解散会议API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        //参数校验
-
         boolean result = confService.dismiss(ip,appId,id);
         return ApiGatewayResponse.success(result);
     }
@@ -67,23 +55,11 @@ public class ConfController extends AbstractAPIController{
     @RequestMapping(value = "/{accountId}/conf/{id}/invite_call",method = RequestMethod.POST)
     public ApiGatewayResponse invite(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                                 @RequestHeader(value = "AppID") String appId,
-                                @RequestBody ConfInviteCallInputDTO dto) throws YunhuniApiException {
+                                @Valid @RequestBody ConfInviteCallInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("邀请会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        //参数校验
-        checkInputLen(dto.getFrom());
-        if(StringUtils.isBlank(dto.getTo())){
-            throw new RequestIllegalArgumentException();
-        }
-        if(dto.getMaxDuration() == null || dto.getMaxDuration()<= 0 || dto.getMaxDuration() > MAX_DURATION_SEC){
-            throw new RequestIllegalArgumentException();
-        }
-        if(dto.getMaxDialDuration() != null && dto.getMaxDialDuration() <= 0){
-            throw new RequestIllegalArgumentException();
-        }
-
         String callId = confService.invite(ip,appId,id,
                 dto.getFrom(),dto.getTo(),dto.getMaxDuration(),dto.getMaxDialDuration(),
                 dto.getDialVoiceStopCond(),dto.getPlayFile(),dto.getVoiceMode());
@@ -95,19 +71,11 @@ public class ConfController extends AbstractAPIController{
     @RequestMapping(value = "/{accountId}/conf/{id}/join",method = RequestMethod.POST)
     public ApiGatewayResponse join(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                                    @RequestHeader(value = "AppID") String appId,
-                                   @RequestBody ConfJoinInputDTO dto) throws YunhuniApiException {
+                                   @Valid @RequestBody ConfJoinInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("加入会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        //参数校验
-        if(StringUtils.isBlank(dto.getCallId())){
-            throw new RequestIllegalArgumentException();
-        }
-        if(dto.getMaxDuration() == null || dto.getMaxDuration() <= 0 || dto.getMaxDuration() > MAX_DURATION_SEC){
-            throw new RequestIllegalArgumentException();
-        }
-
         boolean  result = confService.join(ip,appId,id,dto.getCallId(),dto.getMaxDuration(),dto.getPlayFile(),dto.getVoiceMode());
         return ApiGatewayResponse.success(result);
     }
@@ -115,16 +83,11 @@ public class ConfController extends AbstractAPIController{
     @RequestMapping(value = "/{accountId}/conf/{id}/quit",method = RequestMethod.POST)
     public ApiGatewayResponse quit(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId,
-                             @RequestBody ConfQuitInputDTO dto) throws YunhuniApiException {
+                             @Valid @RequestBody ConfQuitInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("推出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        //参数校验
-        if(StringUtils.isBlank(dto.getCallId())){
-            throw new RequestIllegalArgumentException();
-        }
-
         boolean  result = confService.quit(ip,appId,id,dto.getCallId());
         return ApiGatewayResponse.success(result);
     }
@@ -132,16 +95,11 @@ public class ConfController extends AbstractAPIController{
     @RequestMapping(value = "/{accountId}/conf/{id}/start_play",method = RequestMethod.POST)
     public ApiGatewayResponse play(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId,
-                             @RequestBody ConfPlayInputDTO dto) throws YunhuniApiException {
+                             @Valid @RequestBody ConfPlayInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        //参数校验
-        if(dto.getFiles() == null || dto.getFiles().size() == 0){
-            throw new RequestIllegalArgumentException();
-        }
-
         boolean  result = confService.startPlay(ip,appId,id,dto.getFiles());
         return ApiGatewayResponse.success(result);
     }
@@ -160,7 +118,7 @@ public class ConfController extends AbstractAPIController{
     @RequestMapping(value = "/{accountId}/conf/{id}/start_record",method = RequestMethod.POST)
     public ApiGatewayResponse record(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId,
-                             @RequestBody ConfRecordInputDTO dto) throws YunhuniApiException {
+                             @Valid @RequestBody ConfRecordInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("会议放音API参数,accountId={},appId={},confId={}",accountId,appId,id);
         }
@@ -183,17 +141,11 @@ public class ConfController extends AbstractAPIController{
     @RequestMapping(value = "/{accountId}/conf/{id}/set_voice_mode",method = RequestMethod.POST)
     public ApiGatewayResponse setVoiceMode(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                                    @RequestHeader(value = "AppID") String appId,
-                                   @RequestBody ConfSetVoiceModeInputDTO dto) throws YunhuniApiException {
+                                   @Valid @RequestBody ConfSetVoiceModeInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
             logger.debug("设置会议成员录放音模式API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
-        if(StringUtils.isBlank(dto.getCallId())){
-            throw new RequestIllegalArgumentException();
-        }
-        if(dto.getVoiceMode() == null){
-            throw new RequestIllegalArgumentException();
-        }
         boolean  result = confService.setVoiceMode(ip,appId,id,dto.getCallId(),dto.getVoiceMode());
         return ApiGatewayResponse.success(result);
     }

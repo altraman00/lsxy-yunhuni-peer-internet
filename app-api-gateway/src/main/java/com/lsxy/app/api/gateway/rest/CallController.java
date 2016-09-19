@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -137,37 +138,13 @@ public class CallController extends AbstractAPIController{
     }
 
     @RequestMapping(value = "/{account_id}/call/verify_call",method = RequestMethod.POST)
-    public ApiGatewayResponse verify_call(HttpServletRequest request, @RequestBody VerifyCallInputDTO dto, @PathVariable String account_id) throws YunhuniApiException {
-        String appId = request.getHeader("AppID");
+    public ApiGatewayResponse verify_call(HttpServletRequest request, @PathVariable String account_id,
+            @RequestHeader("AppID") String appId, @Valid @RequestBody VerifyCallInputDTO dto) throws YunhuniApiException {
         String ip = WebUtils.getRemoteAddress(request);
 
         if(logger.isDebugEnabled()){
             logger.debug("VERIFY CALL API参数,appId={},dto={}",appId,dto);
         }
-        //参数校验
-        checkInputLen(dto.getFrom());
-        if(StringUtils.isBlank(dto.getTo())){
-            throw new RequestIllegalArgumentException();
-        }
-
-        if(dto.getMaxDialDuration() !=null && dto.getMaxDialDuration() <=0){
-            throw new RequestIllegalArgumentException();
-        }
-
-        if(StringUtils.isBlank(dto.getPlayFile()) && StringUtils.isBlank(dto.getVerifyCode())){
-            throw new RequestIllegalArgumentException();
-        }
-
-        if(StringUtils.isNotBlank(dto.getVerifyCode()) && (dto.getVerifyCode().length()>12
-                || !StringUtils.isNumeric(dto.getVerifyCode()))){
-            throw new RequestIllegalArgumentException();
-        }
-
-        if(dto.getRepeat() != null && dto.getRepeat()<0 && dto.getRepeat()>MAX_REPEAT_TIMES){
-            throw new RequestIllegalArgumentException();
-        }
-
-        checkInputLen(dto.getUserData());
 
         String callId = callService.verifyCall(ip,appId, dto.getFrom(),dto.getTo(),dto.getMaxDialDuration(),dto.getVerifyCode(),dto.getPlayFile(),dto.getRepeat(),dto.getUserData());
         Map<String,String> result = new HashMap<>();
