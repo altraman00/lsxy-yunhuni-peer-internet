@@ -21,7 +21,8 @@ import java.util.Set;
  * CTI 客户端启动器  需要配合JNI使用
  */
 @Component
-@Profile(value={"test","production", "development","localdev"})
+@Profile(value={//"test",
+ "production", "development","localdev"})
 public class CTIClient implements RpcEventListener{
 
 
@@ -30,7 +31,8 @@ public class CTIClient implements RpcEventListener{
     @Autowired(required = false)
     private StasticsCounter sc;
 
-    @Value("${area.agent.client.cti.unitid}")
+    //本地unitid 由于需要通过环境变量设置值,所以不适用"." 而适用_
+    @Value("${area_agent_client_cti_unitid:10}")
     private byte localUnitID;
 
     @Autowired

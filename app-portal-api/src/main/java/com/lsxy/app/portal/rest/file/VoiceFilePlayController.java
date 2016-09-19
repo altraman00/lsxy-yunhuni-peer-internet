@@ -1,10 +1,12 @@
 package com.lsxy.app.portal.rest.file;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -40,6 +42,8 @@ public class VoiceFilePlayController extends AbstractRestController {
     private OSSService ossService;
     @Autowired
     private CalBillingService calBillingService;
+    @Autowired
+    private MQService mqService;
     /**
      * 根据放音文件id删除放音文件
      * @param id
@@ -51,18 +55,26 @@ public class VoiceFilePlayController extends AbstractRestController {
         VoiceFilePlay voiceFilePlay =  voiceFilePlayService.findById(id);
         try {
             ossService.deleteObject(repository, voiceFilePlay.getFileKey());
-            //删除OSS文件成功，删除数据库记录
-            voiceFilePlayService.delete(voiceFilePlay);
-            //删除记录成功,更新剩余存储容量大小
+            voiceFilePlay.setOssDeleted(VoiceFilePlay.DELETED_SUCCESS);
+        }catch(Exception e){
+            logger.error("删除OSS文件：{1}失败，异常{2}",voiceFilePlay.getFileKey(),e);
+            voiceFilePlay.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
+        }
+        try{
+            mqService.publish(new VoiceFilePlayDeleteEvent(VoiceFilePlayDeleteEvent.FILE,voiceFilePlay.getTenant().getId(),
+                    voiceFilePlay.getApp().getId(),voiceFilePlay.getId(),voiceFilePlay.getName()));
+        }catch (Exception e){
+            logger.error("删除区域文件：{1}失败，异常{2}",voiceFilePlay.getFileKey(),e);
+            voiceFilePlay.setAaDeleted(VoiceFilePlay.DELETED_FAIL);
+        }
+        //删除OSS文件成功，删除数据库记录
+        voiceFilePlayService.delete(voiceFilePlay);
+        //删除记录成功,更新剩余存储容量大小
 //            Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
 //            billing.setFileRemainSize(billing.getFileRemainSize()+voiceFilePlay.getSize());
 //            billingService.save(billing);
-            Account account = getCurrentAccount();
-            calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
-        }catch(Exception e){
-            logger.error("删除OSS文件：{1}失败，异常{2}",voiceFilePlay.getFileKey(),e);
-            return RestResponse.failed("0000","OSS删除失败");
-        }
+        Account account = getCurrentAccount();
+        calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         return RestResponse.success(voiceFilePlay);
     }
 
@@ -74,6 +86,9 @@ public class VoiceFilePlayController extends AbstractRestController {
     @RequestMapping("/create")
     public RestResponse createRemark(VoiceFilePlay voiceFilePlay,String appId){
         //将对象保存数据库
+        if(logger.isDebugEnabled()) {
+            logger.debug("开始创建放音文件记录，应用{}，记录{}", appId, voiceFilePlay);
+        }
         App app = appService.findById(appId);
         voiceFilePlay.setRemark("");
         voiceFilePlay.setApp(app);
@@ -86,6 +101,9 @@ public class VoiceFilePlayController extends AbstractRestController {
 //        billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
 //        billingService.save(billing);
         calBillingService.incUseFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
+        if(logger.isDebugEnabled()) {
+            logger.debug("创建放音文件记录成功，应用{}，记录{}", appId, voiceFilePlay);
+        }
         return RestResponse.success(voiceFilePlay);
     }
     /**

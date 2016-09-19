@@ -1,6 +1,5 @@
 package com.lsxy.app.portal.open;
 
-import com.lsxy.framework.mq.events.portal.RegisterSuccessEvent;
 import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
@@ -27,8 +26,6 @@ public class RegisterController {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private MQService mqService;
     /**
      * 用户注册信息检查
      * @param userName 用户名
@@ -86,29 +83,9 @@ public class RegisterController {
     @RequestMapping("/create_account")
     public RestResponse createAccount(String userName,String mobile,String email) throws Exception {
         RestResponse response;
-        //创建用户前再进行一次校验
-        int result = accountService.checkRegInfo(userName,mobile,email);
-        if(logger.isDebugEnabled()){
-            logger.debug("checkRegInfo：{} "+result);
-        }
-        if(result == AccountService.REG_CHECK_PASS){
-            Account account = accountService.createAccount(userName,mobile,email);
-            if(logger.isDebugEnabled()){
-                logger.debug("createAccount：{}"+account);
-            }
-            if(account != null){
-                if(logger.isDebugEnabled()){
-                    logger.debug("RegisterSuccessEvent-start;{}"+account);
-                }
-                RegisterSuccessEvent event = new RegisterSuccessEvent(account.getId());
-                mqService.publish(event);
-                if(logger.isDebugEnabled()){
-                    logger.debug("RegisterSuccessEvent-end;{},{}"+account,event);
-                }
-                response = RestResponse.success(account);
-            }else{
-                response = failed("0000","注册用户失败，系统出错！");
-            }
+        Account account = accountService.createAccount(userName,mobile,email);
+        if(account != null){
+            response = RestResponse.success(account);
         }else{
             response = failed("0000","注册用户失败,注册信息已存在");
         }
@@ -116,7 +93,7 @@ public class RegisterController {
     }
 
     /**
-     * 获取账号
+     *  获取账号
      * @param accountId
      * @return
      */

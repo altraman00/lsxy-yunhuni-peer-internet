@@ -515,6 +515,7 @@ public class DateUtils {
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND,0);
 		SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
 		String day_end=df.format(cal.getTime());   
 		return day_end;
@@ -531,6 +532,7 @@ public class DateUtils {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND,0);
         SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return cal.getTime();
     }
@@ -551,6 +553,7 @@ public class DateUtils {
     	cal.set(Calendar.HOUR_OF_DAY, 23);
     	cal.set(Calendar.MINUTE, 59);
     	cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND,999);
     	SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
     	String day_end=df.format(cal.getTime());   
     	//System.out.println("day_end>>>"+day_end);  
@@ -573,6 +576,7 @@ public class DateUtils {
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND,999);
         SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date lastDay = cal.getTime();
         String format = df.format(lastDay);
@@ -686,6 +690,7 @@ public class DateUtils {
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND,0);
 		SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
 		String day_end=df.format(cal.getTime());   
 		return day_end;
@@ -701,7 +706,7 @@ public class DateUtils {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
-        SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        cal.set(Calendar.MILLISECOND,0);
         return cal.getTime();
     }
 
@@ -715,6 +720,7 @@ public class DateUtils {
     	cal.set(Calendar.HOUR_OF_DAY, 23);
     	cal.set(Calendar.MINUTE, 59);
     	cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
     	SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");       
     	String day_end=df.format(cal.getTime());   
     	return day_end;
@@ -731,6 +737,7 @@ public class DateUtils {
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND,999);
         SimpleDateFormat df =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return cal.getTime();
     }
@@ -774,6 +781,7 @@ public class DateUtils {
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND,999);
         return calendar.getTime();
     }
 
@@ -788,6 +796,7 @@ public class DateUtils {
         calendar.set(Calendar.HOUR_OF_DAY, 00);
         calendar.set(Calendar.MINUTE, 00);
         calendar.set(Calendar.SECOND, 00);
+        calendar.set(Calendar.MILLISECOND,0);
         return calendar.getTime();
     }
 

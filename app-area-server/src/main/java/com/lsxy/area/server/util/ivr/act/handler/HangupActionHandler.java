@@ -35,11 +35,10 @@ public class HangupActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
-        String nextUrl = "";
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作",getAction());
         }
@@ -65,7 +64,7 @@ public class HangupActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;

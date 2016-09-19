@@ -126,11 +126,24 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     }
 
     @Override
-    public List<VoiceFilePlay> findNotSync() {
-        String hql = "from VoiceFilePlay obj where ( obj.sync<>?1 or obj.sync is null )and obj.status=?2 and obj.app.deleted='0' group by obj.lastTime ";
-        List<VoiceFilePlay> list = this.list(hql,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS);
+    public List<String> findNotSyncApp() {
+        String sql = "SELECT app_id AS appId FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_play obj where ( obj.sync<>? or obj.sync is null )and obj.status=?  group by obj.app_id ";
+        List<String> list = jdbcTemplate.queryForList(sql,String.class,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS);
         return list;
     }
+
+    @Override
+    public List<VoiceFilePlay> findNotSyncByApp(String app) {
+        String hql = "from VoiceFilePlay obj where ( obj.sync<>?1 or obj.sync is null )and obj.status=?2 and obj.app.id=?3 ";
+        List<VoiceFilePlay> list = this.list(hql,VoiceFilePlay.SYNC_SUCCESS,VoiceFilePlay.STATUS_SUCCESS,app);
+        return list;
+    }
+
+    @Override
+    public List<VoiceFilePlay> findByAppId(String appId) {
+        return voiceFilePlayDao.findByAppId(appId);
+    }
+
 
     @Override
     public void batchUpdateSync(List<String> ids, Integer sync) {
@@ -142,8 +155,41 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
                     id += ",";
                 }
             }
-            String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_play set sync=? where  deleted=0 and id in( " + id + " )";
+            String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET sync=? WHERE  deleted=0 AND id IN( " + id + " )";
             jdbcTemplate.update(sql, sync);
         }
+    }
+
+    @Override
+    public void batchUpdateValueByKey(List<String> ids, String key, Object value) {
+        if(ids.size()>0) {
+            String id = "";
+            for (int i = 0; i < ids.size(); i++) {
+                id += " '" + ids.get(i) + "' ";
+                if (i != (ids.size() - 1)) {
+                    id += ",";
+                }
+            }
+            String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET "+key+"=? WHERE id IN( " + id + " )";
+            jdbcTemplate.update(sql, value);
+        }
+    }
+
+    @Override
+    public void updateDeletedByAppId(String appId) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET deleted=1,oss_deleted=-1,aa_deleted=-1 WHERE app_id=? ";
+        jdbcTemplate.update(sql, appId);
+    }
+
+    @Override
+    public void updateDeletedStautsByAppId(String appId, Object status) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET aa_deleted=? WHERE app_id=? ";
+        jdbcTemplate.update(sql,status, appId);
+    }
+
+    @Override
+    public void updateDeletedStautsByid(String id, Object status) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET aa_deleted=? WHERE id=? ";
+        jdbcTemplate.update(sql, status, id);
     }
 }

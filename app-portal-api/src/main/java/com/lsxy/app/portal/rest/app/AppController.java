@@ -1,20 +1,29 @@
 package com.lsxy.app.portal.rest.app;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
+import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,13 +33,19 @@ import java.util.List;
 @RequestMapping("/rest/app")
 @RestController
 public class AppController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(AppController.class);
     @Autowired
     private AppService appService;
     @Autowired
     private TenantService tenantService;
     @Autowired
-    AppOnlineActionService appOnlineActionService;
-
+    private AppOnlineActionService appOnlineActionService;
+    @Autowired
+    private VoiceFilePlayService voiceFilePlayService;
+    @Autowired
+    private OSSService ossService;
+    @Autowired
+    private MQService mqService;
     /**
      * 根据应用名字查找应用数
      * @param name 应用名字
@@ -86,9 +101,45 @@ public class AppController extends AbstractRestController {
         if(flag){
             App resultApp = appService.findById(id);
             appService.delete(resultApp);
+            deletedVF(resultApp);
             return RestResponse.success();
         }else{
             return RestResponse.failed("0000","应用不属于用户");
+        }
+    }
+
+    /**
+     * 删除应用下放音文件
+     */
+    private void deletedVF(App app){
+        try {
+            //查询应用下的放音文件
+            List<VoiceFilePlay> list = voiceFilePlayService.findByAppId(app.getId());
+            if(list.size()>0) {
+                //更新文件状态为删除
+                voiceFilePlayService.updateDeletedByAppId(app.getId());
+                //删除oss上的应用放音文件
+                List<String> ossDLsit = new ArrayList<String>();
+                for (int i = 0; i < list.size(); i++) {
+                    ossDLsit.add(list.get(i).getFileKey());
+                }
+                String repository = SystemConfig.getProperty("global.oss.aliyun.bucket");
+                List<String> reList = ossService.deleteObjects(repository, ossDLsit);
+                //批量OSS删除成功的更新状态
+                if(reList!=null&&reList.size()>0) {
+                    List<String> ossDeletedOk = new ArrayList();
+                    for(int i=0;i<list.size();i++){
+                        if(reList.contains(list.get(i).getFileKey())){
+                            ossDeletedOk.add(list.get(i).getId());
+                        }
+                    }
+                    voiceFilePlayService.batchUpdateValueByKey(ossDeletedOk, "oss_deleted", 1);
+                }
+                //发起删除区域代理上的文件的事件
+                mqService.publish(new VoiceFilePlayDeleteEvent(VoiceFilePlayDeleteEvent.APP,app.getTenant().getId(),app.getId()));
+            }
+        }catch (Exception e){
+            logger.error("删除应用下放音文件,操作失败{}",e);
         }
     }
     /**

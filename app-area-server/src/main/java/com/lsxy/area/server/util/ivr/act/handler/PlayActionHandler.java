@@ -43,9 +43,14 @@ public class PlayActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
+        }
+        BusinessState state = businessStateService.get(callId);
+        if(state == null){
+            logger.info("没有找到call_id={}的state",callId);
+            return false;
         }
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
@@ -53,21 +58,10 @@ public class PlayActionHandler extends ActionHandler{
         if(StringUtils.isNotBlank(root.getTextTrim())){
             plays.add(root.getTextTrim());
         }
-        String nextUrl = "";
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
-        }
+
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
-                            getAction(),finish_keys,repeat,plays);
-        }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
+                    getAction(),finish_keys,repeat,plays);
         }
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
@@ -92,7 +86,7 @@ public class PlayActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;

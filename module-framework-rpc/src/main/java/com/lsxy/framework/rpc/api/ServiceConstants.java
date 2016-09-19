@@ -18,6 +18,7 @@ public class ServiceConstants {
 	public static final String MN_CH_SYS_CALL_ANSWER = "MN_CH_SYS_CALL_ANSWER";//应答
 	public static final String MN_CH_SYS_CALL_DROP = "MN_CH_SYS_CALL_DROP";//挂断
 	public static final String MN_CH_SYS_CALL_REJECT = "MN_CH_SYS_CALL_REJECT";//拒接
+	public static final String MN_CH_SYS_CALL_CONNECT_START = "MN_CH_SYS_CALL_CONNECT_START";//双通道拨号
 
 	public static final String MN_CH_SYS_CALL_CONF_ENTER = "MN_CH_SYS_CALL_CONF_ENTER";//将呼叫加入会议
 	public static final String MN_CH_SYS_CALL_CONF_EXIT = "MN_CH_SYS_CALL_CONF_EXIT";//将呼叫退出会议
@@ -43,8 +44,10 @@ public class ServiceConstants {
 
 	public static final String MN_CH_TEST_ECHO= "MN_CH_TEST_ECHO";//压力测试使用
 
-	public static final String CH_MN_HEARTBEAT_ECHO = "CH_MN_HEARTBEAT_ECHO ";		//心跳请求
+	public static final String CH_MN_HEARTBEAT_ECHO = "CH_MN_HEARTBEAT_ECHO";		//心跳请求
 
-	public static final String MN_CH_VF_SYNC = "MN_CH_VF_SYNC ";		//放音文件同步指令
-	public static final String MN_CH_VF_SYNC_OK = "MN_CH_VF_SYNC_OK ";		//放音文件同步成功指令
+	public static final String MN_CH_VF_SYNC = "MN_CH_VF_SYNC";		//放音文件同步指令
+	public static final String MN_CH_VF_SYNC_OK = "MN_CH_VF_SYNC_OK";		//放音文件同步成功指令
+	public static final String MN_CH_VF_DELETED = "MN_CH_VF_DELETED";		//放音文件同步指令
+	public static final String MN_CH_VF_DELETED_OK = "MN_CH_VF_DELETED_OK";		//放音文件同步成功指令
 }

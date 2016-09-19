@@ -27,7 +27,7 @@ public class CleanExpireResourceTask {
     /**
      * 清除过期号码
      */
-    @Scheduled(cron="0 0 0 * * ?")
+    @Scheduled(cron="0 0 3 * * ?")
     public void cleanExpireResource(){
         Date date=new Date();
         String day = DateUtils.formatDate(date, "yyyy-MM-dd");

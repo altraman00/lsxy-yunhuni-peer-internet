@@ -586,7 +586,7 @@ public class CalBillingServiceImpl implements CalBillingService{
                 billing.setSmsRemain(sms);
                 //TODO 统计容量
                 Long size = this.getFsizeByPreDateSum(tenantId, date, billing.getFileRemainSize());
-                billing.setSmsRemain(size);
+                billing.setFileRemainSize(size);
                 //更新结算时间
                 billing.setBalanceDate(date);
                 billingService.save(billing);
