@@ -1,5 +1,9 @@
-package com.lsxy.area.api;
+package com.lsxy.app.api.gateway.dto;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +14,17 @@ import java.util.List;
  */
 public class NotifyCallDTO implements Serializable {
     private String from;        //主叫号码
+    @NotNull
     private String to;          //被叫号码
     private String play_file;     //通知放音文件(列表)
     private List<List<Object>> play_content; //话音文件播放内容
+    @Min(0)
+    @Max(10)
     private Integer repeat = 1;     //重复播放次数
+    @Min(1)
+    @Max(5 * 60)
     private Integer max_dial_duration;  //最大拨号等待时间（秒）
+    @Size(max = 128)
     private String user_data;
 
     public String getFrom() {
