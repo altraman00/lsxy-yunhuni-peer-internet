@@ -18,7 +18,7 @@ public class IVRPauseActionEvent extends AbstractDelayMQEvent{
     }
     @Override
     public String getTopicName() {
-        return MQTopicConstants.TOPIC_AGENT_SERVER;
+        return MQTopicConstants.TOPIC_AREA_SERVER;
     }
 
     public String getCallId() {
