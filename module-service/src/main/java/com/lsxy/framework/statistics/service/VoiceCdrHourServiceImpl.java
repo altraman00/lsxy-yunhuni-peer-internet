@@ -13,10 +13,12 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,8 +45,8 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour("+selects+" id,dt,hour,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
                 " select "+selects+"  REPLACE(UUID(), '-', '') as id, ? as dt,? as day, "+
                 " IFNULL(sum(call_time_long),0) as among_duration," +
-                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+"  c1.call_ack_dt is not null ) as among_connect," +
-                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+" c1.call_ack_dt is null ) as  among_not_connect ," +
+                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+"  c1.call_ack_dt is not null AND last_time BETWEEN ? AND ? ) as among_connect," +
+                " (select count(1) from db_lsxy_bi_yunhuni.tb_bi_voice_cdr c1 where "+wheres+" c1.call_ack_dt is null AND last_time BETWEEN ? AND ?) as  among_not_connect ," +
                 " count(1) as among_call,"+
                 " ? as create_time,? as last_time,? as deleted,? as sortno,? as version "+
                 " from db_lsxy_bi_yunhuni.tb_bi_voice_cdr a where last_time BETWEEN ? AND ? "+groupbys;
@@ -58,6 +60,7 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         Object[] obj = new Object[]{
                 sqlDate1,hour1,
+                sqlDate1,sqlDate3,sqlDate1,sqlDate3,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
@@ -69,6 +72,34 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
                 }
             }
         });
+    }
+
+    @Override
+    public Map<String,Object> calAverageCall(String tenantId){
+        Object[] argus = {tenantId};
+        String sql = "SELECT IFNULL(SUM(cdr.among_duration),0) duration,IFNULL(SUM(cdr.among_connect),0) connect_num,IFNULL(SUM(cdr.among_call),0) call_num " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour cdr WHERE cdr.tenant_id = ? AND cdr.app_id IS NULL AND cdr.type IS NULL";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, argus);
+        Map<String,Object> result = new HashMap<>();
+        //lineAverageCallTime lineLinkRate
+        if(new BigDecimal(0).compareTo((BigDecimal)map.get("connect_num")) == -1){
+            BigDecimal divide = ((BigDecimal) map.get("duration")).divide((BigDecimal) map.get("connect_num"),0, BigDecimal.ROUND_UP).divide(new BigDecimal(60), 0, BigDecimal.ROUND_UP);
+            result.put("lineAverageCallTime",divide.longValue());
+        }else{
+            result.put("lineAverageCallTime",0);
+        }
+        if(new BigDecimal(0).compareTo((BigDecimal)map.get("connect_num")) == -1){
+            BigDecimal divide = ((BigDecimal) map.get("connect_num")).divide((BigDecimal) map.get("call_num"), 4, BigDecimal.ROUND_UP).multiply(new BigDecimal(100));
+            result.put("lineLinkRate",divide.doubleValue());
+        }else{
+            result.put("lineLinkRate",0.0);
+        }
+        return result;
+    }
+
+    @Override
+    public VoiceCdrHour findByAppIdAndTime(String appId, Date currentHour) {
+        return voiceCdrHourDao.findFirstByAppIdAndDtAndTenantIdIsNullAndTypeIsNull(appId,currentHour);
     }
 
 }

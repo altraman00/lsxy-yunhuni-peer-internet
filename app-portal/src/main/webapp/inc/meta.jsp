@@ -18,7 +18,6 @@
 
 	String rootUrl = SystemConfig.getProperty("portal.system.root.url");
 	String devModel = SystemConfig.getProperty("system.developModel","true");
-
 	SecurityUser currentUser = (SecurityUser)request.getSession().getAttribute("currentUser");
 	String userName = null;
 	if(currentUser != null){
@@ -36,6 +35,22 @@
 
 
 <title><%=SystemConfig.getProperty("portal.system.title") %></title>
+<script>
+	var _hmt = _hmt || [];
+	(function() {
+		var hm = document.createElement("script");
+		hm.src = "//hm.baidu.com/hm.js?0c61ac734b9dde2e0b1841e2750ec7bd";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hm, s);
+	})();
+</script>
+<script language="JavaScript" type="text/javascript">
+	var flag = true;
+	if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 || window.navigator.userAgent.indexOf("MSIE 9.0")>0) {flag = false;} } if(!flag){
+		document.write('<div style="width:100%;height:50px;text-align: center; position: fixed;top: 0; background-color: #fffecb;color:#000; font-size: 14px; line-height: 50px; ">非常抱歉，网站暂时还不支持您的浏览器版本，我们的程序猿正在全力修复中~</div>');
+	}
+</script>
+
 <meta charset="utf-8" />
 <meta name="renderer" content="webkit">
 <meta name="description" content="app, web app, responsive, admin dashboard, admin, flat, flat ui, ui kit, off screen nav" />

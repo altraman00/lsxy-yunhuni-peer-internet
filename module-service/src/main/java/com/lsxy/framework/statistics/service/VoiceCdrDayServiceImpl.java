@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -210,6 +209,11 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
             }
         }
         return sum;
+    }
+
+    @Override
+    public VoiceCdrDay findByAppIdAndTime(String appId, Date currentDay) {
+        return voiceCdrDayDao.findFirstByAppIdAndDtAndTenantIdIsNullAndTypeIsNull(appId,currentDay);
     }
 
 }

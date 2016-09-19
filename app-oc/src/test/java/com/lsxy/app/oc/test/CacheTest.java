@@ -70,7 +70,7 @@ public class CacheTest {
         String userOriName = account.getUserName();
 
         //更新缓存
-        String userName="修改了啊";
+        String userName="修改了啊啊";
         String saveUrl = restPrefixUrl + "open/test/cache/account/save/"+id+"?userName={1}";
         RestResponse<String> responsex = RestRequest.buildRequest().get(saveUrl,String.class,userName);
         Assert.isTrue(responsex.getData().equals("OK"));

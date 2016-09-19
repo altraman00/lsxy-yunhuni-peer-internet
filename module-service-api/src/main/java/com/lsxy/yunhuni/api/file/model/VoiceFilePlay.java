@@ -24,6 +24,8 @@ public class VoiceFilePlay extends IdEntity {
     public static int SYNC_SUCCESS = 1;
     public static int SYNC_WAIT = 0;
     public static int SYNC_FAIL = -1;
+    public static int DELETED_SUCCESS = 1;
+    public static int DELETED_FAIL = -1;
     private Tenant tenant;//所属租户
     private App app;//所属应用
     private String name;//文件名
@@ -36,6 +38,25 @@ public class VoiceFilePlay extends IdEntity {
     private Date checkTime;//审核时间
     private String reason;//不通过原因
     private Integer sync;//文件是否已同步:1已同步0未同步-1同步失败
+    private Integer ossDeleted;//oss文件删除状态 1 已删除，-1删除失败
+    private Integer aaDeleted;//区域文件删除状态 1 已删除，-1删除失败
+    @Column(name = "oss_deleted")
+    public Integer getOssDeleted() {
+        return ossDeleted;
+    }
+
+    public void setOssDeleted(Integer ossDeleted) {
+        this.ossDeleted = ossDeleted;
+    }
+    @Column(name = "aa_deleted")
+    public Integer getAaDeleted() {
+        return aaDeleted;
+    }
+
+    public void setAaDeleted(Integer aaDeleted) {
+        this.aaDeleted = aaDeleted;
+    }
+
     @Column(name = "sync")
     public Integer getSync() {
         return sync;

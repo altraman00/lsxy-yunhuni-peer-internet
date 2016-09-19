@@ -122,6 +122,7 @@
                                     <div class="col-md-6 padder-v fix-padding">
                                         <div class='wrapperBox'>
                                             <div class="row">
+                                                    <!--
                                                 <div class="col-md-4 remove-padding">
                                                  <span class="h5 block m-t-xs">
                                                    <strong>线路状况</strong>
@@ -132,12 +133,16 @@
                                                      线
                                                  </span>
                                                 </div>
+                                                     -->
                                                 <div class="col-md-4 remove-padding">
                                                  <span class="h5 block m-t-xs">
                                                    <strong>平均通话时长</strong>
                                                  </span>
                                                 <span>
-                                                  <small class="text-muted text-uc account-number">${homeVO.lineAverageCallTime}</small>分钟
+                                                    <c:if test="${homeVO.lineAverageCallTime <= 0}">--</c:if>
+                                                    <c:if test="${homeVO.lineAverageCallTime > 0}">
+                                                        <small class="text-muted text-uc account-number">${homeVO.lineAverageCallTime}</small>分钟
+                                                    </c:if>
                                                  </span>
                                                 </div>
                                                 <div class="col-md-4 remove-padding">
@@ -145,7 +150,10 @@
                                                    <strong>接通率</strong>
                                                  </span>
                                                 <span>
-                                                  <small class="text-muted text-uc account-number">${homeVO.lineLinkRate}</small>%
+                                                    <c:if test="${homeVO.lineLinkRate <= 0.0}">--</c:if>
+                                                    <c:if test="${homeVO.lineLinkRate > 0.0}">
+                                                        <small class="text-muted text-uc account-number">${homeVO.lineLinkRate}</small>%
+                                                    </c:if>
                                                  </span>
                                                 </div>
                                             </div>
@@ -190,9 +198,9 @@
                                     <div class="panel-body clearfix border-top-none">
                                         <p>
                                             REST API: ${homeVO.restApi}
-                                        <span>
-                                          <a href="#">API文档</a>
-                                        </span>
+                                        <%--<span>--%>
+                                          <%--<a href="#">API文档</a>--%>
+                                        <%--</span>--%>
                                         </p>
                                         <p>
                                             SecretKey: <span id="secretKey">${homeVO.secretKey}</span>

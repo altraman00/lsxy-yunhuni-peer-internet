@@ -4,6 +4,7 @@ import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +28,9 @@ public class CleanExpireRegisterAccountTask {
 
     @Scheduled(cron="0 0 0 * * ?")
     public void cleanExpireRegisterAccount(){
-
-
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName();
+        Date date=new Date();
+        String day = DateUtils.formatDate(date, "yyyy-MM-dd");
+        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
         //执行互斥处理消息
         String flagValue = redisCacheService.get("scheduled_" + cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
@@ -41,7 +42,7 @@ public class CleanExpireRegisterAccountTask {
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]准备处理该任务:"+cacheKey);
                 }
-                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,22*60*60);
+                redisCacheService.setTransactionFlag(cacheKey, SystemConfig.id,24*60*60);
                 String currentCacheValue = redisCacheService.get(cacheKey);
                 if(logger.isDebugEnabled()){
                     logger.debug("["+cacheKey+"]当前cacheValue:"+currentCacheValue);
