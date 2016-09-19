@@ -46,6 +46,11 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     }
 
     @Override
+    public VoiceFilePlay findById(String id) {
+        return getDao().findOne(id);
+    }
+
+    @Override
     public Page<VoiceFilePlay> pageList(Integer pageNo, Integer pageSize, String name,String appId,String[] tenantId,Integer status,String startTime,String endTime) {
         String sql = " FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_play obj WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(name)){
