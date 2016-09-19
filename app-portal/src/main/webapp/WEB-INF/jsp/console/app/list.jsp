@@ -451,6 +451,9 @@
                             if(pageObj.currentPageNo>pageObj.totalPageCount){
                                 pageObj.currentPageNo = pageObj.totalPageCount;
                             }
+                            if(pageObj.currentPageNo <= 0){
+                                pageObj.currentPageNo=1;
+                            }
                             showtoast("删除成功！",pageObj.pageUrl+"?pageNo="+pageObj.currentPageNo+"&pageSize="+pageObj.pageSize,1000);
                         }else{
                             if(response.errorCode=='0011'){

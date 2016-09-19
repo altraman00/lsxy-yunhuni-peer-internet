@@ -18,6 +18,7 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.core.utils.VelocityUtils;
 import com.lsxy.framework.message.dao.AccountMessageDao;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,8 +204,9 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         String invoiceHql = "  FROM InvoiceApply obj WHERE (obj.status=?1) OR (obj.status=?2  and obj.expressNo is null) ";
         long awaitInvoice = this.countByCustom(invoiceHql,InvoiceApply.STATUS_SUBMIT,InvoiceApply.STATUS_DONE);
         //审核中心
-        String demandHql = "  FROM Tenant obj WHERE obj.isRealAuth in('"+Tenant.AUTH_WAIT+"','"+Tenant.AUTH_ONESELF_WAIT+"','"+Tenant.AUTH_UPGRADE_WAIT+"') ";
-        long awaitDemand = this.countByCustom(demandHql);
+        String demandHql1 = "  FROM Tenant obj WHERE obj.isRealAuth in('"+Tenant.AUTH_WAIT+"','"+Tenant.AUTH_ONESELF_WAIT+"','"+Tenant.AUTH_UPGRADE_WAIT+"') ";
+        String demandHql2 = "  from VoiceFilePlay obj where obj.status='"+VoiceFilePlay.STATUS_WAIT+"'  ";
+        long awaitDemand = this.countByCustom(demandHql1)+this.countByCustom(demandHql2);
         Map map = new HashMap();
         map.put("awaitService",awaitService);
         map.put("awaitInvoice",awaitInvoice);
