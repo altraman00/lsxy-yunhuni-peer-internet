@@ -2,6 +2,7 @@ package com.lsxy.framework.mq.ons;
 
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.lsxy.framework.config.SystemConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +19,14 @@ import java.util.Properties;
 @Conditional(OnsCondition.class)
 public class OnsMQConfig {
 
+
+    @Autowired
+    private String systemId;
+
     public OnsMQConfig(){
-        String systemId = System.getProperty("systemId");
         consumerId = SystemConfig.getProperty(systemId + ".mq.ons.cid","CID_YUNHUNI-TENANT-001");
         producerId =  SystemConfig.getProperty(systemId + ".mq.ons.pid","PID_YUNHUNI-TENANT-001");
+
     }
 
     private String consumerId;
