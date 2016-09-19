@@ -1,8 +1,10 @@
 package com.lsxy.framework.mq.ons;
 
-import java.util.Properties;
-
-import com.lsxy.framework.mq.api.MQEvent;
+import com.aliyun.openservices.ons.api.Message;
+import com.aliyun.openservices.ons.api.ONSFactory;
+import com.aliyun.openservices.ons.api.Producer;
+import com.aliyun.openservices.ons.api.SendResult;
+import com.lsxy.framework.mq.api.AbstractDelayMQEvent;
 import com.lsxy.framework.mq.api.AbstractMQProducer;
 import com.lsxy.framework.mq.api.MQEvent;
 import org.apache.commons.codec.binary.Base64;
@@ -15,12 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import com.aliyun.openservices.ons.api.Message;
-import com.aliyun.openservices.ons.api.ONSFactory;
-import com.aliyun.openservices.ons.api.Producer;
-import com.aliyun.openservices.ons.api.PropertyKeyConst;
-import com.aliyun.openservices.ons.api.SendResult;
-import com.lsxy.framework.config.SystemConfig;
+import java.util.Properties;
 
 @Component
 @ConditionalOnProperty(value = "global.mq.provider", havingValue = "ons", matchIfMissing = false)
