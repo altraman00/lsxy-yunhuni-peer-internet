@@ -21,9 +21,7 @@ import java.util.Set;
  * CTI 客户端启动器  需要配合JNI使用
  */
 @Component
-@Profile(value={
-        //"test",//测试环境暂时关闭cti zhangxb
-        "production", "development","localdev"})
+@Profile(value={"test","production", "development","localdev"})
 public class CTIClient implements RpcEventListener{
 
 
