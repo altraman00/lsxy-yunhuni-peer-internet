@@ -16,7 +16,7 @@ public class OSSClientFactory extends AliOSSClientFactoryBean {
     @Override
     protected void initClient() {
         if (logger.isDebugEnabled()){
-            logger.debug("创建ALI OSS链接客户端，区域创建的");
+            logger.debug("OSSClientFactory创建ALI OSS链接客户端，区域创建的");
         }
         // endpoint以杭州为例，其它region请按实际情况填写
 //        String endpoint = "http://oss-cn-beijing-internal.aliyuncs.com";
@@ -28,7 +28,7 @@ public class OSSClientFactory extends AliOSSClientFactoryBean {
         // 创建OSSClient实例
         ossClient =buildOSSClient(accessKeyId,accessKeySecret,endpoint);
         if (logger.isDebugEnabled()){
-            logger.debug("链接客户端成功：");
+            logger.debug("OSSClientFactory链接客户端成功：");
         }
     }
 }
