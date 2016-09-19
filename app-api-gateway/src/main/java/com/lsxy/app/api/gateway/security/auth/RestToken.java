@@ -11,6 +11,7 @@ import java.util.Date;
  */
 public class RestToken extends UsernamePasswordAuthenticationToken {
     private Date timestamp;
+    private String tenantId;
 
     // this constructor creates a non-authenticated token (see super-class)
     public RestToken(String principal, RestCredentials credentials, Date timestamp) {
@@ -19,9 +20,10 @@ public class RestToken extends UsernamePasswordAuthenticationToken {
     }
 
     // this constructor creates an authenticated token (see super-class)
-    public RestToken(String principal, RestCredentials credentials, Date timestamp, Collection<? extends GrantedAuthority> authorities) {
+    public RestToken(String principal, RestCredentials credentials, Date timestamp,String tenantId, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities);
         this.timestamp = timestamp;
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -38,6 +40,9 @@ public class RestToken extends UsernamePasswordAuthenticationToken {
         return timestamp;
     }
 
+    public String getTenantId() {
+        return tenantId;
+    }
 }
 
 
