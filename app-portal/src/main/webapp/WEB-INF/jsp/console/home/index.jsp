@@ -198,9 +198,9 @@
                                     <div class="panel-body clearfix border-top-none">
                                         <p>
                                             REST API: ${homeVO.restApi}
-                                        <span>
-                                          <a href="#">API文档</a>
-                                        </span>
+                                        <%--<span>--%>
+                                          <%--<a href="#">API文档</a>--%>
+                                        <%--</span>--%>
                                         </p>
                                         <p>
                                             SecretKey: <span id="secretKey">${homeVO.secretKey}</span>

@@ -98,7 +98,7 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
             try {
                 date1 = new Timestamp(DateUtils.parseDate(startTime, "yyyy-MM-dd").getTime());
                 corp += " and a.create_time>=:date1 ";
-                oneself += " and a.create_time>=date1 ";
+                oneself += " and a.create_time>=:date11 ";
             }catch (Exception e){
 
             }
@@ -108,7 +108,7 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
             try {
                 date2 = new Timestamp(DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss").getTime());
                 corp += " and a.create_time<=:date2 ";
-                oneself += " and a.create_time<=date2 ";
+                oneself += " and a.create_time<=:date22 ";
             }catch (Exception e){
 
             }
@@ -135,11 +135,15 @@ public class RealnamePrivateServiceImpl extends AbstractService<RealnamePrivate>
         Query pageQuery = em.createNativeQuery(pageSql,"authResult");
         if(date1!=null){
             countQuery.setParameter("date1",date1);
+            countQuery.setParameter("date11",date1);
             pageQuery.setParameter("date1",date1);
+            pageQuery.setParameter("date11",date1);
         }
         if(date2!=null){
             countQuery.setParameter("date2",date2);
             pageQuery.setParameter("date2",date2);
+            countQuery.setParameter("date22",date2);
+            pageQuery.setParameter("date22",date2);
         }
         int total = ((BigInteger)countQuery.getSingleResult()).intValue();
         int start = (pageNo-1)*pageSize;

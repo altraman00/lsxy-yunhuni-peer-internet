@@ -67,7 +67,7 @@ public class MessageServiceImpl extends AbstractService<Message> implements Mess
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" group by obj.create_time desc";
+        pageSql +=" group by obj.line_time desc";
         Query pageQuery = em.createNativeQuery(pageSql,Message.class);
         if(date1!=null){
             countQuery.setParameter("date1",date1);
