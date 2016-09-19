@@ -1,5 +1,6 @@
 package com.lsxy.app.api.gateway.dto;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -7,6 +8,7 @@ import java.util.List;
  */
 public class ConfPlayInputDTO extends CommonDTO{
 
+    @NotNull
     private List<String> files;
 
     public List<String> getFiles() {

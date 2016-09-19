@@ -2,9 +2,10 @@ package com.lsxy.app.api.gateway.rest;
 
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.ApiReturnCodeEnum;
-import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
-import com.lsxy.framework.core.utils.JSONUtil2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -16,11 +17,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @RequestMapping("/${api.gateway.version}/account/")
 public class AbstractAPIController {
-    public static final int MAX_INTPUT_STR_LEN = 128;
 
-    public static final int MAX_DURATION_SEC = 60 * 60 * 6;
-
-    public static final int MAX_REPEAT_TIMES = 10;
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAPIController.class);
 
     /**
      * 对Controller层统一的异常处理
@@ -29,21 +27,16 @@ public class AbstractAPIController {
      * @return
      */
     @ExceptionHandler(Exception.class)
-    public String exp(HttpServletRequest request, HttpServletResponse response, Exception ex) {
-        response.setContentType("application/json;charset=UTF-8");
-        ex.printStackTrace();
+    public ApiGatewayResponse exp(HttpServletRequest request, HttpServletResponse response, Exception ex) {
         ApiGatewayResponse failed;
         if(ex instanceof YunhuniApiException){
             failed = ApiGatewayResponse.failed(((YunhuniApiException) ex).getCode(),ex.getMessage());
+        }else if(ex instanceof MethodArgumentNotValidException){
+            failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.IllegalArgument.getCode(), ApiReturnCodeEnum.IllegalArgument.getMsg());
         }else{
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.UnknownFail.getCode(), ApiReturnCodeEnum.UnknownFail.getMsg());
         }
-        return JSONUtil2.objectToJson(failed);
-    }
-
-    public void checkInputLen(String input) throws RequestIllegalArgumentException {
-        if(input != null && input.length()>MAX_INTPUT_STR_LEN){
-            throw new RequestIllegalArgumentException();
-        }
+        logger.info("调用接口出现异常：",ex);
+        return failed;
     }
 }

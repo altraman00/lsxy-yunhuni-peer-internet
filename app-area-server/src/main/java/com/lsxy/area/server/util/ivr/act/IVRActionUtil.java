@@ -3,14 +3,22 @@ package com.lsxy.area.server.util.ivr.act;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.util.ivr.act.handler.ActionHandler;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,9 +45,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Future;
 
 /**
@@ -57,7 +63,7 @@ public class IVRActionUtil {
 
     private CloseableHttpAsyncClient client = null;
 
-    private int MAX_DURATION_SEC = 60 * 60 * 6;
+    public static final int MAX_DURATION_SEC = 60 * 60 * 6;
 
     //设置请求和传输超时时间
     private RequestConfig config =
@@ -77,6 +83,15 @@ public class IVRActionUtil {
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private LineGatewayService lineGatewayService;
+
+    @Autowired
+    private CallSessionService callSessionService;
+
+    @Autowired
+    private VoiceIvrService voiceIvrService;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -223,25 +238,60 @@ public class IVRActionUtil {
 
     /**
      * 询问是否接受，然后执行action
-     * @param call_id
      * @return
      */
-    public boolean doActionIfAccept(String call_id){
-        BusinessState state = businessStateService.get(call_id);
-        String appId = state.getAppId();
-        App app = appService.findById(appId);
-        Map<String,Object> businessData = state.getBusinessData();
-        String from = null;
-        if(businessData!=null){
-            from = (String)businessData.get("from");
-        }
+    public boolean doActionIfAccept(App app, Tenant tenant,String res_id, String from, String to){
+        String call_id = UUIDGenerator.uuid();
         boolean accept = getAcceptRequest(app.getUrl(),from);
         if(!accept){
-            reject(state.getAppId(),state.getResId(),call_id);
-            return true;
+            reject(app.getId(),res_id,call_id);
+        }else{
+            answer(app.getId(),res_id,call_id);
         }
-        answer(state.getAppId(),state.getResId(),call_id);
+        saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         return true;
+    }
+
+    private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to){
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        //保存业务数据，后续事件要用到
+        BusinessState state = new BusinessState.Builder()
+                .setTenantId(tenant.getId())
+                .setAppId(app.getId())
+                .setId(call_id)
+                .setResId(res_id)
+                .setType("ivr_incoming")
+                .setAreaId(app.getArea().getId())
+                .setLineGatewayId(lineGateway.getId())
+                .setBusinessData(new MapBuilder<String,Object>()
+                        //incoming事件from 和 to是相反的
+                        .put("from",to)
+                        .put("to",from)
+                        .build())
+                .build();
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_CALLING);
+        callSession.setApp(app);
+        callSession.setTenant(tenant);
+        callSession.setRelevanceId(call_id);
+        callSession.setType(CallSession.TYPE_VOICE_IVR);
+        callSession.setResId(state.getResId());
+        callSession = callSessionService.save(callSession);
+        Map<String,Object> businessData = state.getBusinessData();
+        if(businessData == null){
+            businessData = new HashMap<>();
+            state.setBusinessData(businessData);
+        }
+        businessData.put("sessionid",callSession.getId());
+        businessStateService.save(state);
+        VoiceIvr voiceIvr = new VoiceIvr();
+        voiceIvr.setId(call_id);
+        voiceIvr.setFromNum(from);
+        voiceIvr.setToNum(to);
+        voiceIvr.setStartTime(new Date());
+        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+        voiceIvrService.save(voiceIvr);
     }
 
     private void reject(String appId,String res_id,String call_id){
@@ -302,19 +352,80 @@ public class IVRActionUtil {
             return false;
         }
         ActionHandler  h = null;
-        Element ele = null;
+        Element root = null;
+        Element actionEle = null;
         try {
             Document doc = DocumentHelper.parseText(resXML);
-            ele = doc.getRootElement();
-            h = handlers.get(ele.getName().toLowerCase());
+            root = doc.getRootElement();
+            actionEle = getActionEle(root);
+            h = handlers.get(actionEle.getName().toLowerCase());
+            if(h == null){
+                logger.info("没有找到对应的ivr动作处理类");
+                return false;
+            }
+            return h.handle(call_id,actionEle,getNextUrl(root));
         } catch (Throwable e) {
             logger.error("处理ivr动作指令出错",e);
             return false;
         }
-        if(h == null){
-            logger.info("没有找到对应的ivr动作处理类");
-            return false;
-        }
-        return h.handle(call_id,ele);
     }
+
+    /**
+     * 校验ivr指令，返回对应的ivr根元素
+     * @param root
+     * @return
+     */
+    private Element getActionEle(Element root) {
+        List elements = root.elements();
+        Element actionEle = null;
+        if(elements == null || elements.size() == 0){
+            throw new IllegalArgumentException("ivr action xml 格式错误");
+        }
+        if(elements.size()>2){
+            throw new IllegalArgumentException("ivr action xml 格式错误");
+        }
+        int actionElement_count = 0;
+        for (Object obj : elements) {
+            Element ele = (Element)obj;
+            boolean hasHandler = handlers.get(ele.getName().toLowerCase()) != null;
+            boolean isNext = ele.getName().equals("next");
+            if(!hasHandler && !isNext){
+                throw new IllegalArgumentException("ivr action xml 格式错误");
+            }
+            if(hasHandler){
+                actionEle = ele;
+                actionElement_count ++;
+            }
+        }
+        if(actionElement_count>1){
+            throw new IllegalArgumentException("只能包含一个ivr action");
+        }
+        return actionEle;
+    }
+
+    /**
+     * 获取next节点的值
+     * @param root
+     * @return
+     */
+    private String getNextUrl(Element root){
+        String next = root.elementTextTrim("next");
+        if(StringUtils.isBlank(next)){
+            next = "";
+        }
+        return next;
+    }
+
+    /*public static void main(String[] args) throws DocumentException {
+        Document doc = DocumentHelper.parseText("\n" +
+                "   <Response>\n" +
+                "    <Get action=\"handle-user-input.jsp\" numdigits=\"1\">\n" +
+                "        <Play>menu.wav</Play>\n" +
+                "    </Get>\n" +
+                "    <Play>sorrybye.wav</Play>\n" +
+                "    <Redirect>/welcome/voice</Redirect>\n" +
+                "    <Next>/welcome/voice</Next>/>\n" +
+                "</Response>");
+
+    }*/
 }
