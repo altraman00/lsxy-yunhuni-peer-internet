@@ -2,6 +2,7 @@ package com.lsxy.framework.base;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.HqlUtil;
@@ -21,11 +22,12 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.List;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 @Transactional
-public abstract class AbstractService<T> implements BaseService<T> {
+public abstract class AbstractService<T extends IdEntity> implements BaseService<T> {
 
     private Logger logger = LoggerFactory.getLogger(AbstractService.class);
 
@@ -62,6 +64,8 @@ public abstract class AbstractService<T> implements BaseService<T> {
             }
     )
     public T save(T entity) {
+        //更新最后修改时间
+        entity.setLastTime(new Date());
         return getDao().save(entity);
     }
 

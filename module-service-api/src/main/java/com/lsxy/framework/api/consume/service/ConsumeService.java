@@ -16,8 +16,8 @@ public interface ConsumeService extends BaseService<Consume> {
      * @param userName 用户名
      * @param pageNo 第几页
      * @param pageSize 每页记录数
-     * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param startTime 开始时间(yyyy-MM)
+     * @param endTime 结束时间(yyyy-MM)
      * @return
      */
      Page<Consume> pageList(String userName,Integer pageNo, Integer pageSize,String startTime,String endTime);
