@@ -47,8 +47,9 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
         String selects = map.get("selects");
         String groupbys = map.get("groupbys");
         String wheres = map.get("wheres");
-        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_month("+selects+" id,dt,month,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
+        String sql =" insert into db_lsxy_bi_yunhuni.tb_bi_voice_cdr_month("+selects+" id,dt,month,among_cost_time,among_duration,among_connect,among_not_connect,among_call,create_time,last_time,deleted,sortno,version )" +
                 " select "+selects+"   REPLACE(UUID(), '-', '') as id,? as dt,? as month, "+
+                " IFNULL(sum(among_cost_time),0) as among_cost_time," +
                 " IFNULL(sum(among_duration),0) as among_duration," +
                 " IFNULL(SUM(among_connect),0) as among_connect," +
                 " IFNULL(SUM(among_not_connect),0) as  among_not_connect ," +

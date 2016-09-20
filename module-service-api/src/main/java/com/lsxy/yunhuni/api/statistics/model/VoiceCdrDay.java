@@ -23,6 +23,7 @@ public class VoiceCdrDay extends IdEntity {
     private String areaId;//区域
     private Date dt;//统计时间
     private Integer day;//统计日期范围1-31
+    private Long amongCostTime;//本时段消费会话时长
     private Long amongDuration;//本时段会话时长
     private Long amongConnect;//本时段接通个数
     private Long amongNotConnect;//本时段未接通个数
@@ -86,6 +87,16 @@ public class VoiceCdrDay extends IdEntity {
     public void setAreaId(String areaId) {
         this.areaId = areaId;
     }
+
+    @Column(name = "among_cost_time")
+    public Long getAmongCostTime() {
+        return amongCostTime;
+    }
+
+    public void setAmongCostTime(Long amongCostTime) {
+        this.amongCostTime = amongCostTime;
+    }
+
     @Column(name = "among_duration")
     public Long getAmongDuration() {
         return amongDuration;

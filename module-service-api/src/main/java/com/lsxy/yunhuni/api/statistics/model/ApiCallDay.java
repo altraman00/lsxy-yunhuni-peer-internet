@@ -18,7 +18,7 @@ import java.util.Date;
 public class ApiCallDay extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
-    private Integer type;//api类型
+    private String type;//api类型
     private Date dt;//统计时间
     private Integer day;//统计日期范围1-31
     private Long amongApi;//本时段api调用次数
@@ -54,11 +54,11 @@ public class ApiCallDay extends IdEntity {
         this.appId = appId;
     }
     @Column(name = "type")
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
     @Column(name = "among_api")
