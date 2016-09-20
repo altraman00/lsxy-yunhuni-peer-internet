@@ -46,6 +46,12 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
         return Constants.EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED;
     }
 
+    /**
+     * 处理收码结束事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){

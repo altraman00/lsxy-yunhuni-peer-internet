@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * dail动作指令处理器
  * Created by liuws on 2016/9/2.
  */
 @Component

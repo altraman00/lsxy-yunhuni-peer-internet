@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * 设置会议成员放音模式
  * Created by liuws on 2016/8/24.
  */
 public class ConfSetVoiceModeInputDTO extends CommonDTO{

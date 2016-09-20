@@ -7,6 +7,7 @@ import javax.validation.GroupSequence;
 import javax.validation.constraints.*;
 
 /**
+ * 语音验证码
  * Created by liuws on 2016/8/24.
  */
 @GroupSequence({VerifyCallInputDTO.class,VerifyCallInputDTO.Second.class})

@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * IVR呼出
  * Created by liuws on 2016/8/24.
  */
 public class IVRCallInputDTO extends CommonDTO{

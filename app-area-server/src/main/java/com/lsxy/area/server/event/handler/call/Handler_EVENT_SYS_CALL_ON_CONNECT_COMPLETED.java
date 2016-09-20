@@ -42,6 +42,12 @@ public class Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED extends EventHandler {
         return Constants.EVENT_SYS_CALL_ON_CONNECT_COMPLETED;
     }
 
+    /**
+     * 处理 双通道连接结束事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){

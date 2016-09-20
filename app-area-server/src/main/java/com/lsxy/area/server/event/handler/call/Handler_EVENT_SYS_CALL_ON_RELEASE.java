@@ -46,6 +46,12 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         return Constants.EVENT_SYS_CALL_ON_RELEASE;
     }
 
+    /**
+     * 处理呼叫结束事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){
