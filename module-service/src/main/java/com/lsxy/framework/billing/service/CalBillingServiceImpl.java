@@ -36,7 +36,7 @@ public class CalBillingServiceImpl implements CalBillingService{
     @Override
     public BigDecimal getBalance(String tenantId) {
         if(logger.isDebugEnabled()){
-            logger.info("获取余额");
+            logger.info("获取余额,tenantId:{}",tenantId);
         }
         BigDecimal balance;
         Date date = new Date();
