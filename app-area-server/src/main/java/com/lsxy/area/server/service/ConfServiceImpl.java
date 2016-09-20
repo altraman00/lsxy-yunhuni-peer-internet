@@ -5,7 +5,6 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.*;
-import com.lsxy.area.server.util.ConfUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -26,10 +25,12 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tandy on 16/8/18.
@@ -39,6 +40,14 @@ import java.util.Map;
 public class ConfServiceImpl implements ConfService {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfServiceImpl.class);
+
+    /**最大与会数**/
+    public static final int MAX_PARTS = 10;
+
+    /**key的过期时间 秒**/
+    public static final int EXPIRE = 60 * 60 * 12;
+
+    private static final String CONF_PARTS_COUNTER_KEY_PREFIX = "conf_parts_";
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -65,7 +74,7 @@ public class ConfServiceImpl implements ConfService {
     private PlayFileUtil playFileUtil;
 
     @Autowired
-    private ConfUtil confUtil;
+    private RedisTemplate redisTemplate;
 
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
@@ -112,8 +121,8 @@ public class ConfServiceImpl implements ConfService {
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
         }
-        if(maxParts!=null && maxParts>ConfUtil.MAX_PARTS){
-            maxParts = confUtil.MAX_PARTS;
+        if(maxParts!=null && maxParts>MAX_PARTS){
+            maxParts = MAX_PARTS;
         }
         //TODO
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
@@ -144,7 +153,7 @@ public class ConfServiceImpl implements ConfService {
                                 .setLineGatewayId(lineGateway.getId())
                                 .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
-                                        .put("max_parts",maxParts,ConfUtil.MAX_PARTS)//最大与会数
+                                        .put("max_parts",maxParts,MAX_PARTS)//最大与会数
                                         .putIfNotEmpty("auto_hangup",autoHangup)//会议结束是否自动挂断
                                         .putIfNotEmpty("recording",recording)//是否自动启动录音
                                         .build())
@@ -238,7 +247,7 @@ public class ConfServiceImpl implements ConfService {
             throw new ConfNotExistsException();
         }
 
-        if(confUtil.outOfParts(confId)){
+        if(this.outOfParts(confId)){
             throw new OutOfConfMaxPartsException();
         }
 
@@ -307,7 +316,7 @@ public class ConfServiceImpl implements ConfService {
             throw new BalanceNotEnoughException();
         }
 
-        if(confUtil.outOfParts(confId)){
+        if(this.outOfParts(confId)){
             throw new OutOfConfMaxPartsException();
         }
 
@@ -640,5 +649,56 @@ public class ConfServiceImpl implements ConfService {
             }
         }
         return true;
+    }
+
+
+    private String key(String confId){
+        if(StringUtils.isBlank(confId)){
+            throw new IllegalArgumentException("会议ID不能为null");
+        }
+        return CONF_PARTS_COUNTER_KEY_PREFIX + confId;
+    }
+    /**
+     * 判断是否达到最大与会数
+     * @param confId
+     * @return
+     */
+    @Override
+    public boolean outOfParts(String confId){
+        String key = key(confId);
+        return redisTemplate.opsForSet().size(key) >= MAX_PARTS;
+    }
+
+    /**
+     * 增加会议成员
+     * @param confId
+     */
+    @Override
+    public void incrPart(String confId,String callId){
+        String key = key(confId);
+        redisTemplate.opsForSet().add(key,callId);
+        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 减少会议成员
+     * @param confId
+     */
+    @Override
+    public void decrPart(String confId,String callId){
+        String key = key(confId);
+        redisTemplate.opsForSet().remove(key,callId);
+        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 获取会议成员的call_id
+     * @param confId
+     * @return
+     */
+    @Override
+    public List<String> getParts(String confId){
+        String key = key(confId);
+        return (List<String>)redisTemplate.opsForSet().members(key);
     }
 }

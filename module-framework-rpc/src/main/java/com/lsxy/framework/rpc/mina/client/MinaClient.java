@@ -34,7 +34,6 @@ import java.security.GeneralSecurityException;
  *
  */
 @Component
-//@Conditional(MinaCondition.class)
 @ConditionalOnProperty(value = "global.rpc.provider", havingValue = "mina", matchIfMissing = false)
 public class MinaClient extends AbstractClient {
 	private static final Logger logger = LoggerFactory.getLogger(MinaClient.class);

@@ -13,14 +13,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.Properties;
 
 @Component
-@Conditional(OnsCondition.class)
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "ons", matchIfMissing = false)
 public class OnsProducer  extends AbstractMQProducer implements InitializingBean,DisposableBean {
 
 	private final static Log logger = LogFactory.getLog(OnsProducer.class);

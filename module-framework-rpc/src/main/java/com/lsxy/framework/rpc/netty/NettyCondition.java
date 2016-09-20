@@ -8,9 +8,9 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 /**
  * Created by tandy on 16/7/29.
  */
-public class NettyCondition implements Condition {
-    @Override
-    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return SystemConfig.getProperty("global.rpc.provider","netty").equals("netty");
-    }
-}
+//public class NettyCondition implements Condition {
+//    @Override
+//    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+//        return SystemConfig.getProperty("global.rpc.provider","netty").equals("netty");
+//    }
+//}

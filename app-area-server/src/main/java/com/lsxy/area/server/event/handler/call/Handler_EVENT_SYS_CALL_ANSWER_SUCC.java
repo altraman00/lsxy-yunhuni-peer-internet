@@ -3,7 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -35,7 +35,7 @@ public class Handler_EVENT_SYS_CALL_ANSWER_SUCC extends EventHandler{
     private NotifyCallbackUtil notifyCallbackUtil;
 
     @Autowired
-    private IVRActionUtil ivrActionUtil;
+    private IVRActionService ivrActionService;
 
     @Override
     public String getEventName() {
@@ -64,7 +64,7 @@ public class Handler_EVENT_SYS_CALL_ANSWER_SUCC extends EventHandler{
             logger.error("处理{}事件出错，call_id={}",getEventName(),call_id);
             return res;
         }
-        ivrActionUtil.doAction(call_id);
+        ivrActionService.doAction(call_id);
         return res;
     }
 
