@@ -1,7 +1,7 @@
 package com.lsxy.app.api.gateway.security.auth;
 
-import com.lsxy.framework.api.gateway.model.ApiInvokeLog;
-import com.lsxy.framework.api.gateway.service.ApiInvokeLogService;
+import com.lsxy.yunhuni.api.gateway.model.ApiInvokeLog;
+import com.lsxy.yunhuni.api.gateway.service.ApiInvokeLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

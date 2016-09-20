@@ -2,7 +2,7 @@ package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.framework.api.statistics.model.ConsumeDay;
+import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;

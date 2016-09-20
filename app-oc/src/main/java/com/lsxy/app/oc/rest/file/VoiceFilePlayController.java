@@ -1,8 +1,8 @@
 package com.lsxy.app.oc.rest.file;
 
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.framework.api.message.model.AccountMessage;
-import com.lsxy.framework.api.message.service.AccountMessageService;
+import com.lsxy.yunhuni.api.message.model.AccountMessage;
+import com.lsxy.yunhuni.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
