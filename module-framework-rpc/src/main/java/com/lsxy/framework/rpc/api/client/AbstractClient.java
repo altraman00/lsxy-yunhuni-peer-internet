@@ -164,8 +164,7 @@ public abstract class AbstractClient implements Client{
                         logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
                     }
                 } catch (Exception e) {
-//                    e.printStackTrace();
-                    logger.error("客户端连接失败:{}    {}", serverUrl,  e.getMessage());
+                    logger.error("客户端连接失败:" + serverUrl,  e);
                 }
             }
         }
