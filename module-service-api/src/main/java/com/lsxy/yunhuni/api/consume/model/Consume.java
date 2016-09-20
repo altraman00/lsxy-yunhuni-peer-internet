@@ -16,7 +16,6 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_consume")
 public class Consume extends IdEntity {
-    public static String RENT_NUMBER = "rent_number";  //租用号码的消费类型
 
     private Date dt;//消费时间
     private String type;//消费类型 或产品的标识码
