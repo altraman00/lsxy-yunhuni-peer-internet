@@ -78,6 +78,8 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
     @Override
     public void delete(T entity) throws IllegalAccessException, InvocationTargetException {
+        //设置删除时间
+        entity.setDeleteTime(new Date());
         this.logicDelete(entity);
     }
 
