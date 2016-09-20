@@ -3,7 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.area.server.service.act.IVRActionService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;

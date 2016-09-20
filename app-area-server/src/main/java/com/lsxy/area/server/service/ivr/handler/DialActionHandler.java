@@ -1,9 +1,9 @@
-package com.lsxy.area.server.service.act.handler;
+package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.area.server.service.act.IVRActionService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -71,7 +71,7 @@ public class DialActionHandler extends ActionHandler{
     @Override
     public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
+            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
         }
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作",getAction());

@@ -1,4 +1,4 @@
-package com.lsxy.area.server.service.act.handler;
+package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by liuws on 2016/9/2.
  */
 @Component
-public class HangupActionHandler extends ActionHandler{
+public class RecordActionHandler extends ActionHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -31,31 +31,42 @@ public class HangupActionHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return "hangup";
+        return "record";
     }
 
     @Override
     public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
+            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
         }
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作",getAction());
-        }
+
         BusinessState state = businessStateService.get(callId);
         if(state == null){
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
+
+        String max_duration = root.attributeValue("max_duration");
+        String beeping = root.attributeValue("beeping");
+        String finish_keys = root.attributeValue("finish_keys");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("开始处理ivr[{}]动作，max_duration={},beeping={},finish_keys={}",
+                    getAction(),max_duration,beeping,finish_keys);
+        }
+
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("max_seconds",max_duration)
+                .putIfNotEmpty("beep",beeping)
+                .putIfNotEmpty("finish_keys",finish_keys)
                 .putIfNotEmpty("user_data",callId)
                 .put("appid",state.getAppId())
                 .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECORD_START, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {

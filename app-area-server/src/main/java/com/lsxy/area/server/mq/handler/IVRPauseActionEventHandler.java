@@ -1,6 +1,6 @@
 package com.lsxy.area.server.mq.handler;
 
-import com.lsxy.area.server.service.act.IVRActionService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.agentserver.IVRPauseActionEvent;
 import org.slf4j.Logger;
