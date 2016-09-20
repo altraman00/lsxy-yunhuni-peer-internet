@@ -4,7 +4,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
+import com.lsxy.area.server.service.act.IVRActionService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -39,7 +39,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     private NotifyCallbackUtil notifyCallbackUtil;
 
     @Autowired
-    private IVRActionUtil ivrActionUtil;
+    private IVRActionService ivrActionService;
 
     @Override
     public String getEventName() {
@@ -93,7 +93,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 ivr_call_id = (String)state.getBusinessData().get("ivr_call_id");
             }
             if(StringUtils.isNotBlank(ivr_call_id)){
-                ivrActionUtil.doAction(ivr_call_id);
+                ivrActionService.doAction(ivr_call_id);
             }
         }
 

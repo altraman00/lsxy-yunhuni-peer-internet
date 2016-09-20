@@ -1,6 +1,6 @@
 package com.lsxy.area.server.mq.handler;
 
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
+import com.lsxy.area.server.service.act.IVRActionService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.agentserver.IVRPauseActionEvent;
 import org.slf4j.Logger;
@@ -19,13 +19,13 @@ public class IVRPauseActionEventHandler implements MQMessageHandler<IVRPauseActi
     private static final Logger logger = LoggerFactory.getLogger(IVRPauseActionEventHandler.class);
 
     @Autowired
-    private IVRActionUtil ivrActionUtil;
+    private IVRActionService ivrActionService;
 
     @Override
     public void handleMessage(IVRPauseActionEvent message) throws JMSException {
         if(logger.isDebugEnabled()){
             logger.debug("处理IVR暂停动作{}",message.toJson());
         }
-        ivrActionUtil.doAction(message.getCallId());
+        ivrActionService.doAction(message.getCallId());
     }
 }

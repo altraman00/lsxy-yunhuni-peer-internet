@@ -1,4 +1,4 @@
-package com.lsxy.area.server.util.ivr.act.handler;
+package com.lsxy.area.server.service.act.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
@@ -23,7 +23,7 @@ import java.util.Map;
  * Created by liuws on 2016/9/2.
  */
 @Component
-public class PlayListActionHandler extends ActionHandler{
+public class PlayActionHandler extends ActionHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -39,7 +39,7 @@ public class PlayListActionHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return "playlist";
+        return "play";
     }
 
     @Override
@@ -47,28 +47,22 @@ public class PlayListActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
         }
-
         BusinessState state = businessStateService.get(callId);
         if(state == null){
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
-        List<Element> peles = root.elements("play");
-
-        for (Element pele: peles) {
-            if(StringUtils.isNotBlank(pele.getTextTrim())){
-                plays.add(pele.getTextTrim());
-            }
+        if(StringUtils.isNotBlank(root.getTextTrim())){
+            plays.add(root.getTextTrim());
         }
+
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},plays={}",
+            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
                     getAction(),finish_keys,repeat,plays);
         }
-
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         if(plays!=null && plays.size()>0){
@@ -88,6 +82,7 @@ public class PlayListActionHandler extends ActionHandler{
                 logger.error("调用失败",e);
             }
         }
+
         if(businessData == null){
             businessData = new HashMap<>();
         }

@@ -4,7 +4,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
+import com.lsxy.area.server.service.act.IVRActionService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -55,7 +55,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     private ResourcesRentService resourcesRentService;
 
     @Autowired
-    private IVRActionUtil ivrActionUtil;
+    private IVRActionService ivrActionService;
 
     @Autowired
     private LineGatewayService lineGatewayService;
@@ -125,7 +125,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.info("找不到对应的APP");
             return res;
         }
-        ivrActionUtil.doActionIfAccept(app,tenant,res_id,from,to);
+        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to);
         return res;
     }
 

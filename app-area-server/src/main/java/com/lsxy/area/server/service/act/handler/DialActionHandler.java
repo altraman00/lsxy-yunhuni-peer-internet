@@ -1,9 +1,9 @@
-package com.lsxy.area.server.util.ivr.act.handler;
+package com.lsxy.area.server.service.act.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
+import com.lsxy.area.server.service.act.IVRActionService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -51,7 +51,7 @@ public class DialActionHandler extends ActionHandler{
     private PlayFileUtil playFileUtil;
 
     @Autowired
-    private IVRActionUtil ivrActionUtil;
+    private IVRActionService ivrActionService;
 
     @Override
     public String getAction() {
@@ -98,7 +98,7 @@ public class DialActionHandler extends ActionHandler{
         businessStateService.save(state);
 
         if(!dialSucc){//拨号失败直接进行ivr下一步
-            ivrActionUtil.doAction(callId);
+            ivrActionService.doAction(callId);
         }
         return true;
     }
@@ -163,7 +163,7 @@ public class DialActionHandler extends ActionHandler{
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
                 .putIfNotEmpty("ring_play_file",ring_play_file)
-                .put("max_answer_seconds",maxCallDuration, IVRActionUtil.MAX_DURATION_SEC)
+                .put("max_answer_seconds",maxCallDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
                 .put("appid ",app.getId())
@@ -188,7 +188,7 @@ public class DialActionHandler extends ActionHandler{
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
-                        .put("max_seconds",max_seconds,IVRActionUtil.MAX_DURATION_SEC)
+                        .put("max_seconds",max_seconds, IVRActionService.MAX_DURATION_SEC)
                         .put("connect_mode",connect_mode,1)
                         .putIfNotEmpty("volume1",volume1)
                         .putIfNotEmpty("volume2",volume2)

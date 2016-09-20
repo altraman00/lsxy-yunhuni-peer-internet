@@ -1,8 +1,8 @@
-package com.lsxy.area.server.util.ivr.act;
+package com.lsxy.area.server.service.act;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.server.util.ivr.act.handler.ActionHandler;
+import com.lsxy.area.server.service.act.handler.ActionHandler;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -52,8 +52,8 @@ import java.util.concurrent.Future;
  * Created by liuws on 2016/9/1.
  */
 @Component
-public class IVRActionUtil {
-    private static final Logger logger = LoggerFactory.getLogger(IVRActionUtil.class);
+public class IVRActionService {
+    private static final Logger logger = LoggerFactory.getLogger(IVRActionService.class);
 
     private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
