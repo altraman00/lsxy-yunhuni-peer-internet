@@ -16,6 +16,8 @@ public class ApiInvokeLog extends IdEntity {
     private String uri;
     private String appid;
     private String certid;
+    private String tenantId;
+    private String type;
 
     private String signature;
     private String method;
@@ -83,5 +85,21 @@ public class ApiInvokeLog extends IdEntity {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

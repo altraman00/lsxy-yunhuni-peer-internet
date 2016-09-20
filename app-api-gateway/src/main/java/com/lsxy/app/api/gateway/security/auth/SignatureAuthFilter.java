@@ -132,7 +132,12 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
             SecurityContextHolder.getContext().setAuthentication(successfulAuthentication);
 
             //调用日志异步入库
-            getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri);
+            String tenantId = null;
+            if(successfulAuthentication instanceof RestToken){
+                RestToken restToken = (RestToken) successfulAuthentication;
+                tenantId = restToken.getTenantId();
+            }
+            getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri,tenantId,certID);
 
             if(logger.isDebugEnabled()){
                 logger.debug("签名校验完毕,花费{}ms",(System.currentTimeMillis()-start));

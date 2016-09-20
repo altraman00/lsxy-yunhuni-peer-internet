@@ -39,5 +39,5 @@ public interface ApiCertificateService extends BaseService<ApiCertificate> {
      * @param certId
      * @return
      */
-    String findApiCertificateSecretKeyByCertId(String certId);
+    ApiCertificate findApiCertificateSecretKeyByCertId(String certId);
 }

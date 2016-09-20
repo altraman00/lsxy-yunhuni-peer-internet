@@ -76,12 +76,8 @@ public class ApiCertificateServiceImpl extends AbstractService<ApiCertificate> i
     }
 
     @Override
-    public String findApiCertificateSecretKeyByCertId(String certId) {
+    public ApiCertificate findApiCertificateSecretKeyByCertId(String certId) {
         ApiCertificate ac = this.apiCertificateDao.findByCertId(certId);
-        String secretKey = null;
-        if(ac != null) {
-            secretKey = ac.getSecretKey();
-        }
-        return secretKey;
+        return ac;
     }
 }

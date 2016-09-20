@@ -5,6 +5,7 @@ import com.lsxy.framework.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.yunhuni.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class CalCostTest {
     private CalBillingService calBillingService;
     @Autowired
     VoiceCdrHourService voiceCdrHourService;
+    @Autowired
+    ResourcesRentService resourcesRentService;
 
     @Test
     public void testCalCost(){
@@ -50,5 +53,10 @@ public class CalCostTest {
         Map<String, Object> map = voiceCdrHourService.calAverageCall("1");
         System.out.println(map.get("lineAverageCallTime"));
         System.out.println(map.get("lineLinkRate"));
+    }
+    @Test
+    public void testResourcesRent(){
+
+        resourcesRentService.resourcesRentTask();
     }
 }

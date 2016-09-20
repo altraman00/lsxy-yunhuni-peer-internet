@@ -1,4 +1,4 @@
-package com.lsxy.area.api;
+package com.lsxy.app.api.gateway.dto;
 
 import java.util.List;
 import java.io.Serializable;
