@@ -9,6 +9,7 @@ import org.apache.activemq.command.ActiveMQTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.jms.core.JmsTemplate;
@@ -20,8 +21,8 @@ import javax.jms.Destination;
  * Created by Tandy on 2016/7/21.
  */
 @Component
-@Conditional(ActMQCondition.class)
 @DependsOn("jmsTemplate")
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "actmq", matchIfMissing = false)
 public class ActMQService extends AbstractMQService {
 
     public static final Logger logger = LoggerFactory.getLogger(ActMQService.class);

@@ -1,11 +1,10 @@
 package com.lsxy.framework.mq.ons;
 
-import com.lsxy.framework.mq.actmq.ActMQCondition;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQMessageParser;
 import com.lsxy.framework.mq.exceptions.InvalidMQEventMessageException;
 import net.sf.json.JSONObject;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -15,7 +14,7 @@ import static com.lsxy.framework.cache.FrameworkCacheConfig.logger;
  * Created by Tandy on 2016/7/23.
  */
 @Component
-@Conditional(OnsCondition.class)
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "ons", matchIfMissing = false)
 public class OnsMessageParser implements MQMessageParser {
     @Override
     public MQEvent parse(String message) throws InvalidMQEventMessageException {

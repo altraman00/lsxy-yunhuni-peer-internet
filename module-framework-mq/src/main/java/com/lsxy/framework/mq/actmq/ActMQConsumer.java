@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
@@ -26,8 +27,8 @@ import java.util.Set;
  * Created by Tandy on 2016/7/22.
  *
  */
-@Conditional(ActMQCondition.class)
 @Component
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "actmq", matchIfMissing = false)
 public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean, InitializingBean,MessageListener {
 
     public static final Logger logger = LoggerFactory.getLogger(ActMQConsumer.class);
