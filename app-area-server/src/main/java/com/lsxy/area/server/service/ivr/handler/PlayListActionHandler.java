@@ -1,4 +1,4 @@
-package com.lsxy.area.server.util.ivr.act.handler;
+package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
@@ -23,7 +23,7 @@ import java.util.Map;
  * Created by liuws on 2016/9/2.
  */
 @Component
-public class PlayActionHandler extends ActionHandler{
+public class PlayListActionHandler extends ActionHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -39,30 +39,36 @@ public class PlayActionHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return "play";
+        return "playlist";
     }
 
     @Override
     public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
+            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
         }
+
         BusinessState state = businessStateService.get(callId);
         if(state == null){
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
+
         String finish_keys = root.attributeValue("finish_keys");
         String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
-        if(StringUtils.isNotBlank(root.getTextTrim())){
-            plays.add(root.getTextTrim());
-        }
+        List<Element> peles = root.elements("play");
 
+        for (Element pele: peles) {
+            if(StringUtils.isNotBlank(pele.getTextTrim())){
+                plays.add(pele.getTextTrim());
+            }
+        }
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
+            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},plays={}",
                     getAction(),finish_keys,repeat,plays);
         }
+
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         if(plays!=null && plays.size()>0){
@@ -82,7 +88,6 @@ public class PlayActionHandler extends ActionHandler{
                 logger.error("调用失败",e);
             }
         }
-
         if(businessData == null){
             businessData = new HashMap<>();
         }

@@ -2,8 +2,8 @@ package com.lsxy.area.server.event.handler.conf;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.ConfUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -55,7 +55,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     private MeetingService meetingService;
 
     @Autowired
-    private ConfUtil confUtil;
+    private ConfService confService;
 
     @Override
     public String getEventName() {
@@ -157,7 +157,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     }
 
     private void handupParts(String confId) {
-        List<String> parts = confUtil.getParts(confId);
+        List<String> parts = confService.getParts(confId);
         if(parts!=null && parts.size()>0){
             for (String callId : parts) {
                 handup(callId);
