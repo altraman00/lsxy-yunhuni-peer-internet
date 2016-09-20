@@ -6,6 +6,8 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
+import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -23,10 +25,12 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tandy on 16/8/18.
@@ -36,6 +40,14 @@ import java.util.Map;
 public class ConfServiceImpl implements ConfService {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfServiceImpl.class);
+
+    /**最大与会数**/
+    public static final int MAX_PARTS = 10;
+
+    /**key的过期时间 秒**/
+    public static final int EXPIRE = 60 * 60 * 12;
+
+    private static final String CONF_PARTS_COUNTER_KEY_PREFIX = "conf_parts_";
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -61,6 +73,29 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private PlayFileUtil playFileUtil;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private TenantServiceSwitchService tenantServiceSwitchService;
+
+    private boolean isEnableConfService(String tenantId,String appId){
+        try {
+            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
+            if(serviceSwitch.getIsSessionService() == null || serviceSwitch.getIsSessionService() != 1){
+                return false;
+            }
+            App app = appService.findById(appId);
+            if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+                return false;
+            }
+        } catch (Throwable e) {
+            logger.error("判断是否开启service失败",e);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
@@ -78,13 +113,16 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(tenantId,appId)){
             throw new AppServiceInvalidException();
         }
 
         boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
+        }
+        if(maxParts!=null && maxParts>MAX_PARTS){
+            maxParts = MAX_PARTS;
         }
         //TODO
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
@@ -96,7 +134,7 @@ public class ConfServiceImpl implements ConfService {
                                 .putIfNotEmpty("user_data",confId)
                                 .putIfNotEmpty("max_seconds",maxDuration)
                                 .putIfNotEmpty("bg_file",bgmFile)
-                                .put("appid",appId)
+                                .putIfNotEmpty("appid",appId)
                                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
@@ -114,12 +152,10 @@ public class ConfServiceImpl implements ConfService {
                                 .setAreaId(app.getArea().getId())
                                 .setLineGatewayId(lineGateway.getId())
                                 .setBusinessData(new MapBuilder<String,Object>()
-                                        .put("max_seconds",maxDuration)//会议最大持续时长
-                                        //TODO 需要判断最大与会数
-                                        .put("max_parts",maxParts)//最大与会数
-                                        //TODO 需要判断是否自动挂断所有会话
-                                        .put("auto_hangup",autoHangup)//会议结束是否自动挂断
-                                        .put("recording",recording)//是否自动启动录音
+                                        .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
+                                        .put("max_parts",maxParts,MAX_PARTS)//最大与会数
+                                        .putIfNotEmpty("auto_hangup",autoHangup)//会议结束是否自动挂断
+                                        .putIfNotEmpty("recording",recording)//是否自动启动录音
                                         .build())
                                 .build();
         businessStateService.save(state);
@@ -139,7 +175,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -161,7 +197,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",state.getResId())
                 .putIfNotEmpty("user_data",confId)
-                .put("appid",appId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
@@ -193,7 +229,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(tenantId,appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -211,6 +247,10 @@ public class ConfServiceImpl implements ConfService {
             throw new ConfNotExistsException();
         }
 
+        if(this.outOfParts(confId)){
+            throw new OutOfConfMaxPartsException();
+        }
+
         String callId = UUIDGenerator.uuid();
         //TODO
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
@@ -222,7 +262,7 @@ public class ConfServiceImpl implements ConfService {
                 .putIfNotEmpty("max_answer_seconds",maxDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid",appId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -240,12 +280,14 @@ public class ConfServiceImpl implements ConfService {
                                     .setAreaId(app.getArea().getId())
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(new MapBuilder<String,Object>()
-                                        .put("max_seconds",maxDuration)//最大时间
-                                        .put("conf_id",confId)//所属会议
-                                        .put("play_file",playFile)//加入后在会议播放这个文件
-                                        .put("voice_mode",voiceMode)//加入后的声音模式
+                                        .putIfNotEmpty("from",oneTelnumber)
+                                        .putIfNotEmpty("to",to)
+                                        .putIfNotEmpty("max_seconds",maxDuration)//最大时间
+                                        .putIfNotEmpty("conf_id",confId)//所属会议
+                                        .putIfNotEmpty("play_file",playFile)//加入后在会议播放这个文件
+                                        .putIfNotEmpty("voice_mode",voiceMode)//加入后的声音模式
                                         //TODO 这个是什么鬼dial_voice_stop_cond
-                                        .put("dial_voice_stop_cond",dialVoiceStopCond)//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
+                                        .putIfNotEmpty("dial_voice_stop_cond",dialVoiceStopCond)//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
                                         .build())
                                     .build();
         businessStateService.save(callstate);
@@ -265,13 +307,17 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
         boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
         if(!isAmountEnough){
             throw new BalanceNotEnoughException();
+        }
+
+        if(this.outOfParts(confId)){
+            throw new OutOfConfMaxPartsException();
         }
 
         return this.confEnter(callId,confId,maxDuration,playFile,voiceMode);
@@ -290,7 +336,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
         BusinessState call_state = businessStateService.get(callId);
@@ -308,7 +354,7 @@ public class ConfServiceImpl implements ConfService {
                 .putIfNotEmpty("res_id",call_state.getResId())
                 .putIfNotEmpty("conf_res_id",conf_state.getResId())
                 .putIfNotEmpty("user_data",callId)
-                .put("appid",appId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
@@ -333,7 +379,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -352,7 +398,7 @@ public class ConfServiceImpl implements ConfService {
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("file",StringUtils.join(playFiles,"|"))
                 .putIfNotEmpty("user_data",confId)
-                .put("appid",appId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
@@ -377,7 +423,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -390,7 +436,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("user_data",confId)
-                .put("appid",appId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
@@ -415,7 +461,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -442,7 +488,7 @@ public class ConfServiceImpl implements ConfService {
                 //TODO 文件名如何定
                 .putIfNotEmpty("record_file",UUIDGenerator.uuid())
                 .putIfNotEmpty("user_data",confId)
-                .put("appid",appId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
@@ -467,7 +513,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
         BusinessState conf_state = businessStateService.get(confId);
@@ -477,9 +523,9 @@ public class ConfServiceImpl implements ConfService {
         }
 
         Map<String,Object> params = new MapBuilder<String,Object>()
-                .put("res_id",conf_state.getResId())
-                .put("user_data",confId)
-                .put("appid",appId)
+                .putIfNotEmpty("res_id",conf_state.getResId())
+                .putIfNotEmpty("user_data",confId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP, params);
@@ -504,7 +550,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
+        if(!isEnableConfService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
@@ -529,7 +575,7 @@ public class ConfServiceImpl implements ConfService {
                 .putIfNotEmpty("call_res_id",call_state.getResId())
                 .putIfNotEmpty("mode",voiceMode)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid",appId)
+                .putIfNotEmpty("appid",appId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
@@ -587,7 +633,7 @@ public class ConfServiceImpl implements ConfService {
                                     .putIfNotEmpty("voice_mode",voice_mode)
                                     .putIfNotEmpty("play_file",play_file)
                                     .putIfNotEmpty("user_data",call_id)
-                                    .put("appid", conf_state.getAppId())
+                                    .putIfNotEmpty("appid", conf_state.getAppId())
                                     .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
         try {
@@ -603,5 +649,56 @@ public class ConfServiceImpl implements ConfService {
             }
         }
         return true;
+    }
+
+
+    private String key(String confId){
+        if(StringUtils.isBlank(confId)){
+            throw new IllegalArgumentException("会议ID不能为null");
+        }
+        return CONF_PARTS_COUNTER_KEY_PREFIX + confId;
+    }
+    /**
+     * 判断是否达到最大与会数
+     * @param confId
+     * @return
+     */
+    @Override
+    public boolean outOfParts(String confId){
+        String key = key(confId);
+        return redisTemplate.opsForSet().size(key) >= MAX_PARTS;
+    }
+
+    /**
+     * 增加会议成员
+     * @param confId
+     */
+    @Override
+    public void incrPart(String confId,String callId){
+        String key = key(confId);
+        redisTemplate.opsForSet().add(key,callId);
+        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 减少会议成员
+     * @param confId
+     */
+    @Override
+    public void decrPart(String confId,String callId){
+        String key = key(confId);
+        redisTemplate.opsForSet().remove(key,callId);
+        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 获取会议成员的call_id
+     * @param confId
+     * @return
+     */
+    @Override
+    public List<String> getParts(String confId){
+        String key = key(confId);
+        return (List<String>)redisTemplate.opsForSet().members(key);
     }
 }

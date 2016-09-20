@@ -3,6 +3,7 @@ package com.lsxy.area.api;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 
 import java.util.List;
+
 /**
  * Created by liuws on 2016/8/25.
  * 会议相关
@@ -93,4 +94,26 @@ public interface ConfService {
      * @return
      */
     public boolean confEnter(String call_id,String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException;
+
+
+    public boolean outOfParts(String confId);
+
+    /**
+     * 增加会议成员
+     * @param confId
+     */
+    public void incrPart(String confId,String callId);
+
+    /**
+     * 减少会议成员
+     * @param confId
+     */
+    public void decrPart(String confId,String callId);
+
+    /**
+     * 获取会议成员的call_id
+     * @param confId
+     * @return
+     */
+    public List<String> getParts(String confId);
 }

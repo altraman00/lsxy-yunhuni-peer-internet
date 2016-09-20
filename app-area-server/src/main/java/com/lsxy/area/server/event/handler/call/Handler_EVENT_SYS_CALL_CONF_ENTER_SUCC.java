@@ -2,6 +2,7 @@ package com.lsxy.area.server.event.handler.call;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -11,6 +12,11 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.session.model.Meeting;
+import com.lsxy.yunhuni.api.session.model.MeetingMember;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.MeetingMemberService;
+import com.lsxy.yunhuni.api.session.service.MeetingService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -36,6 +43,18 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private MeetingService meetingService;
+
+    @Autowired
+    private MeetingMemberService meetingMemberService;
+
+    @Autowired
+    private CallSessionService callSessionService;
+
+    @Autowired
+    private ConfService confService;
 
     @Override
     public String getEventName() {
@@ -85,6 +104,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             logger.info("没有找到对应的会议信息callid={},confid={}",call_id,conf_id);
             return res;
         }
+        //会议成员增加
+        confService.incrPart(conf_id,call_id);
+
         if(StringUtils.isBlank(appId)){
             logger.info("没有找到对应的app信息appId={}",appId);
             return res;
@@ -116,6 +138,26 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
+        }
+
+        Meeting meeting = meetingService.findById(conf_id);
+        if(meeting!=null){
+            String callSessionId = (String)businessData.get("sessionid");
+            MeetingMember meetingMember = new MeetingMember();
+            meetingMember.setId(call_id);
+            meetingMember.setNumber((String)businessData.get("to"));
+            meetingMember.setJoinTime(new Date());
+            if(state.getType().equalsIgnoreCase("ivr_incoming")){
+                meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);
+            }else{
+                meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);
+            }
+            meetingMember.setMeeting(meeting);
+            if(callSessionId!=null){
+                meetingMember.setSession(callSessionService.findById(callSessionId));
+            }
+            meetingMember.setResId(state.getResId());
+            meetingMemberService.save(meetingMember);
         }
         return res;
     }

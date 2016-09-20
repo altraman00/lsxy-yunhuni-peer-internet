@@ -1,4 +1,4 @@
-package com.lsxy.area.server.util.ivr.act.handler;
+package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
@@ -7,7 +7,6 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,7 @@ import java.util.Map;
  * Created by liuws on 2016/9/2.
  */
 @Component
-public class RecordActionHandler extends ActionHandler{
+public class HangupActionHandler extends ActionHandler{
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -32,27 +31,16 @@ public class RecordActionHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return "record";
+        return "hangup";
     }
 
     @Override
-    public boolean handle(String callId, Element root) {
+    public boolean handle(String callId, Element root,String next) {
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},act={}",callId,getAction());
-        }
-        String max_duration = root.attributeValue("max_duration");
-        String beeping = root.attributeValue("beeping");
-        String finish_keys = root.attributeValue("finish_keys");
-        String nextUrl = "";
-        Element next = root.element("next");
-        if(next!=null){
-            if(StringUtils.isNotBlank(next.getTextTrim())){
-                nextUrl = next.getTextTrim();
-            }
+            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
         }
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，max_duration={},beeping={},finish_keys={}",
-                            getAction(),max_duration,beeping,finish_keys);
+            logger.debug("开始处理ivr[{}]动作",getAction());
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
@@ -63,14 +51,11 @@ public class RecordActionHandler extends ActionHandler{
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
-                .putIfNotEmpty("max_seconds",max_duration)
-                .putIfNotEmpty("beep",beeping)
-                .putIfNotEmpty("finish_keys",finish_keys)
                 .putIfNotEmpty("user_data",callId)
                 .put("appid",state.getAppId())
                 .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECORD_START, params);
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {
@@ -79,7 +64,7 @@ public class RecordActionHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
-        businessData.put("next",nextUrl);
+        businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
         return true;

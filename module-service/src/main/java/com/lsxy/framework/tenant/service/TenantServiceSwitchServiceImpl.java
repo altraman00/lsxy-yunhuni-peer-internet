@@ -9,6 +9,10 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.tenant.dao.TenantServiceSwitchDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -34,13 +38,22 @@ public class TenantServiceSwitchServiceImpl extends AbstractService<TenantServic
 
 
     @Override
-    public TenantServiceSwitch findOneByTenant(String tenant) throws MatchMutiEntitiesException {
+    @Cacheable(value="entity",key="'entity_switch_'+#tenantId",unless = "#result == null")
+    public TenantServiceSwitch findOneByTenant(String tenantId) throws MatchMutiEntitiesException {
         String hql = "from TenantServiceSwitch obj where obj.tenant.id = ?1";
-        TenantServiceSwitch tenantServiceSwitch = this.findUnique(hql, tenant);
+        TenantServiceSwitch tenantServiceSwitch = this.findUnique(hql, tenantId);
         return tenantServiceSwitch;
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_switch_' + #tenantId", beforeInvocation = true)
+            },
+            put = {
+                    @CachePut(value = "entity", key = "'entity_switch_' + #tenantId",unless = "#entity == null")
+            }
+    )
     public TenantServiceSwitch saveOrUpdate(String tenantId,TenantServiceSwitch switchs) {
         TenantServiceSwitch s = null;
         try{

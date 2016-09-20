@@ -17,7 +17,8 @@ public enum ApiReturnCodeEnum {
     CallNotExists("101016","呼叫不存在"),
     AppOffLine("101017","应用没上线"),
     DuoCallbackNumIsSample("101018","双向回拔的号码不能是同一号码"),
-    PlayFileNotExists("101019","放音文件不存在或未审核");
+    PlayFileNotExists("101019","放音文件不存在或未审核"),
+    OutOfConfMaxParts("101020","超过最大与会数");
 
     private String code;
     private String msg;

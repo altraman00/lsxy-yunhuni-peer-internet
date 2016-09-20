@@ -4,6 +4,7 @@ import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.ONSFactory;
 import com.aliyun.openservices.ons.api.Producer;
 import com.aliyun.openservices.ons.api.SendResult;
+import com.lsxy.framework.mq.api.AbstractDelayMQEvent;
 import com.lsxy.framework.mq.api.AbstractMQProducer;
 import com.lsxy.framework.mq.api.MQEvent;
 import org.apache.commons.codec.binary.Base64;
@@ -50,9 +51,16 @@ public class OnsProducer  extends AbstractMQProducer implements InitializingBean
             // 注意：不设置也不会影响消息正常收发
             msg.setKey(event.getId());
             msg.setUserProperties(p);
-            // 发送消息，只要不抛异常就是成功
-            SendResult sendResult = producer.send(msg);
-            logger.debug(sendResult);
+		if(event instanceof AbstractDelayMQEvent){
+			AbstractDelayMQEvent e = (AbstractDelayMQEvent)event;
+			if(e.isDelay()){
+				msg.setStartDeliverTime(System.currentTimeMillis() + e.getDelay());
+			}
+		}
+
+		// 发送消息，只要不抛异常就是成功
+		SendResult sendResult = producer.send(msg);
+		logger.debug(sendResult);
 	}
 	
 	public void init(){
