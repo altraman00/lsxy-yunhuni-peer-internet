@@ -23,6 +23,7 @@ public class VoiceCdrHour extends IdEntity {
     private String areaId;//区域
     private Date dt;//统计时间
     private Integer hour;//统计小时范围0-23
+    private Long amongCostTime;//本时段消费会话时长
     private Long amongDuration;//本时段会话时长
     private Long amongConnect;//本时段接通个数
     private Long amongNotConnect;//本时段未接通个数
@@ -51,6 +52,15 @@ public class VoiceCdrHour extends IdEntity {
     public void setHour(Integer hour) {
         this.hour = hour;
     }
+    @Column(name = "among_cost_time")
+    public Long getAmongCostTime() {
+        return amongCostTime;
+    }
+
+    public void setAmongCostTime(Long amongCostTime) {
+        this.amongCostTime = amongCostTime;
+    }
+
     @Column(name = "app_id")
     public String getAppId() {
         return appId;
