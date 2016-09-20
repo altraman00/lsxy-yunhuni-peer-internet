@@ -1,10 +1,10 @@
 package com.lsxy.app.oc.rest.dashboard;
 
 import com.lsxy.app.oc.rest.dashboard.vo.*;
-import com.lsxy.framework.api.statistics.service.ConsumeDayService;
-import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
-import com.lsxy.framework.api.statistics.service.VoiceCdrDayService;
-import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;

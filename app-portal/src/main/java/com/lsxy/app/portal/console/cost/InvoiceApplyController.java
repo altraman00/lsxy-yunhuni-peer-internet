@@ -5,7 +5,7 @@ import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.security.AvoidDuplicateSubmission;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
-import com.lsxy.framework.api.statistics.model.ConsumeDay;
+import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
 import com.lsxy.framework.core.security.SecurityUser;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.EntityUtils;

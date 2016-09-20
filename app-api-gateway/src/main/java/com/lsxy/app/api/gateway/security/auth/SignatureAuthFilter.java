@@ -1,8 +1,6 @@
 package com.lsxy.app.api.gateway.security.auth;
 
 import com.lsxy.app.api.gateway.util.SpringContextHolder;
-import com.lsxy.framework.api.gateway.model.ApiInvokeLog;
-import com.lsxy.framework.api.gateway.service.ApiInvokeLogService;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -15,13 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
