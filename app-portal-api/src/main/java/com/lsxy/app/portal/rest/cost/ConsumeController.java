@@ -1,8 +1,8 @@
 package com.lsxy.app.portal.rest.cost;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.consume.model.Consume;
-import com.lsxy.framework.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;

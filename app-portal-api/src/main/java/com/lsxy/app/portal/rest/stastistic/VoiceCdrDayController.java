@@ -1,8 +1,8 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.statistics.model.VoiceCdrDay;
-import com.lsxy.framework.api.statistics.service.VoiceCdrDayService;
+import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.lang.StringUtils;

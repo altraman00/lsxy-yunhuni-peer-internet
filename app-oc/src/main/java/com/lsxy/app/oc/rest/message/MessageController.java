@@ -1,9 +1,9 @@
 package com.lsxy.app.oc.rest.message;
 
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.yunhuni.api.message.model.AccountMessage;
 import com.lsxy.framework.api.message.model.Message;
-import com.lsxy.framework.api.message.service.AccountMessageService;
+import com.lsxy.yunhuni.api.message.service.AccountMessageService;
 import com.lsxy.framework.api.message.service.MessageService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;

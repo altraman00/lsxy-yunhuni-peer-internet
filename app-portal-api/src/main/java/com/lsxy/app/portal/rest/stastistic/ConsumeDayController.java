@@ -1,8 +1,8 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.statistics.model.ConsumeDay;
-import com.lsxy.framework.api.statistics.service.ConsumeDayService;
+import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
