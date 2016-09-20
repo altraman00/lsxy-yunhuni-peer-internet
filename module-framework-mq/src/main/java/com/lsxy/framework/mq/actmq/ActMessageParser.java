@@ -1,11 +1,10 @@
 package com.lsxy.framework.mq.actmq;
 
-import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQMessageParser;
 import com.lsxy.framework.mq.exceptions.InvalidMQEventMessageException;
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -16,7 +15,7 @@ import java.io.ObjectInputStream;
  * Created by Tandy on 2016/7/23.
  */
 @Component
-@Conditional(ActMQCondition.class)
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "actmq", matchIfMissing = false)
 public class ActMessageParser implements MQMessageParser {
     @Override
     public MQEvent parse(String message) throws InvalidMQEventMessageException {

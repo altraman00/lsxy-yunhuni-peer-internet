@@ -123,7 +123,4 @@
         <appender-ref ref="ROLLINGFILE_DEBUG"/>
     </logger>
 
-
-    <logger name="com.lsxy.framework.rpc" level="INFO" additivity="true" />
-
 </included>

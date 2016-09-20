@@ -6,14 +6,14 @@ import com.lsxy.framework.mq.api.MQProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
  * Created by Tandy on 2016/7/21.
  */
 @Component
-@Conditional(OnsCondition.class)
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "ons", matchIfMissing = false)
 public class OnsMQService extends AbstractMQService{
 
     public static final Logger logger = LoggerFactory.getLogger(OnsMQService.class);

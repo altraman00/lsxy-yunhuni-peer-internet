@@ -2,7 +2,10 @@ package com.lsxy.framework.mq.ons;
 
 import com.aliyun.openservices.ons.api.PropertyKeyConst;
 import com.lsxy.framework.config.SystemConfig;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -15,13 +18,16 @@ import java.util.Properties;
 
 @Component
 @Configuration
-@Conditional(OnsCondition.class)
-public class OnsMQConfig {
+@ConditionalOnProperty(value = "global.mq.provider", havingValue = "ons", matchIfMissing = false)
+public class OnsMQConfig implements InitializingBean{
+
+
+    @Autowired
+    private String systemId;
 
     public OnsMQConfig(){
-        String systemId = System.getProperty("systemId");
-        consumerId = SystemConfig.getProperty(systemId + ".mq.ons.cid","CID_YUNHUNI-TENANT-001");
-        producerId =  SystemConfig.getProperty(systemId + ".mq.ons.pid","PID_YUNHUNI-TENANT-001");
+
+
     }
 
     private String consumerId;
@@ -76,6 +82,12 @@ public class OnsMQConfig {
 
     public void setProducerId(String producerId) {
         this.producerId = producerId;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        consumerId = SystemConfig.getProperty(systemId + ".mq.ons.cid","CID_YUNHUNI-TENANT-001");
+        producerId =  SystemConfig.getProperty(systemId + ".mq.ons.pid","PID_YUNHUNI-TENANT-001");
     }
 
     //    @Bean
