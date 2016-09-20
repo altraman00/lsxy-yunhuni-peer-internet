@@ -96,6 +96,8 @@ public class HomeController extends AbstractPortalController {
             Long fileRemainSize = billing.getFileRemainSize()/(1024 * 1024);
             vo.setFileUsedSize(fileTotalSize - fileRemainSize);
             vo.setFileTotalSize(fileTotalSize);
+        }else{
+            throw new RuntimeException("系统出错，账务表不存在，请联系管理员");
         }
 
         //TODO 获取当前线路状况，从redis里取
