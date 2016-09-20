@@ -5,7 +5,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.yunhuni.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

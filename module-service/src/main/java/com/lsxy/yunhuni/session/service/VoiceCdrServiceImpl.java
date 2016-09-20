@@ -1,10 +1,10 @@
 package com.lsxy.yunhuni.session.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.statistics.model.VoiceCdrDay;
-import com.lsxy.framework.api.statistics.model.VoiceCdrHour;
-import com.lsxy.framework.api.statistics.service.VoiceCdrDayService;
-import com.lsxy.framework.api.statistics.service.VoiceCdrHourService;
+import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
+import com.lsxy.yunhuni.api.statistics.model.VoiceCdrHour;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;

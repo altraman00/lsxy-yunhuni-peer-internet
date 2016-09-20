@@ -1,9 +1,9 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
-import com.lsxy.framework.api.statistics.service.VoiceCdrHourService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.config.Constants;
-import com.lsxy.yunhuni.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.junit.Test;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 /**

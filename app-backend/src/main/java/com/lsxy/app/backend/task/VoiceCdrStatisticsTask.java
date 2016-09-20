@@ -1,8 +1,8 @@
 package com.lsxy.app.backend.task;
 
-import com.lsxy.framework.api.statistics.service.VoiceCdrDayService;
-import com.lsxy.framework.api.statistics.service.VoiceCdrHourService;
-import com.lsxy.framework.api.statistics.service.VoiceCdrMonthService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrMonthService;
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;

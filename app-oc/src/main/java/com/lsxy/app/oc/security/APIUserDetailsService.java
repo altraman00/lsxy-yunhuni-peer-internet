@@ -1,9 +1,7 @@
 package com.lsxy.app.oc.security;
 
-import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
-import com.lsxy.oc.api.user.model.OcUser;
-import com.lsxy.oc.api.user.service.OcUserService;
+import com.lsxy.yunhuni.api.user.model.OcUser;
+import com.lsxy.yunhuni.api.user.service.OcUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

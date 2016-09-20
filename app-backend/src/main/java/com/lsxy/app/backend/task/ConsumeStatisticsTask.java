@@ -1,8 +1,8 @@
 package com.lsxy.app.backend.task;
 
-import com.lsxy.framework.api.statistics.service.ConsumeDayService;
-import com.lsxy.framework.api.statistics.service.ConsumeHourService;
-import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeHourService;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;

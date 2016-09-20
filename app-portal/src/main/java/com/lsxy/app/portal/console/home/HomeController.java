@@ -8,12 +8,11 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.billing.model.Billing;
+import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -97,6 +96,8 @@ public class HomeController extends AbstractPortalController {
             Long fileRemainSize = billing.getFileRemainSize()/(1024 * 1024);
             vo.setFileUsedSize(fileTotalSize - fileRemainSize);
             vo.setFileTotalSize(fileTotalSize);
+        }else{
+            throw new RuntimeException("系统出错，账务表不存在，请联系管理员");
         }
 
         //TODO 获取当前线路状况，从redis里取
