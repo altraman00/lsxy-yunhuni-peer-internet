@@ -609,7 +609,9 @@ public class TenantController {
 //            sum  = sum.add(list.get(i).getAmount());
 //        }
 //        dto.setSumAmount(sum);
+        consumeService.save(list.get(0));
         dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+
         return RestResponse.success(dto);
     }
 
