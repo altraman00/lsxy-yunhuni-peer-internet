@@ -9,7 +9,7 @@
     <ul class="nav navbar-nav hidden-xs nav_b">
         <li class="dropdown">
             <a href="${ctx}/console/home" class="dropdown-toggle padding-10" data-toggle="dropdown">
-                <span onclick="window.location.href='${ctx}/console/home'" class="">商户管理控制台</span>
+                <span onclick="window.location.href='${ctx}/console/home'" class="">云呼你管理控制台</span>
             </a>
         </li>
     </ul>
@@ -18,7 +18,7 @@
             <%--<i class="fa fa-fw fa-book"></i>文档中心--%>
         <%--</a></li>--%>
         <li class="hidden-xs a-color"> <a href="#" onclick="window.open('<%=SystemConfig.getProperty("global.official.website.url")%>')" class="dropdown-toggle" data-toggle="dropdown" onclick="window.location.href='news.html' ">
-            <img src="${resPrefixUrl }/images/index/index.png" alt=""> 首页 </a>
+            <img src="${resPrefixUrl }/images/index/index.png" class="header-index-img" alt=""> 首页 </a>
 
         </li>
         <li class="hidden-xs"> <a href="#" class="dropdown-toggle" onclick="window.location.href='${ctx}/console/message/account_message/index'" data-toggle="dropdown"> <i class="fa fa-bell"></i> <span id="notReadMessageNum" class="bg-danger <c:if test="${homeVO.messageNum>0}">header-msg</c:if>" ></span> </a>
