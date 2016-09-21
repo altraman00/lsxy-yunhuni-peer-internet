@@ -598,12 +598,13 @@ public class TenantController {
         dto.setConsumes(page);
         List<Consume> list  = page.getResult();
         changeTypeToChineseOfConsume(list);
-        BigDecimal sum  = new BigDecimal("0.00");
-        for(int i=0;i<list.size();i++){
-            sum  = sum.add(list.get(i).getAmount());
-        }
-       // dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
-        dto.setSumAmount(sum);
+
+//        BigDecimal sum  = new BigDecimal("0.00");
+//        for(int i=0;i<list.size();i++){
+//            sum  = sum.add(list.get(i).getAmount());
+//        }
+//        dto.setSumAmount(sum);
+        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
         return RestResponse.success(dto);
     }
 
