@@ -595,9 +595,9 @@ public class TenantController {
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
         Page<Consume> page = consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize);
-        dto.setConsumes(page);
         List<Consume> list  = page.getResult();
         changeTypeToChineseOfConsume(list);
+        dto.setConsumes(page);
 
 //        BigDecimal sum  = new BigDecimal("0.00");
 //        for(int i=0;i<list.size();i++){
