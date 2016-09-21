@@ -9,7 +9,7 @@
     <ul class="nav navbar-nav hidden-xs nav_b">
         <li class="dropdown">
             <a href="${ctx}/console/home" class="dropdown-toggle padding-10" data-toggle="dropdown">
-                <span onclick="window.location.href='${ctx}/console/home'" class="">商户管理控制台</span>
+                <span onclick="window.location.href='${ctx}/console/home'" class="">云呼你管理控制台</span>
             </a>
         </li>
     </ul>
