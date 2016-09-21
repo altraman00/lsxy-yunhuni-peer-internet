@@ -13,7 +13,8 @@
 
 <div class="register-header">
     <div class="box">
-        <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png" />
+        <a a href="#" onclick="window.open('<%=SystemConfig.getProperty("global.official.website.url")%>')">
+        <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png" /></a>
         <div class="text">
             如以有云呼你账号，<a href="${ctx }/login">立即登录</a>
         </div>
