@@ -28,6 +28,7 @@
             <p class="p">账号注册成功，请72小时内前往邮箱收取邮件激活账号 ${email}</p>
             <p><a class="btn_actemail"  data-email="${email}" >去邮箱收取邮件</a></p>
         </div>
+        <div id="accountId" style="display:none">${accountId}</div>
     </div>
 </div>
 <!--/container -->
