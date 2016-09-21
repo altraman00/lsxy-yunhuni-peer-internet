@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
@@ -823,7 +824,24 @@ public class TenantController {
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
         }
         List<ConsumeMonth> consumeMonths = consumeMonthService.getConsumeMonths(tenant,appId,month);
+        changeTypeToChinese(consumeMonths);
         return RestResponse.success(consumeMonths);
+    }
+
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumeMonths
+     */
+    private void changeTypeToChinese(List<ConsumeMonth> consumeMonths){
+        for (ConsumeMonth consumeMonth:consumeMonths){
+            String type = consumeMonth.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consumeMonth.setType(consumeCode.getName());
+            }catch(Exception e){
+                consumeMonth.setType("未知项目");
+            }
+        }
     }
 
     @ApiOperation(value = "租户(某月所有天/某年所有月)的消费额统计")
