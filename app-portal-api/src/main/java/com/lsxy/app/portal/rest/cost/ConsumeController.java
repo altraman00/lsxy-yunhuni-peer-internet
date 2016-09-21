@@ -48,7 +48,7 @@ public class ConsumeController extends AbstractRestController {
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consume.setType(consumeCode.getName());
             }catch(Exception e){
-                e.printStackTrace();
+//                e.printStackTrace();
                 consume.setType("未知项目");
             }
         }
