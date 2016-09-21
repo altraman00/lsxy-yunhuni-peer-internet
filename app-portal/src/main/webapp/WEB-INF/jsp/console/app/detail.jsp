@@ -424,12 +424,12 @@
 //                            data.abort();
 //                        });
                         var filename = data.files[0].name;
-                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
-                        var result=  re.test(filename);
-                        if(result){
-                            if(data.files[0].size <= (5* 1024 * 1024)) {
-                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
-                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
+//                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
+//                        var result=  re.test(filename);
+//                        if(result){
+//                            if(data.files[0].size <= (5* 1024 * 1024)) {
+//                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+//                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
                                         $('#progress').show();
                                         $('#fileName').html(filename);
                                         $('.modalCancel-app-down').unbind("click").one("click", function () {
@@ -437,22 +437,28 @@
                                             cancelCancel=false;
                                             $('#fileupload').attr('disabled',"disabled");
                                         });
-                                    }else{
-                                        $('#progress').hide();
-                                        showtoast("存储空间不足，无法上传");
-                                    }
-                                },"post");
-                            }else{
-                                $('#progress').hide();
-                                showtoast("上传文件超过5M");
-                            }
-                        }else{
-                            $('#progress').hide();
-                            showtoast("上传格式不正确");
-                        }
+//                                    }else{
+//                                        $('#progress').hide();
+//                                        showtoast("存储空间不足，无法上传");
+//                                    }
+//                                },"post");
+//                            }else{
+//                                $('#progress').hide();
+//                                showtoast("上传文件超过5M");
+//                            }
+//                        }else{
+//                            $('#progress').hide();
+//                            showtoast("上传格式不正确");
+//                        }
                     },
                     done: function (e, data) {
-                        showtoast('上传成功');
+                        console.info(data)
+                        var resultDate = data._response.jqXHR.responseJSON;
+                        if(resultDate.success){
+                            showtoast('上传成功');
+                        }else {
+                            showtoast(resultDate.errorMsg);
+                        }
                         $('#progress .progress-bar').css(
                                 'width',
                                 0 + '%'
@@ -473,8 +479,13 @@
                             $('.modal-loadding').show();
                         }
                     },fail: function(e, data) {
+                        var resultDate = data._response.jqXHR.responseJSON;
+                        if(resultDate.success){
+                            showtoast('上传失败');
+                        }else {
+                            showtoast(resultDate.errorMsg);
+                        }
                         cancelCancel=true;
-                        showtoast('上传失败');
                         $('.modal-loadding').hide();
                         $('#fileupload').removeAttr('disabled');
                     }
