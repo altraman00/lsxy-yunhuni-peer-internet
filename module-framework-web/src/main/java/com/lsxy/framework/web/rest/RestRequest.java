@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static javafx.scene.input.KeyCode.PLAY;
+import static javafx.scene.input.KeyCode.T;
+
 /**
  * Created by Tandy on 2016/6/22.
  * YUNHUNI REST API 请求对象
@@ -171,6 +174,19 @@ public class RestRequest {
     public <T> RestResponse<T> post(String url, String payload, Class<T> responseDataType, String... uriparams) {
         return exchange(url,HttpMethod.POST,payload,responseDataType,uriparams);
     }
+
+    /**
+     * rest api post request method
+     *
+     * @param url              目标地址
+     * @param payload           请求post 参数
+     * @param responseDataType 返回对象类型
+     * @param <T>              返回对象类型
+     * @return
+     */
+    public <T> RestResponse<T> post(String url, String payload, Class<T> responseDataType,HttpHeaders headers, String... uriparams) {
+        return exchange(url,HttpMethod.POST,payload,responseDataType,headers,uriparams);
+    }
     /**
      * 公用的代码抽取
      * @param url              请求的目标url 地址
@@ -181,11 +197,24 @@ public class RestRequest {
      * @return
      */
     public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Object payload, Class<T> responseDataType,Object... uriparams){
+        return exchange(url,httpMethod,payload,responseDataType,null,uriparams);
+    }
+
+    /**
+     * 公用的代码抽取
+     * @param url              请求的目标url 地址
+     * @param httpMethod       请求的方式
+     * @param payload           请求参数  可以是Map或者是String 用于处理post body
+     * @param responseDataType 请求返回对象restresponse中data属性的数据类型
+     * @param <T>              用户指定rest response返回对象中data属性的数据对象类
+     * @return
+     */
+    public <T> RestResponse<T> exchange(String url,HttpMethod httpMethod, Object payload, Class<T> responseDataType,HttpHeaders headers,Object... uriparams){
         RestResponse<T> restResponse = null;
         MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
         HttpEntity entity = null;
         //构建请求头信息
-        HttpHeaders headers = buildHttpHeaders(url,httpMethod,payload,uriparams);
+        headers = buildHttpHeaders(url,httpMethod,payload,headers,uriparams);
 
         if(payload instanceof  Map){
             Map<String,Object> params = (Map<String, Object>) payload;
@@ -217,7 +246,6 @@ public class RestRequest {
         }
         return restResponse;
     }
-
     /**
      * 构建http header头信息
      * @return
@@ -226,8 +254,10 @@ public class RestRequest {
      * @param params
      * @param uriparams
      */
-    protected HttpHeaders buildHttpHeaders(String url, HttpMethod httpMethod,Object  params, Object[] uriparams) {
-        HttpHeaders headers = new HttpHeaders();
+    protected HttpHeaders buildHttpHeaders(String url, HttpMethod httpMethod,Object  params,HttpHeaders headers, Object[] uriparams) {
+        if(headers == null){
+            headers = new HttpHeaders();
+        }
         if (StringUtil.isNotEmpty(this.securityToken)) {
             headers.set(SystemConfig.getProperty("global.rest.api.security.header", "X-YUNHUNI-API-TOKEN"), this.securityToken);
         }
