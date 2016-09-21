@@ -26,6 +26,10 @@ public class MCController {
 
     @Autowired
     RedisCacheService redisCacheService;
+
+    //暗码,配置成为生产环境为空的状态
+    @Autowired(required = false)
+    private String hideCode;
     /**
      * 发送手机验证码
      */
