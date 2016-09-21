@@ -1,13 +1,16 @@
 package com.lsxy.framework.billing.service;
 
+import com.lsxy.framework.api.billing.model.Billing;
+import com.lsxy.framework.api.billing.service.BillingService;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.api.billing.model.Billing;
-import com.lsxy.framework.api.billing.service.BillingService;
-import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.core.utils.JSONUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +22,7 @@ import java.util.Date;
  */
 @Service
 public class CalBillingServiceImpl implements CalBillingService{
-
+    public static final Logger logger = LoggerFactory.getLogger(CalBillingServiceImpl.class);
     @Autowired
     BillingService billingService;
     @Autowired
@@ -32,12 +35,18 @@ public class CalBillingServiceImpl implements CalBillingService{
     */
     @Override
     public BigDecimal getBalance(String tenantId) {
+        if(logger.isDebugEnabled()){
+            logger.info("获取余额,tenantId:{}",tenantId);
+        }
         BigDecimal balance;
         Date date = new Date();
         Date preDate = DateUtils.getPreDate(date);
         Billing billing = billingService.findBillingByTenantId(tenantId);
         if(billing == null){
             throw new RuntimeException("用户账务表不存在");
+        }
+        if(logger.isDebugEnabled()){
+            logger.info("用户账务表：{}", JSONUtil.objectToJson(billing));
         }
         Date balanceDate = billing.getBalanceDate();
         String balanceDateStr = null;
