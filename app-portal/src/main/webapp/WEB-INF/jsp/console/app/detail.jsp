@@ -183,7 +183,7 @@
                                         </a>
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
-                                    <li class="right" id="uploadButton" hidden><a href="#" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+                                    <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <div class="tab-pane fade in active" id="play">
@@ -405,6 +405,14 @@
 
 
         <script>
+            window.onload=function(){
+                var flag = true;
+                if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 || window.navigator.userAgent.indexOf("MSIE 9.0")>0) {flag = false;} } if(!flag){
+                    $('#uploadButtonA').unbind("click").bind("click",function(){
+                        showtoast("非常抱歉，本站的上传文件功能，暂时不支持IE9及以下的浏览器版本，请更换或者升级浏览器");
+                    })
+                }
+            }
             // 上传多个文件
             var cancelCancel=false;
             $(function(){
