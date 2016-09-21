@@ -55,7 +55,7 @@
 </script>
 <script language="JavaScript" type="text/javascript">
 	var flag = true;
-	if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 || window.navigator.userAgent.indexOf("MSIE 9.0")>0) {flag = false;} } if(!flag){
+	if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 ) {flag = false;} } if(!flag){
 		document.write('<div style="width:100%;height:50px;text-align: center; position: fixed;top: 0; background-color: #fffecb;color:#000; font-size: 14px; line-height: 50px; ">非常抱歉，网站暂时还不支持您的浏览器版本，我们的程序猿正在全力修复中~</div>');
 	}
 </script>
