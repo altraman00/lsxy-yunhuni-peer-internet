@@ -1,6 +1,7 @@
 package com.lsxy.app.api.gateway.security.auth;
 
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -42,8 +43,15 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
         // hashed blob
         RestCredentials credentials = restToken.getCredentials();
 
+        String tenantId = null;
         // get secretKey access key from api key
-        String secretKey = apiCertificateService.findApiCertificateSecretKeyByCertId(apiKey);
+        String secretKey = null;
+        ApiCertificate apiCertificate = apiCertificateService.findApiCertificateSecretKeyByCertId(apiKey);
+        if(apiCertificate != null){
+            secretKey = apiCertificate.getSecretKey();
+            tenantId = apiCertificate.getTenant().getId();
+        }
+
 
         if(logger.isDebugEnabled()){
             logger.debug("签名数据：{}",credentials.getRequestData());
@@ -80,7 +88,7 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
 
         // this constructor create a new fully authenticated token, with the "authenticated" flag set to true
         // we use null as to indicates that the user has no authorities. you can change it if you need to set some roles.
-        restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(), null);
+        restToken = new RestToken(apiKey, credentials, restToken.getTimestamp(),tenantId, null);
 
         return restToken;
     }

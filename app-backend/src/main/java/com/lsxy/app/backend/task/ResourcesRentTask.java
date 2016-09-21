@@ -31,8 +31,8 @@ public class ResourcesRentTask {
     @Scheduled(cron="0 30 0 * * ?")
     public void resourcesRentTask(){
         Date date=new Date();
-        String month = DateUtils.formatDate(date, "yyyy-MM");
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + month;
+        String day = DateUtils.formatDate(date, "yyyy-MM-dd");
+        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
         //执行互斥处理消息
         String flagValue = redisCacheService.get("scheduled_" + cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){

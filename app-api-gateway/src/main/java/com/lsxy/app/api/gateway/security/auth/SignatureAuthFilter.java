@@ -1,8 +1,6 @@
 package com.lsxy.app.api.gateway.security.auth;
 
 import com.lsxy.app.api.gateway.util.SpringContextHolder;
-import com.lsxy.framework.api.gateway.model.ApiInvokeLog;
-import com.lsxy.framework.api.gateway.service.ApiInvokeLogService;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -15,13 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -132,7 +127,12 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
             SecurityContextHolder.getContext().setAuthentication(successfulAuthentication);
 
             //调用日志异步入库
-            getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri);
+            String tenantId = null;
+            if(successfulAuthentication instanceof RestToken){
+                RestToken restToken = (RestToken) successfulAuthentication;
+                tenantId = restToken.getTenantId();
+            }
+            getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri,tenantId,certID);
 
             if(logger.isDebugEnabled()){
                 logger.debug("签名校验完毕,花费{}ms",(System.currentTimeMillis()-start));

@@ -6,7 +6,7 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.area.server.util.ivr.act.IVRActionUtil;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -60,7 +60,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
     private NotifyCallbackUtil notifyCallbackUtil;
 
     @Autowired
-    private IVRActionUtil ivrActionUtil;
+    private IVRActionService ivrActionService;
 
     @Autowired
     private CallSessionService callSessionService;
@@ -186,13 +186,13 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 voiceIvrService.save(voiceIvr);
 
                 notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
-                ivrActionUtil.doAction(call_id);
+                ivrActionService.doAction(call_id);
             }
         }else if("ivr_dial".equals(state.getType())){//通过ivr拨号动作发起的呼叫
             String ivr_call_id = (String)businessData.get("ivr_call_id");
             if(StringUtils.isNotBlank(error)){
                 //拨号失败直接继续ivr
-                ivrActionUtil.doAction(ivr_call_id);
+                ivrActionService.doAction(ivr_call_id);
             }else{
                 BusinessState ivrState = businessStateService.get(ivr_call_id);
                 String res_id_one = ivrState.getResId();

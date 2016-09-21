@@ -1,7 +1,7 @@
 package com.lsxy.framework.invoice.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.statistics.service.ConsumeMonthService;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.model.InvoiceInfo;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
@@ -10,15 +10,11 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.invoice.dao.InvoiceApplyDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;

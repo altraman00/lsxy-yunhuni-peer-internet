@@ -1,7 +1,7 @@
 package com.lsxy.app.api.gateway.security.auth;
 
-import com.lsxy.framework.api.gateway.model.ApiInvokeLog;
-import com.lsxy.framework.api.gateway.service.ApiInvokeLogService;
+import com.lsxy.yunhuni.api.gateway.model.ApiInvokeLog;
+import com.lsxy.yunhuni.api.gateway.service.ApiInvokeLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ASyncSaveApiLogTask {
      * @param uri
      */
     @Async
-    public void invokeApiSaveDB(String appid, String payload, String contentType, String method, String signature, String uri){
+    public void invokeApiSaveDB(String appid, String payload, String contentType, String method, String signature, String uri,String tenantId,String certId){
         ApiInvokeLog log = new ApiInvokeLog();
         log.setAppid(appid);
         log.setBody(payload);
@@ -36,6 +36,10 @@ public class ASyncSaveApiLogTask {
         log.setMethod(method);
         log.setSignature(signature);
         log.setUri(uri);
+        log.setCertid(certId);
+        log.setTenantId(tenantId);
+        //TODO 设置api调用类型
+        log.setType(uri);
         apiInvokeLogService.save(log);
 
         if(logger.isDebugEnabled()) {

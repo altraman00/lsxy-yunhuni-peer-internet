@@ -1,11 +1,11 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.api.gateway.dto.DuoCallbackDTO;
+import com.lsxy.app.api.gateway.dto.NotifyCallDTO;
 import com.lsxy.app.api.gateway.dto.VerifyCallInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.area.api.CallService;
-import com.lsxy.area.api.DuoCallbackDTO;
-import com.lsxy.area.api.NotifyCallDTO;
 import com.lsxy.area.api.exceptions.DuoCallbackNumIsSampleException;
 import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
@@ -88,21 +88,13 @@ public class CallController extends AbstractAPIController{
         String callId;
         String to1 = dto.getTo1();
         String to2 = dto.getTo2();
-        if(StringUtils.isBlank(to1)){
-            throw new RequestIllegalArgumentException();
-        }else if(StringUtils.isBlank(to2)){
-            throw new RequestIllegalArgumentException();
-        }else if(to1.equals(to2)){
+        if(to1.equals(to2)){
+            //语音回拔两个号码不能是同一个
             throw new DuoCallbackNumIsSampleException();
         }
-        if(dto.getMax_dial_duration() == null){
-            throw new RequestIllegalArgumentException();
-        }
-        if(dto.getMax_call_duration() == null){
-            throw new RequestIllegalArgumentException();
-        }
 
-        callId = callService.duoCallback(ip,appId, dto);
+        callId = callService.duoCallback(ip,appId,dto.getFrom1(),dto.getTo1(),dto.getFrom2(),dto.getTo2(),dto.getRing_tone(),dto.getRing_tone_mode(),dto.getMax_dial_duration(),
+                dto.getMax_call_duration(),dto.getRecording(),dto.getRecord_mode(),dto.getUser_data());
 
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
@@ -130,7 +122,8 @@ public class CallController extends AbstractAPIController{
             throw new RequestIllegalArgumentException();
         }
 
-        String callId = callService.notifyCall(ip,appId, dto);
+        String callId = callService.notifyCall(ip,appId, dto.getFrom(),dto.getTo(),dto.getPlay_file(),
+                dto.getPlay_content(),dto.getRepeat(),dto.getMax_dial_duration(),dto.getUser_data());
         Map<String,String> result = new HashMap<>();
         result.put("callId",callId);
         result.put("user_data", dto.getUser_data());

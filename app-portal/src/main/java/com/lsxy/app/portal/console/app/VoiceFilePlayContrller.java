@@ -8,7 +8,7 @@ import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yunhuni.api.billing.model.Billing;
+import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

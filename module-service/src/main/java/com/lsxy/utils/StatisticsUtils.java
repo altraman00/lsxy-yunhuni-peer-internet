@@ -30,7 +30,7 @@ public class StatisticsUtils {
         List isList = Arrays.asList(select[0]);
         for(int j=0;j<select[1].length;j++){
             if(!isList.contains(select[1][j])){
-                wheres += select[1][j]+" is null  and ";
+                wheres += select[1][j]+" is not null  and ";
             }
         }
         if(StringUtil.isNotEmpty(groupbys)){

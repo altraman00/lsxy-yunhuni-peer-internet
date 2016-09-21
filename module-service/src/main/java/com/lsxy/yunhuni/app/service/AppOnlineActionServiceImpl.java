@@ -1,8 +1,8 @@
 package com.lsxy.yunhuni.app.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.consume.model.Consume;
-import com.lsxy.framework.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
@@ -11,9 +11,8 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.billing.model.Billing;
-import com.lsxy.yunhuni.api.billing.service.BillingService;
-import com.lsxy.yunhuni.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.billing.service.BillingService;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.service.AreaService;
 import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;

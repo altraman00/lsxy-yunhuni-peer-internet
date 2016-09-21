@@ -2,18 +2,15 @@ package com.lsxy.app.oc.open;
 
 import com.lsxy.app.oc.exceptions.APIErrors;
 import com.lsxy.app.oc.utils.PortalRestResponse;
-import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.web.rest.UserRestToken;
-import com.lsxy.oc.api.exceptions.OcUserNotFoundException;
-import com.lsxy.oc.api.user.model.OcUser;
-import com.lsxy.oc.api.user.service.OcUserService;
-import io.swagger.annotations.ApiParam;
+import com.lsxy.yunhuni.api.exceptions.OcUserNotFoundException;
+import com.lsxy.yunhuni.api.user.model.OcUser;
+import com.lsxy.yunhuni.api.user.service.OcUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 /**

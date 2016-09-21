@@ -2,6 +2,8 @@ package com.lsxy.area.api;
 
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 
+import java.util.List;
+
 /**
  * Created by tandy on 16/8/17.
  * 呼叫相关服务器
@@ -19,10 +21,10 @@ public interface CallService {
      * 双向回拔
      * @param ip ip
      * @param appId 应用id
-     * @param duoCallbackDTO 双向回拔数据
      * @return
      */
-    String duoCallback(String ip,String appId, DuoCallbackDTO duoCallbackDTO) throws YunhuniApiException;
+    String duoCallback(String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
+                       Integer max_dial_duration,Integer max_call_duration ,Boolean recording,Integer record_mode,String user_data) throws YunhuniApiException;
     /**
      * 取消双向回拔
      * @param ip
@@ -35,19 +37,19 @@ public interface CallService {
      * 外呼通知
      * @param ip
      * @param appId
-     * @param notifyCallDTO
      * @return
      */
-    String notifyCall(String ip, String appId, NotifyCallDTO notifyCallDTO) throws YunhuniApiException;
+    String notifyCall(String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
+                      Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException;
 
     /**
      * 语音验证码/高级版 有收码功能
      * @param ip
      * @param appId
-     * @param dto
      * @return
      */
-    String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException;
+    String captchaCall(String ip, String appId, String from,String to,String verify_code,
+                       String max_dial_duration,String max_keys,List<String> files,String user_data)  throws YunhuniApiException;
 
     /**
      * 语音验证码/拨通电话 告诉用户验证码

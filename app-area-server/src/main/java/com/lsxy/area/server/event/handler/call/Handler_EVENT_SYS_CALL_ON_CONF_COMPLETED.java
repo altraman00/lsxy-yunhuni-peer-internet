@@ -2,8 +2,8 @@ package com.lsxy.area.server.event.handler.call;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.ConfUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -39,7 +39,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
     private NotifyCallbackUtil notifyCallbackUtil;
 
     @Autowired
-    private ConfUtil confUtil;
+    private ConfService confService;
 
     @Override
     public String getEventName() {
@@ -90,7 +90,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
             return res;
         }
         //会议成员递减
-        confUtil.decrPart(conf_id,call_id);
+        confService.decrPart(conf_id,call_id);
         if(StringUtils.isBlank(appId)){
             logger.info("没有找到对应的app信息appId={}",appId);
             return res;

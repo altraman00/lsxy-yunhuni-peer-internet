@@ -1,7 +1,9 @@
 package com.lsxy.area.server.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.lsxy.area.api.*;
+import com.lsxy.area.api.BusinessState;
+import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
@@ -179,11 +181,10 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String duoCallback(String ip,String appId, DuoCallbackDTO dto) throws YunhuniApiException {
+    public String duoCallback(String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
+                              Integer max_dial_duration,Integer max_call_duration ,Boolean recording,Integer record_mode,String user_data) throws YunhuniApiException {
         String apiCmd = "duo_call";
         String duocCallId = UUIDGenerator.uuid();
-        String to1 = dto.getTo1();
-        String to2 = dto.getTo2();
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
             throw new NumberNotAllowToCallException();
         }
@@ -208,30 +209,30 @@ public class CallServiceImpl implements CallService {
 
         //TODO 获取号码
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
-        dto.setFrom1(oneTelnumber);
-        dto.setFrom2(oneTelnumber);
+        from1 = oneTelnumber;
+        from2 = oneTelnumber;
         //TODO 获取线路IP和端口
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-        String to1_uri = dto.getTo1()+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
-        String to2_uri = dto.getTo2()+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
+        String to1_uri = to1+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
+        String to2_uri = to2+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
         Map<String, Object> params = new HashMap<>();
-        params.put("from1_uri", dto.getFrom1());
+        params.put("from1_uri", from1);
         params.put("to1_uri",to1_uri);
-        params.put("from2_uri", dto.getFrom2());
+        params.put("from2_uri", from2);
         params.put("to2_uri",to2_uri);
-        params.put("max_connect_seconds",dto.getMax_call_duration());
-        params.put("max_ring_seconds",dto.getMax_dial_duration());
-        if(StringUtils.isNotBlank(dto.getRing_tone())){
-            params.put("ring_play_file",dto.getRing_tone());
-            params.put("ring_play_mode",dto.getRing_tone_mode());
+        params.put("max_connect_seconds",max_call_duration);
+        params.put("max_ring_seconds",max_dial_duration);
+        if(StringUtils.isNotBlank(ring_tone)){
+            params.put("ring_play_file",ring_tone);
+            params.put("ring_play_mode",ring_tone_mode);
         }
         params.put("user_data1",duocCallId);
         params.put("user_data2",duocCallId);
         //录音
-        if(dto.getRecording()){
+        if(recording){
             //TODO 录音文件名称
             params.put("record_file ",duocCallId);
-            params.put("record_mode",dto.getRecord_mode());
+            params.put("record_mode",record_mode);
             params.put("record_format ",1);
         }
 
@@ -249,7 +250,7 @@ public class CallServiceImpl implements CallService {
                                     .setAppId(appId)
                                     .setId(duocCallId)
                                     .setType(apiCmd)
-                                    .setUserdata(dto.getUser_data())
+                                    .setUserdata(user_data)
                                     .setCallBackUrl(app.getUrl())
                                     .setAreaId(app.getArea().getId())
                                     .setLineGatewayId(lineGateway.getId())
@@ -258,7 +259,7 @@ public class CallServiceImpl implements CallService {
 
             businessStateService.save(cache);
             //保存双向回拔表
-            VoiceCallback voiceCallback = new VoiceCallback(duocCallId,dto.getFrom1(),dto.getFrom2(),to1_uri,to2_uri);
+            VoiceCallback voiceCallback = new VoiceCallback(duocCallId,from1,from2,to1_uri,to2_uri);
             voiceCallbackService.save(voiceCallback);
             CallSession callSession = new CallSession((String) data.get(to1_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
             CallSession callSession2 = new CallSession((String) data.get(to2_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
@@ -304,10 +305,10 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String notifyCall(String ip, String appId, NotifyCallDTO dto) throws YunhuniApiException{
+    public String notifyCall(String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
+                             Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException{
         String apiCmd = "notify_call";
         String callId = UUIDGenerator.uuid();
-        String to = dto.getTo();
         if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
         }
@@ -333,18 +334,18 @@ public class CallServiceImpl implements CallService {
 
         //TODO 获取号码
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
-        dto.setFrom(oneTelnumber);
+        from = oneTelnumber;
         //TODO 获取线路IP和端口
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-        String to_uri = dto.getTo()+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
+        String to_uri = to+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
         //TODO 获取线路IP和端口
         Map<String, Object> params = new HashMap<>();
-        params.put("from_uri", dto.getFrom());
+        params.put("from_uri", from);
         params.put("to_uri", to_uri);
-        params.put("play_repeat",dto.getRepeat());
-        params.put("max_ring_seconds",dto.getMax_dial_duration());
+        params.put("play_repeat",repeat);
+        params.put("max_ring_seconds",max_dial_duration);
         params.put("user_data",callId);
-        params.put("play_content",this.getPlayContent(app.getTenant().getId(),appId,dto.getPlay_file(),dto.getPlay_content()));
+        params.put("play_content",this.getPlayContent(app.getTenant().getId(),appId,play_file,play_content));
 
         try {
             //增加区域参数 选择合适的会话(传入appid即可)
@@ -360,7 +361,7 @@ public class CallServiceImpl implements CallService {
                                     .setAppId(app.getId())
                                     .setId(callId)
                                     .setType(apiCmd)
-                                    .setUserdata(dto.getUser_data())
+                                    .setUserdata(user_data)
                                     .setCallBackUrl(app.getUrl())
                                     .setAreaId(area.getId())
                                     .setLineGatewayId(lineGateway.getId())
@@ -368,7 +369,7 @@ public class CallServiceImpl implements CallService {
                                     .build();
             businessStateService.save(cache);
             //保存语音通知
-            NotifyCall notifyCall = new NotifyCall(dto.getFrom(),to_uri);
+            NotifyCall notifyCall = new NotifyCall(from,to_uri);
             notifyCallService.save(notifyCall);
             CallSession callSession = new CallSession((String) data.get(to_uri),CallSession.STATUS_CALLING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
             callSessionService.save(callSession);
@@ -381,8 +382,8 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public String captchaCall(String ip, String appId, CaptchaCallDTO dto) throws YunhuniApiException{
-        String to = dto.getTo();
+    public String captchaCall(String ip, String appId, String from,String to,String verify_code,
+                              String max_dial_duration,String max_keys,List<String> files,String user_data) throws YunhuniApiException{
         if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
         }
@@ -417,17 +418,17 @@ public class CallServiceImpl implements CallService {
         Map<String, Object> params = new MapBuilder<String, Object>()
                 .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
                 .putIfNotEmpty("from_uri",oneTelnumber)
-                .putIfNotEmpty("max_ring_seconds",dto.getMax_dial_duration())
-                .putIfNotEmpty("valid_keys",dto.getVerify_code())
-                .putIfNotEmpty("max_keys",dto.getMax_keys())
+                .putIfNotEmpty("max_ring_seconds",max_dial_duration)
+                .putIfNotEmpty("valid_keys",verify_code)
+                .putIfNotEmpty("max_keys",max_keys)
                 .putIfNotEmpty("user_data",callId)
                 .put("appid ",app.getId())
                 .build();
 
-        dto.setFiles(playFileUtil.convertArray(app.getTenant().getId(),appId,dto.getFiles()));
+        files = playFileUtil.convertArray(app.getTenant().getId(),appId,files);
 
-        if(dto.getFiles() != null && dto.getFiles().size()>0){
-            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(dto.getFiles(),"|"),7,""}};
+        if(files!= null && files .size()>0){
+            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(files,"|"),7,""}};
             params.put("play_content", JSONUtil2.objectToJson(plays));
         }
         try {
@@ -441,7 +442,7 @@ public class CallServiceImpl implements CallService {
                     .setId(callId)
                     .setType("captcha_call")
                     .setCallBackUrl(app.getUrl())
-                    .setUserdata(dto.getUser_data())
+                    .setUserdata(user_data)
                     .setAreaId(app.getArea().getId())
                     .setLineGatewayId(lineGateway.getId())
                     .setBusinessData(new MapBuilder<String,Object>()
