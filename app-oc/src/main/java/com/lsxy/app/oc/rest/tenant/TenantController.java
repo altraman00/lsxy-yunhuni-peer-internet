@@ -600,7 +600,6 @@ public class TenantController {
         if(logger.isDebugEnabled()){
             logger.debug("消费列表：{}", JSONUtil.objectToJson(list));
         }
-        list.get(0).getTenant().setTenantName("哈哈哈");
         changeTypeToChineseOfConsume(list);
         dto.setConsumes(page);
 
