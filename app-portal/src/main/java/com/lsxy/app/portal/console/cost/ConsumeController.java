@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.console.cost;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.framework.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;

@@ -1,6 +1,6 @@
 package com.lsxy.app.oc.rest.tenant.vo;
 
-import com.lsxy.framework.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.framework.core.utils.Page;
 
 import java.io.Serializable;

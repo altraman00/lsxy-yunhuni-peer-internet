@@ -1,14 +1,14 @@
 package com.lsxy.yunhuni.product.service;
 
-import com.lsxy.framework.api.consume.model.CaptchaUse;
-import com.lsxy.framework.api.consume.model.Consume;
-import com.lsxy.framework.api.consume.model.VoiceTimeUse;
-import com.lsxy.framework.api.consume.service.CaptchaUseService;
-import com.lsxy.framework.api.consume.service.ConsumeService;
-import com.lsxy.framework.api.consume.service.VoiceTimeUseService;
+import com.lsxy.yunhuni.api.consume.model.CaptchaUse;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.model.VoiceTimeUse;
+import com.lsxy.yunhuni.api.consume.service.CaptchaUseService;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.consume.service.VoiceTimeUseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.yunhuni.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.Product;
 import com.lsxy.yunhuni.api.product.model.ProductPrice;

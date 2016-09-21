@@ -25,10 +25,12 @@ public class AreaClient {
     @Value("${area.agent.server.url}")
     private String serverUrl;
 
-    @Value("${area.agent.areaid}")
+    //通过环境变量配置该参数,不支持".",只支持"_"
+    @Value("${area_agent_areaid:area001}")
     private String areaid;
 
-    @Value("${area.agent.nodeid}")
+    //由于需要通过设置环境变量设置该值,需要适用下划线,不支持"."
+    @Value("${area_agent_nodeid:1}")
     private String nodeid;
 
     @Autowired

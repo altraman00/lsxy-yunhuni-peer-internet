@@ -2,7 +2,7 @@ package com.lsxy.app.portal.console.message;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.framework.api.message.model.AccountMessage;
+import com.lsxy.yunhuni.api.message.model.AccountMessage;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;

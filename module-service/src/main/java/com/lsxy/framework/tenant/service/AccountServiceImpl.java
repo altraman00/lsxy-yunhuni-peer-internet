@@ -18,8 +18,8 @@ import com.lsxy.framework.mq.events.portal.RegisterSuccessEvent;
 import com.lsxy.framework.tenant.dao.AccountDao;
 import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
-import com.lsxy.yunhuni.api.billing.model.Billing;
-import com.lsxy.yunhuni.api.billing.service.BillingService;
+import com.lsxy.framework.api.billing.model.Billing;
+import com.lsxy.framework.api.billing.service.BillingService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,6 @@ import java.util.List;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by Tandy on 2016/6/24.
