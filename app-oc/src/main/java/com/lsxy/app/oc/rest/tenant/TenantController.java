@@ -3,6 +3,7 @@ package com.lsxy.app.oc.rest.tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -596,6 +597,9 @@ public class TenantController {
         ConsumesVO dto = new ConsumesVO();
         Page<Consume> page = consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize);
         List<Consume> list  = page.getResult();
+        if(logger.isDebugEnabled()){
+            logger.debug("消费列表：{}", JSONUtil.objectToJson(list));
+        }
         changeTypeToChineseOfConsume(list);
         dto.setConsumes(page);
 
@@ -938,7 +942,7 @@ public class TenantController {
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consumeMonth.setType(consumeCode.getName());
             }catch(Exception e){
-                e.printStackTrace();
+//                e.printStackTrace();
                 consumeMonth.setType("未知项目");
             }
         }
@@ -956,7 +960,7 @@ public class TenantController {
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consume.setType(consumeCode.getName());
             }catch(Exception e){
-                e.printStackTrace();
+//                e.printStackTrace();
                 consume.setType("未知项目");
             }
         }

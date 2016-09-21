@@ -155,7 +155,7 @@ public class ConsumeDayController extends AbstractRestController {
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consumeDay.setType(consumeCode.getName());
             }catch(Exception e){
-                e.printStackTrace();
+//                e.printStackTrace();
                 consumeDay.setType("未知项目");
             }
         }
