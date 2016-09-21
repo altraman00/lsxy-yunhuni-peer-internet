@@ -107,6 +107,7 @@ public class ConsumeMonthController extends AbstractRestController {
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consumeMonth.setType(consumeCode.getName());
             }catch(Exception e){
+                e.printStackTrace();
                 consumeMonth.setType("未知项目");
             }
         }

@@ -938,6 +938,7 @@ public class TenantController {
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consumeMonth.setType(consumeCode.getName());
             }catch(Exception e){
+                e.printStackTrace();
                 consumeMonth.setType("未知项目");
             }
         }
@@ -955,6 +956,7 @@ public class TenantController {
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consume.setType(consumeCode.getName());
             }catch(Exception e){
+                e.printStackTrace();
                 consume.setType("未知项目");
             }
         }
