@@ -183,7 +183,7 @@
                                         </a>
                                     </li>
                                     <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
-                                    <li class="right" id="uploadButton" hidden><a href="#" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
+                                    <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <div class="tab-pane fade in active" id="play">
@@ -344,7 +344,7 @@
     <div class="modal-loadding loadding"></div>
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" ></a></div>
     <div class="content">
-        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传；单条语音最大支持 5M；文件名称只允许含英文、数字，其他字符将会造成上传失败。  </p>
+        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row  mt-10">
@@ -405,6 +405,14 @@
 
 
         <script>
+            window.onload=function(){
+                var flag = true;
+                if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 || window.navigator.userAgent.indexOf("MSIE 9.0")>0) {flag = false;} } if(!flag){
+                    $('#uploadButtonA').unbind("click").bind("click",function(){
+                        showtoast("非常抱歉，本站的上传文件功能，暂时不支持IE9及以下的浏览器版本，请更换或者升级浏览器");
+                    })
+                }
+            }
             // 上传多个文件
             var cancelCancel=false;
             $(function(){
@@ -424,12 +432,12 @@
 //                            data.abort();
 //                        });
                         var filename = data.files[0].name;
-                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
-                        var result=  re.test(filename);
-                        if(result){
-                            if(data.files[0].size <= (5* 1024 * 1024)) {
-                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
-                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
+//                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
+//                        var result=  re.test(filename);
+//                        if(result){
+//                            if(data.files[0].size <= (5* 1024 * 1024)) {
+//                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+//                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
                                         $('#progress').show();
                                         $('#fileName').html(filename);
                                         $('.modalCancel-app-down').unbind("click").one("click", function () {
@@ -437,22 +445,28 @@
                                             cancelCancel=false;
                                             $('#fileupload').attr('disabled',"disabled");
                                         });
-                                    }else{
-                                        $('#progress').hide();
-                                        showtoast("存储空间不足，无法上传");
-                                    }
-                                },"post");
-                            }else{
-                                $('#progress').hide();
-                                showtoast("上传文件超过5M");
-                            }
-                        }else{
-                            $('#progress').hide();
-                            showtoast("上传格式不正确");
-                        }
+//                                    }else{
+//                                        $('#progress').hide();
+//                                        showtoast("存储空间不足，无法上传");
+//                                    }
+//                                },"post");
+//                            }else{
+//                                $('#progress').hide();
+//                                showtoast("上传文件超过5M");
+//                            }
+//                        }else{
+//                            $('#progress').hide();
+//                            showtoast("上传格式不正确");
+//                        }
                     },
                     done: function (e, data) {
-                        showtoast('上传成功');
+                        console.info(data)
+                        var resultDate = data._response.jqXHR.responseJSON;
+                        if(resultDate.success){
+                            showtoast('上传成功');
+                        }else {
+                            showtoast(resultDate.errorMsg);
+                        }
                         $('#progress .progress-bar').css(
                                 'width',
                                 0 + '%'
@@ -473,8 +487,13 @@
                             $('.modal-loadding').show();
                         }
                     },fail: function(e, data) {
+                        var resultDate = data._response.jqXHR.responseJSON;
+                        if(resultDate.success){
+                            showtoast('上传失败');
+                        }else {
+                            showtoast(resultDate.errorMsg);
+                        }
                         cancelCancel=true;
-                        showtoast('上传失败');
                         $('.modal-loadding').hide();
                         $('#fileupload').removeAttr('disabled');
                     }

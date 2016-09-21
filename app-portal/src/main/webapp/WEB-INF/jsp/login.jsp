@@ -14,7 +14,9 @@
 	<div class="row">
 		<div class="col-sm-12 text-center">
 			<div class="login-logo">
+				<a a href="#" onclick="window.open('<%=SystemConfig.getProperty("global.official.website.url")%>')">
 				<img src="${resPrefixUrl }/images/index/logo_plus.png" />
+				</a>
 			</div>
 		</div>
 	</div>
