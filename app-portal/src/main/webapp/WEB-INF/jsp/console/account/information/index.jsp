@@ -82,14 +82,14 @@
                                             <lable class="col-md-3 text-right">主要业务：</lable>
                                             <div class="col-md-4">
                                                 <input type="text" name="business" placeholder="" value="${account.business}"
-                                                       class="form-control input-form notEmpty"/>
+                                                       class="form-control input-form "/>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">网站：</lable>
                                             <div class="col-md-4">
                                                 <input type="text" name="url" placeholder="" value="${account.url}"
-                                                       class="form-control input-form notEmpty"/>
+                                                       class="form-control input-form "/>
                                             </div>
                                         </div>
                                         <div class="form-group" >
@@ -98,15 +98,15 @@
                                         <div class="form-group">
                                             <lable class="col-md-3 text-right">所在地区：</lable>
                                             <div class="col-md-2 ">
-                                                <select name="province" class="form-control province notEmpty">
+                                                <select name="province" class="form-control province ">
                                                 </select>
                                             </div>
                                             <div class="col-md-2 ">
-                                                <select name="city" class="form-control city notEmpty">
+                                                <select name="city" class="form-control city ">
                                                 </select>
                                             </div>
                                             <div class="col-md-2 " style="display: none;">
-                                                <select name="area" class="form-control city notEmpty"></select>
+                                                <select name="area" class="form-control city "></select>
                                             </div>
                                         </div>
 
@@ -114,7 +114,7 @@
                                             <lable class="col-md-3 text-right">通讯地址：</lable>
                                             <div class="col-md-4">
                                                 <input type="text" name="address" placeholder="" value="${account.address}"
-                                                       class="form-control input-form notEmpty" />
+                                                       class="form-control input-form " />
                                             </div>
                                         </div>
 
@@ -123,7 +123,7 @@
                                             <lable class="col-md-3 text-right">联系电话：</lable>
                                             <div class="col-md-4">
                                                 <input type="text" placeholder="例如:020-88888888" value="${account.phone}" name="phone"
-                                                       class="form-control input-form notEmpty"/>
+                                                       class="form-control input-form "/>
                                             </div>
                                         </div>
 
