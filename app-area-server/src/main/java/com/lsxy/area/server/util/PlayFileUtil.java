@@ -89,7 +89,7 @@ public class PlayFileUtil {
     }
 
     private String convert(String tenantId,String appId,String olefile,String newfile){
-        String fix = olefile.substring(olefile.lastIndexOf("."));
-        return String.format(FORMAT,tenantId,appId,newfile,fix);
+        String sufix = olefile.substring(olefile.lastIndexOf(".") + 1);
+        return String.format(FORMAT,tenantId,appId,newfile,sufix);
     }
 }
