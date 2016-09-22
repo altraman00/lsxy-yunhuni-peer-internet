@@ -188,7 +188,7 @@ public class TenantController {
         Map<String,Object> result = new HashMap<>();
         result.put("cert",cert);
         result.put("apiUrl",SystemConfig.getProperty("api.gateway.url","http://api.yunhuni.com") + "/"+ SystemConfig.getProperty("api.gateway.version","v1")+"/account/" + cert.getCertId() + "/");
-        return RestResponse.success();
+        return RestResponse.success(result);
     }
 
     @ApiOperation(value = "租户账务信息，余额/套餐/存储")
