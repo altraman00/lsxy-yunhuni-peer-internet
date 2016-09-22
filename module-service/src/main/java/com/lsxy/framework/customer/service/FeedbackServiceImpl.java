@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.customer.dao.FeedbackDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -41,10 +42,14 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
         Date date1 = null;
         Date date2 = null;
         try {
-             date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+            if(StringUtils.isNotBlank(startTime)){
+                date1 = DateUtils.parseDate(startTime, "yyyy-MM-dd");
+            }
         }catch (Exception e){}
         try {
-            date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            if(StringUtils.isNotBlank(endTime)){
+                date2 = DateUtils.parseDate(endTime + " 23:59:59", "yyyy-MM-dd HH:mm:ss");
+            }
         }catch (Exception e){}
 
         String sql = " FROM db_lsxy_base.tb_base_customer_feedback obj WHERE obj.deleted=0 ";

@@ -1,12 +1,13 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
-import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
+import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ public class ConsumeMonthController extends AbstractRestController {
         }
         Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         List<ConsumeMonth> list =  consumeMonthService.list(tenantId,appId,type,date1,date2);
+        changeTypeToChinese(list);
         return RestResponse.success(list);
     }
 
@@ -58,6 +60,7 @@ public class ConsumeMonthController extends AbstractRestController {
         }
         Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         Page<ConsumeMonth> page =  consumeMonthService.pageList(tenantId,appId,type,date1,date2,pageNo,pageSize);
+        changeTypeToChinese(page.getResult());
         return RestResponse.success(page);
     }
     /**
@@ -78,6 +81,7 @@ public class ConsumeMonthController extends AbstractRestController {
         Date startDate2 = DateUtils.parseDate(endTime,"yyyy-MM");
         Date endDate2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
         Page<ConsumeMonth> page =  consumeMonthService.compareStartTimeAndEndTimePageList( tenantId,  appId, type, startDate1,  endDate1,startDate2,endDate2,pageNo, pageSize);
+        changeTypeToChinese(page.getResult());
         return RestResponse.success(page);
     }
     @RequestMapping("/get")
@@ -88,7 +92,25 @@ public class ConsumeMonthController extends AbstractRestController {
         }
         Account account = getCurrentAccount();
         List<ConsumeMonth> consumeMonths = consumeMonthService.getConsumeMonths(account.getTenant().getId(),appId,month);
+        changeTypeToChinese(consumeMonths);
         return RestResponse.success(consumeMonths);
+    }
+
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumeMonths
+     */
+    private void changeTypeToChinese(List<ConsumeMonth> consumeMonths){
+        for (ConsumeMonth consumeMonth:consumeMonths){
+            String type = consumeMonth.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consumeMonth.setType(consumeCode.getName());
+            }catch(Exception e){
+//                e.printStackTrace();
+                consumeMonth.setType("未知项目");
+            }
+        }
     }
 
 }

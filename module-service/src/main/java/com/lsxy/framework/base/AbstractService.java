@@ -13,11 +13,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceProperty;
 import javax.persistence.Query;
-import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -33,7 +34,8 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
 
     public abstract BaseDaoInterface<T,Serializable> getDao();
 
-    @PersistenceContext
+    @PersistenceContext(type = javax.persistence.PersistenceContextType.EXTENDED,
+            properties = @PersistenceProperty(name="org.hibernate.flushMode", value="COMMIT"))
     private EntityManager em;
 
     public EntityManager getEm() {

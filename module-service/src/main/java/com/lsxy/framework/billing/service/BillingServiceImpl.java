@@ -53,6 +53,9 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
         } catch (MatchMutiEntitiesException e) {
             e.printStackTrace();
             throw new RuntimeException("存在多个对应账务信息");
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
         }
     }
 

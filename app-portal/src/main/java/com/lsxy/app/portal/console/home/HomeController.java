@@ -134,7 +134,9 @@ public class HomeController extends AbstractPortalController {
                 if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
                     ResourcesRent rent = getIvrNumber(token,app.getId());
                     if(rent != null){
-                        appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+                        if(rent.getResourceTelenum()!=null) {
+                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+                        }
                         appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
                     }
                 }

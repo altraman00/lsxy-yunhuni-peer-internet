@@ -13,7 +13,8 @@
 
 <div class="register-header">
     <div class="box">
-        <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png"/>
+        <a a href="#" onclick="window.open('<%=SystemConfig.getProperty("global.official.website.url")%>')">
+        <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png"/></a>
         <div class="text">
             如果有云呼你账号，<a href="${ctx }/login">立即登录</a>
         </div>
@@ -28,6 +29,7 @@
             <p class="p">账号注册成功，请72小时内前往邮箱收取邮件激活账号 ${email}</p>
             <p><a class="btn_actemail"  data-email="${email}" >去邮箱收取邮件</a></p>
         </div>
+        <div id="accountId" style="display:none">${accountId}</div>
     </div>
 </div>
 <!--/container -->

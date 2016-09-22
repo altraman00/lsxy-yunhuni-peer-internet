@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Account;
@@ -42,6 +43,7 @@ public class ConsumeDayController extends AbstractRestController {
         }
         Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
         List<ConsumeDay> list =  consumeDayService.list(tenantId,  appId,  type,  date1,  date2 );
+        changeTypeToChinese(list);
         return RestResponse.success(list);
     }
 
@@ -64,6 +66,7 @@ public class ConsumeDayController extends AbstractRestController {
         }
         Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
         Page<ConsumeDay> page =  consumeDayService.pageList( tenantId,  appId, type, date1,  date2, pageNo, pageSize);
+        changeTypeToChinese(page.getResult());
         return RestResponse.success(page);
     }
     /**
@@ -84,6 +87,7 @@ public class ConsumeDayController extends AbstractRestController {
         Date startDate2 = DateUtils.parseDate(endTime,"yyyy-MM");
         Date endDate2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
         Page<ConsumeDay> page =  consumeDayService.compareStartTimeAndEndTimePageList( tenantId,  appId, type, startDate1,  endDate1,startDate2,endDate2,pageNo, pageSize);
+        changeTypeToChinese(page.getResult());
         return RestResponse.success(page);
     }
 
@@ -118,6 +122,7 @@ public class ConsumeDayController extends AbstractRestController {
             endTime=startTime;
         }
         List<ConsumeDay> pageList =  consumeDayService.pageListByTime(userName,appId,startTime,endTime,pageNo ,pageSize);
+        changeTypeToChinese(pageList);
         return RestResponse.success(pageList);
     }
 
@@ -135,7 +140,24 @@ public class ConsumeDayController extends AbstractRestController {
         }
         Account account = getCurrentAccount();
         List<ConsumeDay> consumeDays = consumeDayService.getConsumeDays(account.getTenant().getId(),appId,day);
+        changeTypeToChinese(consumeDays);
         return RestResponse.success(consumeDays);
     }
 
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumeDays
+     */
+    private void changeTypeToChinese(List<ConsumeDay> consumeDays){
+        for (ConsumeDay consumeDay:consumeDays){
+            String type = consumeDay.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consumeDay.setType(consumeCode.getName());
+            }catch(Exception e){
+//                e.printStackTrace();
+                consumeDay.setType("未知项目");
+            }
+        }
+    }
 }

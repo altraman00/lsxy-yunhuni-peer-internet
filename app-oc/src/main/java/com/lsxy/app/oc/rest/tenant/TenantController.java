@@ -3,6 +3,8 @@ package com.lsxy.app.oc.rest.tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
@@ -594,14 +596,19 @@ public class TenantController {
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
         Page<Consume> page = consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize);
-        dto.setConsumes(page);
         List<Consume> list  = page.getResult();
-        BigDecimal sum  = new BigDecimal("0.00");
-        for(int i=0;i<list.size();i++){
-            sum  = sum.add(list.get(i).getAmount());
+        if(logger.isDebugEnabled()){
+            logger.debug("消费列表：{}", JSONUtil.objectToJson(list));
         }
-       // dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
-        dto.setSumAmount(sum);
+        changeTypeToChineseOfConsume(list);
+        dto.setConsumes(page);
+
+//        BigDecimal sum  = new BigDecimal("0.00");
+//        for(int i=0;i<list.size();i++){
+//            sum  = sum.add(list.get(i).getAmount());
+//        }
+//        dto.setSumAmount(sum);
+        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
         return RestResponse.success(dto);
     }
 
@@ -823,8 +830,11 @@ public class TenantController {
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
         }
         List<ConsumeMonth> consumeMonths = consumeMonthService.getConsumeMonths(tenant,appId,month);
+        changeTypeToChineseOfConsumeMonth(consumeMonths);
         return RestResponse.success(consumeMonths);
     }
+
+
 
     @ApiOperation(value = "租户(某月所有天/某年所有月)的消费额统计")
     @RequestMapping(value = "/tenants/{tenant}/consume/statistic",method = RequestMethod.GET)
@@ -919,4 +929,41 @@ public class TenantController {
             @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         return RestResponse.success(rechargeService.pageListByTenant(tenant,pageNo,pageSize));
     }
+
+
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumeMonths
+     */
+    private void changeTypeToChineseOfConsumeMonth(List<ConsumeMonth> consumeMonths){
+        for (ConsumeMonth consumeMonth:consumeMonths){
+            String type = consumeMonth.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consumeMonth.setType(consumeCode.getName());
+            }catch(Exception e){
+//                e.printStackTrace();
+                consumeMonth.setType("未知项目");
+            }
+        }
+    }
+
+
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumes
+     */
+    private void changeTypeToChineseOfConsume(List<Consume> consumes){
+        for (Consume consume:consumes){
+            String type = consume.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consume.setType(consumeCode.getName());
+            }catch(Exception e){
+//                e.printStackTrace();
+                consume.setType("未知项目");
+            }
+        }
+    }
+
 }
