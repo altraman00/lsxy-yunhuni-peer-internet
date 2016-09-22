@@ -65,4 +65,13 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
     void updateDeletedStautsByAppId(String appId,Object status);
 
     void updateDeletedStautsByid(String id,Object status);
+
+    /**
+     * 查找文件名在应用中是否已存在
+     * @param tenantId
+     * @param appId
+     * @param name
+     * @return
+     */
+    long findByFileName(String tenantId, String appId, String name);
 }
