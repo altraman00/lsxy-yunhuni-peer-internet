@@ -39,7 +39,7 @@ public class ConsumerTest {
     @Test
     public void testSendMsg(){
         String token = login();
-        String tenantid="40288aca574060400157406339080002";
+        String tenantid="8a2a6a4a57282a21015735ef3d7b0003";
         String url = restPrefixUrl + "/tenant/tenants/"+tenantid+"/consumes?year=2016&month=7&pageNo=1&pageSize=1";
 
 //        @RequestParam Integer year,
