@@ -60,7 +60,7 @@ public class CaptchaCall extends IdEntity {
         this.toNum = toNum;
     }
 
-    @Column( name = "hangup_side")
+    @Column( name = "handup_side")
     public String getHangupSide() {
         return hangupSide;
     }
