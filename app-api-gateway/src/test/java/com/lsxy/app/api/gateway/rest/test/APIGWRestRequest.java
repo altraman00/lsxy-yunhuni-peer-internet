@@ -5,6 +5,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestRequestConnectionConfig;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.methods.HttpHead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -54,8 +55,10 @@ public class APIGWRestRequest extends RestRequest{
 
 
     @Override
-    protected HttpHeaders buildHttpHeaders(String url, HttpMethod httpMethod,Object params, Object[] uriparams) {
-        HttpHeaders headers = new HttpHeaders();
+    protected HttpHeaders buildHttpHeaders(String url, HttpMethod httpMethod, Object params, HttpHeaders headers, Object[] uriparams) {
+        if(headers == null){
+            headers = new HttpHeaders();
+        }
 
         if(uriparams != null && uriparams.length > 0){
             url= (new DefaultUriTemplateHandler()).expand(url,uriparams).toString();
