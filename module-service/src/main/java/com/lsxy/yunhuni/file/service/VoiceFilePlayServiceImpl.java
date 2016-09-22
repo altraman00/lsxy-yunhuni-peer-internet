@@ -117,10 +117,11 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     @Override
     @Cacheable(value="entity",key="'entity_'+#appId+'_'+#name",unless = "#result == null")
     public String getVerifiedFile(String appId, String name) {
-        String hql = " from VoiceFilePlay obj  where obj.appId = ?1 and obj.status = ?2 and obj.name= ?3";
+        System.out.println("=====================!!!!!!!!!!!!!!!!!222");
+        String hql = "from VoiceFilePlay obj where obj.app.id = ?1 and obj.status = ?2 and obj.name= ?3";
         VoiceFilePlay file = null;
         try {
-            file = this.findUnique(hql,appId,name,1);
+            file = this.findUnique(hql,appId,1,name);
         } catch (MatchMutiEntitiesException e) {
             logger.error("app放音文件重复",e);
         }
@@ -196,5 +197,10 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     public void updateDeletedStautsByid(String id, Object status) {
         String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET aa_deleted=? WHERE id=? ";
         jdbcTemplate.update(sql, status, id);
+    }
+
+    @Override
+    public long findByFileName(String tenantId, String appId, String name) {
+        return this.countByCustom("from VoiceFilePlay obj where obj.tenant.id = ?1 and obj.app.id=?2 and name = ?3 ",tenantId,appId,name);
     }
 }

@@ -118,7 +118,7 @@ public class RPCCaller {
 			//如果session为空
 			if(session == null) {
 				logger.error("RPC连接会话不存在,无法发送请求,请求消息丢入修正队列:{}", request);
-				fixQueue.fix(request);
+				throw new RightSessionNotFoundExcepiton("会话不存在："+request.getSessionid());
 			}
 			logger.debug(">>*"+request);
 			session.write(request);
