@@ -1,7 +1,9 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
+import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Account;
@@ -149,7 +151,13 @@ public class ConsumeDayController extends AbstractRestController {
      * @param consumeDays
      */
     private void changeTypeToChinese(List<ConsumeDay> consumeDays){
-        for (ConsumeDay consumeDay:consumeDays){
+        for(int i = 0;i < consumeDays.size();i++){
+            ConsumeDay consumeDay = new ConsumeDay();
+            try {
+                BeanUtils.copyProperties(consumeDay,consumeDays.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             String type = consumeDay.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
@@ -158,6 +166,7 @@ public class ConsumeDayController extends AbstractRestController {
 //                e.printStackTrace();
                 consumeDay.setType("未知项目");
             }
+            consumeDays.set(i,consumeDay);
         }
     }
 }
