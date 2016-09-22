@@ -2,6 +2,7 @@ package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.tenant.model.Account;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -13,6 +14,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +42,7 @@ public class ConsumeMonthController extends AbstractRestController {
         }
         Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         List<ConsumeMonth> list =  consumeMonthService.list(tenantId,appId,type,date1,date2);
-        changeTypeToChinese(list);
+        list = changeTypeToChinese(list);
         return RestResponse.success(list);
     }
 
@@ -100,17 +103,26 @@ public class ConsumeMonthController extends AbstractRestController {
      * 将消费类型转换为中文，运用枚举
      * @param consumeMonths
      */
-    private void changeTypeToChinese(List<ConsumeMonth> consumeMonths){
+    private List<ConsumeMonth> changeTypeToChinese(List<ConsumeMonth> consumeMonths){
+        List<ConsumeMonth> consumeMonths1 = new ArrayList<>();
         for (ConsumeMonth consumeMonth:consumeMonths){
-            String type = consumeMonth.getType();
+            ConsumeMonth consumeMonth1 = new ConsumeMonth();
+            try {
+                BeanUtils.copyProperties(consumeMonth1,consumeMonth);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String type = consumeMonth1.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
-                consumeMonth.setType(consumeCode.getName());
+                consumeMonth1.setType(consumeCode.getName());
             }catch(Exception e){
 //                e.printStackTrace();
-                consumeMonth.setType("未知项目");
+                consumeMonth1.setType("未知项目");
             }
+            consumeMonths1.add(consumeMonth1);
         }
+        return consumeMonths1;
     }
 
 }
