@@ -217,7 +217,7 @@ public class TenantController {
         //上个月会话量
         long preAmongCall = voiceCdrMonthService.getAmongCallByDateAndTenant(preMonth,id,null);
         //上个月话务量 分钟
-        long preAmongDuration = Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(preMonth,id,null)/60);
+        long preAmongDuration = Math.round(voiceCdrMonthService.getAmongCostTimeByDateAndTenant(preMonth,id,null)/60);
         //上个月连通量
         long preAmongConnect = voiceCdrMonthService.getAmongConnectByDateAndTenant(preMonth,id);
         //上个月平均通话时长
@@ -235,7 +235,7 @@ public class TenantController {
         //上上个月会话量
         long prepreAmongCall = voiceCdrMonthService.getAmongCallByDateAndTenant(prepreMonth,id,null);
         //上上个月话务量 分钟
-        long prepreAmongDuration = Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(prepreMonth,id,null)/60);
+        long prepreAmongDuration = Math.round(voiceCdrMonthService.getAmongCostTimeByDateAndTenant(prepreMonth,id,null)/60);
         //上上个月连通量
         long prepreAmongConnect = voiceCdrMonthService.getAmongConnectByDateAndTenant(prepreMonth,id);
         //上上个月平均通话时长
@@ -338,7 +338,7 @@ public class TenantController {
                     @Override
                     public Long call(){
                         //转换成分钟
-                        return (long)Math.round(voiceCdrDayService.getAmongDurationByDateAndTenant(d,tenant,appId)/60);
+                        return (long)Math.round(voiceCdrDayService.getAmongCostTimeByDateAndTenant(d,tenant,appId)/60);
                     }
                 }));
             }
@@ -369,7 +369,7 @@ public class TenantController {
             fs.add(pool.submit(new Callable<Long>() {
                 @Override
                 public Long call(){
-                    return (long)Math.round(voiceCdrMonthService.getAmongDurationByDateAndTenant(month_start,tenant,appId)/60);
+                    return (long)Math.round(voiceCdrMonthService.getAmongCostTimeByDateAndTenant(month_start,tenant,appId)/60);
                 }
             }));
         }
@@ -710,7 +710,7 @@ public class TenantController {
             for (App app : apps) {
                 TenantAppVO vo = new TenantAppVO(app);
                 vo.setConsume(consumeMonthService.getAmongAmountByDateAndApp(preMonth,app.getId()));
-                vo.setAmongDuration(voiceCdrMonthService.getAmongDurationByDateAndApp(preMonth,app.getId())/60);
+                vo.setAmongDuration(voiceCdrMonthService.getAmongCostTimeByDateAndApp(preMonth,app.getId())/60);
                 vo.setSessionCount(voiceCdrMonthService.getAmongCallByDateAndApp(preMonth,app.getId()));
                 dto.add(vo);
             }

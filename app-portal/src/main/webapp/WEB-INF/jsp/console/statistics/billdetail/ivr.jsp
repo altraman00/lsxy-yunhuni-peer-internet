@@ -132,7 +132,7 @@
                                                     </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
-                                                    <td>${result.callTimeLong}</td>
+                                                    <td>${result.costTimeLong}</td>
                                                     <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>
