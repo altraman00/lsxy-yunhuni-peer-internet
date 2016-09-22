@@ -42,7 +42,7 @@ public class ConsumeMonthController extends AbstractRestController {
         }
         Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         List<ConsumeMonth> list =  consumeMonthService.list(tenantId,appId,type,date1,date2);
-        list = changeTypeToChinese(list);
+        changeTypeToChinese(list);
         return RestResponse.success(list);
     }
 
@@ -103,26 +103,24 @@ public class ConsumeMonthController extends AbstractRestController {
      * 将消费类型转换为中文，运用枚举
      * @param consumeMonths
      */
-    private List<ConsumeMonth> changeTypeToChinese(List<ConsumeMonth> consumeMonths){
-        List<ConsumeMonth> consumeMonths1 = new ArrayList<>();
-        for (ConsumeMonth consumeMonth:consumeMonths){
-            ConsumeMonth consumeMonth1 = new ConsumeMonth();
+    private void changeTypeToChinese(List<ConsumeMonth> consumeMonths){
+        for(int i = 0;i < consumeMonths.size();i++){
+            ConsumeMonth consumeMonth = new ConsumeMonth();
             try {
-                BeanUtils.copyProperties(consumeMonth1,consumeMonth);
+                BeanUtils.copyProperties(consumeMonth,consumeMonths.get(i));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            String type = consumeMonth1.getType();
+            String type = consumeMonth.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
-                consumeMonth1.setType(consumeCode.getName());
+                consumeMonth.setType(consumeCode.getName());
             }catch(Exception e){
 //                e.printStackTrace();
-                consumeMonth1.setType("未知项目");
+                consumeMonth.setType("未知项目");
             }
-            consumeMonths1.add(consumeMonth1);
+            consumeMonths.set(i,consumeMonth);
         }
-        return consumeMonths1;
     }
 
 }

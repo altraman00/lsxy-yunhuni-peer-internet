@@ -157,7 +157,8 @@ public class TenantController {
             List<TenantVO> temp = list.getResult();
             List<TenantVO> list1 = new ArrayList();
             for(int i=0;i<temp.size();i++){
-                TenantVO tenantVO = temp.get(i);
+                TenantVO tenantVO = new TenantVO();
+                BeanUtils.copyProperties(tenantVO,temp.get(i));
                 BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
                 tenantVO.setRemainCoin(bigDecimal.doubleValue());
                 list1.add(tenantVO);
@@ -602,11 +603,7 @@ public class TenantController {
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
         Page<Consume> page = consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize);
-        List<Consume> list  = page.getResult();
-        if(logger.isDebugEnabled()){
-            logger.debug("消费列表：{}", JSONUtil.objectToJson(list));
-        }
-        changeTypeToChineseOfConsume(list);
+        changeTypeToChineseOfConsume(page.getResult());
         dto.setConsumes(page);
 
 //        BigDecimal sum  = new BigDecimal("0.00");
@@ -942,7 +939,13 @@ public class TenantController {
      * @param consumeMonths
      */
     private void changeTypeToChineseOfConsumeMonth(List<ConsumeMonth> consumeMonths){
-        for (ConsumeMonth consumeMonth:consumeMonths){
+        for(int i = 0;i < consumeMonths.size();i++){
+            ConsumeMonth consumeMonth = new ConsumeMonth();
+            try {
+                BeanUtils.copyProperties(consumeMonth,consumeMonths.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             String type = consumeMonth.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
@@ -951,6 +954,7 @@ public class TenantController {
 //                e.printStackTrace();
                 consumeMonth.setType("未知项目");
             }
+            consumeMonths.set(i,consumeMonth);
         }
     }
 
@@ -960,7 +964,13 @@ public class TenantController {
      * @param consumes
      */
     private void changeTypeToChineseOfConsume(List<Consume> consumes){
-        for (Consume consume:consumes){
+        for(int i = 0;i < consumes.size();i++){
+            Consume consume = new Consume();
+            try {
+                BeanUtils.copyProperties(consume,consumes.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             String type = consume.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
@@ -969,7 +979,9 @@ public class TenantController {
 //                e.printStackTrace();
                 consume.setType("未知项目");
             }
+            consumes.set(i,consume);
         }
+
     }
 
 }

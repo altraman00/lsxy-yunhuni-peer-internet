@@ -34,8 +34,6 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     public abstract BaseDaoInterface<T,Serializable> getDao();
 
     @PersistenceContext
-//            (type = javax.persistence.PersistenceContextType.EXTENDED,
-//            properties = @PersistenceProperty(name="org.hibernate.flushMode", value="COMMIT"))
     private EntityManager em;
 
     public EntityManager getEm() {
