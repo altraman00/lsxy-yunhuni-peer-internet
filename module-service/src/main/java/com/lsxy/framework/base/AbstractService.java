@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceProperty;
 import javax.persistence.Query;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -34,8 +33,9 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
 
     public abstract BaseDaoInterface<T,Serializable> getDao();
 
-    @PersistenceContext(type = javax.persistence.PersistenceContextType.EXTENDED,
-            properties = @PersistenceProperty(name="org.hibernate.flushMode", value="COMMIT"))
+    @PersistenceContext
+//            (type = javax.persistence.PersistenceContextType.EXTENDED,
+//            properties = @PersistenceProperty(name="org.hibernate.flushMode", value="COMMIT"))
     private EntityManager em;
 
     public EntityManager getEm() {
