@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 收码指令处理器
  * Created by liuws on 2016/9/2.
  */
 @Component

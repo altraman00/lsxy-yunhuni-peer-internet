@@ -82,7 +82,7 @@ public class ConfServiceImpl implements ConfService {
     private boolean isEnableConfService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch.getIsSessionService() == null || serviceSwitch.getIsSessionService() != 1){
+            if(serviceSwitch != null && (serviceSwitch.getIsSessionService() == null || serviceSwitch.getIsSessionService() != 1)){
                 return false;
             }
             App app = appService.findById(appId);

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Created by liuws on 2016/8/29.
+ * 目前业务都是异步的
+ * 所以用redis保存业务数据状态
  */
 @Component
 public class BusinessStateServiceImpl implements BusinessStateService {

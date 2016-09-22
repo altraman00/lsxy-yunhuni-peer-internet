@@ -62,6 +62,12 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         return Constants.EVENT_SYS_CONF_ON_START;
     }
 
+    /**
+     * 调用会议创建 成功事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){

@@ -46,6 +46,12 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
         return Constants.EVENT_SYS_CALL_ON_PLAY_COMPLETED;
     }
 
+    /**
+     * 处理放音结束事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){

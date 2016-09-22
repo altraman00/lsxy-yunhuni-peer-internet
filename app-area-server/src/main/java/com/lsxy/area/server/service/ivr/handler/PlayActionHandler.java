@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * play指令处理器
  * Created by liuws on 2016/9/2.
  */
 @Component

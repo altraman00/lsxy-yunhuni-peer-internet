@@ -42,6 +42,12 @@ public class Handler_EVENT_SYS_CONF_ON_FAIL extends EventHandler{
         return Constants.EVENT_SYS_CONF_ON_FAIL;
     }
 
+    /**
+     * 处理会议创建失败事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){

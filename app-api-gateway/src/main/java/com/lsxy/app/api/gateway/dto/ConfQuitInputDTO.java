@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * 退出会议
  * Created by liuws on 2016/8/26.
  */
 public class ConfQuitInputDTO extends CommonDTO{

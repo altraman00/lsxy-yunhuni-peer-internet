@@ -43,16 +43,16 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <lable class="col-lg-3 text-right">绑定手机</lable>
+                        <lable class="col-lg-3 text-right">手机号</lable>
                         <div class="col-lg-9">
                             <input type="text" name="mobile" placeholder="请输入手机号" class="form-control input-form" id="form-mobile" maxlength="11"  />
                             <p class="tips"></p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <lable class="col-lg-3 text-right">绑定邮箱地址</lable>
+                        <lable class="col-lg-3 text-right">邮箱地址</lable>
                         <div class="col-lg-9">
-                            <input type="text" name="email" placeholder="请输入邮箱" class="form-control input-form" id="form-email"  />
+                            <input type="text" name="email" placeholder="请输入邮箱地址" class="form-control input-form" id="form-email"  />
                             <p class="tips">注册后，邮箱地址收到账号激活邮件</p>
                         </div>
                     </div>
