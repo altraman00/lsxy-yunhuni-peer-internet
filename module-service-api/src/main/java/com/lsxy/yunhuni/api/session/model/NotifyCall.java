@@ -22,7 +22,7 @@ public class NotifyCall extends IdEntity {
     private Date endTime;//结束时间
     private String fromNum;//发起方
     private String toNum;//接收方
-    private String handupSide;
+    private String hangupSide;
     private String resId;//资源ID
 
     public NotifyCall() {
@@ -87,13 +87,13 @@ public class NotifyCall extends IdEntity {
         this.toNum = toNum;
     }
 
-    @Column( name = "handup_side")
-    public String getHandupSide() {
-        return handupSide;
+    @Column( name = "hangup_side")
+    public String getHangupSide() {
+        return hangupSide;
     }
 
-    public void setHandupSide(String handupSide) {
-        this.handupSide = handupSide;
+    public void setHangupSide(String hangupSide) {
+        this.hangupSide = hangupSide;
     }
 
     @Column( name = "res_id")
