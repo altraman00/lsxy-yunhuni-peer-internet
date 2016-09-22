@@ -3,7 +3,9 @@ package com.lsxy.app.oc.rest.tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -182,7 +184,11 @@ public class TenantController {
     public RestResponse cert(
             @ApiParam(name = "id",value = "租户id")
             @PathVariable String id){
-        return RestResponse.success(apiCertificateService.findApiCertificateByTenantId(id));
+        ApiCertificate cert = apiCertificateService.findApiCertificateByTenantId(id);
+        Map<String,Object> result = new HashMap<>();
+        result.put("cert",cert);
+        result.put("apiUrl",SystemConfig.getProperty("api.gateway.url","http://api.yunhuni.com") + "/"+ SystemConfig.getProperty("api.gateway.version","v1")+"/account/" + cert.getCertId() + "/");
+        return RestResponse.success();
     }
 
     @ApiOperation(value = "租户账务信息，余额/套餐/存储")
