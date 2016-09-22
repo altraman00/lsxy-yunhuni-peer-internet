@@ -344,7 +344,7 @@
     <div class="modal-loadding loadding"></div>
     <div class="title">文件上传<a class="close_a modalCancel-app-up" data-id="four" ></a></div>
     <div class="content">
-        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传。</p>
+        <p class="info">只支持 .wav 格式的文件，请将其他格式转换成wav格式（编码为 8k、16位）后再上传,单条语音最大支持 5M。</p>
         <form:form action="${ctx}/console/app/file/play/upload" method="post" id="uploadMianForm" enctype="multipart/form-data" target="hidden_frame">
             <div class="input-box ">
                 <div class="row  mt-10">
