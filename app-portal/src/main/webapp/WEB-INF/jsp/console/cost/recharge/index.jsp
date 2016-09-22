@@ -88,6 +88,13 @@
                         <section class="scrollable wrapper w-f">
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
+                                    <div class="form-group cost-tips-box">
+                                        <div class="col-md-12">
+                                            <p><strong>温馨提示：</strong></p>
+                                            <p>1、如您有欠费账单，充值后会优先补扣欠费账单。</p>
+                                            <p>2、充值后请及时对支付订单进行结算，以免影响正常服务。</p>
+                                        </div>
+                                    </div>
                                     <div class="col-md-12 padder-v fix-padding">
                                         <div class='wrapperBox'>
                                             <div class="panel-body clearfix border-top-none personal-base">
@@ -115,7 +122,6 @@
                                         <form:form action="${ctx }/console/cost/recharge/create" id="costDefulat" method="post" >
                                             <!-- 防止表单重复提交要加这个隐藏变量 -->
                                             <input type="hidden" name="submission_token" value="${submission_token}" />
-
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right line30">充值方式：</lable>
                                                 <div class="col-md-2 input-box">
@@ -135,13 +141,6 @@
                                                 </div>
                                                 <div class="col-md-1">
                                                     <span class="line30">元</span>
-                                                </div>
-                                            </div>
-                                            <div class="form-group cost-tips-box">
-                                                <div class="col-md-12">
-                                                    <p><strong>温馨提示：</strong></p>
-                                                    <p>1、如您有欠费账单，充值后会优先补扣欠费账单。</p>
-                                                    <p>2、充值后请及时对支付订单进行结算，以免影响正常服务。</p>
                                                 </div>
                                             </div>
                                             <div class="form-group ">
