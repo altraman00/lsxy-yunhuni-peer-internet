@@ -68,7 +68,7 @@ public class IVRServiceImpl implements IVRService {
     private boolean isEnableIVRService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch.getIsIvrService() == null || serviceSwitch.getIsIvrService() != 1){
+            if(serviceSwitch != null && (serviceSwitch.getIsIvrService() == null || serviceSwitch.getIsIvrService() != 1)){
                 return false;
             }
             App app = appService.findById(appId);

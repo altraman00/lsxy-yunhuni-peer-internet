@@ -11,9 +11,11 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
+ * none指令处理器
  * Created by liuws on 2016/9/2.
  */
 @Component
+@Deprecated
 public class NoneActionHandler extends ActionHandler{
 
     @Autowired

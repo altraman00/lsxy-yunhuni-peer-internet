@@ -48,6 +48,7 @@ public interface CallService {
      * @param appId
      * @return
      */
+    @Deprecated
     String captchaCall(String ip, String appId, String from,String to,String verify_code,
                        String max_dial_duration,String max_keys,List<String> files,String user_data)  throws YunhuniApiException;
 

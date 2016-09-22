@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
+ * 加入会议
  * Created by liuws on 2016/8/24.
  */
 public class ConfJoinInputDTO extends CommonDTO{

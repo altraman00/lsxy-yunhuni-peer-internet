@@ -7,6 +7,7 @@ import java.io.Serializable;
  * 语音验证码
  * Created by liups on 2016/9/1.
  */
+@Deprecated
 public class CaptchaCallDTO implements Serializable {
     private String from;
     private String to;

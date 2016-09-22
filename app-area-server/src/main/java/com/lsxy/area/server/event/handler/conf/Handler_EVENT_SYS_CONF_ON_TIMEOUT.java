@@ -43,6 +43,12 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
         return Constants.EVENT_SYS_CONF_ON_TIMEOUT;
     }
 
+    /**
+     * 处理调用超时事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){

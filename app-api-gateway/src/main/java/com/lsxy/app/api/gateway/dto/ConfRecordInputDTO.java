@@ -6,6 +6,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /**
+ * 会议录音
  * Created by liuws on 2016/8/26.
  */
 public class ConfRecordInputDTO extends CommonDTO{

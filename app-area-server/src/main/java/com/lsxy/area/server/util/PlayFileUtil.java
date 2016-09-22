@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * 放音文件转换成cti 路径
  * Created by liuws on 2016/9/10.
  */
 @Component

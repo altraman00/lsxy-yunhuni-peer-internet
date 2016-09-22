@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.JMSException;
 
 /**
+ * 处理IVR暂停指令消息
  * Created by liuws on 2016/9/13.
  */
 @Component
