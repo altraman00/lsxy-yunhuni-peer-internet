@@ -229,7 +229,7 @@ public class CallServiceImpl implements CallService {
         params.put("user_data1",duocCallId);
         params.put("user_data2",duocCallId);
         //录音
-        if(recording){
+        if(recording != null && recording){
             //TODO 录音文件名称
             params.put("record_file ",duocCallId);
             params.put("record_mode",record_mode);

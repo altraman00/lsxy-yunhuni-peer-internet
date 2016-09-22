@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.rest.cost;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
@@ -42,7 +43,13 @@ public class ConsumeController extends AbstractRestController {
      * @param consumes
      */
     private void changeTypeToChinese(List<Consume> consumes){
-        for (Consume consume:consumes){
+        for(int i = 0;i < consumes.size();i++){
+            Consume consume = new Consume();
+            try {
+                BeanUtils.copyProperties(consume,consumes.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             String type = consume.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
@@ -51,6 +58,7 @@ public class ConsumeController extends AbstractRestController {
 //                e.printStackTrace();
                 consume.setType("未知项目");
             }
+            consumes.set(i,consume);
         }
     }
 
