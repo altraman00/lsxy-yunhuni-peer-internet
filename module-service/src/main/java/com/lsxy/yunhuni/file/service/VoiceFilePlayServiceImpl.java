@@ -120,7 +120,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
         String hql = " from VoiceFilePlay obj  where obj.appId = ?1 and obj.status = ?2 and obj.name= ?3";
         VoiceFilePlay file = null;
         try {
-            file = this.findUnique(hql,appId,name,1);
+            file = this.findUnique(hql,appId,1,name);
         } catch (MatchMutiEntitiesException e) {
             logger.error("app放音文件重复",e);
         }
