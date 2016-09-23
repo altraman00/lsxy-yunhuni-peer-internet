@@ -1,13 +1,10 @@
 package com.lsxy.framework.api.tenant.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import static javafx.scene.input.KeyCode.T;
 
 /**
  * Created by liuws on 2016/8/10.
