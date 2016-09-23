@@ -16,7 +16,6 @@ import java.util.Date;
 public class MeetingMember extends IdEntity {
     public static final int JOINTYPE_INVITE = 1;
     public static final int JOINTYPE_CALL = 2;
-    private String id;
     private String number;//参与者号码
     private Date joinTime;//加入时间
     private Integer joinType;//加入类型1.邀请加入2.呼入加入

@@ -18,7 +18,6 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_captcha_call")
 public class CaptchaCall extends IdEntity {
 
-    private String id;
     private Date startTime;//发起时间
     private Date endTime;//结束时间
     private String fromNum;//发起方

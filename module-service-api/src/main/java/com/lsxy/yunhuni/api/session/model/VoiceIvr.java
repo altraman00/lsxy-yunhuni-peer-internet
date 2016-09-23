@@ -19,7 +19,6 @@ public class VoiceIvr extends IdEntity {
     public static final Integer IVR_TYPE_INCOMING = 1;
     public static final Integer IVR_TYPE_CALL = 2;
 
-    private String id;
     private Date startTime;
     private Date endTime;
     private String fromNum;
