@@ -89,15 +89,10 @@ public class VoiceFilePlayController extends AbstractRestController {
         if(logger.isDebugEnabled()) {
             logger.debug("开始创建放音文件记录，应用{}，记录{}", appId, voiceFilePlay);
         }
-
-        Account account = getCurrentAccount();
-        long isName = voiceFilePlayService.findByFileName(account.getTenant().getId(),appId,voiceFilePlay.getName());
-        if(isName>0){
-            return RestResponse.failed("00000","文件名已存在");
-        }
         App app = appService.findById(appId);
         voiceFilePlay.setRemark("");
         voiceFilePlay.setApp(app);
+        Account account = getCurrentAccount();
         voiceFilePlay.setTenant(account.getTenant());
         voiceFilePlay.setStatus(VoiceFilePlay.STATUS_WAIT);
         voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);
