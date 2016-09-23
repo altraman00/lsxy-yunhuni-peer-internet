@@ -63,6 +63,22 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
             return response;
         }
     }
+
+    /**
+     *
+     * @param request
+     * @param appId
+     * @param name
+     * @return
+     */
+    @RequestMapping("/verify/name")
+    @ResponseBody
+    public RestResponse verify(HttpServletRequest request,String appId,String name){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/count/name?appId={1}&name={2}";
+        RestResponse countResponse =  RestRequest.buildSecurityRequest(token).getPage(uri,Long.class,appId,name);
+        return countResponse;
+    }
     /**
      * 根据当前页，每页记录数，应用ｉｄ，放音文件的名字（模糊查询）进行查询放音文件的分页信息
      * @param request
