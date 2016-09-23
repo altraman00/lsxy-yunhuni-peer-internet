@@ -1,5 +1,6 @@
 package com.lsxy.yunhuni.api.session.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 @Entity
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_session")
+
 public class CallSession extends IdEntity {
     public static final int STATUS_CALLING = 1;
     public static final int STATUS_OVER = 2;
@@ -86,6 +88,7 @@ public class CallSession extends IdEntity {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
     @JoinColumn(name = "app_id")
     public App getApp() {
         return app;
@@ -96,6 +99,7 @@ public class CallSession extends IdEntity {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
