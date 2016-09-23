@@ -15,7 +15,9 @@ public class CustomUUIDGenerator extends UUIDGenerator {
                 && ((IdEntity) obj).getId().trim().length() > 0)) {
             return ((IdEntity) obj).getId();
         } else {
-            return super.generate(session, obj);
+            Serializable a = super.generate(session, obj);
+            System.out.println("===================ID============:"+a);
+            return a;
         }
     }
 }
