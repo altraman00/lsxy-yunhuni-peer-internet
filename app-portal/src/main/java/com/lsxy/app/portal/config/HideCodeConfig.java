@@ -15,6 +15,6 @@ public class HideCodeConfig {
     @Bean
     @Profile("test")
     public String hideCode(){
-        return "!@#$%^&*()__)O(*&^%$#@Q!klm";
+        return "Lwf49fF34fsjtb";
     }
 }

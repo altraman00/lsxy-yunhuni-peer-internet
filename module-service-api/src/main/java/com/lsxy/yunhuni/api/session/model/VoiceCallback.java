@@ -24,7 +24,7 @@ public class VoiceCallback extends IdEntity {
     private String from2Num;//发起方
     private String toNum;//接收方
     private String to2Num;//接收方2
-    private String handupSide;
+    private String hangupSide;
     private String resId;//资源ID
 
     public VoiceCallback() {
@@ -110,13 +110,13 @@ public class VoiceCallback extends IdEntity {
         this.to2Num = to2Num;
     }
 
-    @Column( name = "handup_side")
-    public String getHandupSide() {
-        return handupSide;
+    @Column( name = "hangup_side")
+    public String getHangupSide() {
+        return hangupSide;
     }
 
-    public void setHandupSide(String handupSide) {
-        this.handupSide = handupSide;
+    public void setHangupSide(String hangupSide) {
+        this.hangupSide = hangupSide;
     }
 
     @Column( name = "res_id")

@@ -78,7 +78,7 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
     @Override
     public Map<String,Object> calAverageCall(String tenantId){
         Object[] argus = {tenantId};
-        String sql = "SELECT IFNULL(SUM(cdr.among_duration),0) duration,IFNULL(SUM(cdr.among_connect),0) connect_num,IFNULL(SUM(cdr.among_call),0) call_num " +
+        String sql = "SELECT IFNULL(SUM(cdr.among_cost_time),0) duration,IFNULL(SUM(cdr.among_connect),0) connect_num,IFNULL(SUM(cdr.among_call),0) call_num " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr_hour cdr WHERE cdr.tenant_id = ? AND cdr.app_id IS NULL AND cdr.type IS NULL";
         Map<String, Object> map = jdbcTemplate.queryForMap(sql, argus);
         Map<String,Object> result = new HashMap<>();

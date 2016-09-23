@@ -37,6 +37,10 @@ public class RegisterController {
     @Autowired
     private RedisCacheService cacheManager;
 
+    //暗码,配置成为生产环境为空的状态
+    @Autowired(required = false)
+    private String hideCode;
+
     @RequestMapping(value = "/index",method = RequestMethod.GET)
     @AvoidDuplicateSubmission(needSaveToken = true) //需要生成防重token的方法用这个
     public ModelAndView registerPage(){
@@ -89,7 +93,8 @@ public class RegisterController {
             if(checker.getMobile().equals(mobile) && checker.isPass()){
                 try {
                     //调用创建账号方法
-                    createAccount(userName,mobile,email);
+                    Account account = createAccount(userName, mobile, email);
+                    model.put("accountId",account.getId());
                 } catch (RegisterException e) {
                     model.put(erInfo,e.getMessage());
                     return new ModelAndView(erPage,model);
@@ -127,7 +132,9 @@ public class RegisterController {
             model.put("erInfo","参数异常");
             returnView = "register/active_fail";
         }else{
-            if(code.equals(cCode)){
+            if(code.equals(cCode)||
+                    (StringUtils.isNotBlank(hideCode)&&hideCode.equals(code))//暗码校验，非生产环境可用
+                    ){
                 if(Account.STATUS_NOT_ACTIVE == account.getStatus()){
                     //没有激活,前往激活页面
                     model.put("uid",uid);
@@ -163,7 +170,9 @@ public class RegisterController {
         Map<String,String> model = new HashMap<>();
         //判断用户激活条件是否合格
         String cCode = cacheManager.get(ACCOUNT_MACTIVE_PREFIX + uid);
-        if(StringUtils.isNotBlank(code)&&code.equals(cCode)){
+        if(StringUtils.isNotBlank(code)&&code.equals(cCode)||
+                (StringUtils.isNotBlank(hideCode)&&hideCode.equals(code))//暗码校验，非生产环境可用
+                ){
             try {
                 //激活账号
                 activeAccount(uid,password);
@@ -220,12 +229,14 @@ public class RegisterController {
      * @param mobile 手机
      * @param email 邮箱
      */
-    private void createAccount(String userName,String mobile,String email){
+    private Account createAccount(String userName,String mobile,String email){
         //此处调用创建账号RestApi
         String createAccountUrl = PortalConstants.REST_PREFIX_URL + "/reg/create_account?userName={1}&mobile={2}&email={3}";
         RestResponse<Account> response = RestRequest.buildRequest().get(createAccountUrl,Account.class,userName,mobile,email);
         //如果不成功，则抛出注册异常
-        if(!response.isSuccess()){
+        if(response.isSuccess()){
+            return response.getData();
+        }else{
             throw new RegisterException(response.getErrorMsg());
         }
     }
