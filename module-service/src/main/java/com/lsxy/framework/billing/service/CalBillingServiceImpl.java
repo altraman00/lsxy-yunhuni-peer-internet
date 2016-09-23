@@ -6,6 +6,7 @@ import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import org.apache.commons.lang.StringUtils;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -561,7 +563,12 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public Billing getCalBilling(String tenantId) {
-        Billing billing = billingService.findBillingByTenantId(tenantId);
+        Billing billingOrg = billingService.findBillingByTenantId(tenantId);
+        Billing billing = new Billing();
+        try {
+            BeanUtils.copyProperties(billing,billingOrg);
+        } catch (Exception e) {
+        }
         billing.setBalance(this.getBalance(tenantId));
         billing.setSmsRemain(this.getSms(tenantId));
         billing.setConferenceRemain(this.getConference(tenantId));
