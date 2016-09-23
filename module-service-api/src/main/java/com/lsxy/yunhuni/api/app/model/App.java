@@ -161,7 +161,7 @@ public class App extends IdEntity {
         this.isIvrService = isIvrService;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
     public Area getArea() {
         return area;

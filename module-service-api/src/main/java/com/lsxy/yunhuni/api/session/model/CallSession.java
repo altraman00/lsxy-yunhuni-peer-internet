@@ -85,7 +85,7 @@ public class CallSession extends IdEntity {
         this.status = status;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "app_id")
     public App getApp() {
         return app;
@@ -95,7 +95,7 @@ public class CallSession extends IdEntity {
         this.app = app;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;
