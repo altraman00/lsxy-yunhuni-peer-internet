@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * 双向回拨
+ * 语音验证码
  * Created by liuws on 2016/9/5.
  */
 @Entity
