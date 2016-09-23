@@ -11,11 +11,11 @@ import java.util.Map;
  */
 public class MemberTopVO implements Serializable{
 
-    @JsonProperty("duration_top")
-    private List<Map<String, Object>> durationTop;
-
     @JsonProperty("call_top")
     private List<Map<String, Object>> callTop;
+
+    @JsonProperty("duration_top")
+    private List<Map<String, Object>> durationTop;
 
     @JsonProperty("consume_top")
     private List<Map<String, Object>> consumeTop;
