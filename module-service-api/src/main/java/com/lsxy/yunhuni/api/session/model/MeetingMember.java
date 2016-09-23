@@ -16,12 +16,22 @@ import java.util.Date;
 public class MeetingMember extends IdEntity {
     public static final int JOINTYPE_INVITE = 1;
     public static final int JOINTYPE_CALL = 2;
+    private String id;
     private String number;//参与者号码
     private Date joinTime;//加入时间
     private Integer joinType;//加入类型1.邀请加入2.呼入加入
     private Meeting meeting;//所属会议
     private CallSession session;//关联会话
     private String resId;
+
+    @Id
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @Column( name = "number" )
     public String getNumber() {
