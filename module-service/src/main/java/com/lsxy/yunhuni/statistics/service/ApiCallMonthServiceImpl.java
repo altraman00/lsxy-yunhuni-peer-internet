@@ -54,7 +54,6 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         //sql对于参数
         Object[] obj = new Object[]{sqlDate1,month1,
-                new Timestamp(date2.getTime()),month2,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
