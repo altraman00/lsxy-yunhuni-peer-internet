@@ -221,7 +221,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                 " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app where deleted = 0 GROUP BY tenant_id) app ON t.id = app.tenant_id" +
                 " LEFT JOIN db_lsxy_base.tb_base_billing billing ON t.id = billing.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum(among_amount) as sum_amount FROM db_lsxy_bi_yunhuni.tb_bi_consume_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL GROUP BY tenant_id) consume ON t.id = consume.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
+                " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM db_lsxy_base.tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,sum(among_call) as sum_call,FORMAT(sum(among_cost_time)/60,0) as sum_cost_time  FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr_day WHERE app_id IS NULL AND tenant_id IS NOT NULL AND type IS NULL GROUP BY tenant_id) cdr ON t.id = cdr.tenant_id" +
                 " WHERE 1=1";
         sql += " AND (a.`status` IN ("+Account.STATUS_NORMAL+","+Account.STATUS_LOCK+"))";
