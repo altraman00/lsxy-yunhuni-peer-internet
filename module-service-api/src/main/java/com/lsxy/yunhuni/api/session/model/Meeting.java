@@ -5,6 +5,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -16,10 +17,20 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_meeting")
 public class Meeting  extends IdEntity {
+    private String id;
     private String fromNum;//发起人
     private Date startTime;//发起时间
     private Date endTime;
     private String resId;
+
+    @Id
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @Column(name = "from_num")
     public String getFromNum() {

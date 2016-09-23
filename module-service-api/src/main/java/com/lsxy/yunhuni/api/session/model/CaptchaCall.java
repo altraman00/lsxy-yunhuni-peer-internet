@@ -5,11 +5,12 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * 双向回拨
+ * 语音验证码
  * Created by liuws on 2016/9/5.
  */
 @Entity
@@ -17,12 +18,22 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_captcha_call")
 public class CaptchaCall extends IdEntity {
 
+    private String id;
     private Date startTime;//发起时间
     private Date endTime;//结束时间
     private String fromNum;//发起方
     private String toNum;//接收方
     private String hangupSide;//挂断方
     private String resId;
+
+    @Id
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @Column( name = "start_time")
     public Date getStartTime() {
