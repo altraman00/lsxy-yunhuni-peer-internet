@@ -76,7 +76,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
     public RestResponse verify(HttpServletRequest request,String appId,String name){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/count/name?appId={1}&name={2}";
-        RestResponse countResponse =  RestRequest.buildSecurityRequest(token).getPage(uri,Long.class,appId,name);
+        RestResponse countResponse =  RestRequest.buildSecurityRequest(token).get(uri,Long.class,appId,name);
         return countResponse;
     }
     /**
