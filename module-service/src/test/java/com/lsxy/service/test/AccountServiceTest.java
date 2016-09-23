@@ -26,8 +26,6 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 
-import static com.lsxy.framework.config.SystemConfig.id;
-
 /**
  * Created by Tandy on 2016/7/14.
  */

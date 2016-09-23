@@ -6,7 +6,6 @@ import com.lsxy.framework.api.customer.service.FeedbackService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.customer.dao.FeedbackDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
