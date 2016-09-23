@@ -112,7 +112,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             app = testNumBind.getApp();
         }else{
             //不是公共测试号，从号码资源池中查出被叫号码的应用
-            ResourcesRent rent = resourcesRentService.findByResourceTelenumIdAndStatus(to, ResourcesRent.RENT_STATUS_USING);
+            ResourcesRent rent = resourcesRentService.findByResDataAndRentStatus(to, ResourcesRent.RENT_STATUS_USING);
             tenant = rent.getTenant();
             app = rent.getApp();
         }
@@ -137,5 +137,12 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             end = sip_uri.length();
         }
         return sip_uri.substring(start,end);
+    }
+
+    public static void main(String[] args) {
+        String sip= "sip:13692206627@218.17.203.147";
+        String sip2 ="sip:8675522730043";
+        System.out.println(resolveTelNum(sip));
+        System.out.println(resolveTelNum(sip2));
     }
 }

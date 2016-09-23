@@ -31,6 +31,8 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      */
     ResourcesRent findByResourceTelenumIdAndRentStatus(String id, int status);
 
+    ResourcesRent findByResDataAndRentStatus(String resData, int status);
+
     /**
      * 根据状态获取租户的号码
      * @param id
