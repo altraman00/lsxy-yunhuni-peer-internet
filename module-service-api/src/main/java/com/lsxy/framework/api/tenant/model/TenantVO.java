@@ -69,8 +69,8 @@ public class TenantVO implements Serializable {
     @JsonProperty("account_status")
     private Integer accountStatus;
 
-    @Transient
-    private boolean inited = false;
+//    @Transient
+//    private boolean inited = false;
 
     public String getId() {
         return id;
@@ -152,12 +152,12 @@ public class TenantVO implements Serializable {
     }
 
     public Long getSessionTime() {//秒转换成分钟
-        if(sessionTime !=null){
-            if(!inited){
-                inited = true;
-                return (long)Math.round(sessionTime/60);
-            }
-        }
+//        if(sessionTime !=null){
+//            if(!inited){
+//                inited = true;
+//                return (long)Math.round(sessionTime/60);
+//            }
+//        }
         return sessionTime;
     }
 
