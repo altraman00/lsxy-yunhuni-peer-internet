@@ -23,15 +23,6 @@ public class MeetingMember extends IdEntity {
     private CallSession session;//关联会话
     private String resId;
 
-    @Id
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Column( name = "number" )
     public String getNumber() {
         return number;

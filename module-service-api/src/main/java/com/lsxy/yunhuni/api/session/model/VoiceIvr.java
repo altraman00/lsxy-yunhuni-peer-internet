@@ -5,7 +5,6 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -25,16 +24,6 @@ public class VoiceIvr extends IdEntity {
     private String toNum;
     private Integer ivrType;
     private String handupSide;
-
-
-    @Id
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     @Column(name = "start_num")
     public Date getStartTime() {

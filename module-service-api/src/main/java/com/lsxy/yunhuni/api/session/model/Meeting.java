@@ -5,7 +5,6 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -21,15 +20,6 @@ public class Meeting  extends IdEntity {
     private Date startTime;//发起时间
     private Date endTime;
     private String resId;
-
-    @Id
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     @Column(name = "from_num")
     public String getFromNum() {
