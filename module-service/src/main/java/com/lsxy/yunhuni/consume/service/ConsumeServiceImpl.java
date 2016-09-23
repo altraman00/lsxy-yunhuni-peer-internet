@@ -93,15 +93,4 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         return page;
     }
 
-    public static void main(String[] args) {
-        Integer year = 2016;
-        Integer month = 9;
-        Date date1 = DateUtils.parseDate(year+"-"+month,"yyyy-MM");
-        Calendar cale  = Calendar.getInstance();
-        cale.setTime(date1);
-        cale.set(Calendar.MONTH, cale.get(Calendar.MONTH) + 1);
-        Date date2 = cale.getTime();
-        System.out.println(date1.toString() + date2.toString());
-    }
-
 }
