@@ -138,11 +138,4 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         }
         return sip_uri.substring(start,end);
     }
-
-    public static void main(String[] args) {
-        String sip= "sip:13692206627@218.17.203.147";
-        String sip2 ="sip:8675522730043";
-        System.out.println(resolveTelNum(sip));
-        System.out.println(resolveTelNum(sip2));
-    }
 }
