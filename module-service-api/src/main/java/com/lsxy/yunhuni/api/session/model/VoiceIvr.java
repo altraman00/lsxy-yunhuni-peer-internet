@@ -23,7 +23,7 @@ public class VoiceIvr extends IdEntity {
     private String fromNum;
     private String toNum;
     private Integer ivrType;
-    private String handupSide;
+    private String hangupSide;
 
 
     @Column(name = "start_num")
@@ -71,12 +71,12 @@ public class VoiceIvr extends IdEntity {
         this.ivrType = ivrType;
     }
 
-    @Column(name = "handup_side")
-    public String getHandupSide() {
-        return handupSide;
+    @Column(name = "hangup_side")
+    public String getHangupSide() {
+        return hangupSide;
     }
 
-    public void setHandupSide(String handupSide) {
-        this.handupSide = handupSide;
+    public void setHangupSide(String hangupSide) {
+        this.hangupSide = hangupSide;
     }
 }

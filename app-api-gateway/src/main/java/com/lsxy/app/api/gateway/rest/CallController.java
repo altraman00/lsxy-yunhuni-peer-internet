@@ -82,7 +82,7 @@ public class CallController extends AbstractAPIController{
 //    }
 
     @RequestMapping(value = "/{account_id}/call/duo_callback",method = RequestMethod.POST)
-    public ApiGatewayResponse duoCallback(HttpServletRequest request, @RequestBody DuoCallbackDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse duoCallback(HttpServletRequest request, @Valid @RequestBody DuoCallbackDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         String callId;
@@ -111,7 +111,7 @@ public class CallController extends AbstractAPIController{
     }
 
     @RequestMapping(value = "/{account_id}/call/notify_call",method = RequestMethod.POST)
-    public ApiGatewayResponse notifyCall(HttpServletRequest request, @RequestBody NotifyCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
+    public ApiGatewayResponse notifyCall(HttpServletRequest request, @Valid @RequestBody NotifyCallDTO dto, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
         //参数校验

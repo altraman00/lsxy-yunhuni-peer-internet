@@ -31,7 +31,7 @@ public class CTIClient implements RpcEventListener{
     private StasticsCounter sc;
 
     //本地unitid 由于需要通过环境变量设置值,所以不适用"." 而适用_
-    @Value("${area_agent_client_cti_unitid:10}")
+    @Value("${area_agent_client_cti_unitid:20}")
     private byte localUnitID;
 
     @Autowired
