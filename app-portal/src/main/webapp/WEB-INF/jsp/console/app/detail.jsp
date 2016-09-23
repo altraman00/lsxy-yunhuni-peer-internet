@@ -201,7 +201,7 @@
                                         <table class="table table-striped cost-table-history tablelist" id="playtable">
                                             <thead>
                                             <tr>
-                                                <th width="20%">标题</th>
+                                                <th width="20%">文件名</th>
                                                 <th width="10%">状态</th>
                                                 <th width="10%">大小</th>
                                                 <th width="35%">备注</th>
