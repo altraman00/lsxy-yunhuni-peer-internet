@@ -432,14 +432,14 @@
 //                            data.abort();
 //                        });
                         var filename = data.files[0].name;
-                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
+                        var  re = /^.+(\.wav)$/i;
                         var result=  re.test(filename);
                         if(result){
                             if(data.files[0].size <= (5* 1024 * 1024)) {
                                 ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
                                     if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
-                                        ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename},function(response){
-                                            if(response.data==0){
+                                        ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename},function(response1){
+                                            if(response1.data==0){
                                                 $('#progress').show();
                                                 $('#fileName').html(filename);
                                                 $('.modalCancel-app-down').unbind("click").one("click", function () {
