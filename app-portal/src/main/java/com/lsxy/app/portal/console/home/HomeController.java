@@ -111,7 +111,7 @@ public class HomeController extends AbstractPortalController {
         //此处调用鉴权账号（凭证）RestApi
         ApiCertificate cert = getApiCertificate(token);
         if(cert != null){
-            vo.setRestApi(CERT_REST_PREFIX + "/v1/account/" + cert.getCertId() + "/");
+            vo.setRestApi(CERT_REST_PREFIX + "/"+SystemConfig.getProperty("api.gateway.version","v1")+"/account/" + cert.getCertId() + "/");
             vo.setCertId(cert.getCertId());
             vo.setSecretKey(cert.getSecretKey());
         }
@@ -134,7 +134,9 @@ public class HomeController extends AbstractPortalController {
                 if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
                     ResourcesRent rent = getIvrNumber(token,app.getId());
                     if(rent != null){
-                        appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+                        if(rent.getResourceTelenum()!=null) {
+                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+                        }
                         appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
                     }
                 }

@@ -838,11 +838,11 @@
     };
     var resultFileSize = function(temp){
         if(temp>(1024*1024)){
-            temp = (temp/1024/1024).toFixed(2)+"M";
+            temp = (temp/1024/1024).toFixed(2)+"MB";
         }else if(temp>1024){
-            temp = (temp/1024).toFixed(2)+"K";
+            temp = (temp/1024).toFixed(2)+"KB";
         }else{
-            temp = temp+"b";
+            temp = temp+"B";
         }
         return temp;
     }

@@ -3,13 +3,11 @@ package com.lsxy.app.oc.rest.tenant;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
-import com.lsxy.yunhuni.api.consume.model.Consume;
-import com.lsxy.yunhuni.api.consume.service.ConsumeService;
-import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
-import com.lsxy.yunhuni.api.statistics.service.*;
+import com.lsxy.framework.api.billing.model.Billing;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.*;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -17,12 +15,15 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.portal.ResetPwdVerifySuccessEvent;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.framework.api.billing.model.Billing;
-import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
@@ -30,6 +31,8 @@ import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
+import com.lsxy.yunhuni.api.statistics.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -153,7 +156,8 @@ public class TenantController {
             List<TenantVO> temp = list.getResult();
             List<TenantVO> list1 = new ArrayList();
             for(int i=0;i<temp.size();i++){
-                TenantVO tenantVO = temp.get(i);
+                TenantVO tenantVO = new TenantVO();
+                BeanUtils.copyProperties(tenantVO,temp.get(i));
                 BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
                 tenantVO.setRemainCoin(bigDecimal.doubleValue());
                 list1.add(tenantVO);
@@ -180,7 +184,11 @@ public class TenantController {
     public RestResponse cert(
             @ApiParam(name = "id",value = "租户id")
             @PathVariable String id){
-        return RestResponse.success(apiCertificateService.findApiCertificateByTenantId(id));
+        ApiCertificate cert = apiCertificateService.findApiCertificateByTenantId(id);
+        Map<String,Object> result = new HashMap<>();
+        result.put("cert",cert);
+        result.put("apiUrl",SystemConfig.getProperty("api.gateway.url","http://api.yunhuni.com") + "/"+ SystemConfig.getProperty("api.gateway.version","v1")+"/account/" + cert.getCertId() + "/");
+        return RestResponse.success(result);
     }
 
     @ApiOperation(value = "租户账务信息，余额/套餐/存储")
@@ -594,14 +602,15 @@ public class TenantController {
             @RequestParam(defaultValue = "10") Integer pageSize){
         ConsumesVO dto = new ConsumesVO();
         Page<Consume> page = consumeService.pageListByTenantAndDate(id,year,month,pageNo,pageSize);
+        changeTypeToChineseOfConsume(page.getResult());
         dto.setConsumes(page);
-        List<Consume> list  = page.getResult();
-        BigDecimal sum  = new BigDecimal("0.00");
-        for(int i=0;i<list.size();i++){
-            sum  = sum.add(list.get(i).getAmount());
-        }
-       // dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
-        dto.setSumAmount(sum);
+
+//        BigDecimal sum  = new BigDecimal("0.00");
+//        for(int i=0;i<list.size();i++){
+//            sum  = sum.add(list.get(i).getAmount());
+//        }
+//        dto.setSumAmount(sum);
+        dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
         return RestResponse.success(dto);
     }
 
@@ -823,8 +832,11 @@ public class TenantController {
             month = DateUtils.getPrevMonth(curMonth,"yyyy-MM");
         }
         List<ConsumeMonth> consumeMonths = consumeMonthService.getConsumeMonths(tenant,appId,month);
+        changeTypeToChineseOfConsumeMonth(consumeMonths);
         return RestResponse.success(consumeMonths);
     }
+
+
 
     @ApiOperation(value = "租户(某月所有天/某年所有月)的消费额统计")
     @RequestMapping(value = "/tenants/{tenant}/consume/statistic",method = RequestMethod.GET)
@@ -919,4 +931,56 @@ public class TenantController {
             @RequestParam(required = false,defaultValue = "10") Integer pageSize){
         return RestResponse.success(rechargeService.pageListByTenant(tenant,pageNo,pageSize));
     }
+
+
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumeMonths
+     */
+    private void changeTypeToChineseOfConsumeMonth(List<ConsumeMonth> consumeMonths){
+        for(int i = 0;i < consumeMonths.size();i++){
+            ConsumeMonth consumeMonth = new ConsumeMonth();
+            try {
+                BeanUtils.copyProperties(consumeMonth,consumeMonths.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String type = consumeMonth.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consumeMonth.setType(consumeCode.getName());
+            }catch(Exception e){
+//                e.printStackTrace();
+                consumeMonth.setType("未知项目");
+            }
+            consumeMonths.set(i,consumeMonth);
+        }
+    }
+
+
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumes
+     */
+    private void changeTypeToChineseOfConsume(List<Consume> consumes){
+        for(int i = 0;i < consumes.size();i++){
+            Consume consume = new Consume();
+            try {
+                BeanUtils.copyProperties(consume,consumes.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String type = consume.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consume.setType(consumeCode.getName());
+            }catch(Exception e){
+//                e.printStackTrace();
+                consume.setType("未知项目");
+            }
+            consumes.set(i,consume);
+        }
+
+    }
+
 }
