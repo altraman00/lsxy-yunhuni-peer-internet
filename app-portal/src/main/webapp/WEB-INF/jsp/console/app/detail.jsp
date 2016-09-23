@@ -432,32 +432,52 @@
 //                            data.abort();
 //                        });
                         var filename = data.files[0].name;
-//                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
-//                        var result=  re.test(filename);
-//                        if(result){
-//                            if(data.files[0].size <= (5* 1024 * 1024)) {
-//                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
-//                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
-                                        $('#progress').show();
-                                        $('#fileName').html(filename);
-                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
-                                            data.submit();
-                                            cancelCancel=false;
-                                            $('#fileupload').attr('disabled',"disabled");
-                                        });
-//                                    }else{
-//                                        $('#progress').hide();
-//                                        showtoast("存储空间不足，无法上传");
-//                                    }
-//                                },"post");
-//                            }else{
-//                                $('#progress').hide();
-//                                showtoast("上传文件超过5M");
-//                            }
-//                        }else{
-//                            $('#progress').hide();
-//                            showtoast("上传格式不正确");
-//                        }
+                        var  re = /[a-zA-Z0-9](\.|\/)(wav)$/i;
+                        var result=  re.test(filename);
+                        if(result){
+                            if(data.files[0].size <= (5* 1024 * 1024)) {
+                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
+                                        ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename},function(response){
+                                            if(response.data==0){
+                                                $('#progress').show();
+                                                $('#fileName').html(filename);
+                                                $('.modalCancel-app-down').unbind("click").one("click", function () {
+                                                    data.submit();
+                                                    cancelCancel=false;
+                                                    $('#fileupload').attr('disabled',"disabled");
+                                                });
+                                            }else{
+                                                bootbox.setLocale("zh_CN");
+                                                var h1="该文件名已存在，是否覆盖同名文件";
+                                                bootbox.confirm(h1, function(result) {
+                                                    if (result) {
+                                                        $('#progress').show();
+                                                        $('#fileName').html(filename);
+                                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
+                                                            data.submit();
+                                                            cancelCancel = false;
+                                                            $('#fileupload').attr('disabled', "disabled");
+                                                        });
+                                                    } else {
+                                                        $('#progress').hide();
+                                                    }
+                                                });
+                                            }
+                                        },"post");
+                                    }else{
+                                        $('#progress').hide();
+                                        showtoast("存储空间不足，无法上传");
+                                    }
+                                },"post");
+                            }else{
+                                $('#progress').hide();
+                                showtoast("上传文件超过5M");
+                            }
+                        }else{
+                            $('#progress').hide();
+                            showtoast("上传格式不正确");
+                        }
                     },
                     done: function (e, data) {
                         console.info(data)
