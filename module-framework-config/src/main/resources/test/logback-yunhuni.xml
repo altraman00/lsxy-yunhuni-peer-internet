@@ -33,7 +33,7 @@
         </encoder>
         <!--日志文件最大的大小-->
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>2G</MaxFileSize>
+            <MaxFileSize>2GB</MaxFileSize>
         </triggeringPolicy>
     </appender>
 
