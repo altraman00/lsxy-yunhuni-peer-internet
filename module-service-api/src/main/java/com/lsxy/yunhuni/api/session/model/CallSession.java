@@ -1,6 +1,5 @@
 package com.lsxy.yunhuni.api.session.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -87,8 +86,7 @@ public class CallSession extends IdEntity {
         this.status = status;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+    @ManyToOne
     @JoinColumn(name = "app_id")
     public App getApp() {
         return app;
@@ -98,8 +96,7 @@ public class CallSession extends IdEntity {
         this.app = app;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+    @ManyToOne
     @JoinColumn(name = "tenant_id")
     public Tenant getTenant() {
         return tenant;

@@ -1,6 +1,5 @@
 package com.lsxy.yunhuni.api.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.config.model.Area;
@@ -163,8 +162,7 @@ public class App extends IdEntity {
         this.isIvrService = isIvrService;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+    @ManyToOne
     @JoinColumn(name = "area_id")
     public Area getArea() {
         return area;
