@@ -95,8 +95,8 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
         String begin_time = (String)params.get("begin_time");
-        String from = from_uri.substring(0,from_uri.indexOf("@"));//主叫号码
-        String to = to_uri.substring(0,to_uri.indexOf("@"));//被叫号码
+        String from = resolveTelNum(from_uri);//主叫号码
+        String to = resolveTelNum(to_uri);//被叫号码
 
         Tenant tenant = null;
         App app = null;
@@ -129,4 +129,13 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         return res;
     }
 
+    private static String resolveTelNum(String sip_uri){
+        int start = sip_uri.indexOf(":") + 1;
+        int end = sip_uri.indexOf("@");
+
+        if(end == -1){
+            end = sip_uri.length();
+        }
+        return sip_uri.substring(start,end);
+    }
 }
