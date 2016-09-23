@@ -2,7 +2,6 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 
@@ -34,6 +33,14 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
+
+    /**
+     * 根据号码查询租用关系
+     * @param resData
+     * @param status
+     * @return
+     */
+    ResourcesRent findByResDataAndRentStatus(String resData, int status);
 
     /**
      * 根据租户查询拥有的但没在使用状态的号码

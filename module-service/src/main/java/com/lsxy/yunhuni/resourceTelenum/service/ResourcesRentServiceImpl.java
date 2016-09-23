@@ -69,6 +69,11 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
+    public ResourcesRent findByResDataAndRentStatus(String resData, int status) {
+        return resourcesRentDao.findByResDataAndRentStatus(resData,status);
+    }
+
+    @Override
     public String[] findOwnUnusedNum(Tenant tenant) {
         List<String> telNums = new ArrayList<>();
         List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
