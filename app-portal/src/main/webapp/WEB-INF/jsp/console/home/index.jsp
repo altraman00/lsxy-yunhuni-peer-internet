@@ -52,7 +52,7 @@
                             }
 
 
-                            var html = '<div class="common-info" ><div id="marqueeBox" style="overflow:hidden;float:left;height:'+marqueeHeight+'px" onmouseover="clearInterval(marqueeInterval[0])" onmouseout="marqueeInterval[0]=setInterval(\'startMarquee()\',marqueeDelay)"><div>'+str+'</div></div><span class="close" id="common-close"></span><a class="detail" href="'+ctx+'/console/message/account_message/index">查看详情</a></div>';
+                            var html = '<div class="common-info" ><div id="marqueeBox" style="overflow:hidden;float:left;height:'+marqueeHeight+'px;width:80%;" onmouseover="clearInterval(marqueeInterval[0])" onmouseout="marqueeInterval[0]=setInterval(\'startMarquee()\',marqueeDelay)"><div>'+str+'</div></div><span class="close" id="common-close"></span><a class="detail" href="'+ctx+'/console/message/account_message/index">查看详情</a></div>';
                             document.getElementById("commonMsg").innerHTML= html;
                             marqueeId++;
                             marqueeInterval[0]=setInterval("startMarquee()",marqueeDelay);
