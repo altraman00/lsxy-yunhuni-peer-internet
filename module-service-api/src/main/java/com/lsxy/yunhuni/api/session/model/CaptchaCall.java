@@ -19,6 +19,7 @@ public class CaptchaCall extends IdEntity {
 
     private Date startTime;//发起时间
     private Date endTime;//结束时间
+    private Date answerTime;//应答时间
     private String fromNum;//发起方
     private String toNum;//接收方
     private String hangupSide;//挂断方
@@ -40,6 +41,15 @@ public class CaptchaCall extends IdEntity {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    @Column( name = "answer_time")
+    public Date getAnswerTime() {
+        return answerTime;
+    }
+
+    public void setAnswerTime(Date answerTime) {
+        this.answerTime = answerTime;
     }
 
     @Column( name = "from_num")
