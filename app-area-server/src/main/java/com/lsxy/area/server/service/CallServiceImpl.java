@@ -312,7 +312,7 @@ public class CallServiceImpl implements CallService {
     public String notifyCall(String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
                              Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException{
         String apiCmd = "notify_call";
-        String callId = UUIDGenerator.uuid();
+        String callId;
         if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
         }
@@ -343,6 +343,14 @@ public class CallServiceImpl implements CallService {
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
         String to_uri = to+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
         //TODO 获取线路IP和端口
+
+        //保存语音通知
+        NotifyCall notifyCall = new NotifyCall(from,to_uri);
+        notifyCallService.save(notifyCall);
+        callId = notifyCall.getId();
+        CallSession callSession = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
+        callSessionService.save(callSession);
+
         Map<String, Object> params = new HashMap<>();
         params.put("from_uri", from);
         params.put("to_uri", to_uri);
@@ -357,7 +365,7 @@ public class CallServiceImpl implements CallService {
             Area area = app.getArea();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             Map<String,Object> data = new MapBuilder<String,Object>()
-                    .put(to_uri,UUIDGenerator.uuid())
+                    .put(to_uri,callSession.getId())
                     .build();
             //将数据存到redis
             BusinessState cache = new BusinessState.Builder()
@@ -372,11 +380,7 @@ public class CallServiceImpl implements CallService {
                                     .setBusinessData(data)
                                     .build();
             businessStateService.save(cache);
-            //保存语音通知
-            NotifyCall notifyCall = new NotifyCall(from,to_uri);
-            notifyCallService.save(notifyCall);
-            CallSession callSession = new CallSession((String) data.get(to_uri),CallSession.STATUS_CALLING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
-            callSessionService.save(callSession);
+
 
             rpcCaller.invoke(sessionContext, rpcrequest);
             return callId;
