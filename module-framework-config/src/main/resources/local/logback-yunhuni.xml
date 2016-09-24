@@ -50,7 +50,7 @@
         <!-- This are static fields -->
         <additionalFields>systemId=${systemId},env=local</additionalFields>
         <!-- Optional: Specify field types -->
-        <additionalFieldTypes>env=String</additionalFieldTypes>
+        <additionalFieldTypes>systemId=String,env=String</additionalFieldTypes>
 
         <!-- This are fields using MDC -->
         <mdcFields>mdcField2</mdcFields>
