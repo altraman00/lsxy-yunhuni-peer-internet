@@ -199,11 +199,11 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             logger.debug("用户回调结束事件");
         }
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .put("event","duo_callback.end")
+                .put("event","notify_call.end")
                 .put("id",callId)
-                .put("begin_time",beginTime.getTime())
-                .put("answer_time",answerTime.getTime())
-                .put("end_time",endTime.getTime())
+                .put("begin_time",beginTime==null?null:beginTime.getTime())
+                .put("answer_time",answerTime==null?null:answerTime.getTime())
+                .put("end_time",endTime==null?null:endTime.getTime())
                 .put("dropped_by",paramMap.get("dropped_by"))
                 .put("reason",paramMap.get("reason"))
                 .put("error",paramMap.get("error"))
