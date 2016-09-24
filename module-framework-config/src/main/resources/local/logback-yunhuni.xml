@@ -47,11 +47,10 @@
         <mdcProfiling>true</mdcProfiling>
         <timestampPattern>yyyy-MM-dd HH:mm:ss,SSSS</timestampPattern>
         <maximumMessageSize>8192</maximumMessageSize>
-
         <!-- This are static fields -->
-        <additionalFields>fieldName1=fieldValue1,fieldName2=fieldValue2</additionalFields>
+        <additionalFields>env=local</additionalFields>
         <!-- Optional: Specify field types -->
-        <additionalFieldTypes>fieldName1=String,fieldName2=Double,fieldName3=Long</additionalFieldTypes>
+        <additionalFieldTypes>env=String</additionalFieldTypes>
 
         <!-- This are fields using MDC -->
         <mdcFields>systemId,mdcField2</mdcFields>
