@@ -17,6 +17,7 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_notify_call")
 public class NotifyCall extends IdEntity {
     private Date startTime;//发起时间
+    private Date answerTime;//接听时间
     private Date endTime;//结束时间
     private String fromNum;//发起方
     private String toNum;//接收方
@@ -36,9 +37,17 @@ public class NotifyCall extends IdEntity {
         return startTime;
     }
 
-
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    @Column( name = "answer_time")
+    public Date getAnswerTime() {
+        return answerTime;
+    }
+
+    public void setAnswerTime(Date answerTime) {
+        this.answerTime = answerTime;
     }
 
     @Column( name = "end_time")
