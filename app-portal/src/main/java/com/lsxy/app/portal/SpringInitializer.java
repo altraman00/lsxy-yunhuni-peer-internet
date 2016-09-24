@@ -45,7 +45,6 @@ public class SpringInitializer implements WebApplicationInitializer {
 
     public static final String systemId = "app.portal";
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 

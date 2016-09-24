@@ -23,7 +23,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class MainClass extends AbstractSpringBootWebStarter {
     private static final String systemId = "app.backend";
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 
