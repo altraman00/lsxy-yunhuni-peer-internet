@@ -35,7 +35,6 @@ public class AreaServerMainClass extends AbstractSpringBootStarter {
 
     private static final String systemId = "area.server";
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 

@@ -22,7 +22,6 @@ public class MainClass  extends AbstractSpringBootWebStarter {
     public static final String systemId = "third.join.gateway";
 
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 

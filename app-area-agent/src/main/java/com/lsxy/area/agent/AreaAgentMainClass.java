@@ -27,7 +27,6 @@ public class AreaAgentMainClass extends AbstractSpringBootWebStarter {
 
     private static final String systemId = "area.agent";
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 
