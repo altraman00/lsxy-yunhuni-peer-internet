@@ -39,6 +39,16 @@ public class CallSession extends IdEntity {
     public CallSession() {
     }
 
+    public CallSession(Integer status, App app, Tenant tenant, String relevanceId, String type, String fromNum, String toNum) {
+        this.status = status;
+        this.app = app;
+        this.tenant = tenant;
+        this.relevanceId = relevanceId;
+        this.type = type;
+        this.fromNum = fromNum;
+        this.toNum = toNum;
+    }
+
     public CallSession(String id,Integer status, App app, Tenant tenant, String relevanceId, String type, String fromNum, String toNum) {
         this.id = id;
         this.status = status;

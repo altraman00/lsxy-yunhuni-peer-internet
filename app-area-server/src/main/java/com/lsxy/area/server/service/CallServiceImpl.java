@@ -184,7 +184,7 @@ public class CallServiceImpl implements CallService {
     public String duoCallback(String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
                               Integer max_dial_duration,Integer max_call_duration ,Boolean recording,Integer record_mode,String user_data) throws YunhuniApiException {
         String apiCmd = "duo_call";
-        String duocCallId = UUIDGenerator.uuid();
+        String duocCallId;
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
             throw new NumberNotAllowToCallException();
         }
@@ -215,6 +215,16 @@ public class CallServiceImpl implements CallService {
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
         String to1_uri = to1+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
         String to2_uri = to2+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
+
+        //保存双向回拔表
+        VoiceCallback voiceCallback = new VoiceCallback(from1,from2,to1_uri,to2_uri);
+        voiceCallbackService.save(voiceCallback);
+        duocCallId = voiceCallback.getId();
+        CallSession callSession = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
+        CallSession callSession2 = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
+        callSessionService.save(callSession);
+        callSessionService.save(callSession2);
+
         Map<String, Object> params = new HashMap<>();
         params.put("from1_uri", from1);
         params.put("to1_uri",to1_uri);
@@ -241,8 +251,8 @@ public class CallServiceImpl implements CallService {
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
         try {
             Map<String,Object> data = new MapBuilder<String,Object>()
-                    .put(to1_uri,UUIDGenerator.uuid())
-                    .put(to2_uri,UUIDGenerator.uuid())
+                    .put(to1_uri,callSession.getId())
+                    .put(to2_uri,callSession2.getId())
                     .build();
             //将数据存到redis
             BusinessState cache = new BusinessState.Builder()
@@ -258,13 +268,7 @@ public class CallServiceImpl implements CallService {
                                     .build();
 
             businessStateService.save(cache);
-            //保存双向回拔表
-            VoiceCallback voiceCallback = new VoiceCallback(duocCallId,from1,from2,to1_uri,to2_uri);
-            voiceCallbackService.save(voiceCallback);
-            CallSession callSession = new CallSession((String) data.get(to1_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
-            CallSession callSession2 = new CallSession((String) data.get(to2_uri),CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
-            callSessionService.save(callSession);
-            callSessionService.save(callSession2);
+
             rpcCaller.invoke(sessionContext, rpcrequest);
 
             return duocCallId;
