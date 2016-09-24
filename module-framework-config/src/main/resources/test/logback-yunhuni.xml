@@ -49,12 +49,12 @@
         <maximumMessageSize>8192</maximumMessageSize>
 
         <!-- This are static fields -->
-        <additionalFields>fieldName1=fieldValue1,fieldName2=fieldValue2</additionalFields>
+        <additionalFields>env=test</additionalFields>
         <!-- Optional: Specify field types -->
-        <additionalFieldTypes>fieldName1=String,fieldName2=Double,fieldName3=Long</additionalFieldTypes>
+        <additionalFieldTypes>env=String</additionalFieldTypes>
 
         <!-- This are fields using MDC -->
-        <mdcFields>mdcField1,mdcField2</mdcFields>
+        <mdcFields>systemId,mdcField2</mdcFields>
         <dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>
         <includeFullMdc>true</includeFullMdc>
         <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
