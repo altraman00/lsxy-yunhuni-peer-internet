@@ -197,13 +197,13 @@
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
                                         <p>
-                                            REST API: ${homeVO.restApi}
+                                            接口API: ${homeVO.restApi}
                                         <%--<span>--%>
                                           <%--<a href="#">API文档</a>--%>
                                         <%--</span>--%>
                                         </p>
                                         <p>
-                                            SecretKey: <span id="secretKey">${homeVO.secretKey}</span>
+                                            密钥: <span id="secretKey">${homeVO.secretKey}</span>
                                         <span>
                                           <a  class='reset_sk_confirm' >重新生成</a>
                                         </span>
@@ -212,7 +212,7 @@
                                         </span>
                                         </p>
                                         <p>
-                                            鉴权ID: <span >${homeVO.certId}</span>
+                                            鉴权账号: <span >${homeVO.certId}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -245,7 +245,7 @@
                                                         <span class="app-icon pull-left m-r-sm">
                                                             <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/>
                                                         </span>
-                                                        <span class="h5 block m-t-xs text-muted">APPID :
+                                                        <span class="h5 block m-t-xs text-muted">应用标识 :
                                                             <span>${app.id}</span>
                                                             <small class="text-success">已上线</small>
                                                         </span>
@@ -282,7 +282,7 @@
                                                         <span class="app-icon pull-left m-r-sm">
                                                             <img src="${resPrefixUrl}/images/index/cp.png" width="50px"/>
                                                         </span>
-                                                        <span class="h5 block m-t-xs text-muted">APPID :
+                                                        <span class="h5 block m-t-xs text-muted">应用标识 :
                                                             <span>${app.id}</span>
                                                             <small class="text-danger">未上线</small>
                                                         </span>
