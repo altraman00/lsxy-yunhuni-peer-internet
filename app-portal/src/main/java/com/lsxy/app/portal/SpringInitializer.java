@@ -2,6 +2,7 @@ package com.lsxy.app.portal;
 
 import com.lsxy.app.portal.config.SpringStartupConfig;
 import com.lsxy.framework.core.web.SpringContextUtil;
+import org.slf4j.MDC;
 import org.springframework.session.web.context.AbstractHttpSessionApplicationInitializer;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -41,6 +42,12 @@ return new String[] { "/" };
 }
  */
 public class SpringInitializer implements WebApplicationInitializer {
+
+    public static final String systemId = "app.portal";
+    static {
+        MDC.put("systemId",systemId);
+        System.setProperty("systemId",systemId);
+    }
 
     @Override
     public void onStartup(ServletContext container) throws ServletException {
