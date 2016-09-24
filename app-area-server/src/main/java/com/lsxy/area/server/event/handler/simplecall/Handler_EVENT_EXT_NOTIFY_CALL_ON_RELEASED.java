@@ -137,9 +137,9 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
         CaptchaCall captchaCall = captchaCallService.findById(call_id);
         if(captchaCall!=null){
             captchaCall.setHangupSide((String)paramMap.get("dropped_by"));
-            captchaCall.setEndTime(end_time!=null?new Date(end_time):new Date());
-            if(answer_time != null){
-                captchaCall.setAnswerTime(new Date(answer_time));
+            captchaCall.setEndTime(endTime!=null?endTime:new Date());
+            if(answerTime != null){
+                captchaCall.setAnswerTime(answerTime);
             }
             captchaCallService.save(captchaCall);
         }
