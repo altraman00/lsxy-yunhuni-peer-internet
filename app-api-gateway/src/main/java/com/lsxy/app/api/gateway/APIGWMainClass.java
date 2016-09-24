@@ -28,7 +28,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 public class APIGWMainClass extends AbstractSpringBootWebStarter {
     private static final String systemId = "api.gateway";
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 

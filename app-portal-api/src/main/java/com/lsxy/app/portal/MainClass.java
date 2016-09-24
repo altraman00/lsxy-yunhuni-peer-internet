@@ -26,7 +26,6 @@ public class MainClass extends AbstractSpringBootWebStarter {
     public static final String systemId = "portal.api";
 
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 

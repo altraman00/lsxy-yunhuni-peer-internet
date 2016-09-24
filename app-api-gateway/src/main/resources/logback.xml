@@ -2,6 +2,7 @@
 <configuration debug="false">
     <contextName>api-gateway</contextName>
     <property name="APP_NAME" value="api-gateway" />
+    <property name="systemId" value="api.gateway" />
     <include resource="logback-yunhuni.xml"/>
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
     <logger name="org.springframework.security" level="INFO" additivity="true" />

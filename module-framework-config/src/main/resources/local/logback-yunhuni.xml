@@ -48,12 +48,12 @@
         <timestampPattern>yyyy-MM-dd HH:mm:ss,SSSS</timestampPattern>
         <maximumMessageSize>8192</maximumMessageSize>
         <!-- This are static fields -->
-        <additionalFields>env=local</additionalFields>
+        <additionalFields>systemId=${systemId},env=local</additionalFields>
         <!-- Optional: Specify field types -->
         <additionalFieldTypes>env=String</additionalFieldTypes>
 
         <!-- This are fields using MDC -->
-        <mdcFields>systemId,mdcField2</mdcFields>
+        <mdcFields>mdcField2</mdcFields>
         <dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>
         <includeFullMdc>true</includeFullMdc>
         <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->

@@ -23,7 +23,6 @@ public class DemoMainClass extends AbstractSpringBootWebStarter {
     public static final String systemId = "user.join.demo";
 
     static {
-        MDC.put("systemId",systemId);
         System.setProperty("systemId",systemId);
     }
 

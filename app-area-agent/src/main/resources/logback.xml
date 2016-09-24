@@ -2,6 +2,7 @@
 <configuration debug="false">
     <contextName>area-agent</contextName>
     <property name="APP_NAME" value="area-agent" />
+    <property name="systemId" value="area.agent" />
     <include resource="logback-yunhuni.xml"/>
     <!--<logger name="org.springframework.boot" level="DEBUG" additivity="true" />-->
     <!--<logger name="io.netty" level="INFO" additivity="false" />-->
