@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.api.client.ClientSessionContext;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
+import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class AreaAgentMainClass extends AbstractSpringBootWebStarter {
 
+    private static final String systemId = "area.agent";
+    static {
+        MDC.put("systemId",systemId);
+        System.setProperty("systemId",systemId);
+    }
 
 
     public static void main(String[] args) throws RemoteServerStartException {
@@ -44,6 +50,6 @@ public class AreaAgentMainClass extends AbstractSpringBootWebStarter {
 
     @Override
     public String systemId() {
-        return "area-agent";
+        return systemId;
     }
 }

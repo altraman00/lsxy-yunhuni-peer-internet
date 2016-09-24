@@ -54,7 +54,7 @@
         <additionalFieldTypes>fieldName1=String,fieldName2=Double,fieldName3=Long</additionalFieldTypes>
 
         <!-- This are fields using MDC -->
-        <mdcFields>mdcField1,mdcField2</mdcFields>
+        <mdcFields>systemId,mdcField2</mdcFields>
         <dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>
         <includeFullMdc>true</includeFullMdc>
         <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
