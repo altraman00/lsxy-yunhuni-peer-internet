@@ -7,7 +7,7 @@ package com.lsxy.yunhuni.api.consume.enums;
 public enum ConsumeCode {
     duo_call("语音回拔"),
     sys_conf("语音会议"),
-    ivr_call("语音IVR"),
+    ivr_call("自定义IVR"),
     captcha_call("语音验证码"),
     notify_call("语音通知"),
     rent_number("号码租用");
