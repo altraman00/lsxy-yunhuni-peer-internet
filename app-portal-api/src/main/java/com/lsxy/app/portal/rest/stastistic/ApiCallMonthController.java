@@ -19,7 +19,7 @@ import java.util.List;
  * 消费日统计
  * Created by zhangxb on 2016/7/6.
  */
-@RequestMapping("/rest/api_call_day")
+@RequestMapping("/rest/api_call_month")
 @RestController
 public class ApiCallMonthController extends AbstractRestController {
     @Autowired
