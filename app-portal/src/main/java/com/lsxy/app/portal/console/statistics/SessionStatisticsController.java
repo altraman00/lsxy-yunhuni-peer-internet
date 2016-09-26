@@ -43,16 +43,6 @@ public class SessionStatisticsController extends AbstractPortalController {
         mav.setViewName("/console/statistics/session/index");
         return mav;
     }
-    /**
-     * 获取租户下的全部应用
-     * @param request
-     * @return
-     */
-    private RestResponse getAppList(HttpServletRequest request){
-        String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/list";
-        return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
-    }
 
     /**
      * 异步获取图表显示信息
