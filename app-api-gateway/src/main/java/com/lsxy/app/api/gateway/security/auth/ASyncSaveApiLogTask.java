@@ -39,12 +39,27 @@ public class ASyncSaveApiLogTask {
         log.setCertid(certId);
         log.setTenantId(tenantId);
         //TODO 设置api调用类型
-        log.setType(uri);
+        String[] split = uri.split("/");
+        String type;
+        if(split.length > 5){
+            type = "/" + split[4] + "/" +split[5];
+        }else{
+            type = uri;
+        }
+        log.setType(type);
         apiInvokeLogService.save(log);
 
         if(logger.isDebugEnabled()) {
             logger.debug("调用日志异步入库中完成:{}",log);
         }
+    }
+
+    public static void main(String[] args) {
+        String uri = "/v1/account/da7ac16cba78993fd942d3ef2beb8549/call/verify_call";
+        String[] split = uri.split("/");
+        String type = "/" + split[4] + "/" +split[5];
+        System.out.println(split.length);
+        System.out.println(type);
     }
 
 }
