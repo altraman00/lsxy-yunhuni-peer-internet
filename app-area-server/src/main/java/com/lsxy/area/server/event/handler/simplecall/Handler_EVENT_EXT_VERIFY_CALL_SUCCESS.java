@@ -97,7 +97,7 @@ public class Handler_EVENT_EXT_VERIFY_CALL_SUCCESS extends EventHandler {
         captchaCall.setHangupSide(null);
         captchaCall.setResId(res_id);
         captchaCallService.save(captchaCall);
-
+        
         state.setResId(res_id);
         busniessData.put("sessionid",callSession.getId());
         businessStateService.save(state);

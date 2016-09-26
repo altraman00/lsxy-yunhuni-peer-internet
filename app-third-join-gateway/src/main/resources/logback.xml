@@ -2,6 +2,7 @@
 <configuration debug="false">
     <contextName>app-third-join-gateway</contextName>
     <property name="APP_NAME" value="app-third-join-gateway" />
+    <property name="systemId" value="third.join.gateway" />
     <include resource="logback-yunhuni.xml"/>
 
 </configuration>

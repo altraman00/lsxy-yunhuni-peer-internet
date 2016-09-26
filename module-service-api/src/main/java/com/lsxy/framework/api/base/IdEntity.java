@@ -4,13 +4,12 @@ package com.lsxy.framework.api.base;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -64,7 +63,7 @@ public abstract class IdEntity implements Serializable{
 //	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	//@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "com.lsxy.framework.api.base.CustomUUIDGenerator")
 	public String getId() {
 		return id;
 	}
