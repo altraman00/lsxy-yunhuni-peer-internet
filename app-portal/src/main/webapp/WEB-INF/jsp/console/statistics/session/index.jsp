@@ -193,8 +193,8 @@
             xdAll2 = eval('('+xdAll2+')');
 //            xdAll2 = JSON.stringify(resultData[0]);
 //            xdAll2 = eval('('+xdAll2+')');
-            charts(xdAll2,ydAll,resultData[2].max(),resultData[1].max(),type);
-            charts2(xdAll,resultData[0].max(),type);
+            charts(xdAll,xdAll2,resultData[0].max(),resultData[2].max(),type);
+            charts2(ydAll,resultData[1].max(),type);
         });
     }
 
