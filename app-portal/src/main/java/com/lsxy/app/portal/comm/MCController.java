@@ -26,6 +26,10 @@ public class MCController {
 
     @Autowired
     RedisCacheService redisCacheService;
+
+    //暗码,配置成为生产环境为空的状态
+    @Autowired(required = false)
+    private String hideCode;
     /**
      * 发送手机验证码
      */
@@ -98,6 +102,17 @@ public class MCController {
         Map<String,Object> result = new HashMap<>();
         //检查手机验证码
         if(StringUtils.isNotBlank(mc) && StringUtils.isNotBlank(mobile)){
+            //暗码校验，非生产环境可用start-↓↓↓↓↓↓↓↓--->
+            if(StringUtils.isNotBlank(hideCode)){
+                if(mc.equals(hideCode)){
+                    MobileCodeChecker checker = new MobileCodeChecker(mobile,true);
+                    MobileCodeUtils.setMobileCodeChecker(request,checker);
+                    result.put("flag",true);
+                    result.put("msg","验证通过");
+                    return RestResponse.success(result);
+                }
+            }
+            //暗码校验，非生产环境可用end-↑↑↑↑↑↑↑↑↑--->
             String s = checkMobileCode(mobile, mc);
             if("1".equals(s)){
                 MobileCodeChecker checker = new MobileCodeChecker(mobile,true);

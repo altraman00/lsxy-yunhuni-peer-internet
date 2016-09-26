@@ -5,6 +5,6 @@
     <include resource="logback-yunhuni.xml"/>
 
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
-
+    <!--<logger name="org.springframework" level="DEBUG" additivity="true" />-->
 
 </configuration>
