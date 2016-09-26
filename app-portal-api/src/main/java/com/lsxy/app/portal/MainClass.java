@@ -9,6 +9,7 @@ import com.lsxy.framework.sms.FrameworkSmsConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
+import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -23,6 +24,10 @@ import org.springframework.context.annotation.Import;
 public class MainClass extends AbstractSpringBootWebStarter {
 
     public static final String systemId = "portal.api";
+
+    static {
+        System.setProperty("systemId",systemId);
+    }
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MainClass.class, args);
