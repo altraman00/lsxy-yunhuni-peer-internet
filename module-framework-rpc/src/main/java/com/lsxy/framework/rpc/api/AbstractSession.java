@@ -41,13 +41,6 @@ public abstract class AbstractSession implements Session {
     @Override
     public void write(RPCMessage object) throws SessionWriteException {
         if (this.isValid()) {
-            if (logger.isDebugEnabled()) {
-                //心跳检测日志过于频繁,通过配置开关进行关闭
-                if(object instanceof RPCRequest && ((RPCRequest)object).getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO) && SystemConfig.getProperty("area.agent.log.show.heartbeat").equals("false") ){
-                }else{
-                    logger.debug("[{}]>>{}", this.getId(), object);
-                }
-            }
             concreteWrite(object);
         } else {
             logger.error("通道无效,无法写入对象,该对象将会进入FIX队列:{}", object);

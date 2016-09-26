@@ -8,7 +8,6 @@ import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
-import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
