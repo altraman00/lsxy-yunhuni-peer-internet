@@ -136,7 +136,7 @@ public class CallController extends AbstractAPIController{
             }
         }
         //播放内容不能为空
-        if(StringUtil.isBlank(dto.getPlay_file()) || dto.getPlay_content() == null || dto.getPlay_content().size() == 0 ){
+        if(StringUtil.isBlank(dto.getPlay_file()) && (dto.getPlay_content() == null || dto.getPlay_content().size() == 0 )){
             throw new RequestIllegalArgumentException();
         }
 
