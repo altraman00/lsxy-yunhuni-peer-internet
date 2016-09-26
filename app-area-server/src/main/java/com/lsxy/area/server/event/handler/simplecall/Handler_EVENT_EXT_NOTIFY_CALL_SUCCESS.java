@@ -36,7 +36,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
     CallSessionService callSessionService;
     @Override
     public String getEventName() {
-        return Constants.EVENT_EXT_DUO_CALLBACK_SUCCESS;
+        return Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS;
     }
 
     @Override
