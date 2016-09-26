@@ -54,12 +54,4 @@ public class ASyncSaveApiLogTask {
         }
     }
 
-    public static void main(String[] args) {
-        String uri = "/v1/account/da7ac16cba78993fd942d3ef2beb8549/call/verify_call";
-        String[] split = uri.split("/");
-        String type = "/" + split[4] + "/" +split[5];
-        System.out.println(split.length);
-        System.out.println(type);
-    }
-
 }
