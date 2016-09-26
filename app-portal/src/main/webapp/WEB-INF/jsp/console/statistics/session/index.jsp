@@ -41,11 +41,6 @@
                                         <input type="radio" name="stime" value="year" class="selectdata ml-15" />月统计
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 text-center">
-                                        <p class="font18">/消费额统计</p>
-                                    </div>
-                                </div>
 
                                 <!--日统计-->
                                 <div class="row monthform" >
@@ -65,11 +60,20 @@
                                         <span class="tips-error yeartips"></span>
                                     </div>
                                 </div>
-
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <p class="font18">话务量/消费额统计</p>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12 scanvas" >
                                         <!--统计列表-->
                                         <div class="ecpanel" id="ecpanel" style=" height: 600px;  "></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <p class="font18">会话量统计</p>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -184,8 +188,10 @@
             xdAll = eval('('+xdAll+')');
             ydAll = JSON.stringify(resultData[1]);
             ydAll = eval('('+ydAll+')');
+//            xdAll2 = JSON.stringify(resultData[0]);
+//            xdAll2 = eval('('+xdAll2+')');
             charts(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
-            charts2(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
+            charts2(xdAll,resultData[0].max(),type);
         });
     }
 
@@ -349,7 +355,10 @@
      * @param tdata 标题项
      * @param tdata 标题项
      */
-    function charts2(xd,yd,xdMax,xyMax,type){
+    function charts2(xd2,xyMax2,type){
+        console.info(xd2)
+        console.info(xyMax2)
+        console.info(type)
 //        var type = $('input[name="stime"]:checked').val();
         var Xdata = monthData;
         var Ydata = monthData;
@@ -365,7 +374,7 @@
 //            var yd = meetDataMonth();
 //        }
 
-        var myChart = echarts.init(document.getElementById('ecpane2'),'wonderland');
+        var myChart2 = echarts.init(document.getElementById('ecpane2'),'wonderland');
         option = {
             title: {
                 text: '',
@@ -404,7 +413,7 @@
                     type: 'value',
                     scale: true,
                     name: '会话(次)',
-                    max: xyMax,
+                    max: xyMax2,
                     min: 0,
                     boundaryGap: [0.2, 0.2],
                     nameGap:32,
@@ -417,12 +426,13 @@
                 {
                     name:'会话数',
                     type:'line',
-                    data:yd
+                    data:xd2
                 }
             ]
         };
 
-        myChart.setOption(option);
+        myChart2.setOption(option);
+        console.info(10000)
     }
 
 
