@@ -1,5 +1,6 @@
 package com.lsxy.framework.rpc.api;
 
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import org.slf4j.Logger;
@@ -41,13 +42,15 @@ public abstract class AbstractSession implements Session {
     public void write(RPCMessage object) throws SessionWriteException {
         if (this.isValid()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("[{}]>>{}", this.getId(), object);
+                //心跳检测日志过于频繁,通过配置开关进行关闭
+                if(object instanceof RPCRequest && ((RPCRequest)object).getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO) && SystemConfig.getProperty("area.agent.log.show.heartbeat").equals("false") ){
+                }else{
+                    logger.debug("[{}]>>{}", this.getId(), object);
+                }
             }
             concreteWrite(object);
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("channel is not writable or invalid , fix object {}", object);
-            }
+            logger.error("通道无效,无法写入对象,该对象将会进入FIX队列:{}", object);
             throw new SessionWriteException("通道无效,无法写入对象");
         }
     }
