@@ -41,7 +41,7 @@ public class ConfController extends AbstractAPIController{
     }
 
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/dismiss",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/dismiss/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse dismiss(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                                @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
@@ -52,7 +52,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/invite_call",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/invite_call/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse invite(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                                 @RequestHeader(value = "AppID") String appId,
                                 @Valid @RequestBody ConfInviteCallInputDTO dto) throws YunhuniApiException {
@@ -68,7 +68,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/join",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/join/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse join(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                                    @RequestHeader(value = "AppID") String appId,
                                    @Valid @RequestBody ConfJoinInputDTO dto) throws YunhuniApiException {
@@ -80,7 +80,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/quit",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/quit/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse quit(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId,
                              @Valid @RequestBody ConfQuitInputDTO dto) throws YunhuniApiException {
@@ -92,7 +92,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/start_play",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/start_play/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse play(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId,
                              @Valid @RequestBody ConfPlayInputDTO dto) throws YunhuniApiException {
@@ -104,7 +104,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/stop_play",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/stop_play/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse stopPlay(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
@@ -115,7 +115,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/start_record",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/start_record/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse record(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId,
                              @Valid @RequestBody ConfRecordInputDTO dto) throws YunhuniApiException {
@@ -127,7 +127,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/stop_record",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/stop_record/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse stopRecord(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                              @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
@@ -138,7 +138,7 @@ public class ConfController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/conf/{id}/set_voice_mode",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/conf/set_voice_mode/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse setVoiceMode(HttpServletRequest request, @PathVariable String accountId,@PathVariable String id,
                                    @RequestHeader(value = "AppID") String appId,
                                    @Valid @RequestBody ConfSetVoiceModeInputDTO dto) throws YunhuniApiException {
