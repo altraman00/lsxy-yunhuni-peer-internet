@@ -127,9 +127,9 @@
                                                     <c:if test="${apply.type == 2}">
                                                         企业增值税普通发票
                                                     </c:if>
-                                                    <c:if test="${apply.type == 3}">
-                                                        企业增值税专用发票
-                                                    </c:if>
+                                                    <%--<c:if test="${apply.type == 3}">--%>
+                                                        <%--企业增值税专用发票--%>
+                                                    <%--</c:if>--%>
                                                 </lable>
                                             </div>
 

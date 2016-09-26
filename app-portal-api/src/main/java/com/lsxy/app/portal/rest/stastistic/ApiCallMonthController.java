@@ -3,9 +3,7 @@ package com.lsxy.app.portal.rest.stastistic;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yunhuni.api.statistics.model.ApiCallDay;
 import com.lsxy.yunhuni.api.statistics.model.ApiCallMonth;
-import com.lsxy.yunhuni.api.statistics.service.ApiCallDayService;
 import com.lsxy.yunhuni.api.statistics.service.ApiCallMonthService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 消费日统计
+ * api月统计
  * Created by zhangxb on 2016/7/6.
  */
 @RequestMapping("/rest/api_call_month")
@@ -35,11 +33,11 @@ public class ApiCallMonthController extends AbstractRestController {
      */
     @RequestMapping("/list")
     public RestResponse list(String tenantId, String appId, String type, String startTime, String endTime ){
-        Date date1 = DateUtils.parseDate(startTime,"yyyy-MM");
-        if(StringUtils.isEmpty(endTime)){
+        Date date1 = DateUtils.parseDate(startTime,"yyyy");
+        if(org.springframework.util.StringUtils.isEmpty(endTime)){
             endTime = startTime;
         }
-        Date date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(endTime,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+        Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         List<ApiCallMonth> list =  apiCallMonthService.list(tenantId,  appId,  type,  date1,  date2 );
         return RestResponse.success(list);
     }

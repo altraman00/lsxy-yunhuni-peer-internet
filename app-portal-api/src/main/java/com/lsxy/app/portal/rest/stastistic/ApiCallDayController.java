@@ -1,16 +1,10 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.api.tenant.model.Account;
-import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.statistics.model.ApiCallDay;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
 import com.lsxy.yunhuni.api.statistics.service.ApiCallDayService;
-import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 消费日统计
+ * api日统计
  * Created by zhangxb on 2016/7/6.
  */
 @RequestMapping("/rest/api_call_day")
