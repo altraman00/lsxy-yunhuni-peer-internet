@@ -37,23 +37,21 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     }
 
     @Override
-    public Page<Consume> pageList(String userName,Integer pageNo, Integer pageSize,String startTime,String endTime) {
+    public Page<Consume> pageList(String userName,Integer pageNo, Integer pageSize,String startTime,String endTime,String appId) {
         Date startDate = null;
         Date endDate = null;
         if(StringUtils.isNotBlank(startTime)){
-            startDate = DateUtils.parseDate(startTime, "yyyy-MM");
+            startDate = DateUtils.parseDate(startTime+"-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
         }
         if(StringUtils.isNotBlank(endTime)){
-            endDate = DateUtils.parseDate(endTime, "yyyy-MM");
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(endDate);
-            //当前月＋1，即下个月
-            cal.add(Calendar.MONTH,1);
-            endDate = cal.getTime();
+            endDate = DateUtils.getLastTimeOfMonth(DateUtils.parseDate(endTime,"yyyy-MM"));
         }
-
+        String tmepAppId = "";
+        if(StringUtils.isNotEmpty(appId)){
+            tmepAppId += " and  obj.appId ='"+appId+"'";
+        }
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<?2 and obj.dt>=?3 ORDER BY obj.dt";
+        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<?2 and obj.dt>=?3 "+tmepAppId+" ORDER BY obj.dt";
         Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endDate,startDate);
         return page;
     }

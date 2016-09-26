@@ -90,6 +90,14 @@
                         </div>
                         <form:form role="form" action="${ctx}/console/cost/consume" method="post" id="mainForm">
                         <section class="scrollable wrapper w-f">
+                            <section class="panel panel-default pos-rlt clearfix ">
+                                <ul id="myTab" class="nav nav-tabs">
+                                    <li <c:if test="${appId==null||appId==''}">class="active"</c:if> ><a  data-toggle="tab" data-app="-1">全部应用</a></li>
+                                    <c:forEach items="${appList}" var="app">
+                                        <li <c:if test="${appId==app.id}">class="active"</c:if> ><a  data-toggle="tab" data-app="${app.id}">${app.name}</a></li>
+                                    </c:forEach>
+                                </ul>
+                            </section>
                             <section class="panel panel-default yunhuni-personal">
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-12 padder-v fix-padding">
@@ -102,6 +110,7 @@
                                                     <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" readonly="readonly"/>
                                                     到
                                                     <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" readonly="readonly"/>
+                                                    <input type="text" name="appId" id="appId" value="${appId}" hidden>
                                                     <button class="btn btn-primary query" type="button" id="findform" >查询</button>
                                                     <span class="tips-error" ></span>
                                                 </div>
@@ -136,7 +145,7 @@
                                 </table>
                             </section>
                             <c:set var="pageUrl" value="${ctx}/console/cost/consume"></c:set>
-                            <c:set var="extraParam" value="&startTime=${startTime}&endTime=${endTime}"></c:set>
+                            <c:set var="extraParam" value="&appId=${appId}&startTime=${startTime}&endTime=${endTime}"></c:set>
                             <%@include file="/inc/pagefooter.jsp" %>
                         </section>
                     </section>
@@ -152,6 +161,15 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/cost/history.js'> </script>
 <script type="text/javascript">
+    //应用
+    $('#myTab li a').click(function(){
+        var app = $(this).attr('data-app');
+        if(app==-1){
+            app=null;
+        }
+        $('#appId').val(app);
+        $('#mainForm').submit();
+    });
     function compareTime(starttime,endtime){
         if(!starttime){
             return '请填写开始时间';
