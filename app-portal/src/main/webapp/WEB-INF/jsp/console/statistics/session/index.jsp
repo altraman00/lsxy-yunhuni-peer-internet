@@ -170,6 +170,7 @@
      * endtime 对比时间
      */
     var xdAll="";
+    var xdAll2="";
     var ydAll="";
     function initchart(){
         var type = $('input[name="stime"]:checked').val();
@@ -188,9 +189,11 @@
             xdAll = eval('('+xdAll+')');
             ydAll = JSON.stringify(resultData[1]);
             ydAll = eval('('+ydAll+')');
+            xdAll2 = JSON.stringify(resultData[2]);
+            xdAll2 = eval('('+xdAll2+')');
 //            xdAll2 = JSON.stringify(resultData[0]);
 //            xdAll2 = eval('('+xdAll2+')');
-            charts(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
+            charts(xdAll2,ydAll,resultData[2].max(),resultData[1].max(),type);
             charts2(xdAll,resultData[0].max(),type);
         });
     }
