@@ -79,10 +79,10 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.debug("用户回调结束事件");
         }
+        Long begin_time = null;
+        Long end_time = null;
+        Long answer_time = null;
         if(StringUtils.isNotBlank(callBackUrl)){
-            Long begin_time = null;
-            Long end_time = null;
-            Long answer_time = null;
             if(paramMap.get("begin_time") != null){
                 begin_time = ((long)paramMap.get("begin_time")) * 1000;
             }
@@ -121,7 +121,10 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
         CaptchaCall captchaCall = captchaCallService.findById(call_id);
         if(captchaCall!=null){
             captchaCall.setHangupSide((String)paramMap.get("dropped_by"));
-            captchaCall.setEndTime(new Date());
+            captchaCall.setEndTime(end_time!=null?new Date(end_time):new Date());
+            if(answer_time != null){
+                captchaCall.setAnswerTime(new Date(answer_time));
+            }
             captchaCallService.save(captchaCall);
         }
         return res;
