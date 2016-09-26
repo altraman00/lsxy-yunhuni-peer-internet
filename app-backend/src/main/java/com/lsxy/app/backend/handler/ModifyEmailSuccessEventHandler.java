@@ -48,6 +48,7 @@ public class ModifyEmailSuccessEventHandler implements MQMessageHandler<ModifyEm
             params.put("id",account.getId());
             params.put("code",uuid);
             params.put("date", DateUtils.getDate("yyyy年MM月dd日 HH:mm"));
+            params.put("globalOfficialWebsiteUrl", SystemConfig.getProperty("global.official.website.url"));
             mailService.send("重置邮箱",message.getEmail(),"03-portal-notify-modify-email.vm",params);
             //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
             String testEmail = SystemConfig.getProperty("global.mail.tester.email");
