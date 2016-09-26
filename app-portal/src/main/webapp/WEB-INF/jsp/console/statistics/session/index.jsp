@@ -193,8 +193,8 @@
             xdAll2 = eval('('+xdAll2+')');
 //            xdAll2 = JSON.stringify(resultData[0]);
 //            xdAll2 = eval('('+xdAll2+')');
-            charts(xdAll,xdAll2,resultData[0].max(),resultData[2].max(),type);
-            charts2(ydAll,resultData[1].max(),type);
+            charts(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
+            charts2(ydAll2,resultData[2].max(),type);
         });
     }
 
@@ -311,7 +311,7 @@
                 {
                     type: 'value',
                     scale: true,
-                    name: '会话(次)',
+                    name: '话务量(分钟)',
                     max: xyMax,
                     min: 0,
                     boundaryGap: [0.2, 0.2],
@@ -387,7 +387,7 @@
                 trigger: 'axis'
             },
             legend: {
-                data:['会话数']
+                data:['会话量']
             },
             toolbox: {
                 show: true,
@@ -415,7 +415,7 @@
                 {
                     type: 'value',
                     scale: true,
-                    name: '会话(次)',
+                    name: '会话量(次)',
                     max: xyMax2,
                     min: 0,
                     boundaryGap: [0.2, 0.2],
@@ -427,7 +427,7 @@
             ],
             series: [
                 {
-                    name:'会话数',
+                    name:'会话量',
                     type:'line',
                     data:xd2
                 }

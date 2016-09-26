@@ -58,14 +58,13 @@ public class SessionStatisticsController extends AbstractPortalController {
         List list = new ArrayList();
         List tempConsumeList = getConsumeList(request,type,appId,startTime);
         List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
-        List tempApiCallList = getApiCallList(request,type,appId,startTime);
         Object date = 12;
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
             date = DateUtils.parseDate(startTime,"yyyy-MM");
         }
-        list.add(getArrays(tempConsumeList,date));
-        list.add(getArrays(tempVoiceCdrList,date));
-        list.add(getArrays(tempApiCallList,date));
+        list.add(getArrays(tempConsumeList,date,""));
+        list.add(getArrays(tempVoiceCdrList,date,"amongCostTime"));
+        list.add(getArrays(tempVoiceCdrList,date,"amongCall"));
         return RestResponse.success(list);
     }
     /**
@@ -139,7 +138,7 @@ public class SessionStatisticsController extends AbstractPortalController {
      * @param list 待处理的list
      * @return
      */
-    private Object[] getArrays(List list,Object date) {
+    private Object[] getArrays(List list,Object date,String type) {
         int leng = getLong(date);
         Object[] list1 = new Object[leng];
         for(int j=0;j<leng;j++){
@@ -150,11 +149,19 @@ public class SessionStatisticsController extends AbstractPortalController {
             if(obj instanceof ConsumeMonth){
                 list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof VoiceCdrMonth){
-                list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
+                }
             }else if(obj instanceof ConsumeDay){
                 list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof VoiceCdrDay){
-                list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
+                }
             }else if(obj instanceof ApiCallDay){
                 list1[((ApiCallDay)obj).getDay()-1]=((ApiCallDay)obj).getAmongApi();
             }else if(obj instanceof ApiCallMonth){
