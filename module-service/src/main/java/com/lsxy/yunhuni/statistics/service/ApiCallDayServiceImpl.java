@@ -51,7 +51,7 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
         Timestamp sqlDate3 = new Timestamp(date3.getTime());
         //sql对于参数
         Object[] obj = new Object[]{
-                new Timestamp(date2.getTime()),day2,
+                sqlDate1,day1,
                 initDate,initDate,0,times,0,
                 sqlDate1,sqlDate3
         };
