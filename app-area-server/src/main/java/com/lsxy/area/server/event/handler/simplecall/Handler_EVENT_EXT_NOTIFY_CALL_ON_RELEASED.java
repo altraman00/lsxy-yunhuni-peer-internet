@@ -167,6 +167,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             notifyCall.setStartTime(beginTime);
             notifyCall.setAnswerTime(answerTime);
             notifyCall.setEndTime(endTime);
+            notifyCall.setHangupSide((String) paramMap.get("dropped_by"));
             notifyCallService.save(notifyCall);
         }
         //处理会话表数据
