@@ -568,9 +568,11 @@ public class CallServiceImpl implements CallService {
             playFile.add("");
             dtos.add(0,playFile);
         }
-        for(List<Object> play:dtos){
-            if(play.get(1).equals(0)){
-                play.set(0,playFileUtil.convertArray(tenantId, appId, (String) play.get(0)));
+        if(dtos != null){
+            for(List<Object> play:dtos){
+                if(play.get(1).equals(0)){
+                    play.set(0,playFileUtil.convertArray(tenantId, appId, (String) play.get(0)));
+                }
             }
         }
         return JSONUtil.objectToJson(dtos);
