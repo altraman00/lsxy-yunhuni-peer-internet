@@ -2,6 +2,7 @@
 <configuration debug="false">
     <contextName>yunhuni-app-portal-api</contextName>
     <property name="APP_NAME" value="app-portal-api" />
+    <property name="systemId" value="app.portal.api" />
     <include resource="logback-yunhuni.xml"/>
-    <logger name="com.lsxy" level="DEBUG" additivity="true" />
+
 </configuration>

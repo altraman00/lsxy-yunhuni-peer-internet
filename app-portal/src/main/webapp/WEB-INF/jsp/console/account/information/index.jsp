@@ -64,7 +64,7 @@
                                     <form:form role="form" action="" method="post" class="register-form"
                                           id="personalAuthForm">
                                         <input type="hidden" name="id" value="${account.id}"/>
-                                        <p class="noticeInfo hr text-success"><strong>请完善以下信息，方便我们更好的为您服务</strong> </p>
+                                        <p class="noticeInfo hr text-success"><strong>请完善以下信息，方便我们更好地为您服务</strong> </p>
                                         <div class="form-group">
                                             <span class="hr text-label" ><strong>业务信息</strong></span>
                                         </div>

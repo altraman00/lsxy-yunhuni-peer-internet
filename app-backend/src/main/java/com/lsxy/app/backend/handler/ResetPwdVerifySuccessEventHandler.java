@@ -53,6 +53,7 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
             params.put("key",key);
             params.put("code",code);
             params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
+            params.put("globalOfficialWebsiteUrl", SystemConfig.getProperty("global.official.website.url"));
             //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
             String testEmail = SystemConfig.getProperty("global.mail.tester.email");
             if(StringUtils.isNotBlank(testEmail)){

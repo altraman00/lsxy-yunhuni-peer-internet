@@ -7,6 +7,7 @@ import com.lsxy.framework.core.security.SecurityUser;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.app.model.App;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,16 @@ public abstract class AbstractPortalController {
         Account account = restResponse.getData();
         return account;
     }
-
+    /**
+     * 获取租户下的全部应用
+     * @param request
+     * @return
+     */
+    public RestResponse getAppList(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list";
+        return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
+    }
     /**
      * 获取当前用户（SecurityUser）
      * @param request
