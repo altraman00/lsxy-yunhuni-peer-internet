@@ -58,7 +58,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     @Caching(
             evict = {
                     @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true),
-                    @CacheEvict(value="entity",key="'entity_'+#entity.app.id+'_'+#entity.name", beforeInvocation = true)
+                    @CacheEvict(value="playfile",key="'playfile_'+#entity.app.id+'_'+#entity.name", beforeInvocation = true)
             }
     )
     public void delete(VoiceFilePlay entity) throws IllegalAccessException, InvocationTargetException {
@@ -130,12 +130,12 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     }
 
     @Override
-    @Cacheable(value="entity",key="'entity_'+#appId+'_'+#name",unless = "#result == null")
+    @Cacheable(value="playfile",key="'playfile_'+#appId+'_'+#name",unless = "#result == null")
     public String getVerifiedFile(String appId, String name) {
-        String hql = "from VoiceFilePlay obj where obj.app.id = ?1 and obj.status = ?2 and obj.name= ?3";
+        String hql = "from VoiceFilePlay obj where obj.app.id = ?1 and obj.status = ?2 and obj.name= ?3 and obj.sync = ?4";
         VoiceFilePlay file = null;
         try {
-            file = this.findUnique(hql,appId,1,name);
+            file = this.findUnique(hql,appId,1,name,1);
         } catch (MatchMutiEntitiesException e) {
             logger.error("app放音文件重复",e);
         }
