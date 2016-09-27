@@ -261,8 +261,8 @@
                                                     </div>
                                                     <div class="app-status-left fr">
                                                         <ul class="app-status-list">
-                                                            <li><img src="${resPrefixUrl}/images/index/status_1.png" alt=""> 1小时内呼叫量: <span class="number">${app.callOfHour}</span> </li>
-                                                            <li><img src="${resPrefixUrl}/images/index/status_2.png" alt=""> 1天内呼叫量: <span class="number">${app.callOfDay}</span> </li>
+                                                            <li><img src="${resPrefixUrl}/images/index/status_1.png" alt=""> 前1小时内呼叫量: <span class="number">${app.callOfHour}</span> </li>
+                                                            <li><img src="${resPrefixUrl}/images/index/status_2.png" alt=""> 前1天内呼叫量: <span class="number">${app.callOfDay}</span> </li>
                                                             <li><img src="${resPrefixUrl}/images/index/status_3.png" alt=""> 当前呼叫并发: <span class="number">${app.currentCall}</span> </li>
                                                         </ul>
                                                         <a href="${ctx}/console/app/detail?id=${app.id}" class="fr">详情</a>
