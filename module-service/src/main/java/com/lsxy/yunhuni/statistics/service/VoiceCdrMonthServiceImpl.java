@@ -100,10 +100,24 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
     }
 
     @Override
+    public long getAmongCostTimeByDate(Date d) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongCostTime",null,null,null);
+    }
+
+    @Override
     public long getAmongDurationByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
         return getSumFieldBetween(d1,d2,"amongDuration",tenant,appId,null);
+    }
+
+    @Override
+    public long getAmongCostTimeByDateAndTenant(Date d, String tenant, String appId) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongCostTime",tenant,appId,null);
     }
 
     @Override
@@ -125,6 +139,13 @@ public class VoiceCdrMonthServiceImpl extends AbstractService<VoiceCdrMonth> imp
         Date d1 = DateUtils.getFirstTimeOfMonth(d);
         Date d2 = DateUtils.getLastTimeOfMonth(d);
         return getSumFieldBetween(d1,d2,"amongDuration",null,app,null);
+    }
+
+    @Override
+    public long getAmongCostTimeByDateAndApp(Date d, String app) {
+        Date d1 = DateUtils.getFirstTimeOfMonth(d);
+        Date d2 = DateUtils.getLastTimeOfMonth(d);
+        return getSumFieldBetween(d1,d2,"amongCostTime",null,app,null);
     }
 
     @Override

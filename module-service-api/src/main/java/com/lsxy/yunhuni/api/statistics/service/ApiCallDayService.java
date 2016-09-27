@@ -5,6 +5,7 @@ import com.lsxy.yunhuni.api.statistics.model.ApiCallDay;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * api调用小时统计service
@@ -27,6 +28,17 @@ public interface ApiCallDayService extends BaseService<ApiCallDay> {
      * @return
      */
     public long getInvokeCountByDateAndTenant(Date d, String tenant,String appId);
+
+    /**
+     * 获取用户某时间的列表数据
+     * @param tenantId 对于租户
+     * @param appId 应用id
+     * @param type 消费类型
+     * @param startTime 时间
+     * @param endTime 结束时间
+     * @return
+     */
+    List<ApiCallDay> list(Object tenantId, Object appId,Object type,Date startTime, Date endTime);
 
 }
 

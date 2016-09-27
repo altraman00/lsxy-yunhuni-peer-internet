@@ -53,9 +53,8 @@ public class AreaClient {
 
     @PostConstruct
     public void start() throws ClientBindException {
-        if(logger.isDebugEnabled()){
-            logger.debug("客户端启动:  {}  {}-{}" , serverUrl, areaid,nodeid);
-        }
+        logger.info("客户端启动:  {}  {}-{}" , serverUrl, areaid,nodeid);
+
         client.setServerUrl(serverUrl);
         client.setClientId(areaid,nodeid);
         client.bind();

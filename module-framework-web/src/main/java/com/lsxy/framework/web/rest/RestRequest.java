@@ -117,6 +117,9 @@ public class RestRequest {
     public <T> RestResponse<Page<T>> getPage(String url, Class<T> responseDataType, Object... uriparams) {
         RestResponse<Page> restResponse = get(url, Page.class, uriparams);
         Page<Object> page = restResponse.getData();
+        if(page == null){
+            return restResponse.wrapIndicateTypeRestResponse(null);
+        }
 
         //将对象列表转换为具体对象类型的列表
         List<T> concreteList = convertListToConcretList(page.getResult(),responseDataType);

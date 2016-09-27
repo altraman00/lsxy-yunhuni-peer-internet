@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.statistics.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.yunhuni.api.statistics.model.ApiCallDay;
 import com.lsxy.yunhuni.api.statistics.model.ApiCallMonth;
 import com.lsxy.yunhuni.api.statistics.service.ApiCallMonthService;
 import com.lsxy.framework.base.AbstractService;
@@ -82,6 +83,13 @@ public class ApiCallMonthServiceImpl extends AbstractService<ApiCallMonth> imple
             }
         }
         return sum;
+    }
+
+    @Override
+    public List<ApiCallMonth> list(Object tenantId, Object appId, Object type, Date startTime, Date endTime) {
+        String hql = "from ApiCallMonth obj where "+StatisticsUtils.getSqlIsNotNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt";
+        List<ApiCallMonth>  list = this.list(hql,startTime,endTime);
+        return list;
     }
 
 }

@@ -32,15 +32,18 @@ public class ConsumeController extends AbstractPortalController {
      * @return
      */
     @RequestMapping(value = "")
-    public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String startTime, String endTime){
+    public ModelAndView index(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
+                              String appId,String startTime, String endTime){
         if(startTime==null){startTime = DateUtils.formatDate(new Date(),"yyyy-MM");}
         if(endTime==null){endTime = DateUtils.formatDate(new Date(),"yyyy-MM");}
-        RestResponse<Page<Consume>> restResponse = getPageList(request,pageNo,pageSize,startTime,endTime);
+        RestResponse<Page<Consume>> restResponse = getPageList(request,pageNo,pageSize,startTime,endTime,appId);
         Page<Consume> pageObj = restResponse.getData();
         ModelAndView mav = new ModelAndView();
+        mav.addObject("appList",getAppList(request).getData());
         mav.addObject("pageObj",pageObj);
         mav.addObject("startTime",startTime);
         mav.addObject("endTime",endTime);
+        mav.addObject("appId",appId);
         mav.setViewName("/console/cost/consume/index");
         return mav;
     }
@@ -51,9 +54,9 @@ public class ConsumeController extends AbstractPortalController {
      * @param pageSize 一页多少数据
      * @return
      */
-    private RestResponse getPageList(HttpServletRequest request, Integer pageNo, Integer pageSize,String startTime,String endTime){
+    private RestResponse getPageList(HttpServletRequest request, Integer pageNo, Integer pageSize,String startTime,String endTime,String appId){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/consume/page?pageNo={1}&pageSize={2}&startTime={3}&endTime={4}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri,Consume.class ,pageNo,pageSize,startTime,endTime);
+        String uri = restPrefixUrl + "/rest/consume/page?pageNo={1}&pageSize={2}&startTime={3}&endTime={4}&appId={5}";
+        return RestRequest.buildSecurityRequest(token).getPage(uri,Consume.class ,pageNo,pageSize,startTime,endTime,appId);
     }
 }

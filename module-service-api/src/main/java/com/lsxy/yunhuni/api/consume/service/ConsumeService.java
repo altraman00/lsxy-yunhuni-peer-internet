@@ -20,7 +20,7 @@ public interface ConsumeService extends BaseService<Consume> {
      * @param endTime 结束时间(yyyy-MM)
      * @return
      */
-     Page<Consume> pageList(String userName,Integer pageNo, Integer pageSize,String startTime,String endTime);
+    Page<Consume> pageList(String userName,Integer pageNo, Integer pageSize,String startTime,String endTime,String appId);
     /**
      * 获取用户区间内的分页数据
      * @param tenantId 用户名

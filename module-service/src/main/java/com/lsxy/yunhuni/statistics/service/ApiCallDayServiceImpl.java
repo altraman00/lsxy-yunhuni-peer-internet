@@ -81,4 +81,11 @@ public class ApiCallDayServiceImpl extends AbstractService<ApiCallDay> implement
         return sum;
     }
 
+    @Override
+    public List<ApiCallDay> list(Object tenantId, Object appId, Object type, Date startTime, Date endTime) {
+        String hql = "from ApiCallDay obj where "+StatisticsUtils.getSqlIsNotNull(tenantId,appId, type)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.dt";
+        List<ApiCallDay>  list = this.list(hql,startTime,endTime);
+        return list;
+    }
+
 }

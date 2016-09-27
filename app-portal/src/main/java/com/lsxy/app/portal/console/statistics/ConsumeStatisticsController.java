@@ -44,16 +44,7 @@ public class ConsumeStatisticsController extends AbstractPortalController {
         return mav;
     }
 
-    /**
-     * 获取租户下的全部应用
-     * @param request
-     * @return
-     */
-    private RestResponse getAppList(HttpServletRequest request){
-        String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/list";
-        return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
-    }
+
 
     /**
      * 异步分页信息
