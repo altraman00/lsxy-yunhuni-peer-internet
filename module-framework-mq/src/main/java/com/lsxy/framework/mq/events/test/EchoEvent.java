@@ -8,9 +8,20 @@ import com.lsxy.framework.mq.topic.MQTopicConstants;
  * 测试使用
  */
 public class EchoEvent extends AbstractMQEvent {
-    private int id;
-    public EchoEvent(int id){
-        this.id = id;
+    private int echoId;
+
+    public EchoEvent(){}
+
+    public int getEchoId() {
+        return echoId;
+    }
+
+    public void setEchoId(int echoId) {
+        this.echoId = echoId;
+    }
+
+    public EchoEvent(int echoId){
+        this.echoId = echoId;
     }
     @Override
     public String getTopicName() {
