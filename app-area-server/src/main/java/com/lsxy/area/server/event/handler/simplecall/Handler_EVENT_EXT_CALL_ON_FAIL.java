@@ -10,10 +10,8 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
-import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.session.model.CallSession;
-import com.lsxy.yunhuni.api.session.model.VoiceCallback;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -127,10 +125,7 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
 
         if(logger.isDebugEnabled()){
-            logger.debug("双向回拔结束事件");
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("处理{}事件完成",getEventName());
+            logger.debug("处理{}事件完成",event);
         }
         return res;
     }
