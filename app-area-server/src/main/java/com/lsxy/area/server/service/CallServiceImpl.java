@@ -97,7 +97,7 @@ public class CallServiceImpl implements CallService {
     private boolean isEnableDuoCallService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1){
+            if(serviceSwitch != null && (serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1)){
                 return false;
             }
             App app = appService.findById(appId);
@@ -114,7 +114,7 @@ public class CallServiceImpl implements CallService {
     private boolean isEnableVoiceCallbackService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1){
+            if(serviceSwitch !=null && (serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1)){
                 return false;
             }
             App app = appService.findById(appId);
@@ -132,7 +132,7 @@ public class CallServiceImpl implements CallService {
     private boolean isEnableVoiceValidateService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch.getIsVoiceValidate() == null || serviceSwitch.getIsVoiceValidate() != 1){
+            if(serviceSwitch != null && (serviceSwitch.getIsVoiceValidate() == null || serviceSwitch.getIsVoiceValidate() != 1)){
                 return false;
             }
             App app = appService.findById(appId);
@@ -390,6 +390,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Deprecated
     public String captchaCall(String ip, String appId, String from,String to,String verify_code,
                               String max_dial_duration,String max_keys,List<String> files,String user_data) throws YunhuniApiException{
         if(apiGwRedBlankNumService.isRedNum(to)){

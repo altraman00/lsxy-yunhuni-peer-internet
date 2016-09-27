@@ -98,7 +98,9 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
         captchaCall.setHangupSide(null);
         captchaCall.setResId(res_id);
         captchaCallService.save(captchaCall);
-
+        if(logger.isDebugEnabled()){
+            logger.debug("语言验证码id:{}======={}",call_id,captchaCall.getId());
+        }
         state.setResId(res_id);
         busniessData.put("sessionid",callSession.getId());
         businessStateService.save(state);

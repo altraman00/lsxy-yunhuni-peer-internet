@@ -42,6 +42,12 @@ public class Handler_EVENT_SYS_CALL_CONNECT_ON_START extends EventHandler {
         return Constants.EVENT_SYS_CALL_CONNECT_ON_START;
     }
 
+    /**
+     * 处理调用双通道连接 成功事件
+     * @param request
+     * @param session
+     * @return
+     */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         if(logger.isDebugEnabled()){

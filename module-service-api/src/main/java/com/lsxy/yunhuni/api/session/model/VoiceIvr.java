@@ -25,7 +25,6 @@ public class VoiceIvr extends IdEntity {
     private Integer ivrType;
     private String hangupSide;
 
-
     @Column(name = "start_num")
     public Date getStartTime() {
         return startTime;

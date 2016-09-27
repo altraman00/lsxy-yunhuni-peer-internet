@@ -50,6 +50,7 @@ import java.util.concurrent.Future;
 
 /**
  * Created by liuws on 2016/9/1.
+ * 解析IVR 动作指令 调用不同的处理器
  */
 @Component
 public class IVRActionService {

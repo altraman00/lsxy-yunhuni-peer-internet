@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * 放音文件转换成cti 路径
  * Created by liuws on 2016/9/10.
  */
 @Component
@@ -88,7 +89,7 @@ public class PlayFileUtil {
     }
 
     private String convert(String tenantId,String appId,String olefile,String newfile){
-        String fix = olefile.substring(olefile.lastIndexOf("."));
-        return String.format(FORMAT,tenantId,appId,newfile,fix);
+        String sufix = olefile.substring(olefile.lastIndexOf(".") + 1);
+        return String.format(FORMAT,tenantId,appId,newfile,sufix);
     }
 }
