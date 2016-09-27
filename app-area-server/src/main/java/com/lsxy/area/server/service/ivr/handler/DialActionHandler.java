@@ -2,11 +2,10 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -15,11 +14,16 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +57,12 @@ public class DialActionHandler extends ActionHandler{
 
     @Autowired
     private IVRActionService ivrActionService;
+
+    @Autowired
+    private VoiceIvrService voiceIvrService;
+
+    @Autowired
+    private CallSessionService callSessionService;
 
     @Override
     public String getAction() {
@@ -119,7 +129,6 @@ public class DialActionHandler extends ActionHandler{
     }
 
     public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
-        String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
@@ -159,6 +168,24 @@ public class DialActionHandler extends ActionHandler{
         }catch (Throwable t){
             logger.error("",t);
         }
+
+        VoiceIvr voiceIvr = new VoiceIvr();
+        voiceIvr.setFromNum(oneTelnumber);
+        voiceIvr.setToNum(to);
+        voiceIvr.setStartTime(new Date());
+        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
+        voiceIvr = voiceIvrService.save(voiceIvr);
+        String callId = voiceIvr.getId();
+
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setApp(app);
+        callSession.setTenant(app.getTenant());
+        callSession.setRelevanceId(callId);
+        callSession.setType(CallSession.TYPE_VOICE_IVR);
+        callSession.setResId(null);
+        callSession = callSessionService.save(callSession);
+
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
                 .putIfNotEmpty("from_uri",oneTelnumber)
@@ -197,6 +224,7 @@ public class DialActionHandler extends ActionHandler{
                         .putIfNotEmpty("play_file",play_file)
                         .put("play_repeat",play_repeat,1)
                         .putIfNotEmpty("recording",recording)
+                        .putIfNotEmpty("sessionid",callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);

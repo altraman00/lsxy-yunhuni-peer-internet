@@ -27,9 +27,11 @@ import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.CaptchaCall;
 import com.lsxy.yunhuni.api.session.model.NotifyCall;
 import com.lsxy.yunhuni.api.session.model.VoiceCallback;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.CaptchaCallService;
 import com.lsxy.yunhuni.api.session.service.NotifyCallService;
 import com.lsxy.yunhuni.api.session.service.VoiceCallbackService;
 import org.apache.commons.lang.StringUtils;
@@ -38,10 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by tandy on 16/8/18.
@@ -93,6 +92,9 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
+
+    @Autowired
+    private CaptchaCallService captchaCallService;
 
     private boolean isEnableDuoCallService(String tenantId,String appId){
         try {
@@ -220,8 +222,8 @@ public class CallServiceImpl implements CallService {
         VoiceCallback voiceCallback = new VoiceCallback(from1,from2,to1_uri,to2_uri);
         voiceCallbackService.save(voiceCallback);
         duocCallId = voiceCallback.getId();
-        CallSession callSession = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
-        CallSession callSession2 = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
+        CallSession callSession = new CallSession(CallSession.STATUS_PREPARING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
+        CallSession callSession2 = new CallSession(CallSession.STATUS_PREPARING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
         callSessionService.save(callSession);
         callSessionService.save(callSession2);
 
@@ -348,7 +350,7 @@ public class CallServiceImpl implements CallService {
         NotifyCall notifyCall = new NotifyCall(from,to_uri);
         notifyCallService.save(notifyCall);
         callId = notifyCall.getId();
-        CallSession callSession = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
+        CallSession callSession = new CallSession(CallSession.STATUS_PREPARING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
         callSessionService.save(callSession);
 
         Map<String, Object> params = new HashMap<>();
@@ -494,12 +496,27 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        //TODO 获取线路IP和端口
-        //TODO 待定
-        String callId = UUIDGenerator.uuid();
-        //TODO
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
+        CaptchaCall captchaCall = new CaptchaCall();
+        captchaCall.setStartTime(new Date());
+        captchaCall.setEndTime(null);
+        captchaCall.setFromNum(oneTelnumber);
+        captchaCall.setToNum(to);
+        captchaCall.setHangupSide(null);
+        captchaCall.setResId(null);
+        captchaCall = captchaCallService.save(captchaCall);
+        String callId = captchaCall.getId();
+
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setApp(app);
+        callSession.setTenant(app.getTenant());
+        callSession.setRelevanceId(callId);
+        callSession.setType(CallSession.TYPE_VOICE_VOICECODE);
+        callSession.setResId(null);
+        callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String, Object>()
                 .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
@@ -540,6 +557,7 @@ public class CallServiceImpl implements CallService {
                     .setBusinessData(new MapBuilder<String,Object>()
                             .putIfNotEmpty("from",oneTelnumber)
                             .putIfNotEmpty("to",to)
+                            .putIfNotEmpty("sessionid",callSession.getId())
                             .build())
                     .build();
             businessStateService.save(cache);

@@ -97,12 +97,15 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议创建超时通知给开发者");
         }
+
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .putIfNotEmpty("event","conf.create.timeout")
+                .putIfNotEmpty("event","conf.end")
                 .putIfNotEmpty("id",conf_id)
+                .putIfNotEmpty("error","创建会议失败")
                 .putIfNotEmpty("user_data",user_data)
                 .build();
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+
         if(logger.isDebugEnabled()){
             logger.debug("会议创建超时通知发送成功");
         }
