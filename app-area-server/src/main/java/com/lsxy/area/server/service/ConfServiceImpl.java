@@ -21,6 +21,8 @@ import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.session.model.Meeting;
+import com.lsxy.yunhuni.api.session.service.MeetingService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,9 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
 
+    @Autowired
+    private MeetingService meetingService;
+
     private boolean isEnableConfService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
@@ -128,7 +133,12 @@ public class ConfServiceImpl implements ConfService {
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
-        String confId = UUIDGenerator.uuid();
+        Meeting meeting = new Meeting();
+        meeting.setResId(null);
+        meeting.setStartTime(null);
+        meeting = meetingService.save(meeting);
+        String confId = meeting.getId();
+
         bgmFile = playFileUtil.convert(tenantId,appId,bgmFile);
         Map<String, Object> map = new MapBuilder<String,Object>()
                                 .putIfNotEmpty("user_data",confId)

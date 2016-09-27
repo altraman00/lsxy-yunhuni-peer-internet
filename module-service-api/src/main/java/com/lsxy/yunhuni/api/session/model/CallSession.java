@@ -16,9 +16,10 @@ import javax.persistence.*;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_session")
 
 public class CallSession extends IdEntity {
+    public static final int STATUS_PREPARING = 0;
     public static final int STATUS_CALLING = 1;
     public static final int STATUS_OVER = 2;
-    public static final int STATUS_RINGING = 3;
+    public static final int STATUS_EXCEPTION = 3;
     //TODO 换成与ProductCode枚举关联
     public static final String TYPE_VOICE_NOTIFY = ProductCode.notify_call.name();
     public static final String TYPE_VOICE_CALLBACK = ProductCode.duo_call.name();
