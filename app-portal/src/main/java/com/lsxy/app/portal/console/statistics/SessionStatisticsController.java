@@ -1,10 +1,7 @@
 package com.lsxy.app.portal.console.statistics;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
-import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
-import com.lsxy.yunhuni.api.statistics.model.VoiceCdrMonth;
+import com.lsxy.yunhuni.api.statistics.model.*;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -46,16 +43,6 @@ public class SessionStatisticsController extends AbstractPortalController {
         mav.setViewName("/console/statistics/session/index");
         return mav;
     }
-    /**
-     * 获取租户下的全部应用
-     * @param request
-     * @return
-     */
-    private RestResponse getAppList(HttpServletRequest request){
-        String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/list";
-        return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
-    }
 
     /**
      * 异步获取图表显示信息
@@ -75,9 +62,29 @@ public class SessionStatisticsController extends AbstractPortalController {
         if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
             date = DateUtils.parseDate(startTime,"yyyy-MM");
         }
-        list.add(getArrays(tempConsumeList,date));
-        list.add(getArrays(tempVoiceCdrList,date));
+        list.add(getArrays(tempConsumeList,date,""));
+        list.add(getArrays(tempVoiceCdrList,date,"amongCostTime"));
+        list.add(getArrays(tempVoiceCdrList,date,"amongCall"));
         return RestResponse.success(list);
+    }
+    /**
+     * 获取通话记录（session）的List
+     * @param request
+     * @param appId 应用id
+     * @param startTime 开始时间
+     * @param type 统计类型
+     * @return
+     */
+    private List getApiCallList(HttpServletRequest request,String type,String appId,String startTime){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/api_call_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
+        Class clazz = ApiCallDay.class;
+        if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
+            clazz = ApiCallMonth.class;
+        }
+        appId = "-1".equals(appId)?null:appId;
+        String tenantId = getCurrentAccount(request).getTenant().getId();
+        return (List)RestRequest.buildSecurityRequest(token).getList(uri, clazz,tenantId,appId,startTime).getData();
     }
     /**
      * 获取通话记录（session）的List
@@ -131,7 +138,7 @@ public class SessionStatisticsController extends AbstractPortalController {
      * @param list 待处理的list
      * @return
      */
-    private Object[] getArrays(List list,Object date) {
+    private Object[] getArrays(List list,Object date,String type) {
         int leng = getLong(date);
         Object[] list1 = new Object[leng];
         for(int j=0;j<leng;j++){
@@ -142,11 +149,23 @@ public class SessionStatisticsController extends AbstractPortalController {
             if(obj instanceof ConsumeMonth){
                 list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof VoiceCdrMonth){
-                list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
+                }
             }else if(obj instanceof ConsumeDay){
                 list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
             }else if(obj instanceof VoiceCdrDay){
-                list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
+                }
+            }else if(obj instanceof ApiCallDay){
+                list1[((ApiCallDay)obj).getDay()-1]=((ApiCallDay)obj).getAmongApi();
+            }else if(obj instanceof ApiCallMonth){
+                list1[((ApiCallMonth) obj).getMonth()-1]=((ApiCallMonth)obj).getAmongApi();
             }
         }
         return list1;

@@ -69,7 +69,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>应用名称</th>
-                                        <th>APPID</th>
+                                        <th>应用标识</th>
                                         <th>应用状态</th>
                                         <th>应用创建时间</th>
                                         <th>操作</th>
