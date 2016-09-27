@@ -13,7 +13,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +51,18 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     @Override
     public VoiceFilePlay findById(String id) {
         return getDao().findOne(id);
+    }
+
+
+    @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true),
+                    @CacheEvict(value="entity",key="'entity_'+#entity.app.id+'_'+#entity.name", beforeInvocation = true)
+            }
+    )
+    public void delete(VoiceFilePlay entity) throws IllegalAccessException, InvocationTargetException {
+        super.delete(entity);
     }
 
     @Override
@@ -117,7 +132,6 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
     @Override
     @Cacheable(value="entity",key="'entity_'+#appId+'_'+#name",unless = "#result == null")
     public String getVerifiedFile(String appId, String name) {
-        System.out.println("=====================!!!!!!!!!!!!!!!!!222");
         String hql = "from VoiceFilePlay obj where obj.app.id = ?1 and obj.status = ?2 and obj.name= ?3";
         VoiceFilePlay file = null;
         try {
