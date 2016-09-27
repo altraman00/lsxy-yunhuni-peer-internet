@@ -415,6 +415,7 @@
             }
             // 上传多个文件
             var cancelCancel=false;
+            var isCanner = false;
             $(function(){
                 var Allfile = [],allFileLength = 0, errorFileArray = [];
                 $('#fileupload').fileupload({
@@ -491,6 +492,7 @@
                                 'width',
                                 0 + '%'
                         );
+                        isCanner=false;
                         cancelCancel=true;
                         $('.modal-loadding').hide();
                         $('.modalCancel-app-up').click();
@@ -505,6 +507,7 @@
                         );
                         if(progress==100){
                             $('.modal-loadding').show();
+                            isCanner=true;
                         }
                     },fail: function(e, data) {
                         var resultDate = data._response.jqXHR.responseJSON;
@@ -527,7 +530,7 @@
 <script>
     $('.modalCancel-app-up').click(function(){
         var v = $('#progress .progress-bar').css('width');
-        if(v=='0%'||v=='0px'||cancelCancel){
+//        if(v=='0%'||v=='0px'||cancelCancel){
             $('#resetForm').click();
             $('#fileName').html("");
             var id = $(this).attr('data-id');
@@ -535,6 +538,9 @@
             $('#show-bg').fadeOut();
             $('#progress').hide();
             $('#fileupload').removeAttr('disabled');
+//        }
+        if(isCanner){
+            window.location.href=ctx+'/console/app/detail?id='+appId;
         }
     });
     /**
