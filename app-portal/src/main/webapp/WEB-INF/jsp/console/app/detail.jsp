@@ -182,14 +182,14 @@
                                             放音媒体库
                                         </a>
                                     </li>
-                                    <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
+                                    <%--<li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>--%>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
                                     <div class="tab-pane fade in active" id="play">
                                         <p class="application_info">
                                             1、当您的应用需使用IVR服务时，请上传语音文件至放音媒体库，语音文件均需要审核<br/>
-                                            2、每个帐号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
+                                            2、每个账号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
@@ -377,10 +377,10 @@
             </div>
             <input type="reset" id="resetForm" hidden/>
     </div>
-    <div class="footer">
-        <a class="cancel modalCancel-app-up " data-id="four" >返回</a>
-        <a class="sure modalSureFour modalCancel-app-down" data-id="four" >确认</a>
-    </div>
+    <%--<div class="footer">--%>
+        <%--<a class="cancel modalCancel-app-up " data-id="four" >返回</a>--%>
+        <%--<a class="sure modalSureFour modalCancel-app-down" data-id="four" >确认</a>--%>
+    <%--</div>--%>
     </form:form>
 </div>
 
@@ -428,9 +428,6 @@
                                 'width',
                                 0 + '%'
                         );
-//                        $('.modalCancel-app-up').one("click",function(){
-//                            data.abort();
-//                        });
                         var filename = data.files[0].name;
                         var  re = /^.+(\.wav)$/i;
                         var result=  re.test(filename);
@@ -442,11 +439,12 @@
                                             if(response1.data==0){
                                                 $('#progress').show();
                                                 $('#fileName').html(filename);
-                                                $('.modalCancel-app-down').unbind("click").one("click", function () {
-                                                    data.submit();
-                                                    cancelCancel=false;
-                                                    $('#fileupload').attr('disabled',"disabled");
+                                                data.submit();
+                                                $('.modalCancel-app-up').bind("click", function () {
+                                                    data.abort();
                                                 });
+                                                cancelCancel=false;
+                                                $('#fileupload').attr('disabled',"disabled");
                                             }else{
                                                 bootbox.setLocale("zh_CN");
                                                 var h1="该文件名已存在，是否覆盖同名文件";
@@ -454,11 +452,12 @@
                                                     if (result) {
                                                         $('#progress').show();
                                                         $('#fileName').html(filename);
-                                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
-                                                            data.submit();
-                                                            cancelCancel = false;
-                                                            $('#fileupload').attr('disabled', "disabled");
+                                                        data.submit();
+                                                        $('.modalCancel-app-up').bind("click", function () {
+                                                            data.abort();
                                                         });
+                                                        cancelCancel = false;
+                                                        $('#fileupload').attr('disabled', "disabled");
                                                     } else {
                                                         $('#progress').hide();
                                                     }
@@ -491,6 +490,7 @@
                                 'width',
                                 0 + '%'
                         );
+                        isCanner=false;
                         cancelCancel=true;
                         $('.modal-loadding').hide();
                         $('.modalCancel-app-up').click();
@@ -505,6 +505,7 @@
                         );
                         if(progress==100){
                             $('.modal-loadding').show();
+                            isCanner=true;
                         }
                     },fail: function(e, data) {
                         var resultDate = data._response.jqXHR.responseJSON;
@@ -527,7 +528,7 @@
 <script>
     $('.modalCancel-app-up').click(function(){
         var v = $('#progress .progress-bar').css('width');
-        if(v=='0%'||v=='0px'||cancelCancel){
+//        if(v=='0%'||v=='0px'||cancelCancel){
             $('#resetForm').click();
             $('#fileName').html("");
             var id = $(this).attr('data-id');
@@ -535,7 +536,7 @@
             $('#show-bg').fadeOut();
             $('#progress').hide();
             $('#fileupload').removeAttr('disabled');
-        }
+//        }
     });
     /**
      *绑定测试电话号码

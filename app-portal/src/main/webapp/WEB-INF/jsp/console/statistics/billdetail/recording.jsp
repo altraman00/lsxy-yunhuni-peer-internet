@@ -116,7 +116,7 @@
                                                         <c:set value="${sum.size}" var="sum_size"></c:set>
                                                     </c:if>
                                                 </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_money}" pattern="0.00"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：<fmt:formatNumber value="${sum_size}" pattern="0.00"></fmt:formatNumber> M</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_money}" pattern="0.000"></fmt:formatNumber>元&nbsp;&nbsp;&nbsp;&nbsp;存储容量：<fmt:formatNumber value="${sum_size}" pattern="0.000"></fmt:formatNumber> M</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
@@ -135,7 +135,7 @@
                                                     <td>${result.toNum}</td>
                                                     <td>${result.costTimeLong}</td>
                                                     <td></td>
-                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
+                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

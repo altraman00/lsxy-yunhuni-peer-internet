@@ -64,7 +64,7 @@
                                 <div class="row" >
                                     <div class="tips-box-padding">
                                         <div class="tips-box">
-                                            <p>修改密码时需要输入当前密码；新密码长度要大于6位，建议您定期更换密码，确保帐号安全。</p>
+                                            <p>修改密码时需要输入当前密码；新密码长度要大于6位，建议您定期更换密码，确保账号安全。</p>
                                         </div>
                                     </div>
                                 </div>
