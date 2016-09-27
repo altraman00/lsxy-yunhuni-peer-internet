@@ -136,7 +136,7 @@
                                                         <c:if test="${result.joinType == 1}">邀请加入</c:if>
                                                         <c:if test="${result.joinType == 2}">呼入加入</c:if>
                                                     </td>
-                                                    <td>${result.callTimeLong}</td>
+                                                    <td>${result.costTimeLong}</td>
                                                     <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>

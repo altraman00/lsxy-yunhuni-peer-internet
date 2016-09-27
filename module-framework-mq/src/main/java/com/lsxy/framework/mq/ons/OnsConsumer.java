@@ -8,6 +8,8 @@ import com.lsxy.framework.mq.api.MessageHandlerExcutorTask;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ import java.util.Set;
 @ConditionalOnProperty(value = "global.mq.provider", havingValue = "ons", matchIfMissing = false)
 public class OnsConsumer extends AbstractMQConsumer implements MessageListener,InitializingBean,DisposableBean{
 
-	private static final Log logger = LogFactory.getLog(OnsConsumer.class);
+	private static final Logger logger = LoggerFactory.getLogger(OnsConsumer.class);
 	private Consumer consumer;
 
 	@Autowired
@@ -92,38 +94,40 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 //		}
 //	}
 
-	
+
 	public Action consume(Message message, ConsumeContext context) {
 		String msg = null;
 		try {
-			logger.debug("recivied a message with id:["+message.getMsgID()+"] and message key is :["+message.getKey()+"]");
-			logger.debug("msg user properties:"+message.getUserProperties());
+			logger.debug("recivied a message with id:[" + message.getMsgID() + "] and message key is :[" + message.getKey() + "]");
+			logger.debug("msg user properties:" + message.getUserProperties());
 			String isBase64Encode = message.getUserProperties("base64");
-			if(isBase64Encode != null && isBase64Encode.equals("true")){
-				msg = new String(Base64.decodeBase64(message.getBody()),"UTF-8");
-			}else{
-				msg = new String(message.getBody(),"UTF-8");
+			if (isBase64Encode != null && isBase64Encode.equals("true")) {
+				msg = new String(Base64.decodeBase64(message.getBody()), "UTF-8");
+			} else {
+				msg = new String(message.getBody(), "UTF-8");
 			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		if(msg == null)
-			return null;
-		logger.debug("recivied msg :" + msg);
-		try {
+			if (msg == null)
+				return null;
+			logger.debug("recivied msg :" + msg);
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
-				logger.debug("parse msg to MQEvent object and id is :"	+ event.getId());
+				logger.debug("parse msg to MQEvent object and id is :" + event.getId());
 				Set<Class<? extends MQMessageHandler>> handlers = this.getMqHandlerFactory().getHandler(event);
-				for (Class hc: handlers) {
-					MQMessageHandler handler = (MQMessageHandler) applicationContext.getBean(hc);
-					messageHandlerExcutorTask.doTask(handler,event);
+				if (handlers != null) {
+					for (Class hc : handlers) {
+						MQMessageHandler handler = (MQMessageHandler) applicationContext.getBean(hc);
+						messageHandlerExcutorTask.doTask(handler, event);
+					}
+				} else {
+					if (logger.isDebugEnabled()) {
+						logger.debug("not found any handler to hand this mq event:{}", event);
+					}
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error("handle message in exception:" + message, ex);
+			return Action.ReconsumeLater;
 		}
-		
 		return Action.CommitMessage;
 	}
 

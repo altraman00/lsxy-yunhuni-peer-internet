@@ -240,7 +240,7 @@ public class DashboardController {
      * 话务量指标
      * @return
      */
-    @ApiOperation(value = "话务量数据")
+    @ApiOperation(value = "话务量指标")
     @RequestMapping(value = "/duration/indicant",method = RequestMethod.GET)
     public RestResponse durationIndicant(){
         DurationIndicantVO dto = new DurationIndicantVO();
@@ -281,41 +281,41 @@ public class DashboardController {
     private long getDurationIndicantOfBeforeYesterday(){
         Date toDay = new Date();
         Date pre_pre_date = DateUtils.getPreDate(DateUtils.getPreDate(toDay));//前天
-        return voiceCdrDayService.getAmongDurationByDate(pre_pre_date);
+        return voiceCdrDayService.getAmongCostTimeByDate(pre_pre_date);
     }
 
     //获取昨天话务量
     private long getDurationIndicantOfYesterday(){
         Date toDay = new Date();
         Date pre_date = DateUtils.getPreDate(toDay);//昨天
-        return voiceCdrDayService.getAmongDurationByDate(pre_date);
+        return voiceCdrDayService.getAmongCostTimeByDate(pre_date);
     }
 
     //获取上上周的话务量
     private long getDurationIndicantOfBefore2Week(){
         Date toDay = new Date();
         Date pp_week_date = DateUtils.getPrevWeek(DateUtils.getPrevWeek(toDay));
-        return voiceCdrDayService.getAmongDurationBetween(
+        return voiceCdrDayService.getAmongCostTimeBetween(
                         DateUtils.getFirstDayOfWeek(pp_week_date),DateUtils.getLastDayOfWeek(pp_week_date));
     }
     //获取上周的话务量
     private long getDurationIndicantOfBeforeWeek(){
         Date toDay = new Date();
         Date p_week_date = DateUtils.getPrevWeek(toDay);
-        return voiceCdrDayService.getAmongDurationBetween(
+        return voiceCdrDayService.getAmongCostTimeBetween(
                 DateUtils.getFirstDayOfWeek(p_week_date),DateUtils.getLastDayOfWeek(p_week_date));
     }
     //获取上上月的话务量
     private long getDurationIndicantOfBefore2Month(){
         Date toDay = new Date();
         Date pp_month_date = DateUtils.getPrevMonth(DateUtils.getPrevMonth(toDay));
-        return voiceCdrMonthService.getAmongDurationByDate(pp_month_date);
+        return voiceCdrMonthService.getAmongCostTimeByDate(pp_month_date);
     }
     //获取上月的话务量
     private long getDurationIndicantOfBeforeMonth(){
         Date toDay = new Date();
         Date p_month_date = DateUtils.getPrevMonth(toDay);
-        return voiceCdrMonthService.getAmongDurationByDate(p_month_date);
+        return voiceCdrMonthService.getAmongCostTimeByDate(p_month_date);
     }
 
     /**
@@ -436,7 +436,7 @@ public class DashboardController {
                     @Override
                     public Long call(){
                         //转换成分钟
-                        return (long)Math.round(voiceCdrDayService.getAmongDurationByDate(d)/60);
+                        return (long)Math.round(voiceCdrDayService.getAmongCostTimeByDate(d)/60);
                     }
                 }));
             }
@@ -495,7 +495,7 @@ public class DashboardController {
     public RestResponse memberTop(@RequestParam Integer top){
         MemberTopVO dto = new MemberTopVO();
         dto.setCallTop(voiceCdrDayService.getCallTop(top));
-        dto.setDurationTop(voiceCdrDayService.getDurationTop(top));
+        dto.setDurationTop(voiceCdrDayService.getCostTimeTop(top));
         dto.setConsumeTop(consumeDayService.getConsumeTop(top));
         //上周
         Date toDay = new Date();
@@ -503,7 +503,7 @@ public class DashboardController {
         Date p_week_date_start = DateUtils.getFirstDayOfWeek(p_week_date);
         Date p_week_date_end = DateUtils.getLastDayOfWeek(p_week_date);
         dto.setCallWeekTop(voiceCdrDayService.getCallTopByDateBetween(top,p_week_date_start,p_week_date_end));
-        dto.setDurationWeekTop(voiceCdrDayService.getDurationTopByDateBetween(top,p_week_date_start,p_week_date_end));
+        dto.setDurationWeekTop(voiceCdrDayService.getCostTimeTopByDateBetween(top,p_week_date_start,p_week_date_end));
         return RestResponse.success(dto);
     }
 }

@@ -1,5 +1,6 @@
 package com.lsxy.framework.rpc.api.client;
 
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -150,7 +151,7 @@ public abstract class AbstractClient implements Client{
                         RPCRequest echoRequest = RPCRequest.newRequest(ServiceConstants.CH_MN_HEARTBEAT_ECHO,"");
                         RPCResponse echoResponse = rpcCaller.invokeWithReturn(session,echoRequest);
                         if(echoResponse.isOk()) {
-                            if (logger.isDebugEnabled()) {
+                            if (logger.isDebugEnabled() && SystemConfig.getProperty("area.agent.log.show.heartbeat","true").equals("true")) {
                                 logger.debug("连接着呢:{}", this.serverUrl);
                             }
                         }
