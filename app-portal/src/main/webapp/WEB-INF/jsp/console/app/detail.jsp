@@ -189,7 +189,7 @@
                                     <div class="tab-pane fade in active" id="play">
                                         <p class="application_info">
                                             1、当您的应用需使用IVR服务时，请上传语音文件至放音媒体库，语音文件均需要审核<br/>
-                                            2、每个帐号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
+                                            2、每个账号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
