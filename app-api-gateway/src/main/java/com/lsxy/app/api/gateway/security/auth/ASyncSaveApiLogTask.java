@@ -39,7 +39,14 @@ public class ASyncSaveApiLogTask {
         log.setCertid(certId);
         log.setTenantId(tenantId);
         //TODO 设置api调用类型
-        log.setType(uri);
+        String[] split = uri.split("/");
+        String type;
+        if(split.length > 5){
+            type = "/" + split[4] + "/" +split[5];
+        }else{
+            type = uri;
+        }
+        log.setType(type);
         apiInvokeLogService.save(log);
 
         if(logger.isDebugEnabled()) {

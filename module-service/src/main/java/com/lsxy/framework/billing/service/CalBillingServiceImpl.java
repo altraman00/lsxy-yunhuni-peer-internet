@@ -247,7 +247,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @param tenantId
      * @param date
      * @param type 类型（购买或消费的key前缀）
-     * @return 时长（秒）
+     * @return 时长（秒）或容量Byte
      */
     private Long getIncrLong(String tenantId, Date date,String type){
         Long time;
@@ -506,7 +506,7 @@ public class CalBillingServiceImpl implements CalBillingService{
     private Long getFsizeByPreDateSum(String tenantId, Date date, Long fileRemainSize) {
         Long useSize = getUseFsize(tenantId, date);
         Long addSize = getAddFsize(tenantId, date);
-        return fileRemainSize + useSize - addSize;
+        return fileRemainSize + addSize - useSize;
     }
 
     /**

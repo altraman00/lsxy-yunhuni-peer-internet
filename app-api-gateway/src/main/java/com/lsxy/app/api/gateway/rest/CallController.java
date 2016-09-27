@@ -9,6 +9,7 @@ import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.exceptions.DuoCallbackNumIsSampleException;
 import com.lsxy.area.api.exceptions.RequestIllegalArgumentException;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.utils.WebUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -102,7 +104,7 @@ public class CallController extends AbstractAPIController{
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{account_id}/call/duo_callback/cancel",method = RequestMethod.POST)
+    @RequestMapping(value = "/{account_id}/call/duo_callback_cancel",method = RequestMethod.POST)
     public ApiGatewayResponse duoCallbackCancel(HttpServletRequest request, @RequestBody Map params, @PathVariable String account_id) throws YunhuniApiException {
         String appId = request.getHeader("AppID");
         String ip = WebUtils.getRemoteAddress(request);
@@ -119,6 +121,22 @@ public class CallController extends AbstractAPIController{
             throw new RequestIllegalArgumentException();
         }
         if(dto.getMax_dial_duration() == null){
+            throw new RequestIllegalArgumentException();
+        }
+
+        //将二维数组是为空的数组去掉
+        List<List<Object>> playContent = dto.getPlay_content();
+        if(playContent != null){
+            for(int i = 0;i < playContent.size();i++){
+                List<Object> list = playContent.get(i);
+                if(list.size()< 2 || list.get(0)==null || "".equals(list.get(0))|| list.get(1)==null || "".equals(list.get(1))){
+                    playContent.remove(i);
+                    i--;
+                }
+            }
+        }
+        //播放内容不能为空
+        if(StringUtil.isBlank(dto.getPlay_file()) && (dto.getPlay_content() == null || dto.getPlay_content().size() == 0 )){
             throw new RequestIllegalArgumentException();
         }
 

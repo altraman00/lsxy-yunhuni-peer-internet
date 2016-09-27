@@ -14,6 +14,7 @@ import javax.persistence.*;
 @Entity
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_session")
+
 public class CallSession extends IdEntity {
     public static final int STATUS_CALLING = 1;
     public static final int STATUS_OVER = 2;
@@ -36,6 +37,16 @@ public class CallSession extends IdEntity {
     private String toNum; //接收方
 
     public CallSession() {
+    }
+
+    public CallSession(Integer status, App app, Tenant tenant, String relevanceId, String type, String fromNum, String toNum) {
+        this.status = status;
+        this.app = app;
+        this.tenant = tenant;
+        this.relevanceId = relevanceId;
+        this.type = type;
+        this.fromNum = fromNum;
+        this.toNum = toNum;
     }
 
     public CallSession(String id,Integer status, App app, Tenant tenant, String relevanceId, String type, String fromNum, String toNum) {

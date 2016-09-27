@@ -30,8 +30,7 @@ public class VoiceCallback extends IdEntity {
     public VoiceCallback() {
     }
 
-    public VoiceCallback(String id,String fromNum, String from2Num, String toNum,String to2Num) {
-        this.id = id;
+    public VoiceCallback(String fromNum, String from2Num, String toNum,String to2Num) {
         this.fromNum = fromNum;
         this.from2Num = from2Num;
         this.toNum = toNum;

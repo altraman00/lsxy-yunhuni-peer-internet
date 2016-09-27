@@ -7,7 +7,7 @@ package com.lsxy.yunhuni.api.product.enums;
 public enum ProductCode {
     duo_call("duo_call1","语音回拔"),
     sys_conf("sys_conf","语音会议"),
-    ivr_call("ivr_call,ivr_incoming,ivr_dial","语音IVR"),
+    ivr_call("ivr_call,ivr_incoming,ivr_dial","自定义IVR"),
     captcha_call("captcha_call,verify_call","语音验证码"),
     notify_call("notify_call","语音通知");
 

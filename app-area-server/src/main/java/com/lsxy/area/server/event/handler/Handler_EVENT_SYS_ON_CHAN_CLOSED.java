@@ -52,7 +52,18 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             throw new RuntimeException("cdr数据为空");
         }
         VoiceCdr voiceCdr = getVoiceCdr((String) cdrObj);
-        BusinessState businessState = businessStateService.get(voiceCdr.getCdr_additionalinfo2());
+        BusinessState businessState;
+        String cdr_additionalinfo2 = voiceCdr.getCdr_additionalinfo2();
+        if(StringUtils.isNotBlank(cdr_additionalinfo2)){
+            businessState = businessStateService.get(cdr_additionalinfo2);
+        }else{
+            return null;
+        }
+        if(businessState == null){
+            voiceCdrService.save(voiceCdr);
+            logger.error("返回CDR找不到关联的业务数据,cdr.id：{}",voiceCdr.getId());
+            return null;
+        }
         voiceCdr.setAreaId(businessState.getAreaId());
         voiceCdr.setTenantId(businessState.getTenantId());
         voiceCdr.setAppId(businessState.getAppId());
