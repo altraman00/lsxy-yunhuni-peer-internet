@@ -128,7 +128,6 @@
                                         <th>消费时间</th>
                                         <th>消费金额</th>
                                         <th>消费类型</th>
-                                        <th>备注</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -138,7 +137,6 @@
                                             <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
                                             <td><fmt:formatNumber value="${result.amount}" pattern="0.00"></fmt:formatNumber> </td>
                                             <td>${result.type}</td>
-                                            <td>${result.remark}</td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>
