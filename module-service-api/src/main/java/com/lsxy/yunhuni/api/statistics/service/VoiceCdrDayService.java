@@ -38,13 +38,24 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @return
      */
     public long getAmongDurationBetween(Date d1,Date d2);
-
+    /**
+     * 获取某个时间范围的总的通话时长(扣费话务量)
+     * @param
+     * @return
+     */
+    public long getAmongCostTimeBetween(Date d1,Date d2);
     /**
      * 获取某天的总的通话时长(话务量)
      * @param d
      * @return
      */
     public long getAmongDurationByDate(Date d);
+    /**
+     * 获取某天的总的扣费时长(扣费话务量)
+     * @param d
+     * @return
+     */
+    public long getAmongCostTimeByDate(Date d);
 
     /**
      * 总的会话量排名
@@ -57,6 +68,11 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * top
      */
     public List<Map<String,Object>> getDurationTop(int top);
+    /**
+     * 总的扣费话务量排名
+     * top
+     */
+    public List<Map<String,Object>> getCostTimeTop(int top);
 
     /**
      * 时间范围内的会话量排名
@@ -69,6 +85,11 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * top
      */
     public List<Map<String,Object>> getDurationTopByDateBetween(int top,Date d1,Date d2);
+    /**
+     * 时间范围内的扣费话务量排名
+     * top
+     */
+    public List<Map<String,Object>> getCostTimeTopByDateBetween(int top,Date d1,Date d2);
 
     /**
      * 获取某个租户某天的通话时长(话务量)
@@ -76,7 +97,12 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @return
      */
     public long getAmongDurationByDateAndTenant(Date d,String tenant,String appId);
-
+    /**
+     * 获取某个租户某天的通话时长(扣费话务量)
+     * @param d
+     * @return
+     */
+    public long getAmongCostTimeByDateAndTenant(Date d,String tenant,String appId);
     /**
      * 获取某个租户某天的通话次数(会话量)
      * @param d
