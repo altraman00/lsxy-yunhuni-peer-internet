@@ -415,7 +415,6 @@
             }
             // 上传多个文件
             var cancelCancel=false;
-            var isCanner = false;
             $(function(){
                 var Allfile = [],allFileLength = 0, errorFileArray = [];
                 $('#fileupload').fileupload({
@@ -429,9 +428,6 @@
                                 'width',
                                 0 + '%'
                         );
-//                        $('.modalCancel-app-up').one("click",function(){
-//                            data.abort();
-//                        });
                         var filename = data.files[0].name;
                         var  re = /^.+(\.wav)$/i;
                         var result=  re.test(filename);
@@ -443,11 +439,12 @@
                                             if(response1.data==0){
                                                 $('#progress').show();
                                                 $('#fileName').html(filename);
-//                                                $('.modalCancel-app-down').unbind("click").one("click", function () {
-                                                    data.submit();
-                                                    cancelCancel=false;
-                                                    $('#fileupload').attr('disabled',"disabled");
-//                                                });
+                                                data.submit();
+                                                $('.modalCancel-app-up').bind("click", function () {
+                                                    data.abort();
+                                                });
+                                                cancelCancel=false;
+                                                $('#fileupload').attr('disabled',"disabled");
                                             }else{
                                                 bootbox.setLocale("zh_CN");
                                                 var h1="该文件名已存在，是否覆盖同名文件";
@@ -455,11 +452,12 @@
                                                     if (result) {
                                                         $('#progress').show();
                                                         $('#fileName').html(filename);
-//                                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
-                                                            data.submit();
-                                                            cancelCancel = false;
-                                                            $('#fileupload').attr('disabled', "disabled");
-//                                                        });
+                                                        data.submit();
+                                                        $('.modalCancel-app-up').bind("click", function () {
+                                                            data.abort();
+                                                        });
+                                                        cancelCancel = false;
+                                                        $('#fileupload').attr('disabled', "disabled");
                                                     } else {
                                                         $('#progress').hide();
                                                     }
@@ -539,9 +537,6 @@
             $('#progress').hide();
             $('#fileupload').removeAttr('disabled');
 //        }
-        if(isCanner){
-            window.location.href=ctx+'/console/app/detail?id='+appId;
-        }
     });
     /**
      *绑定测试电话号码
