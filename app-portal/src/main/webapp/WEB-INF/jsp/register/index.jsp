@@ -53,7 +53,7 @@
                         <lable class="col-lg-3 text-right">邮箱地址</lable>
                         <div class="col-lg-9">
                             <input type="text" name="email" placeholder="请输入邮箱地址" class="form-control input-form" id="form-email"  />
-                            <p class="tips">注册后，邮箱地址收到账号激活邮件</p>
+                            <p class="tips">注册后，邮箱将会收到账号激活邮件</p>
                         </div>
                     </div>
                     <div class="form-group reader">

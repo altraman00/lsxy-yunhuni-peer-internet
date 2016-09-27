@@ -117,6 +117,7 @@
                                                 <th>主叫</th>
                                                 <th>被叫</th>
                                                 <th>挂机时间</th>
+                                                <th>消费金额(元)</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -126,6 +127,7 @@
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
                                                     <td><fmt:formatDate value="${result.callEndDt}" pattern="yyyy-MM-dd"></fmt:formatDate></td>
+                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

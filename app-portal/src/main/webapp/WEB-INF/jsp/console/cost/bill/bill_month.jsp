@@ -120,7 +120,7 @@
                                 <section class="panel panel-default yunhuni-personal">
                                     <div class="fix-padding">
                                         <p class="bg-success price_info">
-                                            ${month} 消费总额  <span class="text-warning"> <fmt:formatNumber value="${sumAmount==null?0:sumAmount}" pattern="0.00"/></span> 元
+                                            ${month} 消费总额  <span class="text-warning"> <fmt:formatNumber value="${sumAmount==null?0:sumAmount}" pattern="0.000"/></span> 元
                                         </p>
                                     </div>
                                 </section>
@@ -134,7 +134,7 @@
                                                 <tr>
                                                 </c:if>
                                                     <td class="extend_width">${billMonth.type} : </td>
-                                                    <td> <fmt:formatNumber value="${billMonth.amongAmount==null?0:billMonth.amongAmount}" pattern="0.00"/> 元</td>
+                                                    <td> <fmt:formatNumber value="${billMonth.amongAmount==null?0:billMonth.amongAmount}" pattern="0.000"/> 元</td>
                                                 <c:if test="${s.index % 2 == 1 || (s.index + 1) == fn:length(billMonths)}">
                                                     <c:if test="${s.index % 2 == 0}">
                                                         <td class="extend_width"></td><td></td>
