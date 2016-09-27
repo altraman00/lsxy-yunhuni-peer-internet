@@ -41,11 +41,6 @@
                                         <input type="radio" name="stime" value="year" class="selectdata ml-15" />月统计
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12 text-center">
-                                        <p class="font18">会话数/消费额统计</p>
-                                    </div>
-                                </div>
 
                                 <!--日统计-->
                                 <div class="row monthform" >
@@ -65,11 +60,26 @@
                                         <span class="tips-error yeartips"></span>
                                     </div>
                                 </div>
-
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <p class="font18">话务量/消费额统计</p>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-12 scanvas" >
                                         <!--统计列表-->
                                         <div class="ecpanel" id="ecpanel" style=" height: 600px;  "></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <p class="font18">会话量统计</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 scanvas" >
+                                        <!--统计列表-->
+                                        <div class="ecpanel" id="ecpane2" style=" height: 600px;  "></div>
                                     </div>
                                 </div>
                             </section>
@@ -160,6 +170,7 @@
      * endtime 对比时间
      */
     var xdAll="";
+    var xdAll2="";
     var ydAll="";
     function initchart(){
         var type = $('input[name="stime"]:checked').val();
@@ -178,7 +189,12 @@
             xdAll = eval('('+xdAll+')');
             ydAll = JSON.stringify(resultData[1]);
             ydAll = eval('('+ydAll+')');
+            xdAll2 = JSON.stringify(resultData[2]);
+            xdAll2 = eval('('+xdAll2+')');
+//            xdAll2 = JSON.stringify(resultData[0]);
+//            xdAll2 = eval('('+xdAll2+')');
             charts(xdAll,ydAll,resultData[0].max(),resultData[1].max(),type);
+            charts2(xdAll2,resultData[2].max(),type);
         });
     }
 
@@ -240,9 +256,11 @@
 //        var type = $('input[name="stime"]:checked').val();
         var Xdata = monthData;
         var Ydata = monthData;
+        var textData = '日期';
         if(type=='year'){
             Xdata = timeData;
             Ydata = timeData;
+            textData = '月份';
 //            var xd = moneyDataYear();
 //            var yd = meetDataYear();
         }
@@ -260,7 +278,7 @@
                 trigger: 'axis'
             },
             legend: {
-                data:['会话数', '消费额']
+                data:['话务量', '消费额']
             },
             toolbox: {
                 show: true,
@@ -280,20 +298,20 @@
                     type: 'category',
                     boundaryGap: true,
                     data : Xdata,
-                    name: '日期',
+                    name: textData,
 
                 },
                 {
                     type: 'category',
                     boundaryGap: true,
-                    data: Ydata
+                    data: Ydata,
                 }
             ],
             yAxis: [
                 {
                     type: 'value',
                     scale: true,
-                    name: '会话(次)',
+                    name: '话务量(分钟)',
                     max: xyMax,
                     min: 0,
                     boundaryGap: [0.2, 0.2],
@@ -324,7 +342,7 @@
                     data:xd
                 },
                 {
-                    name:'会话数',
+                    name:'话务量',
                     type:'line',
                     data:yd
                 }
@@ -333,6 +351,96 @@
 
         myChart.setOption(option);
     }
+
+    /**
+     * 回调数据
+     * @param tdata 标题项
+     * @param tdata 标题项
+     * @param tdata 标题项
+     */
+    function charts2(xd2,xyMax2,type){
+        console.info(xd2)
+        console.info(xyMax2)
+        console.info(type)
+//        var type = $('input[name="stime"]:checked').val();
+        var Xdata = monthData;
+        var Ydata = monthData;
+        var textData = '日期';
+        if(type=='year'){
+            Xdata = timeData;
+            Ydata = timeData;
+            textData = '月份';
+//            var xd = moneyDataYear();
+//            var yd = meetDataYear();
+        }
+//            var xd = moneyDataMonth();
+//            var yd = meetDataMonth();
+//        }
+
+        var myChart2 = echarts.init(document.getElementById('ecpane2'),'wonderland');
+        option = {
+            title: {
+                text: '',
+                subtext: ''
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data:['会话量']
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    dataView: {readOnly: false},
+                    restore: {},
+                    saveAsImage: {}
+                }
+            },
+            dataZoom: {
+                show: false,
+                start: 0,
+                end: 100
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: true,
+                    data : Xdata,
+                    name: textData,
+
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    scale: true,
+                    name: '会话量(次)',
+                    max: xyMax2,
+                    min: 0,
+                    boundaryGap: [0.2, 0.2],
+                    nameGap:32,
+                    nameTextStyle:{
+                        color:'#999',
+                    }
+                }
+            ],
+            series: [
+                {
+                    name:'会话量',
+                    type:'line',
+                    data:xd2
+                }
+            ]
+        };
+
+        myChart2.setOption(option);
+        console.info(10000)
+    }
+
+
+
+
 
     //当浏览器大小变化时
     $(window).resize(function () {

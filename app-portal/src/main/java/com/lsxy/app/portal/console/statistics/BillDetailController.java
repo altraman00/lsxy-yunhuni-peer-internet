@@ -172,16 +172,7 @@ public class BillDetailController extends AbstractPortalController {
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/plist?pageNo={1}&pageSize={2}&type={3}&time={4}&appId={5}";
         return RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class,pageNo,pageSize,type,time,appId);
     }
-    /**
-     * 获取租户下的全部应用
-     * @param request
-     * @return
-     */
-    private RestResponse getAppList(HttpServletRequest request){
-        String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/app/list";
-        return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
-    }
+
     /**
      * 处理初始条件
      * @param request

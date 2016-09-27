@@ -103,7 +103,7 @@
                                 </div>
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-130">
-                                        APPID：
+                                        应用标识：
                                     </div>
                                     <div class="col-md-10 ">
                                         <p>${app.id}</p>

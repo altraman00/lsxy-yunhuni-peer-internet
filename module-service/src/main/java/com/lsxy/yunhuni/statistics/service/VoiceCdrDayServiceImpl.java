@@ -104,10 +104,31 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
         return sum;
     }
 
+    @Override
+    public long getAmongCostTimeBetween(Date d1, Date d2) {
+        String hql = "from VoiceCdrDay obj where "
+                +StatisticsUtils.getSqlIsNull(null,null, null)+" obj.dt between ?1 and ?2";
+        List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (VoiceCdrDay day : ds) {
+            if(day!=null && day.getAmongCostTime() !=null){
+                sum += day.getAmongCostTime();
+            }
+        }
+        return sum;
+    }
+
     public long getAmongDurationByDate(Date d){
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
         return getAmongDurationBetween(d1,d2);
+    }
+
+    @Override
+    public long getAmongCostTimeByDate(Date d) {
+        Date d1 = DateUtils.getFirstTimeOfDate(d);
+        Date d2 = DateUtils.getLastTimeOfDate(d);
+        return getAmongCostTimeBetween(d1,d2);
     }
 
     private List<Map<String, Object>> getTops(List<VoiceCdrDay> ds,String field,Integer factor){
@@ -151,6 +172,16 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
+    public List<Map<String, Object>> getCostTimeTop(int top) {
+        String sql = "select FORMAT(sum(among_cost_time)/60,0) as value ,tenant_id as id ,b.tenant_name as name from db_lsxy_bi_yunhuni.tb_bi_voice_cdr_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null group by a.tenant_id ORDER BY sum(a.among_cost_time) DESC limit 0,?";
+        List list = jdbcTemplate.queryForList(sql,top);
+//        String hql = "from VoiceCdrDay obj where obj.appId is null and obj.tenantId is not null and type is null ORDER BY sum(obj.amongDuration) DESC";
+//        List<VoiceCdrDay> list = this.getTopList(hql,false,top);
+        //  return getTops(list,"sumDuration",60);
+        return list;
+    }
+
+    @Override
     public List<Map<String, Object>> getCallTopByDateBetween(int top, Date d1, Date d2) {
 //        String sql = "select id,tenant_id,sum(among_call)among_call from tb_bi_voice_cdr_day where app_id is null and tenant_id is not null and type is null and dt between :d1 and :d2 group BY tenant_id order by among_call desc";
 //        Query query = em.createNativeQuery(sql,VoiceCdrDay.class);
@@ -181,6 +212,13 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     }
 
     @Override
+    public List<Map<String, Object>> getCostTimeTopByDateBetween(int top, Date d1, Date d2) {
+        String sql = "select a.tenant_id as id ,FORMAT(sum(a.among_cost_time)/60,0) as value,b.tenant_name as name  from db_lsxy_bi_yunhuni.tb_bi_voice_cdr_day a LEFT JOIN db_lsxy_base.tb_base_tenant b on a.tenant_id = b.id where a.app_id is null and a.tenant_id is not null and a.type is null and a.dt between ? and ? group BY a.tenant_id order by sum(a.among_cost_time) desc limit 0,?" ;
+        List list = jdbcTemplate.queryForList(sql,d1,d2,top);
+        return list;
+    }
+
+    @Override
     public long getAmongDurationByDateAndTenant(Date d, String tenant,String appId) {
         Date d1 = DateUtils.getFirstTimeOfDate(d);
         Date d2 = DateUtils.getLastTimeOfDate(d);
@@ -191,6 +229,22 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
         for (VoiceCdrDay day : ds) {
             if(day!=null && day.getAmongDuration() !=null){
                 sum += day.getAmongDuration();
+            }
+        }
+        return sum;
+    }
+
+    @Override
+    public long getAmongCostTimeByDateAndTenant(Date d, String tenant, String appId) {
+        Date d1 = DateUtils.getFirstTimeOfDate(d);
+        Date d2 = DateUtils.getLastTimeOfDate(d);
+        String hql = "from VoiceCdrDay obj where "
+                +StatisticsUtils.getSqlIsNull(tenant,appId, null)+" obj.dt between ?1 and ?2";
+        List<VoiceCdrDay> ds = this.findByCustomWithParams(hql,d1,d2);
+        long sum = 0;
+        for (VoiceCdrDay day : ds) {
+            if(day!=null && day.getAmongCostTime() !=null){
+                sum += day.getAmongCostTime();
             }
         }
         return sum;
