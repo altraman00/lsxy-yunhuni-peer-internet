@@ -21,7 +21,9 @@ import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.Meeting;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.MeetingService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -83,6 +85,9 @@ public class ConfServiceImpl implements ConfService {
 
     @Autowired
     private MeetingService meetingService;
+
+    @Autowired
+    private CallSessionService callSessionService;
 
     private boolean isEnableConfService(String tenantId,String appId){
         try {
@@ -262,6 +267,16 @@ public class ConfServiceImpl implements ConfService {
         }
 
         String callId = UUIDGenerator.uuid();
+
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setApp(app);
+        callSession.setTenant(app.getTenant());
+        callSession.setRelevanceId(callId);
+        callSession.setType(CallSession.TYPE_VOICE_MEETING);
+        callSession.setResId(null);
+        callSession = callSessionService.save(callSession);
+
         //TODO
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
@@ -298,6 +313,7 @@ public class ConfServiceImpl implements ConfService {
                                         .putIfNotEmpty("voice_mode",voiceMode)//加入后的声音模式
                                         //TODO 这个是什么鬼dial_voice_stop_cond
                                         .putIfNotEmpty("dial_voice_stop_cond",dialVoiceStopCond)//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
+                                        .putIfNotEmpty("sessionid",callSession.getId())
                                         .build())
                                     .build();
         businessStateService.save(callstate);

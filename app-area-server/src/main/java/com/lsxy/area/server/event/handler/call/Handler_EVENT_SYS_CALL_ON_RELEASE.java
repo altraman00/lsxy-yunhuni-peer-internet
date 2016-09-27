@@ -12,6 +12,8 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -40,6 +42,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
     @Autowired
     private IVRActionService ivrActionService;
+
+    @Autowired
+    private CallSessionService callSessionService;
 
     @Override
     public String getEventName() {
@@ -117,6 +122,13 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
 
         businessStateService.delete(call_id);
+
+        //更新会话记录状态
+        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        if(callSession != null){
+            callSession.setStatus(CallSession.STATUS_OVER);
+            callSessionService.save(callSession);
+        }
         return res;
     }
 }

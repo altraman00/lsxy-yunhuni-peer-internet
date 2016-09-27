@@ -10,6 +10,8 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -35,6 +37,9 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
 
     @Autowired
     private ConfService confService;
+
+    @Autowired
+    private CallSessionService callSessionService;
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
@@ -73,6 +78,14 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         }
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
+        }
+
+        //更新会话记录状态
+        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        if(callSession != null){
+            callSession.setResId(res_id);
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSessionService.save(callSession);
         }
         return res;
     }
