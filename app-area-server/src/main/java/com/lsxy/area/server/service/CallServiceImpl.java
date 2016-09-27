@@ -227,19 +227,21 @@ public class CallServiceImpl implements CallService {
         callSessionService.save(callSession);
         callSessionService.save(callSession2);
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("from1_uri", from1);
-        params.put("to1_uri",to1_uri);
-        params.put("from2_uri", from2);
-        params.put("to2_uri",to2_uri);
-        params.put("max_connect_seconds",max_call_duration);
-        params.put("max_ring_seconds",max_dial_duration);
+        Map<String, Object> params = new MapBuilder<String, Object>()
+                .putIfNotEmpty("from1_uri", from1)
+                .putIfNotEmpty("to1_uri",to1_uri)
+                .putIfNotEmpty("from2_uri", from2)
+                .putIfNotEmpty("to2_uri",to2_uri)
+                .putIfNotEmpty("max_connect_seconds",max_call_duration)
+                .putIfNotEmpty("max_ring_seconds",max_dial_duration)
+                .putIfNotEmpty("user_data1",duocCallId)
+                .putIfNotEmpty("user_data2",duocCallId)
+                .build();
+
         if(StringUtils.isNotBlank(ring_tone)){
             params.put("ring_play_file",ring_tone);
             params.put("ring_play_mode",ring_tone_mode);
         }
-        params.put("user_data1",duocCallId);
-        params.put("user_data2",duocCallId);
         //录音
         if(recording != null && recording){
             //TODO 录音文件名称
@@ -353,13 +355,15 @@ public class CallServiceImpl implements CallService {
         CallSession callSession = new CallSession(CallSession.STATUS_PREPARING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
         callSessionService.save(callSession);
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("from_uri", from);
-        params.put("to_uri", to_uri);
-        params.put("play_repeat",repeat);
-        params.put("max_ring_seconds",max_dial_duration);
-        params.put("user_data",callId);
-        params.put("play_content",this.getPlayContent(app.getTenant().getId(),appId,play_file,play_content));
+        Map<String, Object> params = new MapBuilder<String, Object>()
+                .putIfNotEmpty("from_uri", from)
+                .putIfNotEmpty("from_uri", from)
+                .putIfNotEmpty("to_uri", to_uri)
+                .putIfNotEmpty("play_repeat",repeat)
+                .putIfNotEmpty("max_ring_seconds",max_dial_duration)
+                .putIfNotEmpty("user_data",callId)
+                .putIfNotEmpty("play_content",this.getPlayContent(app.getTenant().getId(),appId,play_file,play_content))
+                .build();
 
         try {
             //增加区域参数 选择合适的会话(传入appid即可)
