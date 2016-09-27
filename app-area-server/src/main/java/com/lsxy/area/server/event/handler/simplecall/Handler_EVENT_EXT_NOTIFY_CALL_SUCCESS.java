@@ -71,6 +71,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
                 CallSession callSession = callSessionService.findById(sessionId);
                 if(callSession != null){
                     callSession.setResId(resId);
+                    callSession.setStatus(CallSession.STATUS_CALLING);
                     callSessionService.save(callSession);
                 }
             }
