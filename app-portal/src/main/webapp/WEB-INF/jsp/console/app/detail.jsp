@@ -182,7 +182,7 @@
                                             放音媒体库
                                         </a>
                                     </li>
-                                    <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
+                                    <%--<li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>--%>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
@@ -377,10 +377,10 @@
             </div>
             <input type="reset" id="resetForm" hidden/>
     </div>
-    <div class="footer">
-        <a class="cancel modalCancel-app-up " data-id="four" >返回</a>
-        <a class="sure modalSureFour modalCancel-app-down" data-id="four" >确认</a>
-    </div>
+    <%--<div class="footer">--%>
+        <%--<a class="cancel modalCancel-app-up " data-id="four" >返回</a>--%>
+        <%--<a class="sure modalSureFour modalCancel-app-down" data-id="four" >确认</a>--%>
+    <%--</div>--%>
     </form:form>
 </div>
 
@@ -442,11 +442,11 @@
                                             if(response1.data==0){
                                                 $('#progress').show();
                                                 $('#fileName').html(filename);
-                                                $('.modalCancel-app-down').unbind("click").one("click", function () {
+//                                                $('.modalCancel-app-down').unbind("click").one("click", function () {
                                                     data.submit();
                                                     cancelCancel=false;
                                                     $('#fileupload').attr('disabled',"disabled");
-                                                });
+//                                                });
                                             }else{
                                                 bootbox.setLocale("zh_CN");
                                                 var h1="该文件名已存在，是否覆盖同名文件";
@@ -454,11 +454,11 @@
                                                     if (result) {
                                                         $('#progress').show();
                                                         $('#fileName').html(filename);
-                                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
+//                                                        $('.modalCancel-app-down').unbind("click").one("click", function () {
                                                             data.submit();
                                                             cancelCancel = false;
                                                             $('#fileupload').attr('disabled', "disabled");
-                                                        });
+//                                                        });
                                                     } else {
                                                         $('#progress').hide();
                                                     }
