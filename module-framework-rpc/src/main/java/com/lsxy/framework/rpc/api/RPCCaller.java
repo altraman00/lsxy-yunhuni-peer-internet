@@ -52,7 +52,6 @@ public class RPCCaller {
 
 
 	public void putResponse(RPCResponse response){
-		logger.debug("putResponse:收到响应【"+response.getSessionid()+"】");
 		responseMap.put(response.getSessionid(), response);
 	}
 
@@ -71,7 +70,7 @@ public class RPCCaller {
 	 */
 	public void receivedResponse(RPCResponse response) {
 		if(logger.isDebugEnabled()){
-			logger.debug(">>[NM]"+response);
+			logger.debug(">>"+response);
 		}
 		this.putResponse(response);
 		RPCRequest request = this.getRequest(response.getSessionid());
@@ -79,9 +78,11 @@ public class RPCCaller {
 		this.fireRequestListener(response);
 
 		if(request != null){
-			if(logger.isDebugEnabled()){
-				logger.debug("通知请求对象该醒了:{}",request);
-			}
+//			if(logger.isDebugEnabled()){
+//				if(!request.getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO) || SystemConfig.getProperty("area.agent.log.show.heartbeat","true").equals("true")) {
+//					logger.debug("通知请求对象该醒了:{}", request);
+//				}
+//			}
 			synchronized (request){
 				request.notify();
 			}
@@ -200,7 +201,9 @@ public class RPCCaller {
 		}
 		//返回值取到
 		if(logger.isDebugEnabled()){
-		    logger.debug("请求醒了:{},已经睡了{}ms",request,(System.currentTimeMillis() - startWait));
+			if(!request.getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO) || SystemConfig.getProperty("area.agent.log.show.heartbeat","true").equals("true")) {
+				logger.debug("请求醒了:{},已经睡了{}ms", request, (System.currentTimeMillis() - startWait));
+			}
 		}
 		RPCResponse response = responseMap.get(request.getSessionid());
 

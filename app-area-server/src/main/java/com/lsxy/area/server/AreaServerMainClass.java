@@ -12,7 +12,6 @@ import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
-import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;

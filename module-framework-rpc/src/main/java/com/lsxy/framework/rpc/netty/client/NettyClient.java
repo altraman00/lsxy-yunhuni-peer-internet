@@ -34,6 +34,9 @@ import java.util.concurrent.TimeUnit;
 @ConditionalOnClass(name="com.lsxy.area.agent.AreaClient")
 public class NettyClient extends AbstractClient{
 
+    //连接失败次数
+    private int errorTimes;
+
     @Autowired
     private SessionContext sessionContext;
 
@@ -66,27 +69,17 @@ public class NettyClient extends AbstractClient{
                 }
             });
 
-            if(logger.isDebugEnabled()){
-                logger.debug("尝试连接区域服务器:{}",serverUrl);
-            }
+            logger.info("尝试连接区域服务器[{}]:{}",errorTimes++,serverUrl);
 
             // Start the client.
             ChannelFuture f = b.connect(host, port).sync();
             //连接成功后,稍微等一下,如果连接时通过nginx做的代理,刚开始连接上,如果后端服务没有READY的情况下,连接成功后,过一会会断开连接
             TimeUnit.SECONDS.sleep(2);
 
-            if(f.isSuccess() && f.channel().isActive()){
-                logger.info("客户端连接成功,准备发送注册客户端命令");
-                session = new NettyClientSession(f.channel(),handler,serverUrl);
-                f.channel().attr(SESSION_ID).set(session.getId());
-                this.doConnect(session);
-            }
             f.channel().closeFuture().addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
-                    if(logger.isDebugEnabled()){
-                        logger.error("客户端连接断开啦。。。。。{}",future.channel());
-                    }
+                    logger.error("客户端连接断开啦。。。。。{}",future.channel());
 
                     Attribute att =future.channel().attr(AttributeKey.valueOf("sessionid"));
                     if(att != null){
@@ -96,9 +89,19 @@ public class NettyClient extends AbstractClient{
                         }
                         sessionContext.remove(sessionid);
                     }
+                    workerGroup.shutdownGracefully();
 
                 }
             });
+
+            if(f.isSuccess() && f.channel().isActive()){
+                logger.info("客户端连接成功,准备发送注册客户端命令");
+                session = new NettyClientSession(f.channel(),handler,serverUrl);
+                f.channel().attr(SESSION_ID).set(session.getId());
+               this.doConnect(session);
+            }
+
+
             // Wait until the connection is closed.
 //            f.channel().closeFuture().sync();
         }catch(Exception ex){
