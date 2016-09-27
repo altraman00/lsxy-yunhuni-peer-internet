@@ -51,6 +51,7 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
             params.put("uid",account.getId());
             params.put("code",uuid);
             params.put("date", DateUtils.getDate("yyyy年MM月dd日"));
+            params.put("globalOfficialWebsiteUrl", SystemConfig.getProperty("global.official.website.url"));
             mailService.send("账号激活",account.getEmail(),"01-portal-notify-account-activate.vm",params);
             //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
             String testEmail = SystemConfig.getProperty("global.mail.tester.email");

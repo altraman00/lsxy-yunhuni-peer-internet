@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 放音文件
@@ -51,7 +52,12 @@ public class VoiceFilePlayController extends AbstractRestController {
      */
     @RequestMapping("/delete")
     public RestResponse delete(String id) throws InvocationTargetException, IllegalAccessException {
-        String repository=SystemConfig.getProperty("global.oss.aliyun.bucket");
+        VoiceFilePlay voiceFilePlay = deleteOneVoiceFilePlay(id);
+        return RestResponse.success(voiceFilePlay);
+    }
+
+    private VoiceFilePlay deleteOneVoiceFilePlay(String id) throws IllegalAccessException, InvocationTargetException {
+        String repository= SystemConfig.getProperty("global.oss.aliyun.bucket");
         VoiceFilePlay voiceFilePlay =  voiceFilePlayService.findById(id);
         try {
             ossService.deleteObject(repository, voiceFilePlay.getFileKey());
@@ -75,24 +81,54 @@ public class VoiceFilePlayController extends AbstractRestController {
 //            billingService.save(billing);
         Account account = getCurrentAccount();
         calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
-        return RestResponse.success(voiceFilePlay);
+        return voiceFilePlay;
     }
 
+    /**
+     * 查看改文件名的数量
+     * @param appId 应用id
+     * @param name 文件名
+     * @return
+     */
+    @RequestMapping("/count/name")
+    public RestResponse countName(String appId,String name){
+        List list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,name);
+        return RestResponse.success(list.size());
+    }
     /**
      * 新建放音文件记录
      * @param voiceFilePlay
      * @return
      */
     @RequestMapping("/create")
-    public RestResponse createRemark(VoiceFilePlay voiceFilePlay,String appId){
+    public RestResponse createVoiceFilePlay(VoiceFilePlay voiceFilePlay,String appId) throws InvocationTargetException, IllegalAccessException {
         //将对象保存数据库
         if(logger.isDebugEnabled()) {
             logger.debug("开始创建放音文件记录，应用{}，记录{}", appId, voiceFilePlay);
         }
         App app = appService.findById(appId);
+        Account account = getCurrentAccount();
+        if(logger.isDebugEnabled()) {
+            logger.debug("判断应用{}是否有重名文件{}", appId, voiceFilePlay.getName());
+        }
+        List<VoiceFilePlay> list = voiceFilePlayService.findByFileName(getCurrentAccount().getTenant().getId(),appId,voiceFilePlay.getName());
+        if(list!=null) {
+            for (int i = 0; i < list.size(); i++) {
+                if(logger.isDebugEnabled()) {
+                    logger.debug("开始删除重名文件对象{}",list.get(i));
+                }
+                deleteOneVoiceFilePlay(list.get(i).getId());
+                if(logger.isDebugEnabled()) {
+                    logger.debug("删除重名文件对象{},文件名{}，删除成功",list.get(i).getId(),list.get(i).getName());
+                }
+            }
+        }else{
+            if(logger.isDebugEnabled()) {
+                logger.debug("没有重名文件");
+            }
+        }
         voiceFilePlay.setRemark("");
         voiceFilePlay.setApp(app);
-        Account account = getCurrentAccount();
         voiceFilePlay.setTenant(account.getTenant());
         voiceFilePlay.setStatus(VoiceFilePlay.STATUS_WAIT);
         voiceFilePlay = voiceFilePlayService.save(voiceFilePlay);

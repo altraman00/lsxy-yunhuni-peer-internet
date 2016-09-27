@@ -2,6 +2,7 @@
 <configuration debug="false">
     <contextName>area-agent</contextName>
     <property name="APP_NAME" value="area-agent" />
+    <property name="systemId" value="area.agent" />
     <include resource="logback-yunhuni.xml"/>
     <!--<logger name="org.springframework.boot" level="DEBUG" additivity="true" />-->
     <!--<logger name="io.netty" level="INFO" additivity="false" />-->
@@ -10,5 +11,11 @@
     <logger name="com.lsxy.area" level="DEBUG" additivity="true" />
     <!--<logger name="com.lsxy.framework.rpc.api.server" level="DEBUG" additivity="true" />-->
     <!--<logger name="com.lsxy.framework.rpc.netty.codec" level="INFO" additivity="false"/>-->
+
+<!--&lt;!&ndash;区域配置不能往中心丢日志,覆盖父亲配置&ndash;&gt;-->
+    <!--<root level="INFO">-->
+        <!--<appender-ref ref="STDOUT" />-->
+        <!--<appender-ref ref="ROLLINGFILE"/>-->
+    <!--</root>-->
 
 </configuration>

@@ -12,6 +12,7 @@ import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
+import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
@@ -31,15 +32,19 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class AreaServerMainClass extends AbstractSpringBootStarter {
 
+
+    private static final String systemId = "area.server";
+    static {
+        System.setProperty("systemId",systemId);
+    }
+
     public static void main(String[] args) throws RemoteServerStartException {
         System.setProperty(Constants.DUBBO_PROPERTIES_KEY,"config.properties");
         SpringApplication.run(AreaServerMainClass.class);
     }
 
-
-
     @Override
     public String systemId() {
-        return "area.server";
+        return systemId;
     }
 }

@@ -23,7 +23,8 @@
 
 <div class="register-header">
     <div class="box">
-        <img class="logo" src="${resPrefixUrl}/images/index/logo_top.png"/>
+        <a a href="#" onclick="window.open('${globalOfficialWebsiteUrl}')">
+        <img class="logo" src="${resPrefixUrl}/images/index/logo_top.png"/></a>
         <div class="text">
             如果有云呼你账号，<a href="${host}/login">立即登录</a>
         </div>
@@ -36,7 +37,7 @@
             <br/>
             <p>你好！</p>
             </br>
-            <p>您于${date}变更了云呼你账号绑定邮箱，点击一下链接，即可激活该邮箱：</p>
+            <p>您于${date}变更了云呼你账号绑定邮箱，点击以下链接，即可激活该邮箱：</p>
             <br/>
             <a href="${host}/modify/email?id=${id}&code=${code}" target="_blank">${host}/modify/email?id=${id}&code=${code}</a>
             <br/>

@@ -7,6 +7,7 @@ import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
+import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -20,6 +21,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class})
 public class MainClass extends AbstractSpringBootWebStarter {
+    private static final String systemId = "app.backend";
+    static {
+        System.setProperty("systemId",systemId);
+    }
+
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MainClass.class, args);
@@ -27,6 +33,6 @@ public class MainClass extends AbstractSpringBootWebStarter {
 
     @Override
     public String systemId() {
-        return "app.backend";
+        return systemId;
     }
 }

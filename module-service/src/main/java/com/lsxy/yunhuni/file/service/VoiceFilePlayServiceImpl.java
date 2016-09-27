@@ -212,4 +212,8 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
         String sql = "UPDATE db_lsxy_bi_yunhuni.tb_bi_voice_file_play SET aa_deleted=? WHERE id=? ";
         jdbcTemplate.update(sql, status, id);
     }
+    @Override
+    public List<VoiceFilePlay> findByFileName(String tenantId, String appId, String name) {
+        return this.list("from VoiceFilePlay obj where obj.tenant.id = ?1 and obj.app.id=?2 and name = ?3 ",tenantId,appId,name);
+    }
 }

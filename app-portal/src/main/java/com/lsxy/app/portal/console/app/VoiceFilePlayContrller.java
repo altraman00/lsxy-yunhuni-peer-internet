@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.console.app;
 
+import com.alibaba.fastjson.JSON;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.config.SystemConfig;
@@ -20,7 +21,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +62,22 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         }else{
             return response;
         }
+    }
+
+    /**
+     *
+     * @param request
+     * @param appId
+     * @param name
+     * @return
+     */
+    @RequestMapping("/verify/name")
+    @ResponseBody
+    public RestResponse verify(HttpServletRequest request,String appId,String name){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_play/count/name?appId={1}&name={2}";
+        RestResponse countResponse =  RestRequest.buildSecurityRequest(token).get(uri,Long.class,appId,name);
+        return countResponse;
     }
     /**
      * 根据当前页，每页记录数，应用ｉｄ，放音文件的名字（模糊查询）进行查询放音文件的分页信息
@@ -135,8 +155,22 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/upload")
-    @ResponseBody
-    public RestResponse uploadMore(HttpServletRequest request,@RequestParam("file") MultipartFile[] multipartfiles,String appId ,String key){
+    public void uploadMore(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile[] multipartfiles, String appId , String key){
+        response.setHeader("content-type", "application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            RestResponse restResponse = getRestResponse( request,  response, multipartfiles,  appId ,  key);
+            if(!restResponse.isSuccess()) {
+                response.setStatus(489,"错误啦");
+            }
+            Writer writer = response.getWriter();
+            writer.write(JSON.toJSONString(restResponse));
+            writer.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+    private RestResponse getRestResponse(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile[] multipartfiles, String appId , String key){
         String tenantId = this.getCurrentUser(request).getTenantId();
         String ymd = DateUtils.formatDate(new Date(),"yyyyMMdd");
         RestResponse restResponse = null;
@@ -146,41 +180,59 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
                 for (int i=0;i< multipartfiles.length;i++) {
                     MultipartFile file  = multipartfiles[i];
                     String name = file.getOriginalFilename();//文件名
+                    boolean flagName = name.matches("^.+(.wav)$");
+                    if(!flagName){
+                        return RestResponse.failed("0000", "上传失败,上传格式不正确");
+                    }
                     long size = file.getSize();//文件大小
-                    String type = name.substring(name.lastIndexOf("."),name.length());
+                    if(size > 5*1024*1024) {
+                        return RestResponse.failed("0000", "上传失败,文件超过5M");
+                    }
+                    RestResponse response1 = getBilling(request);
+                    if(response1.isSuccess()) {
+                        Billing billing = (Billing) response1.getData();
+                        if(billing.getFileRemainSize()<size){
+                            return RestResponse.failed("0000", "存储空间不足，无法上传");
+                        }
+                    }else{
+                        return response1;
+                    }
+                    String type = name.substring(name.lastIndexOf("."), name.length());
                     //如果文件夹不存在，则创建文件夹
-                    String folder = getFolder(tenantId,appId,ymd);
-                    new File(filePlayPath+"/"+folder).mkdirs();
-                    String fileKey = getFileKey(tenantId,appId,ymd,type);
-                    File newFile = new File(filePlayPath +"/"+fileKey);
+                    String folder = getFolder(tenantId, appId, ymd);
+                    new File(filePlayPath + "/" + folder).mkdirs();
+                    String fileKey = getFileKey(tenantId, appId, ymd, type);
+                    File newFile = new File(filePlayPath + "/" + fileKey);
                     //保存在临时文件夹
                     boolean flag = false;
                     try {
                         file.transferTo(newFile);
                         flag = true;
-                    }catch (Exception e){
-                        logger.error("上传放音文件-保存文件过程出错,{}",e);
+                    } catch (Exception e) {
+                        logger.error("上传放音文件-保存文件过程出错,{}", e);
                     }
 //                    int re = downFile(file,filePlayPath +"/"+fileKey);
-                    if(flag) {
+                    if (flag) {
                         //文件保存成功，将对象保存数据库
                         restResponse = createVoiceFilePlay(request, name, size, fileKey, appId);
                         if (!restResponse.isSuccess()) {
                             logger.info("上传成功，保存失败：{}", name);
                             //将本地文件删除
                             new File(filePlayPath + "/" + fileKey).delete();
-                            restResponse = RestResponse.failed("0000", "上传失败");
+                            return RestResponse.failed("0000", "上传失败");
+                        }else{
+                            return RestResponse.success("上传成功");
                         }
-                    }else{
-                        restResponse = RestResponse.failed("0000", "上传失败");
+                    } else {
+                        return RestResponse.failed("0000", "上传失败");
                     }
                 }
             }
         }catch (Exception e){
             logger.info("文件上传异常：{}",e);
-            restResponse = RestResponse.failed("0000","上传失败");
+            return RestResponse.failed("0000","上传失败");
         }
-        return restResponse;
+        return null;
     }
     /**
      * 上传文件（支持多文件）--直接上传OSS版本
