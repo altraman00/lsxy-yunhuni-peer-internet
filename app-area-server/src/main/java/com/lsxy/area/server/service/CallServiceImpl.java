@@ -222,8 +222,8 @@ public class CallServiceImpl implements CallService {
         VoiceCallback voiceCallback = new VoiceCallback(from1,from2,to1_uri,to2_uri);
         voiceCallbackService.save(voiceCallback);
         duocCallId = voiceCallback.getId();
-        CallSession callSession = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
-        CallSession callSession2 = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
+        CallSession callSession = new CallSession(CallSession.STATUS_PREPARING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to1_uri);
+        CallSession callSession2 = new CallSession(CallSession.STATUS_PREPARING,app,app.getTenant(),duocCallId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to2_uri);
         callSessionService.save(callSession);
         callSessionService.save(callSession2);
 
@@ -350,7 +350,7 @@ public class CallServiceImpl implements CallService {
         NotifyCall notifyCall = new NotifyCall(from,to_uri);
         notifyCallService.save(notifyCall);
         callId = notifyCall.getId();
-        CallSession callSession = new CallSession(CallSession.STATUS_CALLING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
+        CallSession callSession = new CallSession(CallSession.STATUS_PREPARING,app,app.getTenant(),callId, ProductCode.changeApiCmdToProductCode(apiCmd).name(),oneTelnumber,to_uri);
         callSessionService.save(callSession);
 
         Map<String, Object> params = new HashMap<>();

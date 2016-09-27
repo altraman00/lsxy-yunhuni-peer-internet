@@ -111,10 +111,10 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
 
         if(StringUtils.isNotBlank(callBackUrl)){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","verify_call.end")
+                    .putIfNotEmpty("event","notify_call.end")
                     .putIfNotEmpty("id",call_id)
                     .putIfNotEmpty("begin_time",beginTime==null?null:beginTime.getTime())
-                    .putIfNotEmpty("answer",answerTime==null?null:answerTime.getTime())
+                    .putIfNotEmpty("answer_time",answerTime==null?null:answerTime.getTime())
                     .putIfNotEmpty("end_time",endTime==null?null:endTime.getTime())
                     .putIfNotEmpty("hangup_by",paramMap.get("dropped_by"))
                     .putIfNotEmpty("reason",paramMap.get("reason"))

@@ -95,6 +95,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)
+                                    .put("user_data",params.get("user_data1"))
                                     .put("user_data1",params.get("user_data1"))
                                     .put("user_data2",params.get("user_data2"))
                                     .build());
@@ -112,6 +113,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("user_data",params.get("user_data1"))
                                     .put("user_data1",params.get("user_data1"))
                                     .put("user_data2",params.get("user_data2"))
                                     .build());
