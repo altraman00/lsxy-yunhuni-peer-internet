@@ -273,7 +273,7 @@ public class ConfServiceImpl implements ConfService {
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
-        callSession.setType(CallSession.TYPE_VOICE_IVR);
+        callSession.setType(CallSession.TYPE_VOICE_MEETING);
         callSession.setResId(null);
         callSession = callSessionService.save(callSession);
 
