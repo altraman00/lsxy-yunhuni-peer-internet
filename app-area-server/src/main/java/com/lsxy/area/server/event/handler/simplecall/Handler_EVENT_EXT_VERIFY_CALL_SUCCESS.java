@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,28 +77,20 @@ public class Handler_EVENT_EXT_VERIFY_CALL_SUCCESS extends EventHandler {
             busniessData = new HashMap<>();
             state.setBusinessData(busniessData);
         }
-        //保存会话记录
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_CALLING);
-        callSession.setApp(appService.findById(state.getAppId()));
-        callSession.setTenant(tenantService.findById(state.getTenantId()));
-        callSession.setRelevanceId(call_id);
-        callSession.setType(CallSession.TYPE_VOICE_VOICECODE);
-        callSession.setResId(res_id);
-        callSessionService.save(callSession);
+        //更新会话记录状态
+        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        if(callSession != null){
+            callSession.setResId(res_id);
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSessionService.save(callSession);
+        }
 
-        CaptchaCall captchaCall = new CaptchaCall();
-        captchaCall.setId(call_id);
-        captchaCall.setStartTime(new Date());
-        captchaCall.setEndTime(null);
-        captchaCall.setFromNum((String)busniessData.get("from"));
-        captchaCall.setToNum((String)busniessData.get("to"));
-        captchaCall.setHangupSide(null);
-        captchaCall.setResId(res_id);
-        captchaCallService.save(captchaCall);
-        
+        CaptchaCall captchaCall = captchaCallService.findById(call_id);
+        if(captchaCall != null){
+            captchaCall.setResId(res_id);
+            captchaCallService.save(captchaCall);
+        }
         state.setResId(res_id);
-        busniessData.put("sessionid",callSession.getId());
         businessStateService.save(state);
         return res;
     }
