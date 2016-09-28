@@ -14,14 +14,7 @@
 				2.访问的指定的数据已经被删除<br/><br/>
 				给您造成的不便我们深感抱歉，您可以发邮件到与我们取得联系，我们会在24小时之内给您回复，谢谢您的支持与谅解!!
 			</div>
-			
-			<div>
-				 <H1>错误：</H1><%=exception%>
-			     <H2>错误内容：</H2>
-		     <%
-			         exception.printStackTrace(response.getWriter());
-			     %>
-			</div>
+
 		</div>
 	</body>
 </html>
