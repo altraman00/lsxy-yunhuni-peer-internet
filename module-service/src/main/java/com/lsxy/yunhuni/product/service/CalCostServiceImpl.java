@@ -81,26 +81,26 @@ public class CalCostServiceImpl implements CalCostService{
         //1.扣量2.扣费3.扣量加扣费
         Integer costType;
         switch (productCode){
-            case captcha_call:{
-                //短信
-                Long sms = calBillingService.getSms(tenantId);
-                if(sms >0){
-                    calBillingService.incUseSms(tenantId,dt,1L);
-                    CaptchaUse captchaUse = new CaptchaUse(dt,productCode.name(),appId,tenantId);
-                    captchaUseService.save(captchaUse);
-                    costTimeLong = 0L;
-                    cost = new BigDecimal(0);
-                    deduct = 1L;
-                    costType = VoiceCdr.COST_TYPE_DEDUCT;
-                }else{
-                    BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
-                    costTimeLong = 0L;
-                    cost = consume;
-                    deduct = 0L;
-                    costType = VoiceCdr.COST_TYPE_COST;
-                }
-                break;
-            }
+//            case captcha_call:{
+//                //短信
+//                Long sms = calBillingService.getSms(tenantId);
+//                if(sms >0){
+//                    calBillingService.incUseSms(tenantId,dt,1L);
+//                    CaptchaUse captchaUse = new CaptchaUse(dt,productCode.name(),appId,tenantId);
+//                    captchaUseService.save(captchaUse);
+//                    costTimeLong = 0L;
+//                    cost = new BigDecimal(0);
+//                    deduct = 1L;
+//                    costType = VoiceCdr.COST_TYPE_DEDUCT;
+//                }else{
+//                    BigDecimal consume = insertConsume(tenantId, appId, time, dt, productCode.name(), productCode.getRemark(), product);
+//                    costTimeLong = 0L;
+//                    cost = consume;
+//                    deduct = 0L;
+//                    costType = VoiceCdr.COST_TYPE_COST;
+//                }
+//                break;
+//            }
             case sys_conf:{
                 //会议
                 Long useTime = calUnitNum(time, product) * product.getTimeUnit();
