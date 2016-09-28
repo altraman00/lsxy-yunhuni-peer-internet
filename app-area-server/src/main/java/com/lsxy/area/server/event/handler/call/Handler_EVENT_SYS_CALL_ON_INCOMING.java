@@ -3,8 +3,8 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -105,7 +105,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             //被叫是公共测试号,根据主叫号查出应用
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
             if(testNumBind == null){
-                logger.info("公共测试号={}找不到对应的app，from={}",to,from);
+                logger.error("公共测试号={}找不到对应的app，from={}",to,from);
                 return res;
             }
             tenant = testNumBind.getTenant();
@@ -113,16 +113,19 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         }else{
             //不是公共测试号，从号码资源池中查出被叫号码的应用
             ResourcesRent rent = resourcesRentService.findByResDataAndRentStatus(to, ResourcesRent.RENT_STATUS_USING);
+            if(rent == null){
+                logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
+            }
             tenant = rent.getTenant();
             app = rent.getApp();
         }
 
         if(tenant == null){
-            logger.info("找不到对应的租户");
+            logger.error("找不到对应的租户:{}",params);
             return res;
         }
         if(app == null){
-            logger.info("找不到对应的APP");
+            logger.error("找不到对应的APP:{}", params);
             return res;
         }
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to);
