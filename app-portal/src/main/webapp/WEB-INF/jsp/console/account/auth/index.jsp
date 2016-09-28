@@ -109,7 +109,7 @@
                                                             <div class="thumbnail">
                                                                 <img src="${resPrefixUrl }/images/personal/id.png" alt="...">
                                                                 <div class="caption">
-                                                                    <p>请手持真实有效的中华人民共和国二代身份证拍照，需要拍摄身份证的正反面照片，照片要求身份证证件完整清晰，人头形象完整清晰且和身份证证件照同属一个。</p>
+                                                                    <p>请手持真实有效的相关证件拍照，需要拍摄证件带有信息的一面，照片要求证件信息和人物形象完整清晰，人物与证件上的身份相符。</p>
                                                                 </div>
                                                             </div>
                                                         </div>
