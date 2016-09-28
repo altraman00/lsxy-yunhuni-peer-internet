@@ -107,7 +107,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         voiceCdrDay = voiceCdrDayService.findByAppIdAndTime(appId,currentDay);
         if(voiceCdrDay == null){
             Date lastDay = DateUtils.getPreDate(currentDay);
-            voiceCdrHour = voiceCdrHourService.findByAppIdAndTime(appId,lastDay);
+            voiceCdrDay = voiceCdrDayService.findByAppIdAndTime(appId,lastDay);
         }
 
         Map result = new HashMap();
