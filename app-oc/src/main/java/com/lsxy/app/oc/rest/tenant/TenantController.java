@@ -197,17 +197,17 @@ public class TenantController {
             @ApiParam(name = "id",value = "租户id")
             @PathVariable String id){
         Billing billing = calBillingService.getCalBilling(id);
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map map= objectMapper.convertValue(billing,Map.class);
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        Map map= objectMapper.convertValue(billing,Map.class);
         //余额正数部分
-        int vTemp = billing.getBalance().intValue();
+//        int vTemp = billing.getBalance().intValue();
         //余额小数部分
-        DecimalFormat df   = new DecimalFormat("######0.00");
-        String format = df.format(billing.getBalance());
-        String vTempDec = format.substring(format.indexOf('.') + 1, format.length());
-        map.put("balance",vTemp);
-        map.put("balanceDec",vTempDec);
-        return RestResponse.success(map);
+//        DecimalFormat df   = new DecimalFormat("######0.00");
+//        String format = df.format(billing.getBalance());
+//        String vTempDec = format.substring(format.indexOf('.') + 1, format.length());
+//        map.put("balance",vTemp);
+//        map.put("balanceDec",vTempDec);
+        return RestResponse.success(billing);
     }
 
     @ApiOperation(value = "租户上个月数据指标")
