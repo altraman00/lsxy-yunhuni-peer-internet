@@ -49,11 +49,11 @@
                                                 <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>
-                                        <li>
-                                            <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
-                                            </div>
-                                        </li>
+                                        <%--<li>--%>
+                                            <%--<div class="aside-li-a">--%>
+                                                <%--<a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>--%>
+                                            <%--</div>--%>
+                                        <%--</li>--%>
                                         <li>
                                             <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
@@ -118,22 +118,25 @@
                                                 <th>呼叫类型</th>
                                                 <th>主叫</th>
                                                 <th>被叫</th>
+                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 <th>时长（秒）</th>
-                                                <th>消费金额（元）</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
-                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
+                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                                     <td>
                                                         <c:if test="${result.ivrType==1}">呼入</c:if>
                                                         <c:if test="${result.ivrType==2}">呼出</c:if>
                                                     </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
+                                                    <td>
+                                                        <span style="float:left;width: 80px" ><span style="float:right;" >
+                                                            ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
+                                                        </span></span></td>
                                                     <td>${result.costTimeLong}</td>
-                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

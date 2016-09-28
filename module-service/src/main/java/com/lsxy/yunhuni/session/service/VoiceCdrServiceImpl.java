@@ -24,6 +24,8 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static com.lsxy.framework.core.utils.DateUtils.getPreDate;
+
 /**
  * Created by zhangxb on 2016/7/19.
  */
@@ -51,7 +53,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   last_time BETWEEN ? and ?";
         String sqlCount = "select count(1) "+sql;
         Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{date1,date2});
-        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" limit ?,?";
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc limit ?,?";
         pageNo--;
         List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2,pageNo*pageSize,pageSize});
         List list = new ArrayList();
@@ -92,6 +94,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Long currentSession = callSessionService.currentCallSessionCount(appId);
         String currentHourStr = DateUtils.formatDate(date, "yyyy-MM-dd HH");
         Date currentHour = DateUtils.parseDate(currentHourStr, "yyyy-MM-dd HH");
+        currentHour = DateUtils.getPrevHour(currentHour);
         voiceCdrHour = voiceCdrHourService.findByAppIdAndTime(appId,currentHour);
         if(voiceCdrHour == null){
             Date lastHour = DateUtils.getPrevHour(currentHour);
@@ -100,6 +103,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 
         String currentDayStr = DateUtils.formatDate(date, "yyyy-MM-dd");
         Date currentDay = DateUtils.parseDate(currentDayStr, "yyyy-MM-dd");
+        currentDay = DateUtils.getPreDate(currentDay);
         voiceCdrDay = voiceCdrDayService.findByAppIdAndTime(appId,currentDay);
         if(voiceCdrDay == null){
             Date lastDay = DateUtils.getPreDate(currentDay);
@@ -107,8 +111,8 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         }
 
         Map result = new HashMap();
-        result.put("dayCount",voiceCdrHour == null ? 0 : voiceCdrHour.getAmongCall());
-        result.put("hourCount",voiceCdrDay == null ? 0 : voiceCdrDay.getAmongCall());
+        result.put("hourCount",voiceCdrHour == null ? 0 : voiceCdrHour.getAmongCall());
+        result.put("dayCount",voiceCdrDay == null ? 0 : voiceCdrDay.getAmongCall());
         result.put("currentSession",currentSession);
         return result;
     }

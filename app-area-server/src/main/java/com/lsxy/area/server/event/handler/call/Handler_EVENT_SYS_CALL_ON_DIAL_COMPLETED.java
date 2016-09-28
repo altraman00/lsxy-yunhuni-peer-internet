@@ -4,9 +4,9 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -18,8 +18,6 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.session.model.CallSession;
-import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.collections.MapUtils;
@@ -29,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,37 +111,15 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         }
         Map<String,Object> businessData = state.getBusinessData();
 
-        //保存会话信息
         if(businessData == null){
             businessData = new HashMap<>();
-            state.setBusinessData(businessData);
         }
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_CALLING);
-        callSession.setApp(appService.findById(state.getAppId()));
-        callSession.setTenant(tenantService.findById(state.getTenantId()));
-        callSession.setRelevanceId(call_id);
-        if(state.getType().equalsIgnoreCase("sys_conf")){
-            callSession.setType(CallSession.TYPE_VOICE_MEETING);
-        }else if(state.getType().equalsIgnoreCase("ivr_call")){
-            callSession.setType(CallSession.TYPE_VOICE_IVR);
-        }else if(state.getType().equalsIgnoreCase("ivr_dial")){
-            callSession.setType(CallSession.TYPE_VOICE_IVR);
-        }
-        callSession.setResId(state.getResId());
-        callSession = callSessionService.save(callSession);
-        businessData.put("sessionid",callSession.getId());
-        businessStateService.save(state);
-
 
         if("sys_conf".equals(state.getType())){//该呼叫是通过(会议邀请呼叫)发起需要将呼叫加入会议
             if(StringUtils.isNotBlank(error)){
                 logger.error("将呼叫加入到会议失败{}",error);
             }else{
-                String conf_id = null;
-                if(businessData!=null){
-                    conf_id = (String)businessData.get("conf_id");
-                }
+                String conf_id = (String)businessData.get("conf_id");
                 if(conf_id == null){
                     logger.info("将呼叫加入到会议失败conf_id为null");
                     return res;
@@ -176,14 +151,6 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .putIfNotEmpty("end_time",end_time)
                         .putIfNotEmpty("user_data",state.getUserdata())
                         .build();
-
-                VoiceIvr voiceIvr = new VoiceIvr();
-                voiceIvr.setId(call_id);
-                voiceIvr.setFromNum((String)businessData.get("from"));
-                voiceIvr.setToNum((String)businessData.get("to"));
-                voiceIvr.setStartTime(new Date());
-                voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
-                voiceIvrService.save(voiceIvr);
 
                 notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
                 ivrActionService.doAction(call_id);

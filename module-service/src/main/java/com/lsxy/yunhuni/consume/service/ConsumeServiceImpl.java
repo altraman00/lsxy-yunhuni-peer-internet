@@ -51,7 +51,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
             tmepAppId += " and  obj.appId ='"+appId+"'";
         }
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<?2 and obj.dt>=?3 "+tmepAppId+" ORDER BY obj.dt";
+        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<?2 and obj.dt>=?3 "+tmepAppId+" ORDER BY obj.dt desc";
         Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endDate,startDate);
         return page;
     }

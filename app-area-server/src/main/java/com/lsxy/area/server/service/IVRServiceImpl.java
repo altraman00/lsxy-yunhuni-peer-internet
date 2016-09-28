@@ -5,28 +5,32 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.IVRService;
 import com.lsxy.area.api.exceptions.*;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -64,6 +68,12 @@ public class IVRServiceImpl implements IVRService {
 
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
+
+    @Autowired
+    private VoiceIvrService voiceIvrService;
+
+    @Autowired
+    private CallSessionService callSessionService;
 
     private boolean isEnableIVRService(String tenantId,String appId){
         try {
@@ -109,10 +119,26 @@ public class IVRServiceImpl implements IVRService {
             throw new BalanceNotEnoughException();
         }
 
-        String callId = UUIDGenerator.uuid();
         //TODO
         String oneTelnumber = appService.findOneAvailableTelnumber(app);
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
+        VoiceIvr voiceIvr = new VoiceIvr();
+        voiceIvr.setFromNum(oneTelnumber);
+        voiceIvr.setToNum(to);
+        voiceIvr.setStartTime(new Date());
+        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
+        voiceIvr = voiceIvrService.save(voiceIvr);
+        String callId = voiceIvr.getId();
+
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setApp(app);
+        callSession.setTenant(app.getTenant());
+        callSession.setRelevanceId(callId);
+        callSession.setType(CallSession.TYPE_VOICE_IVR);
+        callSession.setResId(null);
+        callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
@@ -140,6 +166,7 @@ public class IVRServiceImpl implements IVRService {
                                     .setBusinessData(new MapBuilder<String,Object>()
                                             .putIfNotEmpty("from",from)
                                             .putIfNotEmpty("to",to)
+                                            .putIfNotEmpty("sessionid",callSession.getId())
                                             .build())
                                     .build();
         businessStateService.save(callstate);

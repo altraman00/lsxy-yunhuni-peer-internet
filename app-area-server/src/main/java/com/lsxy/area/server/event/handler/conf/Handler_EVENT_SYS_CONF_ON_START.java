@@ -133,11 +133,12 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             logger.debug("处理{}事件完成",getEventName());
         }
         ifAutoRecording(state.getAppId(),businessData,res_id,conf_id);
-        Meeting meeting = new Meeting();
-        meeting.setId(conf_id);
-        meeting.setResId(res_id);
-        meeting.setStartTime(new Date());
-        meetingService.save(meeting);
+        Meeting meeting = meetingService.findById(conf_id);
+        if(meeting != null){
+            meeting.setResId(res_id);
+            meeting.setStartTime(new Date());
+            meetingService.save(meeting);
+        }
         return res;
     }
 
