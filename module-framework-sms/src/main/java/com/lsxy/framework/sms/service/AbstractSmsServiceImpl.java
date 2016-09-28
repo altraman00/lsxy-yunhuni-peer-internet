@@ -49,17 +49,23 @@ public abstract class AbstractSmsServiceImpl implements  SmsService{
 
     @Override
     public String genVC(String to) throws TooManyGenTimesException {
+        String random = random(Integer.parseInt(SystemConfig.getProperty("global.sms.random.num",4+"")));
+        long codeSameTime = System.currentTimeMillis() + MobileCode.CODE_SAME_TIME;
         String getJson = getRedisCacheService().get(CODE_PREFIX + to);
         if(StringUtils.isNotBlank(getJson)){
             MobileCode getCode = JSONUtil2.fromJson(getJson, MobileCode.class);
             if(getCode != null){
                 if(System.currentTimeMillis() < (getCode.getCreateTime() + MobileCode.TIME_INTERVAL)){
                     throw new TooManyGenTimesException("验证码生成过于频繁");
+                }else{
+                    if(System.currentTimeMillis() < getCode.getCodeSameTime()){
+                        random = getCode.getCheckCode();
+                        codeSameTime = getCode.getCodeSameTime();
+                    }
                 }
             }
         }
-        String random = random(Integer.parseInt(SystemConfig.getProperty("global.sms.random.num",4+"")));
-        MobileCode mobileCode = new MobileCode(to,random);
+        MobileCode mobileCode = new MobileCode(to,random,codeSameTime);
         String setJson = JSONUtil2.objectToJson(mobileCode);
         getRedisCacheService().set(CODE_PREFIX + to,setJson , Long.parseLong(SystemConfig.getProperty("global.sms.code.expire",1800+"")));
         return random;
