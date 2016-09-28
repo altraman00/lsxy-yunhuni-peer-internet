@@ -126,7 +126,7 @@
                                     <tr>
                                         <th width="10">#</th>
                                         <th>消费时间</th>
-                                        <th>消费金额（元）</th>
+                                        <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                         <th>消费类型</th>
                                     </tr>
                                     </thead>

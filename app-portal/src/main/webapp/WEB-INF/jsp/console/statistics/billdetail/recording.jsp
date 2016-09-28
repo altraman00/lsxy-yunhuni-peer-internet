@@ -123,7 +123,7 @@
                                                 <th>主叫</th>
                                                 <th>被叫</th>
                                                 <th>大小</th>
-                                                <th>消费金额（元）</th>
+                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 <th>时长（秒）</th>
                                             </tr>
                                             </thead>
