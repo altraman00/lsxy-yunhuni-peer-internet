@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -75,11 +76,12 @@ public class HomeController extends AbstractPortalController {
         if(billing != null){
             //取出套餐剩余数据
             //余额正数部分
-            int vTemp = billing.getBalance().intValue();
-            if(vTemp<0){
+            BigDecimal balance = billing.getBalance();
+            if(balance.compareTo(BigDecimal.ZERO) == -1){
                 vo.setArrearage("欠费");
-                vTemp = Math.abs(vTemp);
             }
+            int vTemp = balance.intValue();
+            vTemp = Math.abs(vTemp);
             vo.setBalanceInt(vTemp+"");
             //余额小数部分
             DecimalFormat df   = new DecimalFormat("######0.00");

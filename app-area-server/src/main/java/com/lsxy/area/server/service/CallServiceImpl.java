@@ -113,14 +113,14 @@ public class CallServiceImpl implements CallService {
         return true;
     }
 
-    private boolean isEnableVoiceCallbackService(String tenantId,String appId){
+    private boolean isEnableVoiceDirectlyService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch !=null && (serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1)){
+            if(serviceSwitch !=null && (serviceSwitch.getIsVoiceDirectly() == null || serviceSwitch.getIsVoiceDirectly() != 1)){
                 return false;
             }
             App app = appService.findById(appId);
-            if(app.getIsVoiceCallback() == null || app.getIsVoiceCallback() != 1){
+            if(app.getIsVoiceDirectly() == null || app.getIsVoiceDirectly() != 1){
                 return false;
             }
         } catch (Throwable e) {
@@ -331,7 +331,7 @@ public class CallServiceImpl implements CallService {
             }
         }
 
-        if(!isEnableVoiceCallbackService(app.getTenant().getId(),appId)){
+        if(!isEnableVoiceDirectlyService(app.getTenant().getId(),appId)){
             throw new AppServiceInvalidException();
         }
 
