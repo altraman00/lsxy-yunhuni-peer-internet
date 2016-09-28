@@ -111,8 +111,8 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         }
 
         Map result = new HashMap();
-        result.put("dayCount",voiceCdrHour == null ? 0 : voiceCdrHour.getAmongCall());
-        result.put("hourCount",voiceCdrDay == null ? 0 : voiceCdrDay.getAmongCall());
+        result.put("hourCount",voiceCdrHour == null ? 0 : voiceCdrHour.getAmongCall());
+        result.put("dayCount",voiceCdrDay == null ? 0 : voiceCdrDay.getAmongCall());
         result.put("currentSession",currentSession);
         return result;
     }
