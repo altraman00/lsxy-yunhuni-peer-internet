@@ -196,23 +196,14 @@
                                         <div class="h5 border-left">开发者账号</div>
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
-                                        <p>
-                                            接口API: ${homeVO.restApi}
-                                        <%--<span>--%>
-                                          <%--<a href="#">API文档</a>--%>
-                                        <%--</span>--%>
-                                        </p>
-                                        <p>
-                                            密钥: <span id="secretKey">${homeVO.secretKey}</span>
-                                        <span>
-                                          <a  class='reset_sk_confirm' >重新生成</a>
-                                        </span>
+                                        <p>接口API：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.restApi}</span></p>
+                                        <p>密钥：&nbsp;&nbsp;<span id="secretKey" style="font-weight:bold">${homeVO.secretKey}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class='reset_sk_confirm' >重新生成</a></span>
                                         <span>
                                             <a class="tips-error tips-key"></a>
                                         </span>
                                         </p>
                                         <p>
-                                            鉴权账号: <span >${homeVO.certId}</span>
+                                            鉴权账号：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.certId}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -271,7 +262,7 @@
                                             </div>
                                         </section>
                                     </c:if>
-                                    <c:if test="${app.status == 2}" >
+                                    <c:if test="${app.status == 2}">
                                         <section class="panel panel-default pos-rlt clearfix  app-list">
                                             <div class="sectionWrap">
                                                 <header class="panel-heading">
@@ -287,6 +278,8 @@
                                                             <small class="text-danger">未上线</small>
                                                         </span>
                                                         <small class="text-muted m-t-xs yhn-description">${app.description}</small>
+                                                    </div>
+                                                    <div class="app-status-left fr">
                                                         <a href="${ctx}/console/app/detail?id=${app.id}" class="fr">详情</a>
                                                     </div>
                                                 </div>
