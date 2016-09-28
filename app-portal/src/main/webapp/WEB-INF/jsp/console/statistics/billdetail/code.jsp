@@ -106,11 +106,11 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <c:set var="totalCount" value="0"></c:set>
-                                                <c:if test="${pageObj!=null }">
-                                                    <c:set value="${pageObj.totalCount}" var="totalCount"></c:set>
+                                                <c:set var="sum_cost" value="0.00"></c:set>
+                                                <c:if test="${sum!=null && sum.cost!=null}">
+                                                    <c:set value="${sum.cost}" var="sum_cost"></c:set>
                                                 </c:if>
-                                                <th colspan="6"><span class="p-money">总条数：${totalCount}条</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>发送时间</th>

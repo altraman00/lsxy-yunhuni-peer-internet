@@ -26,7 +26,7 @@
     <div class="row box">
         <div class="col-md-12 text-center">
             <img src="${resPrefixUrl }/images/register/icon_12.png"/>
-            <p class="p">账号注册成功，请72小时内前往邮箱收取邮件激活账号 ${email}</p>
+            <p class="p">账号注册成功，请在72小时之内前往邮箱${email},收取邮件完成账号激活</p>
             <p><a class="btn_actemail"  data-email="${email}" >去邮箱收取邮件</a></p>
         </div>
         <div id="accountId" style="display:none">${accountId}</div>
