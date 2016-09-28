@@ -137,54 +137,54 @@
                                                                class="form-control input-form limit50"/>
                                                     </div>
                                                 </div>
-                                                <!--企业专用票start-->
-                                                <div id="comSpecial" class="invoice-type" data-val="3">
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right ">纳税人识别号：</lable>
-                                                        <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}"
-                                                                   class="form-control input-form limit32"/>
-                                                        </div>
-                                                    </div>
+                                                <%--<!--企业专用票start-->--%>
+                                                <%--<div id="comSpecial" class="invoice-type" data-val="3">--%>
+                                                    <%--<div class="form-group">--%>
+                                                        <%--<lable class="col-md-3 text-right ">纳税人识别号：</lable>--%>
+                                                        <%--<div class="col-md-4">--%>
+                                                            <%--<input type="text" placeholder="" name="taxpayerNum"  value="${invoiceInfo.taxpayerNum}"--%>
+                                                                   <%--class="form-control input-form limit32"/>--%>
+                                                        <%--</div>--%>
+                                                    <%--</div>--%>
 
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right ">银行账户：</lable>
-                                                        <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="bankAccount"  value="${invoiceInfo.bankAccount}"
-                                                                   class="form-control input-form limit32"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right ">开户行：</lable>
-                                                        <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="bank"  value="${invoiceInfo.bank}"
-                                                                   class="form-control input-form limit32"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right ">注册地址：</lable>
-                                                        <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="regAddress"  value="${invoiceInfo.regAddress}"
-                                                                   class="form-control input-form limit100"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right ">企业电话：</lable>
-                                                        <div class="col-md-4">
-                                                            <input type="text" placeholder="" name="phone"  value="${invoiceInfo.phone}"
-                                                                   class="form-control input-form limit32"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>
-                                                        <div class="col-md-4">
-                                                            <c:set var="defaultImgUrl" value="${(empty invoiceInfo.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(invoiceInfo.qualificationUrl))}" />
-                                                            <input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${invoiceInfo.qualificationUrl}" data-url='${defaultImgUrl}'>
-                                                            <input type="file" class="form-control-file input-form  limitImageFile"  id="uploadfile"  name="uploadfile">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。
-                                                            <img src='${defaultImgUrl}' alt="" id="imgPre" width="100" height="80" class="recordimg" />
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                    <%--<div class="form-group">--%>
+                                                        <%--<lable class="col-md-3 text-right ">银行账户：</lable>--%>
+                                                        <%--<div class="col-md-4">--%>
+                                                            <%--<input type="text" placeholder="" name="bankAccount"  value="${invoiceInfo.bankAccount}"--%>
+                                                                   <%--class="form-control input-form limit32"/>--%>
+                                                        <%--</div>--%>
+                                                    <%--</div>--%>
+                                                    <%--<div class="form-group">--%>
+                                                        <%--<lable class="col-md-3 text-right ">开户行：</lable>--%>
+                                                        <%--<div class="col-md-4">--%>
+                                                            <%--<input type="text" placeholder="" name="bank"  value="${invoiceInfo.bank}"--%>
+                                                                   <%--class="form-control input-form limit32"/>--%>
+                                                        <%--</div>--%>
+                                                    <%--</div>--%>
+                                                    <%--<div class="form-group">--%>
+                                                        <%--<lable class="col-md-3 text-right ">注册地址：</lable>--%>
+                                                        <%--<div class="col-md-4">--%>
+                                                            <%--<input type="text" placeholder="" name="regAddress"  value="${invoiceInfo.regAddress}"--%>
+                                                                   <%--class="form-control input-form limit100"/>--%>
+                                                        <%--</div>--%>
+                                                    <%--</div>--%>
+                                                    <%--<div class="form-group">--%>
+                                                        <%--<lable class="col-md-3 text-right ">企业电话：</lable>--%>
+                                                        <%--<div class="col-md-4">--%>
+                                                            <%--<input type="text" placeholder="" name="phone"  value="${invoiceInfo.phone}"--%>
+                                                                   <%--class="form-control input-form limit32"/>--%>
+                                                        <%--</div>--%>
+                                                    <%--</div>--%>
+                                                    <%--<div class="form-group">--%>
+                                                        <%--<lable class="col-md-3 text-right lineheight-24">一般纳税人认证资格证书：</lable>--%>
+                                                        <%--<div class="col-md-4">--%>
+                                                            <%--<c:set var="defaultImgUrl" value="${(empty invoiceInfo.qualificationUrl)? (resPrefixUrl.concat('/images/index/l6.png')): (ctx.concat('/console/oss/img?uri=').concat(invoiceInfo.qualificationUrl))}" />--%>
+                                                            <%--<input type="hidden" id="qualificationUrl"  name="qualificationUrl" value="${invoiceInfo.qualificationUrl}" data-url='${defaultImgUrl}'>--%>
+                                                            <%--<input type="file" class="form-control-file input-form  limitImageFile"  id="uploadfile"  name="uploadfile">将原件或盖章的复印件扫描、拍照后上传，文件支持2M以内的jpg、jpeg、gif、png、bmp。--%>
+                                                            <%--<img src='${defaultImgUrl}' alt="" id="imgPre" width="100" height="80" class="recordimg" />--%>
+                                                        <%--</div>--%>
+                                                    <%--</div>--%>
+                                                <%--</div>--%>
                                                 <!--企业专用票end-->
                                                 <div class="form-group">
                                                     <span class="hr text-label"><strong>邮寄信息:</strong></span>

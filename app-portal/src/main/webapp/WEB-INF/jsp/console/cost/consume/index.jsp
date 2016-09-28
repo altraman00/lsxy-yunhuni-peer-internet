@@ -124,9 +124,9 @@
                                 <table class="table table-striped cost-table-history">
                                     <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th width="10">#</th>
                                         <th>消费时间</th>
-                                        <th>消费金额</th>
+                                        <th>消费金额（元）</th>
                                         <th>消费类型</th>
                                     </tr>
                                     </thead>
@@ -135,8 +135,11 @@
                                         <tr>
                                             <td scope="row">${s.index+1}</td>
                                             <td><fmt:formatDate value="${result.dt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
-                                            <td><fmt:formatNumber value="${result.amount}" pattern="0.000"></fmt:formatNumber> </td>
-                                            <td>${result.type}</td>
+                                            <td><span style="float:left;width: 80px" ><span style="float:right;" >
+                                                    ￥<fmt:formatNumber value="${result.amount}" pattern="0.000"></fmt:formatNumber>
+                                            </span></span></td>
+                                            <td>${result.type}
+                                            </td>
                                         </tr>
                                     </c:forEach>
                                     </tbody>

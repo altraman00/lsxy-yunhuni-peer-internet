@@ -110,9 +110,9 @@
                                     <table class="table table-striped cost-table-history tablelist">
                                         <thead>
                                         <tr>
-                                            <th>#</th>
+                                            <th width="10">#</th>
                                             <th>订单号</th>
-                                            <th>金额</th>
+                                            <th><span style="float:left;width: 80px" ><span style="float:right;" >金额（元）</span></span></th>
                                             <th>充值方式</th>
                                             <th>订单创建时间</th>
                                             <th>支付状态</th>
@@ -123,7 +123,10 @@
                                             <tr>
                                                 <td scope="row">${s.index+1}</td>
                                                 <td>${result.orderId}</td>
-                                                <td><fmt:formatNumber value="${ result.amount}" pattern="#0.00" /> </td>
+                                                <td><span style="float:left;width: 80px" ><span style="float:right;" >
+                                                    <fmt:formatNumber value="${ result.amount}" pattern="#0.000" />
+                                                    </span></span>
+                                                </td>
                                                 <td>
                                                     ${result.typeName}
                                                 </td>
