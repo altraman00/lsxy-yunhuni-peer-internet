@@ -237,7 +237,7 @@ public class RechargeController extends AbstractPortalController {
             //余额整数部分
             model.put("balanceInt",amount.intValue());
             //余额小数部分
-            DecimalFormat df   = new DecimalFormat("#0.00");
+            DecimalFormat df   = new DecimalFormat("#0.000");
             String format = df.format(amount);
             model.put("balanceDec",format.substring(format.indexOf('.') + 1, format.length()));
         }

@@ -96,13 +96,15 @@
                                                 <div class="panel-body clearfix border-top-none personal-base">
                                                     <form action="${ctx}/console/cost/bill_month/get" method="get">
                                                         <div class="row">
-                                                            <lable class="">月份：</lable>
+                                                            <span style="width: 20px;">
+                                                            <lable class="">月份：</lable></span>
                                                             <input type="text" class="datepicker form-control" value='${month}' name="month" data-date-end-date="0m" />
                                                             <button class="btn btn-primary query">查询</button>
                                                         </div>
                                                         <div class="row">
-                                                            <lable class="">按应用：</lable>
-                                                            <select class="form-control" name="appId">
+                                                            <span style="width: 20px;">
+                                                            <lable class="" >按应用：</lable></span>
+                                                            <select class="form-control" name="appId" style="padding: 0;">
                                                                 <option value="">所有应用</option>
                                                                 <c:forEach var="app" items="${appList}">
                                                                     <option value="${app.id}"

@@ -214,7 +214,7 @@
                                             <div class="none-app">
                                                 <img src="${resPrefixUrl}/images/index/chicken.png" alt="">
                                             <span>
-                                              还没创建应用，创建应用HAPPY一下吧<br/></br>
+                                              亲~，您还没有创建属于自己的应用，快来试试吧！<br/></br>
                                                 <a href="${ctx}/console/app/index">创建应用</a>
                                             </span>
                                             </div>
