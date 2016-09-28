@@ -63,12 +63,33 @@
                                 </div>
                             </section>
                             <section class="panel panel-default pos-rlt clearfix appliaction-detail">
+                                <%--<div class="row ">--%>
+                                    <%--<div class="col-md-1 remove-padding width-130">--%>
+                                        <%--应用状态：--%>
+                                    <%--</div>--%>
+                                    <%--<div class="col-md-10 ">--%>
+                                        <%--<p>--%>
+                                            <%--<c:if test="${app.status==1}"><span class="success">已上线</span></c:if>--%>
+                                            <%--<c:if test="${app.status==2}"><span class="nosuccess">未上线</span></c:if>--%>
+                                        <%--</p>--%>
+                                    <%--</div>--%>
+                                <%--</div>--%>
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-">
                                         应用名称：
                                     </div>
                                     <div class="col-md-10 ">
-                                        <p>${app.name}</p>
+                                        <p>${app.name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
+                                            <c:if test="${app.status==2}"><span style="color:#ff0000;">未上线</span></c:if></p>
+                                    </div>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-md-1 remove-padding width-130">
+                                        应用标识：
+                                    </div>
+                                    <div class="col-md-10 ">
+                                        <p>${app.id}</p>
                                     </div>
                                 </div>
                                 <div class="row ">
@@ -76,7 +97,7 @@
                                         应用描述：
                                     </div>
                                     <div class="col-md-10 ">
-                                        <p>${app.description}</p>
+                                        <p><c:if test="${app.description==null||app.description==''}">无</c:if><c:if test="${app.description!=null}">${app.description}</c:if></p>
                                     </div>
                                 </div>
                                 <div class="row ">
@@ -98,18 +119,9 @@
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-130">服务器白名单：</div>
                                     <div class="col-md-10 ">
-                                        <p>${app.whiteList}</p>
+                                        <p><c:if test="${app.whiteList==null||app.whiteList==''}">无</c:if><c:if test="${app.whiteList!=null}">${app.whiteList}</c:if></p>
                                     </div>
                                 </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用标识：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.id}</p>
-                                    </div>
-                                </div>
-
                                 <div class="row ">
                                     <div class="col-md-1 remove-padding width-130">
                                         监听通知：
@@ -126,7 +138,7 @@
                                         回调URL：
                                     </div>
                                     <div class="col-md-10 ">
-                                        <p><a href="#" target="_top" >${app.url}</a></p>
+                                        <p><span style="color:#428bca;">${app.url}</span></p>
                                     </div>
                                 </div>
                                 <div class="row ">
@@ -157,20 +169,9 @@
                                                     class="modalShow" data-id="one"
                                                 </c:if>
                                                 <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
-                                                    onclick="showtoast('当前没有测试号码')"
+                                                    onclick="showTestNumBind()"
                                                 </c:if>
                                         >绑定交互测试号</a>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用状态：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>
-                                            <c:if test="${app.status==1}"><span class="success">已上线</span></c:if>
-                                            <c:if test="${app.status==2}"><span class="nosuccess">未上线</span></c:if>
-                                        </p>
                                     </div>
                                 </div>
                                 <div class="row border-block"></div>
@@ -405,6 +406,17 @@
 
 
         <script>
+            function showTestNumBind(){
+//                showtoast('当前没有测试号码')
+                bootbox.setLocale("zh_CN");
+                var h1="当前没有测试号码,是否前往号码管理进行测试号码绑定？";
+                bootbox.confirm(h1, function(result) {
+                    if(result){
+                        window.location.href=ctx+'/console/telenum/bind/index';
+                    }
+                });
+            }
+
             window.onload=function(){
                 var flag = true;
                 if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 || window.navigator.userAgent.indexOf("MSIE 9.0")>0) {flag = false;} } if(!flag){
