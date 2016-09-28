@@ -146,11 +146,11 @@
                                             <div class="col-md-9" >
                                                 <p><strong>高级语音定制服务</strong></p>
                                                 <p><input type="checkbox" name="isSessionService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isSessionService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音会议</font>（可与互联网会议、视频会议融合参会，提供丰富的会议管理功能）</p>
-                                                <p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">通话录音</font>（提供通话录音、录音存储管理等功能）</p>
+                                                <%--<p><input type="checkbox" name="isRecording" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if>  <c:if test="${app.isRecording=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">通话录音</font>（提供通话录音、录音存储管理等功能）</p>--%>
                                                 <p><input type="checkbox" name="isVoiceValidate" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isVoiceValidate=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">语音验证码</font>（通过电话直呼到用户手机并语音播报验证码）</p>
                                                 <p><input type="checkbox" name="isIvrService" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isIvrService=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">自定义IVR</font>（即互动式语音应答可以根据用户输入的内容播放有关的信息）</p>
                                                 <div class="tips ml-36">
-                                                    <p class="app-tips ">开启后，该应用将产生1000的号码租用费以及100元/月的功能费，上线时开始收取，多个应用开启并上线会叠加收费</p>
+                                                    <p class="app-tips ">该选项开启后，将产生1000元的号码租用费以及100元/月的功能费，应用上线时开始收取，多个应用开启并上线会叠加收费</p>
                                                 </div>
                                             </div>
                                         </div>

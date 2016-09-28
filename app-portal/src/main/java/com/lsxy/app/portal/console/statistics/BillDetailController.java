@@ -63,6 +63,7 @@ public class BillDetailController extends AbstractPortalController {
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,time,appId);
         mav.addAllObjects(map);
+        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_VOICECODE,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_VOICECODE,map.get("time"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/code");
         return mav;

@@ -49,11 +49,11 @@
                                                 <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>
-                                        <li>
-                                            <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
-                                            </div>
-                                        </li>
+                                        <%--<li>--%>
+                                            <%--<div class="aside-li-a">--%>
+                                                <%--<a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>--%>
+                                            <%--</div>--%>
+                                        <%--</li>--%>
                                         <li>
                                             <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
@@ -106,28 +106,30 @@
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <c:set var="totalCount" value="0"></c:set>
-                                                <c:if test="${pageObj!=null }">
-                                                    <c:set value="${pageObj.totalCount}" var="totalCount"></c:set>
+                                                <c:set var="sum_cost" value="0.00"></c:set>
+                                                <c:if test="${sum!=null && sum.cost!=null}">
+                                                    <c:set value="${sum.cost}" var="sum_cost"></c:set>
                                                 </c:if>
-                                                <th colspan="6"><span class="p-money">总条数：${totalCount}条</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>发送时间</th>
                                                 <th>主叫</th>
                                                 <th>被叫</th>
                                                 <th>挂机时间</th>
-                                                <th>消费金额(元)</th>
+                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
+                                                <th>时长（秒）</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
-                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
+                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
-                                                    <td><fmt:formatDate value="${result.callEndDt}" pattern="yyyy-MM-dd"></fmt:formatDate></td>
-                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></td>
+                                                    <td><fmt:formatDate value="${result.callEndDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
+                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                    <td>${result.costTimeLong}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

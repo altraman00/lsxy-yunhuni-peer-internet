@@ -109,7 +109,7 @@
                                     <thead>
                                     <tr>
                                         <th>日期</th>
-                                        <th>消费（元）</th>
+                                        <th><span style="float:left;width: 80px" ><span style="float:right;" >消费</span></span></th>
                                     </tr>
                                     </thead>
                                     <tbody id="tableModal">
@@ -381,14 +381,14 @@
                 var tempData = new Date(resultData[i].dt);
                 var tempDataStr = tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate();
                 if(type=='year'){tempDataStr =  tempData.getFullYear()+"-"+(tempData.getMonth()+1);}
-                var temp = [tempDataStr,resultData[i].amongAmount];
+                var temp = [tempDataStr,'￥'+resultData[i].amongAmount];
                 data[i]=temp;
             }
             i++;
             var html ='';
             //数据列表
             for(var i = 0 ; i<data.length; i++){
-                html +='<tr><td>'+data[i][0]+'</td><td>'+data[i][1]+'</td></tr>';
+                html +='<tr><td>'+data[i][0]+'</td><td><span style="float:left;width: 80px" ><span style="float:right;" >'+data[i][1]+'</span></span></td></tr>';
             }
             $('#tableModal').find("tr").remove();
             $('#tableModal').append(html);

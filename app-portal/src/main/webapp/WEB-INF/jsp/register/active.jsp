@@ -28,7 +28,7 @@
         <div class="col-md-6  active-box" >
             <div class="row" >
 
-                <p class="col-lg-offset-1 text-center register-active">账号激活初始化登录密码</p>
+                <p class="col-lg-offset-1 text-center register-active">初始化登录密码，完成账号激活</p>
             </div>
             <div class="row">
                 <form:form role="form" action="${ctx}/reg/active" method="post" class="register-form" id="defaultForm">

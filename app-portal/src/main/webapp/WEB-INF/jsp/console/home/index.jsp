@@ -23,7 +23,6 @@
                             var param = {};
                             ajaxsync(ctx + "/console/message/account_message/list", param, function (result) {
                                 for (var i = 0; i < result.data.length; i++) {
-                                    console.info(result.data[i].message.title);
                                     if(result.data[i].message.type=='0'&&result.data[i].message.title=='系统通知'){
                                         var sr = new String(result.data[i].message.content).substring(0,40);
                                         marqueeContent[i]="<span >"+sr+"</span>";
@@ -196,23 +195,14 @@
                                         <div class="h5 border-left">开发者账号</div>
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
-                                        <p>
-                                            接口API: ${homeVO.restApi}
-                                        <%--<span>--%>
-                                          <%--<a href="#">API文档</a>--%>
-                                        <%--</span>--%>
-                                        </p>
-                                        <p>
-                                            密钥: <span id="secretKey">${homeVO.secretKey}</span>
-                                        <span>
-                                          <a  class='reset_sk_confirm' >重新生成</a>
-                                        </span>
+                                        <p>接口API：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.restApi}</span></p>
+                                        <p>密钥：&nbsp;&nbsp;<span id="secretKey" style="font-weight:bold">${homeVO.secretKey}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class='reset_sk_confirm' >重新生成</a></span>
                                         <span>
                                             <a class="tips-error tips-key"></a>
                                         </span>
                                         </p>
                                         <p>
-                                            鉴权账号: <span >${homeVO.certId}</span>
+                                            鉴权账号：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.certId}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -224,7 +214,7 @@
                                             <div class="none-app">
                                                 <img src="${resPrefixUrl}/images/index/chicken.png" alt="">
                                             <span>
-                                              还没创建应用，创建应用HAPPY一下吧<br/></br>
+                                              亲~，您还没有创建属于自己的应用，快来试试吧！<br/></br>
                                                 <a href="${ctx}/console/app/index">创建应用</a>
                                             </span>
                                             </div>
@@ -271,7 +261,7 @@
                                             </div>
                                         </section>
                                     </c:if>
-                                    <c:if test="${app.status == 2}" >
+                                    <c:if test="${app.status == 2}">
                                         <section class="panel panel-default pos-rlt clearfix  app-list">
                                             <div class="sectionWrap">
                                                 <header class="panel-heading">
@@ -287,6 +277,8 @@
                                                             <small class="text-danger">未上线</small>
                                                         </span>
                                                         <small class="text-muted m-t-xs yhn-description">${app.description}</small>
+                                                    </div>
+                                                    <div class="app-status-left fr">
                                                         <a href="${ctx}/console/app/detail?id=${app.id}" class="fr">详情</a>
                                                     </div>
                                                 </div>

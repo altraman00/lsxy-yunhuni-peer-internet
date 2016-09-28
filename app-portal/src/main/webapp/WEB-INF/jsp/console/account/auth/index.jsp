@@ -81,7 +81,7 @@
                                                 <lable class="col-md-3 text-right">真实姓名：</lable>
                                                 <div class="col-md-4 ">
                                                     <input type="text" name="privateName" placeholder="" class="form-control input-form max30"/>
-                                                    <p class="tips">与所使用认证的证件一致的姓名名称</p>
+                                                    <p class="tips">与所使用认证的证件一致的姓名</p>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -109,7 +109,7 @@
                                                             <div class="thumbnail">
                                                                 <img src="${resPrefixUrl }/images/personal/id.png" alt="...">
                                                                 <div class="caption">
-                                                                    <p>请手持真实有效的中华人民共和国二代身份证拍照，需要拍摄身份证的正反面照片，照片要求身份证证件完整清晰，人头形象完整清晰且和身份证证件照同属一个。</p>
+                                                                    <p>请手持真实有效的相关证件拍照，需要拍摄证件带有信息的一面，照片要求证件信息和人物形象完整清晰，人物与证件上的身份相符。</p>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -152,10 +152,9 @@
                                                 </div>
                                             </div>
                                             <div class="noticeInfo form-group">
-                                                <p class="text-success"> 请提供真实有效的营业执照和组织机构代码证，或三证合一的的营业执照（营业执照，组织机构代码证，税务登记证合为一个证件）一证一码的营业执照照片/扫描件（目前进行企业认证，请进入买家中心操作） </p>
-
+                                                <br>
+                                                <p class="text-success">请提供有效的营业执照、税务登记证、营业执照号、统一社会信用代码、税务登记号或注册号等信息</p>
                                             </div>
-
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right extend_label">证件类型：</lable>
                                                 <div class="radio-form col-md-8">

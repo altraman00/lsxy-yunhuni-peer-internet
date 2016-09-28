@@ -34,9 +34,9 @@
                                 <table class="table table-striped cost-table-history news-table">
                                     <thead>
                                     <tr>
-                                        <th width="20%">消息时间</th>
-                                        <th width="70%">消息内容</th>
-                                        <th width="10%">操作</th>
+                                        <th width="150">消息时间</th>
+                                        <th >消息内容</th>
+                                        <th width="120">操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
