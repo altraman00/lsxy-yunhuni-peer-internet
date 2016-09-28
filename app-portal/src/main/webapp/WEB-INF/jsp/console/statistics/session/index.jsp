@@ -359,9 +359,6 @@
      * @param tdata 标题项
      */
     function charts2(xd2,xyMax2,type){
-        console.info(xd2)
-        console.info(xyMax2)
-        console.info(type)
 //        var type = $('input[name="stime"]:checked').val();
         var Xdata = monthData;
         var Ydata = monthData;
@@ -435,7 +432,6 @@
         };
 
         myChart2.setOption(option);
-        console.info(10000)
     }
 
 

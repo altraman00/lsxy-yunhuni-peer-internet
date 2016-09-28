@@ -23,7 +23,6 @@
                             var param = {};
                             ajaxsync(ctx + "/console/message/account_message/list", param, function (result) {
                                 for (var i = 0; i < result.data.length; i++) {
-                                    console.info(result.data[i].message.title);
                                     if(result.data[i].message.type=='0'&&result.data[i].message.title=='系统通知'){
                                         var sr = new String(result.data[i].message.content).substring(0,40);
                                         marqueeContent[i]="<span >"+sr+"</span>";

@@ -491,7 +491,6 @@
                         }
                     },
                     done: function (e, data) {
-                        console.info(data)
                         var resultDate = data._response.jqXHR.responseJSON;
                         if(resultDate.success){
                             showtoast('上传成功');
@@ -898,7 +897,6 @@
             //数据列表
             for(var i = 0 ; i<data.length; i++){
                 html +='<tr class="playtr" id="play-'+data[i][5]+'"><td class="voice-format">'+data[i][1]+'</td>';
-                console.info(data[i]);
                 if(data[i][2]==-1){
                     html+='<td  title="审核不通过原因：'+data[i][5]+'"><span class="nosuccess">审核不通过</span><i class="fa fa-exclamation-triangle"></i></td>';
                 }else if(data[i][2]==1&&data[i][6]==1){
