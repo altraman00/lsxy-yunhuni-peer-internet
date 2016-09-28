@@ -57,6 +57,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(StringUtils.isNotBlank(cdr_additionalinfo2)){
             businessState = businessStateService.get(cdr_additionalinfo2);
         }else{
+            logger.error("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
             return null;
         }
         if(businessState == null){
