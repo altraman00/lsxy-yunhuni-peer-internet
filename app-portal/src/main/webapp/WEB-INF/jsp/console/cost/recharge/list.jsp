@@ -112,7 +112,7 @@
                                         <tr>
                                             <th width="10">#</th>
                                             <th>订单号</th>
-                                            <th><span style="float:left;width: 80px" ><span style="float:right;" >金额（元）</span></span></th>
+                                            <th><span style="float:left;width: 80px" ><span style="float:right;" >金额</span></span></th>
                                             <th>充值方式</th>
                                             <th>订单创建时间</th>
                                             <th>支付状态</th>
@@ -124,7 +124,7 @@
                                                 <td scope="row">${s.index+1}</td>
                                                 <td>${result.orderId}</td>
                                                 <td><span style="float:left;width: 80px" ><span style="float:right;" >
-                                                    <fmt:formatNumber value="${ result.amount}" pattern="#0.000" />
+                                                    ￥<fmt:formatNumber value="${ result.amount}" pattern="#0.000" />
                                                     </span></span>
                                                 </td>
                                                 <td>
