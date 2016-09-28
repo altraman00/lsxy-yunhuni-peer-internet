@@ -297,7 +297,6 @@
             this.totalPageCount = this.totalCount%this.pageSize==0?parseInt(this.totalCount/ this.pageSize) : parseInt(this.totalCount/ this.pageSize+1);
         }
     }
-    console.info(JSON.stringify(pageObj));
 </script>
 <script>
 

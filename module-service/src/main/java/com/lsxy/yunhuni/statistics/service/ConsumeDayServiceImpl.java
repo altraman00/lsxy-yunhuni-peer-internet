@@ -230,7 +230,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         }
         Date startTime = DateUtils.parseDate(time,"yyyy-MM");
         Date endTime = DateUtils.getLastTimeOfMonth(startTime);
-        String sql = "select sum(among_amount) from db_lsxy_bi_yunhuni.tb_bi_consume_day where tenant_id=:tenant and app_id is null and type is null and dt BETWEEN :start AND :end ";
+        String sql = "select sum(amount) from db_lsxy_bi_yunhuni.tb_bi_consume where tenant_id=:tenant and dt BETWEEN :start AND :end ";
         Query query = em.createNativeQuery(sql);
         query.setParameter("tenant",tenantId);
         query.setParameter("start",startTime);
