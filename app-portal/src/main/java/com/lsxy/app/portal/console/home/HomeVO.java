@@ -12,7 +12,7 @@ public class HomeVO {
     private String arrearage = "";//默认不欠费
     private String balanceInt = "0";              //余额整数
 
-    private String balanceDec = "00";              //余额小数
+    private String balanceDec = "000";              //余额小数
 
     private Integer lineNum ;               //当前线路数量
 

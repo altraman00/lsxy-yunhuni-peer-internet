@@ -84,7 +84,7 @@ public class HomeController extends AbstractPortalController {
             vTemp = Math.abs(vTemp);
             vo.setBalanceInt(vTemp+"");
             //余额小数部分
-            DecimalFormat df   = new DecimalFormat("######0.00");
+            DecimalFormat df   = new DecimalFormat("######0.000");
             String format = df.format(billing.getBalance());
             vo.setBalanceDec(format.substring(format.indexOf('.') + 1, format.length()));
             //语音剩余量
