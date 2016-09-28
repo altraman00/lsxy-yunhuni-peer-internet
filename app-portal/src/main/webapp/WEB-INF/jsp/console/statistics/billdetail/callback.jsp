@@ -110,7 +110,7 @@
                                                 <c:if test="${sum!=null && sum.cost!=null}">
                                                     <c:set value="${sum.cost}" var="sum_cost"></c:set>
                                                 </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.00"></fmt:formatNumber> 元</span></th>
+                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
@@ -123,11 +123,11 @@
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
-                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd"></fmt:formatDate> </td>
+                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
                                                     <td>${result.costTimeLong}</td>
-                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.00"></fmt:formatNumber></td>
+                                                    <td><fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

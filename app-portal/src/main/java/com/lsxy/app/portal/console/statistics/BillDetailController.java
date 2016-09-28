@@ -170,7 +170,20 @@ public class BillDetailController extends AbstractPortalController {
     private RestResponse getPageList(HttpServletRequest request,Integer pageNo,Integer pageSize,String type,String time,String appId){
         String token = getSecurityToken(request);
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/plist?pageNo={1}&pageSize={2}&type={3}&time={4}&appId={5}";
-        return RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class,pageNo,pageSize,type,time,appId);
+        RestResponse<Page<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getPage(uri, VoiceCdr.class, pageNo, pageSize, type, time, appId);
+        if(result.isSuccess() && result.getData() != null){
+            List<VoiceCdr> voiceCdrs = result.getData().getResult();
+            if(voiceCdrs != null && voiceCdrs.size() > 0){
+                for(VoiceCdr cdr:voiceCdrs){
+                    String toNum = cdr.getToNum();
+                    if(StringUtils.isNotBlank(toNum)){
+                        String[] split = toNum.split("@");
+                        cdr.setToNum(split[0]);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -198,4 +211,6 @@ public class BillDetailController extends AbstractPortalController {
         map.put("time",time);
         return map;
     }
+
+
 }
