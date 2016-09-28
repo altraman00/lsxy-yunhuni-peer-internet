@@ -3,6 +3,7 @@ package com.lsxy.third.gateway.rest;
 import com.alipay.config.AlipayConfig;
 import com.alipay.util.AlipayNotify;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.utils.WebUtils;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
@@ -95,6 +96,8 @@ public class AliPayController extends AbstractAPIController{
                             result =  "success";
                         } catch (DataIntegrityViolationException e) {
                             logger.error("插入付款记录失败，交易号已存在，交易号：{}",payRecord.getTradeNo());
+                        }catch(Exception e1){
+                            logger.error("插入付款记录失败:" + JSONUtil.objectToJson(payRecord),e1);
                         }
                     }
                 }
