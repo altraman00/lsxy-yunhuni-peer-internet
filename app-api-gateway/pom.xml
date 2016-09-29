@@ -13,7 +13,7 @@
 
     <artifactId>app-api-gateway</artifactId>
     <properties>
-        <skip_maven_deploy>true</skip_maven_deploy>
+        <skip_maven_deploy>false</skip_maven_deploy>
     </properties>
     <dependencies>
         <dependency>

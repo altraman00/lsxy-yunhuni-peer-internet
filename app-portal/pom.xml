@@ -51,7 +51,7 @@
             </plugin>
 
 
-            <!-- 加入maven deploy插件，当在deploy时，忽略些model-->
+            <!-- 加入maven deploy插件，当在deploy时，忽略些model
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
@@ -60,6 +60,7 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 
