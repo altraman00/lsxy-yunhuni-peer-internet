@@ -7,6 +7,7 @@ import com.lsxy.framework.monitor.SystemMonitor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -16,6 +17,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(value={FrameworkMonitorConfig.class,MonitorTest.class})
+@EnableAutoConfiguration
 public class MonitorTest extends SpringBootTestCase{
 
     @Autowired

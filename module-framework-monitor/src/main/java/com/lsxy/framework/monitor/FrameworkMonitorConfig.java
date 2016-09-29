@@ -16,7 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @ComponentScan
 @Import(value={FrameworkCacheConfig.class})
-@EnableAutoConfiguration
 public class FrameworkMonitorConfig {
 
 }
