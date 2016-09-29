@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Clob;
@@ -22,9 +24,16 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.lsxy.framework.core.utils.BeanUtils.logger;
+import static com.sun.corba.se.impl.util.Utility.printStackTrace;
+import static java.net.InetAddress.getLocalHost;
 
 @SuppressWarnings("rawtypes")
 public class StringUtil extends StringUtils{
+	private static final Logger logger = LoggerFactory.getLogger(StringUtil.class);
 
 	/**
 	 * 从InputStream中获取字符串对象
@@ -1213,8 +1222,18 @@ public class StringUtil extends StringUtils{
 		}
 		return result;
 	}
-	public static void main(String[] args) {
-		System.out.println(Base64.encodeBase64String("我是中国人，哈哈哈abc123!@#$%^&*(".getBytes()));
+	/**
+	 * 获取主机名称
+	 * @return
+     */
+	public static String getHostName(){
+		try {
+			String host = InetAddress.getLocalHost().getHostName();
+			return host;
+		} catch (UnknownHostException e) {
+			logger.error("",e);
+		}
+		return "";
 	}
-	
+
 }

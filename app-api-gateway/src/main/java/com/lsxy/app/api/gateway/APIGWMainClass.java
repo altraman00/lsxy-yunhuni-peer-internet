@@ -4,6 +4,7 @@ import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
+import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
@@ -20,7 +21,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  */
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class,
-        FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class})
+        FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class})
 @EnableAsync
 @EnableWebMvc
 @EnableDubboConfiguration
