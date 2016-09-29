@@ -371,7 +371,7 @@ public class CallServiceImpl implements CallService {
             Area area = app.getArea();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             Map<String,Object> data = new MapBuilder<String,Object>()
-                    .put(to_uri,callSession.getId())
+                    .put("sessionid",callSession.getId())
                     .build();
             //将数据存到redis
             BusinessState cache = new BusinessState.Builder()
@@ -515,6 +515,8 @@ public class CallServiceImpl implements CallService {
 
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setFromNum(oneTelnumber);
+        callSession.setToNum(to);
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);

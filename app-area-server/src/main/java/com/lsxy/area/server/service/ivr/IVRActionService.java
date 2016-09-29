@@ -273,6 +273,8 @@ public class IVRActionService {
                 .build();
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_CALLING);
+        callSession.setFromNum(oneTelnumber);
+        callSession.setToNum(to);
         callSession.setApp(app);
         callSession.setTenant(tenant);
         callSession.setRelevanceId(call_id);

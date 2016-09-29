@@ -64,16 +64,12 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
                 notifyCall.setResId(resId);
                 notifyCallService.save(notifyCall);
             }
-            Map<String, Object> data = state.getBusinessData();
-            Set<Map.Entry<String, Object>> entries = data.entrySet();
-            for(Map.Entry entry:entries){
-                String sessionId = (String) entry.getValue();
-                CallSession callSession = callSessionService.findById(sessionId);
-                if(callSession != null){
-                    callSession.setResId(resId);
-                    callSession.setStatus(CallSession.STATUS_CALLING);
-                    callSessionService.save(callSession);
-                }
+            //更新会话记录状态
+            CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+            if(callSession != null){
+                callSession.setResId(resId);
+                callSession.setStatus(CallSession.STATUS_CALLING);
+                callSessionService.save(callSession);
             }
         }
         return res;
