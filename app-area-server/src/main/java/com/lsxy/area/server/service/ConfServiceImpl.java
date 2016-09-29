@@ -268,18 +268,20 @@ public class ConfServiceImpl implements ConfService {
 
         String callId = UUIDGenerator.uuid();
 
+        //TODO
+        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setFromNum(oneTelnumber);
+        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
         callSession.setType(CallSession.TYPE_VOICE_MEETING);
         callSession.setResId(null);
         callSession = callSessionService.save(callSession);
-
-        //TODO
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
