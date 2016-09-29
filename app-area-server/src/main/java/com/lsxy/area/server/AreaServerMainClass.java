@@ -7,6 +7,7 @@ import com.lsxy.framework.cache.FrameworkCacheConfig;
 import com.lsxy.framework.core.AbstractSpringBootStarter;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.jmx.FrameworkJMXConfig;
+import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.rpc.FrameworkRPCConfig;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
@@ -26,7 +27,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ComponentScan
 @Import(value={FrameworkRPCConfig.class, FrameworkMQConfig.class, FrameworkCacheConfig.class,FrameworkApiConfig.class,
         FrameworkServiceConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class,
-        FrameworkJMXConfig.class})
+        FrameworkJMXConfig.class, FrameworkMonitorConfig.class})
 @EnableDubboConfiguration
 @EnableAsync
 public class AreaServerMainClass extends AbstractSpringBootStarter {

@@ -74,6 +74,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-monitor</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
