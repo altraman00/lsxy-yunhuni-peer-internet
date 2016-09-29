@@ -84,13 +84,13 @@ public class VoiceCdrHourServiceImpl extends AbstractService<VoiceCdrHour> imple
         Map<String,Object> result = new HashMap<>();
         //lineAverageCallTime lineLinkRate
         if(new BigDecimal(0).compareTo((BigDecimal)map.get("connect_num")) == -1){
-            BigDecimal divide = ((BigDecimal) map.get("duration")).divide((BigDecimal) map.get("connect_num"),0, BigDecimal.ROUND_UP).divide(new BigDecimal(60), 0, BigDecimal.ROUND_UP);
+            BigDecimal divide = ((BigDecimal) map.get("duration")).divide((BigDecimal) map.get("connect_num"),0, BigDecimal.ROUND_HALF_UP).divide(new BigDecimal(60), 0, BigDecimal.ROUND_HALF_UP);
             result.put("lineAverageCallTime",divide.longValue());
         }else{
             result.put("lineAverageCallTime",0);
         }
         if(new BigDecimal(0).compareTo((BigDecimal)map.get("connect_num")) == -1){
-            BigDecimal divide = ((BigDecimal) map.get("connect_num")).divide((BigDecimal) map.get("call_num"), 4, BigDecimal.ROUND_UP).multiply(new BigDecimal(100));
+            BigDecimal divide = ((BigDecimal) map.get("connect_num")).divide((BigDecimal) map.get("call_num"), 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
             result.put("lineLinkRate",divide.doubleValue());
         }else{
             result.put("lineLinkRate",0.0);
