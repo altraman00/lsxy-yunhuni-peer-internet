@@ -28,7 +28,7 @@ public class PortalAuthenticationSuccessHandler extends SavedRequestAwareAuthent
         //将tocken保存到session
         Object details = authentication.getDetails();
         if(details instanceof String){
-            HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession();
             if(session != null) {
                 if(logger.isDebugEnabled()){
                     logger.debug("登录成功,Token存入Session:{},{}",PortalConstants.SSO_TOKEN,details);
