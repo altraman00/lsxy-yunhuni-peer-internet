@@ -39,7 +39,7 @@
                         <lable class="col-lg-3 text-right">会员名称</lable>
                         <div class="col-lg-9 ">
                             <input type="text" name="userName" placeholder="请输入账号" class="form-control input-form" id="form-username" />
-                            <p class="tips">6~25个字符，建议中文名称</p>
+                            <p class="tips">2~25个字符，建议中文名称</p>
                         </div>
                     </div>
                     <div class="form-group">
@@ -89,15 +89,16 @@
 <div id="modal-mobile" class="modal-phone">
     <div class="title">验证手机号</div>
     <div class="content">
-        <div class="input">
+        <div class="input margin-auto">
             手机号 :  <span id="mobile_number">1361****986</span>
         </div>
-        <div class="input">
-            <div class="code-title">验证码 :</div>
-            <input class="code form-control" type="text" name="mobileCode" id="mobileCode"/>
-            <button class="code-button" id="send-code" >发送验证码</button>
-        </div>
         <div class="input in-block" id="second-codeblock" ></div>
+        <div class="input">
+            <%--<div class="code-title">验证码 :</div>--%>
+            <input class="code form-control" type="text" name="mobileCode" id="mobileCode" placeholder="手机验证码"/>
+            <button class="code-button" id="send-code" >获取验证码</button>
+        </div>
+
         <p id="mobileCodeTips" class="text-center tips-error" ></p>
     </div>
     <div class="footer">
@@ -121,7 +122,7 @@
     $('#modal-sendmobile').click(function(){
         var mobileCode = $("#mobileCode").val();
         if(mobileCode == ""){
-            tipsmsg("请填入验证码","mobileCodeTips");
+            tipsmsg("请输入手机验证码","mobileCodeTips");
             return;
         }
         var mobile = $("#form-mobile").val();
@@ -147,7 +148,7 @@
             if($('#second-code').length>0){
                 var second = $('#second-code').val();
                 if(second.length!=4){
-                    tipsmsg('请输入四位验证码','mobileCodeTips'); return false;
+                    tipsmsg('请输入图形验证码','mobileCodeTips'); return false;
                 }
             }
             vCode = $("#second-code").val();
@@ -171,7 +172,7 @@
 
                     //启动二次校验
                     $('#second-code').show();
-                    var html = '<div class="code-title">验证码 :</div><input class="code form-control" type="text" name="" id="second-code" onkeyup="clearErrMsg()"/>';
+                    var html = '<input class="code form-control" type="text" name="" id="second-code" onkeyup="clearErrMsg()" placeholder="图形验证码"/>';
                     html += '<a class="code-img"><img id="imgValidateCode" src="' + ctx + '/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"></a>';
                     $('#second-codeblock').html(html);
 
