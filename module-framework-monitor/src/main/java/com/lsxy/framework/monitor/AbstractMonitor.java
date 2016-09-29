@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AbstractMonitor {
 
-    public static final String PREFIX_CACHE="monitor_"+System.getProperty("systemId") +"_" + StringUtil.getHostName();
+    public static final String PREFIX_CACHE="monitor_"+System.getProperty("systemId") +"_" + StringUtil.getHostName()+"_";
 
     //监控过期时间 默认5S
     public static final long MONITOR_EXPIRED_TIME=5;
