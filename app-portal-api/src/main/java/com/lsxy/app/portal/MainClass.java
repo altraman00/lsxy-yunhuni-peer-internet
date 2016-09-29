@@ -3,6 +3,7 @@ package com.lsxy.app.portal;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
+import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.oss.FrameworkOSSConfig;
 import com.lsxy.framework.sms.FrameworkSmsConfig;
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class,
-        FrameworkSmsConfig.class, FrameworkMQConfig.class, FrameworkOSSConfig.class})
+        FrameworkSmsConfig.class, FrameworkMQConfig.class, FrameworkOSSConfig.class, FrameworkMonitorConfig.class})
 public class MainClass extends AbstractSpringBootWebStarter {
 
     public static final String systemId = "portal.api";

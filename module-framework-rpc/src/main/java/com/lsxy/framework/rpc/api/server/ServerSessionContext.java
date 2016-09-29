@@ -2,12 +2,10 @@ package com.lsxy.framework.rpc.api.server;
 
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import com.lsxy.framework.rpc.exceptions.RightSessionNotFoundExcepiton;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -120,5 +118,15 @@ public class ServerSessionContext extends SessionContext{
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		for (Object key:areaSessionMap.keySet()) {
+			Session session = (Session) areaSessionMap.get(key);
+			sb.append("{"+key + ":" + session.getRemoteAddress() + "}");
+		}
+		return sb.toString();
 	}
 }

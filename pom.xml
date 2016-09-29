@@ -42,6 +42,7 @@
         <module>app-user-app-demo</module>
         <module>module-service-area-api</module>
         <module>module-framework-jmx</module>
+        <module>module-framework-monitor</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -294,7 +295,16 @@
                 <artifactId>springfox-swagger2</artifactId>
                 <version>2.2.2</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.9.9-RC1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-framework-monitor</artifactId>
+                <version>1.0.2-SNAPSHOT</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
