@@ -133,6 +133,8 @@ public class IVRServiceImpl implements IVRService {
 
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setFromNum(oneTelnumber);
+        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);

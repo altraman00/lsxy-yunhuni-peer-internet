@@ -48,7 +48,7 @@
                         <div class="col-lg-9">
                             <input type="password" name="password" placeholder="请输入密码" class="form-control input-form" id="form-password" maxlength="18"  />
                             <div class="tips">
-                                <span class="special-span" >6~18个字符，建议字符数字组合</span>
+                                <span class="special-span" >2~18个字符，建议字符数字组合</span>
                                 <div id="pw-strength" class="pw-strength">
                                     <div class="pw-bar"></div>
                                     <div class="pw-bar-on"></div>

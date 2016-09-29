@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
+ * 租户租用号码到期后自动扣费续期
  * Created by liups on 2016/9/17.
  */
 @Component

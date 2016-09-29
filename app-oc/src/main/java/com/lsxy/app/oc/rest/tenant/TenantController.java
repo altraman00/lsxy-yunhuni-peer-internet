@@ -229,10 +229,9 @@ public class TenantController {
         //上个月连通量
         long preAmongConnect = voiceCdrMonthService.getAmongConnectByDateAndTenant(preMonth,id);
         //上个月平均通话时长
-        long preAvgTime = preAmongCall == 0 ? 0 : preAmongDuration/preAmongCall;
+        long preAvgTime = preAmongCall == 0 ? 0 :  new BigDecimal(preAmongDuration).divide(new BigDecimal(preAmongCall),0, BigDecimal.ROUND_HALF_UP).longValue() ;
         //上个月连通率
-        double preConnectRate = preAmongCall == 0 ? 0 : new BigDecimal((preAmongConnect/preAmongCall) * 100)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        double preConnectRate = preAmongCall == 0 ? 0 : new BigDecimal(preAmongConnect).divide(new BigDecimal(preAmongCall),4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).doubleValue();
 
         //上上个月
         Date prepreMonth = DateUtils.getPrevMonth(preMonth);
@@ -611,6 +610,7 @@ public class TenantController {
 //        }
 //        dto.setSumAmount(sum);
         dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+
         return RestResponse.success(dto);
     }
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
+ * 清除过期的，注册没激活的账号
  * Created by liups on 2016/8/6.
  */
 @Component

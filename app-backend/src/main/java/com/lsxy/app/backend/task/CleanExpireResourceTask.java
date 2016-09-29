@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
+ * 清除租户租用过期的号码，解除与租户的绑定
  * Created by liups on 2016/8/8.
  */
 @Component
