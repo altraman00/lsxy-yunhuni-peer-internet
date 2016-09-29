@@ -3,11 +3,7 @@ package com.lsxy.framework.monitor;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.StringUtil;
-import com.sun.media.jfxmediaimpl.HostUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import sun.security.krb5.internal.HostAddress;
-
-import java.net.InetAddress;
 
 /**
  * Created by tandy on 16/9/29.
