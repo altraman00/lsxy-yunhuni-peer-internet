@@ -4,7 +4,6 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -81,6 +80,8 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
         }
         //保存会话记录
         CallSession callSession = new CallSession();
+        callSession.setFromNum((String)busniessData.get("from"));
+        callSession.setToNum((String)busniessData.get("to"));
         callSession.setStatus(CallSession.STATUS_CALLING);
         callSession.setApp(appService.findById(state.getAppId()));
         callSession.setTenant(tenantService.findById(state.getTenantId()));
