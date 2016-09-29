@@ -12,7 +12,7 @@
     <packaging>war</packaging>
     <artifactId>app-portal</artifactId>
     <properties>
-        <skip_maven_deploy>true</skip_maven_deploy>
+        <skip_maven_deploy>false</skip_maven_deploy>
     </properties>
     <build>
         <finalName>portal</finalName>

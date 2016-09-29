@@ -38,12 +38,12 @@ public class AvoidDuplicateSubmissionInterceptor extends HandlerInterceptorAdapt
                         }
                         return false;
                     }
-                    request.getSession(false).removeAttribute(SUBMISSION_TOKEN);
+                    request.getSession().removeAttribute(SUBMISSION_TOKEN);
                 }
 
                 boolean needSaveSession = annotation.needSaveToken();
                 if (needSaveSession) {
-                    request.getSession(false).setAttribute(SUBMISSION_TOKEN, UUID.randomUUID().toString());
+                    request.getSession().setAttribute(SUBMISSION_TOKEN, UUID.randomUUID().toString());
                 }
             }
             return true;
