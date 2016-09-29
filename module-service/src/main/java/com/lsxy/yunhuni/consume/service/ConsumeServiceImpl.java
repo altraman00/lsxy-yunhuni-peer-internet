@@ -51,8 +51,8 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
             tmepAppId += " and  obj.appId ='"+appId+"'";
         }
         Tenant tenant = tenantService.findTenantByUserName(userName);
-        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt<?2 and obj.dt>=?3 "+tmepAppId+" ORDER BY obj.dt desc";
-        Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),endDate,startDate);
+        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt BETWEEN  ?2 and ?3 "+tmepAppId+" ORDER BY obj.dt desc";
+        Page<Consume> page = this.pageList(hql,pageNo,pageSize,tenant.getId(),startDate,endDate);
         return page;
     }
 
@@ -66,12 +66,9 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     @Override
     public Page<Consume> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize) {
 
-        String hql = "from Consume obj where obj.tenant.id=?1 AND  dt BETWEEN ?2 AND ?3 ";
-        Date date1 = DateUtils.parseDate(year+"-"+month,"yyyy-MM");
-        Calendar cale  = Calendar.getInstance();
-        cale.setTime(date1);
-        cale.set(Calendar.MONTH, cale.get(Calendar.MONTH) + 1);
-        Date date2 = cale.getTime();
+        String hql = "from Consume obj where obj.tenant.id=?1 AND  obj.dt BETWEEN ?2 AND ?3  ORDER BY obj.dt desc";
+        Date date1 = DateUtils.parseDate(year+"-"+month+"-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Date date2 = DateUtils.getLastTimeOfMonth(DateUtils.parseDate(year+"-"+month,"yyyy-MM"));
         Page<Consume>  page = this.pageList(hql,pageNo,pageSize,tenantId,date1,date2);
 //        int start = (pageNo-1)*pageSize;
 //        String db_name = "db_lsxy_base";//year +"-" + month;

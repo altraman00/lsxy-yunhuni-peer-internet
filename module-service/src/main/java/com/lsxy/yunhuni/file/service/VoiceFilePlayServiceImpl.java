@@ -100,10 +100,10 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
             }catch (Exception e){}
         }
         if(date1!=null){
-            sql += " AND obj.createTime>= :date1 ";
+            sql += " AND obj.create_time>= :date1 ";
         }
         if(date2!=null){
-            sql += " AND obj.createTime<= :date2";
+            sql += " AND obj.create_time<= :date2";
         }
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
