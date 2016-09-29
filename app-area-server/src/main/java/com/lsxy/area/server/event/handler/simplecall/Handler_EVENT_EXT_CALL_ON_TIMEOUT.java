@@ -48,6 +48,7 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
+
         if(logger.isDebugEnabled()){
             logger.debug("开始处理{}事件,{}",getEventName(),request);
         }
@@ -76,16 +77,47 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
             logger.error("businessstate is null");
             return res;
         }
-        Map<String, Object> data = state.getBusinessData();
-        Set<Map.Entry<String, Object>> entries = data.entrySet();
-        for(Map.Entry entry:entries){
-            String sessionId = (String) entry.getValue();
-            CallSession callSession = callSessionService.findById(sessionId);
-            if(callSession != null){
-                callSession.setStatus(CallSession.STATUS_EXCEPTION);
-                callSessionService.save(callSession);
+
+        ProductCode productCode = ProductCode.changeApiCmdToProductCode(state.getType());
+        String event;
+        switch (productCode){
+            case duo_call:{
+                Map<String, Object> data = state.getBusinessData();
+                Set<Map.Entry<String, Object>> entries = data.entrySet();
+                for(Map.Entry entry:entries){
+                    String sessionId = (String) entry.getValue();
+                    CallSession callSession = callSessionService.findById(sessionId);
+                    if(callSession != null){
+                        callSession.setStatus(CallSession.STATUS_EXCEPTION);
+                        callSessionService.save(callSession);
+                    }
+                }
+                event = "duo_callback.end";
+                break;
             }
+            case notify_call:{
+                //处理会话表数据
+                CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+                if(callSession != null){
+                    callSession.setStatus(CallSession.STATUS_EXCEPTION);
+                    callSessionService.save(callSession);
+                }
+                event = "notify_call.end";
+                break;
+            }
+            case captcha_call:
+                //处理会话表数据
+                CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+                if(callSession != null){
+                    callSession.setStatus(CallSession.STATUS_EXCEPTION);
+                    callSessionService.save(callSession);
+                }
+                event = "verify_call.end";
+                break;
+            default:
+                return res;
         }
+
         //释放资源
         businessStateService.delete(callId);
 
@@ -99,24 +131,6 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
             logger.debug("用户回调结束事件");
         }
 
-        ProductCode productCode = ProductCode.changeApiCmdToProductCode(state.getType());
-        String event;
-        switch (productCode){
-            case duo_call:{
-                event = "duo_callback.end";
-                break;
-            }
-            case notify_call:{
-                event = "notify_call.end";
-                break;
-            }
-            case captcha_call:
-                event = "verify_call.end";
-                break;
-            default:
-                return res;
-        }
-
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .put("event",event)
                 .put("id",callId)
@@ -126,10 +140,7 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
         notifyCallbackUtil.postNotify(callBackUrl,notify_data,3);
 
         if(logger.isDebugEnabled()){
-            logger.debug("双向回拔结束事件");
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("处理{}事件完成",getEventName());
+            logger.debug("处理{}事件完成",event);
         }
         return res;
     }
