@@ -1,5 +1,9 @@
 package com.lsxy.framework.sms.clients;
 
+import com.sun.javafx.collections.MappingChange;
+
+import java.util.Map;
+
 /**
  * Created by Tandy on 2016/7/7.
  */
@@ -12,7 +16,7 @@ public interface SMSClient {
      *      成功  true
      *      失败  false
      */
-    public boolean sendsms(String to,String msg);
+    public String sendsms(String to, String msg);
 
     /**
      * 剩余额度查询

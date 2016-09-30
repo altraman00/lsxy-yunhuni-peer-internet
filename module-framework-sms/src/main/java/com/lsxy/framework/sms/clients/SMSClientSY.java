@@ -4,6 +4,10 @@ import org.apache.axis2.AxisFault;
 import sy_soapserver.GetbalanceDocument;
 import sy_soapserver.GetbalanceResponseDocument;
 import sy_soapserver.SendmsgDocument;
+import sy_soapserver.SendmsgResponseDocument;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Tandy on 2016/7/7.
@@ -26,7 +30,7 @@ public class SMSClientSY implements SMSClient {
     }
 
     @Override
-    public boolean sendsms(String to, String msg) {
+    public String sendsms(String to, String msg) {
         try {
             SendmsgDocument.Sendmsg sendmsg =  (SendmsgDocument.Sendmsg)getTestObject(SendmsgDocument.Sendmsg.class);;
             SendmsgDocument sendmsg42 = (SendmsgDocument) getTestObject(SendmsgDocument.class);;
@@ -36,12 +40,12 @@ public class SMSClientSY implements SMSClient {
             sendmsg.setPhone(to);
             sendmsg42.setSendmsg(sendmsg);
             //发短信方法
-            stub.sendmsg(sendmsg42);
-            return true;
+            SendmsgResponseDocument result = stub.sendmsg(sendmsg42);
+            return result.getSendmsgResponse().getSendmsg();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -96,7 +100,7 @@ public class SMSClientSY implements SMSClient {
 
     public static void main(String[] args) {
         SMSClientSY client = new SMSClientSY();
-        boolean result = client.sendsms("13971068693","【云呼你】您的验证码是0000");
+        String result = client.sendsms("18826474526","【云呼你】您的验证码是0000");
         System.out.println("发送结果 :" + result);
     }
 
