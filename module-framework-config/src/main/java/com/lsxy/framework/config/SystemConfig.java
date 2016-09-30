@@ -33,7 +33,7 @@ private static final Logger logger = LoggerFactory.getLogger(SystemConfig.class)
 			is = SystemConfig.class.getClassLoader().getResourceAsStream(Constants.DEFAULT_CONFIG_FILE);
 		}catch(Exception e)
 		{
-			e.printStackTrace();;
+			logger.error("加载全局配置文件失败！",e);
 		}
 		try
 		{
@@ -41,7 +41,7 @@ private static final Logger logger = LoggerFactory.getLogger(SystemConfig.class)
 				is = SystemConfig.class.getResourceAsStream(Constants.DEFAULT_CONFIG_FILE);
 		}catch(Exception e)
 		{
-			e.printStackTrace();;
+			logger.error("加载全局配置文件失败！",e);
 		}
 		if(is == null){
 			logger.error("加载配置文件失败,类路径中没有找到配置文件:"+Constants.DEFAULT_CONFIG_FILE);

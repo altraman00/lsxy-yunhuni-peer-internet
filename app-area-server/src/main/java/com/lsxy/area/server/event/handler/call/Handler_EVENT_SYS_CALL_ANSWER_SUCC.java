@@ -8,6 +8,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
@@ -50,19 +51,14 @@ public class Handler_EVENT_SYS_CALL_ANSWER_SUCC extends EventHandler{
      */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
-            logger.error("request params is null");
-            return res;
+            throw new InvalidParamException("request params is null");
         }
         String call_id = (String)params.get("user_data");
         if(call_id == null){
-            logger.error("处理{}事件出错，call_id={}",getEventName(),call_id);
-            return res;
+            throw new InvalidParamException("call_id=null");
         }
         ivrActionService.doAction(call_id);
         return res;

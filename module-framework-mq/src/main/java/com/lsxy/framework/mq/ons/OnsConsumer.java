@@ -62,7 +62,7 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 			logger.debug("ons consumer build success,ready to start");
 
 		}catch(Exception ex){
-			ex.printStackTrace();
+			logger.error("初始化MQ控件失败",ex);
 		}
 	}
 

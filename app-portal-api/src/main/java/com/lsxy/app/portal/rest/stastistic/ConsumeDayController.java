@@ -10,6 +10,8 @@ import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequestMapping("/rest/consume_day")
 @RestController
 public class ConsumeDayController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(ConsumeDayController.class);
     @Autowired
     ConsumeDayService consumeDayService;
 
@@ -155,7 +158,7 @@ public class ConsumeDayController extends AbstractRestController {
             try {
                 BeanUtils.copyProperties(consumeDay,consumeDays.get(i));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("转换类属性出错",e);
             }
             String type = consumeDay.getType();
             try{

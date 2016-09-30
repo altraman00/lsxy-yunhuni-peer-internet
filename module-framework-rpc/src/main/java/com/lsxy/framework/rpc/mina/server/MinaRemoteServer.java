@@ -29,7 +29,7 @@ import java.security.GeneralSecurityException;
 @Component
 @ConditionalOnProperty(value = "global.rpc.provider", havingValue = "mina", matchIfMissing = false)
 public class MinaRemoteServer implements RemoteServer{
-private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.class);
 	private NioSocketAcceptor acceptor;
 
     @Autowired
@@ -115,7 +115,7 @@ private static final Logger logger = LoggerFactory.getLogger(MinaRemoteServer.cl
         try {
             this.bind();
         } catch (IOException | GeneralSecurityException e) {
-            e.printStackTrace();
+			logger.error("IO异常",e);
             throw new RemoteServerStartException(e);
         }
     }

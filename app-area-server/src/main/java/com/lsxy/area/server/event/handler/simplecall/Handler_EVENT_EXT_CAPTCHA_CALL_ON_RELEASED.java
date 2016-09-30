@@ -9,6 +9,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.CaptchaCall;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -49,36 +50,25 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_ON_RELEASED extends EventHandler {
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String, Object> paramMap = request.getParamMap();
         if(MapUtils.isEmpty(paramMap)){
-            logger.info("request.params is null");
-            return res;
+            throw new InvalidParamException("request.params is null");
         }
         String call_id = (String)paramMap.get("user_data");
         if(StringUtils.isBlank(call_id)){
-            logger.info("call_id is null");
-            return res;
+            throw new InvalidParamException("call_id is null");
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            logger.info("businessstate is null");
-            return res;
+            throw new InvalidParamException("businessstate is null");
         }
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         if(StringUtils.isBlank(appId)){
-            logger.info("appId为空");
-            return res;
+            throw new InvalidParamException("appId为空");
         }
         String callBackUrl = state.getCallBackUrl();
-        //开始通知开发者
-        if(logger.isDebugEnabled()){
-            logger.debug("用户回调结束事件");
-        }
         Long begin_time = null;
         Long end_time = null;
         Long answer_time = null;

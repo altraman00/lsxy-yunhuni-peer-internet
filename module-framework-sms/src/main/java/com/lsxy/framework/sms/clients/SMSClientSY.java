@@ -1,17 +1,21 @@
 package com.lsxy.framework.sms.clients;
 
 import org.apache.axis2.AxisFault;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sy_soapserver.GetbalanceDocument;
 import sy_soapserver.GetbalanceResponseDocument;
 import sy_soapserver.SendmsgDocument;
 import sy_soapserver.SendmsgResponseDocument;
+
+import static com.lsxy.framework.mq.ons.OnsMQService.logger;
 
 /**
  * Created by Tandy on 2016/7/7.
  * 圣亚短信通客户端
  */
 public class SMSClientSY implements SMSClient {
-
+    private static final Logger logger = LoggerFactory.getLogger(SMSClientSY.class);
     private String userName = "广州流水行云科技";
     private String password = "lsxy123";
 
@@ -20,9 +24,9 @@ public class SMSClientSY implements SMSClient {
         try {
             stub = new sy_soapserver.SY_SoapServerStub(); //the default implementation should point to the right endpoint
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();
+            logger.error("异常",axisFault);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("异常",e);
         }
     }
 
@@ -40,7 +44,7 @@ public class SMSClientSY implements SMSClient {
             SendmsgResponseDocument result = stub.sendmsg(sendmsg42);
             return result.getSendmsgResponse().getSendmsg();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("发送短信异常",e);
         }
         return null;
     }
@@ -58,7 +62,7 @@ public class SMSClientSY implements SMSClient {
             GetbalanceResponseDocument responseDocument =  stub.getbalance(getBalanceDocument);
             result = Integer.parseInt(responseDocument.getGetbalanceResponse().getGetbalance());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("异常",e);
         }
         return result;
     }

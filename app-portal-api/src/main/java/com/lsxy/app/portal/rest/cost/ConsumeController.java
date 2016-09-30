@@ -7,6 +7,8 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequestMapping("/rest/consume")
 @RestController
 public class ConsumeController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(ConsumeController.class);
     @Autowired
     ConsumeService consumeService;
     /**
@@ -48,7 +51,7 @@ public class ConsumeController extends AbstractRestController {
             try {
                 BeanUtils.copyProperties(consume,consumes.get(i));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("转换类属性出错",e);
             }
             String type = consume.getType();
             try{
