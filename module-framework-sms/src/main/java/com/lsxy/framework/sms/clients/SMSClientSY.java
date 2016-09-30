@@ -6,9 +6,6 @@ import sy_soapserver.GetbalanceResponseDocument;
 import sy_soapserver.SendmsgDocument;
 import sy_soapserver.SendmsgResponseDocument;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by Tandy on 2016/7/7.
  * 圣亚短信通客户端
