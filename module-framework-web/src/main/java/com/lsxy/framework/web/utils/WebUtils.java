@@ -45,7 +45,7 @@ public class WebUtils {
 			logger.debug("请求响应 ["+getRemoteAddress(request)+"]["+request.getSession().getId()+"]:"+json);
 			response.getWriter().print(json);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO异常",e);
 		}
 	}
 	/**
@@ -61,7 +61,7 @@ public class WebUtils {
 			logger.debug("response output :"+json);
 			response.getWriter().print(json);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO异常",e);
 		}
 	}
 	/**
@@ -193,8 +193,7 @@ public class WebUtils {
 				try {
 					BeanUtils.setProperty(object, paramName,value);
 				} catch (Exception e) {
-					logger.error("为对象"+object+"设置属性"+paramName+"时出现异常，该值为"+value);
-					e.printStackTrace();
+					logger.error("为对象"+object+"设置属性"+paramName+"时出现异常，该值为"+value,e);
 				}
 			}
 			
@@ -240,7 +239,7 @@ public class WebUtils {
 	                }
 	            }
 	        } catch (IOException e) {
-	            e.printStackTrace(System.out);
+				logger.error("IO异常",e);
 	        }
 	        return macAddress;
 	    }

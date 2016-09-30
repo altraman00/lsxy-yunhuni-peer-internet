@@ -9,6 +9,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.collections.MapUtils;
@@ -50,24 +51,18 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
      */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
-            logger.error("request params is null");
-            return res;
+            throw new InvalidParamException("request params is null");
         }
         String conf_id = (String)params.get("user_data");
         if(StringUtils.isBlank(conf_id)){
-            logger.info("conf_id is null");
-            return res;
+            throw new InvalidParamException("conf_id is null");
         }
         BusinessState state = businessStateService.get(conf_id);
         if(state == null){
-            logger.info("businessstate is null");
-            return res;
+            throw new InvalidParamException("businessstate is null");
         }
 
         if(logger.isDebugEnabled()){
@@ -79,18 +74,11 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
         Map<String,Object> businessData = state.getBusinessData();
 
         if(StringUtils.isBlank(appId)){
-            logger.info("没有找到对应的app信息appId={}",appId);
-            return res;
+            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
         App app = appService.findById(state.getAppId());
         if(app == null){
-            logger.info("没有找到对应的app信息appId={}",appId);
-            return res;
-        }
-
-        if(StringUtils.isBlank(app.getUrl())){
-            logger.info("没有找到appId={}的回调地址",appId);
-            return res;
+            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
 
         //开始通知开发者
@@ -105,14 +93,16 @@ public class Handler_EVENT_SYS_CONF_ON_PLAY_COMPLETED extends EventHandler {
         if(params.get("end_time") != null){
             end_time = ((long)params.get("end_time")) * 1000;
         }
-        Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .putIfNotEmpty("event","conf.play_end")
-                .putIfNotEmpty("id",conf_id)
-                .putIfNotEmpty("begin_time",begin_time)
-                .putIfNotEmpty("end_time",end_time)
-                .putIfNotEmpty("user_data",user_data)
-                .build();
-        notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+        if(StringUtils.isNotBlank(app.getUrl())){
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","conf.play_end")
+                    .putIfNotEmpty("id",conf_id)
+                    .putIfNotEmpty("begin_time",begin_time)
+                    .putIfNotEmpty("end_time",end_time)
+                    .putIfNotEmpty("user_data",user_data)
+                    .build();
+            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+        }
         if(logger.isDebugEnabled()){
             logger.debug("会议放音结束通知发送成功");
         }

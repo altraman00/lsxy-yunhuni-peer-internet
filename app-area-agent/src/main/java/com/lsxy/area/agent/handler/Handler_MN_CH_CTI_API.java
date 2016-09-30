@@ -81,8 +81,7 @@ public class Handler_MN_CH_CTI_API extends RpcRequestHandler{
             /*发送请求给CTI次数计数*/
             if(sc!=null) sc.getSendCTIRequestCount().incrementAndGet();
         } catch (IOException e) {
-            logger.error("操作CTI资源异常{}",request);
-            e.printStackTrace();
+            logger.error("操作CTI资源异常{}",request,e);
         }
         return null;
     }

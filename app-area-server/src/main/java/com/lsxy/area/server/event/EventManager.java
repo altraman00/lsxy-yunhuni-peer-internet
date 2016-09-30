@@ -3,6 +3,7 @@ package com.lsxy.area.server.event;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +53,20 @@ public class EventManager {
 
     public RPCResponse fire(RPCRequest request, Session session){
         String method = (String) request.getParameter("method");
-        if(logger.isDebugEnabled()){
-            logger.debug("收到CTI事件:{}-----{}" , method,request.getParamMap());
-        }
         EventHandler handler = handlers.get(method);
-        return handler.handle(request,session);
+        if(handler == null){
+            return null;
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("开始处理{}事件,{}",handler.getEventName(),request);
+        }
+        try{
+            return handler.handle(request,session);
+        }catch (InvalidParamException e){
+            logger.error("非法调用参数",e);
+        }catch (Throwable t){
+            logger.error("处理失败",t);
+        }
+        return null;
     }
 }

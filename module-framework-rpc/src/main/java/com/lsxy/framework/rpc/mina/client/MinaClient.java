@@ -113,7 +113,7 @@ public class MinaClient extends AbstractClient {
             doConnect(session);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("异常",ex);
             if (session != null)
                 session.close(true);
             logger.info("连接" + host + ":" + port + "失败，请确认节点代理服务是否开启，10秒后再次尝试。。。。");
