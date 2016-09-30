@@ -57,7 +57,7 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
 
         //如果短信发送成功就异步存到数据库
         String clientName = smsClientFactory.getSMSClient().getClientName();
-        SMSSendLog log = new SMSSendLog(to,content,clientName);
+        SMSSendLog log = new SMSSendLog(to,content,clientName,"true");
         asyncSmsSaveTask.saveToDB(log);
         return "true";
     }
