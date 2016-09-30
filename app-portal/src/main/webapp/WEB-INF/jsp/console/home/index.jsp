@@ -357,19 +357,16 @@
         } );
 
         restapi.on( 'complete', function(client, args) {
-            var temp = args.text;
-            if(temp.length>25){
-                temp = temp.substring(0,25)+"\r\n"+temp.substring(25,temp.length);
-            }
-            showtoast("复制成功："+ temp);
+//            var temp = args.text;
+            showtoast("复制成功");
         } );
 
         secrekey.on( 'complete', function(client, args) {
-            showtoast("复制成功："+ args.text);
+            showtoast("复制成功");
         } );
 
         certid.on( 'complete', function(client, args) {
-            showtoast("复制成功："+ args.text);
+            showtoast("复制成功");
         } );
     }
 
