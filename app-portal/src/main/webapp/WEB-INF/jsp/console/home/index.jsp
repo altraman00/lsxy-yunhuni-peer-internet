@@ -195,15 +195,37 @@
                                         <div class="h5 border-left">开发者账号</div>
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
-                                        <p>接口API：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.restApi}</span></p>
-                                        <p>密钥：&nbsp;&nbsp;<span id="secretKey" style="font-weight:bold">${homeVO.secretKey}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class='reset_sk_confirm' >重新生成</a></span>
-                                        <span>
-                                            <a class="tips-error tips-key"></a>
-                                        </span>
+                                        <p>
+                                            <span class="index-key">API地址:</span>
+                                            <span id="restapi" data-clipboard-target="restapi" style="font-weight:bold">http://api.yunhuni.com/1234135312321414134/</span>
+                                        <%--<span>--%>
+                                          <%--<a href="#">API文档</a>--%>
+                                        <%--</span>--%>
                                         </p>
                                         <p>
-                                            鉴权账号：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.certId}</span>
+                                            <span class="index-key">密钥:</span>
+                                            <span id="secretkey" data-clipboard-target="secretkey" style="font-weight:bold">1234135312321414134</span>
+                                        <span>
+                                          <a class='reset_confirm' >重新生成</a>
+                                        </span>
+                                        <%--<span>--%>
+                                          <%--<a class='tips-error tips-key'>提示</a>--%>
+                                        <%--</span>--%>
+
                                         </p>
+                                        <p>
+                                            <span class="index-key">鉴权账号:</span>
+                                            <span id="certid" data-clipboard-target="certid" style="font-weight:bold">123456789123456789</span>
+                                        </p>
+                                        <%--<p>接口API：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.restApi}</span></p>--%>
+                                        <%--<p>密钥：&nbsp;&nbsp;<span id="secretKey" style="font-weight:bold">${homeVO.secretKey}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class='reset_sk_confirm' >重新生成</a></span>--%>
+                                        <%--<span>--%>
+                                            <%--<a class="tips-error tips-key"></a>--%>
+                                        <%--</span>--%>
+                                        <%--</p>--%>
+                                        <%--<p>--%>
+                                            <%--鉴权账号：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.certId}</span>--%>
+                                        <%--</p>--%>
                                     </div>
                                 </div>
                             </section>
@@ -299,7 +321,62 @@
 </section>
 
 <%@include file="/inc/footer.jsp"%>
+<script type="text/javascript" src="${resPrefixUrl}/js/zero/ZeroClipboard.js"></script>
+<script type="text/javascript">
 
+    if(window.clipboardData){
+        //支持IE
+        var restapi = document.getElementById("restapi");
+        restapi.onclick = function(){
+            alert(restapi.innerHTML);
+            window.clipboardData.setData('text',restapi.innerHTML);
+        }
+
+        var secretkey = document.getElementById("secretkey");
+        secretkey.onclick = function(){
+            alert(secretkey.innerHTML);
+            window.clipboardData.setData('text',secretkey.innerHTML);
+        }
+
+        var certid = document.getElementById("certid");
+        certid.onclick = function(){
+            alert(certid.innerHTML);
+            window.clipboardData.setData('text',certid.innerHTML);
+        }
+
+
+    }else{
+        var restapi = new ZeroClipboard( document.getElementById("restapi"), {
+            moviePath: "${resPrefixUrl}/js/zero/ZeroClipboard.swf"
+        } );
+        var secrekey = new ZeroClipboard( document.getElementById("secretkey"), {
+            moviePath: "${resPrefixUrl}/js/zero/ZeroClipboard.swf"
+        } );
+        var certid = new ZeroClipboard( document.getElementById("certid"), {
+            moviePath: "${resPrefixUrl}/js/zero/ZeroClipboard.swf"
+        } );
+
+        restapi.on( 'complete', function(client, args) {
+            var temp = args.text;
+            if(temp.length>25){
+                temp = temp.substring(0,25)+"\r\n"+temp.substring(25,temp.length);
+            }
+            showtoast("复制成功："+ temp);
+        } );
+
+        secrekey.on( 'complete', function(client, args) {
+            showtoast("复制成功："+ args.text);
+        } );
+
+        certid.on( 'complete', function(client, args) {
+            showtoast("复制成功："+ args.text);
+        } );
+    }
+
+
+
+
+</script>
 <script type="text/javascript">
 
     // restfult api 重新生成confirm
