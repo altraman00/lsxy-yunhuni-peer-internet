@@ -88,8 +88,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS,e);
                     }
                 }
 
@@ -104,8 +103,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
                 }
 
@@ -120,14 +118,13 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT,e);
                     }
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("调用创建语音认证码资源失败",e);
             response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;

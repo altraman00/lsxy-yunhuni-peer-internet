@@ -2,6 +2,8 @@ package com.lsxy.framework.mq.api;
 
 import com.lsxy.framework.core.utils.JSONUtil2;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.MessageCreator;
 
 import javax.jms.JMSException;
@@ -18,7 +20,7 @@ import java.io.Serializable;
  *
  */
 public abstract class AbstractMQEvent implements MQEvent,MessageCreator,Serializable {
-
+	public static final Logger logger = LoggerFactory.getLogger(AbstractMQEvent.class);
 	private String id;
 
 	private  long timestamp;
@@ -84,7 +86,7 @@ public abstract class AbstractMQEvent implements MQEvent,MessageCreator,Serializ
 			byte[] bytes = bao.toByteArray();
 			result = Base64.encodeBase64String(bytes);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO异常",e);
 		}
 		return result;
 	}

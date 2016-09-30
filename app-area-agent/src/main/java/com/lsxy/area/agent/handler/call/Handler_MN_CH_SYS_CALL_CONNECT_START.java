@@ -77,8 +77,7 @@ public class Handler_MN_CH_SYS_CALL_CONNECT_START extends RpcRequestHandler {
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_CONNECT_ON_START);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_CONNECT_ON_START,e);
                     }
                 }
 
@@ -94,7 +93,7 @@ public class Handler_MN_CH_SYS_CALL_CONNECT_START extends RpcRequestHandler {
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("调用资源操作失败",e);
             response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;

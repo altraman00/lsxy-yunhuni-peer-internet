@@ -3,6 +3,8 @@ package com.lsxy.app.portal.console.ossfile;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.oss.OSSService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +20,7 @@ import java.io.InputStream;
 @Controller
 @RequestMapping("/console/oss")
 public class OssFileController extends AbstractPortalController {
+    private static final Logger logger = LoggerFactory.getLogger(OssFileController.class);
     @Autowired
     private OSSService ossService;
 
@@ -39,15 +42,13 @@ public class OssFileController extends AbstractPortalController {
                 out.write(buffer, 0, length);
             }
         } catch (Exception e) {
-            System.out.println("文件流输出异常");
-            e.printStackTrace();
+            logger.error("文件流输出异常",e);
         }finally {
             try {
                 in.close();
                 out.close();
             } catch (IOException e) {
-                System.out.println("文件流关闭异常");
-                e.printStackTrace();
+                logger.error("文件流关闭异常",e);
             }
         }
     }

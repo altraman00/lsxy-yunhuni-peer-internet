@@ -104,7 +104,7 @@ public class TestController {
                 logger.debug("整个测试全部完成,共耗时:{}ms",result);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("线程池异常",e);
         }
         return RestResponse.success("测试完毕,共耗时:"+result+"ms");
     }
@@ -165,7 +165,7 @@ public class TestController {
                 logger.debug("整个测试全部完成,共耗时:{}ms",System.currentTimeMillis() - starttime);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("线程池异常",e);
         }
         return RestResponse.success("测试完毕了");
     }

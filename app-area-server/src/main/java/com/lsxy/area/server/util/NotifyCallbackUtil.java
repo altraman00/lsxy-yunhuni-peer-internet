@@ -137,8 +137,7 @@ public class NotifyCallbackUtil {
                 }
             });
         }catch (Throwable t){
-            logger.error("调用{}失败",url);
-            t.printStackTrace();
+            logger.error("调用{}失败",url,t);
         }
     }
 

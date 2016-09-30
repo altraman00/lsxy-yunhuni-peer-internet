@@ -942,14 +942,14 @@ public class TenantController {
             try {
                 BeanUtils.copyProperties(consumeMonth,consumeMonths.get(i));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("复制属性异常",e);
             }
             String type = consumeMonth.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consumeMonth.setType(consumeCode.getName());
             }catch(Exception e){
-//                e.printStackTrace();
+                logger.error("发现未知消费项目",e);
                 consumeMonth.setType("未知项目");
             }
             consumeMonths.set(i,consumeMonth);
@@ -967,14 +967,14 @@ public class TenantController {
             try {
                 BeanUtils.copyProperties(consume,consumes.get(i));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("复制属性异常",e);
             }
             String type = consume.getType();
             try{
                 ConsumeCode consumeCode = ConsumeCode.valueOf(type);
                 consume.setType(consumeCode.getName());
             }catch(Exception e){
-//                e.printStackTrace();
+                logger.error("发现未知消费项目",e);
                 consume.setType("未知项目");
             }
             consumes.set(i,consume);
