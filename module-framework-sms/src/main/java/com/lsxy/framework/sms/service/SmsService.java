@@ -21,7 +21,7 @@ public interface SmsService {
      * @param params
      * @return
      */
-    public String sendsms(String to,String template,Map<String,Object> params);
+    public boolean sendsms(String to,String template,Map<String,Object> params);
 
     /**
      * 生成验证码并存到Redis（不负责发送）
