@@ -46,9 +46,6 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Commander cticlient = cticlientContext.getAvalibleClient();

@@ -49,9 +49,6 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String, Object> paramMap = request.getParamMap();
         String callId = (String)paramMap.get("user_data1");
