@@ -485,7 +485,7 @@
                     if(response.success){
                         var isIvrService = response.data.isIvrService==1?1:0;
                         $('#trb-'+id).html('');
-                        $('#statusapp-'+id).html('未上线').removeClass('success').addClass('nosuccess');
+                        $('#statusapp-'+id).html('未上线').attr('style','color:#ff0000;');
                         $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\')">申请上线</a>');
                         showtoast('下线成功');
                     }else{

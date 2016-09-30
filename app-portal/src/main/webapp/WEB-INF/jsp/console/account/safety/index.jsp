@@ -317,7 +317,7 @@
         var param = {'oldPws':psw,csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/account/safety/validation_psw",param,function(data){
             if(data.sucess==2) {
-                showmsg(data.msg,'moadltips2');
+                //showmsg(data.msg,'moadltips2');
                 $('.addmobile1').hide();
                 $('.addmobile'+type).show();
             }else{
