@@ -197,14 +197,14 @@
                                     <div class="panel-body clearfix border-top-none">
                                         <p>
                                             <span class="index-key">API地址:</span>
-                                            <span id="restapi" data-clipboard-target="restapi" style="font-weight:bold">http://api.yunhuni.com/1234135312321414134/</span>
+                                            <span id="restapi" data-clipboard-target="restapi" style="font-weight:bold">${homeVO.restApi}</span>
                                         <%--<span>--%>
                                           <%--<a href="#">API文档</a>--%>
                                         <%--</span>--%>
                                         </p>
                                         <p>
                                             <span class="index-key">密钥:</span>
-                                            <span id="secretkey" data-clipboard-target="secretkey" style="font-weight:bold">1234135312321414134</span>
+                                            <span id="secretkey" data-clipboard-target="secretkey" style="font-weight:bold">${homeVO.secretKey}</span>
                                         <span>
                                           <a class='reset_confirm' >重新生成</a>
                                         </span>
@@ -215,7 +215,7 @@
                                         </p>
                                         <p>
                                             <span class="index-key">鉴权账号:</span>
-                                            <span id="certid" data-clipboard-target="certid" style="font-weight:bold">123456789123456789</span>
+                                            <span id="certid" data-clipboard-target="certid" style="font-weight:bold">${homeVO.certId}</span>
                                         </p>
                                         <%--<p>接口API：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.restApi}</span></p>--%>
                                         <%--<p>密钥：&nbsp;&nbsp;<span id="secretKey" style="font-weight:bold">${homeVO.secretKey}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class='reset_sk_confirm' >重新生成</a></span>--%>
