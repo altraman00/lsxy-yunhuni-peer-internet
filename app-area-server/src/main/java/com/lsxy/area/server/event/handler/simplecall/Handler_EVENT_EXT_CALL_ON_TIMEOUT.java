@@ -48,10 +48,6 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String, Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
