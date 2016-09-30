@@ -8,8 +8,8 @@
     </div>
     <ul class="nav navbar-nav hidden-xs nav_b">
         <li class="dropdown">
-            <a href="${ctx}/console/home" class="dropdown-toggle padding-15" data-toggle="dropdown">
-                <span onclick="window.location.href='${ctx}/console/home'" class="" style="letter-spacing: 4px;">管理控制台</span>
+            <a href="${ctx}/console/home" class="dropdown-toggle navbar-index padding-15" data-toggle="dropdown">
+                <span onclick="window.location.href='${ctx}/console/home'" class="" >管理控制台</span>
             </a>
         </li>
     </ul>
