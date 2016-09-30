@@ -18,9 +18,9 @@ public class SMSSendLog  extends IdEntity {
 
     private String msgContent;
 
-
     private String smsClient;
 
+    private String smsResult;
 
     private String sendTo;
 
@@ -28,10 +28,11 @@ public class SMSSendLog  extends IdEntity {
     public SMSSendLog(){
 
     }
-    public SMSSendLog(String to, String content, String clientName) {
+    public SMSSendLog(String to, String content, String clientName,String smsResult) {
         this.sendTo = to;
         this.msgContent = content;
         this.smsClient = clientName;
+        this.smsResult = smsResult;
     }
 
     @Column(name="sms_content")
@@ -59,5 +60,14 @@ public class SMSSendLog  extends IdEntity {
 
     public void setSendTo(String sendTo) {
         this.sendTo = sendTo;
+    }
+
+    @Column(name="sms_result")
+    public String getSmsResult() {
+        return smsResult;
+    }
+
+    public void setSmsResult(String smsResult) {
+        this.smsResult = smsResult;
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -46,7 +47,7 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
     }
 
     @Override
-    public boolean sendsms(String to, String template, Map<String, Object> params) {
+    public String sendsms(String to, String template, Map<String, Object> params) {
         String content = buildSmsContent(template,params);
 
         if(logger.isDebugEnabled()){
@@ -58,7 +59,7 @@ public class SmsServiceImplNotProduction extends AbstractSmsServiceImpl {
         String clientName = smsClientFactory.getSMSClient().getClientName();
         SMSSendLog log = new SMSSendLog(to,content,clientName);
         asyncSmsSaveTask.saveToDB(log);
-        return true;
+        return "true";
     }
 
 

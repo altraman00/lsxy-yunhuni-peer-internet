@@ -48,24 +48,25 @@ public class SmsServiceImplProduction  extends AbstractSmsServiceImpl {
     }
 
     @Override
-    public boolean sendsms(String to, String template, Map<String, Object> params) {
+    public String sendsms(String to, String template, Map<String, Object> params) {
 
         String content = buildSmsContent(template,params);
         if(logger.isDebugEnabled()){
             logger.debug("发送短信给：{}",to);
             logger.debug("内容:{}",content);
         }
-        boolean result =  smsClientFactory.getSMSClient().sendsms(to,content);
+        String result =  smsClientFactory.getSMSClient().sendsms(to,content);
 
         if(logger.isDebugEnabled()){
             logger.debug("发送结果:{}",result);
         }
-        if(result){
+        if(StringUtils.isNotEmpty(result)){
             //如果短信发送成功就异步存到数据库
             String clientName = smsClientFactory.getSMSClient().getClientName();
-            SMSSendLog log = new SMSSendLog(to,content,clientName);
-
+            SMSSendLog log = new SMSSendLog(to,content,clientName,result);
             asyncSmsSaveTask.saveToDB(log);
+        }else{
+            logger.error("短信发送失败，发送对象["+to+"]发送内容["+content+"]");
         }
         return result;
     }

@@ -61,8 +61,7 @@ public class OssFileController extends AbstractRestController {
                 out.write(buffer, 0, length);
             }
         } catch (Exception e) {
-            logger.info("文件流输出异常");
-            e.printStackTrace();
+            logger.error("文件流输出异常",e);
         }finally {
             try {
                 in.close();
