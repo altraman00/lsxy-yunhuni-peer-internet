@@ -8,6 +8,8 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.BillingService;
 import com.lsxy.framework.billing.dao.BillingDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -22,7 +24,7 @@ import java.io.Serializable;
  */
 @Service
 public class BillingServiceImpl extends AbstractService<Billing> implements BillingService {
-
+    private static final Logger logger = LoggerFactory.getLogger(BillingServiceImpl.class);
     @Autowired
     private BillingDao billingDao;
 
@@ -51,10 +53,10 @@ public class BillingServiceImpl extends AbstractService<Billing> implements Bill
         try {
             return this.findUnique(hql,tenantId);
         } catch (MatchMutiEntitiesException e) {
-            e.printStackTrace();
+            logger.error("存在多个对应账务信息",e);
             throw new RuntimeException("存在多个对应账务信息");
         }catch(Exception e){
-            e.printStackTrace();
+            logger.error("获取账务信息异常",e);
             return null;
         }
     }

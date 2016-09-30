@@ -2,17 +2,19 @@ package com.lsxy.app.oc.rest.tenant.vo;
 
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.yunhuni.api.app.model.App;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by liuws on 2016/8/12.
  */
 public class TenantAppVO implements Serializable {
-
+    public static final Logger logger = LoggerFactory.getLogger(TenantAppVO.class);
     private String id;
     private String name;//应用名字
     private Integer status;//应用状态
@@ -40,9 +42,9 @@ public class TenantAppVO implements Serializable {
         try {
             BeanUtils.copyProperties(this,app);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.error("复制类属性异常",e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            logger.error("复制类属性异常",e);
         }
     }
 

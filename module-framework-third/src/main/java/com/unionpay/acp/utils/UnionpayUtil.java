@@ -2,9 +2,9 @@ package com.unionpay.acp.utils;
 
 import com.lsxy.framework.config.SystemConfig;
 import com.unionpay.acp.sdk.AcpService;
-import com.unionpay.acp.sdk.SDKConfig;
 import com.unionpay.acp.sdk.SDKConstants;
-import com.unionpay.acp.sdk.SDKUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,7 +22,7 @@ import java.util.Map.Entry;
  * 说明：以下代码只是为了方便商户测试而提供的样例代码，商户可以根据自己需要，按照技术文档编写。该代码仅供参考。<br>
  */
 public class UnionpayUtil {
-
+	private static final Logger logger = LoggerFactory.getLogger(UnionpayUtil.class);
 	//商户号码
 	public static String merId = SystemConfig.getProperty("third.join.gateway.unionpay.mer_id","802440048160857");
 
@@ -130,7 +130,7 @@ public class UnionpayUtil {
         }
         } catch (Exception e) {
             System.out.println("读取文件内容出错");
-            e.printStackTrace();
+			logger.error("银联支付异常",e);
         }
 	 	for(int i=0;i<ZmDataList.size();i++){
 	 		System.out.println("行数: "+ (i+1));

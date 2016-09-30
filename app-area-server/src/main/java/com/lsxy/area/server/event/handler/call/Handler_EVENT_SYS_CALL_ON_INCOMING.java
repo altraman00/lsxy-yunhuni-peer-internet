@@ -10,6 +10,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
@@ -82,14 +83,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
      */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
-            logger.error("request params is null");
-            return res;
+            throw new InvalidParamException("request params is null");
         }
         String res_id = (String)params.get("res_id");
         String from_uri = (String)params.get("from_uri");//主叫sip地址
@@ -105,8 +102,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             //被叫是公共测试号,根据主叫号查出应用
             TestNumBind testNumBind = testNumBindService.findByNumber(from);
             if(testNumBind == null){
-                logger.error("公共测试号={}找不到对应的app，from={}",to,from);
-                return res;
+                throw new InvalidParamException("公共测试号={}找不到对应的app，from={}",to,from);
             }
             tenant = testNumBind.getTenant();
             app = testNumBind.getApp();
@@ -114,19 +110,17 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             //不是公共测试号，从号码资源池中查出被叫号码的应用
             ResourcesRent rent = resourcesRentService.findByResDataAndRentStatus(to, ResourcesRent.RENT_STATUS_USING);
             if(rent == null){
-                logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
+                throw new InvalidParamException("号码资源池中找不到被叫号码对应的应用：{}",params);
             }
             tenant = rent.getTenant();
             app = rent.getApp();
         }
 
         if(tenant == null){
-            logger.error("找不到对应的租户:{}",params);
-            return res;
+            throw new InvalidParamException("找不到对应的租户:{}",params);
         }
         if(app == null){
-            logger.error("找不到对应的APP:{}", params);
-            return res;
+            throw new InvalidParamException("找不到对应的APP:{}", params);
         }
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to);
         return res;

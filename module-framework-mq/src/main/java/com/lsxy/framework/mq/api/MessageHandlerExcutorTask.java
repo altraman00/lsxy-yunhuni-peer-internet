@@ -3,6 +3,8 @@ package com.lsxy.framework.mq.api;
 
 
 import com.lsxy.framework.mq.exceptions.MessageHandlingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,7 @@ import javax.jms.JMSException;
  */
 @Component
 public class MessageHandlerExcutorTask {
+    private static final Logger logger = LoggerFactory.getLogger(MessageHandlerExcutorTask.class);
     /**
      *异步执行任务
      * @param handler
@@ -25,7 +28,7 @@ public class MessageHandlerExcutorTask {
         try {
             handler.handleMessage(event);
         } catch (JMSException e) {
-            e.printStackTrace();
+            logger.error("JMS异常",e);
             throw new MessageHandlingException(e);
 
         }

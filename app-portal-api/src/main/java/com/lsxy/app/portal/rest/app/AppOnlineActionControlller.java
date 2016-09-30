@@ -15,6 +15,8 @@ import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,7 @@ import java.util.Map;
 @RequestMapping("/rest/app_online")
 @RestController
 public class AppOnlineActionControlller extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(AppOnlineActionControlller.class);
     public static final String ALTERNATIVE_IVR_PREFIX = "IVR_TELENUM_SEL_";     //个人备选IVR号存在redis中的前缀
 
     @Autowired
@@ -139,11 +142,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
                 redisCacheService.del(ALTERNATIVE_IVR_PREFIX + tenant.getId());
                 return RestResponse.success(action);
             } catch (NotEnoughMoneyException e) {
-                e.printStackTrace();
+                logger.error("支付余额不足",e);
                 return RestResponse.failed("0000","余额不足");
             } catch (TeleNumberBeOccupiedException e) {
                 //号码资源被占用，则清空redis缓存的号码，重新从号码池中取新的号码
-                e.printStackTrace();
+                logger.error("选定号码已被占用",e);
                 String areaId = null;
                 if(app.getArea() != null){
                     areaId = app.getArea().getId();

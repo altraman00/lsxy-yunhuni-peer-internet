@@ -46,9 +46,6 @@ public class Handler_MN_CH_SYS_CALL_RECEIVE_DTMF_START extends RpcRequestHandler
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Commander cticlient = cticlientContext.getAvalibleClient();
@@ -84,7 +81,7 @@ public class Handler_MN_CH_SYS_CALL_RECEIVE_DTMF_START extends RpcRequestHandler
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("调用资源操作失败",e);
             response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;

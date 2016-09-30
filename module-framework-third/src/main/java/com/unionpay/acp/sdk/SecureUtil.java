@@ -246,7 +246,7 @@ public class SecureUtil {
 			}
 		} catch (Exception ex) {
 			System.err.println("Data format error!\n");
-			ex.printStackTrace();
+			logger.error("银联支付异常",ex);
 		} finally {
 			o.close();
 		}
@@ -512,7 +512,7 @@ public class SecureUtil {
 			String strMac = this.byte2hex(macCode);
 			return strMac;
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error("银联支付异常",ex);
 			throw ex;
 		}
 	}
@@ -882,10 +882,10 @@ public class SecureUtil {
 
 			return tEncryptPIN;
 		} catch (Exception e) {
-			e.printStackTrace(System.out);
+			logger.error("银联支付异常",e);
 			return tPIN;
 		} catch (Error e) {
-			e.printStackTrace(System.out);
+			logger.error("银联支付异常",e);
 			return tPIN;
 		}
 	}

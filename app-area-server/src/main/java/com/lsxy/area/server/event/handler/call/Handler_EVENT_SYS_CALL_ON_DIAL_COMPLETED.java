@@ -16,6 +16,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -84,27 +85,21 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
      */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
-            logger.error("request params is null");
-            return res;
+            throw new InvalidParamException("request params is null");
         }
         String call_id = (String)params.get("user_data");
         //错误信息。如果拨号失败，该参数记录错误信息。如果拨号成功的被接听，该参数的值是 null。
         String error = (String)params.get("error");
 
         if(StringUtils.isBlank(call_id)){
-            logger.info("call_id is null");
-            return res;
+            throw new InvalidParamException("call_id is null");
         }
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            logger.info("businessstate is null");
-            return res;
+            throw new InvalidParamException("businessstate is null");
         }
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
@@ -121,8 +116,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             }else{
                 String conf_id = (String)businessData.get("conf_id");
                 if(conf_id == null){
-                    logger.info("将呼叫加入到会议失败conf_id为null");
-                    return res;
+                    throw new InvalidParamException("将呼叫加入到会议失败conf_id为null");
                 }
                 try {
                     confService.confEnter(call_id,conf_id,null,null,null);
@@ -144,15 +138,17 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 if(params.get("end_time") != null){
                     end_time = ((long)params.get("end_time")) * 1000;
                 }
-                Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                        .putIfNotEmpty("event","ivr.dial_end")
-                        .putIfNotEmpty("id",call_id)
-                        .putIfNotEmpty("begin_time",begin_time)
-                        .putIfNotEmpty("end_time",end_time)
-                        .putIfNotEmpty("user_data",state.getUserdata())
-                        .build();
+                if(StringUtils.isNotBlank(app.getUrl())){
+                    Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("event","ivr.dial_end")
+                            .putIfNotEmpty("id",call_id)
+                            .putIfNotEmpty("begin_time",begin_time)
+                            .putIfNotEmpty("end_time",end_time)
+                            .putIfNotEmpty("user_data",state.getUserdata())
+                            .build();
 
-                notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+                    notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+                }
                 ivrActionService.doAction(call_id);
             }
         }else if("ivr_dial".equals(state.getType())){//通过ivr拨号动作发起的呼叫

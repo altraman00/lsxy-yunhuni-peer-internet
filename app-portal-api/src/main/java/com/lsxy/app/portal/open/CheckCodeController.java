@@ -9,6 +9,8 @@ import com.lsxy.framework.sms.service.SmsService;
 import com.lsxy.framework.web.rest.RestResponse;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/code")
 public class CheckCodeController {
+    private static final Logger logger = LoggerFactory.getLogger(CheckCodeController.class);
     @Autowired
     SmsService smsService;
 
@@ -39,7 +42,7 @@ public class CheckCodeController {
         try {
             code = smsService.genVC(mobile);
         } catch (TooManyGenTimesException e) {
-            e.printStackTrace();
+            logger.error("认证码生成次数过于频繁",e);
             return RestResponse.failed("0000",e.getMessage());
         }
         String template = "01-portal-test-num-bind.vm";
@@ -66,13 +69,13 @@ public class CheckCodeController {
                 response = RestResponse.failed("0000","校验出错");
             }
         } catch (InvalidValidateCodeException e) {
-            e.printStackTrace();
+            logger.error("验证码错误",e);
             response = RestResponse.failed("0000","验证码错误");
         } catch (CheckOutMaxTimesException e) {
-            e.printStackTrace();
+            logger.error("验证超过最大次数",e);
             response = RestResponse.failed("0000","验证超过最大次数");
         } catch (CheckCodeNotFoundException e) {
-            e.printStackTrace();
+            logger.error("验证码不存在或已过期",e);
             response = RestResponse.failed("0000","验证码不存在或已过期");
         }
         return response;
