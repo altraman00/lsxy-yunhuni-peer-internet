@@ -206,11 +206,11 @@
                                             <span class="index-key">密钥:</span>
                                             <span id="secretkey" data-clipboard-target="secretkey" style="font-weight:bold">${homeVO.secretKey}</span>
                                         <span>
-                                          <a class='reset_confirm' >重新生成</a>
+                                          <a class='reset_sk_confirm' >重新生成</a>
                                         </span>
-                                        <%--<span>--%>
-                                          <%--<a class='tips-error tips-key'>提示</a>--%>
-                                        <%--</span>--%>
+                                        <span>
+                                          <a class='tips-error tips-key'></a>
+                                        </span>
 
                                         </p>
                                         <p>
@@ -383,7 +383,8 @@
             if(result){
                 ajaxsync(ctx + "/console/home/change_sk",null,function(response){
                     if(response.data != null){
-                        $("#secretKey").html(response.data);
+                        $("#secretkey").html(response.data);
+                        $(".tips-key").html("");
                     }else{
                         //errorCode errorMsg
                         $(".tips-key").html("生成失败!" + response.errorMsg)
