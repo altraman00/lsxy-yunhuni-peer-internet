@@ -119,7 +119,7 @@ public class AlipayNotify {
                 .getInputStream()));
             inputLine = in.readLine().toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("异常",e);
             inputLine = "";
         }
         if(logger.isDebugEnabled()){

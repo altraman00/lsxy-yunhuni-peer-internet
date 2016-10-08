@@ -126,7 +126,7 @@ public class HomeController extends AbstractPortalController {
                 try {
                     BeanUtils.copyProperties2(appStateVO,app,false);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("复制类属性异常",e);
                 }
                 Map map = getStatistics(token, app);
 

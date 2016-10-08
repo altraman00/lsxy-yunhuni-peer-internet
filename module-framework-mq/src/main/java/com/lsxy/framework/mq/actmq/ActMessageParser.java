@@ -4,6 +4,8 @@ import com.lsxy.framework.mq.api.MQEvent;
 import com.lsxy.framework.mq.api.MQMessageParser;
 import com.lsxy.framework.mq.exceptions.InvalidMQEventMessageException;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,7 @@ import java.io.ObjectInputStream;
 @Component
 @ConditionalOnProperty(value = "global.mq.provider", havingValue = "actmq", matchIfMissing = false)
 public class ActMessageParser implements MQMessageParser {
+    private static final Logger logger = LoggerFactory.getLogger(ActMessageParser.class);
     @Override
     public MQEvent parse(String message) throws InvalidMQEventMessageException {
         return buildFromBase64(message);
@@ -37,7 +40,7 @@ public class ActMessageParser implements MQMessageParser {
             Object obj = ois.readObject();
             event = (MQEvent) obj;
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("IO异常",e);
         }
         return event;
     }

@@ -72,9 +72,9 @@ public class ResetPwdVerifySuccessEventHandler implements MQMessageHandler<Reset
                 logger.debug("邮件重置密码：code:{},email:{}",key,re);
             }
         } catch (MailConfigNotEnabledException e) {
-            e.printStackTrace();
+            logger.error("找不到有效的邮件配置",e);
         } catch (MailContentNullException e) {
-            e.printStackTrace();
+            logger.error("邮件内容为空！",e);
         }
     }
 

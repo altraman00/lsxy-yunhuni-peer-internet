@@ -1,8 +1,5 @@
 package com.lsxy.framework.core.utils;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -14,6 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Map;
 
 
 /**
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
  *
  */
 public class JSONUtil2 {
+	private static final Logger logger = LoggerFactory.getLogger(JSONUtil2.class);
 	/**
 	 * 将一个对象json化
 	 * 
@@ -50,7 +53,7 @@ public class JSONUtil2 {
 				result = om.writeValueAsString(obj);
 			}
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			logger.error("Json处理异常",e);
 		}
 		return result;
 	}
@@ -76,7 +79,7 @@ public class JSONUtil2 {
 		try {
 			json = mapper.writeValueAsString(o);
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			logger.error("Json处理异常",e);
 		}
 		return json;
 	}
@@ -101,7 +104,7 @@ public class JSONUtil2 {
 		try {
 			json = mapper.writeValueAsString(o);
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			logger.error("Json处理异常",e);
 		}
 		return json;
 	}
@@ -120,11 +123,11 @@ public class JSONUtil2 {
 			om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);  
 			obj = om.readValue(json, valueType);
 		} catch (JsonParseException e) {
-			e.printStackTrace();
+			logger.error("Json解析异常",e);
 		} catch (JsonMappingException e) {
-			e.printStackTrace();
+			logger.error("JsonMapping异常",e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO异常",e);
 		}
 		return obj;
 	}
@@ -141,11 +144,11 @@ public class JSONUtil2 {
 		try {
 			json = mapper.writeValueAsString(map);
 		} catch (JsonGenerationException e) {
-			e.printStackTrace();
+			logger.error("Json转换异常",e);
 		} catch (JsonMappingException e) {
-			e.printStackTrace();
+			logger.error("JsonMapping转换异常",e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO异常",e);
 		}
 		
 		return json;
@@ -184,7 +187,7 @@ public class JSONUtil2 {
 				result = jn.toString();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO异常",e);
 		}
 		return result;
 	}
@@ -217,7 +220,7 @@ public class JSONUtil2 {
 				result = jn;
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO异常",e);
 		}
 		return result;
 	}

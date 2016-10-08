@@ -7,6 +7,8 @@ import com.lsxy.framework.core.utils.EncryptDecryptData;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import javax.servlet.*;
@@ -20,7 +22,7 @@ import java.util.Date;
  * Servlet Filter implementation class SecurityFilter
  */
 public abstract class SecurityFilter implements Filter {
-	private Log logger = LogFactory.getLog(SecurityFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
 	public String[] excludePath = null;
 
     /**
@@ -97,7 +99,7 @@ public abstract class SecurityFilter implements Filter {
 //				}
 //			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("异常",e);
 		}
 		chain.doFilter(request, response);
 	}

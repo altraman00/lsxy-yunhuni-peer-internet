@@ -1,20 +1,15 @@
 package com.lsxy.framework.core.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class PropertiesUtil extends ArrayList {
-
+	private static final Logger logger = LoggerFactory.getLogger(PropertiesUtil.class);
 	private static final long serialVersionUID = 1L;
 
 	// 设置字符集
@@ -32,7 +27,7 @@ public class PropertiesUtil extends ArrayList {
 				this.write("");
 			this.addAll(Arrays.asList(read(fileName, encoding).split("\n")));
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error("异常",ex);
 		}
 	}
 	public PropertiesUtil(File file, String encoding) {
@@ -44,7 +39,7 @@ public class PropertiesUtil extends ArrayList {
 				this.write("");
 			this.addAll(Arrays.asList(read(file, encoding).split("\n")));
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error("异常",ex);
 		}
 	}
 	/**

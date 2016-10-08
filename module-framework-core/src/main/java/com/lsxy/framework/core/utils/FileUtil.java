@@ -1,28 +1,12 @@
 package com.lsxy.framework.core.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.codec.binary.Base64;
-
-
 
 
 /**
@@ -36,6 +20,8 @@ import org.apache.commons.codec.binary.Base64;
  *          <b>class name:</b>FileUtil<br>
  */
 public class FileUtil {
+	private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+
 	/**
 	 * 将流中的文本读入一个 StringBuffer 中
 	 * 
@@ -152,7 +138,7 @@ public class FileUtil {
 			br.close();
 			bw.close();
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			logger.error("IO异常",ioe);
 		}
 	}
 
@@ -210,7 +196,7 @@ public class FileUtil {
 			return result;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("操作流异常",e);
 		}
 		return null;
 	}
@@ -531,9 +517,9 @@ public class FileUtil {
 	 * @author jiangxc<br>
 	 *         <b>create Date:</b>Jul 13, 2009 3:45:21 PM<br>
 	 *         <b>last modify Date:</b>Jul 13, 2009 3:45:21 PM<br>
+	 * @param filePath
 	 * @param fileName
 	 * @param textList
-	 * @param encoding
 	 * @throws IOException
 	 */
 
@@ -802,8 +788,7 @@ public class FileUtil {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("复制整个文件夹内容操作出错");
-			e.printStackTrace();
+			logger.error("复制整个文件夹内容操作出错",e);
 		}
 	}
 
@@ -1007,13 +992,13 @@ public class FileUtil {
             stream = new java.io.BufferedOutputStream(fstream);
             stream.write(b);
         } catch (Exception e){
-            e.printStackTrace();
+			logger.error("操作文件流异常",e);
         } finally {
             if (stream != null) {
                 try{
                     stream.close();
                 } catch (IOException e1){
-                    e1.printStackTrace();
+					logger.error("关闭流异常",e1);
                 }
             }
         }

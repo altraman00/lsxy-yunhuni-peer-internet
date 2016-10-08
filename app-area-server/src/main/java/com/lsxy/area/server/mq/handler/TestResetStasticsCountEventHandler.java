@@ -51,7 +51,6 @@ public class TestResetStasticsCountEventHandler implements MQMessageHandler<Test
                 rpcCaller.invoke(sessionContext,request);
             } catch (Exception e) {
                 logger.error("重置统计数据失败:{}",e);
-                e.printStackTrace();
             }
         }
     }

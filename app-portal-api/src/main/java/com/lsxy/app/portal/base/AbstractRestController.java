@@ -4,6 +4,8 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.web.rest.RestResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
  * 抽象控制器类，提供获取当前登录用户的方法
  */
 public abstract class AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractRestController.class);
     @Autowired
     AccountService accountService;
 
@@ -27,7 +30,7 @@ public abstract class AbstractRestController {
      */
     @ExceptionHandler(Exception.class)
     public String exp(HttpServletRequest request, Exception ex) {
-        ex.printStackTrace();
+        logger.error("异常",ex);
         RestResponse failed = RestResponse.failed("0000", ex.getMessage());
         return JSONUtil2.objectToJson(failed);
     }

@@ -33,7 +33,7 @@ public abstract class AbstractPortalController {
      */
     @ExceptionHandler(Exception.class)
     public ModelAndView exp(HttpServletRequest request,HttpServletResponse response,Exception ex) {
-        ex.printStackTrace();
+        logger.error("异常",ex);
         ModelAndView mav;
         //Ajax请求带有X-Requested-With:XMLHttpRequest
         String xRequestedWith = request.getHeader("X-Requested-With");

@@ -25,6 +25,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.lsxy.framework.config.SystemConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,8 +34,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class MailService {
-
-	protected static Log logger = LogFactory.getLog(MailService.class);
+	private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
 	/**
 	 * 把主题转换为中文
@@ -46,7 +47,7 @@ public class MailService {
 		try {
 			strText = MimeUtility.encodeText(strText, "UTF-8", "B");	
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("设置编码异常",e);
 		}
 
 		return strText;
@@ -120,7 +121,7 @@ public class MailService {
 			// 发送邮件
 			Transport.send(msg);
 		} catch (MessagingException e) {
-			e.printStackTrace();
+			logger.error("设置消息体异常",e);
 			return false;
 		}
 		return true;

@@ -65,8 +65,7 @@ public class CTIClient implements RpcEventListener{
             }
 
         } catch (Exception ex) {
-            logger.error("CTI客户端启动失败:{}", ex.getMessage());
-            ex.printStackTrace();
+            logger.error("CTI客户端启动失败",ex);
         }
     }
 
@@ -106,8 +105,8 @@ public class CTIClient implements RpcEventListener{
 
             rpcCaller.invoke(sessionContext,areaRPCRequest);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("CTI事件通知区域管理器时发生异常,事件被丢失:{}-{}",rpcRequest.getMethod(), rpcRequest.getParams());
+            logger.error("CTI事件通知区域管理器时发生异常",e);
         }
     }
 

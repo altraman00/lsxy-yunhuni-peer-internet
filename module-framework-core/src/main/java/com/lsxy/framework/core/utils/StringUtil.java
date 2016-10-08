@@ -1,35 +1,21 @@
 package com.lsxy.framework.core.utils;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Clob;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.lsxy.framework.core.utils.BeanUtils.logger;
-import static com.sun.corba.se.impl.util.Utility.printStackTrace;
-import static java.net.InetAddress.getLocalHost;
 
 @SuppressWarnings("rawtypes")
 public class StringUtil extends StringUtils{
@@ -55,7 +41,7 @@ public class StringUtil extends StringUtils{
 				is.close();
 				result = new String(baos.toByteArray(),charset);
 			}catch(Exception ex){
-				ex.printStackTrace();
+				logger.error("异常",ex);
 			}
 		}
 		return result;
@@ -1058,7 +1044,7 @@ public class StringUtil extends StringUtils{
 		try {
 			md = MessageDigest.getInstance("MD5");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("异常",e);
 			return password;
 		}
 		md.reset();
@@ -1097,9 +1083,9 @@ public class StringUtil extends StringUtils{
 	        } catch (NoSuchAlgorithmException e) {  
 	            System.out.println("NoSuchAlgorithmException caught!");  
 	            System.exit(-1);  
-	        } catch (UnsupportedEncodingException e) {  
-	            e.printStackTrace();  
-	        }    
+	        } catch (UnsupportedEncodingException e) {
+				logger.error("转码异常",e);
+	        }
 	        byte[] byteArray = messageDigest.digest();  	  
 	        StringBuffer md5StrBuff = new StringBuffer();  	  
 	        for (int i = 0; i < byteArray.length; i++)  {  

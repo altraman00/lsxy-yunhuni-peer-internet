@@ -83,6 +83,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
                 Date curTime = new Date();
                 //状态变成已支付
                 recharge.setStatus(RechargeStatus.PAID.name());
+                recharge.setPayTime(curTime);
                 rechargeDao.save(recharge);
                 Tenant tenant = recharge.getTenant();
                 //redis插入今日充值

@@ -9,6 +9,8 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
 import com.lsxy.yunhuni.api.statistics.service.ConsumeMonthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequestMapping("/rest/consume_month")
 @RestController
 public class ConsumeMonthController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(ConsumeMonthController.class);
     @Autowired
     ConsumeMonthService consumeMonthService;
     /**
@@ -107,7 +110,7 @@ public class ConsumeMonthController extends AbstractRestController {
             try {
                 BeanUtils.copyProperties(consumeMonth,consumeMonths.get(i));
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("转换类属性出错",e);
             }
             String type = consumeMonth.getType();
             try{
