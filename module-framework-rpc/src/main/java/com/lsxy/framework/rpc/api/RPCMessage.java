@@ -1,9 +1,9 @@
 package com.lsxy.framework.rpc.api;
 
-import io.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Arrays;
 
 /**
  * Created by tandy on 16/8/2.
@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  */
 public class RPCMessage {
-
+    private static final Logger logger = LoggerFactory.getLogger(RPCMessage.class);
     // 会话标识 请求对象和响应对象是匹配的
     private String sessionid;
 
@@ -95,13 +95,13 @@ public class RPCMessage {
             ois = new ObjectInputStream(bais);
             obj = ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("IO异常",e);
         }finally{
             if(ois != null){
                 try {
                     ois.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("IO异常",e);
                 }
             }
         }
@@ -122,7 +122,7 @@ public class RPCMessage {
             out.writeObject(obj);
             result = bos.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("IO异常",e);
         } finally {
             try {
                 if (out != null) {

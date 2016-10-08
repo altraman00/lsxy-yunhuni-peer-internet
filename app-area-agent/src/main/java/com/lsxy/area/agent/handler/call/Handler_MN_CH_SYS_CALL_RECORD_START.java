@@ -76,7 +76,7 @@ public class Handler_MN_CH_SYS_CALL_RECORD_START extends RpcRequestHandler{
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("调用资源操作失败",e);
             response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;

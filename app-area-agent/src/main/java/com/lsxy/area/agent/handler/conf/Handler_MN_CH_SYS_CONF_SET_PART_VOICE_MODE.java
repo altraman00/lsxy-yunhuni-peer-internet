@@ -70,7 +70,7 @@ public class Handler_MN_CH_SYS_CONF_SET_PART_VOICE_MODE extends RpcRequestHandle
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("调用资源操作失败",e);
             response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;

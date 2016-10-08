@@ -94,15 +94,13 @@ public class MinaClientHandler extends AbstractClientRPCHandler {
 		public void exceptionCaught(IoSession session, Throwable cause)
 				throws Exception {
 			if(cause instanceof IOException){
-				logger.info("控制中心服务器连接断开，请检查网络连接是否正常，或者控制中心已停止服务，请联系管理员");
+				logger.error("控制中心服务器连接断开，请检查网络连接是否正常，或者控制中心已停止服务，请联系管理员",cause);
 				//需要停止服务端口
 //			NodeAgentServer server = (NodeAgentServer) SpringContextUtil.getBean("nodeAgentServer");
 //			server.unbind();
 //			NodeAgentContext.getInstance().resetNodeAgentContext();
 			}else{
-				logger.info("=========================NM服务出错啦======================");
-				cause.printStackTrace();
-
+				logger.error("=========================NM服务出错啦======================",cause);
 			}
 		}
 	};

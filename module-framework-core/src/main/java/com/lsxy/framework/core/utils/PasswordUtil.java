@@ -1,20 +1,20 @@
 package com.lsxy.framework.core.utils;
 
+import com.lsxy.framework.config.SystemConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Random;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-
-import com.lsxy.framework.config.SystemConfig;
-
 public class PasswordUtil {
-	
+	private static final Logger logger = LoggerFactory.getLogger(PasswordUtil.class);
 	
 	
 	public static String genRandomNum(int pwd_len){
@@ -66,22 +66,22 @@ public class PasswordUtil {
 			result = EncryptDecryptData.encrypt(key,password);
 		} catch (InvalidKeyException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("加密异常",e);
 		} catch (NoSuchAlgorithmException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("加密异常",e);
 		} catch (IllegalBlockSizeException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("加密异常",e);
 		} catch (BadPaddingException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("加密异常",e);
 		} catch (NoSuchPaddingException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("加密异常",e);
 		} catch (InvalidKeySpecException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("加密异常",e);
 		}
 		return result;
 	}
@@ -98,22 +98,22 @@ public class PasswordUtil {
 			result = EncryptDecryptData.decrypt(key,password);
 		} catch (InvalidKeyException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("解码异常",e);
 		} catch (IllegalBlockSizeException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("解码异常",e);
 		} catch (BadPaddingException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("解码异常",e);
 		} catch (NoSuchAlgorithmException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("解码异常",e);
 		} catch (NoSuchPaddingException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("解码异常",e);
 		} catch (InvalidKeySpecException e) {
 			// TODO 自动生成 catch 块
-			e.printStackTrace();
+			logger.error("解码异常",e);
 		}
 		return result;
 		

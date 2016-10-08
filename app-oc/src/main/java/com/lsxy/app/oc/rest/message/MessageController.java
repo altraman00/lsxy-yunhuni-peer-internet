@@ -147,9 +147,9 @@ public class MessageController extends AbstractRestController {
                 sendMessage(message);
             }
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            logger.error("参数异常",e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            logger.error("调用异常",e);
         }
         return RestResponse.success(message);
     }

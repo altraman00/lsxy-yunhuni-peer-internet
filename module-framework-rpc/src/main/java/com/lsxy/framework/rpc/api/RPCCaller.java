@@ -102,7 +102,7 @@ public class RPCCaller {
 				rl.recivedResponse(response);
 				this.removeRequestListener(rl);
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("RequestListener为空",e);
 			}
 		}
 	}
