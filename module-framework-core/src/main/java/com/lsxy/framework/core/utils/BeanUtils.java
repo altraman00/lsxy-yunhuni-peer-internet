@@ -234,9 +234,9 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
 					try {
 						setProperty(bean, propertyname, null);
 					} catch (IllegalAccessException e) {
-						e.printStackTrace();
+						logger.error("访问属性异常",e);
 					} catch (InvocationTargetException e) {
-						e.printStackTrace();
+						logger.error("反射调用异常",e);
 					}
 				}
 			}
@@ -339,9 +339,9 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
 				try {
 					BeanUtils.setProperty(bean, propName, value);
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+					logger.error("访问属性异常",e);
 				} catch (InvocationTargetException e) {
-					e.printStackTrace();
+					logger.error("反射调用异常",e);
 				}
 			}
 		}

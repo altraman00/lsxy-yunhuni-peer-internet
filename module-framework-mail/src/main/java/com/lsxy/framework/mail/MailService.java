@@ -1,6 +1,7 @@
 package com.lsxy.framework.mail;
 
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,8 @@ import com.lsxy.framework.config.SystemConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import static java.util.logging.Logger.global;
 
 /**
  * Mail实体类(包含发件功能)
@@ -78,7 +81,7 @@ public class MailService {
 //			props.put("http.proxyHost",proxyhost);  
 //			props.put("http.proxyPort",port);
 //		}
-		
+
 		Session session = Session.getInstance(props,
 				new Authenticator() {
 					public PasswordAuthentication getPasswordAuthentication() {
@@ -88,8 +91,15 @@ public class MailService {
 		try {
 			// 构造MimeMessage并设定基本的值，创建消息对象
 			MimeMessage msg = new MimeMessage(session);
+			//设置自定义发件人昵称
+			String nickname = "云呼你";
+			try {
+				nickname = javax.mail.internet.MimeUtility.encodeText(SystemConfig.getProperty("global.mail.sender.nickname","云呼你"));
+			} catch (UnsupportedEncodingException e) {
+				logger.error("编码异常",e);
+			}
 			// 设置消息内容
-			msg.setFrom(new InternetAddress(SystemConfig.getProperty("global.mail.sender.email")));
+			msg.setFrom(new InternetAddress(nickname + " <"+ SystemConfig.getProperty("global.mail.sender.email") + ">"));
 			// 把邮件地址映射到Internet地址上
 			InternetAddress[] address = { new InternetAddress(mailto) };
 			/**

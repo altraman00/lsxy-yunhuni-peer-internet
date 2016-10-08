@@ -1,18 +1,14 @@
 package com.lsxy.framework.core.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.*;
+import javax.crypto.spec.DESKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
 
 /**
 * 通过DES加密解密实现一个String字符串的加密和解密.
@@ -21,7 +17,7 @@ import javax.crypto.spec.DESKeySpec;
 * 
 */
 public class EncryptDecryptData {
-
+    private static final Logger logger = LoggerFactory.getLogger(EncryptDecryptData.class);
     public static void main(String[] args) throws NoSuchAlgorithmException,
             InvalidKeyException, NoSuchPaddingException,
             InvalidKeySpecException, IllegalBlockSizeException,
@@ -50,7 +46,7 @@ public class EncryptDecryptData {
 			kg = KeyGenerator.getInstance("DES");
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+            logger.error("获取加密算法异常",e);
 		}
         kg.init(sr);
         // 生成密匙
@@ -90,7 +86,7 @@ public class EncryptDecryptData {
     /**
     * 加密方法
     * 
-    * @param rawKeyData
+    * @param skey
     * @param str
     * @return
     * @throws InvalidKeyException
@@ -127,8 +123,8 @@ public class EncryptDecryptData {
     /**
     * 解密方法
     * 
-    * @param rawKeyData
-    * @param encryptedData
+    * @param skey
+    * @param encryptedString
     * @throws IllegalBlockSizeException
     * @throws BadPaddingException
     * @throws InvalidKeyException
