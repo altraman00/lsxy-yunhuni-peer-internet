@@ -287,6 +287,9 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js'> </script>
 <script type="text/javascript" src='${resPrefixUrl }/js/application/list.js'> </script>
 <script type="text/javascript">
+    $('.close_a').click(function () {
+        window.location.href=ctx+'/console/app/list';
+    });
     var pageObj = {
         currentPageNo : '${pageObj.currentPageNo}',
         totalCount : '${pageObj.totalCount}',

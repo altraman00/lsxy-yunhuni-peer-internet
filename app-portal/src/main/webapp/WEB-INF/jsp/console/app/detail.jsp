@@ -852,7 +852,7 @@
         },"post");
 
         //每页显示数量
-        var listRow = 3;
+        var listRow = 20;
         //显示多少个分页按钮
         var showPageCount = 5;
         //指定id，创建分页标签
@@ -928,7 +928,7 @@
         },"post");
 
         //每页显示数量
-        var listRow = 3;
+        var listRow = 20;
         //显示多少个分页按钮
         var showPageCount = 5;
         //指定id，创建分页标签
