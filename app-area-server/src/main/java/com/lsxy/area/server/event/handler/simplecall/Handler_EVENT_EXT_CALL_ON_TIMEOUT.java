@@ -10,6 +10,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.session.model.CallSession;
@@ -48,15 +49,10 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String, Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
-            logger.error("request.params is null");
-            return res;
+            throw new InvalidParamException("request.params is null");
         }
         if(logger.isDebugEnabled()){
             logger.debug("返回数据map,{}", JSONUtil.objectToJson(params));
@@ -67,15 +63,13 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
             if(StringUtils.isBlank(callId)){
                 callId = (String)params.get("user_data2");
                 if(StringUtils.isBlank(callId)){
-                    logger.error("businessstate is null");
-                    return res;
+                    throw new InvalidParamException("businessstate is null");
                 }
             }
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
-            logger.error("businessstate is null");
-            return res;
+            throw new InvalidParamException("businessstate is null");
         }
 
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(state.getType());

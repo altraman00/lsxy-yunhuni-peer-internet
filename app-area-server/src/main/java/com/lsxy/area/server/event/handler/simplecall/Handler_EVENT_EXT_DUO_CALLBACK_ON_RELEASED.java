@@ -9,6 +9,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCallback;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -49,20 +50,15 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_ON_RELEASED extends EventHandler {
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         Map<String, Object> paramMap = request.getParamMap();
         String callId = (String)paramMap.get("user_data1");
         if(StringUtils.isBlank(callId)){
-            logger.info("call_id is null");
-            return res;
+            throw new InvalidParamException("call_id is null");
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
-            logger.info("businessstate is null");
-            return res;
+            throw new InvalidParamException("businessstate is null");
         }
         //处理返回数据的各个时间
         Date beginTime = null;
