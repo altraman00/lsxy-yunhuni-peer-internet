@@ -64,7 +64,7 @@ public class FeedbackServiceImpl extends AbstractService<Feedback> implements Fe
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" GROUP BY obj.create_time DESC";
+        pageSql +=" ORDER BY obj.create_time DESC";
         Query pageQuery = em.createNativeQuery(pageSql,Feedback.class);
         if(date1!=null){
             countQuery.setParameter("date1",date1);
