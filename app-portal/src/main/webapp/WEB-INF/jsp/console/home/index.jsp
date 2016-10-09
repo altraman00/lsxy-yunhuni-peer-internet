@@ -196,7 +196,7 @@
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
                                         <p>
-                                            <span class="index-key">API地址:</span>
+                                            <span class="index-key">接口API:</span>
                                             <span id="restapi" data-clipboard-target="restapi" style="font-weight:bold">${homeVO.restApi}</span>
                                         <%--<span>--%>
                                           <%--<a href="#">API文档</a>--%>

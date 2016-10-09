@@ -8,6 +8,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 导出文件
@@ -100,8 +102,16 @@ public class ExportExcel   {
                 }else{
                     textValue = getValue(pattern, t, fieldName);
                 }
-                if(textValue != null){
-                    cell.setCellValue(textValue);
+                // 如果不是图片数据，就利用正则表达式判断textValue是否全部由数字组成
+                if (textValue != null) {
+                    Pattern p = Pattern.compile("^//d+(//.//d+)?$");
+                    Matcher matcher = p.matcher(textValue);
+                    if (matcher.matches()) {
+                        // 是数字当作double处理
+                        cell.setCellValue(Double.parseDouble(textValue));
+                    } else {
+                        cell.setCellValue(textValue);
+                    }
                 }
             }
         }
