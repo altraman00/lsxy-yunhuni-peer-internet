@@ -177,14 +177,14 @@ public class BillDetailController extends AbstractPortalController {
             headers = new String[]{};
             values = new String[]{};
         }*/
-        else if("ivr".equals(type)) {//IVR定制服务
+        else if("ivr".equals(type)) {// 自定义IVR
             oType = CallSession.TYPE_VOICE_IVR;
-            title = "IVR定制服务";
+            title = " 自定义IVR";
             headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
             values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
-        }else if("metting".equals(type)){//会议
+        }else if("metting".equals(type)){// 语音会议
             oType = CallSession.TYPE_VOICE_MEETING;
-            title = "会议";
+            title = " 语音会议";
             headers = new String[]{"会议标识ID","呼叫时间","参与者","参与类型","消费金额","时长（秒）"};
             values = new String[]{"sessionId","callStartDt","joinType:0-fromNum;1-toNum;2-fromNum","joinType:0=创建;1=邀请加入;2=呼入加入","cost","costTimeLong"};
         }else if("callback".equals(type)){//语音回拨
@@ -205,7 +205,7 @@ public class BillDetailController extends AbstractPortalController {
             appName = "全部";
         }
         one = title+" 时间："+time+" 应用："+appName;
-        downloadExcel(title,one,headers,values,list,null,response);
+        downloadExcel(title,one,headers,values,list,null,"cost",response);
     }
     /**
      * 统计
