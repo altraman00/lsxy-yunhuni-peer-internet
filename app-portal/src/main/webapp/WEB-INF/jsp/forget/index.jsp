@@ -68,15 +68,16 @@
                                 <small class="help-block tips-error" id="mobileTips" ></small>
                             </div>
                         </div>
+                        <div class="row code-box" id="second-codeblock" ></div>
                         <div class="row">
                             <div class="col-md-7 ">
-                                <input class="form-control" name="code" id="code" placeholder="验证码"  />
+                                <input class="form-control" name="code" id="code" placeholder="手机验证码"  />
                             </div>
                             <div class="col-md-5">
-                                <button class="sendcode" type="button" id="send-code" >发送验证码</button>
+                                <button class="sendcode" type="button" id="send-code" >获取验证码</button>
                             </div>
                         </div>
-                        <div class="row code-box" id="second-codeblock" ></div>
+
                         <div class="row">
                             <div class="col-md-12">
                                 <span id="mobileCodeTips" class="tips-error" style="display: none" ></span>
@@ -167,7 +168,7 @@
                             //启动二次校验
                             $('#second-code').show();
 
-                            var html = '<div class="col-md-7"><input class="form-control" name=""  placeholder="验证码"  id="second-code" onkeyup="clearErrMsg()"/><small class="help-block tips-error" id="secondcodeTips"></small></div><div class="col-md-5">';
+                            var html = '<div class="col-md-7"><input class="form-control" name=""  placeholder="图形验证码"  id="second-code" onkeyup="clearErrMsg()"/><small class="help-block tips-error" id="secondcodeTips"></small></div><div class="col-md-5">';
                             html += '<span class="code-img"><img id="imgValidateCode" src="' + ctx + '/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"></span></div>';
 
                             $('#second-codeblock').html(html);
