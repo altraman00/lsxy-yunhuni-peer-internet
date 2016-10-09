@@ -90,7 +90,7 @@ public class ConsumeDayServiceImpl extends AbstractService<ConsumeDay> implement
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" group by obj.create_time";
+        pageSql +=" ORDER BY obj.create_time";
         Query pageQuery = em.createNativeQuery(pageSql,ConsumeDay.class);
         countQuery.setParameter("date1",date1);
         pageQuery.setParameter("date1",date1);
