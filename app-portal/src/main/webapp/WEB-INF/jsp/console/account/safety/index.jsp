@@ -74,7 +74,7 @@
                                                             <a  href="${ctx}/console/account/auth/index">点击进行实名认证</a></span>
                                                         </c:if>
                                                         <c:if test="${safetyVo.isReal ==1}">
-                                                            <span><img src="${resPrefixUrl }/images/index/ok_green.png"/> 已认证</span>
+                                                            <span><img src="${resPrefixUrl }/images/index/ok_green.png"/><a  href="${ctx}/console/account/auth/index">已认证</a></span>
                                                         </c:if>
                                                     </div>
                                                 </div>
@@ -317,7 +317,7 @@
         var param = {'oldPws':psw,csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/account/safety/validation_psw",param,function(data){
             if(data.sucess==2) {
-                showmsg(data.msg,'moadltips2');
+                //showmsg(data.msg,'moadltips2');
                 $('.addmobile1').hide();
                 $('.addmobile'+type).show();
             }else{

@@ -49,7 +49,7 @@ public class OSSServiceImpl implements OSSService{
             if (logger.isDebugEnabled()){
                 logger.debug("上传OSS文件{}({})失败，花费时间{} ms，原因{}",orignalFileName,fileKey,(System.currentTimeMillis()-starttime),e);
             }
-            e.printStackTrace();
+            logger.error("上传OSS文件失败",e);
             return false;
         }
         long endtime = System.currentTimeMillis();
@@ -66,7 +66,7 @@ public class OSSServiceImpl implements OSSService{
             InputStream inputStream = new FileInputStream(file);
             client.putObject(repository, fileKey, inputStream);
         }catch(Exception ex){
-            ex.printStackTrace();
+            logger.error("上传文件异常",ex);
             return false;
         }
         return true;

@@ -7,6 +7,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.NotifyCall;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -41,20 +42,15 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_SUCCESS extends EventHandler {
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse res = null;
         String callId = (String)request.getParamMap().get("user_data");
         String resId = (String)request.getParamMap().get("res_id");
         if(StringUtils.isBlank(callId)){
-            logger.error("call_id is null");
-            return res;
+            throw new InvalidParamException("call_id is null");
         }
         BusinessState state = businessStateService.get(callId);
         if(state == null){
-            logger.error("businessstate is null");
-            return res;
+            throw new InvalidParamException("businessstate is null");
         }
         if(StringUtils.isNotBlank(resId)){
             state.setResId(resId);

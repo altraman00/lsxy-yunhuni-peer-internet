@@ -170,7 +170,7 @@ public class RedisCacheService {
 	                		return null;
 	                	}
 	                } catch (UnsupportedEncodingException e) {
-	                    e.printStackTrace();
+						logger.error("不支持的编码转换",e);
 	                }
 	                return null;
 	            }
@@ -322,7 +322,7 @@ public class RedisCacheService {
 		                		return null;
 		                	}
 		                } catch (UnsupportedEncodingException e) {
-		                    e.printStackTrace();
+							logger.error("不支持的编码转换",e);
 		                }
 		                return null;
 		            }

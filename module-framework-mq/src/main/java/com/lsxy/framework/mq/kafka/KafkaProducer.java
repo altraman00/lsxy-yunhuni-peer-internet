@@ -1,23 +1,20 @@
 package com.lsxy.framework.mq.kafka;
 
-import java.util.Properties;
-
-import com.lsxy.framework.mq.api.MQProducer;
+import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.mq.api.AbstractMQProducer;
+import com.lsxy.framework.mq.api.MQEvent;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.mq.api.MQEvent;
-import com.lsxy.framework.mq.api.AbstractMQProducer;
+import java.util.Properties;
 
 public class KafkaProducer extends AbstractMQProducer {
-	
-	private Log logger = LogFactory.getLog(KafkaProducer.class);
+
+	private static final Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
 	private Producer<String, MQEvent> producer;
 	
 	public void init(){
@@ -31,7 +28,7 @@ public class KafkaProducer extends AbstractMQProducer {
         	producer = new Producer<String, MQEvent>(config);
         	logger.debug("kafka producer build successfull");
         }catch(Exception ex){
-        	ex.printStackTrace();
+			logger.error("初始化MQ控件失败",ex);
         }
 	}
 	

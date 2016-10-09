@@ -16,6 +16,8 @@ import com.lsxy.yunhuni.api.statistics.model.VoiceCdrHour;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.yunhuni.session.dao.VoiceCdrDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import java.util.*;
  */
 @Service
 public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  VoiceCdrService{
+    private static final Logger logger = LoggerFactory.getLogger(VoiceCdrServiceImpl.class);
     @Autowired
     private VoiceCdrDao voiceCdrDao;
     @Override
@@ -82,9 +85,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             try {
                 BeanUtils.copyProperties(voiceCdr,rows.get(i));
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("异常",e);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                logger.error("异常",e);
             }
             list.add(voiceCdr);
         }

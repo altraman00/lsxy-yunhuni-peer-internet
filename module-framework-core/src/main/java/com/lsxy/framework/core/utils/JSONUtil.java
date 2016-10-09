@@ -1,14 +1,5 @@
 package com.lsxy.framework.core.utils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.ezmorph.object.DateMorpher;
 import net.sf.json.JSONArray;
@@ -16,8 +7,12 @@ import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import net.sf.json.util.CycleDetectionStrategy;
 import net.sf.json.util.JSONUtils;
-
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * 解析json字符串
@@ -27,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
  */
 @SuppressWarnings({"unchecked","rawtypes"})
 public class JSONUtil {
+	private static final Logger logger = LoggerFactory.getLogger(JSONUtil.class);
 	/**
 	 * 将简单的json字符串解析到map中，并以集合的形式返回
 	 * 
@@ -268,7 +264,7 @@ public class JSONUtil {
         try {
             jsonStr =  mapper.writeValueAsString(obj);
         } catch (IOException e) {
-            e.printStackTrace();
+			logger.error("IO异常",e);
         }
         return jsonStr;
     }

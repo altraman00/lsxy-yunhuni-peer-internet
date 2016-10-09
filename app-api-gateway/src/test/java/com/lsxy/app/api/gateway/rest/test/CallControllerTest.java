@@ -71,7 +71,7 @@ public class CallControllerTest {
             try {
                 thread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("线程池异常",e);
             }
         }
 
