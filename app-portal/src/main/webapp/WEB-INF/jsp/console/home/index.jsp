@@ -358,16 +358,16 @@
 
         restapi.on( 'complete', function(client, args) {
 //            var temp = args.text;
-            showtoast("接口API复制成功");
+            showtoast("复制成功");
         } );
 
-        secrekey.on( 'complete', function(client, args) {
+/*        secrekey.on( 'complete', function(client, args) {
             showtoast("密钥复制成功");
         } );
 
         certid.on( 'complete', function(client, args) {
             showtoast("鉴权账号复制成功");
-        } );
+        } );*/
     }
 
 
