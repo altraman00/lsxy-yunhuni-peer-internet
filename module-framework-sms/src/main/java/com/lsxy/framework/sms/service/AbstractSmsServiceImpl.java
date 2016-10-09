@@ -1,7 +1,5 @@
 package com.lsxy.framework.sms.service;
 
-import com.lsxy.framework.api.sms.model.SMSSendLog;
-import com.lsxy.framework.api.sms.service.SMSSendLogService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.JSONUtil2;
