@@ -108,7 +108,10 @@ public class ExportExcel   {
                     Matcher matcher = p.matcher(textValue);
                     if (matcher.matches()) {
                         // 是数字当作double处理
-                        cell.setCellValue(Double.parseDouble(textValue));
+                        cell.setCellValue(textValue);
+                        HSSFCellStyle cellStyle = workbook.createCellStyle();
+                        cellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0.0000"));
+                        cell.setCellStyle(cellStyle);
                     } else {
                         cell.setCellValue(textValue);
                     }
