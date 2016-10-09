@@ -159,6 +159,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         response.setHeader("content-type", "application/json");
         response.setCharacterEncoding("UTF-8");
         try {
+
             RestResponse restResponse = getRestResponse( request,  response, multipartfiles,  appId ,  key);
             if(!restResponse.isSuccess()) {
                 response.setStatus(489,"错误啦");
