@@ -27,7 +27,7 @@ public class ExportExcel   {
 //     * @param out 与输出设备关联的流对象，可以将EXCEL文档导出到本地文件或者网络中
      * @param pattern 如果有时间数据，设定输出格式。默认为"yyy-MM-dd HH:mm:ss"
      */
-    public static <T> HSSFWorkbook exportExcel(String title,String one, String[] headers, String[] values,Collection<T> dataset, String pattern) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static <T> HSSFWorkbook exportExcel(String title,String one, String[] headers, String[] values,Collection<T> dataset, String pattern,String money) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if(pattern==null){
             pattern = "yyy-MM-dd HH:mm:ss";
         }
@@ -92,11 +92,11 @@ public class ExportExcel   {
 //                cell.setCellStyle(style2);
                 String fieldName = objs[i];
                 String textValue = null;
-                if(fieldName.indexOf(":")>0){
+                if(fieldName.indexOf(":")!=-1){
                     String[] s1 = fieldName.split(":");
-                    if(s1[1].indexOf("=")>0) {
+                    if(s1[1].indexOf("=")!=-1) {
                         textValue = getKeyValue(s1[1],"=", getValue(pattern, t, s1[0]));
-                    }else if(s1[1].indexOf("-")>0){
+                    }else if(s1[1].indexOf("-")!=-1){
                         textValue = getValue(pattern,t,getKeyValue(s1[1],"-", getValue(pattern, t, s1[0])));
                     }
                 }else{
@@ -104,11 +104,12 @@ public class ExportExcel   {
                 }
                 // 如果不是图片数据，就利用正则表达式判断textValue是否全部由数字组成
                 if (textValue != null) {
-                    Pattern p = Pattern.compile("^[-+]?\\d+(.\\d+)?$");
-                    Matcher matcher = p.matcher(textValue.trim());
-                    if (matcher.matches()) {
+//                    Pattern p = Pattern.compile("^[-+]?\\d+(.\\d+)?$");
+//                    Matcher matcher = p.matcher(textValue.trim());
+//                    matcher.matches();
+                    if(StringUtils.isNotEmpty(money)&&(","+money+",").indexOf(","+fieldName+",")!=-1) {
                         cell.setCellValue(Double.parseDouble(textValue));
-                    } else {
+                    }else{
                         cell.setCellValue(textValue);
                     }
                 }
@@ -150,6 +151,13 @@ public class ExportExcel   {
         Matcher matcher = p.matcher(test);
         if (matcher.matches()) {
             System.out.println(Double.parseDouble(test));
+        }else{
+            System.out.println(false);
+        }
+        String money ="cost";
+        String fieldName = "cost";
+        if(StringUtils.isNotEmpty(money)&&(","+money+",").indexOf(","+fieldName+",")!=-1) {
+            System.out.println(true);
         }else{
             System.out.println(false);
         }
