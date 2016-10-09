@@ -328,19 +328,19 @@
         //支持IE
         var restapi = document.getElementById("restapi");
         restapi.onclick = function(){
-            showtoast("接口API复制成功");
+            showtoast("复制成功");
             window.clipboardData.setData('text',restapi.innerHTML);
         }
 
         var secretkey = document.getElementById("secretkey");
         secretkey.onclick = function(){
-            showtoast("密钥复制成功");
+            showtoast("复制成功");
             window.clipboardData.setData('text',secretkey.innerHTML);
         }
 
         var certid = document.getElementById("certid");
         certid.onclick = function(){
-            showtoast("鉴权账号复制成功");
+            showtoast("复制成功");
             window.clipboardData.setData('text',certid.innerHTML);
         }
 
