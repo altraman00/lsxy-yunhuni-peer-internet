@@ -107,11 +107,12 @@
                                                     <a class="current_month">本月</a>
                                                     <a class="last_month">上月</a>
                                                     从
-                                                    <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime"data-date-end-date="0m" readonly="readonly"/>
+                                                    <input type="text" class="datepicker currentMonth form-control" value='${startTime}' name="startTime" id="startTime" data-date-end-date="0m" readonly="readonly"/>
                                                     到
-                                                    <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" data-date-end-date="0m" readonly="readonly"/>
+                                                    <input type="text" class="datepicker lastMonth form-control" value='${endTime}' name="endTime" id="endTime" data-date-end-date="0m" readonly="readonly"/>
                                                     <input type="text" name="appId" id="appId" value="${appId}" hidden>
                                                     <button class="btn btn-primary query" type="button" id="findform" >查询</button>
+                                                    <button class="btn btn-primary query" type="button" onclick="download()" >导出</button>
                                                     <span class="tips-error" ></span>
                                                 </div>
                                             </div>
@@ -171,6 +172,11 @@
         $('#appId').val(app);
         $('#mainForm').submit();
     });
+    function download(){
+        $('#mainForm').attr('action',ctx+"/console/cost/consume/download");
+        $('#mainForm').submit();
+        $('#mainForm').attr('action',ctx+"/console/cost/consume");
+    }
     function compareTime(starttime,endtime){
         if(!starttime){
             return '请填写开始时间';

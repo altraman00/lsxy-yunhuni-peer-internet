@@ -147,7 +147,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" group by obj.apply_time desc";
+        pageSql +=" ORDER BY obj.apply_time desc";
         Query pageQuery = em.createNativeQuery(pageSql,InvoiceApply.class);
         if(date1!=null){
             countQuery.setParameter("date1",date1);
@@ -192,7 +192,7 @@ public class InvoiceApplyServiceImpl extends AbstractService<InvoiceApply> imple
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" group by obj.apply_time desc";
+        pageSql +=" ORDER BY obj.apply_time desc";
         Query pageQuery = em.createNativeQuery(pageSql,InvoiceApply.class);
         int total = ((BigInteger)countQuery.getSingleResult()).intValue();
         int start = (pageNo-1)*pageSize;
