@@ -106,7 +106,7 @@ public class IVRActionService {
         client.start();
     }
     private void initHandler(){
-        Reflections reflections = new Reflections("com.lsxy.area.server.util.ivr");
+        Reflections reflections = new Reflections("com.lsxy.area.server.service.ivr");
         Set<Class<? extends ActionHandler>> handlerClasss = reflections.getSubTypesOf(ActionHandler.class);
         for (Class<? extends ActionHandler> handlerClass : handlerClasss) {
             ActionHandler handler = applicationContext.getBean(handlerClass);
