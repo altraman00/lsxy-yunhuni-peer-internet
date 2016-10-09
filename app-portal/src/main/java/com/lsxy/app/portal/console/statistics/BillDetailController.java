@@ -12,11 +12,13 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -144,7 +146,67 @@ public class BillDetailController extends AbstractPortalController {
         mav.setViewName("/console/statistics/billdetail/callback");
         return mav;
     }
-
+    /**
+     * 下载
+     * @param request
+     * @param time 时间
+     * @param appId 应用id
+     * @return
+     */
+    @RequestMapping("{type}/download")
+    public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable String type, String time, String appId){
+        String oType = "";
+        String title = "";
+        String one = "";
+        String[] headers = null;
+        String[] values = null;
+        if("notify".equals(type)){//语音通知
+            oType = CallSession.TYPE_VOICE_NOTIFY;
+            title = "语音通知";
+            headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
+            values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
+        }else if("code".equals(type)){//语音验证码
+            oType = CallSession.TYPE_VOICE_VOICECODE;
+            title = "语音验证码";
+            headers = new String[]{"发送时间","主叫","被叫","挂机时间","消费金额","时长（秒）"};
+            values = new String[]{"callStartDt","fromNum","toNum","callEndDt","cost","costTimeLong"};
+        }
+        /*else if("recording".equals(type)){//录音
+            oType = CallSession.TYPE_VOICE_RECORDING;
+            title = "录音";
+            headers = new String[]{};
+            values = new String[]{};
+        }*/
+        else if("ivr".equals(type)) {//IVR定制服务
+            oType = CallSession.TYPE_VOICE_IVR;
+            title = "IVR定制服务";
+            headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
+            values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
+        }else if("metting".equals(type)){//会议
+            oType = CallSession.TYPE_VOICE_MEETING;
+            title = "会议";
+            headers = new String[]{"会议标识ID","呼叫时间","参与者","参与类型","消费金额","时长（秒）"};
+            values = new String[]{"sessionId","callStartDt","joinType:0-fromNum;1-toNum;2-fromNum","joinType:0=创建;1=邀请加入;2=呼入加入","cost","costTimeLong"};
+        }else if("callback".equals(type)){//语音回拨
+            oType = CallSession.TYPE_VOICE_CALLBACK;
+            title = "语音回拨";
+            headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
+            values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
+        }
+        List list = null;
+        if(StringUtils.isNotEmpty(oType)){
+            Map<String,String> map = init(request,time,appId);
+            list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
+        }
+        String appName = "";
+        if(StringUtils.isNotEmpty(appId)){
+            appName = ((App)getAppById(request,appId).getData()).getName();
+        }else{
+            appName = "全部";
+        }
+        one = title+" 时间："+time+" 应用："+appName;
+        downloadExcel(title,one,headers,values,list,null,response);
+    }
     /**
      * 统计
      * @param request
@@ -157,6 +219,32 @@ public class BillDetailController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/sum?type={1}&time={2}&appId={3}";
         return RestRequest.buildSecurityRequest(token).get(uri, Map.class,type,time,appId);
+    }
+    /**
+     * 获取页面数据
+     * @param request
+     * @param type 类型
+     * @param time 时间
+     * @param appId 应用
+     * @return
+     */
+    private RestResponse getList(HttpServletRequest request,String type,String time,String appId){
+        String token = getSecurityToken(request);
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/voice_cdr/list?type={1}&time={2}&appId={3}";
+        RestResponse<List<VoiceCdr>> result = RestRequest.buildSecurityRequest(token).getList(uri, VoiceCdr.class, type, time, appId);
+        if(result.isSuccess() && result.getData() != null){
+            List<VoiceCdr> voiceCdrs = result.getData();
+            if(voiceCdrs != null && voiceCdrs.size() > 0){
+                for(VoiceCdr cdr:voiceCdrs){
+                    String toNum = cdr.getToNum();
+                    if(StringUtils.isNotBlank(toNum)){
+                        String[] split = toNum.split("@");
+                        cdr.setToNum(split[0]);
+                    }
+                }
+            }
+        }
+        return result;
     }
     /**
      * 获取页面分页数据

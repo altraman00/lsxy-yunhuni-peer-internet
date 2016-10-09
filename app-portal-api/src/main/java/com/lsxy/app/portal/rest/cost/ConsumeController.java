@@ -23,6 +23,19 @@ public class ConsumeController extends AbstractRestController {
     @Autowired
     ConsumeService consumeService;
     /**
+     * 获取数据
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    @RequestMapping("/list")
+    public RestResponse pageList(String startTime,String endTime,String appId){
+        String userName = getCurrentAccountUserName();
+        List<Consume> list =  consumeService.list(userName,startTime,endTime,appId);
+        changeTypeToChinese(list);
+        return RestResponse.success(list);
+    }
+    /**
      * 获取分页数据
      * @param pageNo 第几页
      * @param pageSize 每页记录数

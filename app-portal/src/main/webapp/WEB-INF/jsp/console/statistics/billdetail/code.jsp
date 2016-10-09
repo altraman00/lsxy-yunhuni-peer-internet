@@ -99,6 +99,7 @@
                                             </div>
                                             <div class="col-md-2">
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
+                                                <button class="btn btn-primary" type="button" onclick="download()"> 导出</button>
                                             </div>
                                         </div>
                                     </form:form>
@@ -157,6 +158,11 @@
     function appSubmit(appId){
         $('#appId').val(appId);
         $('#mainForm').submit();
+    }
+    function download(){
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/code/download");
+        $('#mainForm').submit();
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/code");
     }
 </script>
 </body>
