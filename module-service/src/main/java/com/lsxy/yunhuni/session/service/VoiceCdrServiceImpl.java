@@ -48,6 +48,28 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     private VoiceCdrDayService voiceCdrDayService;
 
     @Override
+    public List<VoiceCdr> list(String type, String tenantId, String time, String appId) {
+        Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
+        Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   last_time BETWEEN ? and ?";
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc ";
+        List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2});
+        List<VoiceCdr> list = new ArrayList();
+        for(int i=0;i<rows.size();i++){
+            VoiceCdr voiceCdr = new VoiceCdr();
+            try {
+                BeanUtils.copyProperties(voiceCdr,rows.get(i));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            list.add(voiceCdr);
+        }
+        return list;
+    }
+
+    @Override
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, String type,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");

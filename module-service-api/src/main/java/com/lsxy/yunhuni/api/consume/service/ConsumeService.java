@@ -5,12 +5,22 @@ import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.framework.core.utils.Page;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 消费记录Service
  * Created by zhangxb on 2016/7/8.
  */
 public interface ConsumeService extends BaseService<Consume> {
+    /**
+     * 获取用户区间内的数据
+     * @param userName
+     * @param startTime
+     * @param endTime
+     * @param appId
+     * @return
+     */
+    List<Consume> list(String userName,String startTime,String endTime,String appId);
     /**
      * 获取用户区间内的分页数据
      * @param userName 用户名
