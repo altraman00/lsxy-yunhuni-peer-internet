@@ -11,12 +11,15 @@ import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.consume.dao.ConsumeDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消费记录ServiceImpl
@@ -30,6 +33,8 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     TenantService tenantService;
     @Autowired
     EntityManager em;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public BaseDaoInterface<Consume, Serializable> getDao() {
@@ -106,6 +111,13 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
 //        pageQuery.setFirstResult(start);
 //        return new Page<>(start,total,pageSize,pageQuery.getResultList());
         return page;
+    }
+
+    @Override
+    public BigDecimal getConsumeByTenantIdAndDate(String tenantId, Date startDate, Date endDate) {
+        String sql = "SELECT IFNULL(SUM(c.amount),0) as consume FROM db_lsxy_bi_yunhuni.tb_bi_consume c WHERE c.tenant_id=? AND c.dt >= ? AND c.dt < ? and c.deleted=0";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, tenantId,startDate,endDate);
+        return (BigDecimal) map.get("consume");
     }
 
 }
