@@ -265,9 +265,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         Date curTime = new Date();
         //插入消费记录
         Consume consume = new Consume(curTime, ConsumeCode.rent_number.name(),amount,ConsumeCode.rent_number.getName(),appId,tenant);
-        consumeService.save(consume);
-        //Redis中消费增加
-        calBillingService.incConsume(tenant.getId(),curTime,amount);
+        consumeService.consume(consume);
     }
 
     /**
