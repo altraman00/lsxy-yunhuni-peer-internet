@@ -328,19 +328,19 @@
         //支持IE
         var restapi = document.getElementById("restapi");
         restapi.onclick = function(){
-            alert(restapi.innerHTML);
+            showtoast("接口API复制成功");
             window.clipboardData.setData('text',restapi.innerHTML);
         }
 
         var secretkey = document.getElementById("secretkey");
         secretkey.onclick = function(){
-            alert(secretkey.innerHTML);
+            showtoast("密钥复制成功");
             window.clipboardData.setData('text',secretkey.innerHTML);
         }
 
         var certid = document.getElementById("certid");
         certid.onclick = function(){
-            alert(certid.innerHTML);
+            showtoast("鉴权账号复制成功");
             window.clipboardData.setData('text',certid.innerHTML);
         }
 
@@ -358,15 +358,15 @@
 
         restapi.on( 'complete', function(client, args) {
 //            var temp = args.text;
-            showtoast("复制成功");
+            showtoast("接口API复制成功");
         } );
 
         secrekey.on( 'complete', function(client, args) {
-            showtoast("复制成功");
+            showtoast("密钥复制成功");
         } );
 
         certid.on( 'complete', function(client, args) {
-            showtoast("复制成功");
+            showtoast("鉴权账号复制成功");
         } );
     }
 
