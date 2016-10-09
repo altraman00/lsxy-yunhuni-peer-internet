@@ -196,7 +196,7 @@
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
                                         <p>
-                                            <span class="index-key">API地址:</span>
+                                            <span class="index-key">接口API:</span>
                                             <span id="restapi" data-clipboard-target="restapi" style="font-weight:bold">${homeVO.restApi}</span>
                                         <%--<span>--%>
                                           <%--<a href="#">API文档</a>--%>
@@ -328,19 +328,19 @@
         //支持IE
         var restapi = document.getElementById("restapi");
         restapi.onclick = function(){
-            showtoast("接口API复制成功");
+            showtoast("复制成功");
             window.clipboardData.setData('text',restapi.innerHTML);
         }
 
         var secretkey = document.getElementById("secretkey");
         secretkey.onclick = function(){
-            showtoast("密钥复制成功");
+            showtoast("复制成功");
             window.clipboardData.setData('text',secretkey.innerHTML);
         }
 
         var certid = document.getElementById("certid");
         certid.onclick = function(){
-            showtoast("鉴权账号复制成功");
+            showtoast("复制成功");
             window.clipboardData.setData('text',certid.innerHTML);
         }
 
