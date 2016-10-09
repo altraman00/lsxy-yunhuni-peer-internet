@@ -10,6 +10,7 @@ import com.lsxy.framework.oss.OSSService;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.framework.api.billing.model.Billing;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +160,15 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         response.setHeader("content-type", "application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-
+            RestResponse<App> appResp = this.getAppById(request, appId);
+            if(appResp.isSuccess() && appResp.getData() != null){
+                App app = appResp.getData();
+                if(app.getStatus() == App.STATUS_OFFLINE){
+                    throw new RuntimeException("请先上线应用");
+                }
+            }else{
+                throw new RuntimeException("获取app失败");
+            }
             RestResponse restResponse = getRestResponse( request,  response, multipartfiles,  appId ,  key);
             if(!restResponse.isSuccess()) {
                 response.setStatus(489,"错误啦");
