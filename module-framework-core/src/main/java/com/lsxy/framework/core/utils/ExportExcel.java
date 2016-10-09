@@ -104,10 +104,9 @@ public class ExportExcel   {
                 }
                 // 如果不是图片数据，就利用正则表达式判断textValue是否全部由数字组成
                 if (textValue != null) {
-                    Pattern p = Pattern.compile("^//d+(//.//d+)?$");
-                    Matcher matcher = p.matcher(textValue);
+                    Pattern p = Pattern.compile("^[-+]?\\d+(.\\d+)?$");
+                    Matcher matcher = p.matcher(textValue.trim());
                     if (matcher.matches()) {
-                        // 是数字当作double处理
                         cell.setCellValue(Double.parseDouble(textValue));
                     } else {
                         cell.setCellValue(textValue);
@@ -144,5 +143,15 @@ public class ExportExcel   {
              textValue = value.toString();
          }
         return textValue;
+    }
+    public static void main(String[] args){
+        Pattern p = Pattern.compile("^[-+]?\\d+(.\\d+)?$");
+        String test = "1000.0";
+        Matcher matcher = p.matcher(test);
+        if (matcher.matches()) {
+            System.out.println(Double.parseDouble(test));
+        }else{
+            System.out.println(false);
+        }
     }
 }
