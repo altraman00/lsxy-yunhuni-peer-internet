@@ -4,12 +4,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by tandy on 16/8/1.
  */
 public class ServerHandler extends ChannelInboundHandlerAdapter {
-
+    private static final Logger logger = LoggerFactory.getLogger(ChannelInboundHandlerAdapter.class);
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         LoopBackTimeStamp ts = (LoopBackTimeStamp) msg;
@@ -32,7 +34,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         // Close the connection when an exception is raised.
-        cause.printStackTrace();
+        logger.error("异常",cause);
         ctx.close();
     }
 }

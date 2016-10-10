@@ -46,9 +46,6 @@ public class Handler_MN_CH_SYS_CALL_ANSWER extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Commander cticlient = cticlientContext.getAvalibleClient();
@@ -77,8 +74,7 @@ public class Handler_MN_CH_SYS_CALL_ANSWER extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_ANSWER_SUCC);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_ANSWER_SUCC,e);
                     }
                 }
 
@@ -94,7 +90,7 @@ public class Handler_MN_CH_SYS_CALL_ANSWER extends RpcRequestHandler{
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("调用资源操作失败",e);
             response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;

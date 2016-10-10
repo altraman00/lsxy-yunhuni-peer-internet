@@ -67,7 +67,7 @@ public class APIGWRestRequest extends RestRequest{
             URL urlx = new URL(url);
             url = urlx.getPath();
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error("URL异常",e);
         }
 
         String timestamp =  DateUtils.formatDate(new Date(),"yyyyMMddHHmmss");

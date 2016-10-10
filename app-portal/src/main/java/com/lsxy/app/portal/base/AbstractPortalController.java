@@ -4,11 +4,14 @@ import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.app.portal.exceptions.TokenMissingException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.security.SecurityUser;
+import com.lsxy.framework.core.utils.ExportExcel;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.DateUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,8 +19,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 /**
  * Created by liups on 2016/6/28.
@@ -33,7 +36,7 @@ public abstract class AbstractPortalController {
      */
     @ExceptionHandler(Exception.class)
     public ModelAndView exp(HttpServletRequest request,HttpServletResponse response,Exception ex) {
-        ex.printStackTrace();
+        logger.error("异常",ex);
         ModelAndView mav;
         //Ajax请求带有X-Requested-With:XMLHttpRequest
         String xRequestedWith = request.getHeader("X-Requested-With");
@@ -91,6 +94,18 @@ public abstract class AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list";
         return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
     }
+
+    /**
+     * 获取单个应用
+     * @param request
+     * @param id
+     * @return
+     */
+    public RestResponse getAppById(HttpServletRequest request,String id ){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/get/{1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
+    }
     /**
      * 获取当前用户（SecurityUser）
      * @param request
@@ -98,5 +113,25 @@ public abstract class AbstractPortalController {
      */
     public SecurityUser getCurrentUser(HttpServletRequest request){
         return (SecurityUser) request.getSession().getAttribute("currentUser");
+    }
+
+    /**
+     * 导出文件
+     * @param response
+     */
+    public <T>  void downloadExcel(String title,String one, String[] headers, String[] values, Collection<T> dataset, String pattern, String money,HttpServletResponse response) {
+        try {
+            Date d = new Date();
+            String name = DateUtils.formatDate(d,"yyyyMMdd")+ d.getTime();
+            HSSFWorkbook wb = ExportExcel.exportExcel(title,one,headers,values,dataset,pattern,money);
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition", "attachment;filename="+name+".xls");
+            OutputStream ouputStream = response.getOutputStream();
+            wb.write(ouputStream);
+            ouputStream.flush();
+            ouputStream.close();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

@@ -82,7 +82,7 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
             try {
                 connection.close();
             } catch (JMSException e) {
-                e.printStackTrace();
+                logger.error("JMS异常",e);
             }
         }
     }
@@ -116,8 +116,7 @@ public class ActMQConsumer extends AbstractMQConsumer implements DisposableBean,
                     messageHandlerExcutorTask.doTask(handler,event);
                 }
             } catch (MessageHandlingException | JMSException | InvalidMQEventMessageException e) {
-                logger.error("处理消息出现异常：{}",e);
-                e.printStackTrace();
+                logger.error("处理消息出现异常!",e);
             }
         }
     }

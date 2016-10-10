@@ -67,11 +67,9 @@ public class RegisterSuccessEventHandler implements MQMessageHandler<RegisterSuc
             long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
             cacheManager.set("account_mactive_" + account.getId() ,uuid,expireTime * 60 * 60);
         } catch (MailConfigNotEnabledException e) {
-            e.printStackTrace();
-            logger.error("邮箱发送失败，原因：{}",e);
+            logger.error("邮箱发送失败!",e);
         } catch (MailContentNullException e) {
-            e.printStackTrace();
-            logger.error("邮箱发送失败，原因：{}",e);
+            logger.error("邮箱发送失!",e);
         }
     }
 }

@@ -34,7 +34,7 @@ public abstract class AsbstractStatisticCounter {
                 AtomicInteger  ai = (AtomicInteger) field.get(this);
                 ai.set(0);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("访问属性异常",e);
             }
         }
     }
@@ -63,7 +63,7 @@ public abstract class AsbstractStatisticCounter {
                     logger.debug("{}:\t{}",fieldName,value);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("访问属性异常",e);
             }
         }
         if(logger.isDebugEnabled()){

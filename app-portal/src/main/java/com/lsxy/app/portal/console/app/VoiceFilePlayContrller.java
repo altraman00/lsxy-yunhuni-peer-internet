@@ -167,7 +167,7 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
             writer.write(JSON.toJSONString(restResponse));
             writer.close();
         } catch (IOException e1) {
-            e1.printStackTrace();
+            logger.error("上传文件IO异常",e1);
         }
     }
     private RestResponse getRestResponse(HttpServletRequest request, HttpServletResponse response, @RequestParam("file") MultipartFile[] multipartfiles, String appId , String key){

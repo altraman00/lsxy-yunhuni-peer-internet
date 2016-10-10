@@ -195,15 +195,37 @@
                                         <div class="h5 border-left">开发者账号</div>
                                     </header>
                                     <div class="panel-body clearfix border-top-none">
-                                        <p>接口API：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.restApi}</span></p>
-                                        <p>密钥：&nbsp;&nbsp;<span id="secretKey" style="font-weight:bold">${homeVO.secretKey}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class='reset_sk_confirm' >重新生成</a></span>
-                                        <span>
-                                            <a class="tips-error tips-key"></a>
-                                        </span>
+                                        <p>
+                                            <span class="index-key">接口API:</span>
+                                            <span id="restapi" data-clipboard-target="restapi" style="font-weight:bold">${homeVO.restApi}</span>
+                                        <%--<span>--%>
+                                          <%--<a href="#">API文档</a>--%>
+                                        <%--</span>--%>
                                         </p>
                                         <p>
-                                            鉴权账号：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.certId}</span>
+                                            <span class="index-key">密钥:</span>
+                                            <span id="secretkey" data-clipboard-target="secretkey" style="font-weight:bold">${homeVO.secretKey}</span>
+                                        <span>
+                                          <a class='reset_sk_confirm' >重新生成</a>
+                                        </span>
+                                        <span>
+                                          <a class='tips-error tips-key'></a>
+                                        </span>
+
                                         </p>
+                                        <p>
+                                            <span class="index-key">鉴权账号:</span>
+                                            <span id="certid" data-clipboard-target="certid" style="font-weight:bold">${homeVO.certId}</span>
+                                        </p>
+                                        <%--<p>接口API：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.restApi}</span></p>--%>
+                                        <%--<p>密钥：&nbsp;&nbsp;<span id="secretKey" style="font-weight:bold">${homeVO.secretKey}</span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class='reset_sk_confirm' >重新生成</a></span>--%>
+                                        <%--<span>--%>
+                                            <%--<a class="tips-error tips-key"></a>--%>
+                                        <%--</span>--%>
+                                        <%--</p>--%>
+                                        <%--<p>--%>
+                                            <%--鉴权账号：&nbsp;&nbsp;<span style="font-weight:bold">${homeVO.certId}</span>--%>
+                                        <%--</p>--%>
                                     </div>
                                 </div>
                             </section>
@@ -299,7 +321,59 @@
 </section>
 
 <%@include file="/inc/footer.jsp"%>
+<script type="text/javascript" src="${resPrefixUrl}/js/zero/ZeroClipboard.js"></script>
+<script type="text/javascript">
 
+    if(window.clipboardData){
+        //支持IE
+        var restapi = document.getElementById("restapi");
+        restapi.onclick = function(){
+            showtoast("复制成功");
+            window.clipboardData.setData('text',restapi.innerHTML);
+        }
+
+        var secretkey = document.getElementById("secretkey");
+        secretkey.onclick = function(){
+            showtoast("复制成功");
+            window.clipboardData.setData('text',secretkey.innerHTML);
+        }
+
+        var certid = document.getElementById("certid");
+        certid.onclick = function(){
+            showtoast("复制成功");
+            window.clipboardData.setData('text',certid.innerHTML);
+        }
+
+
+    }else{
+        var restapi = new ZeroClipboard( document.getElementById("restapi"), {
+            moviePath: "${resPrefixUrl}/js/zero/ZeroClipboard.swf"
+        } );
+        var secrekey = new ZeroClipboard( document.getElementById("secretkey"), {
+            moviePath: "${resPrefixUrl}/js/zero/ZeroClipboard.swf"
+        } );
+        var certid = new ZeroClipboard( document.getElementById("certid"), {
+            moviePath: "${resPrefixUrl}/js/zero/ZeroClipboard.swf"
+        } );
+
+        restapi.on( 'complete', function(client, args) {
+//            var temp = args.text;
+            showtoast("复制成功");
+        } );
+
+/*        secrekey.on( 'complete', function(client, args) {
+            showtoast("密钥复制成功");
+        } );
+
+        certid.on( 'complete', function(client, args) {
+            showtoast("鉴权账号复制成功");
+        } );*/
+    }
+
+
+
+
+</script>
 <script type="text/javascript">
 
     // restfult api 重新生成confirm
@@ -309,7 +383,8 @@
             if(result){
                 ajaxsync(ctx + "/console/home/change_sk",null,function(response){
                     if(response.data != null){
-                        $("#secretKey").html(response.data);
+                        $("#secretkey").html(response.data);
+                        $(".tips-key").html("");
                     }else{
                         //errorCode errorMsg
                         $(".tips-key").html("生成失败!" + response.errorMsg)

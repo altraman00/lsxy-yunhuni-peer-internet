@@ -1,6 +1,9 @@
 package com.lsxy.framework.core.utils;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -16,7 +19,7 @@ import java.util.GregorianCalendar;
  *
  */
 public class DateUtils {
-
+    private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
     public DateUtils() {
 
     }
@@ -50,7 +53,7 @@ public class DateUtils {
         try {
             dt = org.apache.commons.lang3.time.DateUtils.parseDate(date,partten);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("字符串无法解析为时间",e);
         }
         return dt;
     }
@@ -331,7 +334,7 @@ public class DateUtils {
 			String strDate=DateUtils.getDate(curDate, parrten);
 			calendar.setTime(sdf.parse(strDate));
 		} catch (ParseException e) {
-			e.printStackTrace();
+            logger.error("字符串无法解析为时间",e);
 		}
 		calendar.add(Calendar.MONTH, monthCount);
 		return sdf.format(calendar.getTime());
@@ -383,7 +386,7 @@ public class DateUtils {
         try {
 			mydate = sdf.parse(currDate);
 		} catch (ParseException e) {
-			e.printStackTrace();
+            logger.error("字符串无法解析为时间",e);
 		}
         calendar.setTime(mydate);   
         calendar.add(Calendar.MONTH, -1);
@@ -435,7 +438,7 @@ public class DateUtils {
         try {
 			mydate = sdf.parse(currDate);
 		} catch (ParseException e) {
-			e.printStackTrace();
+            logger.error("字符串无法解析为时间",e);
 		}
         calendar.setTime(mydate);   
         calendar.add(Calendar.MONTH, 1);
@@ -460,7 +463,7 @@ public class DateUtils {
         try {
 			mydate = sdf.parse(currYear);
 		} catch (ParseException e) {
-			e.printStackTrace();
+            logger.error("字符串无法解析为时间",e);
 		}
         calendar.setTime(mydate);   
         calendar.add(Calendar.YEAR, -1);
@@ -484,7 +487,7 @@ public class DateUtils {
         try {
 			mydate = sdf.parse(currYear);
 		} catch (ParseException e) {
-			e.printStackTrace();
+            logger.error("字符串无法解析为时间",e);
 		}
         calendar.setTime(mydate);   
         calendar.add(Calendar.YEAR, 1);
@@ -583,7 +586,7 @@ public class DateUtils {
         try {
             lastDay = df.parse(format);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("字符串无法解析为时间",e);
         }
         return lastDay;
     }
@@ -675,7 +678,7 @@ public class DateUtils {
     	    }
     	    dates[dates.length-1] = endTime;
 		} catch (ParseException e) {
-			e.printStackTrace();
+            logger.error("访问属性异常",e);
 		}
 	    return dates;
     }

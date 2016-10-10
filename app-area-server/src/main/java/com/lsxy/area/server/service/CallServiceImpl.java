@@ -277,8 +277,7 @@ public class CallServiceImpl implements CallService {
 
             return duocCallId;
         }catch(Exception e){
-            logger.error("消息发送到区域失败:{}", rpcrequest);
-            e.printStackTrace();
+            logger.error("消息发送到区域失败:{}", rpcrequest,e);
             throw new InvokeCallException(e);
         }
     }
@@ -305,8 +304,7 @@ public class CallServiceImpl implements CallService {
         try {
             rpcCaller.invoke(sessionContext, rpcrequest);
         }catch(Exception e){
-            logger.error("消息发送到区域失败:{}", rpcrequest);
-            e.printStackTrace();
+            logger.error("消息发送到区域失败:{}", rpcrequest,e);
             throw new InvokeCallException(e);
         }
 

@@ -1,14 +1,9 @@
 package com.lsxy.app.oc.rest.cost;
 
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.invoice.model.InvoiceApply;
 import com.lsxy.framework.api.invoice.service.InvoiceApplyService;
 import com.lsxy.framework.api.invoice.service.InvoiceInfoService;
-import com.lsxy.yunhuni.api.message.model.AccountMessage;
-import com.lsxy.yunhuni.api.message.service.AccountMessageService;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
-import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
@@ -16,9 +11,16 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.message.model.AccountMessage;
+import com.lsxy.yunhuni.api.message.service.AccountMessageService;
+import com.lsxy.yunhuni.api.statistics.model.ConsumeDay;
+import com.lsxy.yunhuni.api.statistics.service.ConsumeDayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +38,7 @@ import java.util.Map;
 @RequestMapping("/finance/invoice")
 @RestController
 public class InvoiceApplyController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(InvoiceApplyController.class);
     @Autowired
     InvoiceApplyService invoiceApplyService;
     @Autowired
@@ -178,10 +181,10 @@ public class InvoiceApplyController extends AbstractRestController {
                     accountMessageService.sendTenantTempletMessage(null,invoiceApply.getTenant().getId(), AccountMessage.MESSAGE_TYPE_INVOCE_APPLY_FAIL);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("参数错误",e);
                 restResponse = RestResponse.failed("0","参数错误");
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                logger.error("参数错误",e);
                 restResponse = RestResponse.failed("0","参数错误");
             }
         }else{

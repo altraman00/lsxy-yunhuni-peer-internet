@@ -9,6 +9,7 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
@@ -49,7 +50,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             logger.info("开始处理CDR数据：{}",cdrObj);
         }
         if(cdrObj == null){
-            throw new RuntimeException("cdr数据为空");
+            throw new InvalidParamException("cdr数据为空");
         }
         VoiceCdr voiceCdr = getVoiceCdr((String) cdrObj);
         BusinessState businessState;
@@ -57,13 +58,11 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(StringUtils.isNotBlank(cdr_additionalinfo2)){
             businessState = businessStateService.get(cdr_additionalinfo2);
         }else{
-            logger.error("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
-            return null;
+            throw new InvalidParamException("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
         }
         if(businessState == null){
-            voiceCdrService.save(voiceCdr);
-            logger.error("返回CDR找不到关联的业务数据,cdr.id：{}",voiceCdr.getId());
-            return null;
+//            voiceCdrService.save(voiceCdr);
+            throw new InvalidParamException("返回CDR找不到关联的业务数据,cdr.id：{}",voiceCdr.getId());
         }
         voiceCdr.setAreaId(businessState.getAreaId());
         voiceCdr.setTenantId(businessState.getTenantId());

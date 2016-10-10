@@ -102,7 +102,7 @@ public class FixQueue implements Runnable{
                 }
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("修正队列异常",e);
         }
     }
 }

@@ -1,10 +1,6 @@
 package com.lsxy.yunhuni.session.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
-import com.lsxy.yunhuni.api.statistics.model.VoiceCdrHour;
-import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
-import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -15,7 +11,13 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
+import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
+import com.lsxy.yunhuni.api.statistics.model.VoiceCdrHour;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrDayService;
+import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.yunhuni.session.dao.VoiceCdrDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -24,13 +26,12 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-import static com.lsxy.framework.core.utils.DateUtils.getPreDate;
-
 /**
  * Created by zhangxb on 2016/7/19.
  */
 @Service
 public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  VoiceCdrService{
+    private static final Logger logger = LoggerFactory.getLogger(VoiceCdrServiceImpl.class);
     @Autowired
     private VoiceCdrDao voiceCdrDao;
     @Override
@@ -45,6 +46,28 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     private VoiceCdrHourService voiceCdrHourService;
     @Autowired
     private VoiceCdrDayService voiceCdrDayService;
+
+    @Override
+    public List<VoiceCdr> list(String type, String tenantId, String time, String appId) {
+        Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
+        Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   last_time BETWEEN ? and ?";
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc ";
+        List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2});
+        List<VoiceCdr> list = new ArrayList();
+        for(int i=0;i<rows.size();i++){
+            VoiceCdr voiceCdr = new VoiceCdr();
+            try {
+                BeanUtils.copyProperties(voiceCdr,rows.get(i));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            list.add(voiceCdr);
+        }
+        return list;
+    }
 
     @Override
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, String type,String tenantId, String time, String appId) {
@@ -62,9 +85,9 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             try {
                 BeanUtils.copyProperties(voiceCdr,rows.get(i));
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error("异常",e);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                logger.error("异常",e);
             }
             list.add(voiceCdr);
         }

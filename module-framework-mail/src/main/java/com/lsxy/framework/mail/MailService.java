@@ -1,6 +1,7 @@
 package com.lsxy.framework.mail;
 
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,15 +26,18 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.lsxy.framework.config.SystemConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import static java.util.logging.Logger.global;
 
 /**
  * Mail实体类(包含发件功能)
  */
 @Component
 public class MailService {
-
-	protected static Log logger = LogFactory.getLog(MailService.class);
+	private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
 	/**
 	 * 把主题转换为中文
@@ -46,7 +50,7 @@ public class MailService {
 		try {
 			strText = MimeUtility.encodeText(strText, "UTF-8", "B");	
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("设置编码异常",e);
 		}
 
 		return strText;
@@ -77,7 +81,7 @@ public class MailService {
 //			props.put("http.proxyHost",proxyhost);  
 //			props.put("http.proxyPort",port);
 //		}
-		
+
 		Session session = Session.getInstance(props,
 				new Authenticator() {
 					public PasswordAuthentication getPasswordAuthentication() {
@@ -87,8 +91,15 @@ public class MailService {
 		try {
 			// 构造MimeMessage并设定基本的值，创建消息对象
 			MimeMessage msg = new MimeMessage(session);
+			//设置自定义发件人昵称
+			String nickname = "云呼你";
+			try {
+				nickname = javax.mail.internet.MimeUtility.encodeText(SystemConfig.getProperty("global.mail.sender.nickname","云呼你"));
+			} catch (UnsupportedEncodingException e) {
+				logger.error("编码异常",e);
+			}
 			// 设置消息内容
-			msg.setFrom(new InternetAddress(SystemConfig.getProperty("global.mail.sender.email")));
+			msg.setFrom(new InternetAddress(nickname + " <"+ SystemConfig.getProperty("global.mail.sender.email") + ">"));
 			// 把邮件地址映射到Internet地址上
 			InternetAddress[] address = { new InternetAddress(mailto) };
 			/**
@@ -120,7 +131,7 @@ public class MailService {
 			// 发送邮件
 			Transport.send(msg);
 		} catch (MessagingException e) {
-			e.printStackTrace();
+			logger.error("设置消息体异常",e);
 			return false;
 		}
 		return true;

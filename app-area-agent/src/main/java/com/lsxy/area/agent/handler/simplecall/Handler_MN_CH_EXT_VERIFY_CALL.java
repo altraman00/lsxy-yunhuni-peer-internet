@@ -49,9 +49,6 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理{}事件,{}",getEventName(),request);
-        }
         RPCResponse response = RPCResponse.buildResponse(request);
 
         Commander cticlient = cticlientContext.getAvalibleClient();
@@ -88,8 +85,7 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_VERIFY_CALL_SUCCESS);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_EXT_VERIFY_CALL_SUCCESS,e);
                     }
                 }
 
@@ -104,8 +100,7 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_FAIL,e);
                     }
                 }
 
@@ -120,14 +115,13 @@ public class Handler_MN_CH_EXT_VERIFY_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_EXT_CALL_ON_TIMEOUT,e);
                     }
                 }
             });
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("调用CTI创建语音验证码呼叫失败",e);
             response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
         return response;
