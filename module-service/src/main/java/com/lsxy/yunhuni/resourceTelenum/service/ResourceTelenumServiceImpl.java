@@ -72,4 +72,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         ResourceTelenum resourceTelenum = resourceTelenumDao.findFirstByStatus(ResourceTelenum.STATUS_FREE);
         return resourceTelenum.getTelNumber();
     }
+
+    @Override
+    public String findOneFreeNumber() {
+        //TODO 获取一个当前有效的号码
+        ResourceTelenum resourceTelenum = resourceTelenumDao.findFirstByStatus(ResourceTelenum.STATUS_FREE);
+        return resourceTelenum.getTelNumber();
+    }
 }

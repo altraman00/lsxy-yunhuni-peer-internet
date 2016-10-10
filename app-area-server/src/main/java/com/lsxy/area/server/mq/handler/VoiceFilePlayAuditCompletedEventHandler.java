@@ -8,6 +8,8 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.slf4j.Logger;
@@ -38,6 +40,9 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
 
     @Autowired
     private VoiceFilePlayService voiceFilePlayService;
+
+    @Autowired
+    AppService appService;
 
     @Override
     public void handleMessage(VoiceFilePlayAuditCompletedEvent event) throws JMSException {
@@ -74,7 +79,11 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
             logger.debug("本次同步文件信息:{}",param);
         }
         Map<String, Object> params = new HashMap<>();
-        params.put("appid ",appId);
+        App app = appService.findById(appId);
+        if(app.getStatus() == App.STATUS_OFFLINE){
+            throw new RuntimeException("应用没上线");
+        }
+        params.put("areaId ",app.getArea().getId());
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
         request.setBody(param);
         try {
