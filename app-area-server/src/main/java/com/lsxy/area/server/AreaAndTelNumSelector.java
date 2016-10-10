@@ -1,6 +1,7 @@
 package com.lsxy.area.server;
 
 import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -39,9 +40,11 @@ public class AreaAndTelNumSelector {
         }else{
             List<String> testNums = testNumBindService.findNumByAppId(app.getId());
             if(testNums != null && testNums.size() > 0 && testNums.containsAll(tos)){
-                String oneTelnumber = resourceTelenumService.findOneFreeNumber();
+                //获取测试用的区域
+                String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+                String oneTelnumber = resourceTelenumService.findOneFreeNumber(areaId);
                 result.put("oneTelnumber",oneTelnumber);
-                result.put("areaId",telnumToLineGatewayService.getAreaIdByTelnum(oneTelnumber));
+                result.put("areaId", areaId);
             }else{
                 throw new AppOffLineException();
             }
@@ -53,7 +56,7 @@ public class AreaAndTelNumSelector {
         if(app.getStatus() == app.STATUS_ONLINE){
             return app.getArea().getId();
         }else{
-            return "area01";
+            return SystemConfig.getProperty("area.server.test.area.id", "area001");
         }
     }
 
