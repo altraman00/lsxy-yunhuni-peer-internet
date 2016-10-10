@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.framework.core.utils.Page;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -41,4 +42,13 @@ public interface ConsumeService extends BaseService<Consume> {
      * 进行消费
      */
     void consume(Consume consume);
+
+    /**
+     * 获取租户一个时间段的消费金额
+     * @param tenantId 租户ID
+     * @param startDate 开始时间（大于等于）
+     * @param endDate 结束时间 （小于）
+     * @return
+     */
+    BigDecimal getConsumeByTenantIdAndDate(String tenantId, Date startDate, Date endDate);
 }

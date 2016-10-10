@@ -16,6 +16,7 @@ import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.recharge.dao.RechargeDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -23,6 +24,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/7/1.
@@ -44,6 +46,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
 
     @Autowired
     CalBillingService calBillingService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public BaseDaoInterface<Recharge, Serializable> getDao() {
@@ -149,6 +154,13 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' order by obj.createTime desc";
         page =  this.pageList(hql,pageNo,pageSize,tenant);
         return page;
+    }
+
+    @Override
+    public BigDecimal getRechargeByTenantIdAndDate(String tenantId, Date startDate, Date endDate) {
+        String sql = "SELECT IFNULL(SUM(r.amount),0) as recharge FROM db_lsxy_base.tb_base_recharge r WHERE r.tenant_id=? AND r.pay_time >= ? AND r.pay_time < ? and r.deleted=0";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, tenantId,startDate,endDate);
+        return (BigDecimal) map.get("recharge");
     }
 
 }

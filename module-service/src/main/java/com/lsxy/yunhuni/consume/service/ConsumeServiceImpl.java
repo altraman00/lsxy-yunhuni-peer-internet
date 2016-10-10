@@ -1,25 +1,21 @@
 package com.lsxy.yunhuni.consume.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.yunhuni.api.consume.model.Consume;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.consume.model.Consume;
-import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.consume.dao.ConsumeDao;
+import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -37,6 +33,9 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     EntityManager em;
     @Autowired
     CalBillingService calBillingService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Override
     public BaseDaoInterface<Consume, Serializable> getDao() {
         return consumeDao;
@@ -105,6 +104,13 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         this.save(consume);
         //Redis中消费增加
         calBillingService.incConsume(consume.getTenant().getId(),consume.getDt(),consume.getAmount());
+    }
+
+    @Override
+    public BigDecimal getConsumeByTenantIdAndDate(String tenantId, Date startDate, Date endDate) {
+        String sql = "SELECT IFNULL(SUM(c.amount),0) as consume FROM db_lsxy_bi_yunhuni.tb_bi_consume c WHERE c.tenant_id=? AND c.dt >= ? AND c.dt < ? and c.deleted=0";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, tenantId,startDate,endDate);
+        return (BigDecimal) map.get("consume");
     }
 
 }
