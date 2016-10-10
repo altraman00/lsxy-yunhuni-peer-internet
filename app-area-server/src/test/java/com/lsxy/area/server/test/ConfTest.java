@@ -2,6 +2,7 @@ package com.lsxy.area.server.test;
 
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
+import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.area.server.AreaServerMainClass;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -10,12 +11,18 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import com.lsxy.yunhuni.api.session.model.Meeting;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.MeetingService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import scala.actors.threadpool.Arrays;
+
+import java.util.List;
 
 /**
  * Created by Liuws on 2016/7/14.
@@ -56,8 +63,66 @@ public class ConfTest {
     @Autowired
     private VoiceIvrService voiceIvrService;
 
-    @Test
-    public void test(){
+    @Autowired
+    private MeetingService meetingService;
 
+    private String getMeeting(){
+        List<Meeting> meetings = (List<Meeting>)meetingService.list("from Meeting order by createTime desc");
+        return meetings.get(0).getId();
+    }
+
+    @Test
+    public void create() throws YunhuniApiException {
+        confService.create("192.168.0.1","40288aca574060400157406427f20005",45,30,true,true,"3.wav",null);
+    }
+
+    @Test
+    public void dismiss() throws YunhuniApiException {
+        confService.dismiss("192.168.0.1","40288aca574060400157406427f20005",getMeeting());
+    }
+
+    @Test
+    public void invite() throws YunhuniApiException {
+        confService.invite("192.168.0.1","40288aca574060400157406427f20005",getMeeting()
+                ,"8675522730043","13692206627",4500,45,0,"3.wav",1);
+    }
+
+    @Test
+    public void join() throws YunhuniApiException {
+        List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
+        confService.join("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId()
+               ,4500,"3.wav",1);
+    }
+
+    @Test
+    public void quit() throws YunhuniApiException {
+        List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
+        confService.quit("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId());
+    }
+
+    @Test
+    public void play() throws YunhuniApiException {
+        confService.startPlay("192.168.0.1","40288aca574060400157406427f20005",getMeeting(), Arrays.asList(new String[]{"3.wav"}));
+    }
+
+    @Test
+    public void stoPlay() throws YunhuniApiException {
+        confService.stopPlay("192.168.0.1","40288aca574060400157406427f20005",getMeeting());
+    }
+
+    @Test
+    public void record() throws YunhuniApiException {
+        confService.startRecord("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),600);
+    }
+
+    @Test
+    public void stopRecord() throws YunhuniApiException {
+        confService.stopRecord("192.168.0.1","40288aca574060400157406427f20005",getMeeting());
+    }
+
+    @Test
+    public void setVoiceMode() throws YunhuniApiException {
+        List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
+        confService.setVoiceMode("192.168.0.1","40288aca574060400157406427f20005",getMeeting(),lists.get(0).getId(),2);
     }
 }
