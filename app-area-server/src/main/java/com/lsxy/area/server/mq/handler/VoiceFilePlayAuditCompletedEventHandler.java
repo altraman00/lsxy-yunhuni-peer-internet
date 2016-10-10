@@ -53,14 +53,20 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
             List<String> apps = voiceFilePlayService.findNotSyncApp();
             for(int j=0;j<apps.size();j++){
                 List<VoiceFilePlay> list = voiceFilePlayService.findNotSyncByApp(apps.get(j));
-                List<Map<String,Object>> list1 = new ArrayList<>();
-                for(int i=0;i<list.size();i++) {
-                    if(list.get(i).getApp()!=null) {
-                        Map<String, Object> map = getStringObjectMap(list.get(i));
-                        list1.add(map);
+                if(list.size()>0) {//当没有需要同步的文件时，不发送请求
+                    List<Map<String, Object>> list1 = new ArrayList<>();
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).getApp() != null) {
+                            Map<String, Object> map = getStringObjectMap(list.get(i));
+                            list1.add(map);
+                        }
+                    }
+                    initRequest(list1, apps.get(j));
+                }else{
+                    if(logger.isDebugEnabled()){
+                        logger.debug("应用id：["+apps.get(j)+"]没有需要同步的文件");
                     }
                 }
-                initRequest(list1,apps.get(j));
             }
         }else{
             VoiceFilePlay voiceFilePlay = voiceFilePlayService.findById(event.getKey());
@@ -69,6 +75,10 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
                 Map<String, Object> map = getStringObjectMap(voiceFilePlay);
                 list1.add(map);
                 initRequest(list1, voiceFilePlay.getApp().getId());
+            }else{
+                if(logger.isDebugEnabled()){
+                    logger.debug("放音文件同步结束：当前放音文件不存在");
+                }
             }
         }
     }
