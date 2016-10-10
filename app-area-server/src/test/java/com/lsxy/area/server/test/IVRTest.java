@@ -13,11 +13,15 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
 
 /**
  * Created by Tandy on 2016/7/14.
@@ -54,6 +58,9 @@ public class IVRTest {
     @Autowired
     private LineGatewayService lineGatewayService;
 
+    @Autowired
+    private VoiceIvrService voiceIvrService;
+
     @Test
     public void test(){
         App app = appService.findById("40288aca574060400157406427f20005");
@@ -62,7 +69,14 @@ public class IVRTest {
         String from = "13692206627";
         String to = "8675522730043";
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to);
+
+        List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
+        System.out.println(lists.get(0).getId());
         //下一步干嘛
-        ivrActionService.doAction("64a9640882efe40d3a06a02388308817");
+        int step = 1;
+        while(ivrActionService.doAction(lists.get(0).getId())){
+            System.out.println("ivr step" + (step++));
+        }
+
     }
 }

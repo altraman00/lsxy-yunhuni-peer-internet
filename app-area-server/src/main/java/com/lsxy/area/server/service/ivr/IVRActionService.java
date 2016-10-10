@@ -341,7 +341,7 @@ public class IVRActionService {
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
-            return  true;
+            return  false;
         }
         String resXML = null;
         if(nextUrl == null){//第一次
