@@ -585,10 +585,24 @@ public class TenantController {
 
     @ApiOperation(value = "给租户充值")
     @RequestMapping(value = "/tenants/{id}/recharge",method = RequestMethod.PUT)
-    public RestResponse apiInvokeStatistic(
+    public RestResponse recharge(
             @PathVariable String id,
             @RequestBody RechargeInput input){
         return RestResponse.success(rechargeService.doRecharge(id,input.getAmount()));
+    }
+
+    @ApiOperation(value = "给租户平账")
+    @RequestMapping(value = "/tenants/{id}/flat_balance",method = RequestMethod.PUT)
+    public RestResponse flatAmount(
+            @PathVariable String id,
+            @RequestBody RechargeInput input){
+        Tenant tenant = tenantService.findById(id);
+        if(tenant == null){
+            throw new IllegalArgumentException("租户不存在");
+        }
+        Consume consume = new Consume(new Date(), ConsumeCode.flat_balance.name(),input.getAmount(),ConsumeCode.flat_balance.getName(),"0",tenant);
+        consumeService.consume(consume);
+        return RestResponse.success(true);
     }
 
     @ApiOperation(value = "租户消费记录")

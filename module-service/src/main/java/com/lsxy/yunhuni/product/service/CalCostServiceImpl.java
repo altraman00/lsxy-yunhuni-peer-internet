@@ -239,12 +239,8 @@ public class CalCostServiceImpl implements CalCostService{
         Tenant tenant = new Tenant();
         tenant.setId(tenantId);
         BigDecimal cost = this.calCost(product, tenantId, time);
-        calBillingService.incConsume(tenantId,dt,cost);
         Consume consume = new Consume(dt,code,cost,remark,appId,tenant);
-        if(logger.isDebugEnabled()){
-            logger.info("插入消费记录：{}", JSONUtil.objectToJson(consume));
-        }
-        consumeService.save(consume);
+        consumeService.consume(consume);
         return cost;
     }
 
