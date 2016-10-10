@@ -70,7 +70,7 @@ public class ConsumeController extends AbstractPortalController {
         }else{
             appName = "全部";
         }
-        downloadExcel("消费记录","消费记录 时间："+startTime+"至"+endTime +"  应用："+appName,new String[]{"消费时间","消费金额","消费类型"},new String[]{"dt","amount","type"},list,null,response);
+        downloadExcel("消费记录","消费记录 时间："+startTime+"至"+endTime +"  应用："+appName,new String[]{"消费时间","消费金额","消费类型"},new String[]{"dt","amount","type"},list,null,"amount",response);
     }
     /**
      * 获取消费记录的分页信息

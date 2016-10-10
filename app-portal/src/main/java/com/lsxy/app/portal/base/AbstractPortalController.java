@@ -101,7 +101,7 @@ public abstract class AbstractPortalController {
      * @param id
      * @return
      */
-    public RestResponse getAppById(HttpServletRequest request,String id ){
+    public RestResponse<App> getAppById(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/get/{1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
@@ -119,11 +119,11 @@ public abstract class AbstractPortalController {
      * 导出文件
      * @param response
      */
-    public <T>  void downloadExcel(String title,String one, String[] headers, String[] values, Collection<T> dataset, String pattern, HttpServletResponse response) {
+    public <T>  void downloadExcel(String title,String one, String[] headers, String[] values, Collection<T> dataset, String pattern, String money,HttpServletResponse response) {
         try {
             Date d = new Date();
             String name = DateUtils.formatDate(d,"yyyyMMdd")+ d.getTime();
-            HSSFWorkbook wb = ExportExcel.exportExcel(title,one,headers,values,dataset,pattern);
+            HSSFWorkbook wb = ExportExcel.exportExcel(title,one,headers,values,dataset,pattern,money);
             response.setContentType("application/vnd.ms-excel");
             response.setHeader("Content-disposition", "attachment;filename="+name+".xls");
             OutputStream ouputStream = response.getOutputStream();

@@ -25,7 +25,7 @@ public class VoiceIvr extends IdEntity {
     private Integer ivrType;
     private String hangupSide;
 
-    @Column(name = "start_num")
+    @Column(name = "start_time")
     public Date getStartTime() {
         return startTime;
     }
@@ -34,7 +34,7 @@ public class VoiceIvr extends IdEntity {
         this.startTime = startTime;
     }
 
-    @Column(name = "end_num")
+    @Column(name = "end_time")
     public Date getEndTime() {
         return endTime;
     }
