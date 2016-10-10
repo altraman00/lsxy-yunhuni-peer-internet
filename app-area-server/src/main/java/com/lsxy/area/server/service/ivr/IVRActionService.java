@@ -111,7 +111,7 @@ public class IVRActionService {
         client.start();
     }
     private void initHandler(){
-        Reflections reflections = new Reflections("com.lsxy.area.server.util.ivr");
+        Reflections reflections = new Reflections("com.lsxy.area.server.service.ivr");
         Set<Class<? extends ActionHandler>> handlerClasss = reflections.getSubTypesOf(ActionHandler.class);
         for (Class<? extends ActionHandler> handlerClass : handlerClasss) {
             ActionHandler handler = applicationContext.getBean(handlerClass);
@@ -356,7 +356,7 @@ public class IVRActionService {
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
-            return  true;
+            return  false;
         }
         String resXML = null;
         if(nextUrl == null){//第一次
@@ -434,16 +434,4 @@ public class IVRActionService {
         return next;
     }
 
-    /*public static void main(String[] args) throws DocumentException {
-        Document doc = DocumentHelper.parseText("\n" +
-                "   <Response>\n" +
-                "    <Get action=\"handle-user-input.jsp\" numdigits=\"1\">\n" +
-                "        <Play>menu.wav</Play>\n" +
-                "    </Get>\n" +
-                "    <Play>sorrybye.wav</Play>\n" +
-                "    <Redirect>/welcome/voice</Redirect>\n" +
-                "    <Next>/welcome/voice</Next>/>\n" +
-                "</Response>");
-
-    }*/
 }

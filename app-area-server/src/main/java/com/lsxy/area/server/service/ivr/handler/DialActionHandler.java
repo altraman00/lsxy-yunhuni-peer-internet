@@ -72,7 +72,7 @@ public class DialActionHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return "hangup";
+        return "dial";
     }
 
     /**
