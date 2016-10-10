@@ -10,7 +10,9 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
@@ -20,7 +22,7 @@ import java.util.List;
  * 测试号码绑定
  * Created by zhangxb on 2016/7/2.
  */
-@RequestMapping("/rest/test_num_bind/")
+@RequestMapping("/rest/test_num_bind")
 @RestController
 public class TestNumBindController extends AbstractRestController {
     @Autowired
@@ -55,6 +57,21 @@ public class TestNumBindController extends AbstractRestController {
             testMobileBindService.delete(testMobileBindList.get(i));
         }
         return RestResponse.success(testMobileBindList.size());
+    }
+
+    /**
+     * 查看绑定手机号码是否已经存在
+     * @param number
+     * @return
+     */
+    @RequestMapping("/isExist")
+    public RestResponse isExist(String number){
+        String userName = getCurrentAccountUserName();
+        List<TestNumBind> testMobileBindList = testMobileBindService.findByNumber(userName,number);
+        if(testMobileBindList.size()>0){
+            return RestResponse.failed("0020","号码已被绑定");
+        }
+        return RestResponse.success();
     }
     /**
      * 测试号码绑定
