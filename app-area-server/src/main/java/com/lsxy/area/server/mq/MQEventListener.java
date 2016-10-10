@@ -22,17 +22,11 @@ public class MQEventListener {
 
     @PostConstruct
     public void startmq(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mqConsumer.start();
-                } catch (JMSException e) {
-                    logger.error("初始化mq组件失败:{}",e.getMessage());
-                    mqConsumer.destroy();
-                }
-            }
-        }).start();
+        try {
+            mqConsumer.start();
+        } catch (JMSException e) {
+            logger.error("初始化mq组件失败:{}",e.getMessage());
+        }
     }
 
 }
