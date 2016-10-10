@@ -419,16 +419,4 @@ public class IVRActionService {
         return next;
     }
 
-    /*public static void main(String[] args) throws DocumentException {
-        Document doc = DocumentHelper.parseText("\n" +
-                "   <Response>\n" +
-                "    <Get action=\"handle-user-input.jsp\" numdigits=\"1\">\n" +
-                "        <Play>menu.wav</Play>\n" +
-                "    </Get>\n" +
-                "    <Play>sorrybye.wav</Play>\n" +
-                "    <Redirect>/welcome/voice</Redirect>\n" +
-                "    <Next>/welcome/voice</Next>/>\n" +
-                "</Response>");
-
-    }*/
 }
