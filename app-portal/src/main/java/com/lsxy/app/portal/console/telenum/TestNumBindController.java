@@ -59,7 +59,18 @@ public class TestNumBindController extends AbstractPortalController{
         String uri = restPrefixUrl +   "/rest/test_num_bind/list";
         return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
     }
-
+    /**
+     * 查看绑定手机号码是否已经存在
+     * @param number
+     * @return
+     */
+    @RequestMapping("/isExist" )
+    @ResponseBody
+    private RestResponse isExist(HttpServletRequest request,String number){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/test_num_bind/isExist?number={1}";
+        return  RestRequest.buildSecurityRequest(token).get(uri, String.class,number);
+    }
     /**
      * 绑定手机号码
      * @param request
