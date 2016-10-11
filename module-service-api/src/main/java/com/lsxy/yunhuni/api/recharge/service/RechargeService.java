@@ -60,4 +60,13 @@ public interface RechargeService extends BaseService<Recharge> {
     List<Recharge> listByTenant(String tenant);
 
     Page<Recharge> pageListByTenant(String tenant, Integer pageNo, Integer pageSize);
+
+    /**
+     * 获取租户一个时间段的充值金额
+     * @param tenantId 租户ID
+     * @param startDate 开始时间（大于等于）
+     * @param endDate 结束时间 （小于）
+     * @return
+     */
+    BigDecimal getRechargeByTenantIdAndDate(String tenantId, Date startDate, Date endDate);
 }
