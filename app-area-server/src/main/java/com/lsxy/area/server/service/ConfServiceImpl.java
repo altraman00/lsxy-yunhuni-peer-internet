@@ -46,7 +46,7 @@ public class ConfServiceImpl implements ConfService {
     private static final Logger logger = LoggerFactory.getLogger(ConfServiceImpl.class);
 
     /**最大与会数**/
-    public static final int MAX_PARTS = 10;
+    public static final int MAX_PARTS = 8;
 
     /**key的过期时间 秒**/
     public static final int EXPIRE = 60 * 60 * 12;
