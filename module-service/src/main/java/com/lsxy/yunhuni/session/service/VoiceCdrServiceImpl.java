@@ -48,7 +48,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     private VoiceCdrDayService voiceCdrDayService;
 
     @Override
-    public List<VoiceCdr> list(String type, String tenantId, String time, String appId) {
+    public List<VoiceCdr> listCdr(String type, String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   last_time BETWEEN ? and ?";
