@@ -42,7 +42,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     }
 
     @Override
-    public List<Consume> list(String userName, String startTime, String endTime, String appId) {
+    public List<Consume> listConsume(String userName, String startTime, String endTime, String appId) {
         Date startDate = null;
         Date endDate = null;
         if(StringUtils.isNotBlank(startTime)){
