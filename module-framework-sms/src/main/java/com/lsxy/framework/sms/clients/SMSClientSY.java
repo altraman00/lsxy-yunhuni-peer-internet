@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import sy_soapserver.GetbalanceDocument;
 import sy_soapserver.GetbalanceResponseDocument;
 import sy_soapserver.SendmsgDocument;
+import sy_soapserver.SendmsgResponseDocument;
 
 import static com.lsxy.framework.mq.ons.OnsMQService.logger;
 
@@ -30,7 +31,7 @@ public class SMSClientSY implements SMSClient {
     }
 
     @Override
-    public boolean sendsms(String to, String msg) {
+    public String sendsms(String to, String msg) {
         try {
             SendmsgDocument.Sendmsg sendmsg =  (SendmsgDocument.Sendmsg)getTestObject(SendmsgDocument.Sendmsg.class);;
             SendmsgDocument sendmsg42 = (SendmsgDocument) getTestObject(SendmsgDocument.class);;
@@ -40,12 +41,12 @@ public class SMSClientSY implements SMSClient {
             sendmsg.setPhone(to);
             sendmsg42.setSendmsg(sendmsg);
             //发短信方法
-            stub.sendmsg(sendmsg42);
-            return true;
+            SendmsgResponseDocument result = stub.sendmsg(sendmsg42);
+            return result.getSendmsgResponse().getSendmsg();
         } catch (Exception e) {
             logger.error("发送短信异常",e);
         }
-        return false;
+        return null;
     }
 
     @Override
@@ -100,7 +101,7 @@ public class SMSClientSY implements SMSClient {
 
     public static void main(String[] args) {
         SMSClientSY client = new SMSClientSY();
-        boolean result = client.sendsms("13971068693","【云呼你】您的验证码是0000");
+        String result = client.sendsms("18826474526","【云呼你】您的验证码是0000");
         System.out.println("发送结果 :" + result);
     }
 
