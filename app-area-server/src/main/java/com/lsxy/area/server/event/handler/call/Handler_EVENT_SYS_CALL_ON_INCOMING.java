@@ -120,6 +120,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             }
             tenant = rent.getTenant();
             app = rent.getApp();
+            if(app!= null && app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
+                logger.error("应用未上线");
+                return res;
+            }
         }
 
         if(tenant == null){
@@ -130,10 +134,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.error("找不到对应的APP:{}", params);
             return res;
         }
-        if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
-            logger.error("应用未上线");
-            return res;
-        }
+
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to);
         return res;
     }
