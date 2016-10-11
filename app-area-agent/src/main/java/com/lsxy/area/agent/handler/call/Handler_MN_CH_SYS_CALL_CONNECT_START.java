@@ -60,7 +60,6 @@ public class Handler_MN_CH_SYS_CALL_CONNECT_START extends RpcRequestHandler {
             cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.connect_start", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
-                    Map<String,String> params = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
                         logger.debug("调用sys.call.connect_start成功call_id={},result={}",call_id,o);
                     }
@@ -68,7 +67,6 @@ public class Handler_MN_CH_SYS_CALL_CONNECT_START extends RpcRequestHandler {
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method", Constants.EVENT_SYS_CALL_CONNECT_ON_START)
-                                    .put("res_id",params.get("res_id"))
                                     .put("user_data",call_id)
                                     .build());
                     try {

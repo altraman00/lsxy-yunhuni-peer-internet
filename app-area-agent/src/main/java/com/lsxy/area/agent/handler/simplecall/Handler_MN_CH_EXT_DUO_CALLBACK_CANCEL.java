@@ -69,9 +69,8 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK_CANCEL extends RpcRequestHandler{
 
                 @Override
                 protected void onResult(Object o) {
-                    Map<String,String> result = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
-                        logger.debug("调用ext.duo_callback.cancel成功，call_id={},result={}",params.get("user_data"),result);
+                        logger.debug("调用ext.duo_callback.cancel成功，call_id={},result={}",params.get("user_data"),o);
                     }
                 }
 
