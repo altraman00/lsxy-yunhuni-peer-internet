@@ -30,7 +30,7 @@ public class VoiceCdrController extends AbstractRestController {
      */
     @RequestMapping("/list")
     public RestResponse list(String type,String time,String appId){
-        List<VoiceCdr> list = voiceCdrService.list(type,getCurrentAccount().getTenant().getId(),time,appId);
+        List<VoiceCdr> list = voiceCdrService.listCdr(type,getCurrentAccount().getTenant().getId(),time,appId);
         return RestResponse.success(list);
     }
     /**

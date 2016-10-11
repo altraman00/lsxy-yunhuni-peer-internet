@@ -34,7 +34,7 @@ public class ConsumeController extends AbstractRestController {
     @RequestMapping("/list")
     public RestResponse pageList(String startTime,String endTime,String appId){
         String userName = getCurrentAccountUserName();
-        List<Consume> list =  consumeService.list(userName,startTime,endTime,appId);
+        List<Consume> list =  consumeService.listConsume(userName,startTime,endTime,appId);
         changeTypeToChinese(list);
         return RestResponse.success(list);
     }
