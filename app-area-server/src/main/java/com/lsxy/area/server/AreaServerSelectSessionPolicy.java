@@ -74,7 +74,7 @@ public class AreaServerSelectSessionPolicy extends DefaultSelectSessionPolicy{
         ListOrderedMap sessions = serverSessionContext.getSessionsByArea(areaid);
         if(sessions.size()>0){
             //统一个区域随机一个节点
-            int idx = RandomUtils.nextInt(1,sessions.size());
+            int idx = RandomUtils.nextInt(0,sessions.size());
             result = (Session) sessions.getValue(idx);
         }
         return result;
