@@ -1,7 +1,7 @@
 package com.lsxy.app.portal.security;
 
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.framework.web.utils.WebUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -25,11 +25,14 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
 
     //验证码错误
     public static final String VC_ERROR = "验证码错误";
+    //暗码,配置成为生产环境为空的状态
+    private String hideCode;
 
     private String servletPath;
-    public CheckCodeAuthenticationFilter(String servletPath,String failureUrl) {
+    public CheckCodeAuthenticationFilter(String servletPath,String failureUrl,String hideCode) {
         super(servletPath);
-        this.servletPath=servletPath;
+        this.servletPath= servletPath;
+        this.hideCode = hideCode;
         setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler(failureUrl));
     }
 
@@ -40,18 +43,28 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
         HttpServletResponse res=(HttpServletResponse)response;
 
         if ("POST".equalsIgnoreCase(req.getMethod())&&servletPath.equals(req.getServletPath())){
-            String expect = (String) req.getSession().getAttribute(PortalConstants.VC_KEY);
-            if(expect == null){
-                unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_OVERTIME));
-                return;
-            }else if(!expect.equalsIgnoreCase(req.getParameter(PortalConstants.VC_KEY))){
-                unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_ERROR));
-                //图形验证码一次验证不过就清空
-                req.getSession().removeAttribute(PortalConstants.VC_KEY);
-                return;
-            }else{
-                //清空图形验证码
-                req.getSession().removeAttribute(PortalConstants.VC_KEY);
+            //暗码校验，非生产环境可用start-↓↓↓↓↓↓↓↓--->
+            if(StringUtils.isNotBlank(hideCode)){
+                if(req.getParameter(PortalConstants.VC_KEY).equals(hideCode.substring(0,4))){
+                    //正确，清空图形验证码
+                    req.getSession().removeAttribute(PortalConstants.VC_KEY);
+                }
+            }
+            //暗码校验，非生产环境可用end-↑↑↑↑↑↑↑↑↑--->
+            else {
+                String expect = (String) req.getSession().getAttribute(PortalConstants.VC_KEY);
+                if (expect == null) {
+                    unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_OVERTIME));
+                    return;
+                } else if (!expect.equalsIgnoreCase(req.getParameter(PortalConstants.VC_KEY))) {
+                    unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_ERROR));
+                    //图形验证码一次验证不过就清空
+                    req.getSession().removeAttribute(PortalConstants.VC_KEY);
+                    return;
+                } else {
+                    //清空图形验证码
+                    req.getSession().removeAttribute(PortalConstants.VC_KEY);
+                }
             }
         }
         chain.doFilter(request,response);
