@@ -21,7 +21,7 @@ public interface ConsumeService extends BaseService<Consume> {
      * @param appId
      * @return
      */
-    List<Consume> list(String userName,String startTime,String endTime,String appId);
+    List<Consume> listConsume(String userName,String startTime,String endTime,String appId);
     /**
      * 获取用户区间内的分页数据
      * @param userName 用户名
