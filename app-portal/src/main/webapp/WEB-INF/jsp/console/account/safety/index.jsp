@@ -206,11 +206,14 @@
             <div class="input ">
                 <input class=" form-control modalMobile " type="text" id="mobile" placeholder="输入手机号码" maxlength="11" />
             </div>
-            <div class="input">
-                <input class="code form-control modalCode " type="text" name="" id="yzm1"placeholder="验证码" />
-                <button class="code-button" id="send-code"data-type="2" >发送验证码</button>
+
+            <div id="second-codeblock" ></div>
+
+            <div class="input-inline-block">
+                <input class="code form-control modalCode " type="text" name="" id="yzm1"placeholder="手机验证码" />
+                <button class="code-button" id="send-code"data-type="2" >获取验证码</button>
             </div>
-            <div class="in-block" id="second-codeblock" ></div>
+
             <p class="tips-error moadltips2 text-center" style="display: none">请先填写手机号码</p>
         </div>
         <div class="footer">
@@ -294,7 +297,7 @@
                 showmsg(response.data.err,'moadltips2');
                 isVc = true;
                 //启动二次校验
-                var html = '<div class="input mb-0 mt-0"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
+                var html = '<div class="input-inline-block"><input class="code form-control " type="text" name="" id="second-code" placeholder="图形验证码"/>';
                 html += '&nbsp;&nbsp;<a class="code-img"><img src="${ctx}/vc/get?dt='+ new Date() +'" onclick="changeImgCode()"  id="imgValidateCode" ></a></div>';
                 $('#second-codeblock').html(html);
 

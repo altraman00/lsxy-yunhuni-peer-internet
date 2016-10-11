@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +46,26 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     @Override
     public BaseDaoInterface<Consume, Serializable> getDao() {
         return consumeDao;
+    }
+
+    @Override
+    public List<Consume> list(String userName, String startTime, String endTime, String appId) {
+        Date startDate = null;
+        Date endDate = null;
+        if(StringUtils.isNotBlank(startTime)){
+            startDate = DateUtils.parseDate(startTime+"-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        }
+        if(StringUtils.isNotBlank(endTime)){
+            endDate = DateUtils.getLastTimeOfMonth(DateUtils.parseDate(endTime,"yyyy-MM"));
+        }
+        String tmepAppId = "";
+        if(StringUtils.isNotEmpty(appId)){
+            tmepAppId += " and  obj.appId ='"+appId+"'";
+        }
+        Tenant tenant = tenantService.findTenantByUserName(userName);
+        String hql = "from Consume obj where obj.tenant.id=?1 and obj.dt BETWEEN  ?2 and ?3 "+tmepAppId+" ORDER BY obj.dt desc";
+        List<Consume> list = this.list(hql,tenant.getId(),startDate,endDate);
+        return list;
     }
 
     @Override

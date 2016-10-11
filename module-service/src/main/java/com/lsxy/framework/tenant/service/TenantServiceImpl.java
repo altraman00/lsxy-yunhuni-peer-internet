@@ -252,7 +252,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
                 "consume.sum_amount 'costCoin',recharge.amount 'totalCoin'," +
                 "cdr.sum_call 'sessionCount',cdr.sum_cost_time 'sessionTime'" + sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql += " group by regDate desc ";
+        pageSql += " ORDER BY regDate desc ";
         Query pageQuery = em.createNativeQuery(pageSql,"tenantResult");
         if(StringUtil.isNotEmpty(name)){
             countQuery.setParameter("name","%"+name+"%");
