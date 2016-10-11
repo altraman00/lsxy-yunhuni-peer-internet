@@ -151,12 +151,14 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     }
 
     private void handupParts(String confId) {
+        logger.info("开始处理会议={}解散自动挂断与会方",confId);
         List<String> parts = confService.getParts(confId);
         if(parts!=null && parts.size()>0){
             for (String callId : parts) {
                 handup(callId);
             }
         }
+        logger.info("处理完成，会议={}解散自动挂断与会方",confId);
     }
 
     private void handup(String callId){
