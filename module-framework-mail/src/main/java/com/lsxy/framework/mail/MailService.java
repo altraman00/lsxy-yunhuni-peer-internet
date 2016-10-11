@@ -66,7 +66,6 @@ public class MailService {
 			throw new MailConfigNotEnabledException();
 		}
 		logger.debug("给"+mailto+"发邮件");
-		logger.debug("邮件内容:"+content);
 		// 构造mail session
 		Properties props = System.getProperties();
 		props.put("mail.smtp.host", SystemConfig.getProperty("global.mail.smtp.host"));
