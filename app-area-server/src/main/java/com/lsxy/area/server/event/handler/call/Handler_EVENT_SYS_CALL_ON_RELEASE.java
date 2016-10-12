@@ -75,6 +75,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
+        businessStateService.delete(call_id);
         if(StringUtils.isBlank(state.getAppId())){
             throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());
         }
@@ -113,8 +114,6 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         }
-
-        businessStateService.delete(call_id);
 
         //更新会话记录状态
         CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
