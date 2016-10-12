@@ -117,6 +117,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             ResourcesRent rent = resourcesRentService.findByResDataAndRentStatus(to, ResourcesRent.RENT_STATUS_USING);
             if(rent == null){
                 logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
+                return res;
             }
             tenant = rent.getTenant();
             app = rent.getApp();
