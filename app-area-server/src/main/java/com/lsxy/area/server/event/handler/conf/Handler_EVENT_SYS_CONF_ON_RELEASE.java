@@ -116,10 +116,10 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         Long begin_time = null;
         Long end_time = null;
         if(params.get("begin_time") != null){
-            begin_time = ((long)params.get("begin_time")) * 1000;
+            begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
         }
         if(params.get("end_time") != null){
-            end_time = ((long)params.get("end_time")) * 1000;
+            end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
 
         if(StringUtils.isNotBlank(app.getUrl())){
