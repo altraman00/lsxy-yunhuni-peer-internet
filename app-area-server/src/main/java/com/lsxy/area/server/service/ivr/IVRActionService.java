@@ -147,6 +147,9 @@ public class IVRActionService {
                 post.setEntity(se);
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
+                if(logger.isDebugEnabled()){
+                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     String result = receiveResponse(response);
                     if(result!=null && result.equalsIgnoreCase("accept")){
