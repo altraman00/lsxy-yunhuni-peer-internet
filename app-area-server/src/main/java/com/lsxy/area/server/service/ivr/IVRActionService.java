@@ -234,7 +234,11 @@ public class IVRActionService {
         if(entity.getContent() == null){
             return null;
         }
-        return EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
+        String result = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
+        if(logger.isDebugEnabled()){
+            logger.info("http ivr response = {}",result);
+        }
+        return result;
     }
 
     /**
