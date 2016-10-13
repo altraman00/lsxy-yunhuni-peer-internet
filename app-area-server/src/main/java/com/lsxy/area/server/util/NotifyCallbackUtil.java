@@ -38,7 +38,7 @@ public class NotifyCallbackUtil {
 
     //设置请求和传输超时时间
     private RequestConfig config =
-            RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();
+            RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
 
     @PostConstruct
     public void init(){
