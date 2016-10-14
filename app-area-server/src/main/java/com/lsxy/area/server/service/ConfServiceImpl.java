@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -739,8 +740,34 @@ public class ConfServiceImpl implements ConfService {
      * @return
      */
     @Override
-    public List<String> getParts(String confId){
+    public Set<String> getParts(String confId){
         String key = key(confId);
-        return (List<String>)redisTemplate.opsForSet().members(key);
+        Set<String> results = null;
+        try{
+            results = redisTemplate.opsForSet().members(key);
+        }catch (Throwable t){
+            logger.error("获取会议成员失败",t);
+        }
+        return results;
+    }
+
+    /**
+     * 弹出会议成员，并清空
+     */
+    @Override
+    public Set<String> popParts(String confId){
+        String key = key(confId);
+        Set<String> results = null;
+        try{
+            results = redisTemplate.opsForSet().members(key);
+        }catch (Throwable t){
+            logger.error("获取会议成员失败",t);
+        }
+        try{
+            redisTemplate.opsForSet().remove(key);
+        }catch (Throwable t){
+            logger.info("删除会议成员缓存失败",t);
+        }
+        return results;
     }
 }

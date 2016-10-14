@@ -26,8 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by liuws on 2016/8/29.
@@ -152,7 +152,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
 
     private void handupParts(String confId) {
         logger.info("开始处理会议={}解散自动挂断与会方",confId);
-        List<String> parts = confService.getParts(confId);
+        Set<String> parts = confService.popParts(confId);
         if(parts!=null && parts.size()>0){
             for (String callId : parts) {
                 handup(callId);
