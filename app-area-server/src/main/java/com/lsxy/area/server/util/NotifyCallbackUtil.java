@@ -9,7 +9,6 @@ import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ public class NotifyCallbackUtil {
 
     private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
-    private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
+    private static final String ACCEPT_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
     private CloseableHttpAsyncClient client = null;
 
@@ -90,16 +89,15 @@ public class NotifyCallbackUtil {
             HttpPost post = new HttpPost(url);
             RequestConfig c = this.config;
             if(timeout != null){
-                c = RequestConfig.custom().setSocketTimeout(timeout*1000)
+                c = RequestConfig.custom().setConnectionRequestTimeout(timeout*1000).setSocketTimeout(timeout*1000)
                         .setConnectTimeout(timeout*1000).build();
             }
             data.put("action","event_notify");
             post.setConfig(c);
-            post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+            post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
             StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
-            se.setContentType(CONTENT_TYPE_TEXT_JSON);
-            se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
             post.setEntity(se);
+            post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
             client.execute(post,new FutureCallback<HttpResponse>(){
 
                 @Override
