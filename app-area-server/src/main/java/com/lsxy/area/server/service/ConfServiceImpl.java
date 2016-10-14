@@ -764,7 +764,7 @@ public class ConfServiceImpl implements ConfService {
             logger.error("获取会议成员失败",t);
         }
         try{
-            redisTemplate.opsForSet().remove(key);
+            redisTemplate.delete(key);
         }catch (Throwable t){
             logger.info("删除会议成员缓存失败",t);
         }
