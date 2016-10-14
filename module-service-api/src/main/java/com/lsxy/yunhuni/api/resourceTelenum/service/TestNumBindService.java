@@ -28,4 +28,11 @@ public interface TestNumBindService extends BaseService<TestNumBind>  {
     public List<TestNumBind> findByTenant(String tenant,String appId);
 
     public TestNumBind findByNumber(String number)  ;
+
+    /**
+     * 根据应用ID获取测试号码
+     * @param appId
+     * @return
+     */
+    List<String> findNumByAppId(String appId);
 }

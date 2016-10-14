@@ -72,4 +72,5 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         ResourceTelenum resourceTelenum = resourceTelenumDao.findFirstByStatus(ResourceTelenum.STATUS_FREE);
         return resourceTelenum.getTelNumber();
     }
+
 }

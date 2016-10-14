@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.api.billing.service.CalBillingService;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -43,7 +46,9 @@ public class CalCostTest {
 
     @Test
     public void testCalBilling(){
-        Long balance = calBillingService.getConference("1");
+        Date date = DateUtils.parseDate("2016-10-07", "yyyy-MM-dd");
+        Date date1 = DateUtils.parseDate("2016-10-08", "yyyy-MM-dd");
+        BigDecimal balance = calBillingService.getBalance("40288aca574060400157406339080002",date,date1,new BigDecimal(100.0));
         System.out.println(balance);
     }
 

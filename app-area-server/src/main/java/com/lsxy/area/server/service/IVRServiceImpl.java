@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.IVRService;
 import com.lsxy.area.api.exceptions.*;
+import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -75,6 +76,9 @@ public class IVRServiceImpl implements IVRService {
     @Autowired
     private CallSessionService callSessionService;
 
+    @Autowired
+    private AreaAndTelNumSelector areaAndTelNumSelector;
+
     private boolean isEnableIVRService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
@@ -99,10 +103,10 @@ public class IVRServiceImpl implements IVRService {
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
-        String tenantId = app.getTenant().getId();
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
+        String tenantId = app.getTenant().getId();
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
@@ -120,7 +124,9 @@ public class IVRServiceImpl implements IVRService {
         }
 
         //TODO
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         VoiceIvr voiceIvr = new VoiceIvr();
@@ -148,7 +154,7 @@ public class IVRServiceImpl implements IVRService {
                 .putIfNotEmpty("max_answer_seconds",maxCallDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("appid ",app.getId())
+                .putIfNotEmpty("areaId ",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -163,7 +169,7 @@ public class IVRServiceImpl implements IVRService {
                                     .setAppId(appId)
                                     .setId(callId)
                                     .setType("ivr_call")
-                                    .setAreaId(app.getArea().getId())
+                                    .setAreaId(areaId)
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(new MapBuilder<String,Object>()
                                             .putIfNotEmpty("from",from)

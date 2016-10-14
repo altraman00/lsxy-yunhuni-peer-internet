@@ -176,7 +176,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             Map<String, Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",res_id)
                     .putIfNotEmpty("user_data",callId)
-                    .put("appid",state.getAppId())
+                    .put("areaId",state.getAreaId())
                     .build();
 
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);

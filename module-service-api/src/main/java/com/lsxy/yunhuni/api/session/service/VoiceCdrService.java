@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,6 +12,11 @@ import java.util.Map;
  * Created by zhangxb on 2016/7/19.
  */
 public interface VoiceCdrService extends BaseService<VoiceCdr> {
+    /**
+     * 根据类型，日期，应用id来查询获取数据
+     */
+    public List<VoiceCdr> listCdr(String type, String tenantId, String time, String appId);
+
     /**
      * 根据类型，日期，应用id来查询获取分页数据
      */

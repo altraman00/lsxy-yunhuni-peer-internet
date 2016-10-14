@@ -29,6 +29,16 @@ public interface CalBillingService {
     BigDecimal getBalance(String tenantId);
 
     /**
+     * 从原始表中进行账务金额结算
+     * @param tenantId 租户ID
+     * @param lastBalanceDate 上次结算时间
+     * @param balanceDate 本次结算时间
+     * @param lastBalance 上次结算金额
+     * @return
+     */
+    BigDecimal getBalance(String tenantId,Date lastBalanceDate,Date balanceDate,BigDecimal lastBalance);
+
+    /**
      * redis中的充值增量增加
      * @param tenantId 租户ID
      * @param date 日期

@@ -1,7 +1,6 @@
 package com.lsxy.app.portal.rest.stastistic;
 
 import com.lsxy.app.portal.base.AbstractRestController;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
@@ -10,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +21,18 @@ import java.util.Map;
 public class VoiceCdrController extends AbstractRestController {
     @Autowired
     VoiceCdrService voiceCdrService;
-
+    /**
+     * 获取数据
+     * @param type 类型
+     * @param time 时间
+     * @param appId 应用id
+     * @return
+     */
+    @RequestMapping("/list")
+    public RestResponse list(String type,String time,String appId){
+        List<VoiceCdr> list = voiceCdrService.listCdr(type,getCurrentAccount().getTenant().getId(),time,appId);
+        return RestResponse.success(list);
+    }
     /**
      * 获取分页数据
      * @param pageNo 当前页

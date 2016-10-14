@@ -301,11 +301,11 @@
                     name: textData,
 
                 },
-                {
-                    type: 'category',
-                    boundaryGap: true,
-                    data: Ydata,
-                }
+//                {
+//                    type: 'category',
+//                    boundaryGap: true,
+//                    data: Ydata,
+//                }
             ],
             yAxis: [
                 {
@@ -337,7 +337,7 @@
                 {
                     name:'消费额',
                     type:'bar',
-                    xAxisIndex: 1,
+//                    xAxisIndex: 1,
                     yAxisIndex: 1,
                     data:xd
                 },

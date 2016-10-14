@@ -108,7 +108,7 @@ public class VoiceFilePlayServiceImpl extends AbstractService<VoiceFilePlay> imp
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" GROUP BY obj.create_time DESC";
+        pageSql +=" ORDER BY obj.create_time DESC";
         Query pageQuery = em.createNativeQuery(pageSql,VoiceFilePlay.class);
         if(date1!=null){
             countQuery.setParameter("date1",date1);

@@ -8,6 +8,8 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,8 @@ public class VoiceFilePlayDeletedEventHandler implements MQMessageHandler<VoiceF
     private VoiceFilePlayService voiceFilePlayService;
     @Autowired
     private ServerSessionContext sessionContext;
+    @Autowired
+    AppService appService;
 
     @Autowired
     private RPCCaller rpcCaller;
@@ -75,7 +79,8 @@ public class VoiceFilePlayDeletedEventHandler implements MQMessageHandler<VoiceF
                 logger.debug("本次删除文件/文件夹信息:{}",param);
             }
             Map<String, Object> params = new HashMap<>();
-            params.put("appid ",event.getAppId());
+            App app = appService.findById(event.getAppId());
+            params.put("areaId ",app.getArea().getId());
             RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_DELETED,params);
             request.setBody(param);
             try {
