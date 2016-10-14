@@ -260,8 +260,8 @@ public class IVRActionService {
             reject(app.getId(),res_id,call_id);
         }else{
             answer(app.getId(),res_id,call_id);
+            saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         }
-        saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         return true;
     }
 
