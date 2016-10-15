@@ -75,6 +75,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
+        businessStateService.delete(call_id);
         if(StringUtils.isBlank(state.getAppId())){
             throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());
         }
@@ -90,13 +91,13 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         Long end_time = null;
         Long answer_time = null;
         if(params.get("begin_time") != null){
-            begin_time = ((long)params.get("begin_time")) * 1000;
+            begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
         }
         if(params.get("end_time") != null){
-            end_time = ((long)params.get("end_time")) * 1000;
+            end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
         if(params.get("answer_time") != null){
-            answer_time = ((long)params.get("answer_time")) * 1000;
+            answer_time = (Long.parseLong(params.get("answer_time").toString())) * 1000;
         }
 
         //发送呼叫结束通知
@@ -113,8 +114,6 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         }
-
-        businessStateService.delete(call_id);
 
         //更新会话记录状态
         CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));

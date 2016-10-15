@@ -3,6 +3,7 @@ package com.lsxy.area.api;
 import com.lsxy.area.api.exceptions.YunhuniApiException;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by liuws on 2016/8/25.
@@ -115,5 +116,10 @@ public interface ConfService {
      * @param confId
      * @return
      */
-    public List<String> getParts(String confId);
+    public Set<String> getParts(String confId);
+
+    /**
+     * 弹出会议成员，并清空
+     */
+    public Set<String> popParts(String confId);
 }
