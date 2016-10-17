@@ -107,7 +107,7 @@
                                                 </div>
                                                 <div class="row ">
                                                     <div class="col-md-12 remove-padding ">
-                                                        <div class="cost-money">${balanceInt}.<span class="font24">${balanceDec}</span><span class="unit">元</span></div>
+                                                        <div class="cost-money"><span class="unit">${arrearage}</span>${balanceInt}.<span class="font24">${balanceDec}</span><span class="unit">元</span></div>
                                                     </div>
                                                 </div>
 
