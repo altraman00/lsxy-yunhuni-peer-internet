@@ -588,7 +588,7 @@ public class TenantController {
     public RestResponse recharge(
             @PathVariable String id,
             @RequestBody RechargeInput input){
-        return RestResponse.success(rechargeService.doRecharge(id,input.getAmount()));
+        return RestResponse.success(rechargeService.doRecharge(id,input.getAmount(),input.getSource()));
     }
 
     @ApiOperation(value = "给租户平账")

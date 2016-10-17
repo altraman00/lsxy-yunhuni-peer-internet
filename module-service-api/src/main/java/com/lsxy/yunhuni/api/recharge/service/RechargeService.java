@@ -55,7 +55,7 @@ public interface RechargeService extends BaseService<Recharge> {
     /**
      * 人工给租户充值
      */
-    boolean doRecharge(String tenant,BigDecimal amount);
+    boolean doRecharge(String tenant,BigDecimal amount,String source);
 
     List<Recharge> listByTenant(String tenant);
 

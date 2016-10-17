@@ -10,6 +10,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.api.billing.service.BillingService;
 import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.yunhuni.api.recharge.enums.RechargeSource;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
@@ -64,7 +65,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             Tenant tenant = tenantService.findTenantByUserName(username);
             if(tenant != null){
                 String orderId = UUIDGenerator.uuid();
-                recharge = new Recharge(tenant,amount,rechargeType, RechargeStatus.NOTPAID,orderId,null);
+                recharge = new Recharge(tenant,amount, RechargeSource.USER,rechargeType, RechargeStatus.NOTPAID,orderId,null);
                 rechargeDao.save(recharge);
             }
         }
@@ -122,7 +123,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     }
 
     @Override
-    public boolean doRecharge(String tenantId, BigDecimal amount) {
+    public boolean doRecharge(String tenantId, BigDecimal amount,String source) {
         if(StringUtil.isEmpty(tenantId)){
             throw new IllegalArgumentException();
         }
@@ -135,7 +136,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         }
         String orderId = UUIDGenerator.uuid();
         Date curTime = new Date();
-        Recharge recharge = new Recharge(tenant,amount,RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
+        Recharge recharge = new Recharge(tenant,amount,RechargeSource.valueOf(source),RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
         rechargeDao.save(recharge);
         // redis插入今日充值
         calBillingService.incRecharge(tenantId,curTime,amount);
