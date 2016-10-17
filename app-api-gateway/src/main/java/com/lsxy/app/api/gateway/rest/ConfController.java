@@ -85,7 +85,7 @@ public class ConfController extends AbstractAPIController{
                              @RequestHeader(value = "AppID") String appId,
                              @Valid @RequestBody ConfQuitInputDTO dto) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
-            logger.debug("推出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
+            logger.debug("退出会议API参数,accountId={},appId={},confId={},dto={}",accountId,appId,id,dto);
         }
         String ip = WebUtils.getRemoteAddress(request);
         boolean  result = confService.quit(ip,appId,id,dto.getCallId());

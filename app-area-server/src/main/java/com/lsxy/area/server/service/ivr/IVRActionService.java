@@ -31,7 +31,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
@@ -60,7 +59,7 @@ public class IVRActionService {
 
     private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
-    private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
+    private static final String ACCEPT_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
     private static final int RETRY_TIMES = 3;
 
@@ -70,7 +69,7 @@ public class IVRActionService {
 
     //设置请求和传输超时时间
     private RequestConfig config =
-            RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();
+            RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -145,13 +144,15 @@ public class IVRActionService {
                 data.put("action","ivr_incoming");
                 data.put("from",from);
                 post.setConfig(config);
-                post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
-                se.setContentType(CONTENT_TYPE_TEXT_JSON);
-                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
                 post.setEntity(se);
+                post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
+                if(logger.isDebugEnabled()){
+                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     String result = receiveResponse(response);
                     if(result!=null && result.equalsIgnoreCase("accept")){
@@ -182,13 +183,15 @@ public class IVRActionService {
                 Map<String,Object> data = new HashMap<>();
                 data.put("action","ivr_start");
                 post.setConfig(config);
-                post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
-                se.setContentType(CONTENT_TYPE_TEXT_JSON);
-                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
                 post.setEntity(se);
+                post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
+                if(logger.isDebugEnabled()){
+                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
                     success = true;
@@ -214,8 +217,13 @@ public class IVRActionService {
             try{
                 HttpGet get = new HttpGet(url);
                 get.setConfig(config);
+                get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(get,null);
                 HttpResponse response = future.get();
+                if(logger.isDebugEnabled()){
+                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
                     success = true;
@@ -239,7 +247,11 @@ public class IVRActionService {
         if(entity.getContent() == null){
             return null;
         }
-        return EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
+        String result = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
+        if(logger.isDebugEnabled()){
+            logger.info("http ivr response = {}",result);
+        }
+        return result;
     }
 
     /**
@@ -253,8 +265,8 @@ public class IVRActionService {
             reject(app,res_id,call_id);
         }else{
             answer(app,res_id,call_id);
+            saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         }
-        saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         return true;
     }
 

@@ -11,6 +11,7 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,9 @@ import java.util.Map;
  * Created by liuws on 2016/8/29.
  */
 @Component
-public class Handler_EVENT_SYS_CALL_ANSWER_SUCC extends EventHandler{
+public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ANSWER_SUCC.class);
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_CALL_ON_ANSWER_COMPLETED.class);
 
     @Autowired
     private AppService appService;
@@ -40,7 +41,7 @@ public class Handler_EVENT_SYS_CALL_ANSWER_SUCC extends EventHandler{
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_SYS_CALL_ANSWER_SUCC;
+        return Constants.EVENT_SYS_CALL_ON_ANSWER_COMPLETED;
     }
 
     /**
@@ -55,6 +56,11 @@ public class Handler_EVENT_SYS_CALL_ANSWER_SUCC extends EventHandler{
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
             throw new InvalidParamException("request params is null");
+        }
+        String error = (String)params.get("error");
+        if(StringUtils.isNotBlank(error)){
+            logger.info("应答出错:{}",error);
+            return res;
         }
         String call_id = (String)params.get("user_data");
         if(call_id == null){
