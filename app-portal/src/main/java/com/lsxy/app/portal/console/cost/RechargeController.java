@@ -234,8 +234,13 @@ public class RechargeController extends AbstractPortalController {
      */
     private void amountFormat(Map<String, Object> model, BigDecimal amount) {
         if(amount != null){
+            if(amount.compareTo(BigDecimal.ZERO) == -1){
+                model.put("arrearage","欠费");
+            }
+            int vTemp = amount.intValue();
+            vTemp = Math.abs(vTemp);
             //余额整数部分
-            model.put("balanceInt",amount.intValue());
+            model.put("balanceInt",vTemp);
             //余额小数部分
             DecimalFormat df   = new DecimalFormat("#0.000");
             String format = df.format(amount);
