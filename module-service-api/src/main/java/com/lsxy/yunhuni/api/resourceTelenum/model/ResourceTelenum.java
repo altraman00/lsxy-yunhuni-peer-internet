@@ -25,6 +25,10 @@ public class ResourceTelenum extends IdEntity{
     private String operator; //运营商
     private String provider;    //供应商
     private String remark;      //备注
+    private String level;       //号码等级
+    private String callUri;     //呼出URI
+    private String source;      //来源
+    private String usable;      //是否可用  0:否 1：是
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -78,5 +82,41 @@ public class ResourceTelenum extends IdEntity{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "level")
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    @Column(name = "call_uri")
+    public String getCallUri() {
+        return callUri;
+    }
+
+    public void setCallUri(String callUri) {
+        this.callUri = callUri;
+    }
+
+    @Column(name = "source")
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    @Column(name = "usable")
+    public String getUsable() {
+        return usable;
+    }
+
+    public void setUsable(String usable) {
+        this.usable = usable;
     }
 }

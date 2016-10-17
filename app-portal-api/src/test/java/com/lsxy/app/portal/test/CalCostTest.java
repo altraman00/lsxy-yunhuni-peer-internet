@@ -3,6 +3,7 @@ package com.lsxy.app.portal.test;
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.config.service.TelNumLocationService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.api.billing.service.CalBillingService;
@@ -41,6 +42,9 @@ public class CalCostTest {
     @Autowired
     TelNumLocationService telNumLocationService;
 
+    @Autowired
+    TelnumToLineGatewayService telnumToLineGatewayService;
+
     @Test
     public void testCalCost(){
 //        BigDecimal cost = calCostService.calCost("duo_call", "8a2bc5f656c1194c0156c46a187f0002", 60251L);
@@ -75,5 +79,11 @@ public class CalCostTest {
         System.out.println(areaCodeOfTelephone);
         String cityOfMobile = telNumLocationService.getCityOfMobile("13750001373");
         System.out.println(cityOfMobile);
+    }
+
+    @Test
+    public void testNum2Line(){
+        String areaIdByTelnum = telnumToLineGatewayService.getAreaIdByTelnum("8675522730043");
+        System.out.println(areaIdByTelnum);
     }
 }

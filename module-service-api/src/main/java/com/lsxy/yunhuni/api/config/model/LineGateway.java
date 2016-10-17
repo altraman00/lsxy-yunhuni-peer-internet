@@ -25,7 +25,26 @@ public class LineGateway extends IdEntity {
     private String ip;          //ip
     private String port;        //端口
     private String provider;    //线路网关提供商
-    private String remark;
+    private String remark;      //备注
+    private Long priority;    //线路网关优先级(手动指定)
+    private String areaCode;    //归属区号
+    private String fromPrefix;  //呼入主叫前缀
+    private String mobileAreaRule;  //手机区号规则
+    private String telAreaRule;     //固话区号规则
+    private String lineType;        //线路类型：默认sip
+    private String sipProviderHost;     //线路网关host
+    private String sipProviderPort;     //线路网关端口
+    private String sipAuthType;         //sip鉴权方式
+    private String sipAuthAccount;      //sip鉴权账号
+    private String sipAuthPassword;     //sip鉴权密码
+    private String sipAuthIp;         //sip接入点的外网IP地址
+    private String isThrough;           //是否可透传,0:否，1:是
+    private Integer quality;            //质量
+    private String status;              //状态 0:不可用，1:可用
+    private String operator;            //运营商
+    private Long capacity;              //容量
+    private String isPublicLine;      //是否全局线路0：否，1：是
+
 
     @Column(name = "area_id")
     public String getAreaId() {
@@ -88,5 +107,167 @@ public class LineGateway extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @Column(name = "priority")
+    public Long getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Long priority) {
+        this.priority = priority;
+    }
+
+    @Column(name = "area_code")
+    public String getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
+    }
+
+    @Column(name = "from_prefix")
+    public String getFromPrefix() {
+        return fromPrefix;
+    }
+
+    public void setFromPrefix(String fromPrefix) {
+        this.fromPrefix = fromPrefix;
+    }
+
+    @Column(name = "mobile_area_rule")
+    public String getMobileAreaRule() {
+        return mobileAreaRule;
+    }
+
+    public void setMobileAreaRule(String mobileAreaRule) {
+        this.mobileAreaRule = mobileAreaRule;
+    }
+
+    @Column(name = "tel_area_rule")
+    public String getTelAreaRule() {
+        return telAreaRule;
+    }
+
+    public void setTelAreaRule(String telAreaRule) {
+        this.telAreaRule = telAreaRule;
+    }
+
+    @Column(name = "line_type")
+    public String getLineType() {
+        return lineType;
+    }
+
+    public void setLineType(String lineType) {
+        this.lineType = lineType;
+    }
+
+    @Column(name = "sip_provider_host")
+    public String getSipProviderHost() {
+        return sipProviderHost;
+    }
+
+    public void setSipProviderHost(String sipProviderHost) {
+        this.sipProviderHost = sipProviderHost;
+    }
+
+    @Column(name = "sip_provider_port")
+    public String getSipProviderPort() {
+        return sipProviderPort;
+    }
+
+    public void setSipProviderPort(String sipProviderPort) {
+        this.sipProviderPort = sipProviderPort;
+    }
+
+    @Column(name = "sip_auth_type")
+    public String getSipAuthType() {
+        return sipAuthType;
+    }
+
+    public void setSipAuthType(String sipAuthType) {
+        this.sipAuthType = sipAuthType;
+    }
+
+    @Column(name = "sip_auth_account")
+    public String getSipAuthAccount() {
+        return sipAuthAccount;
+    }
+
+    public void setSipAuthAccount(String sipAuthAccount) {
+        this.sipAuthAccount = sipAuthAccount;
+    }
+
+    @Column(name = "sip_auth_password")
+    public String getSipAuthPassword() {
+        return sipAuthPassword;
+    }
+
+    public void setSipAuthPassword(String sipAuthPassword) {
+        this.sipAuthPassword = sipAuthPassword;
+    }
+
+    @Column(name = "sip_auth_ip")
+    public String getSipAuthIp() {
+        return sipAuthIp;
+    }
+
+    public void setSipAuthIp(String sipAuthIp) {
+        this.sipAuthIp = sipAuthIp;
+    }
+
+    @Column(name = "is_through")
+    public String getIsThrough() {
+        return isThrough;
+    }
+
+    public void setIsThrough(String isThrough) {
+        this.isThrough = isThrough;
+    }
+
+    @Column(name = "quality")
+    public Integer getQuality() {
+        return quality;
+    }
+
+    public void setQuality(Integer quality) {
+        this.quality = quality;
+    }
+
+    @Column(name = "status")
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Column(name = "operator")
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
+    }
+
+    @Column(name = "capacity")
+    public Long getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Long capacity) {
+        this.capacity = capacity;
+    }
+
+    @Column(name = "is_public_line")
+    public String getIsPublicLine() {
+        return isPublicLine;
+    }
+
+    public void setIsPublicLine(String isPublicLine) {
+        this.isPublicLine = isPublicLine;
     }
 }
