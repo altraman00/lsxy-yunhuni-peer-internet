@@ -6,10 +6,13 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -41,6 +44,12 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
 
     @Autowired
     private ConfService confService;
+
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
 
     @Override
     public String getEventName() {
@@ -90,6 +99,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
+        hungup(state);
         //会议成员递减
         confService.decrPart(conf_id,call_id);
 
@@ -126,5 +136,23 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
             logger.debug("处理{}事件完成",getEventName());
         }
         return res;
+    }
+
+    private void hungup(BusinessState state){
+        //非ivr发起的会议可以直接挂断
+        if("sys_conf".equals(state.getType())){
+            Map<String, Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("res_id",state.getResId())
+                    .putIfNotEmpty("user_data",state.getId())
+                    .put("areaId",state.getAreaId())
+                    .build();
+
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            } catch (Throwable e) {
+                logger.error("调用失败",e);
+            }
+        }
     }
 }
