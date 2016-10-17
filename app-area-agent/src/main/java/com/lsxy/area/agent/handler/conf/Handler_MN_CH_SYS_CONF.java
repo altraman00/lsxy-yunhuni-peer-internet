@@ -71,7 +71,7 @@ public class Handler_MN_CH_SYS_CONF extends RpcRequestHandler{
                             new MapBuilder<String,Object>()
                             .put("method",Constants.EVENT_SYS_CONF_ON_START)
                             .put("res_id",params.get("res_id"))
-                            .put("user_data",params.get("user_data"))
+                            .put("user_data",conf_id)
                             .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);

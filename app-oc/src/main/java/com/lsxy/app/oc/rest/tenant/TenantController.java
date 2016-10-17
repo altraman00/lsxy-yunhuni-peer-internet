@@ -155,12 +155,14 @@ public class TenantController {
             //修改余额取值
             List<TenantVO> temp = list.getResult();
             List<TenantVO> list1 = new ArrayList();
-            for(int i=0;i<temp.size();i++){
-                TenantVO tenantVO = new TenantVO();
-                BeanUtils.copyProperties(tenantVO,temp.get(i));
-                BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
-                tenantVO.setRemainCoin(bigDecimal.doubleValue());
-                list1.add(tenantVO);
+            if(temp!=null) {
+                for (int i = 0; i < temp.size(); i++) {
+                    TenantVO tenantVO = new TenantVO();
+                    BeanUtils.copyProperties(tenantVO, temp.get(i));
+                    BigDecimal bigDecimal = calBillingService.getBalance(tenantVO.getId());
+                    tenantVO.setRemainCoin(bigDecimal.doubleValue());
+                    list1.add(tenantVO);
+                }
             }
             list2 = new Page<>(list.getStartIndex(),list.getTotalCount(),list.getPageSize(),list1);
         }catch (Exception e){
@@ -624,6 +626,7 @@ public class TenantController {
 //        }
 //        dto.setSumAmount(sum);
         dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+
         return RestResponse.success(dto);
     }
 
@@ -647,29 +650,48 @@ public class TenantController {
     @ApiOperation(value = "认证信息,认证状态(未认证，未审核，已认证，认证失败)")
     @RequestMapping(value = "/tenants/{id}/auth/info",method = RequestMethod.GET)
     public RestResponse authInfo(@PathVariable String id) throws InvocationTargetException, IllegalAccessException {
-        AuthInfoVO info = new AuthInfoVO();
-        info.setStatus("未认证");
+//        AuthInfoVO info = new AuthInfoVO();
+//        info.setStatus("未认证");
+        Map map = new HashMap();
+        RealnamePrivate realnamePrivate = null;
+        RealnameCorp realnameCorp = null;
+        Integer status = 100;
         if(id != null){
             Tenant tenant = tenantService.findById(id);
             if(tenant != null){
-                Integer status = tenant.getIsRealAuth();
-                //未认证，等待审核，已认证，认证失败
-                Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_UPGRADE_WAIT};//等待审核
-                Integer[] auth_success_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,Tenant.AUTH_ONESELF_SUCCESS,Tenant.AUTH_UPGRADE_WAIT,Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_UPGRADE_FAIL};//已认证
-                Integer[] auth_fail_status = new Integer[]{Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_ONESELF_FAIL};
-                if(Arrays.asList(wait_auth_status).contains(status)){//等待审核
-                    info.setStatus("未审核");
-                    info = getAuthInfo(tenant.getId(),status,info);
-                }else if(Arrays.asList(auth_success_status).contains(status)){//已认证
-                    info.setStatus("已认证");
-                    info = getAuthInfo(tenant.getId(),status,info);
-                }else if(Arrays.asList(auth_fail_status).contains(status)){//认证失败
-                    info.setStatus("认证失败");
-                    info = getAuthInfo(tenant.getId(),status,info);
+                status = tenant.getIsRealAuth();
+                Integer[] privateAuth_status = new Integer[]{Tenant.AUTH_ONESELF_SUCCESS,
+                        Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_ONESELF_FAIL,Tenant.AUTH_UPGRADE_FAIL,Tenant.AUTH_UPGRADE_WAIT,Tenant.AUTH_UPGRADE_SUCCESS
+                };//个人认证
+                Integer[] companyAuth_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS, Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_WAIT,Tenant.AUTH_UPGRADE_WAIT,
+                        Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_UPGRADE_FAIL};//公司认证
+                if(Arrays.asList(privateAuth_status).contains(status)) {
+                    realnamePrivate = realnamePrivateService.findByTenantIdNewest(tenant.getId());
                 }
+                if(Arrays.asList(companyAuth_status).contains(status)) {
+                    realnameCorp = realnameCorpService.findByTenantIdNewest(tenant.getId());
+                }
+                //未认证，等待审核，已认证，认证失败
+//                Integer[] wait_auth_status = new Integer[]{Tenant.AUTH_WAIT,Tenant.AUTH_ONESELF_WAIT,Tenant.AUTH_UPGRADE_WAIT};//等待审核
+//                Integer[] auth_success_status = new Integer[]{Tenant.AUTH_COMPANY_SUCCESS,Tenant.AUTH_ONESELF_SUCCESS,Tenant.AUTH_UPGRADE_WAIT,Tenant.AUTH_UPGRADE_SUCCESS,Tenant.AUTH_UPGRADE_FAIL};//已认证
+//                Integer[] auth_fail_status = new Integer[]{Tenant.AUTH_COMPANY_FAIL,Tenant.AUTH_ONESELF_FAIL};
+//                if(Arrays.asList(wait_auth_status).contains(status)){//等待审核
+//                    info.setStatus("未审核");
+//                    info = getAuthInfo(tenant.getId(),status,info);
+//                }else if(Arrays.asList(auth_success_status).contains(status)){//已认证
+//                    info.setStatus("已认证");
+//                    info = getAuthInfo(tenant.getId(),status,info);
+//                }else if(Arrays.asList(auth_fail_status).contains(status)){//认证失败
+//                    info.setStatus("认证失败");
+//                    info = getAuthInfo(tenant.getId(),status,info);
+//                }
+
             }
         }
-        return RestResponse.success(info);
+        map.put("status",status);
+        map.put("realnamePrivate",realnamePrivate);
+        map.put("realnameCorp",realnameCorp);
+        return RestResponse.success(map);
     }
 
     private AuthInfoVO getAuthInfo(String tenantId,Integer status,AuthInfoVO info){

@@ -85,7 +85,7 @@ public class ReceivedtmfActionHandler extends ActionHandler{
                     .putIfNotEmpty("play_repeat",play_repeat)
                     .putIfNotEmpty("breaking_on_key",if_break_on_key)
                     .putIfNotEmpty("user_data",callId)
-                    .put("appid",state.getAppId())
+                    .put("areaId",state.getAreaId())
                     .build();
 
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECEIVE_DTMF_START, params);

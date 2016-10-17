@@ -80,7 +80,7 @@ public class Handler_MN_CH_EXT_CAPTCHA_CALL extends RpcRequestHandler{
                             new MapBuilder<String,Object>()
                                     .put("method", Constants.EVENT_EXT_CAPTCHA_CALL_SUCCESS)
                                     .put("res_id",params.get("res_id"))
-                                    .put("user_data",params.get("user_data"))
+                                    .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);

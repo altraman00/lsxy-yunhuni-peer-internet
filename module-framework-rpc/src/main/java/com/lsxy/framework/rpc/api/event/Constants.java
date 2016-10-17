@@ -14,7 +14,7 @@ public class Constants {
     public static final String EVENT_SYS_CALL_CONF_ENTER_SUCC = "EVENT_SYS_CALL_CONF_ENTER_SUCC";//将呼叫加入会议成功事件
     public static final String EVENT_SYS_CALL_CONF_ENTER_FAIL = "EVENT_SYS_CALL_CONF_ENTER_FAIL";//将呼叫加入会议失败事件
     public static final String EVENT_SYS_CALL_CONF_ENTER_TIMEOUT = "EVENT_SYS_CALL_CONF_ENTER_TIMEOUT";//将呼叫加入会议超时事件
-    public static final String EVENT_SYS_CALL_ANSWER_SUCC = "EVENT_SYS_CALL_ANSWER_SUCC";//应答调用成功事件
+    public static final String EVENT_SYS_CALL_ON_ANSWER_COMPLETED = "sys.call.on_answer_completed";//应答调用成功事件
     public static final String EVENT_SYS_CALL_ON_RELEASE = "sys.call.on_released";//呼叫被释放事件
     public static final String EVENT_SYS_CALL_ON_PLAY_COMPLETED = "sys.call.on_play_completed";//放音结束
     public static final String EVENT_SYS_CALL_ON_RECORD_COMPLETED = "sys.call.on_record_completed";//录音结束事件

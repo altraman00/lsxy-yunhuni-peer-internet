@@ -13,7 +13,7 @@ public class ConfRecordInputDTO extends CommonDTO{
 
     @JsonProperty("max_duration ")
     @Min(1)
-    @Max(60*60*6)
+    @Max(60 * 60 * 6)
     private Integer maxDuration;
 
     public Integer getMaxDuration() {

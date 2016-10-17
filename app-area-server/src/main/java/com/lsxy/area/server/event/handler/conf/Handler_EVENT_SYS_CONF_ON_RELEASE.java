@@ -26,8 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by liuws on 2016/8/29.
@@ -116,10 +116,10 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         Long begin_time = null;
         Long end_time = null;
         if(params.get("begin_time") != null){
-            begin_time = ((long)params.get("begin_time")) * 1000;
+            begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
         }
         if(params.get("end_time") != null){
-            end_time = ((long)params.get("end_time")) * 1000;
+            end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
 
         if(StringUtils.isNotBlank(app.getUrl())){
@@ -151,12 +151,14 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     }
 
     private void handupParts(String confId) {
-        List<String> parts = confService.getParts(confId);
+        logger.info("开始处理会议={}解散自动挂断与会方",confId);
+        Set<String> parts = confService.popParts(confId);
         if(parts!=null && parts.size()>0){
             for (String callId : parts) {
                 handup(callId);
             }
         }
+        logger.info("处理完成，会议={}解散自动挂断与会方",confId);
     }
 
     private void handup(String callId){
@@ -174,7 +176,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             Map<String, Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",res_id)
                     .putIfNotEmpty("user_data",callId)
-                    .put("appid",state.getAppId())
+                    .put("areaId",state.getAreaId())
                     .build();
 
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);

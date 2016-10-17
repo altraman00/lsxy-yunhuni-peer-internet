@@ -2,6 +2,8 @@ package com.lsxy.area.server.service.ivr;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
@@ -29,7 +31,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
@@ -58,7 +59,7 @@ public class IVRActionService {
 
     private static final String APPLICATION_JSON = "application/json;charset=utf-8";
 
-    private static final String CONTENT_TYPE_TEXT_JSON = "text/json";
+    private static final String ACCEPT_TYPE_TEXT_PLAIN = "text/plain;charset=utf-8";
 
     private static final int RETRY_TIMES = 3;
 
@@ -68,7 +69,7 @@ public class IVRActionService {
 
     //设置请求和传输超时时间
     private RequestConfig config =
-            RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(30000).build();
+            RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -94,6 +95,9 @@ public class IVRActionService {
     @Autowired
     private VoiceIvrService voiceIvrService;
 
+    @Autowired
+    private AreaAndTelNumSelector areaAndTelNumSelector;
+
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
     @PostConstruct
@@ -106,7 +110,7 @@ public class IVRActionService {
         client.start();
     }
     private void initHandler(){
-        Reflections reflections = new Reflections("com.lsxy.area.server.util.ivr");
+        Reflections reflections = new Reflections("com.lsxy.area.server.service.ivr");
         Set<Class<? extends ActionHandler>> handlerClasss = reflections.getSubTypesOf(ActionHandler.class);
         for (Class<? extends ActionHandler> handlerClass : handlerClasss) {
             ActionHandler handler = applicationContext.getBean(handlerClass);
@@ -140,13 +144,15 @@ public class IVRActionService {
                 data.put("action","ivr_incoming");
                 data.put("from",from);
                 post.setConfig(config);
-                post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
-                se.setContentType(CONTENT_TYPE_TEXT_JSON);
-                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
                 post.setEntity(se);
+                post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
+                if(logger.isDebugEnabled()){
+                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     String result = receiveResponse(response);
                     if(result!=null && result.equalsIgnoreCase("accept")){
@@ -177,13 +183,15 @@ public class IVRActionService {
                 Map<String,Object> data = new HashMap<>();
                 data.put("action","ivr_start");
                 post.setConfig(config);
-                post.addHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
-                se.setContentType(CONTENT_TYPE_TEXT_JSON);
-                se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON));
                 post.setEntity(se);
+                post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
+                if(logger.isDebugEnabled()){
+                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
                     success = true;
@@ -209,8 +217,13 @@ public class IVRActionService {
             try{
                 HttpGet get = new HttpGet(url);
                 get.setConfig(config);
+                get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(get,null);
                 HttpResponse response = future.get();
+                if(logger.isDebugEnabled()){
+                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
                     success = true;
@@ -234,7 +247,11 @@ public class IVRActionService {
         if(entity.getContent() == null){
             return null;
         }
-        return EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
+        String result = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
+        if(logger.isDebugEnabled()){
+            logger.info("http ivr response = {}",result);
+        }
+        return result;
     }
 
     /**
@@ -245,16 +262,24 @@ public class IVRActionService {
         String call_id = UUIDGenerator.uuid();
         boolean accept = getAcceptRequest(app.getUrl(),from);
         if(!accept){
-            reject(app.getId(),res_id,call_id);
+            reject(app,res_id,call_id);
         }else{
-            answer(app.getId(),res_id,call_id);
+            answer(app,res_id,call_id);
+            saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         }
-        saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         return true;
     }
 
     private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to){
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result;
+        try {
+            result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+        } catch (AppOffLineException e) {
+            throw new RuntimeException(e);
+        }
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
@@ -263,7 +288,7 @@ public class IVRActionService {
                 .setId(call_id)
                 .setResId(res_id)
                 .setType("ivr_incoming")
-                .setAreaId(app.getArea().getId())
+                .setAreaId(areaId)
                 .setLineGatewayId(lineGateway.getId())
                 .setBusinessData(new MapBuilder<String,Object>()
                         //incoming事件from 和 to是相反的
@@ -297,11 +322,12 @@ public class IVRActionService {
         voiceIvrService.save(voiceIvr);
     }
 
-    private void reject(String appId,String res_id,String call_id){
+    private void reject(App app,String res_id,String call_id){
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
                 .put("user_data",call_id)
-                .put("appid",appId)
+                .put("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_REJECT,params);
         try {
@@ -312,12 +338,13 @@ public class IVRActionService {
 
     }
 
-    private void answer(String appId,String res_id,String call_id){
+    private void answer(App app,String res_id,String call_id){
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
                 .put("max_answer_seconds",MAX_DURATION_SEC)
                 .put("user_data",call_id)
-                .put("appid",appId)
+                .put("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
@@ -341,7 +368,7 @@ public class IVRActionService {
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
-            return  true;
+            return  false;
         }
         String resXML = null;
         if(nextUrl == null){//第一次
@@ -419,16 +446,4 @@ public class IVRActionService {
         return next;
     }
 
-    /*public static void main(String[] args) throws DocumentException {
-        Document doc = DocumentHelper.parseText("\n" +
-                "   <Response>\n" +
-                "    <Get action=\"handle-user-input.jsp\" numdigits=\"1\">\n" +
-                "        <Play>menu.wav</Play>\n" +
-                "    </Get>\n" +
-                "    <Play>sorrybye.wav</Play>\n" +
-                "    <Redirect>/welcome/voice</Redirect>\n" +
-                "    <Next>/welcome/voice</Next>/>\n" +
-                "</Response>");
-
-    }*/
 }

@@ -98,17 +98,25 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 	public Action consume(Message message, ConsumeContext context) {
 		String msg = null;
 		try {
-			logger.debug("recivied a message with id:[" + message.getMsgID() + "] and message key is :[" + message.getKey() + "]");
-			logger.debug("msg user properties:" + message.getUserProperties());
+			if(logger.isDebugEnabled()){
+				logger.debug("收到ONS消息:[" + message.getMsgID() + "] and message key is :[" + message.getKey() + "]");
+				logger.debug("消息属性:" + message.getUserProperties());
+			}
+
 			String isBase64Encode = message.getUserProperties("base64");
 			if (isBase64Encode != null && isBase64Encode.equals("true")) {
 				msg = new String(Base64.decodeBase64(message.getBody()), "UTF-8");
 			} else {
 				msg = new String(message.getBody(), "UTF-8");
 			}
-			if (msg == null)
-				return null;
-			logger.debug("recivied msg :" + msg);
+			if (msg == null) {
+				logger.error("收到无效消息:"+message);
+				return Action.CommitMessage;
+			}
+			if(logger.isDebugEnabled()){
+				logger.debug("消息解析后 :" + msg);
+			}
+
 			MQEvent event = parseMessage(msg);
 			if (event != null) {
 				logger.debug("parse msg to MQEvent object and id is :" + event.getId());
@@ -125,8 +133,11 @@ public class OnsConsumer extends AbstractMQConsumer implements MessageListener,I
 				}
 			}
 		} catch (Exception ex) {
-			logger.error("handle message in exception:" + message, ex);
+			logger.error("消息消费失败,之后重试:" + message, ex);
 			return Action.ReconsumeLater;
+		}
+		if(logger.isDebugEnabled()){
+		    logger.debug("消息消费成功:{}",message );
 		}
 		return Action.CommitMessage;
 	}
