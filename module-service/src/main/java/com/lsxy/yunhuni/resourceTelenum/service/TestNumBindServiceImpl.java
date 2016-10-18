@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,12 +21,12 @@ import java.util.List;
 @Service
 public class TestNumBindServiceImpl extends AbstractService<TestNumBind> implements TestNumBindService {
     @Autowired
-    private TestNumBindDao testMobileBindDao;
+    private TestNumBindDao testNumBindDao;
     @Autowired
     private TenantService tenantService;
     @Override
     public BaseDaoInterface<TestNumBind, Serializable> getDao() {
-       return this.testMobileBindDao;
+       return this.testNumBindDao;
     }
 
     @Override
@@ -59,5 +60,17 @@ public class TestNumBindServiceImpl extends AbstractService<TestNumBind> impleme
             return list.get(0);
         }
         return null;
+    }
+
+    @Override
+    public List<String> findNumByAppId(String appId) {
+        List<String> nums = new ArrayList<>();
+        List<TestNumBind> result = testNumBindDao.findByAppId(appId);
+        if(result != null && result.size()>0){
+            for(TestNumBind testNumBind : result){
+                nums.add(testNumBind.getNumber());
+            }
+        }
+        return nums;
     }
 }

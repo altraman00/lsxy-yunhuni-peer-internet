@@ -81,7 +81,9 @@
                                     <div class="col-md-10 ">
                                         <p>${app.name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                             <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
-                                            <c:if test="${app.status==2}"><span style="color:#ff0000;">未上线</span></c:if></p>
+                                            <c:if test="${app.status==2}"><span style="color:#ff0000;">未上线</span></c:if>
+                                            <input type="hidden" id="appStatus" value="${app.status}">
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="row ">
@@ -422,6 +424,12 @@
                 if(window.navigator.userAgent.indexOf("MSIE")>0) { if(window.navigator.userAgent.indexOf("MSIE 6.0")>0 || window.navigator.userAgent.indexOf("MSIE 7.0")>0 || window.navigator.userAgent.indexOf("MSIE 8.0")>0 || window.navigator.userAgent.indexOf("MSIE 9.0")>0) {flag = false;} } if(!flag){
                     $('#uploadButtonA').unbind("click").bind("click",function(){
                         showtoast("非常抱歉，本站的上传文件功能，暂时不支持IE9及以下的浏览器版本，请更换或者升级浏览器");
+                    })
+                }
+                var appStatus = $("#appStatus").val();
+                if(appStatus == 2){
+                    $('#uploadButtonA').unbind("click").bind("click",function(){
+                        showtoast("请先上线应用");
                     })
                 }
             }
