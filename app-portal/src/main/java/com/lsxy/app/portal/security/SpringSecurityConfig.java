@@ -3,7 +3,6 @@ package com.lsxy.app.portal.security;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.session.web.http.SessionRepositoryFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -28,7 +26,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private SessionRepositoryFilter springSessionRepositoryFilter;
-
+    //暗码,配置成为生产环境为空的状态
+    @Autowired(required = false)
+    private String hideCode;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -44,7 +44,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/console/**").access("hasRole('ROLE_TENANT_USER')")
                 .and()
                     //增加自定义的登录校验过滤器
-                    .addFilterBefore(new CheckCodeAuthenticationFilter(loginPage,checkCodeFailurePage),UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(new CheckCodeAuthenticationFilter(loginPage,checkCodeFailurePage,hideCode),UsernamePasswordAuthenticationFilter.class)
                     .formLogin().loginPage(loginPage)
                     .failureUrl(loginFailurePage)
                     .defaultSuccessUrl(loginSuccessPage)

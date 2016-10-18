@@ -155,12 +155,14 @@ public class TenantController {
             //修改余额取值
             List<TenantVO> temp = list.getResult();
             List<TenantVO> list1 = new ArrayList();
-            for(int i=0;i<temp.size();i++){
-                TenantVO tenantVO = new TenantVO();
-                BeanUtils.copyProperties(tenantVO,temp.get(i));
-                BigDecimal bigDecimal =  calBillingService.getBalance(tenantVO.getId());
-                tenantVO.setRemainCoin(bigDecimal.doubleValue());
-                list1.add(tenantVO);
+            if(temp!=null) {
+                for (int i = 0; i < temp.size(); i++) {
+                    TenantVO tenantVO = new TenantVO();
+                    BeanUtils.copyProperties(tenantVO, temp.get(i));
+                    BigDecimal bigDecimal = calBillingService.getBalance(tenantVO.getId());
+                    tenantVO.setRemainCoin(bigDecimal.doubleValue());
+                    list1.add(tenantVO);
+                }
             }
             list2 = new Page<>(list.getStartIndex(),list.getTotalCount(),list.getPageSize(),list1);
         }catch (Exception e){
