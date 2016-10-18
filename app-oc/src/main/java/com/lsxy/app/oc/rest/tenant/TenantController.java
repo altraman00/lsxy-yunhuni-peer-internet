@@ -962,9 +962,11 @@ public class TenantController {
     @RequestMapping(value = "/tenants/{tenant}/recharges",method = RequestMethod.GET)
     public RestResponse recharges(
             @PathVariable String tenant,
+            @RequestParam String type,
+            @RequestParam String source,
             @RequestParam(required = false,defaultValue = "1") Integer pageNo,
             @RequestParam(required = false,defaultValue = "10") Integer pageSize){
-        return RestResponse.success(rechargeService.pageListByTenant(tenant,pageNo,pageSize));
+        return RestResponse.success(rechargeService.pageListByTenant(tenant,type,source,pageNo,pageSize));
     }
 
 

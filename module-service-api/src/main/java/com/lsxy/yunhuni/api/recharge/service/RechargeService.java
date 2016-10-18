@@ -59,7 +59,7 @@ public interface RechargeService extends BaseService<Recharge> {
 
     List<Recharge> listByTenant(String tenant);
 
-    Page<Recharge> pageListByTenant(String tenant, Integer pageNo, Integer pageSize);
+    Page<Recharge> pageListByTenant(String tenant,String type,String source, Integer pageNo, Integer pageSize);
 
     /**
      * 获取租户一个时间段的充值金额
