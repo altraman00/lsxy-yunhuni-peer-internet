@@ -52,9 +52,14 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(cdrObj == null){
             throw new InvalidParamException("cdr数据为空");
         }
-        VoiceCdr voiceCdr = getVoiceCdr((String) cdrObj);
+        VoiceCdr voiceCdr = new VoiceCdr();
+        String cdrOriginal = (String) cdrObj;
+        voiceCdr.setCdrOriginal(cdrOriginal);
+        String cdrOriginalTemp = cdrOriginal.substring(1,cdrOriginal.length()-1);
+        String[] cdrSplit = cdrOriginalTemp.split(",");
+
         BusinessState businessState;
-        String cdr_additionalinfo2 = voiceCdr.getCdr_additionalinfo2();
+        String cdr_additionalinfo2 = cdrSplit[25].trim();
         if(StringUtils.isNotBlank(cdr_additionalinfo2)){
             businessState = businessStateService.get(cdr_additionalinfo2);
         }else{
@@ -93,12 +98,12 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         //TODO 录音文件路径跟大小
         voiceCdr.setRecordUrl(null);
         voiceCdr.setRecordSize(null);
-        voiceCdr.setFromNum(voiceCdr.getCdr_ani());
-        voiceCdr.setToNum(voiceCdr.getCdr_dnis());
-        voiceCdr.setCallStartDt(getCallDate(voiceCdr.getCdr_callbegintime()));
-        voiceCdr.setCallAckDt(getCallDate(voiceCdr.getCdr_connectbegintime()));
-        voiceCdr.setCallEndDt(getCallDate(voiceCdr.getCdr_callendtime()));
-        voiceCdr.setCallTimeLong(Long.parseLong(voiceCdr.getCdr_talkduration()));
+        voiceCdr.setFromNum(cdrSplit[7].trim());
+        voiceCdr.setToNum(cdrSplit[8].trim());
+        voiceCdr.setCallStartDt(getCallDate(cdrSplit[18].trim()));
+        voiceCdr.setCallAckDt(getCallDate(cdrSplit[19].trim()));
+        voiceCdr.setCallEndDt(getCallDate(cdrSplit[20].trim()));
+        voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
         //扣费
         calCostService.callConsume(voiceCdr);
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
@@ -131,41 +136,41 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             return null;
         }
     }
-
-    private VoiceCdr getVoiceCdr(String cdr) {
-        cdr = cdr.substring(1,cdr.length()-1);
-        String[] split = cdr.split(",");
-        VoiceCdr voiceCdr = new VoiceCdr();
-        voiceCdr.setCdr_id(split[0].trim());
-        voiceCdr.setCdr_nodeid(split[1].trim());
-        voiceCdr.setCdr_cdrid(split[2].trim());
-        voiceCdr.setCdr_processid(split[3].trim());
-        voiceCdr.setCdr_callid(split[4].trim());
-        voiceCdr.setCdr_ch(split[5].trim());
-        voiceCdr.setCdr_devno(split[6].trim());
-        voiceCdr.setCdr_ani(split[7].trim());
-        voiceCdr.setCdr_dnis(split[8].trim());
-        voiceCdr.setCdr_dnis2(split[9].trim());
-        voiceCdr.setCdr_orgcallno(split[10].trim());
-        voiceCdr.setCdr_dir(split[11].trim());
-        voiceCdr.setCdr_devtype(split[12].trim());
-        voiceCdr.setCdr_busitype(split[13].trim());
-        voiceCdr.setCdr_callstatus(split[14].trim());
-        voiceCdr.setCdr_endtype(split[15].trim());
-        voiceCdr.setCdr_ipscreason(split[16].trim());
-        voiceCdr.setCdr_callfailcause(split[17].trim());
-        voiceCdr.setCdr_callbegintime(split[18].trim());
-        voiceCdr.setCdr_connectbegintime(split[19].trim());
-        voiceCdr.setCdr_callendtime(split[20].trim());
-        voiceCdr.setCdr_talkduration(split[21].trim());
-        voiceCdr.setCdr_projectid(split[22].trim());
-        voiceCdr.setCdr_flowid(split[23].trim());
-        voiceCdr.setCdr_additionalinfo1(split[24].trim());
-        voiceCdr.setCdr_additionalinfo2(split[25].trim());
-        voiceCdr.setCdr_additionalinfo3(split[26].trim());
-        voiceCdr.setCdr_additionalinfo4(split[27].trim());
-        voiceCdr.setCdr_additionalinfo5(split[28].trim());
-        return voiceCdr;
-    }
+//
+//    private VoiceCdr getVoiceCdr(String cdr) {
+//        cdr = cdr.substring(1,cdr.length()-1);
+//        String[] split = cdr.split(",");
+//        VoiceCdr voiceCdr = new VoiceCdr();
+//        voiceCdr.setCdr_id(split[0].trim());
+//        voiceCdr.setCdr_nodeid(split[1].trim());
+//        voiceCdr.setCdr_cdrid(split[2].trim());
+//        voiceCdr.setCdr_processid(split[3].trim());
+//        voiceCdr.setCdr_callid(split[4].trim());
+//        voiceCdr.setCdr_ch(split[5].trim());
+//        voiceCdr.setCdr_devno(split[6].trim());
+//        voiceCdr.setCdr_ani(split[7].trim());
+//        voiceCdr.setCdr_dnis(split[8].trim());
+//        voiceCdr.setCdr_dnis2(split[9].trim());
+//        voiceCdr.setCdr_orgcallno(split[10].trim());
+//        voiceCdr.setCdr_dir(split[11].trim());
+//        voiceCdr.setCdr_devtype(split[12].trim());
+//        voiceCdr.setCdr_busitype(split[13].trim());
+//        voiceCdr.setCdr_callstatus(split[14].trim());
+//        voiceCdr.setCdr_endtype(split[15].trim());
+//        voiceCdr.setCdr_ipscreason(split[16].trim());
+//        voiceCdr.setCdr_callfailcause(split[17].trim());
+//        voiceCdr.setCdr_callbegintime(split[18].trim());
+//        voiceCdr.setCdr_connectbegintime(split[19].trim());
+//        voiceCdr.setCdr_callendtime(split[20].trim());
+//        voiceCdr.setCdr_talkduration(split[21].trim());
+//        voiceCdr.setCdr_projectid(split[22].trim());
+//        voiceCdr.setCdr_flowid(split[23].trim());
+//        voiceCdr.setCdr_additionalinfo1(split[24].trim());
+//        voiceCdr.setCdr_additionalinfo2(split[25].trim());
+//        voiceCdr.setCdr_additionalinfo3(split[26].trim());
+//        voiceCdr.setCdr_additionalinfo4(split[27].trim());
+//        voiceCdr.setCdr_additionalinfo5(split[28].trim());
+//        return voiceCdr;
+//    }
 
 }
