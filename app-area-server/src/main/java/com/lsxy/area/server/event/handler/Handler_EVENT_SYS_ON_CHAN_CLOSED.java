@@ -71,9 +71,22 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         //产品编码，可根据些判断此cdr是哪个产品的cdr
 
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(businessState.getType());
-        if(businessState.getBusinessData().get("conf_id") != null){
+
+        if("sys_conf".equals(businessState.getType())){
+            voiceCdr.setJoinType(1);
+        }else if(businessState.getBusinessData().get("conf_id") != null){
             productCode = ProductCode.sys_conf;
+            voiceCdr.setJoinType(2);
         }
+
+        if("ivr_incoming".equals(businessState.getType())){
+            voiceCdr.setIvrType(1);
+        }else if("ivr_call".equals(businessState.getType())){
+            voiceCdr.setIvrType(2);
+        }else if("ivr_dial".equals(businessState.getType())){
+            voiceCdr.setIvrType(2);
+        }
+
         voiceCdr.setType(productCode.name());
 
         voiceCdr.setRelevanceId(businessState.getId());
