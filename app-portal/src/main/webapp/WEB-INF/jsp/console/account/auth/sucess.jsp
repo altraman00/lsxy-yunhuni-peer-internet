@@ -137,7 +137,7 @@
                                 <c:if test="${status==1||status==5}">
                                     <div class="row">
                                         <a href="/console/account/auth/index?type=upgrade" class="btn btn-primary btn-form">升级公司认证</a>
-                                        <span class="lineheight-24">个人认证完成后，还可进行公司认证</span>
+                                        <span class="lineheight-24">升级为公司认证后，平台将为开发者开放更多的权限</span>
                                     </div>
                                 </c:if>
                                 <c:if test="${status==-1||status==-2}">
