@@ -22,8 +22,8 @@ public class Recharge  extends IdEntity {
 
     private Tenant tenant;                //所属租户
     private BigDecimal amount;                //充值金额
-    private String source;                  //充值来源 参考RechargeSource
-    private String type;                  //充值方式 参考RechargeType
+    private String source;                  //充值类型（没错，它们英文写反了） 参考RechargeSource
+    private String type;                  //充值渠道（没错，它们英文写反了） 参考RechargeType
     private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
     private Date payTime;                   //付款时间,人工充值的付款时间为创建时的时间

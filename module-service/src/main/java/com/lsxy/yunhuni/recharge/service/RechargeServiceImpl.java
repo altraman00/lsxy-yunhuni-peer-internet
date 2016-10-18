@@ -16,6 +16,7 @@ import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.recharge.dao.RechargeDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -150,10 +151,21 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     }
 
     @Override
-    public Page<Recharge> pageListByTenant(String tenant, Integer pageNo, Integer pageSize) {
+    public Page<Recharge> pageListByTenant(String tenant,String type,String source, Integer pageNo, Integer pageSize) {
         Page<Recharge> page = null;
-        String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' order by obj.createTime desc";
-        page =  this.pageList(hql,pageNo,pageSize,tenant);
+        if(StringUtils.isNotBlank(type) && StringUtils.isNotBlank(source)){
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and type=?2 and source=?3 order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant,type,source);
+        }else if(StringUtils.isNotBlank(type)){
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and type=?2 order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant,type);
+        }else if(StringUtils.isNotBlank(source)){
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and source=?2 order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant,source);
+        }else{
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant);
+        }
         return page;
     }
 
