@@ -768,7 +768,6 @@
         }
     });
     if('${homeVO.appStateVOs != null && fn:length(homeVO.appStateVOs) > 0}'){
-        alert(100);
         initchart();
         sessioncharts();
         apicharts();
