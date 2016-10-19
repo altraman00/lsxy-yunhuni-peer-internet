@@ -69,5 +69,5 @@ public interface AppService extends BaseService<App> {
      * @param app
      * @return
      */
-    String findOneAvailableTelnumber(App app);
+    String findOneAvailableTelnumberCallUri(App app);
 }

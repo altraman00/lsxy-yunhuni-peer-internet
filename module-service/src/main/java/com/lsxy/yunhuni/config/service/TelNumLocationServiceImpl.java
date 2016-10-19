@@ -50,13 +50,13 @@ public class TelNumLocationServiceImpl extends AbstractService<TelnumLocation> i
     }
 
     @Override
-    public String getCityOfMobile(String mobile) {
+    public String getAreaCodeOfMobile(String mobile) {
         String checkNum = mobile.substring(0,7);
         TelnumLocation location = telnumLocationDao.findFirstByMobile(checkNum);
         if(location == null){
             throw new RuntimeException("无效的号码");
         }else{
-            return location.getCity();
+            return location.getAreaCode();
         }
     }
 

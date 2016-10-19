@@ -29,6 +29,6 @@ public interface TelNumLocationService extends BaseService<TelnumLocation> {
      * @param mobile
      * @return
      */
-    String getCityOfMobile(String mobile);
+    String getAreaCodeOfMobile(String mobile);
 
 }

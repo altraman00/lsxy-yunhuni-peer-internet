@@ -27,7 +27,7 @@ public class ResourceTelenum extends IdEntity{
     private String remark;      //备注
     private String level;       //号码等级
     private String callUri;     //呼出URI
-    private String source;      //来源
+    private String source;      //来源 1、租户自带号码，2、线路采购
     private String usable;      //是否可用  0:否 1：是
 
     @ManyToOne

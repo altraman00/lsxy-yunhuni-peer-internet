@@ -5,6 +5,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import static org.apache.commons.lang3.RandomUtils.nextInt;
 
 /**
  * 全局号码资源service
@@ -67,10 +70,14 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public String findOneFreeNumber(String areaId) {
+    public String findOneFreeNumberCallUri(String areaId) {
         //TODO 根据区域获取一个空闲的号码
-        ResourceTelenum resourceTelenum = resourceTelenumDao.findFirstByStatus(ResourceTelenum.STATUS_FREE);
-        return resourceTelenum.getTelNumber();
+        Long numCount = resourceTelenumDao.countByStatus(ResourceTelenum.STATUS_FREE);
+        Long random = RandomUtils.nextLong(0,numCount);
+
+        ResourceTelenum resourceTelenum = resourceTelenumDao.findOneByStatus(ResourceTelenum.STATUS_FREE,random);
+        return resourceTelenum.getCallUri();
     }
+
 
 }

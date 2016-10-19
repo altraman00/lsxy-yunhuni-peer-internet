@@ -103,13 +103,13 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    public String findOneAvailableTelnumber(App app) {
+    public String findOneAvailableTelnumberCallUri(App app) {
         if(app.getIsIvrService()==1){
             List<ResourcesRent> resourcesRents = resourcesRentService.findByAppId(app.getId());
             ResourcesRent resourcesRent = resourcesRents.get(0);
             return resourcesRent.getResData();
         }else{
-            return resourceTelenumService.findOneFreeNumber(app.getArea().getId());
+            return resourceTelenumService.findOneFreeNumberCallUri(app.getArea().getId());
         }
     }
 

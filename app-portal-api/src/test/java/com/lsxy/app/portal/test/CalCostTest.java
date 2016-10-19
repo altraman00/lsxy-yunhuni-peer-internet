@@ -2,7 +2,9 @@ package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelNumLocationService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.config.Constants;
@@ -44,6 +46,10 @@ public class CalCostTest {
 
     @Autowired
     TelnumToLineGatewayService telnumToLineGatewayService;
+    @Autowired
+    ResourceTelenumService resourceTelenumService;
+    @Autowired
+    ApiGwRedBlankNumService apiGwRedBlankNumService;
 
     @Test
     public void testCalCost(){
@@ -77,8 +83,8 @@ public class CalCostTest {
         String areaCodeOfTelephone = telNumLocationService.getAreaCodeOfTelephone(num);
         System.out.println(num);
         System.out.println(areaCodeOfTelephone);
-        String cityOfMobile = telNumLocationService.getCityOfMobile("13750001373");
-        System.out.println(cityOfMobile);
+        String areaCode = telNumLocationService.getAreaCodeOfMobile("13750001373");
+        System.out.println(areaCode);
     }
 
     @Test
@@ -86,4 +92,18 @@ public class CalCostTest {
         String areaIdByTelnum = telnumToLineGatewayService.getAreaIdByTelnum("8675522730043");
         System.out.println(areaIdByTelnum);
     }
+
+    @Test
+    public void testNum(){
+        for(int i=0;i<20;i++){
+            String num = resourceTelenumService.findOneFreeNumberCallUri("area001");
+            System.out.println(num);
+        }
+    }
+    @Test
+    public void testRedNum(){
+        boolean redNum = apiGwRedBlankNumService.isBlackNum("13750001373");
+        System.out.println(redNum);
+    }
+
 }
