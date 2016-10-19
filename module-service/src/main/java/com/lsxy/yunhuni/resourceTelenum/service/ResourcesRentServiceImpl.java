@@ -105,7 +105,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             if(tenant != null){
                 tenantId = tenant.getId();
             }
-            String appId = null;
+            String appId = "0";
             App app = resourcesRent.getApp();
             if(app != null){
                 appId = app.getId();

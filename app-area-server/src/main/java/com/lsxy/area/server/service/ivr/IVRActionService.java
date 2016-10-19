@@ -2,6 +2,8 @@ package com.lsxy.area.server.service.ivr;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
@@ -94,6 +96,9 @@ public class IVRActionService {
     @Autowired
     private VoiceIvrService voiceIvrService;
 
+    @Autowired
+    private AreaAndTelNumSelector areaAndTelNumSelector;
+
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
     @PostConstruct
@@ -106,7 +111,7 @@ public class IVRActionService {
         client.start();
     }
     private void initHandler(){
-        Reflections reflections = new Reflections("com.lsxy.area.server.util.ivr");
+        Reflections reflections = new Reflections("com.lsxy.area.server.service.ivr");
         Set<Class<? extends ActionHandler>> handlerClasss = reflections.getSubTypesOf(ActionHandler.class);
         for (Class<? extends ActionHandler> handlerClass : handlerClasss) {
             ActionHandler handler = applicationContext.getBean(handlerClass);
@@ -245,16 +250,24 @@ public class IVRActionService {
         String call_id = UUIDGenerator.uuid();
         boolean accept = getAcceptRequest(app.getUrl(),from);
         if(!accept){
-            reject(app.getId(),res_id,call_id);
+            reject(app,res_id,call_id);
         }else{
-            answer(app.getId(),res_id,call_id);
+            answer(app,res_id,call_id);
         }
         saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
         return true;
     }
 
     private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to){
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result;
+        try {
+            result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+        } catch (AppOffLineException e) {
+            throw new RuntimeException(e);
+        }
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
@@ -263,7 +276,7 @@ public class IVRActionService {
                 .setId(call_id)
                 .setResId(res_id)
                 .setType("ivr_incoming")
-                .setAreaId(app.getArea().getId())
+                .setAreaId(areaId)
                 .setLineGatewayId(lineGateway.getId())
                 .setBusinessData(new MapBuilder<String,Object>()
                         //incoming事件from 和 to是相反的
@@ -297,11 +310,12 @@ public class IVRActionService {
         voiceIvrService.save(voiceIvr);
     }
 
-    private void reject(String appId,String res_id,String call_id){
+    private void reject(App app,String res_id,String call_id){
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
                 .put("user_data",call_id)
-                .put("appid",appId)
+                .put("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_REJECT,params);
         try {
@@ -312,12 +326,13 @@ public class IVRActionService {
 
     }
 
-    private void answer(String appId,String res_id,String call_id){
+    private void answer(App app,String res_id,String call_id){
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
                 .put("max_answer_seconds",MAX_DURATION_SEC)
                 .put("user_data",call_id)
-                .put("appid",appId)
+                .put("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_ANSWER,params);
         try {
@@ -341,7 +356,7 @@ public class IVRActionService {
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
-            return  true;
+            return  false;
         }
         String resXML = null;
         if(nextUrl == null){//第一次
@@ -419,16 +434,4 @@ public class IVRActionService {
         return next;
     }
 
-    /*public static void main(String[] args) throws DocumentException {
-        Document doc = DocumentHelper.parseText("\n" +
-                "   <Response>\n" +
-                "    <Get action=\"handle-user-input.jsp\" numdigits=\"1\">\n" +
-                "        <Play>menu.wav</Play>\n" +
-                "    </Get>\n" +
-                "    <Play>sorrybye.wav</Play>\n" +
-                "    <Redirect>/welcome/voice</Redirect>\n" +
-                "    <Next>/welcome/voice</Next>/>\n" +
-                "</Response>");
-
-    }*/
 }

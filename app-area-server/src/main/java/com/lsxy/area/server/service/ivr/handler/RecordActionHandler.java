@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.reflections.util.ConfigurationBuilder.build;
+
 /**
  * record指令处理器
  * Created by liuws on 2016/9/2.
@@ -64,7 +66,7 @@ public class RecordActionHandler extends ActionHandler{
                 .putIfNotEmpty("beep",beeping)
                 .putIfNotEmpty("finish_keys",finish_keys)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid",state.getAppId())
+                .put("areaId",state.getAreaId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_RECORD_START, params);

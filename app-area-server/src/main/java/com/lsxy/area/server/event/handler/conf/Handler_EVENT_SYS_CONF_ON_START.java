@@ -124,7 +124,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        ifAutoRecording(state.getAppId(),businessData,res_id,conf_id);
+        ifAutoRecording(state.getAreaId(),businessData,res_id,conf_id);
         Meeting meeting = meetingService.findById(conf_id);
         if(meeting != null){
             meeting.setResId(res_id);
@@ -140,7 +140,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
      * @param res_id
      * @param conf_id
      */
-    private void ifAutoRecording(String appId,Map<String,Object> businessData,String res_id,String conf_id){
+    private void ifAutoRecording(String areaId,Map<String,Object> businessData,String res_id,String conf_id){
         if(businessData == null){
             return;
         }
@@ -154,7 +154,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
                 //TODO 文件名如何定
                 .putIfNotEmpty("record_file", UUIDGenerator.uuid())
                 .putIfNotEmpty("user_data",conf_id)
-                .put("appid",appId)
+                .put("areaId",areaId)
                 .build();
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);

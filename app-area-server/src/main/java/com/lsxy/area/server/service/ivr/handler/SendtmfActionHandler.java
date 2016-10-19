@@ -59,7 +59,7 @@ public class SendtmfActionHandler extends ActionHandler{
                 .putIfNotEmpty("res_id",res_id)
                 .putIfNotEmpty("keys",dtmf_code)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid",state.getAppId())
+                .put("areaId",state.getAreaId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_SEND_DTMF_START, params);

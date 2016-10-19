@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public class RechargeInput implements Serializable{
 
     private BigDecimal amount;
+    private String source;
 
     public BigDecimal getAmount() {
         return amount;
@@ -16,5 +17,13 @@ public class RechargeInput implements Serializable{
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }
