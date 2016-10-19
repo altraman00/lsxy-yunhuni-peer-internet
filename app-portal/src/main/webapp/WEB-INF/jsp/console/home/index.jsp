@@ -458,7 +458,6 @@
        if(!starttime){
            starttime = $('#monthstart').val();
        }
-        console.info(starttime);
         var type='day';
         var param ={'type':type,'appId':-1,'startTime':starttime, csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/statistics/session/list",param,function(result){
@@ -496,7 +495,6 @@
         if(!starttime){
             starttime = $('#sessionstart').val();
         }
-        console.info(starttime);
         var type='day';
         //异步查询 返回json 数据
         //消费额最大值
@@ -516,7 +514,6 @@
         if(!starttime){
             starttime = $('#apistart').val();
         }
-        console.info(starttime);
         var type='day';
         //异步查询 返回json 数据
         //消费额最大值
