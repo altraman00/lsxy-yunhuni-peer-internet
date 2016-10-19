@@ -22,7 +22,8 @@ public interface VoiceCdrDayService extends BaseService<VoiceCdrDay> {
      * @param endTime 结束时间
      * @return
      */
-    public List<VoiceCdrDay> list(String tenantId, String appId,String type,Date startTime, Date endTime); /**
+    public List<VoiceCdrDay> list(String tenantId, String appId,String type,Date startTime, Date endTime);
+    /**
      * 根据当前时间，进行统计
      * @param date1 时间yyyy-MM-dd
      * @param day1 第几天 1-31

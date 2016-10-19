@@ -1,5 +1,8 @@
 package com.lsxy.app.portal.console.home;
 
+import org.apache.tools.ant.util.DateUtils;
+
+import java.util.Date;
 import java.util.List;
 
 
@@ -16,7 +19,7 @@ public class HomeVO {
 
     private Integer lineNum ;               //当前线路数量
 
-    private Integer lineAverageCallTime;    //平均通话时长(分钟)
+    private Long lineAverageCallTime;    //平均通话时长(分钟)
 
     private Double lineLinkRate;            //接通率
 
@@ -36,7 +39,25 @@ public class HomeVO {
 
     private String secretKey;               //secretKey
 
+    private String time;//当前时间
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getTime() {
+        return time;
+    }
     private List<AppStateVO> appStateVOs;    //应用
+    private Integer onLineApp = 0;//上线应用数
+
+    public Integer getOnLineApp() {
+        return onLineApp;
+    }
+
+    public void setOnLineApp(Integer onLineApp) {
+        this.onLineApp = onLineApp;
+    }
 
     public String getArrearage() {
         return arrearage;
@@ -78,11 +99,11 @@ public class HomeVO {
         this.lineNum = lineNum;
     }
 
-    public Integer getLineAverageCallTime() {
+    public Long getLineAverageCallTime() {
         return lineAverageCallTime;
     }
 
-    public void setLineAverageCallTime(Integer lineAverageCallTime) {
+    public void setLineAverageCallTime(Long lineAverageCallTime) {
         this.lineAverageCallTime = lineAverageCallTime;
     }
 
