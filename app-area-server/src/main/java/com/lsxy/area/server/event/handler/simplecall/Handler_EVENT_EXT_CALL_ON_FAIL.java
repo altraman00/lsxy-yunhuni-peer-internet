@@ -72,6 +72,9 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
 
+        //释放资源
+        businessStateService.delete(callId);
+
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(state.getType());
         String event;
         switch (productCode){
@@ -111,9 +114,6 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
             default:
                 return res;
         }
-
-        //释放资源
-        businessStateService.delete(callId);
 
         String callBackUrl = state.getCallBackUrl();
         if(StringUtils.isBlank(callBackUrl)){

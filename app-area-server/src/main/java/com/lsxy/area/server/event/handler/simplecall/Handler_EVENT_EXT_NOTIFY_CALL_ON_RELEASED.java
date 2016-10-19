@@ -64,6 +64,9 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             throw new InvalidParamException("businessstate is null");
         }
 
+        //释放资源
+        businessStateService.delete(callId);
+
         if(state.getType().equalsIgnoreCase("notify_call")){
             return notifyCall(callId,paramMap,state);
         }
@@ -137,7 +140,6 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             }
             captchaCallService.save(captchaCall);
         }
-        businessStateService.delete(call_id);
         return res;
     }
 
@@ -174,8 +176,6 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             callSessionService.save(callSession);
         }
 
-        //释放资源
-        businessStateService.delete(callId);
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         if(StringUtils.isBlank(appId)){

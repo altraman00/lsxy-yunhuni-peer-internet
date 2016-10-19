@@ -10,12 +10,15 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.api.billing.service.BillingService;
 import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.yunhuni.api.recharge.enums.RechargeSource;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import com.lsxy.yunhuni.api.recharge.model.Recharge;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.recharge.dao.RechargeDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -23,6 +26,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/7/1.
@@ -45,6 +49,9 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     @Autowired
     CalBillingService calBillingService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Override
     public BaseDaoInterface<Recharge, Serializable> getDao() {
         return rechargeDao;
@@ -59,7 +66,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             Tenant tenant = tenantService.findTenantByUserName(username);
             if(tenant != null){
                 String orderId = UUIDGenerator.uuid();
-                recharge = new Recharge(tenant,amount,rechargeType, RechargeStatus.NOTPAID,orderId,null);
+                recharge = new Recharge(tenant,amount, RechargeSource.USER,rechargeType, RechargeStatus.NOTPAID,orderId,null);
                 rechargeDao.save(recharge);
             }
         }
@@ -117,7 +124,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     }
 
     @Override
-    public boolean doRecharge(String tenantId, BigDecimal amount) {
+    public boolean doRecharge(String tenantId, BigDecimal amount,String source) {
         if(StringUtil.isEmpty(tenantId)){
             throw new IllegalArgumentException();
         }
@@ -130,7 +137,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         }
         String orderId = UUIDGenerator.uuid();
         Date curTime = new Date();
-        Recharge recharge = new Recharge(tenant,amount,RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
+        Recharge recharge = new Recharge(tenant,amount,RechargeSource.valueOf(source),RechargeType.RENGONG, RechargeStatus.PAID,orderId,curTime);
         rechargeDao.save(recharge);
         // redis插入今日充值
         calBillingService.incRecharge(tenantId,curTime,amount);
@@ -144,11 +151,29 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     }
 
     @Override
-    public Page<Recharge> pageListByTenant(String tenant, Integer pageNo, Integer pageSize) {
+    public Page<Recharge> pageListByTenant(String tenant,String type,String source, Integer pageNo, Integer pageSize) {
         Page<Recharge> page = null;
-        String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' order by obj.createTime desc";
-        page =  this.pageList(hql,pageNo,pageSize,tenant);
+        if(StringUtils.isNotBlank(type) && StringUtils.isNotBlank(source)){
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and type=?2 and source=?3 order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant,type,source);
+        }else if(StringUtils.isNotBlank(type)){
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and type=?2 order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant,type);
+        }else if(StringUtils.isNotBlank(source)){
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' and source=?2 order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant,source);
+        }else{
+            String hql = "from Recharge obj where obj.tenant.id=?1 and obj.status ='PAID' order by obj.createTime desc";
+            page =  this.pageList(hql,pageNo,pageSize,tenant);
+        }
         return page;
+    }
+
+    @Override
+    public BigDecimal getRechargeByTenantIdAndDate(String tenantId, Date startDate, Date endDate) {
+        String sql = "SELECT IFNULL(SUM(r.amount),0) as recharge FROM db_lsxy_base.tb_base_recharge r WHERE r.tenant_id=? AND r.pay_time >= ? AND r.pay_time < ? and r.deleted=0";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, tenantId,startDate,endDate);
+        return (BigDecimal) map.get("recharge");
     }
 
 }

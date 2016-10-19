@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 测试绑定号码DAO
@@ -11,4 +12,5 @@ import java.io.Serializable;
  */
 public interface TestNumBindDao extends BaseDaoInterface<TestNumBind, Serializable> {
 
+    List<TestNumBind> findByAppId(String appId);
 }

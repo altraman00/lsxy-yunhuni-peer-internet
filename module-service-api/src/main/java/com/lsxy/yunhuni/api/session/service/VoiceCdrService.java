@@ -15,7 +15,7 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
     /**
      * 根据类型，日期，应用id来查询获取数据
      */
-    public List<VoiceCdr> list(String type, String tenantId, String time, String appId);
+    public List<VoiceCdr> listCdr(String type, String tenantId, String time, String appId);
 
     /**
      * 根据类型，日期，应用id来查询获取分页数据

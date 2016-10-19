@@ -63,6 +63,7 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
         }
 
         Map<String, Object> params = request.getParamMap();
+        String call_id = (String)params.get("user_data");
         try {
             String play_content = (String)params.get("play_content");
             if(StringUtils.isNotEmpty(play_content)){
@@ -77,14 +78,14 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
                 protected void onResult(Object o) {
                     Map<String,String> params = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
-                        logger.debug("调用ext.notify_call成功，callId={},result={}",params.get("user_data"),o);
+                        logger.debug("调用ext.notify_call成功，callId={},result={}",call_id,o);
                     }
 
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method", Constants.EVENT_EXT_NOTIFY_CALL_SUCCESS)
                                     .put("res_id",params.get("res_id"))
-                                    .put("user_data",params.get("user_data"))
+                                    .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
@@ -95,11 +96,11 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
 
                 @Override
                 protected void onError(RpcError rpcError) {
-                    logger.error("调用ext.notify_call失败call_id={},result={}",params.get("user_data"),rpcError);
+                    logger.error("调用ext.notify_call失败call_id={},result={}",call_id,rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_FAIL)
-                                    .put("user_data",params.get("user_data"))
+                                    .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
@@ -110,11 +111,11 @@ public class Handler_MN_CH_EXT_NOTIFY_CALL extends RpcRequestHandler{
 
                 @Override
                 protected void onTimeout() {
-                    logger.error("调用ext.notify_call超时call_id={}",params.get("user_data"));
+                    logger.error("调用ext.notify_call超时call_id={}",call_id);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
                                     .put("method",Constants.EVENT_EXT_CALL_ON_TIMEOUT)
-                                    .put("user_data",params.get("user_data"))
+                                    .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);

@@ -9,6 +9,8 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +32,10 @@ public class CalBillingServiceImpl implements CalBillingService{
     private RedisCacheService redisCacheService;
     @Autowired
     TenantService tenantService;
-
+    @Autowired
+    RechargeService rechargeService;
+    @Autowired
+    ConsumeService consumeService;
     /*
         余额
     */
@@ -64,6 +69,15 @@ public class CalBillingServiceImpl implements CalBillingService{
         }
 
         return balance;
+    }
+
+    @Override
+    public BigDecimal getBalance(String tenantId, Date lastBalanceDate, Date balanceDate, BigDecimal lastBalance) {
+        Date startDate = DateUtils.nextDate(lastBalanceDate);
+        Date endDate = DateUtils.nextDate(balanceDate);
+        BigDecimal recharge = rechargeService.getRechargeByTenantIdAndDate(tenantId,startDate,endDate);
+        BigDecimal consume = consumeService.getConsumeByTenantIdAndDate(tenantId,startDate,endDate);
+        return lastBalance.add(recharge).subtract(consume);
     }
 
     /**
@@ -588,7 +602,7 @@ public class CalBillingServiceImpl implements CalBillingService{
             Date balanceDate = billing.getBalanceDate();
             if(balanceDate.getTime() < date.getTime()){
                 //TODO 统计余额
-                BigDecimal balance = this.getBalanceByPreDateSum(tenantId, date, billing.getBalance());
+                BigDecimal balance = this.getBalance(tenantId, balanceDate,date, billing.getBalance());
                 billing.setBalance(balance);
                 //TODO 统计语音通知
                 Long voice = this.getVoiceByPreDateSum(tenantId, date, billing.getVoiceRemain());

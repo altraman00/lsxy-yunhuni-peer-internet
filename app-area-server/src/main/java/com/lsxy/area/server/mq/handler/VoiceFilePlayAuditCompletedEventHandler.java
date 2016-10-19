@@ -8,6 +8,8 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.server.ServerSessionContext;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.slf4j.Logger;
@@ -39,6 +41,9 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
     @Autowired
     private VoiceFilePlayService voiceFilePlayService;
 
+    @Autowired
+    AppService appService;
+
     @Override
     public void handleMessage(VoiceFilePlayAuditCompletedEvent event) throws JMSException {
         if(logger.isDebugEnabled()){
@@ -48,14 +53,20 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
             List<String> apps = voiceFilePlayService.findNotSyncApp();
             for(int j=0;j<apps.size();j++){
                 List<VoiceFilePlay> list = voiceFilePlayService.findNotSyncByApp(apps.get(j));
-                List<Map<String,Object>> list1 = new ArrayList<>();
-                for(int i=0;i<list.size();i++) {
-                    if(list.get(i).getApp()!=null) {
-                        Map<String, Object> map = getStringObjectMap(list.get(i));
-                        list1.add(map);
+                if(list.size()>0) {//当没有需要同步的文件时，不发送请求
+                    List<Map<String, Object>> list1 = new ArrayList<>();
+                    for (int i = 0; i < list.size(); i++) {
+                        if (list.get(i).getApp() != null) {
+                            Map<String, Object> map = getStringObjectMap(list.get(i));
+                            list1.add(map);
+                        }
+                    }
+                    initRequest(list1, apps.get(j));
+                }else{
+                    if(logger.isDebugEnabled()){
+                        logger.debug("应用id：["+apps.get(j)+"]没有需要同步的文件");
                     }
                 }
-                initRequest(list1,apps.get(j));
             }
         }else{
             VoiceFilePlay voiceFilePlay = voiceFilePlayService.findById(event.getKey());
@@ -64,6 +75,10 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
                 Map<String, Object> map = getStringObjectMap(voiceFilePlay);
                 list1.add(map);
                 initRequest(list1, voiceFilePlay.getApp().getId());
+            }else{
+                if(logger.isDebugEnabled()){
+                    logger.debug("放音文件同步结束：当前放音文件不存在");
+                }
             }
         }
     }
@@ -74,7 +89,11 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
             logger.debug("本次同步文件信息:{}",param);
         }
         Map<String, Object> params = new HashMap<>();
-        params.put("appid ",appId);
+        App app = appService.findById(appId);
+        if(app.getStatus() == App.STATUS_OFFLINE){
+            throw new RuntimeException("应用没上线");
+        }
+        params.put("areaId ",app.getArea().getId());
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
         request.setBody(param);
         try {

@@ -18,7 +18,7 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_consume_hour")
 public class ConsumeHour extends IdEntity {
     private String tenantId;//所属租户
-    private String appId;//所属应用,
+    private String appId;////所属应用编号（不能为空，仅用查询，勿关联应用，当一个消费不属于任何应用时，设为0）
     private Date dt;//统计时间
     private Integer hour;//统计小时 区间0-23
     private BigDecimal amongAmount;//本小时消费统计 decimal(20,4) DEFAULT NULL,

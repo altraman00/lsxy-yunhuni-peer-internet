@@ -1,22 +1,29 @@
 package com.lsxy.yunhuni.consume.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.consume.dao.ConsumeDao;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 消费记录ServiceImpl
@@ -24,12 +31,17 @@ import java.util.List;
  */
 @Service
 public class ConsumeServiceImpl extends AbstractService<Consume> implements ConsumeService {
+    private static final Logger logger = LoggerFactory.getLogger(ConsumeServiceImpl.class);
     @Autowired
     ConsumeDao consumeDao;
     @Autowired
     TenantService tenantService;
     @Autowired
     EntityManager em;
+    @Autowired
+    CalBillingService calBillingService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public BaseDaoInterface<Consume, Serializable> getDao() {
@@ -37,7 +49,7 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
     }
 
     @Override
-    public List<Consume> list(String userName, String startTime, String endTime, String appId) {
+    public List<Consume> listConsume(String userName, String startTime, String endTime, String appId) {
         Date startDate = null;
         Date endDate = null;
         if(StringUtils.isNotBlank(startTime)){
@@ -106,6 +118,26 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
 //        pageQuery.setFirstResult(start);
 //        return new Page<>(start,total,pageSize,pageQuery.getResultList());
         return page;
+    }
+
+    @Override
+    public void consume(Consume consume) {
+        if(logger.isDebugEnabled()){
+            logger.info("插入消费记录：{}", JSONUtil.objectToJson(consume));
+        }
+        if(consume.getAmount().compareTo(BigDecimal.ZERO) == -1){
+            throw new IllegalArgumentException("金额不能小于0");
+        }
+        this.save(consume);
+        //Redis中消费增加
+        calBillingService.incConsume(consume.getTenant().getId(),consume.getDt(),consume.getAmount());
+    }
+
+    @Override
+    public BigDecimal getConsumeByTenantIdAndDate(String tenantId, Date startDate, Date endDate) {
+        String sql = "SELECT IFNULL(SUM(c.amount),0) as consume FROM db_lsxy_bi_yunhuni.tb_bi_consume c WHERE c.tenant_id=? AND c.dt >= ? AND c.dt < ? and c.deleted=0";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, tenantId,startDate,endDate);
+        return (BigDecimal) map.get("consume");
     }
 
 }

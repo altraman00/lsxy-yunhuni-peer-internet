@@ -2,6 +2,9 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.api.exceptions.AppNotFoundException;
+import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -64,9 +67,12 @@ public class DialActionHandler extends ActionHandler{
     @Autowired
     private CallSessionService callSessionService;
 
+    @Autowired
+    private AreaAndTelNumSelector areaAndTelNumSelector;
+
     @Override
     public String getAction() {
-        return "hangup";
+        return "dial";
     }
 
     /**
@@ -130,7 +136,15 @@ public class DialActionHandler extends ActionHandler{
 
     public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
         App app = appService.findById(appId);
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result;
+        try {
+            result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
+        } catch (AppOffLineException e) {
+            return false;
+        }
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         //解析xml
@@ -196,7 +210,7 @@ public class DialActionHandler extends ActionHandler{
                 .put("max_answer_seconds",maxCallDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid ",app.getId())
+                .put("areaId ",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -212,7 +226,7 @@ public class DialActionHandler extends ActionHandler{
                 .setAppId(appId)
                 .setId(callId)
                 .setType("ivr_dial")
-                .setAreaId(app.getArea().getId())
+                .setAreaId(areaId)
                 .setLineGatewayId(lineGateway.getId())
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)

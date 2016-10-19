@@ -11,7 +11,6 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -72,6 +71,9 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
 
+        //释放资源
+        businessStateService.delete(callId);
+
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(state.getType());
         String event;
         switch (productCode){
@@ -111,9 +113,6 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
             default:
                 return res;
         }
-
-        //释放资源
-        businessStateService.delete(callId);
 
         String callBackUrl = state.getCallBackUrl();
         if(StringUtils.isBlank(callBackUrl)){

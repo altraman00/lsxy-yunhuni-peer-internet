@@ -19,7 +19,7 @@ public class DuoCallbackDTO implements Serializable {
     private String to2;                 //第二方被叫号码
     private String ring_tone;           //自定义回铃音
     @Min(0)
-    @Max(2)
+    @Max(3)
     private Integer ring_tone_mode = 0;     //自定义回铃音播放模式0：收到对端回铃后开始播放 1：拨号时即开始播放，收到对端回铃后停止播放 2：拨号时即开始播放，对端接听或者挂机后停止播放
     @NotNull
     @Min(1)

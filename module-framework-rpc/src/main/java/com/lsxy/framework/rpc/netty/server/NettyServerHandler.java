@@ -91,7 +91,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
         }
         @Override
         public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-            logger.error("客户端连接断开:{}" ,ctx.channel());
+            logger.error("客户端连接断开:"+ctx.channel() );
 
             Session session = getSessionInTheContextObject(ctx);
             if(session != null) {
@@ -105,7 +105,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            logger.error("出现异常:{}",cause);
+            logger.error("出现异常:"+cause.getMessage(),cause);
             super.exceptionCaught(ctx, cause);
         }
 

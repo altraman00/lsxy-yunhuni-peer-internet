@@ -101,7 +101,7 @@ public abstract class AbstractPortalController {
      * @param id
      * @return
      */
-    public RestResponse getAppById(HttpServletRequest request,String id ){
+    public RestResponse<App> getAppById(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/get/{1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);

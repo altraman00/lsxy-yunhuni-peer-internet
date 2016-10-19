@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.recharge.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.yunhuni.api.recharge.enums.RechargeSource;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeStatus;
 import com.lsxy.yunhuni.api.recharge.enums.RechargeType;
 import org.hibernate.annotations.Where;
@@ -21,7 +22,8 @@ public class Recharge  extends IdEntity {
 
     private Tenant tenant;                //所属租户
     private BigDecimal amount;                //充值金额
-    private String type;                  //充值方式 参考RechargeType
+    private String source;                  //充值类型（没错，它们英文写反了） 参考RechargeSource
+    private String type;                  //充值渠道（没错，它们英文写反了） 参考RechargeType
     private String status;                //充值状态 参考RechargeStatus
     private String orderId;               //订单ID
     private Date payTime;                   //付款时间,人工充值的付款时间为创建时的时间
@@ -29,9 +31,10 @@ public class Recharge  extends IdEntity {
     public Recharge() {
     }
 
-    public Recharge(Tenant tenant, BigDecimal amount, RechargeType type, RechargeStatus status, String orderId,Date payTime) {
+    public Recharge(Tenant tenant, BigDecimal amount, RechargeSource source, RechargeType type, RechargeStatus status, String orderId, Date payTime) {
         this.tenant = tenant;
         this.amount = amount;
+        this.source = source.name();
         this.type = type.name();
         this.status = status.name();
         this.orderId = orderId;
@@ -91,5 +94,14 @@ public class Recharge  extends IdEntity {
 
     public void setPayTime(Date payTime) {
         this.payTime = payTime;
+    }
+
+    @Column(name = "source")
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 }

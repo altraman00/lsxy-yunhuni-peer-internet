@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.CallService;
 import com.lsxy.area.api.exceptions.*;
+import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.PlayFileUtil;
@@ -20,7 +21,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
@@ -40,7 +40,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tandy on 16/8/18.
@@ -95,6 +98,9 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     private CaptchaCallService captchaCallService;
+
+    @Autowired
+    private AreaAndTelNumSelector areaAndTelNumSelector;
 
     private boolean isEnableDuoCallService(String tenantId,String appId){
         try {
@@ -191,8 +197,8 @@ public class CallServiceImpl implements CallService {
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
@@ -210,7 +216,10 @@ public class CallServiceImpl implements CallService {
         }
 
         //TODO 获取号码
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to1,to2);
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         from1 = oneTelnumber;
         from2 = oneTelnumber;
         //TODO 获取线路IP和端口
@@ -236,6 +245,7 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("max_ring_seconds",max_dial_duration)
                 .putIfNotEmpty("user_data1",duocCallId)
                 .putIfNotEmpty("user_data2",duocCallId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         if(StringUtils.isNotBlank(ring_tone)){
@@ -250,8 +260,6 @@ public class CallServiceImpl implements CallService {
             params.put("record_format ",1);
         }
 
-        //增加区域参数 选择合适的会话(传入appid即可)
-        params.put("appid ",app.getId());
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
         try {
             Map<String,Object> data = new MapBuilder<String,Object>()
@@ -266,7 +274,7 @@ public class CallServiceImpl implements CallService {
                                     .setType(apiCmd)
                                     .setUserdata(user_data)
                                     .setCallBackUrl(app.getUrl())
-                                    .setAreaId(app.getArea().getId())
+                                    .setAreaId(areaId)
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(data)
                                     .build();
@@ -285,8 +293,8 @@ public class CallServiceImpl implements CallService {
     @Override
     public void duoCallbackCancel(String ip, String appId, String callId) throws YunhuniApiException{
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
@@ -294,11 +302,12 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         BusinessState businessState = businessStateService.get(callId);
         Map<String, Object> params = new MapBuilder<String, Object>()
                 .put("res_id",businessState.getResId())
                 .put("user_data ",businessState.getId())
-                .put("appid ",app.getId())
+                .put("areaId ",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK_CANCEL, params);
         try {
@@ -319,8 +328,8 @@ public class CallServiceImpl implements CallService {
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList.trim())){
@@ -338,8 +347,10 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        //TODO 获取号码
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         from = oneTelnumber;
         //TODO 获取线路IP和端口
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
@@ -361,12 +372,10 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("max_ring_seconds",max_dial_duration)
                 .putIfNotEmpty("user_data",callId)
                 .putIfNotEmpty("play_content",this.getPlayContent(app.getTenant().getId(),appId,play_file,play_content))
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         try {
-            //增加区域参数 选择合适的会话(传入appid即可)
-            params.put("appid ",app.getId());
-            Area area = app.getArea();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             Map<String,Object> data = new MapBuilder<String,Object>()
                     .put("sessionid",callSession.getId())
@@ -379,7 +388,7 @@ public class CallServiceImpl implements CallService {
                                     .setType(apiCmd)
                                     .setUserdata(user_data)
                                     .setCallBackUrl(app.getUrl())
-                                    .setAreaId(area.getId())
+                                    .setAreaId(areaId)
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(data)
                                     .build();
@@ -401,9 +410,8 @@ public class CallServiceImpl implements CallService {
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
-
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
 
         String whiteList = app.getWhiteList();
@@ -425,7 +433,10 @@ public class CallServiceImpl implements CallService {
         //TODO 待定
         String callId = UUIDGenerator.uuid();
         //TODO
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Map<String, Object> params = new MapBuilder<String, Object>()
@@ -435,7 +446,7 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("valid_keys",verify_code)
                 .putIfNotEmpty("max_keys",max_keys)
                 .putIfNotEmpty("user_data",callId)
-                .put("appid ",app.getId())
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         files = playFileUtil.convertArray(app.getTenant().getId(),appId,files);
@@ -456,7 +467,7 @@ public class CallServiceImpl implements CallService {
                     .setType("captcha_call")
                     .setCallBackUrl(app.getUrl())
                     .setUserdata(user_data)
-                    .setAreaId(app.getArea().getId())
+                    .setAreaId(areaId)
                     .setLineGatewayId(lineGateway.getId())
                     .setBusinessData(new MapBuilder<String,Object>()
                             .put("from",oneTelnumber)
@@ -477,9 +488,8 @@ public class CallServiceImpl implements CallService {
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
-
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
 
         String whiteList = app.getWhiteList();
@@ -498,7 +508,10 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         CaptchaCall captchaCall = new CaptchaCall();
@@ -528,7 +541,7 @@ public class CallServiceImpl implements CallService {
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("play_repeat",repeat)
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("appid ",app.getId())
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         playFile = playFileUtil.convertArray(app.getTenant().getId(),appId,playFile);
@@ -556,7 +569,7 @@ public class CallServiceImpl implements CallService {
                     .setType("verify_call")
                     .setCallBackUrl(app.getUrl())
                     .setUserdata(userData)
-                    .setAreaId(app.getArea().getId())
+                    .setAreaId(areaId)
                     .setLineGatewayId(lineGateway.getId())
                     .setBusinessData(new MapBuilder<String,Object>()
                             .putIfNotEmpty("from",oneTelnumber)

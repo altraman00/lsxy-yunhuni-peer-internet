@@ -20,7 +20,7 @@ public class ConsumeMonth extends IdEntity {
     private Date dt;//统计时间
     private Integer month;//统计月 区间1-12
     private BigDecimal amongAmount;//本月消费统计 decimal(20,4) DEFAULT NULL,
-    private String appId;//所属应用,
+    private String appId;////所属应用编号（不能为空，仅用查询，勿关联应用，当一个消费不属于任何应用时，设为0）
     private String tenantId;//所属租户
     private String type;//消费类型
     @Column(name = "type")
