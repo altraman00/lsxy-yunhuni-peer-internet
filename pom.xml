@@ -26,6 +26,7 @@
         <module>app-api-gateway</module>
         <module>app-portal-api</module>
         <module>app-third-join-gateway</module>
+        <module>app-call-center</module>
         <module>module-framework-core</module>
         <module>module-framework-web</module>
         <module>module-framework-mq</module>
