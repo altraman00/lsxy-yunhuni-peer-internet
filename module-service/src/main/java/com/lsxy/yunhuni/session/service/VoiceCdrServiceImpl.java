@@ -143,7 +143,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
 
     @Override
     public Map getAvgCdr(String tenantId, String appId, Date startTime, Date endTime) {
-        String sql = " SELECT IFNULL(FORMAT((a.costTimeLong/a.`session`)/60,0),0) AS  avgCostTime,FORMAT(IFNULL(a.callAckDt/a.`session`,0),2) AS avgCall, a.cost AS cost, a.`session` AS session,FORMAT(a.costTimeLong/60,0) AS costTime FROM(  " +
+        String sql = " SELECT CONVERT(IFNULL((a.costTimeLong/a.`session`)/60,0),SIGNED) AS  avgCostTime,CONVERT(IFNULL(a.callAckDt/a.`session`,0)*100,SIGNED) AS avgCall, a.cost AS cost, a.`session` AS session,CONVERT(a.costTimeLong/60,SIGNED) AS costTime FROM(  " +
                 " SELECT COUNT(id) AS session,IFNULL(SUM(cost_time_long),0) AS costTimeLong,IFNULL(SUM(CASE  WHEN call_ack_dt IS NULL THEN 0 ELSE 1 END),0) AS callAckDt,IFNULL(SUM(cost),0) AS cost FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE 1=1 ";
         if(StringUtils.isNotEmpty(tenantId)){
             sql +=" AND tenant_id='"+tenantId+"' " ;

@@ -19,9 +19,9 @@ public class HomeVO {
 
     private Integer lineNum ;               //当前线路数量
 
-    private Long lineAverageCallTime;    //平均通话时长(分钟)
+    private Object lineAverageCallTime;    //平均通话时长(分钟)
 
-    private Double lineLinkRate;            //接通率
+    private Object lineLinkRate;            //接通率
 
     private Long voiceRemain;           //语音剩余量（分钟）
 
@@ -50,6 +50,15 @@ public class HomeVO {
     }
     private List<AppStateVO> appStateVOs;    //应用
     private Integer onLineApp = 0;//上线应用数
+    private Integer appSize = 0;//总应用数
+
+    public Integer getAppSize() {
+        return appSize;
+    }
+
+    public void setAppSize(Integer appSize) {
+        this.appSize = appSize;
+    }
 
     public Integer getOnLineApp() {
         return onLineApp;
@@ -99,16 +108,20 @@ public class HomeVO {
         this.lineNum = lineNum;
     }
 
-    public Long getLineAverageCallTime() {
+    public Object getLineAverageCallTime() {
         return lineAverageCallTime;
     }
 
-    public void setLineAverageCallTime(Long lineAverageCallTime) {
+    public void setLineAverageCallTime(Object lineAverageCallTime) {
         this.lineAverageCallTime = lineAverageCallTime;
     }
 
-    public Double getLineLinkRate() {
+    public Object getLineLinkRate() {
         return lineLinkRate;
+    }
+
+    public void setLineLinkRate(Object lineLinkRate) {
+        this.lineLinkRate = lineLinkRate;
     }
 
     public void setLineLinkRate(Double lineLinkRate) {

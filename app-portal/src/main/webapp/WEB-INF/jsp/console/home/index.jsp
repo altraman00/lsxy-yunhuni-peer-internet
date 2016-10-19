@@ -8,365 +8,362 @@
 </head>
 <body>
 <section class="vbox">
-<%@include file="/inc/headerNav.jsp"%>
-<section class='aside-section'>
-    <section class="hbox stretch">
-        <!-- .aside -->
-        <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
-        <!-- /.aside -->
-        <section id="content">
-            <section class="hbox stretch">
-                <aside>
-                    <script language="JavaScript" type="text/javascript">
-                        var marqueeContent = new Array();
-                        window.onload = function() {
-                            var param = {};
-                            ajaxsync(ctx + "/console/message/account_message/list", param, function (result) {
-                                for (var i = 0; i < result.data.length; i++) {
-                                    if(result.data[i].message.type=='0'&&result.data[i].message.title=='系统通知'){
-                                        var sr = new String(result.data[i].message.content).substring(0,40);
-                                        marqueeContent[i]="<span >"+sr+"</span>";
-                                    }else{
-                                        marqueeContent[i]="<span >"+result.data[i].message.title+"</span>";
+    <%@include file="/inc/headerNav.jsp"%>
+    <section class='aside-section'>
+        <section class="hbox stretch">
+            <!-- .aside -->
+            <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <!-- /.aside -->
+            <section id="content">
+                <section class="hbox stretch">
+                    <aside>
+                        <script language="JavaScript" type="text/javascript">
+                            var marqueeContent = new Array();
+                            window.onload = function() {
+                                var param = {};
+                                ajaxsync(ctx + "/console/message/account_message/list", param, function (result) {
+                                    for (var i = 0; i < result.data.length; i++) {
+                                        if(result.data[i].message.type=='0'&&result.data[i].message.title=='系统通知'){
+                                            var sr = new String(result.data[i].message.content).substring(0,40);
+                                            marqueeContent[i]="<span >"+sr+"</span>";
+                                        }else{
+                                            marqueeContent[i]="<span >"+result.data[i].message.title+"</span>";
+                                        }
                                     }
+                                    if(result.data.length>0){
+                                        initMarquee();
+                                    }
+                                });
+                            }
+    //                        marqueeContent[0]="<span >云呼你有新的讯息1</span>";
+    //                        marqueeContent[1]="<span >云呼你有新的讯息2</span>";
+    //                        marqueeContent[2]="<span >云呼你有新的讯息3云呼你有新的讯息3</span>";
+    //                        marqueeContent[3]="<span >云呼你有新的讯息4</span>";
+                            var marqueeInterval=new Array();
+                            var marqueeId=0;
+                            var marqueeDelay=2000;
+                            var marqueeHeight=20;
+                            //初始化
+                            function initMarquee() {
+                                var str = '';
+                                if(marqueeContent.length>0){
+                                     str=marqueeContent[0];
                                 }
-                                if(result.data.length>0){
-                                    initMarquee();
+
+
+                                var html = '<div class="common-info" ><div id="marqueeBox" style="overflow:hidden;float:left;height:'+marqueeHeight+'px;width:80%;" onmouseover="clearInterval(marqueeInterval[0])" onmouseout="marqueeInterval[0]=setInterval(\'startMarquee()\',marqueeDelay)"><div>'+str+'</div></div><span class="close" id="common-close"></span><a class="detail" href="'+ctx+'/console/message/account_message/index">查看详情</a></div>';
+                                document.getElementById("commonMsg").innerHTML= html;
+                                marqueeId++;
+                                marqueeInterval[0]=setInterval("startMarquee()",marqueeDelay);
+                                $('#common-close').click(function(){
+                                    $('.common-info').fadeOut()
+                                });
+                            }
+                            //开始滚动
+                            function startMarquee() {
+                                var str=marqueeContent[marqueeId];
+                                marqueeId++;
+                                if(marqueeId>=marqueeContent.length) marqueeId=0;
+                                if(document.getElementById("marqueeBox").childNodes.length==1) {
+                                    var nextLine=document.createElement('DIV');
+                                    nextLine.innerHTML=str;
+                                    document.getElementById("marqueeBox").appendChild(nextLine);
                                 }
-                            });
-                        }
-//                        marqueeContent[0]="<span >云呼你有新的讯息1</span>";
-//                        marqueeContent[1]="<span >云呼你有新的讯息2</span>";
-//                        marqueeContent[2]="<span >云呼你有新的讯息3云呼你有新的讯息3</span>";
-//                        marqueeContent[3]="<span >云呼你有新的讯息4</span>";
-                        var marqueeInterval=new Array();
-                        var marqueeId=0;
-                        var marqueeDelay=2000;
-                        var marqueeHeight=20;
-                        //初始化
-                        function initMarquee() {
-                            var str = '';
-                            if(marqueeContent.length>0){
-                                 str=marqueeContent[0];
-                            }
-
-
-                            var html = '<div class="common-info" ><div id="marqueeBox" style="overflow:hidden;float:left;height:'+marqueeHeight+'px;width:80%;" onmouseover="clearInterval(marqueeInterval[0])" onmouseout="marqueeInterval[0]=setInterval(\'startMarquee()\',marqueeDelay)"><div>'+str+'</div></div><span class="close" id="common-close"></span><a class="detail" href="'+ctx+'/console/message/account_message/index">查看详情</a></div>';
-                            document.getElementById("commonMsg").innerHTML= html;
-                            marqueeId++;
-                            marqueeInterval[0]=setInterval("startMarquee()",marqueeDelay);
-                            $('#common-close').click(function(){
-                                $('.common-info').fadeOut()
-                            });
-                        }
-                        //开始滚动
-                        function startMarquee() {
-                            var str=marqueeContent[marqueeId];
-                            marqueeId++;
-                            if(marqueeId>=marqueeContent.length) marqueeId=0;
-                            if(document.getElementById("marqueeBox").childNodes.length==1) {
-                                var nextLine=document.createElement('DIV');
-                                nextLine.innerHTML=str;
-                                document.getElementById("marqueeBox").appendChild(nextLine);
-                            }
-                            else {
-                                document.getElementById("marqueeBox").childNodes[0].innerHTML=str;
-                                document.getElementById("marqueeBox").appendChild(document.getElementById("marqueeBox").childNodes[0]);
-                                document.getElementById("marqueeBox").scrollTop=0;
-                            }
-                            clearInterval(marqueeInterval[1]);
-                            marqueeInterval[1]=setInterval("scrollMarquee()",20);
-                        }
-
-                        //
-                        function scrollMarquee() {
-                            document.getElementById("marqueeBox").scrollTop++;
-                            if(document.getElementById("marqueeBox").scrollTop%marqueeHeight==(marqueeHeight-1)){
+                                else {
+                                    document.getElementById("marqueeBox").childNodes[0].innerHTML=str;
+                                    document.getElementById("marqueeBox").appendChild(document.getElementById("marqueeBox").childNodes[0]);
+                                    document.getElementById("marqueeBox").scrollTop=0;
+                                }
                                 clearInterval(marqueeInterval[1]);
+                                marqueeInterval[1]=setInterval("scrollMarquee()",20);
                             }
-                        }
+
+                            //
+                            function scrollMarquee() {
+                                document.getElementById("marqueeBox").scrollTop++;
+                                if(document.getElementById("marqueeBox").scrollTop%marqueeHeight==(marqueeHeight-1)){
+                                    clearInterval(marqueeInterval[1]);
+                                }
+                            }
 
 
 
-                    </script>
-                    <div id="commonMsg">
+                        </script>
+                        <div id="commonMsg">
+                        </div>
+                        <section class="vbox xbox">
+                            <!-- 如果没有三级导航 这段代码注释-->
+                            <!-- <div class="head&#45;box"> <a href="#subNav" data&#45;toggle="class:hide"> <i class="fa fa&#45;angle&#45;left text"></i> <i class="fa fa&#45;angle&#45;right text&#45;active"></i> </a> </div> -->
+                            <section class="scrollable wrapper w-f">
+                                <section class="panel panel-default yunhuni-personal">
+                                    <div class="row m-l-none m-r-none bg-light lter">
 
-                    </div>
-
-                    <section class="vbox xbox">
-                        <!-- 如果没有三级导航 这段代码注释-->
-                        <!-- <div class="head&#45;box"> <a href="#subNav" data&#45;toggle="class:hide"> <i class="fa fa&#45;angle&#45;left text"></i> <i class="fa fa&#45;angle&#45;right text&#45;active"></i> </a> </div> -->
-                        <section class="scrollable wrapper w-f">
-                            <section class="panel panel-default yunhuni-personal">
-                                <div class="row m-l-none m-r-none bg-light lter">
-
-                                    <div class="col-md-3 padder-v fix-padding">
-                                        <div class='wrappernewBox green-border-top'>
-                                            <span class="pull-left m-r-sm">
-                                              <img src="${resPrefixUrl}/images/index/avatar-middle.png" width="80"/>
-                                            </span>
-                                            <span class="h5 block m-t-xs">
-                                              <i class="iconfont icon-yue middleicon"></i>
-                                              <span class="inline-block">余额(元)</span>
-                                            </span>
-                                            <span class="block m-t-25">
-                                              ${homeVO.arrearage}<small class="text-muted text-uc account-money green">￥${homeVO.balanceInt}</small>
-                                              <small class="account-number-decimal green">.${homeVO.balanceDec}</small>
-                                              元
-                                            </span>
-                                            <div class="box-footer">
-                                                <button class="btn btn-primary"  onclick="window.location.href='${ctx}/console/cost/recharge'">充值</button>
-                                                <button class="btn btn-default" onclick="window.location.href='${ctx}/console/cost/consume'">消费情况</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 padder-v fix-padding">
-                                        <div class='wrappernewBox blue-border-top'>
-                                            <span class="h5 block m-t-xs"> <i class="iconfont icon-oc-appnum middleicon m-r-5"></i><span class="inline-block">应用数（上线数/总数)</span></span>
-                                            <a class="h5 block m-t-25 text-center" href="application_list.html"><span class="green bigger-font-size">${homeVO.onLineApp}/${fn:length(homeVO.appStateVOs)}</span>个</a>
-                                            <div class="box-footer">
-                                                <a class="btn btn-primary" href="${ctx}/console/app/index" >创建应用</a>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 padder-v fix-padding">
-                                        <div class='wrappernewBox yellow-border-top'>
-                                            <span class="h5 block m-t-xs"> <i class="iconfont icon-huawuliang middleicon m-r-5"></i><span class="inline-block">平均通话时长</span></span>
-                                            <span class="h5 block m-t-25 text-center ">
-                                              <span class="green bigger-font-size">
-                                                  <c:if test="${homeVO.lineAverageCallTime <= 0}">--</c:if>
-                                                    <c:if test="${homeVO.lineAverageCallTime > 0}">
-                                                        ${homeVO.lineAverageCallTime}分钟
-                                                    </c:if>
-                                              </span>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3 padder-v fix-padding">
-                                        <div class='wrappernewBox pink-border-top'>
-                                            <span class="h5 block m-t-xs"> <i class="iconfont icon-oc-callrate middleicon m-r-5"></i><span class="inline-block">接通率</span></span>
-                                            <span class="h5 block m-t-25 text-center ">
-                                                <span class="green bigger-font-size">
-                                                    <c:if test="${homeVO.lineLinkRate <= 0.0}">--</c:if>
-                                                    <c:if test="${homeVO.lineLinkRate > 0.0}">
-                                                        ${homeVO.lineLinkRate}%
-                                                    </c:if>
+                                        <div class="col-md-3 padder-v fix-padding">
+                                            <div class='wrappernewBox green-border-top'>
+                                                <span class="pull-left m-r-sm">
+                                                  <img src="${resPrefixUrl}/images/index/avatar-middle.png" width="80"/>
                                                 </span>
-                                              </span>
-
-                                        </div>
-                                    </div>
-
-
-
-                                </div>
-                            </section>
-                            <section class="panel panel-default pos-rlt clearfix ">
-                                <div class="sectionnewWrap">
-                                    <header class="panel-heading">
-                                        <div class="h5 ">开发者账号</div>
-                                    </header>
-                                    <div class="panel-body clearfix border-top-none">
-                                        <p>
-                                            <span class="iconfont icon-oc-api smallicon inline-block develop-icon"></span>
-                                            <span class="index-key"><strong>接口API:</strong></span>
-                                            <span class="index-api" id="restapi">${homeVO.restApi}</span>
-                                        <span>
-                                          <a href="#"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>API文档</a>
-                                          <a id="copyapi" data-clipboard-text="${homeVO.restApi}"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
-                                        </span>
-                                        </p>
-                                        <p>
-                                            <span class="iconfont icon-oc-secrekey smallicon inline-block develop-icon"></span>
-                                            <span class="index-key"><strong>密钥:</strong></span>
-                                            <span class="index-api" id="secretkey">${homeVO.secretKey}</span>
-                                        <span>
-                                          <a class='reset_confirm'><i class="iconfont icon-resert smallicon inline-block develop-icon"></i>重新生成</a>
-                                          <a id="copysecrekey" data-clipboard-text="${homeVO.secretKey}" ><i class="iconfont icon-oc-small-copy"></i>复制</a>
-                                        </span>
-                                        <span>
-                                          <a class='tips-error tips-key'></a>
-                                        </span>
-                                        </p>
-                                        <p>
-                                            <span class="iconfont icon-oc-certid smallicon inline-block develop-icon"></span>
-                                            <span class="index-key"><strong>鉴权账号:</strong></span>
-                                            <span class="index-api" id="certid" >${homeVO.certId}</span>
-                                        <span>
-                                          <a id="copycertid" data-clipboard-text="${homeVO.certId}" ><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
-                                        </span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <c:if test="${homeVO.appStateVOs == null || fn:length(homeVO.appStateVOs) == 0}">
-                                <section class="panel panel-default pos-rlt clearfix ">
-                                    <div class="sectionWrap">
-                                        <div class="panel-body clearfix">
-                                            <div class="none-newapp">
-                                                <img src="${resPrefixUrl}/images/index/avatar-big.png" alt="">
-                                        <span class="">
-                                          <span class="app">您还没有创建属于自己的应用，快来创建应用吧</span>
-                                          <br/><br/>
-                                          <a class="btn btn-primary fl" href="${ctx}/console/app/index">创建应用</a>
-                                        </span>
+                                                <span class="h5 block m-t-xs">
+                                                  <i class="iconfont icon-yue middleicon"></i>
+                                                  <span class="inline-block">余额(元)</span>
+                                                </span>
+                                                <span class="block m-t-25">
+                                                  ${homeVO.arrearage}<small class="text-muted text-uc account-money green">￥${homeVO.balanceInt}</small>
+                                                  <small class="account-number-decimal green">.${homeVO.balanceDec}</small>
+                                                  元
+                                                </span>
+                                                <div class="box-footer">
+                                                    <button class="btn btn-primary"  onclick="window.location.href='${ctx}/console/cost/recharge'">充值</button>
+                                                    <button class="btn btn-default" onclick="window.location.href='${ctx}/console/cost/consume'">消费情况</button>
+                                                </div>
                                             </div>
                                         </div>
+                                        <c:set var="appSize" value="0"></c:set>
+                                        <c:if test="${homeVO.appSize != null && homeVO.appSize > 0}">
+                                            <c:set var="appSize" value="${homeVO.appSize}"></c:set>
+                                        </c:if>
+                                        <div class="col-md-3 padder-v fix-padding">
+                                            <div class='wrappernewBox blue-border-top'>
+                                                <span class="h5 block m-t-xs"> <i class="iconfont icon-oc-appnum middleicon m-r-5"></i><span class="inline-block">应用数（上线数/总数)</span></span>
+                                                <a class="h5 block m-t-25 text-center" href="application_list.html"><span class="green bigger-font-size">${homeVO.onLineApp}/${appSize}</span>个</a>
+                                                <div class="box-footer">
+                                                    <a class="btn btn-primary" href="${ctx}/console/app/index" >创建应用</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        ${homeVO.lineAverageCallTime}
+                                        <div class="col-md-3 padder-v fix-padding">
+                                            <div class='wrappernewBox yellow-border-top'>
+                                                <span class="h5 block m-t-xs"> <i class="iconfont icon-huawuliang middleicon m-r-5"></i><span class="inline-block">平均通话时长(分钟)</span></span>
+                                                <span class="h5 block m-t-25 text-center ">
+                                                  <span class="green bigger-font-size">
+                                                      <c:if test="${homeVO.lineAverageCallTime <= 0}">--</c:if>
+                                                        <c:if test="${homeVO.lineAverageCallTime > 0}">
+                                                            ${homeVO.lineAverageCallTime}
+                                                        </c:if>
+                                                  </span>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 padder-v fix-padding">
+                                            <div class='wrappernewBox pink-border-top'>
+                                                <span class="h5 block m-t-xs"> <i class="iconfont icon-oc-callrate middleicon m-r-5"></i><span class="inline-block">接通率(%)</span></span>
+                                                <span class="h5 block m-t-25 text-center ">
+                                                    <span class="green bigger-font-size">
+                                                        <c:if test="${homeVO.lineLinkRate <= 0.0}">--</c:if>
+                                                        <c:if test="${homeVO.lineLinkRate > 0.0}">
+                                                            ${homeVO.lineLinkRate}
+                                                        </c:if>
+                                                    </span>
+                                                  </span>
+
+                                            </div>
+                                        </div>
+
+
+
                                     </div>
                                 </section>
-                            <</c:if>
-                            <c:if test="${homeVO.appStateVOs != null && fn:length(homeVO.appStateVOs) > 0}">
                                 <section class="panel panel-default pos-rlt clearfix ">
                                     <div class="sectionnewWrap">
                                         <header class="panel-heading">
-                                            <div class="h5">
-                                                <a class="tab-data cursor tab-active" data-id="today">今日数据</a>
-                                                <a class="tab-data cursor" data-id="month">本月数据</a>
-                                                <a href="${ctx}/console/statistics/consume/index" class="tab-data">更多数据</a>
-                                            </div>
+                                            <div class="h5 ">开发者账号</div>
                                         </header>
-                                        <div class="panel-body clearfix border-top-none remove-padding">
-                                            <div class="row m-l-none m-r-none bg-light lter">
-                                                <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
-                                                    <div class="warpbox">
-                                                        <div class="">
-                                                            <i class="icon iconfont icon-oc-wallet bigicon"></i>
-                                                            <span class="green money datatoday" id="today_cost1">188.<span class="small-font-size" id="today_cost2">33</span></span>
-                                                            <span class="green money datamonth" id="month_cost1">188.<span class="small-font-size" id="month_cost2">32</span></span>
-                                                        </div>
-                                                        <div class="middle-font-size middle-font-color" >
-                                                            消费额(元)
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 padder-v fix-padding width-twenty-percent">
-                                                    <div class="warpbox">
-                                                        <div class="">
-                                                            <i class="icon iconfont icon-oc-msg1 bigicon"></i>
-                                                            <span class="green money datatoday" id="today_session">123456</span>
-                                                            <span class="green money datamonth" id="month_session">123</span>
-                                                        </div>
-                                                        <div class="middle-font-size middle-font-color" >
-                                                            会话量(次)
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
-                                                    <div class="warpbox">
-                                                        <div class="">
-                                                            <i class="icon iconfont icon-oc-mobile bigicon"></i>
-                                                            <span class="green money datatoday" id="today_costTime">0</span>
-                                                            <span class="green money datamonth"  id="month_costTime">123</span>
-                                                        </div>
-                                                        <div class="middle-font-size middle-font-color" >
-                                                            话务量(分钟)
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 padder-v fix-padding width-twenty-percent">
-                                                    <div class="warpbox">
-                                                        <div class="">
-                                                            <i class="icon iconfont icon-oc-talktime bigicon"></i>
-                                                            <span class="green money datatoday" id="today_avgCostTime">0</span>
-                                                            <span class="green money datamonth" id="month_avgCostTime">123</span>
-                                                        </div>
-                                                        <div class="middle-font-size middle-font-color" >
-                                                            平均通话时长(分钟)
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
-                                                    <div class="warpbox remove-border">
-                                                        <div class="">
-                                                            <i class="icon iconfont icon-oc-callrate bigicon"></i>
-                                                            <span class="green money datatoday" id="today_avgCall">0</span>
-                                                            <span class="green money datamonth" id="month_avgCall">123</span>
-                                                        </div>
-                                                        <div class="middle-font-size middle-font-color" >
-                                                            接通率(%)
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
+                                        <div class="panel-body clearfix border-top-none">
+                                            <p>
+                                                <span class="iconfont icon-oc-api smallicon inline-block develop-icon"></span>
+                                                <span class="index-key"><strong>接口API:</strong></span>
+                                                <span class="index-api" id="restapi">${homeVO.restApi}</span>
+                                            <span>
+                                              <a href="#"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>API文档</a>
+                                              <a id="copyapi" data-clipboard-text="${homeVO.restApi}"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
+                                            </span>
+                                            </p>
+                                            <p>
+                                                <span class="iconfont icon-oc-secrekey smallicon inline-block develop-icon"></span>
+                                                <span class="index-key"><strong>密钥:</strong></span>
+                                                <span class="index-api" id="secretkey">${homeVO.secretKey}</span>
+                                            <span>
+                                              <a class='reset_confirm'><i class="iconfont icon-resert smallicon inline-block develop-icon"></i>重新生成</a>
+                                              <a id="copysecrekey" data-clipboard-text="${homeVO.secretKey}" ><i class="iconfont icon-oc-small-copy"></i>复制</a>
+                                            </span>
+                                            <span>
+                                              <a class='tips-error tips-key'></a>
+                                            </span>
+                                            </p>
+                                            <p>
+                                                <span class="iconfont icon-oc-certid smallicon inline-block develop-icon"></span>
+                                                <span class="index-key"><strong>鉴权账号:</strong></span>
+                                                <span class="index-api" id="certid" >${homeVO.certId}</span>
+                                            <span>
+                                              <a id="copycertid" data-clipboard-text="${homeVO.certId}" ><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
+                                            </span>
+                                            </p>
                                         </div>
                                     </div>
                                 </section>
-
-                            <!--话务量消费额-->
-                            <section class="panel panel-default pos-rlt clearfix ">
-                                <div class="sectionWrap">
-                                    <div class="panel-body clearfix border-top-none">
-                                        <div class="row monthform" >
-                                            <div class="col-md-12">
-                                                <input type="text" class="datepicker currentMonth form-control date_block monthstart" value="${homeVO.time}" data-time="${homeVO.time}" />
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-12 scanvas" >
-                                                <!--统计列表-->
-                                                <div class="ecpanel" id="ecpanel" style=" height: 600px;  "></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </section>
-                            <!--话务量消费额end-->
-
-                            <section class="panel panel-default pos-rlt clearfix ">
-
-
-                                <div class="row ">
-                                    <div class="col-md-6 remove-left-padding" >
+                                <c:if test="${appSize== 0}">
+                                    <section class="panel panel-default pos-rlt clearfix ">
                                         <div class="sectionWrap">
-                                            <div class="panel-body clearfix border-top-none">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <input type="text" class="datepicker currentMonth form-control date_block sessionstart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                            <div class="panel-body clearfix">
+                                                <div class="none-newapp">
+                                                    <img src="${resPrefixUrl}/images/index/avatar-big.png" alt="">
+                                            <span class="">
+                                              <span class="app">您还没有创建属于自己的应用，快来创建应用吧</span>
+                                              <br/><br/>
+                                              <a class="btn btn-primary fl" href="${ctx}/console/app/index">创建应用</a>
+                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </c:if>
+
+                                <c:if test="${appSize > 0}">
+                                    <section class="panel panel-default pos-rlt clearfix ">
+                                        <div class="sectionnewWrap">
+                                            <header class="panel-heading">
+                                                <div class="h5">
+                                                    <a class="tab-data cursor tab-active" data-id="today">今日数据</a>
+                                                    <a class="tab-data cursor" data-id="month">本月数据</a>
+                                                    <a href="${ctx}/console/statistics/consume/index" class="tab-data">更多数据</a>
+                                                </div>
+                                            </header>
+                                            <div class="panel-body clearfix border-top-none remove-padding">
+                                                <div class="row m-l-none m-r-none bg-light lter">
+                                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
+                                                        <div class="warpbox">
+                                                            <div class="">
+                                                                <i class="icon iconfont icon-oc-wallet bigicon"></i>
+                                                                <span class="green money datatoday" id="today_cost1">188.<span class="small-font-size" id="today_cost2">33</span></span>
+                                                                <span class="green money datamonth" id="month_cost1">188.<span class="small-font-size" id="month_cost2">32</span></span>
+                                                            </div>
+                                                            <div class="middle-font-size middle-font-color" >
+                                                                消费额(元)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent">
+                                                        <div class="warpbox">
+                                                            <div class="">
+                                                                <i class="icon iconfont icon-oc-msg1 bigicon"></i>
+                                                                <span class="green money datatoday" id="today_session">123456</span>
+                                                                <span class="green money datamonth" id="month_session">123</span>
+                                                            </div>
+                                                            <div class="middle-font-size middle-font-color" >
+                                                                会话量(次)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
+                                                        <div class="warpbox">
+                                                            <div class="">
+                                                                <i class="icon iconfont icon-oc-mobile bigicon"></i>
+                                                                <span class="green money datatoday" id="today_costTime">0</span>
+                                                                <span class="green money datamonth"  id="month_costTime">123</span>
+                                                            </div>
+                                                            <div class="middle-font-size middle-font-color" >
+                                                                话务量(分钟)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent">
+                                                        <div class="warpbox">
+                                                            <div class="">
+                                                                <i class="icon iconfont icon-oc-talktime bigicon"></i>
+                                                                <span class="green money datatoday" id="today_avgCostTime">0</span>
+                                                                <span class="green money datamonth" id="month_avgCostTime">123</span>
+                                                            </div>
+                                                            <div class="middle-font-size middle-font-color" >
+                                                                平均通话时长(分钟)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
+                                                        <div class="warpbox remove-border">
+                                                            <div class="">
+                                                                <i class="icon iconfont icon-oc-callrate bigicon"></i>
+                                                                <span class="green money datatoday" id="today_avgCall">0</span>
+                                                                <span class="green money datamonth" id="month_avgCall">123</span>
+                                                            </div>
+                                                            <div class="middle-font-size middle-font-color" >
+                                                                接通率(%)
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="row" >
-                                                    <div class="col-md-12">
-                                                        <div class="ecpanel" id="sessionecpanel" style=" height: 600px;"></div>
+
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <!--话务量消费额-->
+                                    <section class="panel panel-default pos-rlt clearfix ">
+                                    <div class="sectionWrap">
+                                        <div class="panel-body clearfix border-top-none">
+                                            <div class="row monthform" >
+                                                <div class="col-md-12">
+                                                    <input type="text" class="datepicker currentMonth form-control date_block monthstart" id="monthstart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-12 scanvas" >
+                                                    <!--统计列表-->
+                                                    <div class="ecpanel" id="ecpanel" style=" height: 600px;  "></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </section>
+                                    <!--话务量消费额end-->
+                                    <section class="panel panel-default pos-rlt clearfix ">
+                                    <div class="row ">
+                                        <div class="col-md-6 remove-left-padding" >
+                                            <div class="sectionWrap">
+                                                <div class="panel-body clearfix border-top-none">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <input type="text" class="datepicker currentMonth form-control date_block sessionstart" id="sessionstart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" >
+                                                        <div class="col-md-12">
+                                                            <div class="ecpanel" id="sessionecpanel" style=" height: 600px;"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 remove-right-padding">
+                                            <div class="sectionWrap">
+                                                <div class="panel-body clearfix border-top-none">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <input type="text" class="datepicker currentMonth form-control date_block apistart"  id="apistart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="ecpanel" id="apiecpanel" style="height: 600px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 remove-right-padding">
-                                        <div class="sectionWrap">
-                                            <div class="panel-body clearfix border-top-none">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <input type="text" class="datepicker currentMonth form-control date_block apistart" value="${homeVO.time}" data-time="${homeVO.time}" />
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="ecpanel" id="apiecpanel" style="height: 600px;"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
+                                </section>
+                                </c:if>
+                                <!--end-->
                             </section>
-                            </c:if>
-                            <!--end-->
                         </section>
-
-                    </section>
-                </aside>
+                    </aside>
+                </section>
+                <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
             </section>
-            <a href="#" class="hide nav-off-screen-block" data-toggle="class:nav-off-screen" data-target="#nav"></a>
         </section>
     </section>
-</section>
 </section>
 <%@include file="/inc/footer.jsp"%>
 
@@ -401,7 +398,7 @@
     })
     getAvg("today");
     //查询
-    $('.monthstart').change(function(){
+    $('#monthstart').change(function(){
         var id = $(this).attr('data-id');
         var tipsclass  = '.'+id+'tips';
         $(tipsclass).html('');
@@ -409,11 +406,11 @@
         if(starttime==''){
             tips(tipsclass,'请先填写时间'); return;
         }
-        initchart();
+        initchart(starttime);
     });
 
     //查询
-    $('.sessionstart').change(function(){
+    $('#sessionstart').change(function(){
         var id = $(this).attr('data-id');
         var tipsclass  = '.'+id+'tips';
         $(tipsclass).html('');
@@ -421,11 +418,11 @@
         if(starttime==''){
             tips(tipsclass,'请先填写时间'); return;
         }
-        initsessionchart();
+        initsessionchart(starttime);
     });
 
     //查询
-    $('.apistart').change(function(){
+    $('#apistart').change(function(){
         var id = $(this).attr('data-id');
         var tipsclass  = '.'+id+'tips';
         $(tipsclass).html('');
@@ -433,14 +430,14 @@
         if(starttime==''){
             tips(tipsclass,'请先填写时间'); return;
         }
-        initapichart();
+        initapichart(starttime);
     });
 
 
 
 
     //初始时间
-    function initialStartTime(id){
+    function initialStartTime(){
 //        var starttime =  $('.'+id+'start').val();
 //        if(starttime==''){
 //            starttime = $('.'+id+'start').attr('data-time');
@@ -457,9 +454,12 @@
      * endtime 对比时间
      */
 
-    function initchart(){
+    function initchart(starttime){
+       if(!starttime){
+           starttime = $('#monthstart').val();
+       }
+        console.info(starttime);
         var type='day';
-        var starttime = initialStartTime();
         var param ={'type':type,'appId':-1,'startTime':starttime, csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/statistics/session/list",param,function(result){
             var resultData = result.data;
@@ -492,9 +492,12 @@
     /**
      * 会话量
      * */
-    function initsessionchart(){
+    function initsessionchart(starttime){
+        if(!starttime){
+            starttime = $('#sessionstart').val();
+        }
+        console.info(starttime);
         var type='day';
-        var starttime = initialStartTime();
         //异步查询 返回json 数据
         //消费额最大值
         //会话次数最大值
@@ -509,9 +512,12 @@
     }
     /**api调用
      * **/
-    function initapichart(){
+    function initapichart(starttime){
+        if(!starttime){
+            starttime = $('#apistart').val();
+        }
+        console.info(starttime);
         var type='day';
-        var starttime = initialStartTime();
         //异步查询 返回json 数据
         //消费额最大值
         //会话次数最大值
@@ -758,20 +764,20 @@
         };
         sessionChart.setOption(option);
     }
-
+    var appSize = '${appSize}';
     //当浏览器大小变化时
     $(window).resize(function () {
-        if('${homeVO.appStateVOs != null && fn:length(homeVO.appStateVOs) > 0}') {
+        if(appSize>0) {
             initchart();
-            sessioncharts();
-            apicharts();
+            initsessionchart();
+            initapichart();
         }
     });
-    if('${homeVO.appStateVOs != null && fn:length(homeVO.appStateVOs) > 0}'){
-        initchart();
-        sessioncharts();
-        apicharts();
-    }
+//    if(appSize>0){
+//        initchart();
+//        initsessionchart();
+//        initapichart();
+//    }
 </script>
 
 
@@ -821,7 +827,7 @@
 
 </script>
 
-
+<script src="${resPrefixUrl}/js/include.js" aysnc></script>
 <script src="${resPrefixUrl}/js/include.js"></script>
 <script type="text/javascript">
     $('.reset_confirm').click(function(){
