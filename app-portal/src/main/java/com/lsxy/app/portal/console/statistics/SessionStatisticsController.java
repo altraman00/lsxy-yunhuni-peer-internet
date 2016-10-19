@@ -67,6 +67,30 @@ public class SessionStatisticsController extends AbstractPortalController {
         list.add(getArrays(tempVoiceCdrList,date,"amongCall"));
         return RestResponse.success(list);
     }
+    @RequestMapping("/list/api")
+    @ResponseBody
+    public RestResponse listApiCall(HttpServletRequest request,String type,String startTime,String appId){
+        List list = new ArrayList();
+        List tempConsumeList = getApiCallList(request,type,appId,startTime);
+        Object date = 12;
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
+        list.add(getArrays(tempConsumeList,date,""));
+        return RestResponse.success(list);
+    }
+    @RequestMapping("/list/session")
+    @ResponseBody
+    public RestResponse listSession(HttpServletRequest request,String type,String startTime,String appId){
+        List list = new ArrayList();
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
+        Object date = 12;
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
+        list.add(getArrays(tempVoiceCdrList,date,"amongCall"));
+        return RestResponse.success(list);
+    }
     /**
      * 获取通话记录（session）的List
      * @param request

@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,4 +37,15 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      * @return
      */
     Map currentRecordStatistics(String appId);
+
+    /**
+     * 根据租户id，应用id，和时间区间获取平均通话时长（分钟），接通率，消费金额，会话量，话务量（分钟）
+     * @param tenantId
+     * @param appId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    Map getAvgCdr(String tenantId, String appId, Date startTime, Date endTime);
+
 }
