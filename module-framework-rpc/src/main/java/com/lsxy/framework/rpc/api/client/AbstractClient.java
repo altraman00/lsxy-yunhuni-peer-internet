@@ -8,6 +8,8 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
 import com.lsxy.framework.rpc.exceptions.ClientConnecException;
+import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
+import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,8 +166,15 @@ public abstract class AbstractClient implements Client{
                         sessionContext.putSession(session);
                         logger.info("连接区域管理服务{}:{}】成功,",session.getRemoteAddress().getAddress().getHostAddress(),session.getRemoteAddress().getPort());
                     }
-                } catch (Exception e) {
-                    logger.error("客户端连接失败:" + serverUrl,  e);
+                } catch (RequestTimeOutException e) {
+                    logger.error("心跳请求超时:" + serverUrl,  e);
+                } catch (InterruptedException e) {
+                    logger.error("出现异常",e);
+                } catch (ClientBindException e) {
+                    logger.error("客户端连接异常:" + serverUrl,e);
+                } catch (HaveNoExpectedRPCResponseException e) {
+                    logger.error("非期待响应对象:" + serverUrl,e);
+
                 }
             }
         }
