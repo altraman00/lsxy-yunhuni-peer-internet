@@ -381,7 +381,22 @@
                 var tempData = new Date(resultData[i].dt);
                 var tempDataStr = tempData.getFullYear()+"-"+(tempData.getMonth()+1)+"-"+tempData.getDate();
                 if(type=='year'){tempDataStr =  tempData.getFullYear()+"-"+(tempData.getMonth()+1);}
-                var temp = [tempDataStr,'￥'+resultData[i].amongAmount];
+                var cost = new String(resultData[i].amongAmount).split(".");
+                var cost2 = "";
+                if(cost.length==1){
+                    cost2="000";
+                }else{
+                    cost2 = cost[1];
+                    if(cost[1].length>3){
+                        cost2 = cost[1].substring(0,3);
+                    }else if(cost[1].length<3){
+                        var tleng =3 - cost[1].length;
+                        for(var j=0;j<tleng;j++){
+                            cost2+="0";
+                        }
+                    }
+                }
+                var temp = [tempDataStr,'￥'+cost[0]+"."+cost2];
                 data[i]=temp;
             }
             i++;
