@@ -42,7 +42,7 @@ public class ResourcesRent extends IdEntity {
         this.tenant = tenant;
         this.app = app;
         this.resourceTelenum = resourceTelenum;
-        this.resData = resourceTelenum.getCallUri();
+        this.resData = resourceTelenum.getTelNumber();
         this.resName = resName;
         this.resType = resType;
         this.rentDt = rentDt;

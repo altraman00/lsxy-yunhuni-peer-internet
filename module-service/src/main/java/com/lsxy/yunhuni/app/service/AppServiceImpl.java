@@ -7,10 +7,12 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -104,10 +106,17 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
     @Override
     public String findOneAvailableTelnumberCallUri(App app) {
-        if(app.getIsIvrService()==1){
+        if(app.getIsIvrService() != null && app.getIsIvrService()==1){
             List<ResourcesRent> resourcesRents = resourcesRentService.findByAppId(app.getId());
             ResourcesRent resourcesRent = resourcesRents.get(0);
-            return resourcesRent.getResData();
+            String callUri = resourcesRent.getResourceTelenum().getCallUri();
+            if(StringUtils.isBlank(callUri)){
+                ResourceTelenum telenum = resourceTelenumService.findById(resourcesRent.getResourceTelenum().getId());
+                if(telenum != null){
+                    callUri = telenum.getCallUri();
+                }
+            }
+            return callUri;
         }else{
             return resourceTelenumService.findOneFreeNumberCallUri(app.getArea().getId());
         }

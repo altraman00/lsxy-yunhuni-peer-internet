@@ -2,6 +2,8 @@ package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelNumLocationService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -50,6 +52,9 @@ public class CalCostTest {
     ResourceTelenumService resourceTelenumService;
     @Autowired
     ApiGwRedBlankNumService apiGwRedBlankNumService;
+
+    @Autowired
+    AppService appService;
 
     @Test
     public void testCalCost(){
@@ -104,6 +109,13 @@ public class CalCostTest {
     public void testRedNum(){
         boolean redNum = apiGwRedBlankNumService.isBlackNum("13750001373");
         System.out.println(redNum);
+    }
+    @Test
+    public void testCallUri(){
+        App app = new App();
+        app.setIsIvrService(1);
+        app.setId("8a2bc5f65721aa160157222c8477000b");
+        appService.findOneAvailableTelnumberCallUri(app);
     }
 
 }
