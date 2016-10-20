@@ -71,16 +71,16 @@ public class HomeController extends AbstractPortalController {
     public RestResponse getAvgDer(HttpServletRequest request,@PathVariable String type){
         String token = getSecurityToken(request);
         Date date = new Date();
-        Date date1 = null;
-        Date date2 = null;
+        String date1 = null;
+        String date2 = null;
         if("today".equals(type)) {
             String hour1 = DateUtils.formatDate(date, "yyyy-MM-dd");
-            date1 = DateUtils.parseDate(hour1 + " 00:00:00");
-            date2 = DateUtils.parseDate(hour1 + " 23:59:59");
+            date1 = hour1 + " 00:00:00";
+            date2 = hour1 + " 23:59:59";
         }else {
             String month = DateUtils.formatDate(date, "yyyy-MM");
-            date1 = DateUtils.parseDate(month + "-01 00:00:00");
-            date2 = DateUtils.parseDate(DateUtils.getMonthLastTime(date1), "yyyy-MM-dd HH:mm:ss");
+            date1 = month + "-01 00:00:00";
+            date2 = DateUtils.getMonthLastTime(DateUtils.parseDate(date1));
         }
         String url = PortalConstants.REST_PREFIX_URL +   "/rest/voice_cdr/get_avg_ddr?appId={1}&startTime={2}&endTime={3}";
         return RestRequest.buildSecurityRequest(token).get(url, Map.class,null,date1,date2);
@@ -148,37 +148,37 @@ public class HomeController extends AbstractPortalController {
         }
         List<App> appList = getApps(token);
 
-//        List<AppStateVO> appStateVOs = new ArrayList<>();
+        List<AppStateVO> appStateVOs = new ArrayList<>();
         vo.setAppSize(appList.size());
         int onlineApp = 0;
         if(appList != null){
             for(App app:appList){
-//                AppStateVO appStateVO = new AppStateVO();
-//                try {
-//                    BeanUtils.copyProperties2(appStateVO,app,false);
-//                } catch (Exception e) {
-//                    logger.error("复制类属性异常",e);
-//                }
-//                Map map = getStatistics(token, app);
-//
-//                appStateVO.setCallOfDay((Integer) map.get("dayCount"));
-//                appStateVO.setCallOfHour((Integer) map.get("hourCount"));
-//                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
+                AppStateVO appStateVO = new AppStateVO();
+                try {
+                    BeanUtils.copyProperties2(appStateVO,app,false);
+                } catch (Exception e) {
+                    logger.error("复制类属性异常",e);
+                }
+                Map map = getStatistics(token, app);
+
+                appStateVO.setCallOfDay((Integer) map.get("dayCount"));
+                appStateVO.setCallOfHour((Integer) map.get("hourCount"));
+                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
                 if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
                     onlineApp++;
-//                    ResourcesRent rent = getIvrNumber(token,app.getId());
-//                    if(rent != null){
-//                        if(rent.getResourceTelenum()!=null) {
-//                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
-//                        }
-//                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
-//                    }
+                    ResourcesRent rent = getIvrNumber(token,app.getId());
+                    if(rent != null){
+                        if(rent.getResourceTelenum()!=null) {
+                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+                        }
+                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
+                    }
                 }
-//                appStateVOs.add(appStateVO);
+                appStateVOs.add(appStateVO);
             }
         }
         vo.setOnLineApp(onlineApp);
-//        vo.setAppStateVOs(appStateVOs);
+        vo.setAppStateVOs(appStateVOs);
         vo.setTime(org.apache.tools.ant.util.DateUtils.format(new Date(),"yyyy-MM"));
         return vo;
     }

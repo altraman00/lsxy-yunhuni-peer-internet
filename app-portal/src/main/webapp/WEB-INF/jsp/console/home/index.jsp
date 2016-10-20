@@ -125,13 +125,13 @@
                                         <div class="col-md-3 padder-v fix-padding">
                                             <div class='wrappernewBox blue-border-top'>
                                                 <span class="h5 block m-t-xs"> <i class="iconfont icon-oc-appnum middleicon m-r-5"></i><span class="inline-block">应用数（上线数/总数)</span></span>
-                                                <a class="h5 block m-t-25 text-center" href="application_list.html"><span class="green bigger-font-size">${homeVO.onLineApp}/${appSize}</span>个</a>
+                                                <a class="h5 block m-t-25 text-center" href="${ctx}/console/app/list"><span class="green bigger-font-size">${homeVO.onLineApp}/${appSize}</span>个</a>
                                                 <div class="box-footer">
                                                     <a class="btn btn-primary" href="${ctx}/console/app/index" >创建应用</a>
                                                 </div>
                                             </div>
                                         </div>
-                                        ${homeVO.lineAverageCallTime}
+
                                         <div class="col-md-3 padder-v fix-padding">
                                             <div class='wrappernewBox yellow-border-top'>
                                                 <span class="h5 block m-t-xs"> <i class="iconfont icon-huawuliang middleicon m-r-5"></i><span class="inline-block">平均通话时长(分钟)</span></span>
@@ -176,7 +176,7 @@
                                                 <span class="index-key"><strong>接口API:</strong></span>
                                                 <span class="index-api" id="restapi">${homeVO.restApi}</span>
                                             <span>
-                                              <a href="#"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>API文档</a>
+                                              <%--<a href="#"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>API文档</a>--%>
                                               <a id="copyapi" data-clipboard-text="${homeVO.restApi}"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
                                             </span>
                                             </p>
