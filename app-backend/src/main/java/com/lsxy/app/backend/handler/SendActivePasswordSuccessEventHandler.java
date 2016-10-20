@@ -49,7 +49,6 @@ public class SendActivePasswordSuccessEventHandler implements MQMessageHandler<S
                     String testEmail = SystemConfig.getProperty("global.mail.tester.email");
                     if(StringUtils.isNotBlank(testEmail)){
                         mailService.send("重置密码",testEmail,"02-portal-notify-reset-password.vm",params);
-                        mailService.send("重置密码","295235027@qq.com","02-portal-notify-reset-password.vm",params);
                     }
                     //↑↑↑↑↑测试环境专用，往测试人员发邮件--end-->
                     mailService.send("重置密码",email,"02-portal-notify-reset-password.vm",params);

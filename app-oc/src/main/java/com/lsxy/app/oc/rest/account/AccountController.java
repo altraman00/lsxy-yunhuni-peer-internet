@@ -102,7 +102,7 @@ public class AccountController {
                 cacheManager.del(ACCOUNT_MACTIVE_PREFIX + id);
                 //发送邮件
                 mqService.publish(new SendActivePasswordSuccessEvent(id,password));
-                return  RestResponse.success();
+                return  RestResponse.success("激活成功，发送随机密码");
             }else{
                 return RestResponse.failed("0000","用户对应状态不是未激活，无法激活");
             }
@@ -111,7 +111,7 @@ public class AccountController {
         }
     }
     @ApiOperation(value = "释放账号")
-    @RequestMapping(value = "/expire/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/opt/expire/{id}",method = RequestMethod.GET)
     public RestResponse expire(@ApiParam(name = "id",value = "用户标志")
                                      @PathVariable String id){
         //获取用户信息
