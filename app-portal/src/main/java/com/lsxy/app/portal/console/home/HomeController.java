@@ -71,16 +71,16 @@ public class HomeController extends AbstractPortalController {
     public RestResponse getAvgDer(HttpServletRequest request,@PathVariable String type){
         String token = getSecurityToken(request);
         Date date = new Date();
-        Date date1 = null;
-        Date date2 = null;
+        String date1 = null;
+        String date2 = null;
         if("today".equals(type)) {
             String hour1 = DateUtils.formatDate(date, "yyyy-MM-dd");
-            date1 = DateUtils.parseDate(hour1 + " 00:00:00");
-            date2 = DateUtils.parseDate(hour1 + " 23:59:59");
+            date1 = hour1 + " 00:00:00";
+            date2 = hour1 + " 23:59:59";
         }else {
             String month = DateUtils.formatDate(date, "yyyy-MM");
-            date1 = DateUtils.parseDate(month + "-01 00:00:00");
-            date2 = DateUtils.parseDate(DateUtils.getMonthLastTime(date1), "yyyy-MM-dd HH:mm:ss");
+            date1 = month + "-01 00:00:00";
+            date2 = DateUtils.getMonthLastTime(DateUtils.parseDate(date1));
         }
         String url = PortalConstants.REST_PREFIX_URL +   "/rest/voice_cdr/get_avg_ddr?appId={1}&startTime={2}&endTime={3}";
         return RestRequest.buildSecurityRequest(token).get(url, Map.class,null,date1,date2);
