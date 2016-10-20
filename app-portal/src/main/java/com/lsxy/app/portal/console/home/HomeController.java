@@ -135,7 +135,7 @@ public class HomeController extends AbstractPortalController {
         //获取通话状况
         Map callStatus = getAvgDdr(token,null,null,null);
         //总平均通话时长
-        vo.setLineAverageCallTime(callStatus.get("costTime"));
+        vo.setLineAverageCallTime(callStatus.get("avgCostTime"));
         //总接通率
         vo.setLineLinkRate(callStatus.get("avgCall"));
 

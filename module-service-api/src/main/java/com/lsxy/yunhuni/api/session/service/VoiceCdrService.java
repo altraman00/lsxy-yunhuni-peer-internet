@@ -46,6 +46,6 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      * @param endTime
      * @return
      */
-    Map getAvgCdr(String tenantId, String appId, Date startTime, Date endTime);
+    Map getAvgCdr(String tenantId, String appId, String startTime, String endTime);
 
 }
