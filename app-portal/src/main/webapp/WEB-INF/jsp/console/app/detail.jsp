@@ -59,125 +59,147 @@
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-12 padder-v fix-padding">
                                         <a href="${ctx}/console/app/index?id=${app.id}" class="btn btn-primary query">应用编辑</a>
-                                    </div>
-                                </div>
-                            </section>
-                            <section class="panel panel-default pos-rlt clearfix appliaction-detail">
-                                <%--<div class="row ">--%>
-                                    <%--<div class="col-md-1 remove-padding width-130">--%>
-                                        <%--应用状态：--%>
-                                    <%--</div>--%>
-                                    <%--<div class="col-md-10 ">--%>
-                                        <%--<p>--%>
-                                            <%--<c:if test="${app.status==1}"><span class="success">已上线</span></c:if>--%>
-                                            <%--<c:if test="${app.status==2}"><span class="nosuccess">未上线</span></c:if>--%>
-                                        <%--</p>--%>
-                                    <%--</div>--%>
-                                <%--</div>--%>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-">
-                                        应用名称：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                            <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
-                                            <c:if test="${app.status==2}"><span style="color:#ff0000;">未上线</span></c:if>
-                                            <input type="hidden" id="appStatus" value="${app.status}">
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用标识：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.id}</p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用描述：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p><c:if test="${app.description==null||app.description==''}">无</c:if><c:if test="${app.description!=null}">${app.description}</c:if></p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用类型：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.type}</p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        所属行业：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.industry}</p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">服务器白名单：</div>
-                                    <div class="col-md-10 ">
-                                        <p><c:if test="${app.whiteList==null||app.whiteList==''}">无</c:if><c:if test="${app.whiteList!=null}">${app.whiteList}</c:if></p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        监听通知：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>
-                                            <c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if>
-                                            <c:if test="${app.isAuth!='1'}">没有启动监听</c:if>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        回调URL：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p><span style="color:#428bca;">${app.url}</span></p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        绑定测试号：
-                                    </div>
-                                    <c:set var="tempTestNum" value="0"></c:set>
-                                    <c:forEach items="${testNumBindList}" var="testNumBind">
-                                        <c:if test="${testNumBind.app.id==app.id}">
-                                            <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
+                                        <c:if test="${app.product=='call'}">
+                                            <a href="" class="btn btn-call margin_left-20">呼叫中心管理</a>
                                         </c:if>
-                                    </c:forEach>
-                                    <div class="col-md-3 " id="testNumBind"
-                                            <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
-                                                hidden
-                                            </c:if>
-                                    >
-                                        <c:forEach items="${testNumBindList}" var="testNumBind">
-                                            <c:if test="${testNumBind.app.id==app.id}">
-                                                <span name="testNum">${testNumBind.number} </span>
-                                            </c:if>
-                                        </c:forEach>
-                                    </div>
-
-                                    <div class="col-md-4 " >
-                                        <a
-                                                <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
-                                                    class="modalShow" data-id="one"
-                                                </c:if>
-                                                <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
-                                                    onclick="showTestNumBind()"
-                                                </c:if>
-                                        >绑定交互测试号</a>
                                     </div>
                                 </div>
-                                <div class="row border-block"></div>
                             </section>
+                                <!--新的应用详情-->
+                                <section class="panel panel-default pos-rlt clearfix appliaction-detail">
+                                    <div class="row">
+                                        <div class="col-md-6 remove-padding-left">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading"><i class="iconfont icon-call-base"></i><span class="title">基础信息</span></div>
+                                                <div class="panel-body basebox">
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            应用名称：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            ${app.name}
+                                                            <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
+                                                            <c:if test="${app.status==2}"><span class="text-danger">未上线</span></c:if>
+                                                            <input type="hidden" id="appStatus" value="${app.status}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            应用描述：
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <p><c:if test="${app.description==null||app.description==''}">无</c:if><c:if test="${app.description!=null}">${app.description}</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            应用类型：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>${app.type}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            所属行业：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>${app.industry}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            选择服务：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><c:if test="${app.product=='call'}">呼叫中心</c:if>
+                                                                <c:if test="${app.product=='voice'}">语音</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 remove-padding-left">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading"><i class="iconfont icon-call-developer"></i><span class="title">开发者信息</span></div>
+                                                <div class="panel-body devbox">
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            应用标识：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>${app.id}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            服务器白名单：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><c:if test="${app.whiteList==null||app.whiteList==''}">无</c:if><c:if test="${app.whiteList!=null}">${app.whiteList}</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            监听通知：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if>
+                                                                <c:if test="${app.isAuth!='1'}">没有启动监听</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            回调URL：
+                                                        </div>
+                                                        <div class="col-md-8 ">
+                                                            <p><span style="color:#428bca;">${app.url}</span></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            绑定测试号：
+                                                        </div>
+                                                        <div class="col-md-8" >
+                                                            <c:set var="tempTestNum" value="0"></c:set>
+                                                            <c:forEach items="${testNumBindList}" var="testNumBind">
+                                                                <c:if test="${testNumBind.app.id==app.id}">
+                                                                    <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
+                                                                </c:if>
+                                                            </c:forEach>
+                                                                <c:forEach items="${testNumBindList}" var="testNumBind">
+                                                                    <c:if test="${testNumBind.app.id==app.id}">
+                                                                        <span name="testNum">${testNumBind.number} </span>
+                                                                    </c:if>
+                                                                </c:forEach>
+                                                                <a
+                                                                        <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
+                                                                            class="modalShow" data-id="one"
+                                                                        </c:if>
+                                                                        <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
+                                                                            onclick="showTestNumBind()"
+                                                                        </c:if>
+                                                                >绑定交互测试号</a>
+                                                        </div>
+                                                    </div>
+                                                    <c:if test="${app.product=='call'}">
+                                                    <div class="row">
+                                                        <div class="col-md-1 dev">
+                                                            分机接入信息：
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <p>123465789</p>
+
+                                                            <p class="text-danger">（未上线的分机接入信息只作临时使用，上线后平台会重新分配分机接入信息）</p>
+                                                        </div>
+                                                    </div>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <!--新的应用详情结束-->
                             <section class="panel panel-default pos-rlt clearfix application-tab">
                                 <ul id="myTab" class="nav nav-tabs">
                                     <li class="active" data-id="play">
