@@ -1,8 +1,8 @@
-package com.lsxy.framework.mq.events.oc;
+package com.lsxy.framework.mq.events.portal;
 
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 
-import static com.lsxy.framework.mq.topic.MQTopicConstants.TOPIC_APP_OC;
+import static com.lsxy.framework.mq.topic.MQTopicConstants.TOPIC_APP_PORTAL;
 
 /**
  * Created by zhangxb on 2016/10/20.
@@ -20,7 +20,7 @@ public class SendActivePasswordSuccessEvent extends AbstractMQEvent {
 
     @Override
     public String getTopicName() {
-        return TOPIC_APP_OC;
+        return TOPIC_APP_PORTAL;
     }
 
     public String getKey() {

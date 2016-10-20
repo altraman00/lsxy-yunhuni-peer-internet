@@ -8,7 +8,7 @@ import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mail.MailService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
-import com.lsxy.framework.mq.events.oc.SendActivePasswordSuccessEvent;
+import com.lsxy.framework.mq.events.portal.SendActivePasswordSuccessEvent;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

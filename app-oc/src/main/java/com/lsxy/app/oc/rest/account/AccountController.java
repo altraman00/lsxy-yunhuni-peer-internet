@@ -6,7 +6,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.oc.SendActivePasswordSuccessEvent;
+import com.lsxy.framework.mq.events.portal.SendActivePasswordSuccessEvent;
 import com.lsxy.framework.mq.events.portal.RegisterSuccessEvent;
 import com.lsxy.framework.web.rest.RestResponse;
 import io.swagger.annotations.Api;
