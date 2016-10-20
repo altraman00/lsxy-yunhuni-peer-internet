@@ -236,8 +236,8 @@
                                                         <div class="warpbox">
                                                             <div class="">
                                                                 <i class="icon iconfont icon-oc-wallet bigicon"></i>
-                                                                <span class="green money datatoday" id="today_cost1">188.<span class="small-font-size" id="today_cost2">33</span></span>
-                                                                <span class="green money datamonth" id="month_cost1">188.<span class="small-font-size" id="month_cost2">32</span></span>
+                                                                <span class="green money datatoday" id="today_cost1"></span>
+                                                                <span class="green money datamonth" id="month_cost1"></span>
                                                             </div>
                                                             <div class="middle-font-size middle-font-color" >
                                                                 消费额(元)
@@ -379,8 +379,22 @@
             $('#'+id+"_avgCall").html(result.data.avgCall);
             $('#'+id+"_avgCostTime").html(result.data.avgCostTime);
             var cost = new String(result.data.cost).split(".");
-            $('#'+id+"_cost1").html(cost[0]);
-            $('#'+id+"_cost2").html(cost[1]);
+            var cost2 = "";
+            if(cost.length==1){
+                cost2="000";
+            }else{
+                cost2 = cost[1];
+                if(cost[1].length>3){
+                    cost2 = cost[1].substring(0,3);
+                }else if(cost[1].length<3){
+                    var tleng =3 - cost[1].length;
+                    for(var i=0;i<tleng;i++){
+                        cost2+="0";
+                    }
+                }
+            }
+
+            $('#'+id+"_cost1").html(cost[0]+'.<span class="small-font-size" ">'+cost2+'</span>');
             $('#'+id+"_costTime").html(result.data.costTime);
             $('#'+id+"_session").html(result.data.session);
             if(id=='today'){

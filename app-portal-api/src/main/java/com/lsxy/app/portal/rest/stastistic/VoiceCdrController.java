@@ -72,7 +72,7 @@ public class VoiceCdrController extends AbstractRestController {
         return RestResponse.success(statistics);
     }
     @RequestMapping("/get_avg_ddr")
-    public RestResponse getAvgCdr( String appId, Date startTime, Date endTime) throws Exception{
+    public RestResponse getAvgCdr( String appId, String startTime, String endTime) throws Exception{
         Map map= voiceCdrService.getAvgCdr(getCurrentAccount().getTenant().getId(),appId,startTime,endTime);
         return RestResponse.success(map);
     }

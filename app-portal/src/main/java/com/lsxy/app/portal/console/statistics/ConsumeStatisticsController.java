@@ -144,18 +144,18 @@ public class ConsumeStatisticsController extends AbstractPortalController {
      * @param list 待处理的list
      * @return
      */
-    private double[] getArrays(List list,Object date) {
+    private String[] getArrays(List list,Object date) {
         int leng = getLong(date);
-        double[] list1 = new double[leng];
+        String[] list1 = new String[leng];
         for(int j=0;j<leng;j++){
-            list1[j]=0;
+            list1[j]="0";
         }
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeMonth)obj).getMonth()-1]=StringUtil.getDecimal(((ConsumeMonth)obj).getAmongAmount().toString(),3);
             }else if(obj instanceof ConsumeDay){
-                list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeDay)obj).getDay()-1]=StringUtil.getDecimal(((ConsumeDay)obj).getAmongAmount().toString(),3);
             }
         }
         return list1;
