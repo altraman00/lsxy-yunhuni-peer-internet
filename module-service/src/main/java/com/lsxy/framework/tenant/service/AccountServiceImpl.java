@@ -11,6 +11,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.PasswordUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
@@ -333,5 +334,11 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
     @Override
     public Account findByEmailAndStatus(String email, int status) {
         return accountDao.findByEmailAndStatus(email,status);
+    }
+
+    @Override
+    public Page<Account> pList(Integer status, Integer pageNo, Integer pageSize) {
+        String hql = " from Account obj where obj.status=?1 order by obj.createTime desc";
+        return this.pageList(hql,pageNo,pageSize,status);
     }
 }
