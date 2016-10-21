@@ -145,20 +145,27 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     public Map getAvgCdr(String tenantId, String appId, String startTime, String endTime) {
         String sql = " SELECT CONVERT(IFNULL((a.costTimeLong/a.`session`)/60,0),SIGNED) AS  avgCostTime,CONVERT(IFNULL(a.callAckDt/a.`session`,0)*100,SIGNED) AS avgCall, a.cost AS cost, a.`session` AS session,CONVERT(a.costTimeLong/60,SIGNED) AS costTime FROM(  " +
                 " SELECT COUNT(id) AS session,IFNULL(SUM(cost_time_long),0) AS costTimeLong,IFNULL(SUM(CASE  WHEN call_ack_dt IS NULL THEN 0 ELSE 1 END),0) AS callAckDt,IFNULL(SUM(cost),0) AS cost FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE 1=1 ";
+        String sql2 = "SELECT IFNULL(sum(amount),0) AS cost FROM db_lsxy_bi_yunhuni.tb_bi_consume WHERE 1=1 ";
         if(StringUtils.isNotEmpty(tenantId)){
             sql +=" AND tenant_id='"+tenantId+"' " ;
+            sql2 +=" AND tenant_id='"+tenantId+"' " ;
         }
         if(StringUtils.isNotEmpty(appId)){
             sql += " AND app_id='"+appId+"' ";
+            sql2 += " AND app_id='"+appId+"' ";
         }
         if(StringUtils.isNotEmpty(startTime)){
             sql += " AND create_time>='"+startTime+"' " ;
+            sql2 += " AND create_time>='"+startTime+"' " ;
         }
         if(StringUtils.isNotEmpty(endTime)){
             sql += " AND last_time<='"+endTime+"' " ;
+            sql2 += " AND last_time<='"+endTime+"' " ;
         }
         sql +=" ) a ";
         Map map = jdbcTemplate.queryForMap(sql);
+        Map map2 = jdbcTemplate.queryForMap(sql2);
+        map.putAll(map2);
         return map;
     }
 
