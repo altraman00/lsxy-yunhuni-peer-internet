@@ -66,7 +66,7 @@ public class AccountController {
         return RestResponse.success(list2);
     }
     @ApiOperation(value = "发送激活邮件")
-    @RequestMapping(value = "/send/active/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/send/active/{id}",method = RequestMethod.PUT)
     public RestResponse sendActive(@ApiParam(name = "id",value = "用户标志")
                                      @PathVariable String id){
         //获取用户信息
@@ -86,7 +86,7 @@ public class AccountController {
         }
     }
     @ApiOperation(value = "发送随机密码邮件")
-    @RequestMapping(value = "/send/password/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/send/password/{id}",method = RequestMethod.PUT)
     public RestResponse sendPassword(@ApiParam(name = "id",value = "用户标志")
                                  @PathVariable String id){
         //获取用户信息
@@ -111,7 +111,7 @@ public class AccountController {
         }
     }
     @ApiOperation(value = "释放账号")
-    @RequestMapping(value = "/opt/expire/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/opt/expire/{id}",method = RequestMethod.DELETE)
     public RestResponse expire(@ApiParam(name = "id",value = "用户标志")
                                      @PathVariable String id){
         //获取用户信息
