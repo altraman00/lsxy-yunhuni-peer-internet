@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import org.hibernate.annotations.Where;
 
@@ -12,11 +13,14 @@ import javax.persistence.*;
  * Created by zhangxb on 2016/7/1.
  */
 @Entity
-@Where(clause = "deleted=0")
+@Where(clause = "deleted=0" )
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_oc_resource_telenum")
 public class ResourceTelenum extends IdEntity{
     public static final int STATUS_RENTED = 1; //已被租用
     public static final int STATUS_FREE = 0;    //未被租用
+    public static final String USABLE_TRUE = "1";    //未被租用
+    public static final String USABLE_FALSE = "0";    //未被租用
+
 
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码

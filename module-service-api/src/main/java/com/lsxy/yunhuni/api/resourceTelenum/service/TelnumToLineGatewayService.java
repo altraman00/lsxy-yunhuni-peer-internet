@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 
 import java.util.List;
@@ -21,5 +22,7 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param number
      * @return
      */
-    List<String> getLineIdsByNumber(String number);
+    List<String> getDialingLineIdsByNumber(String number);
+
+    LineGateway getCalledLineByNumber(String number);
 }

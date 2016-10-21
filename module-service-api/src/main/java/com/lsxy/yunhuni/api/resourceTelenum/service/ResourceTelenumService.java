@@ -38,4 +38,11 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      */
     String findOneFreeNumberCallUri(String areaId);
 
+    /**
+     * 根据呼叫URI查找号码
+     * @param uri
+     * @return
+     */
+    String findNumByCallUri(String uri);
+
 }

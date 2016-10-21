@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
@@ -23,6 +24,7 @@ import static org.apache.commons.lang3.RandomUtils.nextInt;
  */
 @Service
 public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum> implements ResourceTelenumService {
+    public static String testCallNumber = SystemConfig.getProperty("portal.test.call.number");
     @Autowired
     private ResourceTelenumDao resourceTelenumDao;
     @Override
@@ -34,7 +36,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     public List<String> getFreeTeleNum(int count,String areaId){
         //TODO 根据区域选择空闲的号码
         List<String> result = new ArrayList<>();
-        List<ResourceTelenum> telenums = resourceTelenumDao.findFirst50ByStatus(ResourceTelenum.STATUS_FREE);
+        List<ResourceTelenum> telenums = resourceTelenumDao.findFirst50ByStatusAndTelNumberNot(ResourceTelenum.STATUS_FREE,testCallNumber);
         if(telenums != null && telenums.size() > 0){
             int size = telenums.size();
             if(size <= count){
@@ -72,11 +74,21 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public String findOneFreeNumberCallUri(String areaId) {
         //TODO 根据区域获取一个空闲的号码
-        Long numCount = resourceTelenumDao.countByStatus(ResourceTelenum.STATUS_FREE);
+        Long numCount = resourceTelenumDao.countByStatusAndTelNumberNot(ResourceTelenum.STATUS_FREE,testCallNumber);
         Long random = RandomUtils.nextLong(0,numCount);
 
-        ResourceTelenum resourceTelenum = resourceTelenumDao.findOneByStatus(ResourceTelenum.STATUS_FREE,random);
+        ResourceTelenum resourceTelenum = resourceTelenumDao.findOneByStatus(ResourceTelenum.STATUS_FREE,testCallNumber,random);
         return resourceTelenum.getCallUri();
+    }
+
+    @Override
+    public String findNumByCallUri(String uri) {
+        ResourceTelenum telenum = resourceTelenumDao.findByCallUri(uri);
+        if(telenum != null && ResourceTelenum.USABLE_TRUE.equals(telenum.getUsable())){
+            return telenum.getTelNumber();
+        }else{
+            return null;
+        }
     }
 
 

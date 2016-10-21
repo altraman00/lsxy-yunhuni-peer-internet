@@ -30,7 +30,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
     @Override
     public LineGateway getBestLineGatewayByNumber(String number){
         //TODO 获取最优的线路
-        List<String> lineIds =  telnumToLineGatewayService.getLineIdsByNumber(number);
+        List<String> lineIds =  telnumToLineGatewayService.getDialingLineIdsByNumber(number);
         String lineId = lineIds.get(0);
         return this.findById(lineId);
     }

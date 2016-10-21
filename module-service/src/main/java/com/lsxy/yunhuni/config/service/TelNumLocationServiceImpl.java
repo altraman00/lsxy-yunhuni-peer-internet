@@ -60,5 +60,4 @@ public class TelNumLocationServiceImpl extends AbstractService<TelnumLocation> i
         }
     }
 
-
 }
