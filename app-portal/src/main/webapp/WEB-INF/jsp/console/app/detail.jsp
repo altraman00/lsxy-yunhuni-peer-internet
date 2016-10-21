@@ -452,8 +452,8 @@
                         var result=  re.test(filename);
                         if(result){
                             if(data.files[0].size <= (5* 1024 * 1024)) {
-                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
-                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
+//                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+//                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
                                         ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename},function(response1){
                                             if(response1.data==0){
                                                 $('#progress').show();
@@ -483,11 +483,11 @@
                                                 });
                                             }
                                         },"post");
-                                    }else{
-                                        $('#progress').hide();
-                                        showtoast("存储空间不足，无法上传");
-                                    }
-                                },"post");
+//                                    }else{
+//                                        $('#progress').hide();
+//                                        showtoast("存储空间不足，无法上传");
+//                                    }
+//                                },"post");
                             }else{
                                 $('#progress').hide();
                                 showtoast("上传文件超过5M");
