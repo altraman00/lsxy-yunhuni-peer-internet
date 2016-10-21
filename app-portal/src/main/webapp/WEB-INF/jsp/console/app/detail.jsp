@@ -59,7 +59,7 @@
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-12 padder-v fix-padding">
                                         <a href="${ctx}/console/app/index?id=${app.id}" class="btn btn-primary query">应用编辑</a>
-                                        <c:if test="${app.product=='call'}">
+                                        <c:if test="${app.serviceType=='call'}">
                                             <a href="" class="btn btn-call margin_left-20">呼叫中心管理</a>
                                         </c:if>
                                     </div>
@@ -112,8 +112,8 @@
                                                             选择服务：
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <p><c:if test="${app.product=='call'}">呼叫中心</c:if>
-                                                                <c:if test="${app.product=='voice'}">语音</c:if></p>
+                                                            <p><c:if test="${app.serviceType=='call_center'}">呼叫中心</c:if>
+                                                                <c:if test="${app.serviceType=='voice'}">语音</c:if></p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -182,7 +182,7 @@
                                                                 >绑定交互测试号</a>
                                                         </div>
                                                     </div>
-                                                    <c:if test="${app.product=='call'}">
+                                                    <c:if test="${app.serviceType=='call_center'}">
                                                     <div class="row">
                                                         <div class="col-md-1 dev">
                                                             分机接入信息：

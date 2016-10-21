@@ -141,11 +141,11 @@
                                             2、呼叫中心服务包含云呼叫中心产品适用于企业为售前售后，业务咨询，业务订购，客户反馈投诉受理等而搭建的客服中心或销售中心。
                                         </p>
                                         <div class="form-group app-createbox" id="app-tag">
-                                            <input type="hidden" name="product" id="product" value="voice">
+                                            <input type="hidden" name="serviceType" id="serviceType" value="voice">
                                             <div class="col-md-3 text-right"><span class="text-label" ><strong>选择服务:</strong></span></div>
                                             <div class="col-md-9" >
                                                 <div class="btn app-tag active" data-app="voice"><i class="iconfont icon-call-voice"></i><span>语音</span></div>
-                                                <div class="btn app-tag" data-app="call"><i class="iconfont icon-call-center" ></i><span>呼叫中心</span></div>
+                                                <div class="btn app-tag" data-app="call_center"><i class="iconfont icon-call-center" ></i><span>呼叫中心</span></div>
                                             </div>
                                         </div>
                                         <!--语音-->
@@ -164,7 +164,7 @@
                                             </div>
                                         </div>
                                         <!--呼叫中心-->
-                                        <div class="form-group app-createbox none app-tap-child" data-child="call" >
+                                        <div class="form-group app-createbox none app-tap-child" data-child="call_center" >
                                             <lable class="col-md-3 text-right"></lable>
                                             <div class="col-md-9" >
                                                 <p><input type="checkbox" name="isCallCenter" value="1" <c:if test="${app.status=='1'}"> disabled="disabled" </c:if> <c:if test="${app.isCallCenter=='1'}">checked</c:if>> 启用 &nbsp;&nbsp;<font style="color: #428bca;">云呼叫中心</font>(专业的销售和客服中心，具备IVR导航、坐席管理、呼叫转移等全方位功能)</p>
@@ -196,16 +196,17 @@
 <script>
     var appId = '${app.id}';
     if(appId){
-        var appProduct = '${app.product}';
+        var appServiceType = '${app.serviceType}';
+        $('#serviceType').val(appServiceType);
         $('.app-tag').each(function () {
-            if(appProduct==$(this).attr('data-app')){
+            if(appServiceType==$(this).attr('data-app')){
                 $(this).addClass("active").siblings().removeClass("active");
             }else{
                 $(this).hide();
             }
         })
         $('.app-tap-child').each(function(){
-            if(appProduct==$(this).attr('data-child'))
+            if(appServiceType==$(this).attr('data-child'))
                 $(this).fadeIn();
             else
                 $(this).hide();
