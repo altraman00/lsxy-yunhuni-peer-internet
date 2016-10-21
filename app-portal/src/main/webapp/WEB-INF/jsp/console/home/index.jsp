@@ -35,10 +35,10 @@
                                     }
                                 });
                             }
-    //                        marqueeContent[0]="<span >云呼你有新的讯息1</span>";
-    //                        marqueeContent[1]="<span >云呼你有新的讯息2</span>";
-    //                        marqueeContent[2]="<span >云呼你有新的讯息3云呼你有新的讯息3</span>";
-    //                        marqueeContent[3]="<span >云呼你有新的讯息4</span>";
+                            //                        marqueeContent[0]="<span >云呼你有新的讯息1</span>";
+                            //                        marqueeContent[1]="<span >云呼你有新的讯息2</span>";
+                            //                        marqueeContent[2]="<span >云呼你有新的讯息3云呼你有新的讯息3</span>";
+                            //                        marqueeContent[3]="<span >云呼你有新的讯息4</span>";
                             var marqueeInterval=new Array();
                             var marqueeId=0;
                             var marqueeDelay=2000;
@@ -47,7 +47,7 @@
                             function initMarquee() {
                                 var str = '';
                                 if(marqueeContent.length>0){
-                                     str=marqueeContent[0];
+                                    str=marqueeContent[0];
                                 }
 
 
@@ -299,61 +299,61 @@
                                     </section>
                                     <!--话务量消费额-->
                                     <section class="panel panel-default pos-rlt clearfix ">
-                                    <div class="sectionWrap">
-                                        <div class="panel-body clearfix border-top-none">
-                                            <div class="row monthform" >
-                                                <div class="col-md-12">
-                                                    <input type="text" class="datepicker currentMonth form-control date_block monthstart" id="monthstart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                        <div class="sectionWrap">
+                                            <div class="panel-body clearfix border-top-none">
+                                                <div class="row monthform" >
+                                                    <div class="col-md-12">
+                                                        <input type="text" class="datepicker currentMonth form-control date_block monthstart" id="monthstart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row">
-                                                <div class="col-md-12 scanvas" >
-                                                    <!--统计列表-->
-                                                    <div class="ecpanel" id="ecpanel" style=" height: 600px;  "></div>
+                                                <div class="row">
+                                                    <div class="col-md-12 scanvas" >
+                                                        <!--统计列表-->
+                                                        <div class="ecpanel" id="ecpanel" style=" height: 450px;  "></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
 
-                                </section>
+                                    </section>
                                     <!--话务量消费额end-->
                                     <section class="panel panel-default pos-rlt clearfix ">
-                                    <div class="row ">
-                                        <div class="col-md-6 remove-left-padding" >
-                                            <div class="sectionWrap">
-                                                <div class="panel-body clearfix border-top-none">
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <input type="text" class="datepicker currentMonth form-control date_block sessionstart" id="sessionstart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                        <div class="row ">
+                                            <div class="col-md-6 remove-left-padding" >
+                                                <div class="sectionWrap">
+                                                    <div class="panel-body clearfix border-top-none">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <input type="text" class="datepicker currentMonth form-control date_block sessionstart" id="sessionstart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="row" >
+                                                            <div class="col-md-12">
+                                                                <div class="ecpanel" id="sessionecpanel" style=" height: 450px;"></div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="row" >
-                                                        <div class="col-md-12">
-                                                            <div class="ecpanel" id="sessionecpanel" style=" height: 600px;"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 remove-right-padding">
+                                                <div class="sectionWrap">
+                                                    <div class="panel-body clearfix border-top-none">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <input type="text" class="datepicker currentMonth form-control date_block apistart"  id="apistart" value="${homeVO.time}" data-time="${homeVO.time}" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="ecpanel" id="apiecpanel" style="height: 450px;"></div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 remove-right-padding">
-                                            <div class="sectionWrap">
-                                                <div class="panel-body clearfix border-top-none">
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <input type="text" class="datepicker currentMonth form-control date_block apistart"  id="apistart" value="${homeVO.time}" data-time="${homeVO.time}" />
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="ecpanel" id="apiecpanel" style="height: 600px;"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                </section>
+                                    </section>
                                 </c:if>
                                 <!--end-->
                             </section>
@@ -469,9 +469,9 @@
      */
 
     function initchart(starttime){
-       if(!starttime){
-           starttime = $('#monthstart').val();
-       }
+        if(!starttime){
+            starttime = $('#monthstart').val();
+        }
         var type='day';
         var param ={'type':type,'appId':-1,'startTime':starttime, csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/statistics/session/list",param,function(result){
@@ -613,6 +613,12 @@
             legend: {
                 data:['话务量', '消费额']
             },
+            grid: {
+                left: '0%',
+                right: '0%',
+                bottom: '3%',
+                containLabel: true
+            },
             toolbox: {
                 show: true,
             },
@@ -635,7 +641,7 @@
                 {
                     type: 'value',
                     scale: true,
-                    name: '会话(次)',
+                    name: '     话务量(分钟)',
                     max: xyMax,
                     min: 0,
                     nameGap:32,
@@ -647,7 +653,7 @@
                 {
                     type: 'value',
                     scale: true,
-                    name: '消费额(元)',
+                    name: '消费额(元)    ',
                     max: xdMax,
                     min: 0,
                     nameGap:32,
@@ -696,8 +702,8 @@
                 data:['会话量']
             },
             grid: {
-                left: '3%',
-                right: '4%',
+                left: '0%',
+                right: '3%',
                 bottom: '3%',
                 containLabel: true
             },
@@ -708,18 +714,19 @@
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                data : Xdata,
-                name: '',
+                data : Xdata
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                name: '  会话量(次)',
             },
             series: [
                 {
                     name:'会话量',
                     type:'line',
                     stack: '总量',
-                    data:xd
+                    data:xd,
+                    areaStyle: {normal: {}}
                 },
             ]
         };
@@ -746,8 +753,8 @@
                 data:['api调用次数']
             },
             grid: {
-                left: '3%',
-                right: '4%',
+                left: '0%',
+                right: '3%',
                 bottom: '3%',
                 containLabel: true
             },
@@ -759,17 +766,18 @@
                 type: 'category',
                 boundaryGap: false,
                 data : Xdata,
-                name: '',
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                name: '次数(次)'
             },
             series: [
                 {
                     name:'api调用次数',
                     type:'line',
                     stack: '',
-                    data:xd
+                    data:xd,
+                    areaStyle: {normal: {}}
                 },
             ]
         };
@@ -784,11 +792,11 @@
             initapichart();
         }
     });
-//    if(appSize>0){
-//        initchart();
-//        initsessionchart();
-//        initapichart();
-//    }
+    //    if(appSize>0){
+    //        initchart();
+    //        initsessionchart();
+    //        initapichart();
+    //    }
 </script>
 
 
@@ -843,7 +851,7 @@
 <script type="text/javascript">
     $('.reset_confirm').click(function(){
         bootbox.setLocale("zh_CN");
-        bootbox.confirm("确定重新生成secretKey么", function(result) {
+        bootbox.confirm("确定重新生成密钥么", function(result) {
             if(result){
                 ajaxsync(ctx + "/console/home/change_sk",null,function(response){
                     if(response.data != null){
