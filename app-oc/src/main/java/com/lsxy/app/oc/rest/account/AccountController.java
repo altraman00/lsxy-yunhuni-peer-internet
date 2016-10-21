@@ -4,6 +4,7 @@ import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.portal.SendActivePasswordSuccessEvent;
@@ -48,9 +49,11 @@ public class AccountController {
         }else{
             return RestResponse.failed("0000","请求类型错误");
         }
+        Page page2 = null;
         List<AccountVo> list2 = new ArrayList();
         if(status != null){
-            List<Account> list  = accountService.pList(status,pageNo,pageSize).getResult();
+            Page page= accountService.pList(status,pageNo,pageSize);
+            List<Account> list  = page.getResult();
             if(list != null && list.size() > 0){
                 for(int i=0;i < list.size(); i++ ){
                     AccountVo accountVo = new AccountVo();
@@ -62,8 +65,9 @@ public class AccountController {
                     list2.add(accountVo);
                 }
             }
+            page2 = new Page<>(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),list2);
         }
-        return RestResponse.success(list2);
+        return RestResponse.success(page2);
     }
     @ApiOperation(value = "发送激活邮件")
     @RequestMapping(value = "/send/active/{id}",method = RequestMethod.PUT)
