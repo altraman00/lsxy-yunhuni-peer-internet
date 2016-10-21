@@ -191,8 +191,7 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <div class="tab-pane fade in active" id="play">
                                         <p class="application_info">
-                                            1、当您的应用需使用IVR服务时，请上传语音文件至放音媒体库，语音文件均需要审核<br/>
-                                            2、每个账号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
+                                            当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
@@ -513,7 +512,7 @@
                         cancelCancel=true;
                         $('.modal-loadding').hide();
                         $('.modalCancel-app-up').click();
-                        fileTotalSoze();
+//                        fileTotalSoze();
                         upplay();
                     },
                     progressall: function (e, data) {
@@ -625,16 +624,16 @@
         var html  = "";
         //异步查询文件信息
 
-        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
-            if(response.success){
-                //添加加载文件信息
-                html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
-                html+='<p>--统计完成</p>';
-                $('#scrolldiv'+id).append(html);
-            }else{
-                showtoast(response.errorMsg);
-            }
-        },"post");
+//        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
+//            if(response.success){
+//                //添加加载文件信息
+//                html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
+//                html+='<p>--统计完成</p>';
+//                $('#scrolldiv'+id).append(html);
+//            }else{
+//                showtoast(response.errorMsg);
+//            }
+//        },"post");
 
         //two 表示的是批量下载
         if(id=='two'){
@@ -802,7 +801,7 @@
                 ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
-                        fileTotalSoze();
+//                        fileTotalSoze();
                         $('#play-'+id).remove();
                         if(pagePlay){
                             pagePlay.count--;
@@ -871,9 +870,9 @@
     }
     var fileTotalSoze = function(){
 
-        ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
-            $('#voiceFilePlay').html("共计" + resultFileSize(response.data.fileTotalSize) + ",已占用" + resultFileSize(response.data.fileRemainSize)+ "");
-        },"post");
+//        ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+//            $('#voiceFilePlay').html("共计" + resultFileSize(response.data.fileTotalSize) + ",已占用" + resultFileSize(response.data.fileRemainSize)+ "");
+//        },"post");
 
     };
     var resultFileSize = function(temp){
@@ -981,7 +980,7 @@
         }
     });
 
-    fileTotalSoze();
+//    fileTotalSoze();
 </script>
 
 </body>
