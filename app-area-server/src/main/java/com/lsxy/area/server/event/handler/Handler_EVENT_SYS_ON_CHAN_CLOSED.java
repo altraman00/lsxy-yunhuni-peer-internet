@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Map;
@@ -27,6 +29,7 @@ import java.util.Map;
  * Created by liuws on 2016/8/29.
  */
 @Component
+@Transactional
 public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_ON_CHAN_CLOSED.class);
@@ -37,6 +40,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     CalCostService calCostService;
     @Autowired
     VoiceCdrService voiceCdrService;
+    @Autowired
+    CalBillingService calBillingService;
+
     @Override
     public String getEventName() {
         return Constants.SYS_ON_CHAN_CLOSED;
@@ -125,6 +131,12 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.info("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
         }
+        calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
+        if(voiceCdr.getCallAckDt() != null){
+            calBillingService.incCallConnect(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
+        }
+        calBillingService.incCallCostTime(voiceCdr.getTenantId(),voiceCdr.getCallEndDt(),voiceCdr.getCostTimeLong());
+
         voiceCdrService.save(voiceCdr);
         return null;
     }

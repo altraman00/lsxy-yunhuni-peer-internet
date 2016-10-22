@@ -11,11 +11,14 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
+import com.lsxy.yunhuni.api.statistics.model.DayStatics;
+import com.lsxy.yunhuni.api.statistics.service.DayStaticsService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -24,6 +27,7 @@ import java.util.Date;
  * Created by liups on 2016/8/30.
  */
 @Service
+@Transactional
 public class CalBillingServiceImpl implements CalBillingService{
     public static final Logger logger = LoggerFactory.getLogger(CalBillingServiceImpl.class);
     @Autowired
@@ -36,6 +40,8 @@ public class CalBillingServiceImpl implements CalBillingService{
     RechargeService rechargeService;
     @Autowired
     ConsumeService consumeService;
+    @Autowired
+    DayStaticsService dayStaticsService;
     /*
         余额
     */
@@ -172,8 +178,12 @@ public class CalBillingServiceImpl implements CalBillingService{
     private void incAmount(String tenantId,Date date,BigDecimal amount,String type){
         //以long型存金额的增量，真实金额=redis中的金额/10000
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
+        String key = type + "_" + tenantId + "_" + dateStr;
         long l = amount.multiply(new BigDecimal(AMOUNT_REDIS_MULTIPLE)).setScale(0, BigDecimal.ROUND_HALF_UP).longValue();
-        redisCacheService.incrBy(type + "_" + tenantId + "_" + dateStr, l);
+        long result = redisCacheService.incrBy(key, l);
+        if(result == l){
+            redisCacheService.expire(key,5 * 24 * 60 * 60);
+        }
     }
 
 
@@ -294,7 +304,11 @@ public class CalBillingServiceImpl implements CalBillingService{
      */
     private void incLong(String tenantId,Date date,Long l,String type){
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        redisCacheService.incrBy(type + "_" + tenantId + "_" + dateStr, l);
+        String key = type + "_" + tenantId + "_" + dateStr;
+        long result = redisCacheService.incrBy(key, l);
+        if(result == l){
+            redisCacheService.expire(key,5 * 24 * 60 * 60);
+        }
     }
 
     /*
@@ -572,8 +586,6 @@ public class CalBillingServiceImpl implements CalBillingService{
     }
 
 
-
-
     @Override
     public Billing getCalBilling(String tenantId) {
         Billing billingOrg = billingService.findBillingByTenantId(tenantId);
@@ -590,6 +602,83 @@ public class CalBillingServiceImpl implements CalBillingService{
         billing.setFileRemainSize(this.getFsize(tenantId));
         return billing;
     }
+
+
+    @Override
+    public BigDecimal getAddBalancByDate(String tenantId, Date date) {
+        return getRecharge(tenantId,date);
+    }
+
+
+    @Override
+    public BigDecimal getUseBalanceByDate(String tenantId, Date date) {
+        return getConsume(tenantId,date);
+    }
+
+
+    @Override
+    public void incCallConnect(String tenantId, Date date) {
+        incLong(tenantId,date,1L, CALL_CONNECT_PREFIX);
+    }
+
+    @Override
+    public Long getCallConnectByDate(String tenantId, Date date) {
+        return getIncrLong(tenantId,date, CALL_CONNECT_PREFIX);
+    }
+
+
+    @Override
+    public void incCallSum(String tenantId, Date date) {
+        incLong(tenantId,date,1L, CALL_SUM_PREFIX);
+    }
+
+    @Override
+    public Long getCallSumByDate(String tenantId, Date date) {
+        return getIncrLong(tenantId,date, CALL_SUM_PREFIX);
+    }
+
+    @Override
+    public void incCallCostTime(String tenantId, Date date,Long costTimeLong) {
+        incLong(tenantId,date,costTimeLong, CALL_COST_TIME_PREFIX);
+    }
+
+    @Override
+    public Long getCallCostTimeByDate(String tenantId, Date date) {
+        return getIncrLong(tenantId,date, CALL_COST_TIME_PREFIX);
+    }
+
+    @Override
+    public DayStatics getCurrentStatics(String tenantId) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        DayStatics dayStatics = dayStaticsService.getStaticByTenantId(tenantId);
+        if(dayStatics == null){
+            dayStatics = new DayStatics(tenantId,null,date,getAddBalancByDate(tenantId,date),getUseBalanceByDate(tenantId,date),
+                    getCallConnectByDate(tenantId,date),getCallSumByDate(tenantId,date),getCallCostTimeByDate(tenantId,date));
+        }else{
+            dayStatics = getCurrentDayStatics(dayStatics,date);
+        }
+        return dayStatics;
+    }
+
+    private DayStatics getCurrentDayStatics(DayStatics dayStatics, Date date) {
+        Date dt = dayStatics.getDt();
+        if(dt.getTime() < date.getTime()){
+            String tenantId = dayStatics.getTenantId();
+            Date nextDate = DateUtils.nextDate(dt);
+            DayStatics nextDayStatics = new DayStatics(tenantId,null,nextDate,
+                    dayStatics.getRecharge().add(getAddBalancByDate(tenantId,nextDate)),
+                    dayStatics.getConsume().add(getUseBalanceByDate(tenantId,nextDate)),
+                    dayStatics.getCallConnect() + getCallConnectByDate(tenantId,nextDate),
+                    dayStatics.getCallSum() + getCallSumByDate(tenantId,nextDate),
+                    dayStatics.getCallCostTime() + getCallCostTimeByDate(tenantId,nextDate));
+            return getCurrentDayStatics(nextDayStatics, date);
+        }else{
+            return dayStatics;
+        }
+    }
+
 
     @Override
     public void calBilling(Date date) {

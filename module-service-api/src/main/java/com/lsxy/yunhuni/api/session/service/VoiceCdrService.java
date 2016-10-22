@@ -48,4 +48,15 @@ public interface VoiceCdrService extends BaseService<VoiceCdr> {
      */
     Map getAvgCdr(String tenantId, String appId, String startTime, String endTime);
 
+
+    /**
+     * 根据租户id，应用id，和时间区间获取接通量，不接通量，话务量（秒）
+     * @param tenantId
+     * @param appId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    Map getStaticCdr(String tenantId, String appId, Date startTime, Date endTime);
+
 }

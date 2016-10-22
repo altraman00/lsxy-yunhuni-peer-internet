@@ -25,6 +25,11 @@ public class Billing extends IdEntity {
     private Long fileRemainSize;//剩余存储容量，单位byte
     private Long fileTotalSize;//总容量，单位byte
     private Date balanceDate;   //结算时间
+    private BigDecimal addBalance;    //总充值额
+    private BigDecimal usebalance;    //总消费额
+    private Long callConnect;    //总接通量
+    private Long callNotConnect;    //总不接通量
+    private Long callCostTime;    //总通话时长
 
     @Column(name = "file_remain_size")
     public Long getFileRemainSize() {
@@ -95,5 +100,50 @@ public class Billing extends IdEntity {
 
     public void setBalanceDate(Date balanceDate) {
         this.balanceDate = balanceDate;
+    }
+
+    @Column(name = "add_balance")
+    public BigDecimal getAddBalance() {
+        return addBalance;
+    }
+
+    public void setAddBalance(BigDecimal addBalance) {
+        this.addBalance = addBalance;
+    }
+
+    @Column(name = "use_balance")
+    public BigDecimal getUsebalance() {
+        return usebalance;
+    }
+
+    public void setUsebalance(BigDecimal usebalance) {
+        this.usebalance = usebalance;
+    }
+
+    @Column(name = "call_connect")
+    public Long getCallConnect() {
+        return callConnect;
+    }
+
+    public void setCallConnect(Long callConnect) {
+        this.callConnect = callConnect;
+    }
+
+    @Column(name = "call_not_connect")
+    public Long getCallNotConnect() {
+        return callNotConnect;
+    }
+
+    public void setCallNotConnect(Long callNotConnect) {
+        this.callNotConnect = callNotConnect;
+    }
+
+    @Column(name = "call_cost_time")
+    public Long getCallCostTime() {
+        return callCostTime;
+    }
+
+    public void setCallCostTime(Long callCostTime) {
+        this.callCostTime = callCostTime;
     }
 }

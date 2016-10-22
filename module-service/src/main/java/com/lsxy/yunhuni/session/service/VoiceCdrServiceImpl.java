@@ -52,8 +52,8 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     public List<VoiceCdr> listCdr(String type, String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   last_time BETWEEN ? and ?";
-        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc ";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   call_end_dt BETWEEN ? and ?";
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_end_dt desc ";
         List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2});
         List<VoiceCdr> list = new ArrayList();
         for(int i=0;i<rows.size();i++){
@@ -74,10 +74,10 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, String type,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   last_time BETWEEN ? and ?";
+        String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0 and   call_end_dt BETWEEN ? and ?";
         String sqlCount = "select count(1) "+sql;
         Integer totalCount = jdbcTemplate.queryForObject(sqlCount,Integer.class,new Object[]{date1,date2});
-        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_start_dt desc limit ?,?";
+        sql = "select "+StringUtil.sqlName(VoiceCdr.class)+sql+" order by call_end_dt desc limit ?,?";
         pageNo--;
         List rows = jdbcTemplate.queryForList(sql,new Object[]{date1,date2,pageNo*pageSize,pageSize});
         List list = new ArrayList();
@@ -104,7 +104,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         if(CallSession.TYPE_VOICE_RECORDING.equals(type)){
             costType = " sum(record_size) as size,sum(cost) as money ";
         }
-        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0  and last_time BETWEEN ? and ? ";
+        String sql = "select "+costType+" from db_lsxy_bi_yunhuni.tb_bi_voice_cdr  where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,type)+ " deleted=0  and call_end_dt BETWEEN ? and ? ";
         Map result = this.jdbcTemplate.queryForMap(sql,new Object[]{date1,date2});
         return result;
     }
@@ -152,12 +152,34 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             sql += " AND app_id='"+appId+"' ";
         }
         if(StringUtils.isNotEmpty(startTime)){
-            sql += " AND create_time>='"+startTime+"' " ;
+            sql += " AND call_end_dt>='"+startTime+"' " ;
         }
         if(StringUtils.isNotEmpty(endTime)){
-            sql += " AND last_time<='"+endTime+"' " ;
+            sql += " AND call_end_dt<='"+endTime+"' " ;
         }
         sql +=" ) a ";
+        Map map = jdbcTemplate.queryForMap(sql);
+        return map;
+    }
+
+    @Override
+    public Map getStaticCdr(String tenantId, String appId, Date startTime, Date endTime) {
+        String sql = "SELECT COUNT(id) AS callSum,IFNULL(SUM(cost_time_long),0) AS costTimeLong," +
+                "IFNULL(SUM(CASE  WHEN call_ack_dt IS NULL THEN 0 ELSE 1 END),0) AS askSum FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr WHERE 1=1 ";
+        if(StringUtils.isNotEmpty(tenantId)){
+            sql +=" AND tenant_id='"+tenantId+"' " ;
+        }
+        if(StringUtils.isNotEmpty(appId)){
+            sql += " AND app_id='"+appId+"' ";
+        }
+        if(startTime != null){
+            String startTimeStr = DateUtils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
+            sql += " AND call_end_dt>='"+startTimeStr+"' " ;
+        }
+        if(endTime != null){
+            String endTimeStr = DateUtils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
+            sql += " AND call_end_dt<'"+endTimeStr+"' " ;
+        }
         Map map = jdbcTemplate.queryForMap(sql);
         return map;
     }

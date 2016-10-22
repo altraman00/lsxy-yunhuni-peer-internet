@@ -219,10 +219,10 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         String sql =" FROM db_lsxy_base.tb_base_tenant t" +
                 " LEFT JOIN (SELECT b.tenant_id,b.`status` FROM db_lsxy_base.tb_base_account b GROUP BY b.tenant_id) a ON t.id = a.tenant_id" +
                 " LEFT JOIN (SELECT tenant_id,count(id) s FROM db_lsxy_bi_yunhuni.tb_bi_app where deleted = 0 GROUP BY tenant_id) app ON t.id = app.tenant_id" +
-                " LEFT JOIN db_lsxy_base.tb_base_billing billing ON t.id = billing.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,sum(amount) as sum_amount FROM db_lsxy_bi_yunhuni.tb_bi_consume GROUP BY tenant_id) consume ON t.id = consume.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM db_lsxy_base.tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
-                " LEFT JOIN (SELECT tenant_id,sum(1) as sum_call,round(sum(cost_time_long)/60) as sum_cost_time FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr GROUP BY tenant_id) cdr ON t.id = cdr.tenant_id" +
+//                " LEFT JOIN db_lsxy_base.tb_base_billing billing ON t.id = billing.tenant_id" +
+//                " LEFT JOIN (SELECT tenant_id,sum(amount) as sum_amount FROM db_lsxy_bi_yunhuni.tb_bi_consume GROUP BY tenant_id) consume ON t.id = consume.tenant_id" +
+//                " LEFT JOIN (SELECT tenant_id,sum(amount) amount FROM db_lsxy_base.tb_base_recharge WHERE `status` = 'PAID' GROUP BY tenant_id ) recharge on t.id = recharge.tenant_id" +
+//                " LEFT JOIN (SELECT tenant_id,sum(1) as sum_call,round(sum(cost_time_long)/60) as sum_cost_time FROM db_lsxy_bi_yunhuni.tb_bi_voice_cdr GROUP BY tenant_id) cdr ON t.id = cdr.tenant_id" +
                 " WHERE 1=1";
         sql += " AND (a.`status` IN ("+Account.STATUS_NORMAL+","+Account.STATUS_LOCK+"))";
         if(StringUtil.isNotEmpty(name)){
@@ -248,9 +248,11 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         String countSql = "SELECT COUNT(t.id) " + sql;
         String pageSql = "SELECT t.id 'id',t.tenant_name 'name'," +
                 "t.create_time 'regDate',t.is_real_auth 'authStatus'," +
-                "a.`status` 'accountStatus',app.s 'appCount',billing.balance 'remainCoin'," +
-                "consume.sum_amount 'costCoin',recharge.amount 'totalCoin'," +
-                "cdr.sum_call 'sessionCount',cdr.sum_cost_time 'sessionTime'" + sql;
+                "a.`status` 'accountStatus',app.s 'appCount'," +
+//                "billing.balance 'remainCoin'," +
+//                "consume.sum_amount 'costCoin',recharge.amount 'totalCoin'," +
+//                "cdr.sum_call 'sessionCount',cdr.sum_cost_time 'sessionTime'" +
+                sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql += " ORDER BY regDate desc ";
         Query pageQuery = em.createNativeQuery(pageSql,"tenantResult");

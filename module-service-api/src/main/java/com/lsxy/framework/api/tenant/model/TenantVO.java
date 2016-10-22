@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -52,10 +53,10 @@ public class TenantVO implements Serializable {
     private Double remainCoin;
 
     @JsonProperty("cost_coin")
-    private Double costCoin;
+    private BigDecimal costCoin;
 
     @JsonProperty("total_coin")
-    private Double totalCoin;
+    private BigDecimal totalCoin;
 
     @JsonProperty("session_count")
     private Long sessionCount;
@@ -124,19 +125,19 @@ public class TenantVO implements Serializable {
         this.remainCoin = remainCoin;
     }
 
-    public Double getCostCoin() {
+    public BigDecimal getCostCoin() {
         return costCoin;
     }
 
-    public void setCostCoin(Double costCoin) {
+    public void setCostCoin(BigDecimal costCoin) {
         this.costCoin = costCoin;
     }
 
-    public Double getTotalCoin() {
+    public BigDecimal getTotalCoin() {
         return totalCoin;
     }
 
-    public void setTotalCoin(Double totalCoin) {
+    public void setTotalCoin(BigDecimal totalCoin) {
         this.totalCoin = totalCoin;
     }
 
@@ -149,12 +150,6 @@ public class TenantVO implements Serializable {
     }
 
     public Long getSessionTime() {//秒转换成分钟
-//        if(sessionTime !=null){
-//            if(!inited){
-//                inited = true;
-//                return (long)Math.round(sessionTime/60);
-//            }
-//        }
         return sessionTime;
     }
 
