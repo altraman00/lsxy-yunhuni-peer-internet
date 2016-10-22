@@ -96,4 +96,15 @@ public class IVRTest {
             System.out.println("ivr step" + (step++));
         }
     }
+
+    /*@Test
+    public void testParse(){
+        String resXML = "<response>\n" +
+                "    <play finish_keys=\"#\">\n" +
+                "      welcome.wav\n" +
+                "    <play>\n" +
+                "    <next>http://yourhost/nextstep</next>\n" +
+                "</response>";
+        System.out.println(ivrActionService.test(resXML));
+    }*/
 }

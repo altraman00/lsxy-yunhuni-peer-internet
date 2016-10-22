@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -34,6 +35,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.reflections.Reflections;
@@ -97,6 +99,9 @@ public class IVRActionService {
 
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
+
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -374,6 +379,10 @@ public class IVRActionService {
         if(nextUrl == null){//第一次
             String appId = state.getAppId();
             App app = appService.findById(appId);
+            if(app == null){
+                logger.error("ivr 找不到对应的app");
+                return false;
+            }
             resXML = getFirstIvr(app.getUrl());
         }else{
             resXML = getNextRequest(nextUrl.toString());
@@ -394,8 +403,24 @@ public class IVRActionService {
                 return false;
             }
             return h.handle(call_id,actionEle,getNextUrl(root));
+        } catch(DocumentException | IllegalArgumentException e){
+            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
+            //发送ivr格式错误通知
+            String appId = state.getAppId();
+            App app = appService.findById(appId);
+            if(app == null){
+                logger.error("ivr 找不到对应的app");
+                return false;
+            }
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","ivr.format_error")
+                    .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("user_data",state.getUserdata())
+                    .build();
+            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            return false;
         } catch (Throwable e) {
-            logger.error("处理ivr动作指令出错",e);
+            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
             return false;
         }
     }
@@ -446,4 +471,23 @@ public class IVRActionService {
         return next;
     }
 
+    /*public ActionHandler test(String resXML){
+        ActionHandler  h = null;
+        Element root = null;
+        Element actionEle = null;
+        try {
+            Document doc = DocumentHelper.parseText(resXML);
+            root = doc.getRootElement();
+            actionEle = getActionEle(root);
+            h = handlers.get(actionEle.getName().toLowerCase());
+            if(h == null){
+                logger.info("没有找到对应的ivr动作处理类");
+                return null;
+            }
+            return h;
+        } catch (Throwable e) {
+            logger.error("处理ivr动作指令出错",e);
+            return null;
+        }
+    }*/
 }
