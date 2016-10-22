@@ -10,7 +10,8 @@ public enum ConsumeCode {
     ivr_call("自定义IVR"),
     captcha_call("语音验证码"),
     notify_call("语音通知"),
-    rent_number("号码租用");
+    rent_number("号码租用"),
+    flat_balance("平账");
 
     private String name;
     ConsumeCode(String name){

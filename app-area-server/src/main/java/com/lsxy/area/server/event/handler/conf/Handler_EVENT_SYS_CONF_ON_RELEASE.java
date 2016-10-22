@@ -98,7 +98,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         if(businessData!=null){
             auto_hangup = (Boolean)businessData.get("auto_hangup");
         }
-        if(auto_hangup){
+        if(auto_hangup != null && auto_hangup){
             handupParts(conf_id);
         }
         if(StringUtils.isBlank(appId)){
