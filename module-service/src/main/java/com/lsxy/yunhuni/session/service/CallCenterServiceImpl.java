@@ -8,10 +8,12 @@ import com.lsxy.yunhuni.api.session.model.CallCenter;
 import com.lsxy.yunhuni.api.session.service.CallCenterService;
 import com.lsxy.yunhuni.session.dao.CallCenterDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/10/22.
@@ -20,6 +22,8 @@ import java.io.Serializable;
 public class CallCenterServiceImpl extends AbstractService<CallCenter> implements CallCenterService {
     @Autowired
     private CallCenterDao callCenterDao;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<CallCenter, Serializable> getDao() {
         return this.callCenterDao;
@@ -38,7 +42,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.startTime='"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.endTime='"+endTime+"' ";
+            hql += " AND  obj.startTime='"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -48,5 +52,30 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         }
         Page<CallCenter> page = this.pageList(pageNo,pageSize);
         return null;
+    }
+
+    @Override
+    public Map sum(String tenantId, String appId, String startTime, String endTime, String type, String agent) {
+        String sql = "SELECT COUNT(id) AS num,IFNULL(sum(cost),0) AS cost FROM db_lsxy_bi_yunhuni.tb_bi_call_center  WHERE  deleted=0 ";
+        if(StringUtil.isNotEmpty(tenantId)){
+            sql += " AND  tenant_id='"+tenantId+"' ";
+        }
+        if(StringUtil.isNotEmpty(appId)){
+            sql += " AND  app_id='"+appId+"' ";
+        }
+        if(StringUtil.isNotEmpty(startTime)){
+            sql += " AND  start_time='"+startTime+"' ";
+        }
+        if(StringUtil.isNotEmpty(endTime)){
+            sql += " AND  start_time='"+endTime+"' ";
+        }
+        if(StringUtil.isNotEmpty(type)){
+            sql += " AND  type='"+type+"' ";
+        }
+        if(StringUtil.isNotEmpty(agent)){
+            sql += " AND  agent like '%"+agent+"'%";
+        }
+        Map result = this.jdbcTemplate.queryForMap(sql);
+        return result;
     }
 }

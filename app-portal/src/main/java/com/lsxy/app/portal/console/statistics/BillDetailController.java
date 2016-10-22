@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.session.model.CallCenter;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import org.apache.commons.lang.StringUtils;
@@ -144,6 +145,36 @@ public class BillDetailController extends AbstractPortalController {
         mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
         mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_CALLBACK,map.get("time"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/callback");
+        return mav;
+    }
+    /**
+     * 呼叫中心
+     * @param request
+     * @return
+     */
+    @RequestMapping("/callcenter")
+    public ModelAndView callcenter(HttpServletRequest request,
+                                   @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
+                                   String appId,String startTime,String endTime,String type,String agent){
+        ModelAndView mav = new ModelAndView();
+        Map<String,String> map = init(request,startTime,appId,App.PRODUCT_CALL_CENTER);
+        if(StringUtils.isEmpty(startTime)){
+            endTime = map.get("time");
+        }
+        if(StringUtils.isEmpty(endTime)){
+            endTime = map.get("time");
+        }
+        map.put("startTime",startTime);
+        map.put("endTime",endTime);
+        mav.addAllObjects(map);
+        String token = getSecurityToken(request);
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/call_center/plist?pageNo={1}&pageSize={2}&appId={3}&startTime={4}&endTime={5}&type={6}&agent={7}";
+        RestResponse<Page<CallCenter>> restRequest =  RestRequest.buildSecurityRequest(token).getPage(uri,CallCenter.class,pageNo,pageSize,appId,startTime,endTime,type,agent);
+        String uri2 = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/sum?appId={1}&startTime={2}&endTime={3}&type={4}&agent={5}";
+        RestResponse restResponse2 = RestRequest.buildSecurityRequest(token).get(uri2, Map.class,appId,startTime,endTime,type,agent);
+        mav.addObject("sum",restResponse2.getData());
+        mav.addObject("pageObj",restRequest.getData());
+        mav.setViewName("/console/statistics/billdetail/callcenter");
         return mav;
     }
     /**

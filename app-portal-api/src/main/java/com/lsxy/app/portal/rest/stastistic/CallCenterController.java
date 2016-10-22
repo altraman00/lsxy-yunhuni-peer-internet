@@ -1,5 +1,6 @@
 package com.lsxy.app.portal.rest.stastistic;
 
+import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -9,16 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * Created by zhangxb on 2016/10/22.
  */
 @RequestMapping("/rest/call_center")
 @RestController
-public class CallCenterController {
+public class CallCenterController extends AbstractRestController {
     @Autowired
     CallCenterService callCenterService;
     @RequestMapping("/plist")
-    public RestResponse plist(Integer pageNo,Integer pageSize,String tenantId,String appId,String startTime,String endTime,String type,String agent){
+    public RestResponse plist(Integer pageNo,Integer pageSize,String appId,String startTime,String endTime,String type,String agent){
         try{
             DateUtils.parseDate(startTime,"yyyy-MM-dd");
             DateUtils.parseDate(endTime,"yyyy-MM-dd");
@@ -27,7 +30,20 @@ public class CallCenterController {
         }catch (Exception e){
             return RestResponse.failed("0000","返回日期类型错误");
         }
-        Page<CallCenter> page =  callCenterService.pList( pageNo, pageSize,tenantId, appId, startTime, endTime, type, agent);
+        Page<CallCenter> page =  callCenterService.pList( pageNo, pageSize,getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type, agent);
         return RestResponse.success(page);
+    }
+    @RequestMapping("/sum")
+    public RestResponse sum(String appId,String startTime,String endTime,String type,String agent){
+        try{
+            DateUtils.parseDate(startTime,"yyyy-MM-dd");
+            DateUtils.parseDate(endTime,"yyyy-MM-dd");
+            startTime += " 00:00:00";
+            endTime += " 23:59:59";
+        }catch (Exception e){
+            return RestResponse.failed("0000","返回日期类型错误");
+        }
+        Map result =  callCenterService.sum(getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type, agent);
+        return RestResponse.success(result);
     }
 }

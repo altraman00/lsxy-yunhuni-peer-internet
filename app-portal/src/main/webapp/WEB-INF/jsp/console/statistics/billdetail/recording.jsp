@@ -59,6 +59,11 @@
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
                                             </div>
                                         </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/callenter">呼叫中心</a>
+                                            </div>
+                                        </li>
                                     </ul>
                                 </nav>
                             </div>
