@@ -243,9 +243,9 @@ public class BillDetailController extends AbstractPortalController {
         if(App.PRODUCT_CALL_CENTER.equals(serviceType)){
             String startTime = request.getParameter("startTime");
             String endTime = request.getParameter("endTime");
-            String type = request.getParameter("endTime");
-            String callnum = request.getParameter("endTime");
-            String agent = request.getParameter("endTime");
+            String type = request.getParameter("type");
+            String callnum = request.getParameter("callnum");
+            String agent = request.getParameter("agent");
             String uri = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/list?appId={1}&startTime={2}&endTime={3}&type={4}&callnum={5}&agent={6}";
             RestResponse restResponse = RestRequest.buildSecurityRequest(getSecurityToken(request)).getList(uri, CallCenter.class,appId,startTime,endTime,type,callnum,agent);
             list = (List)restResponse.getData();
