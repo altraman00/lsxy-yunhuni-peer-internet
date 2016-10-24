@@ -38,6 +38,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.DocumentSource;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,13 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.Future;
 
@@ -105,10 +112,26 @@ public class IVRActionService {
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
+    private Schema schema = null;
+
     @PostConstruct
     public void init(){
         initClient();
         initHandler();
+        initIVRSchema();
+    }
+    private void initIVRSchema() {
+        try{
+            InputStream input = IVRActionService.class.getResourceAsStream("/ivraction.xsd");
+            if(input == null){
+                input = IVRActionService.class.getClassLoader().getResourceAsStream("/ivraction.xsd");
+            }
+            SchemaFactory factory =
+                    SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            this.schema = factory.newSchema(new StreamSource(input));
+        }catch (Throwable t){
+            throw new RuntimeException("ivraction.xsd读取失败");
+        }
     }
     private void initClient(){
         client = HttpAsyncClients.createDefault();
@@ -395,6 +418,9 @@ public class IVRActionService {
         Element actionEle = null;
         try {
             Document doc = DocumentHelper.parseText(resXML);
+            if(validateXMLSchema(doc)){
+
+            }
             root = doc.getRootElement();
             actionEle = getActionEle(root);
             h = handlers.get(actionEle.getName().toLowerCase());
@@ -426,34 +452,20 @@ public class IVRActionService {
     }
 
     /**
-     * 校验ivr指令，返回对应的ivr根元素
+     * 返回对应的ivr根元素
      * @param root
      * @return
      */
     private Element getActionEle(Element root) {
         List elements = root.elements();
         Element actionEle = null;
-        if(elements == null || elements.size() == 0){
-            throw new IllegalArgumentException("ivr action xml 格式错误");
-        }
-        if(elements.size()>2){
-            throw new IllegalArgumentException("ivr action xml 格式错误");
-        }
-        int actionElement_count = 0;
         for (Object obj : elements) {
             Element ele = (Element)obj;
             boolean hasHandler = handlers.get(ele.getName().toLowerCase()) != null;
-            boolean isNext = ele.getName().equals("next");
-            if(!hasHandler && !isNext){
-                throw new IllegalArgumentException("ivr action xml 格式错误");
-            }
             if(hasHandler){
                 actionEle = ele;
-                actionElement_count ++;
+                break;
             }
-        }
-        if(actionElement_count>1){
-            throw new IllegalArgumentException("只能包含一个ivr action");
         }
         return actionEle;
     }
@@ -471,23 +483,13 @@ public class IVRActionService {
         return next;
     }
 
-    /*public ActionHandler test(String resXML){
-        ActionHandler  h = null;
-        Element root = null;
-        Element actionEle = null;
+    public boolean validateXMLSchema(Document doc){
         try {
-            Document doc = DocumentHelper.parseText(resXML);
-            root = doc.getRootElement();
-            actionEle = getActionEle(root);
-            h = handlers.get(actionEle.getName().toLowerCase());
-            if(h == null){
-                logger.info("没有找到对应的ivr动作处理类");
-                return null;
-            }
-            return h;
+            Validator validator = schema.newValidator();
+            validator.validate(new DocumentSource(doc));
         } catch (Throwable e) {
-            logger.error("处理ivr动作指令出错",e);
-            return null;
+            throw new IllegalArgumentException(e);
         }
-    }*/
+        return true;
+    }
 }
