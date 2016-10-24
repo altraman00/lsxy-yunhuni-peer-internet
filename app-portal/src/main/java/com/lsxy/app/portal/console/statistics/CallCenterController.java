@@ -56,14 +56,14 @@ public class CallCenterController extends AbstractPortalController {
     }
     @RequestMapping("/get/list")
     @ResponseBody
-    public RestResponse getList(HttpServletRequest request, String type, String appId, String time){
+    public RestResponse getList(HttpServletRequest request, String type, String appId, String stratTime){
         try{
-            DateUtils.parseDate(time,"yyyy-MM");
+            DateUtils.parseDate(stratTime,"yyyy-MM");
         }catch (Exception e){
             return RestResponse.failed("0000","日期格式错误");
         }
-//        String token = getSecurityToken(request);
-//        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/api_call_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/api_call_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
 //        Class clazz = ApiCallDay.class;
 //        if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
 //            clazz = ApiCallMonth.class;
