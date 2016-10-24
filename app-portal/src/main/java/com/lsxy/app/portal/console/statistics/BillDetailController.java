@@ -187,21 +187,21 @@ public class BillDetailController extends AbstractPortalController {
      * @param appId 应用id
      * @return
      */
-    @RequestMapping("{type}/download")
-    public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable String type, String time, String appId){
+    @RequestMapping("{path}/download")
+    public void download(HttpServletRequest request, HttpServletResponse response, @PathVariable String path, String time, String appId){
         String oType = "";
         String title = "";
         String one = "";
         String[] headers = null;
         String[] values = null;
         String serviceType = "";
-        if("notify".equals(type)){//语音通知
+        if("notify".equals(path)){//语音通知
             oType = CallSession.TYPE_VOICE_NOTIFY;
             title = "语音通知";
             headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
             values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
             serviceType = App.PRODUCT_VOICE;
-        }else if("code".equals(type)){//语音验证码
+        }else if("code".equals(path)){//语音验证码
             oType = CallSession.TYPE_VOICE_VOICECODE;
             title = "语音验证码";
             headers = new String[]{"发送时间","主叫","被叫","挂机时间","消费金额","时长（秒）"};
@@ -214,29 +214,47 @@ public class BillDetailController extends AbstractPortalController {
             headers = new String[]{};
             values = new String[]{};
         }*/
-        else if("ivr".equals(type)) {// 自定义IVR
+        else if("ivr".equals(path)) {// 自定义IVR
             oType = CallSession.TYPE_VOICE_IVR;
             title = " 自定义IVR";
             headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
             values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
             serviceType = App.PRODUCT_VOICE;
-        }else if("metting".equals(type)){// 语音会议
+        }else if("metting".equals(path)){// 语音会议
             oType = CallSession.TYPE_VOICE_MEETING;
             title = " 语音会议";
             headers = new String[]{"会议标识ID","呼叫时间","参与者","参与类型","消费金额","时长（秒）"};
             values = new String[]{"sessionId","callStartDt","joinType:0-fromNum;1-toNum;2-fromNum","joinType:0=创建;1=邀请加入;2=呼入加入","cost","costTimeLong"};
             serviceType = App.PRODUCT_VOICE;
-        }else if("callback".equals(type)){//语音回拨
+        }else if("callback".equals(path)){//语音回拨
             oType = CallSession.TYPE_VOICE_CALLBACK;
             title = "语音回拨";
             headers = new String[]{"呼叫时间","主叫","被叫","消费金额","时长（秒）"};
             values = new String[]{"callStartDt","fromNum","toNum","cost","costTimeLong"};
             serviceType = App.PRODUCT_VOICE;
+        }else if("callcenter".equals(path)){
+            oType = CallSession.TYPE_VOICE_CALLBACK;
+            title = "呼叫中心";
+            headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","坐席","转接结果","通话结束原因","转人工时间","接听时间","通话结束时间","消费金额"};
+            values = new String[]{"startTime","type:1=呼入;2=呼出","fromNum","toNum","agent","toManualResult:1=接听;2=呼叫坐席失败;3=主动放弃;4=超时","overReason","toManualTime","answerTime","endTime","cost"};
+            serviceType = App.PRODUCT_CALL_CENTER;
         }
         List list = null;
-        if(StringUtils.isNotEmpty(oType)){
-            Map<String,String> map = init(request,time,appId,serviceType);
-            list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
+        if(App.PRODUCT_CALL_CENTER.equals(serviceType)){
+            String startTime = request.getParameter("startTime");
+            String endTime = request.getParameter("endTime");
+            String type = request.getParameter("endTime");
+            String callnum = request.getParameter("endTime");
+            String agent = request.getParameter("endTime");
+            String uri = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/list?appId={1}&startTime={2}&endTime={3}&type={4}&callnum={5}&agent={6}";
+            RestResponse restResponse = RestRequest.buildSecurityRequest(getSecurityToken(request)).getList(uri, CallCenter.class,appId,startTime,endTime,type,callnum,agent);
+            list = (List)restResponse.getData();
+            time = startTime+" 至 "+endTime;
+        }else if(App.PRODUCT_VOICE.equals(serviceType)){
+            if(StringUtils.isNotEmpty(oType)){
+                Map<String,String> map = init(request,time,appId,serviceType);
+                list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
+            }
         }
         String appName = "";
         if(StringUtils.isNotEmpty(appId)){

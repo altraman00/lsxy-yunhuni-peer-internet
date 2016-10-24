@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,7 +55,35 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.agent like '%"+agent+"'%";
         }
         Page<CallCenter> page = this.pageList(pageNo,pageSize);
-        return null;
+        return page;
+    }
+
+    @Override
+    public List<CallCenter> getAllList(String tenantId, String appId, String startTime, String endTime, String type, String callnum, String agent) {
+        String hql = " FROM CallCenter obj where 1=1";
+        if(StringUtil.isNotEmpty(tenantId)){
+            hql += " AND  obj.tenantId='"+tenantId+"' ";
+        }
+        if(StringUtil.isNotEmpty(appId)){
+            hql += " AND  obj.appId='"+appId+"' ";
+        }
+        if(StringUtil.isNotEmpty(startTime)){
+            hql += " AND  obj.startTime='"+startTime+"' ";
+        }
+        if(StringUtil.isNotEmpty(endTime)){
+            hql += " AND  obj.startTime='"+endTime+"' ";
+        }
+        if(StringUtil.isNotEmpty(type)){
+            hql += " AND  obj.type='"+type+"' ";
+        }
+        if(StringUtil.isNotEmpty(callnum)){
+            hql += " AND ( obj.fromNum='"+callnum+"' OR obj.toNum='"+callnum+"'  ) ";
+        }
+        if(StringUtil.isNotEmpty(agent)){
+            hql += " AND  obj.agent like '%"+agent+"'%";
+        }
+        List<CallCenter> list = this.list(hql);
+        return list;
     }
 
     @Override

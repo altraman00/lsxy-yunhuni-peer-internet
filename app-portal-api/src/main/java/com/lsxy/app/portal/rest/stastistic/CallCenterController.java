@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +33,19 @@ public class CallCenterController extends AbstractRestController {
         }
         Page<CallCenter> page =  callCenterService.pList( pageNo, pageSize,getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type,callnum, agent);
         return RestResponse.success(page);
+    }
+    @RequestMapping("/list")
+    public RestResponse list(String appId,String startTime,String endTime,String type,String callnum,String agent){
+        try{
+            DateUtils.parseDate(startTime,"yyyy-MM-dd");
+            DateUtils.parseDate(endTime,"yyyy-MM-dd");
+            startTime += " 00:00:00";
+            endTime += " 23:59:59";
+        }catch (Exception e){
+            return RestResponse.failed("0000","返回日期类型错误");
+        }
+        List<CallCenter> list =  callCenterService.getAllList(getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type,callnum, agent);
+        return RestResponse.success(list);
     }
     @RequestMapping("/sum")
     public RestResponse sum(String appId,String startTime,String endTime,String type,String callnum,String agent){
