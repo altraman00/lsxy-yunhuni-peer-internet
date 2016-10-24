@@ -73,32 +73,6 @@ public class CallCenterController extends AbstractPortalController {
 //         (List) RestRequest.buildSecurityRequest(token).getList(uri, clazz,tenantId,appId,time).getData();
         return RestResponse.success();
     }
-    private  <T> Object[] getArrays(Collection<T> dataset, Object leng, String values){
-        //获取数组长度
-        int length = 0;
-        if (leng instanceof Date) {
-            length = Integer.valueOf(DateUtils.getLastDate((Date)leng).split("-")[2]);
-        } else if (leng instanceof Integer) {
-            length =Integer.valueOf((Integer)leng);
-        }
-        //创建数组并初始化
-        Object[] list = new Object[length];
-        for(int j=0;j<length;j++){
-            list[j]=0;
-        }
-        // 遍历集合数据，产生数据行
-        Iterator<T> it = dataset.iterator();
-        int index = 0;
-        while (it.hasNext())
-        {
-            T t = (T) it.next();
-            // 利用反射，根据javabean属性的先后顺序，动态调用getXxx()方法得到属性值
-            Field[] fields = t.getClass().getDeclaredFields();
 
-
-            index++;
-        }
-        return list;
-    }
 
 }
