@@ -21,7 +21,7 @@ public class CallCenterController extends AbstractRestController {
     @Autowired
     CallCenterService callCenterService;
     @RequestMapping("/plist")
-    public RestResponse plist(Integer pageNo,Integer pageSize,String appId,String startTime,String endTime,String type,String agent){
+    public RestResponse plist(Integer pageNo,Integer pageSize,String appId,String startTime,String endTime,String type,String callnum,String agent){
         try{
             DateUtils.parseDate(startTime,"yyyy-MM-dd");
             DateUtils.parseDate(endTime,"yyyy-MM-dd");
@@ -30,11 +30,11 @@ public class CallCenterController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","返回日期类型错误");
         }
-        Page<CallCenter> page =  callCenterService.pList( pageNo, pageSize,getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type, agent);
+        Page<CallCenter> page =  callCenterService.pList( pageNo, pageSize,getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type,callnum, agent);
         return RestResponse.success(page);
     }
     @RequestMapping("/sum")
-    public RestResponse sum(String appId,String startTime,String endTime,String type,String agent){
+    public RestResponse sum(String appId,String startTime,String endTime,String type,String callnum,String agent){
         try{
             DateUtils.parseDate(startTime,"yyyy-MM-dd");
             DateUtils.parseDate(endTime,"yyyy-MM-dd");
@@ -43,7 +43,7 @@ public class CallCenterController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","返回日期类型错误");
         }
-        Map result =  callCenterService.sum(getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type, agent);
+        Map result =  callCenterService.sum(getCurrentAccount().getTenant().getId(), appId, startTime, endTime, type,callnum, agent);
         return RestResponse.success(result);
     }
 }

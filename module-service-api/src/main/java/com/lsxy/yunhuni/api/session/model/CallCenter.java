@@ -24,8 +24,8 @@ public class CallCenter extends IdEntity {
     private String tenantId;
     @Column( name = "app_id")
     private String appId;
-    @Column( name = "tenant_id")
-    private String start_time;//发起时间
+    @Column( name = "start_time")
+    private String startTime;//发起时间
     @Column( name = "answer_time")
     private String answerTime;//接听时间
     @Column( name = "end_time")
@@ -65,12 +65,12 @@ public class CallCenter extends IdEntity {
         this.appId = appId;
     }
 
-    public String getStart_time() {
-        return start_time;
+    public String getStartTime() {
+        return startTime;
     }
 
-    public void setStart_time(String start_time) {
-        this.start_time = start_time;
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 
     public String getAnswerTime() {

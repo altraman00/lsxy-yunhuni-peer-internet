@@ -30,7 +30,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
     }
 
     @Override
-    public Page<CallCenter> pList(Integer pageNo,Integer pageSize,String tenantId, String appId, String startTime, String endTime, String type, String agent) {
+    public Page<CallCenter> pList(Integer pageNo,Integer pageSize,String tenantId, String appId, String startTime, String endTime, String type,String callnum, String agent) {
         String hql = " FROM CallCenter obj where 1=1";
         if(StringUtil.isNotEmpty(tenantId)){
             hql += " AND  obj.tenantId='"+tenantId+"' ";
@@ -47,6 +47,9 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
         }
+        if(StringUtil.isNotEmpty(callnum)){
+            hql += " AND ( obj.fromNum='"+callnum+"' OR obj.toNum='"+callnum+"'  ) ";
+        }
         if(StringUtil.isNotEmpty(agent)){
             hql += " AND  obj.agent like '%"+agent+"'%";
         }
@@ -55,7 +58,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
     }
 
     @Override
-    public Map sum(String tenantId, String appId, String startTime, String endTime, String type, String agent) {
+    public Map sum(String tenantId, String appId, String startTime, String endTime, String type,String callnum, String agent) {
         String sql = "SELECT COUNT(id) AS num,IFNULL(sum(cost),0) AS cost FROM db_lsxy_bi_yunhuni.tb_bi_call_center  WHERE  deleted=0 ";
         if(StringUtil.isNotEmpty(tenantId)){
             sql += " AND  tenant_id='"+tenantId+"' ";
@@ -71,6 +74,9 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
         }
         if(StringUtil.isNotEmpty(type)){
             sql += " AND  type='"+type+"' ";
+        }
+        if(StringUtil.isNotEmpty(callnum)){
+            sql += " AND ( obj.from_num='"+callnum+"' OR obj.to_num='"+callnum+"'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
             sql += " AND  agent like '%"+agent+"'%";

@@ -155,23 +155,26 @@ public class BillDetailController extends AbstractPortalController {
     @RequestMapping("/callcenter")
     public ModelAndView callcenter(HttpServletRequest request,
                                    @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
-                                   String appId,String startTime,String endTime,String type,String agent){
+                                   String appId,String startTime,String endTime,String type,String callnum,String agent){
         ModelAndView mav = new ModelAndView();
         Map<String,String> map = init(request,startTime,appId,App.PRODUCT_CALL_CENTER);
         if(StringUtils.isEmpty(startTime)){
-            endTime = map.get("time");
+            startTime = map.get("time");
         }
         if(StringUtils.isEmpty(endTime)){
             endTime = map.get("time");
         }
+        map.put("type",type);
+        map.put("callnum",callnum);
+        map.put("agent",agent);
         map.put("startTime",startTime);
         map.put("endTime",endTime);
         mav.addAllObjects(map);
         String token = getSecurityToken(request);
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/call_center/plist?pageNo={1}&pageSize={2}&appId={3}&startTime={4}&endTime={5}&type={6}&agent={7}";
-        RestResponse<Page<CallCenter>> restRequest =  RestRequest.buildSecurityRequest(token).getPage(uri,CallCenter.class,pageNo,pageSize,appId,startTime,endTime,type,agent);
-        String uri2 = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/sum?appId={1}&startTime={2}&endTime={3}&type={4}&agent={5}";
-        RestResponse restResponse2 = RestRequest.buildSecurityRequest(token).get(uri2, Map.class,appId,startTime,endTime,type,agent);
+        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/call_center/plist?pageNo={1}&pageSize={2}&appId={3}&startTime={4}&endTime={5}&type={6}&callnum={7}&agent={8}";
+        RestResponse<Page<CallCenter>> restRequest =  RestRequest.buildSecurityRequest(token).getPage(uri,CallCenter.class,pageNo,pageSize,appId,startTime,endTime,type,callnum,agent);
+        String uri2 = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/sum?appId={1}&startTime={2}&endTime={3}&type={4}&callnum={5}&agent={6}";
+        RestResponse restResponse2 = RestRequest.buildSecurityRequest(token).get(uri2, Map.class,appId,startTime,endTime,type,callnum,agent);
         mav.addObject("sum",restResponse2.getData());
         mav.addObject("pageObj",restRequest.getData());
         mav.setViewName("/console/statistics/billdetail/callcenter");

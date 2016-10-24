@@ -20,7 +20,7 @@ public interface CallCenterService  extends BaseService<CallCenter> {
      * @param agent 坐席
      * @return
      */
-    Page<CallCenter> pList(Integer pageNo,Integer pageSize,String tenantId,String appId,String startTime,String endTime,String type,String agent);
+    Page<CallCenter> pList(Integer pageNo,Integer pageSize,String tenantId,String appId,String startTime,String endTime,String type,String callnum,String agent);
     /**
      *  根据以下条件获取分页信息
      * @param tenantId 所属租户
@@ -31,5 +31,5 @@ public interface CallCenterService  extends BaseService<CallCenter> {
      * @param agent 坐席
      * @return
      */
-    Map sum(String tenantId, String appId, String startTime, String endTime, String type, String agent);
+    Map sum(String tenantId, String appId, String startTime, String endTime, String type,String callnum, String agent);
 }

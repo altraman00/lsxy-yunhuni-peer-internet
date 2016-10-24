@@ -35,7 +35,7 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a active">
+                                            <div class="aside-li-a ">
                                                 <a href="${ctx}/console/statistics/billdetail/callback">语音回拨</a>
                                             </div>
                                         </li>
@@ -60,8 +60,8 @@
                                             </div>
                                         </li>
                                         <li>
-                                            <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/callenter">呼叫中心</a>
+                                            <div class="aside-li-a active">
+                                                <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -77,7 +77,7 @@
                                 class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
                         </div>-->
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;语音回拨</span>
+                            <span class="border-left">&nbsp;呼叫中心</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
@@ -93,54 +93,83 @@
                                     </c:forEach>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
-                                    <form:form action="${ctx}/console/statistics/billdetail/callback" method="post" id="mainForm">
+                                    <form:form action="${ctx}/console/statistics/billdetail/callcenter" method="post" id="mainForm">
                                         <div class="row statistics_row" >
                                             <input type="hidden" id="appId" name="appId" value="${appId}">
-                                            <div class="col-md-1">
-                                                日期
-                                            </div>
-                                            <div class="col-md-2">
-                                                <input type="text" name="time" class="form-control currentDay "  value="${time}"  />
-                                            </div>
-                                            <div class="col-md-2">
+                                            日期
+                                            <input type="text" name="startTime" class=" currentDay "  value="${startTime}"  />
+                                            至
+                                            <input type="text" name="endTime" class=" currentDay "  value="${endTime}"  />
+                                            坐席
+                                            <input type="text" name="agent" class=""  value="${agent}"  />
+                                            呼叫号码
+                                            <input type="text" name="callnum" class=""  value="${callnum}"  />
+                                            呼叫类型
+                                            <select name="type">
+                                                <option <c:if test="${type == '1'}"> selected</c:if> value="1">呼出</option>
+                                                <option <c:if test="${type == '2'}"> selected</c:if> value="2">呼入</option>
+                                            </select>
                                                 <button class="btn btn-primary" type="submit"> 查询</button>
                                                 <button class="btn btn-primary" type="button" onclick="download()"> 导出</button>
-                                            </div>
                                         </div>
                                     </form:form>
                                     <div>
                                         <table class="table table-striped cost-table-history">
                                             <thead>
                                             <tr>
-                                                <c:set var="sum_cost" value="0.00"></c:set>
+                                                <c:set var="sum_cost" value="0.000"></c:set>
                                                 <c:if test="${sum!=null && sum.cost!=null}">
                                                     <c:set value="${sum.cost}" var="sum_cost"></c:set>
                                                 </c:if>
-                                                <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
+                                                <c:set var="sum_num" value="0"></c:set>
+                                                <c:if test="${sum!=null && sum.num!=null}">
+                                                    <c:set value="${sum.num}" var="sum_num"></c:set>
+                                                </c:if>
+                                                <th colspan="11" style="text-align: right;"><span class="p-money">呼叫个数：${sum_num}个&nbsp;&nbsp;总消费金额：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
                                                 <th>呼叫时间</th>
+                                                <th>呼叫类型</th>
                                                 <th>主叫</th>
                                                 <th>被叫</th>
+                                                <th>坐席</th>
+                                                <th>转接结果</th>
+                                                <th>通话结束原因</th>
+                                                <th>转人工时间</th>
+                                                <th>接听时间</th>
+                                                <th>通话结束时间</th>
                                                 <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
-                                                <th>时长（秒）</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             <c:forEach items="${pageObj.result}" var="result" varStatus="s">
                                                 <tr>
-                                                    <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
+                                                    <td><fmt:formatDate value="${result.startTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
+                                                    <td>
+                                                        <c:if test="${result.type==1}">呼入</c:if>
+                                                        <c:if test="${result.type==2}">呼出</c:if>
+                                                    </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
+                                                    <td>${result.agent}</td>
+                                                    <td>
+                                                        <c:if test="${result.toManualResult==1}">接听</c:if>
+                                                        <c:if test="${result.toManualResult==2}">呼叫坐席失败</c:if>
+                                                        <c:if test="${result.toManualResult==3}">主动放弃</c:if>
+                                                        <c:if test="${result.toManualResult==4}">超时</c:if>
+                                                    </td>
+                                                    <td>${result.overReason}</td>
+                                                    <td><fmt:formatDate value="${result.toManualTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
+                                                    <td><fmt:formatDate value="${result.answerTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
+                                                    <td><fmt:formatDate value="${result.endTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate></td>
                                                     <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
-                                                    <td>${result.costTimeLong}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
                                         </table>
                                     </div>
-                                    <c:set var="extraParam" value="&time=${time}&appId=${appId}"></c:set>
-                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callback"></c:set>
+                                    <c:set var="extraParam" value="&startTime=${startTime}&endTime=${endTime}&appId=${appId}&agent=${agent}&callnum=${callnum}&type=${type}"></c:set>
+                                    <c:set var="pageUrl" value="${ctx}/console/statistics/billdetail/callcenter"></c:set>
                                     <%@include file="/inc/pagefooter.jsp" %>
                                 </div>
                             </section>
@@ -163,9 +192,9 @@
         $('#mainForm').submit();
     }
     function download(){
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback/download");
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callcenter/download");
         $('#mainForm').submit();
-        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback");
+        $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callcenter");
     }
 </script>
 </body>

@@ -61,7 +61,7 @@
                                         </li>
                                         <li>
                                             <div class="aside-li-a">
-                                                <a href="${ctx}/console/statistics/billdetail/callenter">呼叫中心</a>
+                                                <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
                                             </div>
                                         </li>
                                     </ul>
