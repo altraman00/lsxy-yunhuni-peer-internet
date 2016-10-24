@@ -59,7 +59,7 @@
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-12 padder-v fix-padding">
                                         <a href="${ctx}/console/app/index?id=${app.id}" class="btn btn-primary query">应用编辑</a>
-                                        <c:if test="${app.serviceType=='call'}">
+                                        <c:if test="${app.serviceType=='call_center'}">
                                             <a href="" class="btn btn-call margin_left-20">呼叫中心管理</a>
                                         </c:if>
                                     </div>
