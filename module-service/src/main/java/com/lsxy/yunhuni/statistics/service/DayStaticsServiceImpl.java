@@ -13,21 +13,26 @@ import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import com.lsxy.yunhuni.api.statistics.model.DayStatics;
 import com.lsxy.yunhuni.api.statistics.service.DayStaticsService;
 import com.lsxy.yunhuni.statistics.dao.DayStaticsDao;
+import org.apache.velocity.runtime.directive.Foreach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static com.lsxy.framework.core.utils.DateUtils.nextDate;
 
 /**
  * Created by liups on 2016/10/21.
  */
+@Service
 public class DayStaticsServiceImpl extends AbstractService<DayStatics> implements DayStaticsService {
     @Autowired
     DayStaticsDao dayStaticsDao;
@@ -52,10 +57,19 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
         String yyyyMMdd = DateUtils.formatDate(date, "yyyyMMdd");
         Date staticsDate = DateUtils.parseDate(yyyyMMdd,"yyyyMMdd");
         Iterable<Tenant> tenants = tenantService.list();
-        ExecutorService executorService = Executors.newFixedThreadPool(100);
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        List<Future> results = new ArrayList<>();
         for(Tenant tenant:tenants){
-            executorService.submit(() -> this.staticTenantAndApp(staticsDate, tenant));
+            results.add(executorService.submit(() -> this.staticTenantAndApp(staticsDate, tenant)));
         }
+        for(Future f : results){
+            try {
+                f.get();
+            }catch (Throwable t){
+
+            }
+        }
+        executorService.shutdown();
     }
 
     @Override
@@ -97,15 +111,15 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
             BigDecimal recharge = rechargeService.getRechargeByTenantIdAndDate(tenantId,startDate,endDate);
             BigDecimal consume = consumeService.getConsumeByTenantIdAndDate(tenantId,startDate,endDate);
             Map staticMap = voiceCdrService.getStaticCdr(tenantId, null, startDate, endDate);
-            BigDecimal callSum = (BigDecimal) staticMap.get("callSum");
+            Long callSum = (Long) staticMap.get("callSum");
             BigDecimal askSum = (BigDecimal) staticMap.get("askSum");
-            BigDecimal costTimeLong = (BigDecimal) staticMap.get("callSum");
+            BigDecimal costTimeLong = (BigDecimal) staticMap.get("costTimeLong");
 
             DayStatics current = new DayStatics(tenantId,null,startDate,
                     lastDayStatics.getRecharge().add(recharge),
                     lastDayStatics.getConsume().add(consume),
                     lastDayStatics.getCallConnect() + askSum.longValue(),
-                    lastDayStatics.getCallSum() + callSum.longValue(),
+                    lastDayStatics.getCallSum() + callSum,
                     costTimeLong.longValue() + lastDayStatics.getCallConnect()
                     );
             this.save(current);
