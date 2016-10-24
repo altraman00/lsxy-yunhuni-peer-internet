@@ -29,13 +29,16 @@
                 <section class="scrollable wrapper w-f">
 
                     <section class="panel panel-default pos-rlt clearfix ">
-                        <input type="hidden" value="1" id="defaultapp" />
+                        <input type="hidden" value="${appId}" id="defaultapp" />
                         <ul id="myTab" class="nav nav-tabs">
-                            <li class="active"><a  data-toggle="tab" data-app="1">全部应用</a></li>
-                            <li ><a  data-toggle="tab" data-app="phone">应用二</a></li>
-                            <li ><a  data-toggle="tab" data-app="3">应用三</a></li>
-                            <li ><a  data-toggle="tab" data-app="4">应用四</a></li>
-                            <li ><a  data-toggle="tab" data-app="5">应用五</a></li>
+                            <li <c:if test="${appId==null}"> class="active"</c:if>><a  data-toggle="tab" data-app="${appId}">全部应用</a></li>
+                            <c:forEach items="${appList}" var="app" varStatus="s">
+                                <li
+                                        <c:if test="${app.id==appId}"> class="active"</c:if>
+                                >
+                                    <a href="" data-toggle="tab" data-app="${app.id}" >${app.name}</a>
+                                </li>
+                            </c:forEach>
                         </ul>
                     </section>
 
@@ -463,11 +466,14 @@
         inittalkchart();
 
     });
-
-
+    $(function(){
+        var app = $('#defaultapp').val();
+        console.info("|||||"+app)
+    });
     //应用
     $('#myTab li a').click(function(){
         var app = $(this).attr('data-app');
+        console.info(app)
         $('#defaultapp').val(app);
         //初始化本月数据
 

@@ -339,11 +339,6 @@ public class BillDetailController extends AbstractPortalController {
         }
         return result;
     }
-    public RestResponse getBillAppList(HttpServletRequest request,String serviceType){
-        String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list?serviceType={1}";
-        return RestRequest.buildSecurityRequest(token).getList(uri, App.class,serviceType);
-    }
     /**
      * 处理初始条件
      * @param request

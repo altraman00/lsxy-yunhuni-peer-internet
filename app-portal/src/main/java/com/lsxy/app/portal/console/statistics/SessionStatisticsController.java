@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.statistics;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.yunhuni.api.statistics.model.*;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -27,7 +28,6 @@ import java.util.List;
 @RequestMapping("/console/statistics/session")
 public class SessionStatisticsController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(SessionStatisticsController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 消费统计首页
      * @param request
@@ -77,7 +77,7 @@ public class SessionStatisticsController extends AbstractPortalController {
      */
     private List getApiCallList(HttpServletRequest request,String type,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/api_call_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/api_call_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
         Class clazz = ApiCallDay.class;
         if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
             clazz = ApiCallMonth.class;
@@ -96,7 +96,7 @@ public class SessionStatisticsController extends AbstractPortalController {
      */
     private List getVoiceCdrList(HttpServletRequest request,String type,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/voice_cdr_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/voice_cdr_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
         Class clazz = VoiceCdrDay.class;
         if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
             clazz = VoiceCdrMonth.class;
@@ -115,7 +115,7 @@ public class SessionStatisticsController extends AbstractPortalController {
      */
     private List getConsumeList(HttpServletRequest request,String type,String appId,String startTime){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/consume_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/consume_"+type+"/list?tenantId={1}&appId={2}&startTime={3}";
         Class clazz = ConsumeDay.class;
         if(ConsumeStatisticsVo.TYPE_MONTH.equals(type)){
             clazz = ConsumeMonth.class;
