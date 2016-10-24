@@ -31,4 +31,12 @@ public interface DayStaticsDao extends BaseDaoInterface<DayStatics,Serializable>
      * @return
      */
     DayStatics findFirstByTenantIdAndDtAndAppIdIsNull(String tenantId, Date dt);
+
+    /**
+     * 获取租户某一天以前（包含这一天）最新的天统计
+     * @param tenantId
+     * @param dt
+     * @return
+     */
+    DayStatics findFirstByTenantIdAndDtLessThanAndAppIdIsNullOrderByDtDesc(String tenantId, Date dt);
 }

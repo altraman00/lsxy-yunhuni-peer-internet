@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -652,7 +653,8 @@ public class CalBillingServiceImpl implements CalBillingService{
         Date date = new Date();
         String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
         date = DateUtils.parseDate(dateStr,"yyyyMMdd");
-        DayStatics dayStatics = dayStaticsService.getStaticByTenantId(tenantId);
+        Date preDate = DateUtils.getPreDate(date);
+        DayStatics dayStatics = dayStaticsService.getStaticByTenantId(tenantId,preDate);
         if(dayStatics == null){
             dayStatics = new DayStatics(tenantId,null,date,getAddBalancByDate(tenantId,date),getUseBalanceByDate(tenantId,date),
                     getCallConnectByDate(tenantId,date),getCallSumByDate(tenantId,date),getCallCostTimeByDate(tenantId,date));
@@ -661,6 +663,7 @@ public class CalBillingServiceImpl implements CalBillingService{
         }
         return dayStatics;
     }
+
 
     private DayStatics getCurrentDayStatics(DayStatics dayStatics, Date date) {
         Date dt = dayStatics.getDt();
@@ -679,6 +682,42 @@ public class CalBillingServiceImpl implements CalBillingService{
         }
     }
 
+    @Override
+    public DayStatics getIncStaticsOfCurrentDay(String tenantId) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        DayStatics dayStatics = new DayStatics(tenantId,null,date,getAddBalancByDate(tenantId,date),getUseBalanceByDate(tenantId,date),
+                getCallConnectByDate(tenantId,date),getCallSumByDate(tenantId,date),getCallCostTimeByDate(tenantId,date));
+        return dayStatics;
+    }
+
+    @Override
+    public DayStatics getIncStaticsOfCurrentMonth(String tenantId) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        Date firstTimeOfMonth = DateUtils.getFirstTimeOfMonth(date);
+        DayStatics result;
+        if(date.equals(firstTimeOfMonth)){
+            result = getIncStaticsOfCurrentDay(tenantId);
+        }else{
+            DayStatics currentStatics = getCurrentStatics(tenantId);
+            Date preMonthDate = DateUtils.getPreDate(firstTimeOfMonth);
+            DayStatics preMonthDayStatics = dayStaticsService.getStaticByTenantId(tenantId,preMonthDate);
+            if(currentStatics != null && preMonthDayStatics != null){
+                preMonthDayStatics = getCurrentDayStatics(preMonthDayStatics,preMonthDate);
+                result = new DayStatics(tenantId,null,date,currentStatics.getRecharge().subtract(preMonthDayStatics.getRecharge()),
+                        currentStatics.getConsume().subtract(preMonthDayStatics.getConsume()),
+                        currentStatics.getCallConnect() - preMonthDayStatics.getCallConnect(),
+                        currentStatics.getCallSum() - preMonthDayStatics.getCallSum(),
+                        currentStatics.getCallCostTime() - preMonthDayStatics.getCallCostTime());
+            }else{
+                result = getIncStaticsOfCurrentDay(tenantId);
+            }
+        }
+        return result;
+    }
 
     @Override
     public void calBilling(Date date) {
@@ -711,5 +750,6 @@ public class CalBillingServiceImpl implements CalBillingService{
             }
         }
     }
+
 
 }

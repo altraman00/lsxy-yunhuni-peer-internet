@@ -230,6 +230,20 @@ public interface CalBillingService {
     DayStatics getCurrentStatics(String tenantId);
 
     /**
+     * 获取当天的统计增量
+     * @param tenantId
+     * @return
+     */
+    DayStatics getIncStaticsOfCurrentDay(String tenantId);
+
+    /**
+     * 获取当前月的统计增量
+     * @param tenantId
+     * @return
+     */
+    DayStatics getIncStaticsOfCurrentMonth(String tenantId);
+
+    /**
      * 每日统计账务余额
      * @param date 统计日期
      */

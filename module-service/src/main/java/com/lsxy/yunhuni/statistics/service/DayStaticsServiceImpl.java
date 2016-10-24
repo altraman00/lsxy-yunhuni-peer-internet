@@ -139,13 +139,13 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
     }
 
     @Override
-    public DayStatics getStaticByTenantId(String tenantId) {
-        Date date = DateUtils.getPreDate(new Date());
-        String preDateStr = DateUtils.formatDate(date, "yyyyMMdd");
-        Date dt = DateUtils.parseDate(preDateStr,"yyyyMMdd");
+    public DayStatics getStaticByTenantId(String tenantId,Date date) {
+//        Date date = DateUtils.getPreDate(new Date());
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        Date dt = DateUtils.parseDate(dateStr,"yyyyMMdd");
         DayStatics dayStatics = dayStaticsDao.findFirstByTenantIdAndDtAndAppIdIsNull(tenantId,dt);
         if(dayStatics==null){
-            dayStatics = dayStaticsDao.findFirstByTenantIdAndAppIdIsNullOrderByDtDesc(tenantId);
+            dayStatics = dayStaticsDao.findFirstByTenantIdAndDtLessThanAndAppIdIsNullOrderByDtDesc(tenantId,dt);
         }
         return dayStatics;
     }

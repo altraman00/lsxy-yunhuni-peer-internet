@@ -24,9 +24,9 @@ public interface DayStaticsService extends BaseService<DayStatics> {
     void staticTenantAndApp(Date staticsDate, Tenant tenant);
 
     /**
-     * 获取租户的最新统计
+     * 获取租户的一个日期之前（包含该日期）的最新统计
      * @param tenantId
      * @return
      */
-    DayStatics getStaticByTenantId(String tenantId);
+    DayStatics getStaticByTenantId(String tenantId,Date date);
 }
