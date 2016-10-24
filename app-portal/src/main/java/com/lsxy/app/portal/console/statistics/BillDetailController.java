@@ -249,7 +249,14 @@ public class BillDetailController extends AbstractPortalController {
             String uri = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/list?appId={1}&startTime={2}&endTime={3}&type={4}&callnum={5}&agent={6}";
             RestResponse restResponse = RestRequest.buildSecurityRequest(getSecurityToken(request)).getList(uri, CallCenter.class,appId,startTime,endTime,type,callnum,agent);
             list = (List)restResponse.getData();
-            time = startTime+" 至 "+endTime;
+            time = startTime+" 至 "+endTime +" 坐席："+agent +" 呼叫号码："+callnum+" 类型：";
+            if(CallCenter.CALL_UP==Integer.valueOf(type)){
+                time +=" 呼出 ";
+            }else if(CallCenter.CALL_IN==Integer.valueOf(type)){
+                time += " 呼入 ";
+            }else{
+                time +="  ";
+            }
         }else if(App.PRODUCT_VOICE.equals(serviceType)){
             if(StringUtils.isNotEmpty(oType)){
                 Map<String,String> map = init(request,time,appId,serviceType);
