@@ -42,7 +42,7 @@ public class DayStaticsController extends AbstractRestController {
         map.put("avgCall",new BigDecimal(statics.getCallConnect()).divide(new BigDecimal(statics.getCallSum())).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
         map.put("cost",statics.getConsume());
         map.put("session",statics.getCallSum());
-        map.put("costTime",statics.getCallCostTime());
+        map.put("costTime",Math.round(statics.getCallCostTime()/60.0));
         return RestResponse.success(map);
     }
 }
