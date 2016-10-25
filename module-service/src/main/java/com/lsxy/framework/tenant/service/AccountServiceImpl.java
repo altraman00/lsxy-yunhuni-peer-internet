@@ -235,11 +235,6 @@ public class AccountServiceImpl extends AbstractService<Account> implements Acco
         billing.setConferenceRemain(0L);
         billing.setFileTotalSize(defaultSize);
         billing.setFileRemainSize(defaultSize);
-        billing.setAddBalance(BigDecimal.ZERO);
-        billing.setUsebalance(BigDecimal.ZERO);
-        billing.setCallConnect(0L);
-        billing.setCallNotConnect(0L);
-        billing.setCallCostTime(0L);
         //由于余额计算的规则限制，把结算日期设为前一天
         billing.setBalanceDate(DateUtils.getPreDate(new Date()));
         billingService.save(billing);
