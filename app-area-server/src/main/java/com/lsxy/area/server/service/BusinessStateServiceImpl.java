@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,11 @@ public class BusinessStateServiceImpl implements BusinessStateService {
 
     @Override
     public BusinessState get(String id) {
-        return JSONUtil2.fromJson(redisCacheService.get(getKey(id)),BusinessState.class);
+        String str = redisCacheService.get(getKey(id));
+        if(StringUtils.isBlank(str)){
+            return null;
+        }
+        return JSONUtil2.fromJson(str,BusinessState.class);
     }
 
     @Override

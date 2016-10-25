@@ -137,9 +137,14 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             ResourcesRent rent = resourcesRentService.findByResDataAndRentStatus(to, ResourcesRent.RENT_STATUS_USING);
             if(rent == null){
                 logger.error("号码资源池中找不到被叫号码对应的应用：{}",params);
+                return res;
             }
             tenant = rent.getTenant();
             app = rent.getApp();
+            if(app!= null && app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
+                logger.error("应用未上线");
+                return res;
+            }
         }
 
         if(tenant == null){
@@ -150,10 +155,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.error("找不到对应的APP:{}", params);
             return res;
         }
-        if(app.getStatus() == null || app.getStatus() == App.STATUS_OFFLINE){
-            logger.error("应用未上线");
-            return res;
-        }
+
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to);
         return res;
     }
