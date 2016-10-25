@@ -2,10 +2,12 @@ package com.lsxy.yunhuni.config.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.config.dao.LineGatewayDao;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,4 +36,25 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         String lineId = lineIds.get(0);
         return this.findById(lineId);
     }
+
+    @Override
+    public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isTrans, String status, String isPublicLine) {
+        String hql = " FROM LineGateway obj ";
+        if(StringUtils.isNotEmpty(operator)){
+            hql += " AND obj.operator = '"+operator+"' ";
+        }
+        if(StringUtils.isNotEmpty(isTrans)){
+            hql += " AND obj.isTrans = '"+isTrans+"' ";
+        }
+        if(StringUtils.isNotEmpty(status)){
+            hql += " AND obj.status = '"+status+"' ";
+        }
+        if(StringUtils.isNotEmpty(isPublicLine)){
+            hql += " AND obj.isPublicLine = '"+isPublicLine+"' ";
+        }
+        Page page = this.pageList(hql,pageNo,pageSize);
+        return null;
+    }
+
+
 }
