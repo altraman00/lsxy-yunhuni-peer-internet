@@ -396,6 +396,18 @@ public class IVRActionService {
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
+            Map<String, Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("res_id",state.getResId())
+                    .putIfNotEmpty("user_data",call_id)
+                    .put("areaId",state.getAreaId())
+                    .build();
+
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            } catch (Throwable e) {
+                logger.error("调用失败",e);
+            }
             return  false;
         }
         String resXML = null;
