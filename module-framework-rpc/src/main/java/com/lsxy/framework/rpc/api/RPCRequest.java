@@ -2,6 +2,7 @@ package com.lsxy.framework.rpc.api;
 
 import com.lsxy.framework.core.utils.UUIDGenerator;
 
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,11 @@ import java.util.StringTokenizer;
  *
  */
 public class RPCRequest extends  RPCMessage{
+
+	private static final String EQ = "=";
+	private static final String AND = "&";
+	private static final String EQ_ENCODE = URLEncoder.encode("=");
+	private static final String AND_ENCODE = URLEncoder.encode("&");
 
 	private String name;		//RQ
 	private String param;		//PM
@@ -45,13 +51,13 @@ public class RPCRequest extends  RPCMessage{
 	 */
 	public void _parseParam() {
 		paramMap = new HashMap<>();
-		StringTokenizer st1 = new StringTokenizer(param, "&");
+		StringTokenizer st1 = new StringTokenizer(param, AND);
 		while (st1.hasMoreTokens()) {
-			StringTokenizer st2 = new StringTokenizer(st1.nextToken(), "=");
+			StringTokenizer st2 = new StringTokenizer(st1.nextToken(), EQ);
 			String name = st2.nextToken();
 			String value = null;
 			if(st2.hasMoreElements()){
-				value = st2.nextToken();
+				value = decode(st2.nextToken());
 			}
 			paramMap.put(name, value);
 		}
@@ -118,15 +124,36 @@ public class RPCRequest extends  RPCMessage{
 	 * @return
 	 * 			返回请求对象
 	 */
+
 	public static RPCRequest newRequest(String name,Map<String,Object> params) {
 		StringBuffer sb = new StringBuffer();
 		for (String key:params.keySet() ) {
 			Object value = params.get(key);
-			sb.append(key + "=" + (value == null?"":value) + "&");
+			if(value == null){
+				continue;
+			}
+			String v = encode(value.toString());
+			sb.append(key + EQ + v + AND);
 		}
 		if(sb.length() > 0){
 			sb.subSequence(0,sb.length()-1);
 		}
 		return newRequest(name,sb.toString());
+	}
+
+	/**
+	 * 将=转化为%3D
+	 * &转为%26
+	 * @return
+     */
+	public static String encode(String value){
+		return value.replaceAll(EQ,EQ_ENCODE).replaceAll(AND,AND_ENCODE);
+	}
+
+	public static String decode(String value){
+		if(value == null){
+			return null;
+		}
+		return value.replaceAll(EQ_ENCODE,EQ).replaceAll(AND_ENCODE,AND);
 	}
 }
