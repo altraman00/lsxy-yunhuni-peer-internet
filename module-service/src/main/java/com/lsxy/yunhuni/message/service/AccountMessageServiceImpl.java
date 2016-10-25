@@ -215,13 +215,15 @@ public class AccountMessageServiceImpl extends AbstractService<AccountMessage> i
         long awaitPlayVoiceFile = this.countByCustom(demandHql2);//放音文件
         long awaitDemand = awaitTenant+awaitPlayVoiceFile;//审核中心
         Map map = new HashMap();
+        Map map1 = new HashMap();
         map.put("awaitService",awaitService);//客服中心
         map.put("awaitInvoice",awaitInvoice);//财务中心
         map.put("awaitDemand",awaitDemand);//审核中心
-        map.put("awaitInvoiceApply",awaitInvoiceApply);//发票审核
-        map.put("awaitInvoiceApplySend",awaitInvoiceApplySend);//发票审核发送
-        map.put("awaitTenant",awaitTenant);//会员认证
-        map.put("awaitPlayVoiceFile",awaitPlayVoiceFile);//放音文件
+        map1.put("awaitInvoiceApply",awaitInvoiceApply);//发票审核
+        map1.put("awaitInvoiceApplySend",awaitInvoiceApplySend);//发票审核发送
+        map1.put("awaitTenant",awaitTenant);//会员认证
+        map1.put("awaitPlayVoiceFile",awaitPlayVoiceFile);//放音文件
+        map.put("son",map1);
         return map;
     }
 }
