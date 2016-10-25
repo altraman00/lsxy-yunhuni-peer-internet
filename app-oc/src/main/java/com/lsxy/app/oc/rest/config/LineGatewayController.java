@@ -38,9 +38,10 @@ public class LineGatewayController extends AbstractRestController {
             @ApiParam(name = "operator",value = "运营商") @RequestParam(required = false)String operator,
             @ApiParam(name = "isThrough",value = "是否透传 1支持透传 0不支持透传")@RequestParam(required = false) String isThrough,
             @ApiParam(name = "status",value = "状态 1可用 0不可用") @RequestParam(required = false)String status,
-            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine
+            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine,
+            @ApiParam(name = "order",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String order
     ){
-        Page page= lineGatewayService.getPage(pageNo,pageSize,operator,isThrough,status,isPublicLine);
+        Page page= lineGatewayService.getPage(pageNo,pageSize,operator,isThrough,status,isPublicLine,order);
         return RestResponse.success(page);
     }
     @ApiOperation(value = "新建线路")
@@ -98,4 +99,17 @@ public class LineGatewayController extends AbstractRestController {
         telnumToLineGatewayService.deleteByLineId(lineGateway.getId());
         return RestResponse.success("删除成功");
     }
+//    @ApiOperation(value = "修改状态")
+//    @RequestMapping(value = "/add/public/{id}",method = RequestMethod.PUT)
+//    public RestResponse modify(@ApiParam(name = "id",value = "线路id")
+//                               @PathVariable String id,@ApiParam(name = "status",value = "0=禁用，1=启用" )@RequestParam String status){
+//        LineGateway lineGateway = lineGatewayService.findById(id);
+//        if("0".equals(status)||"1".equals(status)) {
+//            lineGateway.setStatus(status);
+//            lineGatewayService.save(lineGateway);
+//        }else{
+//            return RestResponse.failed("0000","状态错误");
+//        }
+//        return RestResponse.success("修改成功");
+//    }
 }

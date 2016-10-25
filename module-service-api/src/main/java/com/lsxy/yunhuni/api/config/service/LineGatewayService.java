@@ -20,5 +20,5 @@ public interface LineGatewayService extends BaseService<LineGateway> {
      * @param isPublicLine 是否全局线路
      * @return
      */
-    Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine);
+    Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine,String order);
 }

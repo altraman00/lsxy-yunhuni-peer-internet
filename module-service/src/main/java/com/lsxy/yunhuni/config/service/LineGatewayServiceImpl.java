@@ -38,7 +38,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
     }
 
     @Override
-    public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine) {
+    public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine,String order) {
         String hql = " FROM LineGateway obj ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.operator = '"+operator+"' ";
@@ -51,6 +51,23 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         }
         if(StringUtils.isNotEmpty(isPublicLine)){
             hql += " AND obj.isPublicLine = '"+isPublicLine+"' ";
+        }
+        if(StringUtils.isNotEmpty(order)){
+            String temp = " ORDER BY ";
+            String[] o = order.split(";");
+            for(int i=0;i<o.length;i++){
+                String[] oo = o[i].split(":");
+                if("1".equals(oo[1])){
+                    temp += " obj."+oo[0]+" DESC ";
+                }else if("0".equals(oo[1])){
+                    temp += " obj."+oo[0]+" ";
+                }
+                if(i!=o.length-1){
+                    temp += " , ";
+                }
+            }
+        }else{
+            hql += " ORDER BY obj.createTime DESC ";
         }
         Page page = this.pageList(hql,pageNo,pageSize);
         return null;
