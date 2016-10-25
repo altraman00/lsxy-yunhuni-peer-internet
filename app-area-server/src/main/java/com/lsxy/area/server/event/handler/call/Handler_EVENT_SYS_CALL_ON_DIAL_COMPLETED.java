@@ -125,37 +125,46 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }
             }
         }else if("ivr_call".equals(state.getType())){//通过ivr呼出api 发起的呼叫
+            App app = appService.findById(state.getAppId());
+            //发送拨号结束通知
+            Long begin_time = null;
+            Long end_time = null;
+            if(params.get("begin_time") != null){
+                begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
+            }
+            if(params.get("end_time") != null){
+                end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
+            }
+            if(StringUtils.isNotBlank(app.getUrl())){
+                Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                        .putIfNotEmpty("event","ivr.dial_end")
+                        .putIfNotEmpty("id",call_id)
+                        .putIfNotEmpty("begin_time",begin_time)
+                        .putIfNotEmpty("end_time",end_time)
+                        .putIfNotEmpty("error",error)
+                        .putIfNotEmpty("user_data",state.getUserdata())
+                        .build();
+                if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                    ivrActionService.doAction(call_id);
+                }
+            }
             if(StringUtils.isNotBlank(error)){
                 logger.error("IVR呼出失败",error);
-            }else{
-                App app = appService.findById(state.getAppId());
-                //发送拨号结束通知
-                Long begin_time = null;
-                Long end_time = null;
-                if(params.get("begin_time") != null){
-                    begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
-                }
-                if(params.get("end_time") != null){
-                    end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
-                }
-                if(StringUtils.isNotBlank(app.getUrl())){
-                    Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                            .putIfNotEmpty("event","ivr.dial_end")
-                            .putIfNotEmpty("id",call_id)
-                            .putIfNotEmpty("begin_time",begin_time)
-                            .putIfNotEmpty("end_time",end_time)
-                            .putIfNotEmpty("user_data",state.getUserdata())
-                            .build();
-
-                    notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
-                }
-                ivrActionService.doAction(call_id);
             }
         }else if("ivr_dial".equals(state.getType())){//通过ivr拨号动作发起的呼叫
             String ivr_call_id = (String)businessData.get("ivr_call_id");
             if(StringUtils.isNotBlank(error)){
-                //拨号失败直接继续ivr
-                ivrActionService.doAction(ivr_call_id);
+                App app = appService.findById(state.getAppId());
+                Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                        .putIfNotEmpty("event","ivr.connect_end")
+                        .putIfNotEmpty("id",ivr_call_id)
+                        .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                        .putIfNotEmpty("end_time",System.currentTimeMillis())
+                        .putIfNotEmpty("error",error)
+                        .build();
+                if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                    ivrActionService.doAction(ivr_call_id);
+                }
             }else{
                 BusinessState ivrState = businessStateService.get(ivr_call_id);
                 String res_id_one = ivrState.getResId();
@@ -169,12 +178,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 Long schedule_play_time=(Long) businessData.get("play_time");
                 String schedule_play_file = (String) businessData.get("play_file");
                 Integer schedule_play_loop = (Integer) businessData.get("play_repeat");
-
                 if(recording!=null && recording){
                     //TODO 录音文件名如何定
                     record_file = "";
                 }
-
                 try {
                     schedule_play_file = playFileUtil.convert(state.getTenantId(),state.getAppId(),schedule_play_file);
                     Map<String,Object> map = new MapBuilder<String,Object>()

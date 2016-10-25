@@ -83,7 +83,7 @@ public class Handler_EVENT_SYS_CALL_CONNECT_ON_START extends EventHandler {
         }
         if(StringUtils.isNotBlank(app.getUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","connect_begin")
+                    .putIfNotEmpty("event","ivr.connect_begin")
                     .putIfNotEmpty("id",call_id)
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);

@@ -96,7 +96,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED extends EventHandler {
 
         if(StringUtils.isNotBlank(app.getUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","connect_end")
+                    .putIfNotEmpty("event","ivr.connect_end")
                     .putIfNotEmpty("id",call_id)
                     .putIfNotEmpty("begin_time",begin_time)
                     .putIfNotEmpty("end_time",end_time)
