@@ -13,7 +13,6 @@ import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import com.lsxy.yunhuni.api.statistics.model.DayStatics;
 import com.lsxy.yunhuni.api.statistics.service.DayStaticsService;
 import com.lsxy.yunhuni.statistics.dao.DayStaticsDao;
-import org.apache.velocity.runtime.directive.Foreach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -148,7 +147,7 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
                     costTimeLong.longValue() + lastDayStatics.getCallConnect()
             );
             this.save(current);
-            tenantDayStatics(current,date);
+            appDayStatics(current,date);
         }
     }
 
