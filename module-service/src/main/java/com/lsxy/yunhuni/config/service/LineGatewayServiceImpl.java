@@ -70,7 +70,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
             hql += " ORDER BY obj.createTime DESC ";
         }
         Page page = this.pageList(hql,pageNo,pageSize);
-        return null;
+        return page;
     }
 
 
