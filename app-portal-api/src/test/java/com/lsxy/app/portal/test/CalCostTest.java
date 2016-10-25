@@ -77,17 +77,17 @@ public class CalCostTest {
 
     @Test
     public void testDayStatics(){
-        String type = "month";
-        DayStatics statics;
-        if("today".equals(type)){
-            statics = calBillingService.getIncStaticsOfCurrentDay("40288ac9575612a30157561c7ff50004");
-        }else  if("month".equals(type)){
-            statics = calBillingService.getIncStaticsOfCurrentMonth("40288ac9575612a30157561c7ff50004");
-        }else{
-            statics = calBillingService.getCurrentStatics("40288ac9575612a30157561c7ff50004");
-        }
-        System.out.println(JSONUtil2.objectToJson(statics));
-//        dayStaticsService.dayStatics(DateUtils.getPreDate(new Date()));
+//        String type = "month";
+//        DayStatics statics;
+//        if("today".equals(type)){
+//            statics = calBillingService.getIncStaticsOfCurrentDay("40288ac9575612a30157561c7ff50004");
+//        }else  if("month".equals(type)){
+//            statics = calBillingService.getIncStaticsOfCurrentMonth("40288ac9575612a30157561c7ff50004");
+//        }else{
+//            statics = calBillingService.getCurrentStatics("40288ac9575612a30157561c7ff50004");
+//        }
+//        System.out.println(JSONUtil2.objectToJson(statics));
+        dayStaticsService.dayStatics(DateUtils.getPreDate(new Date()));
     }
 
     @Test
