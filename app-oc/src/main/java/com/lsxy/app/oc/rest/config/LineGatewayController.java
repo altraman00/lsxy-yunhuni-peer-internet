@@ -80,6 +80,14 @@ public class LineGatewayController extends AbstractRestController {
         LineGateway lineGateway = lineGatewayService.findById(id);
         return RestResponse.success(lineGateway);
     }
+//    @ApiOperation(value = "线路配置号码")
+//    @RequestMapping(value = "/telnum/{id}",method = RequestMethod.GET)
+//    public RestResponse detail(
+//            @ApiParam(name = "id",value = "线路id")
+//            @PathVariable String id){
+//        LineGateway lineGateway = telnumToLineGatewayService.getPage();
+//        return RestResponse.success(lineGateway);
+//    }
     @ApiOperation(value = "修改状态")
     @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
     public RestResponse modify(@ApiParam(name = "id",value = "线路id")

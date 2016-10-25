@@ -1,6 +1,8 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 
 import java.util.List;
@@ -28,4 +30,10 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param line
      */
     void deleteByLineId(String line);
+    /**
+     * 根据号码选择线路ID
+     * @param number
+     * @return
+     */
+    Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String number,String isDialing,String isCalled,String isThrough);
 }
