@@ -2,7 +2,6 @@ package com.lsxy.framework.rpc.api;
 
 import com.lsxy.framework.core.utils.UUIDGenerator;
 
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +17,8 @@ public class RPCRequest extends  RPCMessage{
 
 	private static final String EQ = "=";
 	private static final String AND = "&";
-	private static final String EQ_ENCODE = URLEncoder.encode("=");
-	private static final String AND_ENCODE = URLEncoder.encode("&");
+	private static final String EQ_ENCODE = "%3D";
+	private static final String AND_ENCODE = "%26";
 
 	private String name;		//RQ
 	private String param;		//PM
