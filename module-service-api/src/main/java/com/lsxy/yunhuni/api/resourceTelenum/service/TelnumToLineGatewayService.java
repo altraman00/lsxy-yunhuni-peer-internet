@@ -22,4 +22,10 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @return
      */
     List<String> getLineIdsByNumber(String number);
+
+    /**
+     * 根据线路逻辑上删除
+     * @param line
+     */
+    void deleteByLineId(String line);
 }

@@ -38,13 +38,13 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
     }
 
     @Override
-    public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isTrans, String status, String isPublicLine) {
+    public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine) {
         String hql = " FROM LineGateway obj ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.operator = '"+operator+"' ";
         }
-        if(StringUtils.isNotEmpty(isTrans)){
-            hql += " AND obj.isTrans = '"+isTrans+"' ";
+        if(StringUtils.isNotEmpty(isThrough)){
+            hql += " AND obj.isThrough = '"+isThrough+"' ";
         }
         if(StringUtils.isNotEmpty(status)){
             hql += " AND obj.status = '"+status+"' ";

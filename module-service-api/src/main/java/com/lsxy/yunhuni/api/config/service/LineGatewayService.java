@@ -15,10 +15,10 @@ public interface LineGatewayService extends BaseService<LineGateway> {
     /**
      * 根据条件获取分页数据
      * @param operator 运营商
-     * @param isTrans 是否透传
+     * @param isThrough 是否透传
      * @param status 状态
      * @param isPublicLine 是否全局线路
      * @return
      */
-    Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isTrans, String status, String isPublicLine);
+    Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine);
 }

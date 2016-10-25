@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.model;
 import com.lsxy.framework.api.base.IdEntity;
 import org.hibernate.annotations.Where;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -13,10 +14,37 @@ import javax.persistence.Table;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_oc_telnum_to_linegateway")
 public class TelnumToLineGateway extends IdEntity {
-    private String telNumber;
-    private String lineId;
-    private String provider;
+    private String telNumber;//号码
+    private String lineId;//'所属线路网关'
+    private String provider;//'供应商'
+    private String isDialing;//可主叫
+    private String isCalled;//可被叫
+    private String isThrough;//可透传
+    @Column( name = "is_dialing")
+    public String getIsDialing() {
+        return isDialing;
+    }
 
+    public void setIsDialing(String isDialing) {
+        this.isDialing = isDialing;
+    }
+    @Column( name = "is_called")
+    public String getIsCalled() {
+        return isCalled;
+    }
+
+    public void setIsCalled(String isCalled) {
+        this.isCalled = isCalled;
+    }
+    @Column( name = "is_through")
+    public String getIsThrough() {
+        return isThrough;
+    }
+
+    public void setIsThrough(String isThrough) {
+        this.isThrough = isThrough;
+    }
+    @Column( name = "tel_number")
     public String getTelNumber() {
         return telNumber;
     }
@@ -24,7 +52,7 @@ public class TelnumToLineGateway extends IdEntity {
     public void setTelNumber(String telNumber) {
         this.telNumber = telNumber;
     }
-
+    @Column( name = "line_id")
     public String getLineId() {
         return lineId;
     }
@@ -32,7 +60,7 @@ public class TelnumToLineGateway extends IdEntity {
     public void setLineId(String lineId) {
         this.lineId = lineId;
     }
-
+    @Column( name = "provider")
     public String getProvider() {
         return provider;
     }

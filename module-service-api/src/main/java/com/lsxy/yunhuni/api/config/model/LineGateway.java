@@ -22,7 +22,7 @@ public class LineGateway extends IdEntity {
     private static final String CHINATELECOM="CHINATELECOM";//中国电信
     private static final String CHINAMOBILE="CHINAMOBILE";//中国移动
     private static final String CHINAUNICOM="CHINAUNICOM";//中国联通
-    private String isTrans;//是否透传
+    private String isThrough;//是否透传
     private String tenantId;//所属租户
     private String areaId;          //区域
     private String lineNumber;  //线路网关编码
@@ -46,13 +46,13 @@ public class LineGateway extends IdEntity {
     private String operator;//运营商
     private Integer capacity;//容量
     private String isPublicLine;//是否全局线路
-    @Column(name="is_trans")
-    public String getIsTrans() {
-        return isTrans;
+    @Column(name="is_through")
+    public String getIsThrough() {
+        return isThrough;
     }
 
-    public void setIsTrans(String isTrans) {
-        this.isTrans = isTrans;
+    public void setIsThrough(String isThrough) {
+        this.isThrough = isThrough;
     }
 
     @Column(name="tenant_id")

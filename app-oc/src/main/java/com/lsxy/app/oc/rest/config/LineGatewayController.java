@@ -7,6 +7,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by zhangxb on 2016/10/24.
@@ -25,16 +28,19 @@ public class LineGatewayController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(LineGatewayController.class);
     @Autowired
     LineGatewayService lineGatewayService;
+    @Autowired
+    TelnumToLineGatewayService telnumToLineGatewayService;
     @RequestMapping(value = "/plist",method = RequestMethod.GET)
     @ApiOperation(value = "获取分页数据")
     public RestResponse pList(
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
             @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize,
             @ApiParam(name = "operator",value = "运营商") @RequestParam(required = false)String operator,
-            @ApiParam(name = "isTrans",value = "是否透传 1支持透传 0不支持透传")@RequestParam(required = false) String isTrans,
+            @ApiParam(name = "isThrough",value = "是否透传 1支持透传 0不支持透传")@RequestParam(required = false) String isThrough,
             @ApiParam(name = "status",value = "状态 1可用 0不可用") @RequestParam(required = false)String status,
-            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine){
-        Page page= lineGatewayService.getPage(pageNo,pageSize,operator,isTrans,status,isPublicLine);
+            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine
+    ){
+        Page page= lineGatewayService.getPage(pageNo,pageSize,operator,isThrough,status,isPublicLine);
         return RestResponse.success(page);
     }
     @ApiOperation(value = "新建线路")
@@ -77,5 +83,19 @@ public class LineGatewayController extends AbstractRestController {
             return RestResponse.failed("0000","状态错误");
         }
         return RestResponse.success("修改成功");
+    }
+    /**
+     * 删除消息
+     * @return
+     */
+    @ApiOperation(value = "删除线路")
+    @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
+    public RestResponse delete(@ApiParam(name="id",value = "线路id") @PathVariable  String id) throws InvocationTargetException, IllegalAccessException {
+        LineGateway lineGateway = lineGatewayService.findById(id);
+        //删除线路
+        lineGatewayService.delete(lineGateway);
+        //删除线路号码关联关系表
+        telnumToLineGatewayService.deleteByLineId(lineGateway.getId());
+        return RestResponse.success("删除成功");
     }
 }

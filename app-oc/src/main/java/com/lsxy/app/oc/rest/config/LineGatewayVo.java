@@ -42,8 +42,8 @@ public class LineGatewayVo {
     private String mobileAreaRule;
     @ApiModelProperty(name="fromPrefix",value = "固话区号规则：0=一律加区号；1=一律不加区号；2=非与线路属于同一个归属地加区号")
     private String telAreaRule;
-    @ApiModelProperty(name="isTrans",value = "是否透传：1=是，0=不是")
-    private String isTrans;
+    @ApiModelProperty(name="isThrough",value = "是否透传：1=是，0=不是")
+    private String isThrough;
     @ApiModelProperty(name="lingPrice",value = "成本价")
     private BigDecimal lingPrice;
     @ApiModelProperty(name="quality",value = "质量：数字1-10")
@@ -53,12 +53,12 @@ public class LineGatewayVo {
     @ApiModelProperty(name="capacity",value = "并发容量：数字")
     private Integer capacity;
 
-    public String getIsTrans() {
-        return isTrans;
+    public String getisThrough() {
+        return isThrough;
     }
 
-    public void setIsTrans(String isTrans) {
-        this.isTrans = isTrans;
+    public void setisThrough(String isThrough) {
+        this.isThrough = isThrough;
     }
 
     public String getIsPublicLine() {

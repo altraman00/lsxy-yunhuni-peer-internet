@@ -9,6 +9,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.resourceTelenum.dao.TelnumToLineGatewayDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -27,7 +28,8 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Autowired
     LineGatewayService lineGatewayService;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<TelnumToLineGateway, Serializable> getDao() {
         return this.telnumToLineGatewayDao;
@@ -54,6 +56,12 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
             results.add(ttg.getLineId());
         }
         return results;
+    }
+
+    @Override
+    public void deleteByLineId(String line) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE line_id='"+line+"'";
+        jdbcTemplate.update(sql);
     }
 
 }
