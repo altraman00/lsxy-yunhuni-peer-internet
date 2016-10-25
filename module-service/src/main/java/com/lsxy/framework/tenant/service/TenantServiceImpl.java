@@ -248,7 +248,7 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         String countSql = "SELECT COUNT(t.id) " + sql;
         String pageSql = "SELECT t.id 'id',t.tenant_name 'name'," +
                 "t.create_time 'regDate',t.is_real_auth 'authStatus'," +
-                "a.`status` 'accountStatus',app.s 'appCount'," +
+                "a.`status` 'accountStatus',app.s 'appCount'" +
 //                "billing.balance 'remainCoin'," +
 //                "consume.sum_amount 'costCoin',recharge.amount 'totalCoin'," +
 //                "cdr.sum_call 'sessionCount',cdr.sum_cost_time 'sessionTime'" +

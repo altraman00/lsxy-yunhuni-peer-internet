@@ -21,12 +21,7 @@ entities= {
             @FieldResult(name="regDate", column="regDate"),
             @FieldResult(name="authStatus", column="authStatus"),
             @FieldResult(name="accountStatus", column="accountStatus"),
-            @FieldResult(name="appCount", column="appCount"),
-            @FieldResult(name="remainCoin", column="remainCoin"),
-            @FieldResult(name="costCoin", column="costCoin"),
-            @FieldResult(name="totalCoin", column="totalCoin"),
-            @FieldResult(name="sessionCount", column="sessionCount"),
-            @FieldResult(name="sessionTime", column="sessionTime"),
+            @FieldResult(name="appCount", column="appCount")
         })
     }
 )
@@ -50,18 +45,23 @@ public class TenantVO implements Serializable {
     private Integer appCount;
 
     @JsonProperty("remain_coin")
+    @Transient
     private Double remainCoin;
 
     @JsonProperty("cost_coin")
+    @Transient
     private BigDecimal costCoin;
 
     @JsonProperty("total_coin")
+    @Transient
     private BigDecimal totalCoin;
 
     @JsonProperty("session_count")
+    @Transient
     private Long sessionCount;
 
     @JsonProperty("session_time")
+    @Transient
     private Long sessionTime;
 
     @JsonProperty("account_status")

@@ -1,8 +1,11 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
+import com.lsxy.framework.api.tenant.model.TenantVO;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil2;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.statistics.model.DayStatics;
 import com.lsxy.yunhuni.api.statistics.service.DayStaticsService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
@@ -43,6 +46,8 @@ public class CalCostTest {
     ResourcesRentService resourcesRentService;
     @Autowired
     DayStaticsService dayStaticsService;
+    @Autowired
+    TenantService tenantService;
 
     @Test
     public void testCalCost(){
@@ -83,5 +88,11 @@ public class CalCostTest {
         }
         System.out.println(JSONUtil2.objectToJson(statics));
 //        dayStaticsService.dayStatics(DateUtils.getPreDate(new Date()));
+    }
+
+    @Test
+    public void testTenantList(){
+        Page<TenantVO> tenantVOPage = tenantService.pageListBySearch(null, null, null, null, null, 1, 20);
+        System.out.println(tenantVOPage);
     }
 }
