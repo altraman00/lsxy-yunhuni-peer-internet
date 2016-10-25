@@ -11,6 +11,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,17 +100,14 @@ public class LineGatewayController extends AbstractRestController {
         telnumToLineGatewayService.deleteByLineId(lineGateway.getId());
         return RestResponse.success("删除成功");
     }
-//    @ApiOperation(value = "修改状态")
-//    @RequestMapping(value = "/add/public/{id}",method = RequestMethod.PUT)
-//    public RestResponse modify(@ApiParam(name = "id",value = "线路id")
-//                               @PathVariable String id,@ApiParam(name = "status",value = "0=禁用，1=启用" )@RequestParam String status){
-//        LineGateway lineGateway = lineGatewayService.findById(id);
-//        if("0".equals(status)||"1".equals(status)) {
-//            lineGateway.setStatus(status);
-//            lineGatewayService.save(lineGateway);
-//        }else{
-//            return RestResponse.failed("0000","状态错误");
-//        }
-//        return RestResponse.success("修改成功");
-//    }
+    @ApiOperation(value = "加入全局")
+    @RequestMapping(value = "/add/public/{id}",method = RequestMethod.PUT)
+    public RestResponse modify(@ApiParam(name = "id",value = "线路id") @PathVariable String id){
+        LineGateway lineGateway = lineGatewayService.findById(id);
+        if(lineGateway!=null&& StringUtils.isNotEmpty(lineGateway.getId())) {
+        }else{
+            return RestResponse.failed("0000","线路不存在");
+        }
+        return RestResponse.success("修改成功");
+    }
 }
