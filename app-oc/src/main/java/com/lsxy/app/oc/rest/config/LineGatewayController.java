@@ -6,12 +6,15 @@ import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
+import org.aspectj.apache.bcel.generic.LineNumberGen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,8 @@ public class LineGatewayController extends AbstractRestController {
     LineGatewayService lineGatewayService;
     @Autowired
     TelnumToLineGatewayService telnumToLineGatewayService;
+    @Autowired
+    LineGatewayToPublicService lineGatewayToPublicService;
     @RequestMapping(value = "/plist",method = RequestMethod.GET)
     @ApiOperation(value = "获取分页数据")
     public RestResponse pList(
@@ -57,6 +62,8 @@ public class LineGatewayController extends AbstractRestController {
         }
         //默认启用线路
         lineGateway.setStatus("1");
+        //默认没有加入全局线路中
+        lineGateway.setIsPublicLine("0");
         lineGatewayService.save(lineGateway);
         return RestResponse.success("创建成功");
     }
@@ -76,10 +83,10 @@ public class LineGatewayController extends AbstractRestController {
     @ApiOperation(value = "修改状态")
     @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
     public RestResponse modify(@ApiParam(name = "id",value = "线路id")
-                                   @PathVariable String id,@ApiParam(name = "status",value = "0=禁用，1=启用" )@RequestParam String status){
+                                   @PathVariable String id,@RequestBody LineGatewayEditStatusVo lineGatewayEditStatusVo){
         LineGateway lineGateway = lineGatewayService.findById(id);
-        if("0".equals(status)||"1".equals(status)) {
-            lineGateway.setStatus(status);
+        if("0".equals(lineGatewayEditStatusVo.getStatus())||"1".equals(lineGatewayEditStatusVo.getStatus())) {
+            lineGateway.setStatus(lineGatewayEditStatusVo.getStatus());
             lineGatewayService.save(lineGateway);
         }else{
             return RestResponse.failed("0000","状态错误");
@@ -100,14 +107,5 @@ public class LineGatewayController extends AbstractRestController {
         telnumToLineGatewayService.deleteByLineId(lineGateway.getId());
         return RestResponse.success("删除成功");
     }
-    @ApiOperation(value = "加入全局")
-    @RequestMapping(value = "/add/public/{id}",method = RequestMethod.PUT)
-    public RestResponse modify(@ApiParam(name = "id",value = "线路id") @PathVariable String id){
-        LineGateway lineGateway = lineGatewayService.findById(id);
-        if(lineGateway!=null&& StringUtils.isNotEmpty(lineGateway.getId())) {
-        }else{
-            return RestResponse.failed("0000","线路不存在");
-        }
-        return RestResponse.success("修改成功");
-    }
+
 }

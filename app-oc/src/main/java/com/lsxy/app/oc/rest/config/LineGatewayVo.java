@@ -10,8 +10,6 @@ import java.math.BigDecimal;
  */
 @ApiModel
 public class LineGatewayVo {
-    @ApiModelProperty(name="isPublicLine",value = "1:全局线路;0:租户专属线路")
-    private String isPublicLine;
     @ApiModelProperty(name="tenantId",value = "所属租户")
     private String tenantId;
     @ApiModelProperty(name="lineNumber",value = "线路标识")
@@ -59,14 +57,6 @@ public class LineGatewayVo {
 
     public void setisThrough(String isThrough) {
         this.isThrough = isThrough;
-    }
-
-    public String getIsPublicLine() {
-        return isPublicLine;
-    }
-
-    public void setIsPublicLine(String isPublicLine) {
-        this.isPublicLine = isPublicLine;
     }
 
     public String getTenantId() {

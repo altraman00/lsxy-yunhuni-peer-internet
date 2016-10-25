@@ -35,6 +35,13 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
+    public int findByLindId(String lindId) {
+        String sql = " SELECT COUNT(id) db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public where line_id='"+lindId+"'";
+        int result = jdbcTemplate.queryForObject(sql,Integer.class);
+        return result;
+    }
+
+    @Override
     public Page<LineGatewayToPublic> getPage(Integer pageNo, Integer pageSize, String operator, String isThrough, String status, String isPublicLine, String order) {
         String hql = " FROM LineGatewayToPublic obj ";
         if(StringUtils.isNotEmpty(operator)){

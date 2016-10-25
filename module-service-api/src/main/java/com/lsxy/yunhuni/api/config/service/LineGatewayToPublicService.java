@@ -9,5 +9,6 @@ import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
  */
 public interface LineGatewayToPublicService extends BaseService<LineGatewayToPublic> {
     int getMaxPriority();
+    int findByLindId(String lindId);
     Page<LineGatewayToPublic> getPage(Integer pageNo, Integer pageSize, String operator, String isThrough, String status, String isPublicLine, String order);
 }
