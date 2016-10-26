@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
@@ -23,7 +24,9 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param number
      * @return
      */
-    List<String> getLineIdsByNumber(String number);
+    List<TelnumToLineGateway> getDialingLinesByNumber(String number);
+
+    LineGateway getCalledLineByNumber(String number);
 
     /**
      * 根据线路逻辑上删除

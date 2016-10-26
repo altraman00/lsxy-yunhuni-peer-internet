@@ -24,20 +24,14 @@ public class ApiGwRedBlankNumServiceImpl extends AbstractService<ApiGwRedBlankNu
     }
 
     @Override
-    public boolean isRedOrBlankNum(String number) {
-        ApiGwRedBlankNum result = apiGwRedBlankNumDao.findByNumberAndStatus(number, ApiGwRedBlankNum.STATUS_ENABLED);
-        return result != null;
-    }
-
-    @Override
     public boolean isRedNum(String number) {
-        ApiGwRedBlankNum result = apiGwRedBlankNumDao.findByNumberAndTypeAndStatus(number,ApiGwRedBlankNum.TYPE_RED, ApiGwRedBlankNum.STATUS_ENABLED);
+        ApiGwRedBlankNum result = apiGwRedBlankNumDao.findFirstByNumberAndTypeAndStatus(number,ApiGwRedBlankNum.TYPE_RED, ApiGwRedBlankNum.STATUS_ENABLED);
         return result != null;
     }
 
     @Override
-    public boolean isBlankNum(String number) {
-        ApiGwRedBlankNum result = apiGwRedBlankNumDao.findByNumberAndTypeAndStatus(number,ApiGwRedBlankNum.TYPE_BLACK, ApiGwRedBlankNum.STATUS_ENABLED);
+    public boolean isBlackNum(String number) {
+        ApiGwRedBlankNum result = apiGwRedBlankNumDao.findFirstByNumberAndTypeAndStatus(number,ApiGwRedBlankNum.TYPE_BLACK, ApiGwRedBlankNum.STATUS_ENABLED);
         return result != null;
     }
 }

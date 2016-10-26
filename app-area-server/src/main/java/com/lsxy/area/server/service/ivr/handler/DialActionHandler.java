@@ -136,14 +136,14 @@ public class DialActionHandler extends ActionHandler{
 
     public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
         App app = appService.findById(appId);
-        Map<String, String> result;
+        AreaAndTelNumSelector.Selector selector;
         try {
-            result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app);
         } catch (AppOffLineException e) {
             return false;
         }
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
@@ -194,7 +194,7 @@ public class DialActionHandler extends ActionHandler{
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        callSession.setToNum(to+"@"+lineGateway.getSipProviderIp());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -203,7 +203,7 @@ public class DialActionHandler extends ActionHandler{
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
                 .putIfNotEmpty("ring_play_file",ring_play_file)

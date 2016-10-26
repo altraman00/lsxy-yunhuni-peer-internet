@@ -37,7 +37,14 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * 根据区域获取一个空闲的，没有绑定租户的号码
      * @return
      */
-    String findOneFreeNumber(String areaId);
+    ResourceTelenum findOneFreeNumber(String areaId);
+
+    /**
+     * 根据呼叫URI查找号码
+     * @param uri
+     * @return
+     */
+    String findNumByCallUri(String uri);
 
     /**
      * 获取分页信息

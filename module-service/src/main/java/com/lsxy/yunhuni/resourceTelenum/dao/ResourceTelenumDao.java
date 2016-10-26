@@ -20,7 +20,7 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
      * @param status
      * @return
      */
-    List<ResourceTelenum> findFirst50ByStatus(Integer status);
+    List<ResourceTelenum> findFirst50ByStatusAndTelNumberNot(Integer status,String testNum);
     /**
      * 根据号码获取资源
      * @param telNumber
@@ -37,10 +37,26 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
             "(SELECT rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.rent_expire<:expireTime AND rent.res_type=1 AND rent.rent_status IN (1,2))",nativeQuery = true)
     void cleanExpireResourceTelnum(@Param("expireTime") Date expireTime);
 
+
+    /**
+     * 根据状态获取总数
+     * @param status
+     * @return
+     */
+    Long countByStatusAndTelNumberNot(int status,String testNum);
+
     /**
      * 获取1个空闲的号码
      * @param status
      * @return
      */
-    ResourceTelenum findFirstByStatus(int status);
+    @Query(value = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.status = :status and tel_number <> :testNum limit :random,1", nativeQuery = true)
+    ResourceTelenum findOneByStatus(@Param("status") int status,@Param("testNum") String testNum,@Param("random") long random);
+
+    /**
+     * 根据呼叫URI查找号码资源
+     * @param callUri
+     * @return
+     */
+    ResourceTelenum findByCallUri(String callUri);
 }

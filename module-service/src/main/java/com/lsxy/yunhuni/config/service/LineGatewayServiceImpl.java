@@ -5,6 +5,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.config.dao.LineGatewayDao;
 import org.apache.commons.lang.StringUtils;
@@ -37,8 +38,8 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
     @Override
     public LineGateway getBestLineGatewayByNumber(String number){
         //TODO 获取最优的线路
-        List<String> lineIds =  telnumToLineGatewayService.getLineIdsByNumber(number);
-        String lineId = lineIds.get(0);
+        List<TelnumToLineGateway> dialingLineIdsByNumber = telnumToLineGatewayService.getDialingLinesByNumber(number);
+        String lineId = dialingLineIdsByNumber.get(0).getLineId();
         return this.findById(lineId);
     }
 

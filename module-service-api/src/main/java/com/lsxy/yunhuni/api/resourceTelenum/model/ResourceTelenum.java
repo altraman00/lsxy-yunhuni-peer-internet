@@ -18,6 +18,9 @@ import java.math.BigDecimal;
 public class ResourceTelenum extends IdEntity{
     public static final int STATUS_RENTED = 1; //已被租用
     public static final int STATUS_FREE = 0;    //未被租用
+    public static final String USABLE_TRUE = "1";    //未被租用
+    public static final String USABLE_FALSE = "0";    //未被租用
+
 
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码

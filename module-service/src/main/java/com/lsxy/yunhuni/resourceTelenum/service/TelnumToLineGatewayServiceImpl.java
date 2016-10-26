@@ -11,15 +11,10 @@ import com.lsxy.yunhuni.resourceTelenum.dao.TelnumToLineGatewayDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by liups on 2016/9/2.
@@ -40,25 +35,28 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public String getAreaIdByTelnum(String telnum){
-        List<TelnumToLineGateway> telnumToLineGateways = telnumToLineGatewayDao.findByTelNumber(telnum);
-        if(telnumToLineGateways == null || telnumToLineGateways.size() <= 0){
+        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayDao.findFirstByTelNumber(telnum);
+        if(telnumToLineGateway == null ){
             throw new RuntimeException("数据异常，号码没有关联线路");
         }
-        Random random = new Random();
-        Integer ranNum = random.nextInt(telnumToLineGateways.size());
-        String lineId = telnumToLineGateways.get(ranNum).getLineId();
+        String lineId = telnumToLineGateway.getLineId();
         LineGateway lineGateway = lineGatewayService.findById(lineId);
         return lineGateway.getAreaId();
     }
 
     @Override
-    public List<String> getLineIdsByNumber(String number) {
-        List<String> results = new LinkedList<>();
-        List<TelnumToLineGateway> telnumToLineGateways = telnumToLineGatewayDao.findByTelNumber(number);
-        for(TelnumToLineGateway ttg:telnumToLineGateways){
-            results.add(ttg.getLineId());
+    public  List<TelnumToLineGateway> getDialingLinesByNumber(String number) {
+        return telnumToLineGatewayDao.findDialingLine(number);
+    }
+
+    @Override
+    public LineGateway getCalledLineByNumber(String number) {
+        TelnumToLineGateway ttg = telnumToLineGatewayDao.findFirstByTelNumberAndIsCalled(number,"1");
+        if(ttg != null){
+            return lineGatewayService.findById(ttg.getLineId());
+        }else{
+            return null;
         }
-        return results;
     }
 
     @Override
