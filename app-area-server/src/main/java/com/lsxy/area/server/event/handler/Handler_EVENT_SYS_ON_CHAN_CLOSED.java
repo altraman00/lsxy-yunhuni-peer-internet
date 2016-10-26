@@ -132,12 +132,12 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             logger.info("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
         }
 
-        voiceCdrService.save(voiceCdr);
         calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
         if(voiceCdr.getCallAckDt() != null){
             calBillingService.incCallConnect(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());
         }
         calBillingService.incCallCostTime(voiceCdr.getTenantId(),voiceCdr.getCallEndDt(),voiceCdr.getCostTimeLong());
+        voiceCdrService.save(voiceCdr);
         return null;
     }
 
