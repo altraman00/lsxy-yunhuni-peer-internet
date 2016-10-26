@@ -8,21 +8,25 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * 号码归属地库
- * Created by liups on 2016/10/13.
+ * Created by zhangxb on 2016/10/25.
  */
 @Entity
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_telnum_location")
 public class TelnumLocation extends IdEntity {
-    private String mobile;  //手机号前缀
-    private String province;    //省份
-    private String city;        //城市
-    private String corp;        //运营商
-    private String areaCode;       //区号
-    private String postCode;        //邮编
+    @Column(name="mobile")
+    private String mobile;//手机号前缀
+    @Column(name="province")
+    private String province;//省份
+    @Column(name="city")
+    private String city;//城市
+    @Column(name="corp")
+    private String corp;//运营商
+    @Column(name="area_code")
+    private String areaCode;//区号
+    @Column(name="post_code")
+    private String postCode;//邮编
 
-    @Column(name = "mobile")
     public String getMobile() {
         return mobile;
     }
@@ -31,7 +35,6 @@ public class TelnumLocation extends IdEntity {
         this.mobile = mobile;
     }
 
-    @Column(name = "province")
     public String getProvince() {
         return province;
     }
@@ -40,7 +43,6 @@ public class TelnumLocation extends IdEntity {
         this.province = province;
     }
 
-    @Column(name = "city")
     public String getCity() {
         return city;
     }
@@ -49,7 +51,6 @@ public class TelnumLocation extends IdEntity {
         this.city = city;
     }
 
-    @Column(name = "corp")
     public String getCorp() {
         return corp;
     }
@@ -58,7 +59,6 @@ public class TelnumLocation extends IdEntity {
         this.corp = corp;
     }
 
-    @Column(name = "area_code")
     public String getAreaCode() {
         return areaCode;
     }
@@ -67,7 +67,6 @@ public class TelnumLocation extends IdEntity {
         this.areaCode = areaCode;
     }
 
-    @Column(name = "post_code")
     public String getPostCode() {
         return postCode;
     }

@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
@@ -45,4 +46,18 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      */
     String findNumByCallUri(String uri);
 
+    /**
+     * 获取分页信息
+     * @param pageNo
+     * @param pageSize
+     * @param operator
+     * @param number
+     * @return
+     */
+    Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize, String operator, String number);
+    /**
+     * 获取分页信息
+     * @return
+     */
+    Page<ResourceTelenum> getPageByNotLine(String id,Integer pageNo, Integer pageSize, String operator, String number);
 }

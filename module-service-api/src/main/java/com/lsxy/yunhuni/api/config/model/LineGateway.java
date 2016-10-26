@@ -19,14 +19,10 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_line_gateway")
 public class LineGateway extends IdEntity {
-    private static final String CHINATELECOM="CHINATELECOM";//中国电信
-    private static final String CHINAMOBILE="CHINAMOBILE";//中国移动
-    private static final String CHINAUNICOM="CHINAUNICOM";//中国联通
+
     private String isThrough;//是否透传
     private String tenantId;//所属租户
     private String areaId;          //区域
-    private String ip;
-    private String port;
     private String lineNumber;  //线路网关编码
     private BigDecimal lingPrice;   //线路网关单价
     private String sipProviderDomain;   //线路网关域名
@@ -82,24 +78,6 @@ public class LineGateway extends IdEntity {
 
     public void setAreaId(String areaId) {
         this.areaId = areaId;
-    }
-
-    @Column(name = "ip")
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    @Column(name = "port")
-    public String getPort() {
-        return port;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
     }
 
     @Column(name = "line_number")

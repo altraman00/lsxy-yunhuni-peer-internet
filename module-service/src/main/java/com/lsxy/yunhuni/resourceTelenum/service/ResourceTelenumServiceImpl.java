@@ -3,10 +3,12 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,5 +93,24 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
     }
 
+
+    @Override
+    public Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize, String operator, String number) {
+        String hql = " FROM ResourceTelenum obj WHERE 1=1 ";
+        if(StringUtils.isNotEmpty(operator)){
+            hql += " AND obj.operator='"+operator+"' ";
+        }
+        if(StringUtils.isNotEmpty(number)){
+            hql += " AND obj.number like '%"+number+"%' ";
+        }
+        hql+=" ORDER BY obj.createTime DESC ";
+        Page page = this.pageList(hql,pageNo,pageSize);
+        return page;
+    }
+
+    @Override
+    public Page<ResourceTelenum> getPageByNotLine(String id, Integer pageNo, Integer pageSize, String operator, String number) {
+        return null;
+    }
 
 }
