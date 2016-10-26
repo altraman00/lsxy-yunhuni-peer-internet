@@ -1,6 +1,7 @@
 package com.lsxy.framework.dubbo;
 
 
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.dubbo.listener.ConsumerInvokeStaticsFilter;
 import com.lsxy.framework.dubbo.listener.ConsumerSubscribeListener;
 import com.lsxy.framework.dubbo.listener.ProviderExportListener;
@@ -11,6 +12,7 @@ import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -26,6 +28,9 @@ import java.util.Set;
 public class DubboEndpoint extends AbstractEndpoint implements ApplicationContextAware {
     private DubboProperties dubboProperties;
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private String systemId;
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
@@ -49,7 +54,11 @@ public class DubboEndpoint extends AbstractEndpoint implements ApplicationContex
         }
         if (serverMode) {
             info.put("server", true);
-            info.put("port", dubboProperties.getPort());
+            String port = SystemConfig.getProperty(systemId+".dubbo.port");
+            if(StringUtils.isEmpty(port)){
+                port = dubboProperties.getPort().toString();
+            }
+            info.put("port", port);
         }
         info.put("app", dubboProperties.getApp());
         info.put("registry", dubboProperties.getRegistry());
