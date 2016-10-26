@@ -25,7 +25,6 @@ public class LineGateway extends IdEntity {
     private String areaId;          //区域
     private String lineNumber;  //线路网关编码
     private BigDecimal lingPrice;   //线路网关单价
-    private String sipProviderDomain;   //线路网关域名
     private String remark;
     private Integer priority;//线路网关优先级
     private String areaCode;//归属区号
@@ -34,7 +33,7 @@ public class LineGateway extends IdEntity {
     private String telAreaRule;//固话区号规则
     private String lineType;//默认sip
     private String sipProviderIp;//线路网关IP
-    private String sipProviderPort;//线路网关端口
+    private String sipProviderDomain;   //线路网关域名
     private String sipAuthType;//鉴权方式
     private String sipAuthAccount;//账号
     private String sipAuthPassword;//密码
@@ -163,14 +162,7 @@ public class LineGateway extends IdEntity {
     public void setSipProviderIp(String sipProviderIp) {
         this.sipProviderIp = sipProviderIp;
     }
-    @Column(name = "sip_provider_port")
-    public String getSipProviderPort() {
-        return sipProviderPort;
-    }
 
-    public void setSipProviderPort(String sipProviderPort) {
-        this.sipProviderPort = sipProviderPort;
-    }
     @Column(name = "sip_auth_type")
     public String getSipAuthType() {
         return sipAuthType;

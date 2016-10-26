@@ -17,7 +17,7 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
-import com.lsxy.yunhuni.api.config.service.TelNumLocationService;
+import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -35,8 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 
 /**
  * Created by liuws on 2016/8/29.
@@ -87,7 +85,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     @Autowired
     private ApiGwRedBlankNumService apiGwRedBlankNumService;
     @Autowired
-    private TelNumLocationService telNumLocationService;
+    private TelnumLocationService telNumLocationService;
 
     @Override
     public String getEventName() {

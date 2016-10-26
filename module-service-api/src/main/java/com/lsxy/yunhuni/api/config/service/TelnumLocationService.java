@@ -22,4 +22,11 @@ public interface TelnumLocationService extends BaseService<TelnumLocation> {
      * @return
      */
     List<Map<String,Object>> getCityAndAreaCode(String province );
+
+    /**
+     * 获取区号
+     * @param telphone
+     * @return
+     */
+    String getAreaCodeOfTelephone(String telphone);
 }

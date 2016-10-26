@@ -40,4 +40,9 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
         List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
         return list;
     }
+
+    @Override
+    public String getAreaCodeOfTelephone(String telphone) {
+        return telnumLocationDao.findAreaCodeByTelephone(telphone);
+    }
 }

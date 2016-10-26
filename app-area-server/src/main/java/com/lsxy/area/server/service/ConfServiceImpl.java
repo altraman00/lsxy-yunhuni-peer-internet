@@ -287,7 +287,7 @@ public class ConfServiceImpl implements ConfService {
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        callSession.setToNum(to+"@"+lineGateway.getSipProviderIp());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -296,7 +296,7 @@ public class ConfServiceImpl implements ConfService {
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_answer_seconds",maxDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
