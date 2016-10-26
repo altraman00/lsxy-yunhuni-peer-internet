@@ -43,5 +43,12 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      */
     void batchDelete(String[] ids);
 
+    /**
+     * 批量增加
+     * @param id
+     * @param ids
+     */
+    void batchInsert(String id,String[] ids);
+
 
 }

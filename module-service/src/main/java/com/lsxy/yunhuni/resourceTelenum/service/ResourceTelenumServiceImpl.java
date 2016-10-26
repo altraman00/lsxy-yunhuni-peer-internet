@@ -10,7 +10,11 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +28,8 @@ import java.util.Random;
 public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum> implements ResourceTelenumService {
     @Autowired
     private ResourceTelenumDao resourceTelenumDao;
+    @PersistenceContext
+    private EntityManager em;
     @Override
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
         return this.resourceTelenumDao;
@@ -91,7 +97,27 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page<ResourceTelenum> getPageByNotLine(String id, Integer pageNo, Integer pageSize, String operator, String number) {
-        return null;
+        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj where obj.deleted=0 AND obj.tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE line_id='"+id+"') ";
+        if(StringUtils.isNotEmpty(operator)){
+            sql +=" AND obj.operator='"+operator+"' ";
+        }
+        if(StringUtils.isNotEmpty(number)){
+            sql +=" AND obj.number LIKE '%"+operator+"%' ";
+        }
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" group by obj.create_time desc";
+        Query pageQuery = em.createNativeQuery(pageSql,ResourceTelenum.class);
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        int start = (pageNo-1)*pageSize;
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
     }
 
 }

@@ -100,4 +100,27 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         jdbcTemplate.update(sql);
     }
 
+    @Override
+    public void batchInsert(String id, String[] ids) {
+
+//        insert into db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway (id, tel_number , line_id, is_dialing,is_called,is_through,is_buy,provider,create_time,last_time,deleted,delete_time,sortno,version) values
+//                (200,'haha' , 'deng' , 'shenzhen'),
+//                (201,'haha2' , 'deng' , 'GD'),
+//                (202,'haha3' , 'deng' , 'Beijing');
+//        id                   varchar(32) not null,
+//                tel_number           varchar(32),
+//                line_id              varchar(32) comment '所属线路网关',
+//                is_dialing           varchar(10),
+//                is_called            varchar(10),
+//                is_through           varchar(10),
+//                is_buy               varchar(10),
+//                provider             varchar(32) comment '供应商',
+//                create_time          datetime,
+//                last_time            datetime,
+//                deleted              int,
+//        delete_time          datetime,
+//        sortno               bigint,
+//        version              int,
+    }
+
 }

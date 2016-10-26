@@ -32,13 +32,13 @@ public class ResourceTelenumController {
     @RequestMapping(value = "/line/plist/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取非线路上的分页数据")
     public RestResponse pListByLine(
-            @ApiParam(name = "id",value = "线路id")  @PathVariable Integer id,
+            @ApiParam(name = "id",value = "线路id")  @PathVariable String id,
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
             @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize,
             @ApiParam(name = "operator",value = "运营商") @RequestParam(required = false)String operator,
             @ApiParam(name = "number",value = "手机号码")@RequestParam(required = false) String number
     ){
-        Page page= resourceTelenumService.getPage(pageNo,pageSize,operator,number);
+        Page page= resourceTelenumService.getPageByNotLine(id,pageNo,pageSize,operator,number);
         return RestResponse.success(page);
     }
 }
