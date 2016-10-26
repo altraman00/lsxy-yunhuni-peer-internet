@@ -202,6 +202,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }
+                ivrState.getBusinessData().put("ivr_dial_call_id",call_id);
+                businessStateService.save(ivrState);
             }
         }
         return res;
