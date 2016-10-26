@@ -21,4 +21,5 @@ public interface LineGatewayService extends BaseService<LineGateway> {
      * @return
      */
     Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine,String order);
+    int batchModify(String[] sql);
 }

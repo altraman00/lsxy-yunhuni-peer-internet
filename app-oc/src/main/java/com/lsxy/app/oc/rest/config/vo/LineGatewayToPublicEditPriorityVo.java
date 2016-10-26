@@ -1,4 +1,4 @@
-package com.lsxy.app.oc.rest.config;
+package com.lsxy.app.oc.rest.config.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

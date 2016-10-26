@@ -3,7 +3,6 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
@@ -12,10 +11,12 @@ import com.lsxy.yunhuni.resourceTelenum.dao.TelnumToLineGatewayDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -81,8 +82,22 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         if(StringUtils.isNotEmpty(number)){
             hql += " AND obj.number like '%"+number+"%' ";
         }
+        hql += " ORDER BY obj.createTime DESC ";
         Page page = this.pageList(hql,pageNo,pageSize);
         return page;
+    }
+
+    @Override
+    public void batchDelete(String[] ids) {
+        String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE id IN (";
+        for(int i=0;i<ids.length;i++){
+            sql+= " '"+ids[i]+"' ";
+            if(i!=ids.length-1){
+                sql+=" , ";
+            }
+        }
+        sql += " ) ";
+        jdbcTemplate.update(sql);
     }
 
 }

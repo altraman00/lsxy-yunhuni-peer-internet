@@ -9,7 +9,11 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.config.dao.LineGatewayDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,7 +27,8 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
     LineGatewayDao lineGatewayDao;
     @Autowired
     TelnumToLineGatewayService telnumToLineGatewayService;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<LineGateway, Serializable> getDao() {
         return this.lineGatewayDao;
@@ -71,6 +76,24 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         }
         Page page = this.pageList(hql,pageNo,pageSize);
         return page;
+    }
+
+    @Override
+    public int batchModify(String[] sql) {
+        int result = 0;
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(
+                jdbcTemplate.getDataSource());
+        TransactionStatus status = transactionManager.getTransaction(def);
+        try {
+            jdbcTemplate.batchUpdate(sql);
+        } catch (Exception ex) {
+            result = -1;
+            transactionManager.rollback(status);
+        } finally {
+            transactionManager.commit(status);
+        }
+        return result;
     }
 
 

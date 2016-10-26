@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.app.oc.rest.config.vo.LineGatewayToPublicEditPriorityVo;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
@@ -114,24 +115,25 @@ public class LineGatewayToPublicController extends AbstractRestController {
             if(o1==o2){
                 return RestResponse.failed("0000","目标优先级和当前优先级一致");
             }
-            boolean flag = o1<o2;
-            int begin = o1>o2?o2:o1;
-            int end = o1>o2?o1:o2;
-            List<LineGatewayToPublic> list = (List)lineGatewayToPublicService.list();
-            for(int i=0;i<list.size();i++){
-                LineGatewayToPublic temp = list.get(i);
-                int tp = temp.getPriority();
-                if(tp>=begin&&tp<=end&&tp!=o1){
-                    if(flag) {
-                        temp.setPriority(tp--);
-                    }else{
-                        temp.setPriority(tp++);
-                    }
-                    lineGatewayToPublicService.save(temp);
-                }
+            boolean flag = true;
+            int begin = -1;
+            int end = -1;
+            if(o1<o2){
+                begin = o1+1;
+                end = o2;
+                flag = true;
+            }else{
+                begin = o2;
+                end = o1-1;
+                flag = false;
             }
-            lineGatewayToPublic.setPriority(o2);
-            lineGatewayToPublicService.save(lineGatewayToPublic);
+            String[] sql = new String[2];
+            String sq1 = " UPDATE db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public SET priority++ WHERE priority BETWEEN '"+begin+"' AND '"+end+"' ";
+            String sq2 = " UPDATE db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public SET priority='"+o2+"' WHERE id ='"+lineGatewayToPublic.getId()+"' ";
+            int re = lineGatewayService.batchModify(sql);
+            if(re==-1){
+                return RestResponse.failed("0000","修改失败，请重试");
+            }
         }else{
             return RestResponse.failed("0000","线路不存在");
         }

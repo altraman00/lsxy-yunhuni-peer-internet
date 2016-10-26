@@ -28,6 +28,11 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
+    public LineGatewayToPublic findById(String id) {
+        return getDao().findOne(id);
+    }
+
+    @Override
     public int getMaxPriority() {
         String sql = " SELECT ISNULL(MAX(priority),0) db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public ";
         int result = jdbcTemplate.queryForObject(sql,Integer.class);

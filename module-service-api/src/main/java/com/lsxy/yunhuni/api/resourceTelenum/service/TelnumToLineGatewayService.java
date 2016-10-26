@@ -36,4 +36,12 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @return
      */
     Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String number,String isDialing,String isCalled,String isThrough);
+
+    /**
+     * 批量删除
+     * @param ids
+     */
+    void batchDelete(String[] ids);
+
+
 }

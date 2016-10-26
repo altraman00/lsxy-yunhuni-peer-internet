@@ -19,9 +19,7 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_line_gateway")
 public class LineGateway extends IdEntity {
-    private static final String CHINATELECOM="CHINATELECOM";//中国电信
-    private static final String CHINAMOBILE="CHINAMOBILE";//中国移动
-    private static final String CHINAUNICOM="CHINAUNICOM";//中国联通
+
     private String isThrough;//是否透传
     private String tenantId;//所属租户
     private String areaId;          //区域

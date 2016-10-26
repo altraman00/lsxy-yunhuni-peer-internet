@@ -1,4 +1,4 @@
-package com.lsxy.app.oc.rest.config;
+package com.lsxy.app.oc.rest.config.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,7 +14,7 @@ public class LineGatewayVo {
     private String tenantId;
     @ApiModelProperty(name="lineNumber",value = "线路标识")
     private String lineNumber;
-    @ApiModelProperty(name="operator",value = "运营商 CHINATELECOM=中国电信；CHINAMOBILE=中国移动；CHINAUNICOM=中国联通")
+    @ApiModelProperty(name="operator",value = "运营商 中国电信；中国移动；中国联通")
     private String operator;
     @ApiModelProperty(name="areaId",value = "区域编号")
     private String areaId;
