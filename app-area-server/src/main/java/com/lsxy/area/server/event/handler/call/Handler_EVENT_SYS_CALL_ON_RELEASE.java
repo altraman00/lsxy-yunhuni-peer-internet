@@ -121,17 +121,6 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             callSession.setStatus(CallSession.STATUS_OVER);
             callSessionService.save(callSession);
         }
-
-        //通过ivr 拨号发起的呼叫在被叫方结束后 要继续ivr
-        if(state.getType().equalsIgnoreCase("ivr_dial")){
-            String ivr_call_id = null;
-            if(state.getBusinessData() != null){
-                ivr_call_id = (String)state.getBusinessData().get("ivr_call_id");
-            }
-            if(StringUtils.isNotBlank(ivr_call_id)){
-                ivrActionService.doAction(ivr_call_id);
-            }
-        }
         return res;
     }
 }
