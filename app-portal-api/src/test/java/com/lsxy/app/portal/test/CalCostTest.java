@@ -1,18 +1,19 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
+import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
-import com.lsxy.yunhuni.api.config.service.TelNumLocationService;
+import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
-import com.lsxy.framework.config.Constants;
-import com.lsxy.framework.api.billing.service.CalBillingService;
-import com.lsxy.yunhuni.api.product.service.CalCostService;
-import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class CalCostTest {
     @Autowired
     ResourcesRentService resourcesRentService;
     @Autowired
-    TelNumLocationService telNumLocationService;
+    TelnumLocationService telnumLocationService;
 
     @Autowired
     TelnumToLineGatewayService telnumToLineGatewayService;
@@ -85,10 +86,10 @@ public class CalCostTest {
     @Test
     public void testNumLocation(){
         String num = "0207224778";
-        String areaCodeOfTelephone = telNumLocationService.getAreaCodeOfTelephone(num);
+        String areaCodeOfTelephone = telnumLocationService.getAreaCodeOfTelephone(num);
         System.out.println(num);
         System.out.println(areaCodeOfTelephone);
-        String areaCode = telNumLocationService.getAreaCodeOfMobile("13750001373");
+        String areaCode = telnumLocationService.getAreaCodeOfMobile("13750001373");
         System.out.println(areaCode);
     }
 
@@ -101,7 +102,7 @@ public class CalCostTest {
     @Test
     public void testNum(){
         for(int i=0;i<20;i++){
-            String num = resourceTelenumService.findOneFreeNumberCallUri("area001");
+            ResourceTelenum num = resourceTelenumService.findOneFreeNumber("area001");
             System.out.println(num);
         }
     }
