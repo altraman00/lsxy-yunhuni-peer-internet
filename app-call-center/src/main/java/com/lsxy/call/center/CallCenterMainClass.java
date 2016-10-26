@@ -16,7 +16,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * Created by tandy on 16/7/19.
@@ -26,7 +25,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class,
         FrameworkCacheConfig.class, YunhuniApiConfig.class,
         YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class, CallCenterApiConfig.class,CallCenterServiceConfig.class})
-@EnableJpaRepositories
 @EnableDubboConfiguration
 public class CallCenterMainClass extends AbstractSpringBootStarter {
 
