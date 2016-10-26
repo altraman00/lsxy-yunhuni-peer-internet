@@ -14,6 +14,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -100,8 +102,15 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public void batchInsert(String id, String[] ids) {
-
-//        insert into db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway (id, tel_number , line_id, is_dialing,is_called,is_through,is_buy,provider,create_time,last_time,deleted,delete_time,sortno,version) values
+        String sql = "INSERT INTO db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway (id, tel_number , line_id, is_dialing,is_called,is_through,is_buy,provider,create_time,last_time,deleted,sortno,version) VALUES ";
+        long times = new Date().getTime();
+        Timestamp initDate = new Timestamp(times);
+        for(int i=0;i<ids.length;i++){
+            sql += " ( REPLACE(UUID(), '-', ''), tel_number , "+id+", is_dialing,is_called,is_through,"+1+",provider,create_time,last_time,0,"+times+",0 )";
+            if(i!=ids.length-1){
+                sql += " , ";
+            }
+        }
 //                (200,'haha' , 'deng' , 'shenzhen'),
 //                (201,'haha2' , 'deng' , 'GD'),
 //                (202,'haha3' , 'deng' , 'Beijing');
