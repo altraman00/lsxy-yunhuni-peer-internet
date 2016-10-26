@@ -1,12 +1,12 @@
 package com.lsxy.app.portal.rest.stastistic;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
-import com.lsxy.yunhuni.api.session.model.CallCenter;
-import com.lsxy.yunhuni.api.session.service.CallCenterService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,8 +19,10 @@ import java.util.Map;
 @RequestMapping("/rest/call_center")
 @RestController
 public class CallCenterController extends AbstractRestController {
-    @Autowired
+
+    @Reference(timeout = 3000)
     CallCenterService callCenterService;
+
     @RequestMapping("/plist")
     public RestResponse plist(Integer pageNo,Integer pageSize,String appId,String startTime,String endTime,String type,String callnum,String agent){
         try{

@@ -1,6 +1,7 @@
 package com.lsxy.call.center;
 
 import com.alibaba.dubbo.common.Constants;
+import com.lsxy.call.center.api.CallCenterApiConfig;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
@@ -15,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * Created by tandy on 16/7/19.
@@ -23,7 +25,8 @@ import org.springframework.context.annotation.Import;
 @ComponentScan
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class,
         FrameworkCacheConfig.class, YunhuniApiConfig.class,
-        YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class})
+        YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class, CallCenterApiConfig.class,CallCenterServiceConfig.class})
+@EnableJpaRepositories
 @EnableDubboConfiguration
 public class CallCenterMainClass extends AbstractSpringBootStarter {
 

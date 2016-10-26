@@ -1,10 +1,10 @@
-package com.lsxy.yunhuni.app.service;
+package com.lsxy.call.center.service;
 
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.service.AppExtensionService;
+import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.yunhuni.api.app.model.AppExtension;
-import com.lsxy.yunhuni.api.app.service.AppExtensionService;
-import com.lsxy.yunhuni.app.dao.AppExtensionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,7 @@ import java.util.List;
  * Created by zhangxb on 2016/10/21.
  */
 @Service
+@com.alibaba.dubbo.config.annotation.Service
 public class AppExtensionServiceImpl extends AbstractService<AppExtension> implements AppExtensionService {
     @Autowired
     AppExtensionDao appExtensionDao;

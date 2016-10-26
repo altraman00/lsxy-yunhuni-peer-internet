@@ -1,7 +1,7 @@
-package com.lsxy.yunhuni.api.app.service;
+package com.lsxy.call.center.api.service;
 
+import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.yunhuni.api.app.model.AppExtension;
 
 import java.util.List;
 

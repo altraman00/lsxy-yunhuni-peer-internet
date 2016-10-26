@@ -1,7 +1,7 @@
-package com.lsxy.yunhuni.app.dao;
+package com.lsxy.call.center.dao;
 
+import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yunhuni.api.app.model.AppExtension;
 
 import java.io.Serializable;
 import java.util.List;

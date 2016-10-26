@@ -1,4 +1,4 @@
-package com.lsxy.yunhuni.api.app.model;
+package com.lsxy.call.center.api.model;
 
 import com.lsxy.framework.api.base.IdEntity;
 import org.hibernate.annotations.Where;

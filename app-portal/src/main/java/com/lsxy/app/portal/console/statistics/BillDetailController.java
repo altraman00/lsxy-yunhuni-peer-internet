@@ -2,13 +2,13 @@ package com.lsxy.app.portal.console.statistics;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.session.model.CallCenter;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import org.apache.commons.lang.StringUtils;

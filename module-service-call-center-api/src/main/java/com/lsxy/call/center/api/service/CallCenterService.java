@@ -1,8 +1,8 @@
-package com.lsxy.yunhuni.api.session.service;
+package com.lsxy.call.center.api.service;
 
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.session.model.CallCenter;
 
 import java.util.List;
 import java.util.Map;

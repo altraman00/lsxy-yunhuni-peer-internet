@@ -3,12 +3,11 @@ package com.lsxy.app.portal.console.app;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.app.model.AppExtension;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
