@@ -9,6 +9,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,8 +35,12 @@ public class AreaAndTelNumSelector {
 
 
 
-    public Selector getTelnumberAndAreaId(App app, String... to) throws AppOffLineException {
-        List<String> tos = Arrays.asList(to);
+    public Selector getTelnumberAndAreaId(App app, String from,String to)throws AppOffLineException{
+        return getTelnumberAndAreaId(app,from,to,null,null);
+    }
+
+    public Selector getTelnumberAndAreaId(App app, String from1,String to1,String from2,String to2) throws AppOffLineException {
+
         Selector selector;
         //TODO 获取号码和区域ID
         if(app.getStatus() == app.STATUS_ONLINE){
@@ -43,6 +48,13 @@ public class AreaAndTelNumSelector {
             List<TelnumToLineGateway> dialingLineIdsByNumber = telnumToLineGatewayService.getDialingLinesByNumber(telnumber.getTelNumber());
             selector = new Selector(telnumber,app.getArea().getId());
         }else{
+            List<String> tos = new ArrayList<>();
+            if(StringUtils.isNotBlank(to1)){
+                tos.add(to1);
+            }
+            if(StringUtils.isNotBlank(to2)){
+                tos.add(to2);
+            }
             List<String> testNums = testNumBindService.findNumByAppId(app.getId());
             if(testNums != null && testNums.size() > 0 && testNums.containsAll(tos)){
                 //获取测试用的区域
