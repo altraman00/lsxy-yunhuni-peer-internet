@@ -195,6 +195,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             .putIfNotEmpty("schedule_play_time",schedule_play_time)
                             .putIfNotEmpty("schedule_play_file",schedule_play_file)
                             .putIfNotEmpty("schedule_play_loop",schedule_play_loop)
+                            .putIfNotEmpty("user_data",ivr_call_id)
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONNECT_START, map);
                     rpcCaller.invoke(sessionContext, rpcrequest);
