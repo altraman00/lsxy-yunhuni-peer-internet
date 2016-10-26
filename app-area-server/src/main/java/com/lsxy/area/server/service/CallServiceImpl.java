@@ -216,9 +216,9 @@ public class CallServiceImpl implements CallService {
         }
 
         //TODO 获取号码
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to1,to2);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to1, to2);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         from1 = oneTelnumber;
         from2 = oneTelnumber;
@@ -347,9 +347,9 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         from = oneTelnumber;
         //TODO 获取线路IP和端口
@@ -433,9 +433,9 @@ public class CallServiceImpl implements CallService {
         //TODO 待定
         String callId = UUIDGenerator.uuid();
         //TODO
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
@@ -508,9 +508,9 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 

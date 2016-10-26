@@ -33,10 +33,10 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
     void cleanExpireResourceTelnum(Date expireTime);
 
     /**
-     * 根据区域获取一个空闲的，没有绑定租户的号码的呼出uri
+     * 根据区域获取一个空闲的，没有绑定租户的号码
      * @return
      */
-    String findOneFreeNumberCallUri(String areaId);
+    ResourceTelenum findOneFreeNumber(String areaId);
 
     /**
      * 根据呼叫URI查找号码

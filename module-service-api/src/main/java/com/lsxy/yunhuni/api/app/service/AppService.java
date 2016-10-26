@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.app.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
 import java.util.List;
@@ -69,5 +70,5 @@ public interface AppService extends BaseService<App> {
      * @param app
      * @return
      */
-    String findOneAvailableTelnumberCallUri(App app);
+    ResourceTelenum findOneAvailableTelnumber(App app);
 }

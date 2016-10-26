@@ -140,9 +140,9 @@ public class ConfServiceImpl implements ConfService {
             maxParts = MAX_PARTS;
         }
         //TODO
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Meeting meeting = new Meeting();
@@ -278,9 +278,9 @@ public class ConfServiceImpl implements ConfService {
         String callId = UUIDGenerator.uuid();
 
         //TODO
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 

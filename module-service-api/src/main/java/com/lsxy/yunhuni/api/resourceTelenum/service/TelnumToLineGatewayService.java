@@ -22,7 +22,7 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param number
      * @return
      */
-    List<String> getDialingLineIdsByNumber(String number);
+    List<TelnumToLineGateway> getDialingLinesByNumber(String number);
 
     LineGateway getCalledLineByNumber(String number);
 }

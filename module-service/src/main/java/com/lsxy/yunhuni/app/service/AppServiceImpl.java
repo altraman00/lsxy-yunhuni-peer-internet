@@ -105,20 +105,18 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    public String findOneAvailableTelnumberCallUri(App app) {
+    public ResourceTelenum findOneAvailableTelnumber(App app) {
         if(app.getIsIvrService() != null && app.getIsIvrService()==1){
             List<ResourcesRent> resourcesRents = resourcesRentService.findByAppId(app.getId());
             ResourcesRent resourcesRent = resourcesRents.get(0);
-            String callUri = resourcesRent.getResourceTelenum().getCallUri();
-            if(StringUtils.isBlank(callUri)){
+            ResourceTelenum callNumber = resourcesRent.getResourceTelenum();
+            if(callNumber == null){
                 ResourceTelenum telenum = resourceTelenumService.findById(resourcesRent.getResourceTelenum().getId());
-                if(telenum != null){
-                    callUri = telenum.getCallUri();
-                }
+                return telenum;
             }
-            return callUri;
+            return callNumber;
         }else{
-            return resourceTelenumService.findOneFreeNumberCallUri(app.getArea().getId());
+            return resourceTelenumService.findOneFreeNumber(app.getArea().getId());
         }
     }
 

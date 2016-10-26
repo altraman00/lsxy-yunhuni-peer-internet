@@ -115,7 +115,7 @@ public class CalCostTest {
         App app = new App();
         app.setIsIvrService(1);
         app.setId("8a2bc5f65721aa160157222c8477000b");
-        appService.findOneAvailableTelnumberCallUri(app);
+        appService.findOneAvailableTelnumber(app);
     }
 
 }

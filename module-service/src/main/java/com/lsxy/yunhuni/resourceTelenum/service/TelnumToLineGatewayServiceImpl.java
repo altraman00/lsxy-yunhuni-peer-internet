@@ -42,13 +42,8 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     }
 
     @Override
-    public List<String> getDialingLineIdsByNumber(String number) {
-        List<String> results = new LinkedList<>();
-        List<TelnumToLineGateway> telnumToLineGateways = telnumToLineGatewayDao.findDialingLine(number);
-        for(TelnumToLineGateway ttg:telnumToLineGateways){
-            results.add(ttg.getLineId());
-        }
-        return results;
+    public  List<TelnumToLineGateway> getDialingLinesByNumber(String number) {
+        return telnumToLineGatewayDao.findDialingLine(number);
     }
 
     @Override

@@ -136,14 +136,14 @@ public class DialActionHandler extends ActionHandler{
 
     public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
         App app = appService.findById(appId);
-        Map<String, String> result;
+        AreaAndTelNumSelector.Selector selector;
         try {
-            result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app);
         } catch (AppOffLineException e) {
             return false;
         }
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 

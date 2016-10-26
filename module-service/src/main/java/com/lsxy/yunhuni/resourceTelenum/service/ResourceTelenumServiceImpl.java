@@ -72,13 +72,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public String findOneFreeNumberCallUri(String areaId) {
+    public ResourceTelenum findOneFreeNumber(String areaId) {
         //TODO 根据区域获取一个空闲的号码
         Long numCount = resourceTelenumDao.countByStatusAndTelNumberNot(ResourceTelenum.STATUS_FREE,testCallNumber);
         Long random = RandomUtils.nextLong(0,numCount);
 
         ResourceTelenum resourceTelenum = resourceTelenumDao.findOneByStatus(ResourceTelenum.STATUS_FREE,testCallNumber,random);
-        return resourceTelenum.getCallUri();
+        return resourceTelenum;
     }
 
     @Override

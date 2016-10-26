@@ -124,9 +124,9 @@ public class IVRServiceImpl implements IVRService {
         }
 
         //TODO
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         VoiceIvr voiceIvr = new VoiceIvr();
