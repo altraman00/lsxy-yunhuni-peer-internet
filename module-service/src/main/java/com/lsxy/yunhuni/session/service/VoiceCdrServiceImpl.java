@@ -184,7 +184,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
             sql += " AND call_end_dt>='"+startTimeStr+"' " ;
         }
         if(endTime != null){
-            String endTimeStr = DateUtils.getDate(startTime,"yyyy-MM-dd HH:mm:ss");
+            String endTimeStr = DateUtils.getDate(endTime,"yyyy-MM-dd HH:mm:ss");
             sql += " AND call_end_dt<'"+endTimeStr+"' " ;
         }
         Map map = jdbcTemplate.queryForMap(sql);
