@@ -95,22 +95,30 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <form:form action="${ctx}/console/statistics/billdetail/callcenter" method="post" id="mainForm">
                                         <div class="row statistics_row" >
-                                            <input type="hidden" id="appId" name="appId" value="${appId}">
-                                            日期
-                                            <input type="text" name="startTime" class=" currentDay "  value="${startTime}"  />
-                                            至
-                                            <input type="text" name="endTime" class=" currentDay "  value="${endTime}"  />
-                                            坐席
-                                            <input type="text" name="agent" class=""  value="${agent}"  />
-                                            呼叫号码
-                                            <input type="text" name="callnum" class=""  value="${callnum}"  />
-                                            呼叫类型
-                                            <select name="type">
-                                                <option <c:if test="${type == '1'}"> selected</c:if> value="1">呼出</option>
-                                                <option <c:if test="${type == '2'}"> selected</c:if> value="2">呼入</option>
-                                            </select>
-                                                <button class="btn btn-primary" type="submit"> 查询</button>
+                                            <div class="col-md-12 search-box remove-padding">
+                                                <input type="hidden" id="appId" name="appId" value="${appId}">
+                                                <span class="search-small-title inline-block">日期</span>
+                                                <input type="text" name="startTime" class="form-control search-input inline-block currentDay "  value="${startTime}"  />
+                                                <span class="search-small-title inline-block text-center">至</span>
+                                                <input type="text" name="endTime" class="form-control  search-input inline-block currentDay "  value="${endTime}"  />
+
+                                                <span class="search-title inline-block text-center">坐席</span>
+                                                <input type="text" name="agent" class="form-control inline-block search-input"  value="${agent}"   placeholder="请输入坐席" />
+
+                                                <span class="search-bigger-title inline-block text-center ">呼叫号码</span>
+                                                <input type="text" name="callnum" class="form-control inline-block search-input"  value="${callnum}"  placeholder="请输入呼叫号码" />
+
+                                                <span class="search-bigger-title inline-block text-center ">呼叫类型</span>
+                                                <select name="type" class="form-control inline-block search-input">
+                                                    <option <c:if test="${type == '1'}"> selected</c:if> value="1">呼出</option>
+                                                    <option <c:if test="${type == '2'}"> selected</c:if> value="2">呼入</option>
+                                                </select>
+
+                                                <button class="btn btn-primary margin-left-20" type="submit"> 查询</button>
                                                 <button class="btn btn-primary" type="button" onclick="download()"> 导出</button>
+                                            </div>
+
+
                                         </div>
                                     </form:form>
                                     <div>
