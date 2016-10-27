@@ -119,7 +119,7 @@ public class DayStaticsServiceImpl extends AbstractService<DayStatics> implement
                     lastDayStatics.getConsume().add(consume),
                     lastDayStatics.getCallConnect() + askSum.longValue(),
                     lastDayStatics.getCallSum() + callSum,
-                    costTimeLong.longValue() + lastDayStatics.getCallConnect()
+                    lastDayStatics.getCallCostTime() + costTimeLong.longValue()
                     );
             this.save(current);
             tenantDayStatics(current,date);
