@@ -11,12 +11,17 @@ import com.lsxy.yunhuni.resourceTelenum.dao.TelnumToLineGatewayDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/9/2.
@@ -101,33 +106,44 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     }
 
     @Override
-    public void batchInsert(String id, String[] ids) {
+    public void batchInsert(String id,Integer provider, String[] ids) {
         String sql = "INSERT INTO db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway (id, tel_number , line_id, is_dialing,is_called,is_through,is_buy,provider,create_time,last_time,deleted,sortno,version) VALUES ";
         long times = new Date().getTime();
         Timestamp initDate = new Timestamp(times);
+        ArrayList list = new ArrayList();
         for(int i=0;i<ids.length;i++){
-            sql += " ( REPLACE(UUID(), '-', ''), tel_number , "+id+", is_dialing,is_called,is_through,"+1+",provider,create_time,last_time,0,"+times+",0 )";
+            sql += " ( REPLACE(UUID(), '-', ''), '"+ids[i]+"' , '"+id+"', 0,0,1,"+1+",'"+provider+"',?,?,0,"+times+",0 ) ";
             if(i!=ids.length-1){
                 sql += " , ";
             }
+            list.add(initDate);
+            list.add(initDate);
         }
-//                (200,'haha' , 'deng' , 'shenzhen'),
-//                (201,'haha2' , 'deng' , 'GD'),
-//                (202,'haha3' , 'deng' , 'Beijing');
-//        id                   varchar(32) not null,
-//                tel_number           varchar(32),
-//                line_id              varchar(32) comment '所属线路网关',
-//                is_dialing           varchar(10),
-//                is_called            varchar(10),
-//                is_through           varchar(10),
-//                is_buy               varchar(10),
-//                provider             varchar(32) comment '供应商',
-//                create_time          datetime,
-//                last_time            datetime,
-//                deleted              int,
-//        delete_time          datetime,
-//        sortno               bigint,
-//        version              int,
+        jdbcTemplate.update(sql,new PreparedStatementSetter(){
+            @Override
+            public void setValues(PreparedStatement ps) throws SQLException {
+                for(int i=0;i<list.size();i++){
+                    ps.setObject(i+1,list.get(i));
+                }
+            }
+        });
+    }
+
+    @Override
+    public Map getTelnumCall(String telnum,String line) {
+        String sql = " SELECT IFNULL(sum(is_dialing+is_through),0) AS isDialing, IFNULL(SUM(is_called),0) AS isCalled  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 ";
+        if(StringUtils.isNotEmpty(line)){
+            sql += " AND line_id<>'"+line+"' ";
+        }
+        Map map =  jdbcTemplate.queryForMap(sql);
+        return map;
+    }
+
+    @Override
+    public List<String> getTelnumByLineId(String line) {
+        String sql = " SELECT tel_number  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 ADN line_id='"+line+"' ";
+        List<String> list = jdbcTemplate.queryForList(sql,String.class);
+        return list;
     }
 
 }

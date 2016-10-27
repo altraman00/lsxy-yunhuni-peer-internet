@@ -78,4 +78,16 @@ public class TelnumToLineGateway extends IdEntity {
     public void setProvider(String provider) {
         this.provider = provider;
     }
+
+    public TelnumToLineGateway() {
+    }
+
+    public TelnumToLineGateway(String telNumber, String lineId, String isDialing, String isCalled, String isThrough, String isBuy) {
+        this.telNumber = telNumber;
+        this.lineId = lineId;
+        this.isDialing = isDialing;
+        this.isCalled = isCalled;
+        this.isThrough = isThrough;
+        this.isBuy = isBuy;
+    }
 }

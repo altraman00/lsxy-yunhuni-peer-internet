@@ -26,7 +26,6 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     ResourceTelenum findByTelNumber(String telNumber);
-
     /**
      * 清除过期的号码资源和租户的关系
      * @param expireTime 过期时间

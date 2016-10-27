@@ -1,11 +1,14 @@
 package com.lsxy.app.oc.rest.config;
 
+import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @Api(value = "号码管理", description = "配置中心相关的接口" )
 @RequestMapping("/config/telnum")
 @RestController
-public class ResourceTelenumController {
+public class ResourceTelenumController extends AbstractRestController {
+    private static final Logger logger = LoggerFactory.getLogger(ResourceTelenumController.class);
     @Autowired
     ResourceTelenumService resourceTelenumService;
     @RequestMapping(value = "/plist",method = RequestMethod.GET)

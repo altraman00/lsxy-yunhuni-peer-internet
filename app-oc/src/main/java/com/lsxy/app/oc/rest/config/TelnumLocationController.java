@@ -32,7 +32,7 @@ public class TelnumLocationController extends AbstractRestController {
         List list= telnumLocationService.getProvinceList();
         return RestResponse.success(list);
     }
-    @RequestMapping(value = "/{province}/list",method = RequestMethod.GET)
+    @RequestMapping(value = "/city/list/{province}",method = RequestMethod.GET)
     @ApiOperation(value = "获取省份对于的城市数据")
     public RestResponse getCityList(
             @ApiParam(name = "province",value = "省份名字")  @PathVariable String province){

@@ -20,7 +20,7 @@ public class ResourceTelenum extends IdEntity{
     public static final int STATUS_FREE = 0;    //未被租用
     public static final String USABLE_TRUE = "1";    //未被租用
     public static final String USABLE_FALSE = "0";    //未被租用
-
+    public static final String[] OPERATORS = {"中国电信","中国移动","中国联通"};
 
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
@@ -29,13 +29,31 @@ public class ResourceTelenum extends IdEntity{
     private String callUri;//呼出URI,
     private String source;//来源
     private String usable;//是否可用
-    private String lineId;  //所属线路
-    private String operator; //运营商
-    private String provider;    //供应商
-    private String remark;      //备注
-    private String areaName;//归属地
+    private String lineId; //所属线路
+    private String operator;//运营商
+    private String provider;//供应商
+    private String remark;//备注
     private String areaCode;//归属地区号
     private BigDecimal amount ;//号码占用费
+    private String isDialing;//可主叫
+    private String isCalled;//可被叫
+    @Column(name = "is_dialing")
+    public String getIsDialing() {
+        return isDialing;
+    }
+
+    public void setIsDialing(String isDialing) {
+        this.isDialing = isDialing;
+    }
+    @Column(name = "is_called")
+    public String getIsCalled() {
+        return isCalled;
+    }
+
+    public void setIsCalled(String isCalled) {
+        this.isCalled = isCalled;
+    }
+
     @Column(name = "level")
     public String getLevel() {
         return level;
@@ -45,7 +63,7 @@ public class ResourceTelenum extends IdEntity{
         this.level = level;
     }
     @Column(name = "call_uri")
-    public String getCall_uri() {
+    public String getCallUri() {
         return callUri;
     }
 
@@ -86,14 +104,6 @@ public class ResourceTelenum extends IdEntity{
         this.amount = amount;
     }
 
-    @Column(name = "area_name")
-    public String getAreaName() {
-        return areaName;
-    }
-
-    public void setAreaName(String areaName) {
-        this.areaName = areaName;
-    }
     @Column(name = "area_code")
     public String getAreaCode() {
         return areaCode;
@@ -155,5 +165,19 @@ public class ResourceTelenum extends IdEntity{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount) {
+        this.operator = operator;
+        this.areaCode = areaCode;
+        this.amount = new BigDecimal(amount);
+        this.callUri = callUri;
+        this.telNumber = telNumber;
+        this.lineId = lineId;
+        this.status =1;
+        this.usable = "1";
+    }
+
+    public ResourceTelenum() {
     }
 }

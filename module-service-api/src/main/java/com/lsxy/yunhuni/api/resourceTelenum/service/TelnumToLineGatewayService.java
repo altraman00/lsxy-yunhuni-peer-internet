@@ -7,6 +7,7 @@ import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/9/2.
@@ -47,11 +48,16 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
     void batchDelete(String[] ids);
 
     /**
-     * 批量增加
-     * @param id
-     * @param ids
+     * 透传-批量增加
      */
-    void batchInsert(String id,String[] ids);
+    void batchInsert(String id,Integer provider,String[] ids);
+    /**
+     * 获取号码是否可呼叫
+     * */
+    Map getTelnumCall(String telnum,String line);
 
-
+    /**
+     * 获取线路上的号码
+     */
+    List<String> getTelnumByLineId(String line);
 }

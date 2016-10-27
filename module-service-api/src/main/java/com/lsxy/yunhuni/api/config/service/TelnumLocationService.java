@@ -30,4 +30,6 @@ public interface TelnumLocationService extends BaseService<TelnumLocation> {
     String getAreaCodeOfTelephone(String telnum);
 
     String getAreaCodeOfMobile(String s);
+
+    String getAreaNameByAreaCode(String areaCode);
 }
