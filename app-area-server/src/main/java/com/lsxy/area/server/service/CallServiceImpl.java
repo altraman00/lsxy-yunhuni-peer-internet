@@ -216,7 +216,7 @@ public class CallServiceImpl implements CallService {
         }
 
         //TODO 获取号码
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to1, to2);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from1,to1,from2, to2);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
@@ -347,7 +347,7 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
@@ -433,7 +433,7 @@ public class CallServiceImpl implements CallService {
         //TODO 待定
         String callId = UUIDGenerator.uuid();
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
@@ -508,7 +508,7 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 

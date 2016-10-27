@@ -124,7 +124,7 @@ public class IVRServiceImpl implements IVRService {
         }
 
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from, to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
