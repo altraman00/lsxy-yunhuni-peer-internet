@@ -1,4 +1,24 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ page import="java.net.*" %>
+<%
+	Cookie cookie = null;
+	Cookie[] cookies = null;
+	cookies = request.getCookies();
+	String mini  = null;
+	String name  = null;
+	if( cookies != null ){
+		for (int i = 0; i < cookies.length; i++){
+			if(( cookies[i].getName( )).compareTo("hasMini") == 0 ){
+				mini = URLDecoder.decode(cookies[i].getValue(), "utf-8");
+			}
+		}
+	}
+	if(mini.compareTo("false")==0){
+		name = "aside-mini aside-transition";
+	}
+%>
+
+<aside class="bg-Green lter aside hidden-print <%= name %> " id="nav">
 <section class="w-f">
 	<header class="head bg_green lter text-center clearfix">
 		<a id='togglerMiniSidebar' href="#nav" data-toggle="class:nav-xs" class="text-center btn btn_b">
@@ -69,3 +89,4 @@
 			<!-- / nav --> </div>
 	</section>
 </section>
+</aside>
