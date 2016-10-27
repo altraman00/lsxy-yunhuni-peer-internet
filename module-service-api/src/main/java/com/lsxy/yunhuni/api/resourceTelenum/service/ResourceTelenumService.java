@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
@@ -37,7 +38,7 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * 根据区域获取一个空闲的，没有绑定租户的号码
      * @return
      */
-    ResourceTelenum findOneFreeNumber(String areaId);
+    ResourceTelenum findOneFreeDialingNumber(String areaId);
 
     /**
      * 根据呼叫URI查找号码
@@ -60,4 +61,11 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     Page<ResourceTelenum> getPageByNotLine(String id,Integer pageNo, Integer pageSize, String operator, String number);
+
+    /**
+     * 用于呼叫号码选择，有ivr号码则选择绑定的ivr号码，没有则随便给一个可以用的
+     * @param app
+     * @return
+     */
+    List<ResourceTelenum> findDialingTelnumber(App app, String... from);
 }

@@ -4,7 +4,6 @@ import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
@@ -102,7 +101,7 @@ public class CalCostTest {
     @Test
     public void testNum(){
         for(int i=0;i<20;i++){
-            ResourceTelenum num = resourceTelenumService.findOneFreeNumber("area001");
+            ResourceTelenum num = resourceTelenumService.findOneFreeDialingNumber("area001");
             System.out.println(num);
         }
     }
@@ -113,10 +112,10 @@ public class CalCostTest {
     }
     @Test
     public void testCallUri(){
-        App app = new App();
-        app.setIsIvrService(1);
-        app.setId("8a2bc5f65721aa160157222c8477000b");
-        appService.findOneAvailableTelnumber(app);
+//        App app = new App();
+//        app.setIsIvrService(1);
+//        app.setId("8a2bc5f65721aa160157222c8477000b");
+//        appService.findDialingTelnumber(app);
     }
 
 }

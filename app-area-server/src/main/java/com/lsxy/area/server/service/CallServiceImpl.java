@@ -216,7 +216,7 @@ public class CallServiceImpl implements CallService {
         }
 
         //TODO 获取号码
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from1,to1,from2, to2);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,true, from1,to1,from2, to2);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 

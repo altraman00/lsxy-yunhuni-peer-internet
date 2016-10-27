@@ -4,6 +4,10 @@ import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
+import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -22,30 +26,50 @@ import java.util.*;
 public class AreaAndTelNumSelector {
 
     @Autowired
-    private AppService appService;
-
-    @Autowired
     TestNumBindService testNumBindService;
-
     @Autowired
     ResourceTelenumService resourceTelenumService;
-
     @Autowired
     TelnumToLineGatewayService telnumToLineGatewayService;
-
-
+    @Autowired
+    LineGatewayService lineGatewayService;
+    @Autowired
+    TelnumLocationService telnumLocationService;
+    @Autowired
+    LineGatewayToTenantService lineGatewayToTenantService;
 
     public Selector getTelnumberAndAreaId(App app, String from,String to)throws AppOffLineException{
-        return getTelnumberAndAreaId(app,from,to,null,null);
+        return getTelnumberAndAreaId(app,false,from,to,null,null);
     }
 
-    public Selector getTelnumberAndAreaId(App app, String from1,String to1,String from2,String to2) throws AppOffLineException {
-
+    public Selector getTelnumberAndAreaId(App app,boolean isDuoCall ,String from1,String to1,String from2,String to2) throws AppOffLineException {
         Selector selector;
         //TODO 获取号码和区域ID
         if(app.getStatus() == app.STATUS_ONLINE){
-            ResourceTelenum telnumber = appService.findOneAvailableTelnumber(app);
-            List<TelnumToLineGateway> dialingLineIdsByNumber = telnumToLineGatewayService.getDialingLinesByNumber(telnumber.getTelNumber());
+            List<LineGateway> lineGateways = lineGatewayToTenantService.findByTenantId(app.getTenant().getId());
+            if(lineGateways == null || lineGateways.size() == 0){
+
+            }
+
+            List<ResourceTelenum> telnumber;
+            if(isDuoCall){
+                telnumber = resourceTelenumService.findDialingTelnumber(app,from1,from2);
+                if(telnumber.get(0).getTelNumber().equals(telnumber.get(1).getTelNumber())){
+                    List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(telnumber.get(0).getTelNumber());
+                    //查出所有的线路
+                    for(TelnumToLineGateway ttg:ttgs){
+                        LineGateway line = lineGatewayService.findById(ttg.getLineId());
+
+                    }
+                }else{
+                    List<TelnumToLineGateway> ttgs0 = telnumToLineGatewayService.getDialingLinesByNumber(telnumber.get(0).getTelNumber());
+                    List<TelnumToLineGateway> ttgs1 = telnumToLineGatewayService.getDialingLinesByNumber(telnumber.get(1).getTelNumber());
+                }
+            }else{
+                telnumber = resourceTelenumService.findDialingTelnumber(app);
+                List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(telnumber.get(0).getTelNumber());
+            }
+
             selector = new Selector(telnumber,app.getArea().getId());
         }else{
             List<String> tos = new ArrayList<>();
@@ -59,7 +83,7 @@ public class AreaAndTelNumSelector {
             if(testNums != null && testNums.size() > 0 && testNums.containsAll(tos)){
                 //获取测试用的区域
                 String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
-                ResourceTelenum telnumber = resourceTelenumService.findOneFreeNumber(areaId);
+                ResourceTelenum telnumber = resourceTelenumService.findOneFreeDialingNumber(areaId);
                 selector = new Selector(telnumber,areaId);
             }else{
                 throw new AppOffLineException();
