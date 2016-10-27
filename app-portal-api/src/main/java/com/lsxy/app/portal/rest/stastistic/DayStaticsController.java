@@ -42,7 +42,7 @@ public class DayStaticsController extends AbstractRestController {
         if(statics.getCallSum() == null || statics.getCallSum()==0){
             map.put("avgCall",0);
         }else{
-            map.put("avgCall",new BigDecimal(statics.getCallConnect()).divide(new BigDecimal(statics.getCallSum())).multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+            map.put("avgCall",new BigDecimal(statics.getCallConnect()).divide(new BigDecimal(statics.getCallSum()),4,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).doubleValue());
         }
         map.put("cost",statics.getConsume());
         map.put("session",statics.getCallSum());
