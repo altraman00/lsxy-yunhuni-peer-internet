@@ -9,6 +9,7 @@ import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -55,6 +56,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Future;
 
@@ -161,7 +163,7 @@ public class IVRActionService {
      * @param from
      * @return
      */
-    public boolean getAcceptRequest(final String url, final String from){
+    public boolean getAcceptRequest(final String url,final String call_id, final String from){
         boolean res = false;
         boolean success = false;
         int re_times = 0;
@@ -171,6 +173,7 @@ public class IVRActionService {
                 Map<String,Object> data = new HashMap<>();
                 data.put("action","ivr_incoming");
                 data.put("from",from);
+                data.put("call_id",call_id);
                 post.setConfig(config);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -201,7 +204,7 @@ public class IVRActionService {
      * @param url
      * @return
      */
-    public String getFirstIvr(final String url){
+    public String getFirstIvr(final String call_id,final String url){
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -210,6 +213,7 @@ public class IVRActionService {
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new HashMap<>();
                 data.put("action","ivr_start");
+                data.put("call_id",call_id);
                 post.setConfig(config);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -232,18 +236,43 @@ public class IVRActionService {
         return res;
     }
 
+    private static String inputUrl(String url,String key,String value){
+        URI uri = URI.create(url);
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
+        String port = "";
+        Integer p = uri.getPort();
+        String path = uri.getPath();
+        String query = uri.getQuery();
+        String fragment = uri.getFragment();
+        if(StringUtil.isEmpty(query)){
+            query = key + "=" + value;
+        }else{
+            query = query + "&" + key + "=" + value;
+        }
+        if(p != -1){
+            port = ":"+p;
+        }
+        if(fragment == null){
+            fragment = "";
+        }else{
+            fragment = "#" + fragment;
+        }
+        return scheme + "://"+host+port+path+"?"+query+fragment;
+    }
+
     /**
      * 调用next
      * @param url
      * @return
      */
-    private String getNextRequest(String url){
+    private String getNextRequest(String call_id,String url){
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
             try{
-                HttpGet get = new HttpGet(url);
+                HttpGet get = new HttpGet(inputUrl(url,"call_id",call_id));
                 get.setConfig(config);
                 get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
@@ -288,7 +317,7 @@ public class IVRActionService {
      */
     public boolean doActionIfAccept(App app, Tenant tenant,String res_id, String from, String to){
         String call_id = UUIDGenerator.uuid();
-        boolean accept = getAcceptRequest(app.getUrl(),from);
+        boolean accept = getAcceptRequest(app.getUrl(),call_id,from);
         if(!accept){
             reject(app,res_id,call_id);
         }else{
@@ -418,9 +447,9 @@ public class IVRActionService {
                 logger.error("ivr 找不到对应的app");
                 return false;
             }
-            resXML = getFirstIvr(app.getUrl());
+            resXML = getFirstIvr(call_id,app.getUrl());
         }else{
-            resXML = getNextRequest(nextUrl.toString());
+            resXML = getNextRequest(call_id,nextUrl.toString());
         }
         if(StringUtils.isBlank(resXML)){
             return false;
