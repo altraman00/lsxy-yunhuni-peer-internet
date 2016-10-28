@@ -58,5 +58,5 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * 获取分页信息
      * @return
      */
-    Page<ResourceTelenum> getPageByNotLine(String id,Integer pageNo, Integer pageSize, String operator, String number);
+    Page<ResourceTelenum> getPageByNotLine(String id,String areaCode,Integer pageNo, Integer pageSize, String operator, String number);
 }

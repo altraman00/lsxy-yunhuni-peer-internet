@@ -72,6 +72,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
                     temp += " , ";
                 }
             }
+            hql += temp;
         }else{
             hql += " ORDER BY obj.createTime DESC ";
         }

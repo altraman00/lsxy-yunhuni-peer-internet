@@ -73,8 +73,11 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     }
 
     @Override
-    public Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String number, String isDialing, String isCalled, String isThrough) {
+    public Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String line,String number, String isDialing, String isCalled, String isThrough) {
         String hql = " FROM TelnumToLineGateway obj WHERE 1=1 ";
+        if(StringUtils.isNotEmpty(line)){
+            hql += " AND obj.lineId='"+line+"' ";
+        }
         if(StringUtils.isNotEmpty(isDialing)){
             hql += " AND obj.isDialing='"+isDialing+"' ";
         }
@@ -85,7 +88,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
             hql += " AND obj.isThrough='"+isThrough+"' ";
         }
         if(StringUtils.isNotEmpty(number)){
-            hql += " AND obj.number like '%"+number+"%' ";
+            hql += " AND obj.telNumber like '%"+number+"%' ";
         }
         hql += " ORDER BY obj.createTime DESC ";
         Page page = this.pageList(hql,pageNo,pageSize);
@@ -93,8 +96,8 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     }
 
     @Override
-    public void batchDelete(String[] ids) {
-        String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE id IN (";
+    public void batchDelete(String line,String[] ids) {
+        String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE line_id='"+line+"' AND id IN (";
         for(int i=0;i<ids.length;i++){
             sql+= " '"+ids[i]+"' ";
             if(i!=ids.length-1){
@@ -106,7 +109,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     }
 
     @Override
-    public void batchInsert(String id,Integer provider, String[] ids) {
+    public void batchInsert(String id,String provider, String[] ids) {
         String sql = "INSERT INTO db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway (id, tel_number , line_id, is_dialing,is_called,is_through,is_buy,provider,create_time,last_time,deleted,sortno,version) VALUES ";
         long times = new Date().getTime();
         Timestamp initDate = new Timestamp(times);
@@ -131,7 +134,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public Map getTelnumCall(String telnum,String line) {
-        String sql = " SELECT IFNULL(sum(is_dialing+is_through),0) AS isDialing, IFNULL(SUM(is_called),0) AS isCalled  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 ";
+        String sql = " SELECT CONVERT(IFNULL(sum(is_dialing+is_through),0),SIGNED) AS isDialing, CONVERT(IFNULL(SUM(is_called),0),SIGNED) AS isCalled  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 ";
         if(StringUtils.isNotEmpty(line)){
             sql += " AND line_id<>'"+line+"' ";
         }
@@ -141,9 +144,15 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public List<String> getTelnumByLineId(String line) {
-        String sql = " SELECT tel_number  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 ADN line_id='"+line+"' ";
+        String sql = " SELECT tel_number  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 AND line_id='"+line+"' ";
         List<String> list = jdbcTemplate.queryForList(sql,String.class);
         return list;
+    }
+
+    @Override
+    public void updateIsThrough(String line, String isThrough) {
+        String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET is_through='"+isThrough+"' WHERE  line_id='"+line+"' ";
+        jdbcTemplate.update(sql);
     }
 
 }

@@ -22,8 +22,18 @@ public class TelnumVo {
     private int isDialing;
     @ApiModelProperty(name="isCalled",value = "可被叫，1是0否")
     private int isCalled;
-    @ApiModelProperty(name="isThrough",value = "是否可透传，1是0否")
-    private int isThrough;
+//    @ApiModelProperty(name="isThrough",value = "是否可透传，1是0否")
+//    private int isThrough;
+    @ApiModelProperty(name="areaCode",value = "归属地区号")
+    private String areaCode;
+
+    public String getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
+    }
 
     public String getTelNumber() {
         return telNumber;
@@ -73,11 +83,11 @@ public class TelnumVo {
         this.isCalled = isCalled;
     }
 
-    public int getIsThrough() {
-        return isThrough;
-    }
-
-    public void setIsThrough(int isThrough) {
-        this.isThrough = isThrough;
-    }
+//    public int getIsThrough() {
+//        return isThrough;
+//    }
+//
+//    public void setIsThrough(int isThrough) {
+//        this.isThrough = isThrough;
+//    }
 }
