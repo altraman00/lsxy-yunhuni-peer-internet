@@ -15,5 +15,5 @@ public interface LineGatewayToTenantService extends BaseService<LineGatewayToTen
      * @param tenantId
      * @return
      */
-    List<LineGateway> findByTenantId(String tenantId);
+    List<LineGateway> findByTenantIdAndAreaId(String tenantId,String areaId);
 }

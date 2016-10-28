@@ -77,4 +77,52 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
             return location.getAreaCode();
         }
     }
+
+    @Override
+    public String solveNum(String num, String telPhoneRule,String mobileRule, String areaCode) {
+        int typeOfNum = getTypeOfNum(num);
+        switch (typeOfNum){
+            //固话
+            case TYPE_TELEPHONE:{
+                switch (telPhoneRule){
+                    //全部加区号
+                    case "0":{
+                        return num;
+                    }
+                    //被叫归属地与线路归属地一致,去掉区号
+                    default:{
+                        String numAreaCode = getAreaCodeOfTelephone(num);
+                        if(areaCode.equals(numAreaCode)){
+                            num = num.replaceFirst(numAreaCode, "");
+                        }
+                        return num;
+                    }
+                }
+            }
+            //手机
+            case TYPE_MOBILE:{
+                switch (mobileRule){
+                    //全部加0
+                    case "0":{
+                        return "0" + num;
+                    }
+                    //全部不加0
+                    case "1":{
+                        return num;
+                    }
+                    //被叫归属地与线路归属地不一致，加0
+                    default:{
+                        String numAreaCode = getAreaCodeOfMobile(num);
+                        if(!areaCode.equals(numAreaCode)){
+                            num = "0" + num;
+                        }
+                        return num;
+                    }
+                }
+            }
+            default:{
+                return num;
+            }
+        }
+    }
 }

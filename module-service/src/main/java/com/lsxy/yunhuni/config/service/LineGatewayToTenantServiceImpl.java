@@ -27,12 +27,14 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
 
 
     @Override
-    public List<LineGateway> findByTenantId(String tenantId) {
+    public List<LineGateway> findByTenantIdAndAreaId(String tenantId,String areaId) {
         List<LineGateway> lineGateways = new ArrayList<>();
-        List<LineGatewayToTenant> list =  lineGatewayToTenantDao.findByTenantId(tenantId);
+        List<LineGatewayToTenant> list =  lineGatewayToTenantDao.findByTenantIdAndLineGateway_AreaIdOrderByPriorityDesc(tenantId,areaId);
         if(list != null && list.size() > 0){
             for(LineGatewayToTenant ltt:list){
-                lineGateways.add(ltt.getLineGateway());
+                LineGateway lineGateway = ltt.getLineGateway();
+                //TODO 判断线路是否可用
+                lineGateways.add(lineGateway);
             }
             return lineGateways;
         }else{

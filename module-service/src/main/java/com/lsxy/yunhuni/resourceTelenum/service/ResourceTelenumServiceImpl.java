@@ -5,6 +5,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -21,8 +22,6 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
-
-import static org.apache.commons.lang3.RandomUtils.nextInt;
 
 /**
  * 全局号码资源service
@@ -83,12 +82,12 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public ResourceTelenum findOneFreeDialingNumber(String areaId) {
-        //TODO 根据区域获取一个空闲的号码
-        Long numCount = resourceTelenumDao.countByStatusAndTelNumberNot(ResourceTelenum.STATUS_FREE,testCallNumber);
+    public ResourceTelenum findOneFreeDialingNumber(List<String> lineIds) {
+        //TODO 根据线路获取一个空闲的号码
+        Long numCount = resourceTelenumDao.countFreeNumber(testCallNumber,lineIds);
         Long random = RandomUtils.nextLong(0,numCount);
 
-        ResourceTelenum resourceTelenum = resourceTelenumDao.findOneByStatus(ResourceTelenum.STATUS_FREE,testCallNumber,random);
+        ResourceTelenum resourceTelenum = resourceTelenumDao.findOneFreeNumber(testCallNumber,lineIds,random);
         return resourceTelenum;
     }
 
@@ -143,19 +142,36 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public List<ResourceTelenum> findDialingTelnumber(App app, String... from) {
+    public List<ResourceTelenum> findDialingTelnumber(List<String> lineIds, App app, String... from) {
         List<ResourceTelenum> result = new ArrayList<>();
-        List<ResourcesRent> resourcesRents = resourcesRentService.findByAppId(app.getId());
         List<ResourceTelenum> appNums = new LinkedList<>();
+        List<ResourcesRent> resourcesRents = resourcesRentService.findByTenantId(app.getTenant().getId());
         if(resourcesRents != null && resourcesRents.size() != 0){
+            //查找应用绑定的号码
             for(ResourcesRent resourcesRent:resourcesRents){
-                ResourceTelenum resourceTelenum = resourcesRent.getResourceTelenum();
-                if(resourceTelenum != null){
-                    //TODO 判断是否是可呼出号码
-                    appNums.add(resourceTelenum);
+                if(resourcesRent.getApp() != null && resourcesRent.getApp().getId().equals(app.getId())){
+                    ResourceTelenum resourceTelenum = resourcesRent.getResourceTelenum();
+                    if(resourceTelenum != null){
+                        //TODO 判断是否是可呼出号码
+                        appNums.add(resourceTelenum);
+                    }
+                }
+            }
+            //应用没绑定号码，选择租户同一区域的号码（没被其他应用绑定）
+            if(appNums.size()==0){
+                for(ResourcesRent resourcesRent:resourcesRents){
+                    if(resourcesRent.getApp() == null){
+                        ResourceTelenum resourceTelenum = resourcesRent.getResourceTelenum();
+                        if(resourceTelenum != null ){
+                            //TODO 判断是否是同一个区域
+                            //TODO 判断是否是可呼出号码
+                            appNums.add(resourceTelenum);
+                        }
+                    }
                 }
             }
         }
+
         ResourceTelenum notEmptyNum = null;
         //传入的参数大于0，则说明选号可能有多个，或者是指定了号码
         if(from.length > 0){
@@ -194,8 +210,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         //如果notEmptyNum值为空，则将其赋值
         if(notEmptyNum == null){
             if(appNums == null || appNums.size()==0){
-                //应用没有绑定的号码，随便给一个可用的
-                notEmptyNum = this.findOneFreeDialingNumber(app.getArea().getId());
+                //应用或租户没有绑定的号码，随便给一个可用的
+                notEmptyNum = this.findOneFreeDialingNumber(lineIds);
             }else{
                 //应用有绑定的号码，随机给一个绑定可用的
                 int anInt = RandomUtils.nextInt(0, appNums.size());

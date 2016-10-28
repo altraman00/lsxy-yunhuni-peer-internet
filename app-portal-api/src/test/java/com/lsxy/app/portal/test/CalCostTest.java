@@ -20,7 +20,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -100,9 +102,10 @@ public class CalCostTest {
 
     @Test
     public void testNum(){
-        for(int i=0;i<20;i++){
-            ResourceTelenum num = resourceTelenumService.findOneFreeDialingNumber("area001");
-            System.out.println(num);
+        List<String> line001 = Arrays.asList("line001","line002","line003");
+        for(int i=0;i<10;i++){
+            ResourceTelenum num = resourceTelenumService.findOneFreeDialingNumber(line001);
+            System.out.println(num.getTelNumber());
         }
     }
     @Test

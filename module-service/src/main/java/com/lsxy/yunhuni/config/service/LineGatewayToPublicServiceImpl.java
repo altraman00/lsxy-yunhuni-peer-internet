@@ -3,15 +3,19 @@ package com.lsxy.yunhuni.config.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToPublicDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/25.
@@ -80,5 +84,16 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
         }
         Page page = this.pageList(hql,pageNo,pageSize);
         return page;
+    }
+
+    @Override
+    public List<LineGateway> findAllLineGatewayByAreaId(String areaId) {
+        List<LineGateway> lineGateways = new ArrayList<>();
+        List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaIdOrderByPriorityDesc(areaId);
+        for (LineGatewayToPublic ltp:ltps){
+            //TODO 判断线路是否可用
+            lineGateways.add(ltp.getLineGateway());
+        }
+        return lineGateways;
     }
 }

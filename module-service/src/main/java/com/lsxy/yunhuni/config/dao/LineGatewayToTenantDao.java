@@ -10,5 +10,5 @@ import java.util.List;
  * Created by liups on 2016/10/27.
  */
 public interface LineGatewayToTenantDao extends BaseDaoInterface<LineGatewayToTenant, Serializable> {
-    List<LineGatewayToTenant> findByTenantId(String tenantId);
+    List<LineGatewayToTenant> findByTenantIdAndLineGateway_AreaIdOrderByPriorityDesc(String tenantId,String areaId);
 }

@@ -33,7 +33,6 @@ public class ResourceTelenum extends IdEntity{
     private String operator; //运营商
     private String provider;    //供应商
     private String remark;      //备注
-    private String areaName;//归属地
     private String areaCode;//归属地区号
     private BigDecimal amount ;//号码占用费
     @Column(name = "level")
@@ -45,7 +44,7 @@ public class ResourceTelenum extends IdEntity{
         this.level = level;
     }
     @Column(name = "call_uri")
-    public String getCall_uri() {
+    public String getCallUri() {
         return callUri;
     }
 
@@ -86,14 +85,6 @@ public class ResourceTelenum extends IdEntity{
         this.amount = amount;
     }
 
-    @Column(name = "area_name")
-    public String getAreaName() {
-        return areaName;
-    }
-
-    public void setAreaName(String areaName) {
-        this.areaName = areaName;
-    }
     @Column(name = "area_code")
     public String getAreaCode() {
         return areaCode;
