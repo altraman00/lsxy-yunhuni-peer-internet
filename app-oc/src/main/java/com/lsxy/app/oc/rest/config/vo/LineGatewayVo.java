@@ -34,7 +34,7 @@ public class LineGatewayVo {
     private String sipAuthPassword;
     @ApiModelProperty(name="mobileAreaRule",value = "手机区号规则：0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0")
     private String mobileAreaRule;
-    @ApiModelProperty(name="telAreaRule",value = "固话区号规则：0=一律加区号；1=一律不加区号；2=非与线路属于同一个归属地加区号")
+    @ApiModelProperty(name="telAreaRule",value = "固话区号规则：0=一律加区号；2=非与线路属于同一个归属地加区号")
     private String telAreaRule;
     @ApiModelProperty(name="lingPrice",value = "成本价 单位元/分钟")
     private BigDecimal lingPrice;

@@ -34,14 +34,14 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public int getMaxPriority() {
-        String sql = " SELECT ISNULL(MAX(priority),0) db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public ";
+        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public ";
         int result = jdbcTemplate.queryForObject(sql,Integer.class);
         return result;
     }
 
     @Override
     public int findByLindId(String lindId) {
-        String sql = " SELECT COUNT(id) db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public where line_id='"+lindId+"'";
+        String sql = " SELECT COUNT(id) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public where line_id='"+lindId+"'";
         int result = jdbcTemplate.queryForObject(sql,Integer.class);
         return result;
     }
@@ -67,14 +67,23 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
             for(int i=0;i<o.length;i++){
                 String[] oo = o[i].split(":");
                 if("1".equals(oo[1])){
-                    temp += " obj.lineGateway."+oo[0]+" DESC ";
+                    if("priority".equals(oo[0])){
+                        temp += " obj." + oo[0] + " DESC ";
+                    }else {
+                        temp += " obj.lineGateway." + oo[0] + " DESC ";
+                    }
                 }else if("0".equals(oo[1])){
-                    temp += " obj.lineGateway."+oo[0]+" ";
+                    if("priority".equals(oo[0])){
+                        temp += " obj." + oo[0] + " ";
+                    }else {
+                        temp += " obj.lineGateway." + oo[0] + " ";
+                    }
                 }
                 if(i!=o.length-1){
                     temp += " , ";
                 }
             }
+            hql += temp;
         }else{
             hql += " ORDER BY obj.priority  ";
         }
