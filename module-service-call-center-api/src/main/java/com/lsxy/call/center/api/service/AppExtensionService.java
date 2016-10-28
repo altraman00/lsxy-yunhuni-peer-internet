@@ -15,4 +15,6 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @return
      */
     List<AppExtension> findByAppId(String appId);
+
+
 }

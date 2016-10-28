@@ -17,6 +17,7 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app_extension")
 public class AppExtension extends IdEntity {
     private String appId;//    app_id               varchar(32) comment '所属应用ID',
+    private String tenantId; //tenant_id   租户id
     private String name;//    name                 varchar(100) comment '名称',
     private Integer enabled;//    enabled              smallint comment '状态',
     private String type;//    type                 varchar(30),
@@ -40,6 +41,16 @@ public class AppExtension extends IdEntity {
     public void setAppId(String appId) {
         this.appId = appId;
     }
+
+    @Column(name = "tenant_id ")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
     @Column(name = "name ")
     public String getName() {
         return name;

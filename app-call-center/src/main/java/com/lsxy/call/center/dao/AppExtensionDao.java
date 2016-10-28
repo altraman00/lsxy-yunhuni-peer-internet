@@ -11,4 +11,8 @@ import java.util.List;
  */
 public interface AppExtensionDao extends BaseDaoInterface<AppExtension, Serializable> {
     List<AppExtension> findByAppId(String appId);
+
+    long countByUser(String user);
+
+    AppExtension findByTenantIdAndAppIdAndUser(String tenantId,String appId,String user);
 }
