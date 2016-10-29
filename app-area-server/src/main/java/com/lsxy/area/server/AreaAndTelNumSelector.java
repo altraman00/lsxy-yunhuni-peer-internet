@@ -54,26 +54,33 @@ public class AreaAndTelNumSelector {
         List<TelnumFormat> to1Num = new ArrayList<>();
         List<TelnumFormat> to2Num = new ArrayList<>();
         if(app.getStatus() == app.STATUS_ONLINE){
+            //查找租户私有线路
             List<LineGateway> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getArea().getId());
             if(lineGateways == null || lineGateways.size() == 0){
+                //如果没有私有线路，找公共线路
                 lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getArea().getId());
             }
             if(lineGateways == null || lineGateways.size() == 0){
                 //TODO 没有线路，则抛出异常
                 throw new RuntimeException("没有可用线路");
             }
+            //所拥有的线路ID列表
             List<String> lineIds = lineGateways.parallelStream().map(LineGateway::getId).collect(Collectors.toList());
 
             List<ResourceTelenum> telnumber;
             if(isDuoCall){
+                //获取一个可呼出的号码
                 telnumber = resourceTelenumService.findDialingTelnumber(lineIds,app,from1,from2);
                 if(telnumber.get(0).getTelNumber().equals(telnumber.get(1).getTelNumber())){
                     ResourceTelenum callTelnumber = telnumber.get(0);
                     //当两个呼出号码一样时，查一次线路就够了
                     //查出所有的线路
+                    //组装数据
                     addToTelnumFormat(to1, to2, lineGateways, to1Num, to2Num, callTelnumber);
                 }else{
+                    //当两个呼出号码不一样时，查两次线路
                     addToTelnumFormat(to1, lineGateways, to1Num, telnumber.get(0));
+                    //组装数据
                     addToTelnumFormat(to2, lineGateways, to2Num, telnumber.get(1));
                 }
             }else{
@@ -117,6 +124,7 @@ public class AreaAndTelNumSelector {
 
     private void addToTelnumFormat(String to1, String to2, List<LineGateway> lineGateways, List<TelnumFormat> to1Num, List<TelnumFormat> to2Num, ResourceTelenum callTelnumber) {
         List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(callTelnumber.getTelNumber());
+        //租户拥有的线路和号码能呼出的线路进行一次交集计算，并组装数据
         for(LineGateway lg:lineGateways){
             Optional<TelnumToLineGateway> first = ttgs.parallelStream().filter(ttg -> ttg.getLineId().equals(lg.getId())).findFirst();
             if(first.isPresent()){
@@ -131,6 +139,7 @@ public class AreaAndTelNumSelector {
 
     private void addToTelnumFormat(String to, List<LineGateway> lineGateways, List<TelnumFormat> to1Num, ResourceTelenum telenum) {
         List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(telenum.getTelNumber());
+        //租户拥有的线路和号码能呼出的线路进行一次交集计算，并组装数据
         for(LineGateway lg:lineGateways){
             Optional<TelnumToLineGateway> first = ttgs.parallelStream().filter(ttg -> ttg.getLineId().equals(lg.getId())).findFirst();
             if(first.isPresent()){
@@ -144,12 +153,12 @@ public class AreaAndTelNumSelector {
     private TelnumFormat getTelnumFormat(String to, ResourceTelenum svTelnumber, LineGateway lg, TelnumToLineGateway telnumToLineGateway) {
         TelnumFormat telnumFormat1 = null;
         if("1".equals(telnumToLineGateway.getIsDialing())){
-            //to1的传输数据类
+            //主叫
             telnumFormat1 = new TelnumFormat(svTelnumber.getCallUri(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp());
         }else if("1".equals(telnumToLineGateway.getIsThrough())){
-            //to1的传输数据类
+            //透传
             telnumFormat1 = new TelnumFormat(svTelnumber.getTelNumber(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp());

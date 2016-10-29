@@ -176,7 +176,6 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-
         ResourceTelenum notEmptyNum = null;
         //传入的参数大于0，则说明选号可能有多个，或者是指定了号码
         if(from.length > 0){
