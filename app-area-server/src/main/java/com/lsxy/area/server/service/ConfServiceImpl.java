@@ -140,7 +140,7 @@ public class ConfServiceImpl implements ConfService {
             maxParts = MAX_PARTS;
         }
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,null,null);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
@@ -278,7 +278,7 @@ public class ConfServiceImpl implements ConfService {
         String callId = UUIDGenerator.uuid();
 
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 

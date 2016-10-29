@@ -64,4 +64,10 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     void resourcesRentTask();
 
+    /**
+     * 获取租户租用的号码
+     * @param id
+     * @return
+     */
+    List<ResourcesRent> findByTenantId(String id);
 }

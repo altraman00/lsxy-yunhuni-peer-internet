@@ -18,6 +18,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourcesRentDao;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -140,6 +142,12 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 }
             }
         }
+    }
+
+    @Override
+    public List<ResourcesRent> findByTenantId(String tenantId) {
+        List<Integer> status = Arrays.asList(1, 2);
+        return resourcesRentDao.findByTenantIdAndRentStatusIn(tenantId,status);
     }
 
 }

@@ -136,16 +136,7 @@ public class DialActionHandler extends ActionHandler{
 
     public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
         App app = appService.findById(appId);
-        AreaAndTelNumSelector.Selector selector;
-        try {
-            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app);
-        } catch (AppOffLineException e) {
-            return false;
-        }
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
@@ -182,6 +173,17 @@ public class DialActionHandler extends ActionHandler{
         }catch (Throwable t){
             logger.error("",t);
         }
+
+        AreaAndTelNumSelector.Selector selector;
+        try {
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
+        } catch (AppOffLineException e) {
+            return false;
+        }
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
 
         VoiceIvr voiceIvr = new VoiceIvr();
         voiceIvr.setFromNum(oneTelnumber);

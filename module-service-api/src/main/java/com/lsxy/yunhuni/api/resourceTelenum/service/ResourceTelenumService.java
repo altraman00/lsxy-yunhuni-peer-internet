@@ -2,6 +2,8 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
@@ -33,10 +35,10 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
     void cleanExpireResourceTelnum(Date expireTime);
 
     /**
-     * 根据区域获取一个空闲的，没有绑定租户的号码
+     * 根据线路列表获取一个空闲的，没有绑定租户的号码
      * @return
      */
-    ResourceTelenum findOneFreeNumber(String areaId);
+    ResourceTelenum findOneFreeDialingNumber(List<String> lineIds);
 
     /**
      * 根据呼叫URI查找号码
@@ -59,4 +61,11 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     Page<ResourceTelenum> getPageByNotLine(String id,String areaCode,Integer pageNo, Integer pageSize, String operator, String number);
+
+    /**
+     * 用于呼叫号码选择，当from不为空时，则根据from的数量选择相应数量的呼出号码，当from为空时，择一个号码
+     * @param app
+     * @return
+     */
+    List<ResourceTelenum> findDialingTelnumber(List<String> lineIds, App app, String... from);
 }

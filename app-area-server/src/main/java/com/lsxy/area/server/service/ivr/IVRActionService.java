@@ -273,7 +273,7 @@ public class IVRActionService {
     private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to){
         AreaAndTelNumSelector.Selector selector;
         try {
-            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, to);
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         } catch (AppOffLineException e) {
             throw new RuntimeException(e);
         }

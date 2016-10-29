@@ -4,7 +4,6 @@ import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.DateUtils;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
@@ -21,7 +20,9 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -101,9 +102,10 @@ public class CalCostTest {
 
     @Test
     public void testNum(){
-        for(int i=0;i<20;i++){
-            ResourceTelenum num = resourceTelenumService.findOneFreeNumber("area001");
-            System.out.println(num);
+        List<String> line001 = Arrays.asList("line001","line002","line003");
+        for(int i=0;i<10;i++){
+            ResourceTelenum num = resourceTelenumService.findOneFreeDialingNumber(line001);
+            System.out.println(num.getTelNumber());
         }
     }
     @Test
@@ -113,10 +115,10 @@ public class CalCostTest {
     }
     @Test
     public void testCallUri(){
-        App app = new App();
-        app.setIsIvrService(1);
-        app.setId("8a2bc5f65721aa160157222c8477000b");
-        appService.findOneAvailableTelnumber(app);
+//        App app = new App();
+//        app.setIsIvrService(1);
+//        app.setId("8a2bc5f65721aa160157222c8477000b");
+//        appService.findDialingTelnumber(app);
     }
 
 }
