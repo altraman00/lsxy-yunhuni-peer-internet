@@ -140,27 +140,58 @@ public class LineGatewayController extends AbstractRestController {
         }
         return RestResponse.success("修改成功");
     }
-    @ApiOperation(value = "修改状态")
-    @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
-    public RestResponse modifyStatus(@ApiParam(name = "id",value = "线路id")
-                                   @PathVariable String id,@RequestBody LineGatewayEditStatusVo lineGatewayEditStatusVo){
+    @ApiOperation(value = "启用线路")
+    @RequestMapping(value = "/enabled/{id}",method = RequestMethod.PUT)
+    public RestResponse enabled(
+            @ApiParam(name = "id",value = "线路id")
+            @PathVariable String id){
         LineGateway lineGateway = lineGatewayService.findById(id);
         if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
             return RestResponse.failed("0000","线路不存在");
         }
-        String status = lineGateway.getStatus();
-        if("0".equals(lineGatewayEditStatusVo.getStatus())||"1".equals(lineGatewayEditStatusVo.getStatus())) {
-            lineGateway.setStatus(lineGatewayEditStatusVo.getStatus());
-            lineGatewayService.save(lineGateway);
-            if("1".equals(status)&&"0".equals(lineGatewayEditStatusVo.getStatus())){
-                //更新号码的状态
-                batchUpCall(lineGateway.getId());
-            }
-        }else{
-            return RestResponse.failed("0000","状态错误");
-        }
-        return RestResponse.success("修改成功");
+        lineGateway.setStatus("1");
+        lineGatewayService.save(lineGateway);
+        return RestResponse.success("启用线路成功");
     }
+    @ApiOperation(value = "禁用线路")
+    @RequestMapping(value = "/disabled/{id}",method = RequestMethod.PUT)
+    public RestResponse disabled(
+            @ApiParam(name = "id",value = "线路id")
+            @PathVariable String id){
+        LineGateway lineGateway = lineGatewayService.findById(id);
+        if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
+            return RestResponse.failed("0000","线路不存在");
+        }
+//        //本来是启用现在改成禁用
+//        if("1".equals(lineGateway.getStatus())){
+//            //更新号码的状态
+//            batchUpCall(lineGateway.getId());
+//        }
+        lineGateway.setStatus("0");
+        lineGatewayService.save(lineGateway);
+        return RestResponse.success("禁用线路成功");
+    }
+//    @ApiOperation(value = "修改状态")
+//    @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
+//    public RestResponse modifyStatus(@ApiParam(name = "id",value = "线路id")
+//                                   @PathVariable String id,@RequestBody LineGatewayEditStatusVo lineGatewayEditStatusVo){
+//        LineGateway lineGateway = lineGatewayService.findById(id);
+//        if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
+//            return RestResponse.failed("0000","线路不存在");
+//        }
+//        String status = lineGateway.getStatus();
+//        if("0".equals(lineGatewayEditStatusVo.getStatus())||"1".equals(lineGatewayEditStatusVo.getStatus())) {
+//            lineGateway.setStatus(lineGatewayEditStatusVo.getStatus());
+//            lineGatewayService.save(lineGateway);
+//            if("1".equals(status)&&"0".equals(lineGatewayEditStatusVo.getStatus())){
+//                //更新号码的状态
+//                batchUpCall(lineGateway.getId());
+//            }
+//        }else{
+//            return RestResponse.failed("0000","状态错误");
+//        }
+//        return RestResponse.success("修改成功");
+//    }
     @ApiOperation(value = "删除线路")
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     public RestResponse delete(@ApiParam(name="id",value = "线路id") @PathVariable  String id) throws InvocationTargetException, IllegalAccessException {

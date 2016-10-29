@@ -68,7 +68,13 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public void deleteByLineId(String line) {
-        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE line_id='"+line+"'";
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE deleted=0 AND line_id='"+line+"'";
+        jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public void deleteByTelnum(String telnum) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE deleted=0 AND tel_number='"+telnum+"'";
         jdbcTemplate.update(sql);
     }
 
@@ -158,6 +164,12 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     @Override
     public TelnumToLineGateway findByTelNumberAndLineId(String telNumber, String lineId) {
         return telnumToLineGatewayDao.findByTelNumberAndLineId(telNumber,lineId);
+    }
+
+    @Override
+    public void updateTelnum(String telnum1,String telnum) {
+        String sql = "UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET tel_number='"+telnum+"' WHERE deleted=0 AND tel_number='"+telnum1+"'";
+        jdbcTemplate.update(sql);
     }
 
 }

@@ -101,10 +101,16 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
 
     @Override
-    public Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize, String operator, String number) {
+    public Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize, String number,String operator,String isThrough,String status) {
         String hql = " FROM ResourceTelenum obj WHERE 1=1 ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.operator='"+operator+"' ";
+        }
+        if(StringUtils.isNotEmpty(isThrough)){
+            hql += " AND obj.isThrough='"+operator+"' ";
+        }
+        if(StringUtils.isNotEmpty(status)){
+            hql += " AND obj.usable='"+status+"' ";
         }
         if(StringUtils.isNotEmpty(number)){
             hql += " AND obj.telNumber like '%"+number+"%' ";

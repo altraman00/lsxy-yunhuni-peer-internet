@@ -7,6 +7,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -67,6 +68,16 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     @Override
     public ResourcesRent findByResourceTelenumIdAndStatus(String id, int status) {
         return resourcesRentDao.findByResourceTelenumIdAndRentStatus(id,status);
+    }
+
+    @Override
+    public ResourcesRent findByResourceTelenumId(String id) {
+        String hql = "  From ResourcesRent obj WHERE obj.rentStatus<>'"+ResourcesRent.RENT_STATUS_RELEASE+"' AND obj.resourceTelenum.id='"+id+"' ";
+        try {
+            return this.findUnique(hql);
+        } catch (MatchMutiEntitiesException e) {
+            return null;
+        }
     }
 
     @Override

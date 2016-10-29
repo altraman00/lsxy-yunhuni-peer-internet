@@ -30,7 +30,7 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
      * @return
      */
     ResourcesRent findByResourceTelenumIdAndRentStatus(String id, int status);
-
+    ResourcesRent findByResourceTelenumId(String id);
     ResourcesRent findByResDataAndRentStatus(String resData, int status);
 
     /**

@@ -33,7 +33,12 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
-
+    /**
+     * 根据号码和租用状态查询租用关系
+     * @param id
+     * @return
+     */
+    ResourcesRent findByResourceTelenumId(String id);
     /**
      * 根据号码查询租用关系
      * @param resData
