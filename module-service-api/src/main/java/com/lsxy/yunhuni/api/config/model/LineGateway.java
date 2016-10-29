@@ -41,6 +41,10 @@ public class LineGateway extends IdEntity {
     private String sipAuthIp;//sip接入点的外网IP地址
     private String status;//状态
     private String isPublicLine;//是否全局线路
+
+    @Transient
+    private Long priority;
+
     @Column(name="is_through")
     public String getIsThrough() {
         return isThrough;
@@ -214,5 +218,13 @@ public class LineGateway extends IdEntity {
 
     public void setIsPublicLine(String isPublicLine) {
         this.isPublicLine = isPublicLine;
+    }
+
+    public Long getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Long priority) {
+        this.priority = priority;
     }
 }
