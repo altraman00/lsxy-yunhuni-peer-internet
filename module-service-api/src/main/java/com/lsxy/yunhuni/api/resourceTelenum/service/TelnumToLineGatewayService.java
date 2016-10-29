@@ -67,4 +67,12 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param isThrough
      */
     void updateIsThrough(String line,String isThrough);
+
+    /**
+     * 根据号码和线路获取对象
+     * @param telNumber
+     * @param lineId
+     * @return
+     */
+    TelnumToLineGateway findByTelNumberAndLineId(String telNumber,String lineId);
 }

@@ -34,18 +34,40 @@ public class ResourceTelenum extends IdEntity{
     private String provider;//供应商
     private String remark;//备注
     private String areaCode;//归属地区号
-    private String telnumLocation;//区域
+    private String areaId;//区域
     private BigDecimal amount ;//号码占用费
     private String isDialing;//可主叫
     private String isCalled;//可被叫
-    @Column(name = "telnum_location")
-    public String getTelnumLocation() {
-        return telnumLocation;
+    private String isThrough;//可被叫
+    private String type;//1采购线路2租户自带
+    @Column(name = "is_through")
+    public String getIsThrough() {
+        return isThrough;
     }
 
-    public void setTelnumLocation(String telnumLocation) {
-        this.telnumLocation = telnumLocation;
+    public void setIsThrough(String isThrough) {
+        this.isThrough = isThrough;
     }
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    @Column(name = "area_id")
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+
+
 
     @Column(name = "is_dialing")
     public String getIsDialing() {
@@ -186,6 +208,7 @@ public class ResourceTelenum extends IdEntity{
         this.lineId = lineId;
         this.status =0;
         this.usable = "1";
+        this.type = "1";
     }
 
     public ResourceTelenum() {

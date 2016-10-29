@@ -20,7 +20,7 @@ public class TelnumToLineGateway extends IdEntity {
     private String isDialing;//可主叫
     private String isCalled;//可被叫
     private String isThrough;//可透传
-    private String isBuy;//是否采购线路
+    private String isBuy;//是否采购线路 1是 0否
     @Column( name = "is_buy")
     public String getIsBuy() {
         return isBuy;

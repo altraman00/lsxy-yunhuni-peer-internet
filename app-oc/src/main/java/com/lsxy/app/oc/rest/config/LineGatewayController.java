@@ -60,6 +60,12 @@ public class LineGatewayController extends AbstractRestController {
     ResourceTelenumService resourceTelenumService;
     @Autowired
     AreaService areaService;
+    @RequestMapping(value = "/list",method = RequestMethod.GET)
+    @ApiOperation(value = "获取全部数据")
+    public RestResponse pList(){
+        List list= (List)lineGatewayService.list();
+        return RestResponse.success(list);
+    }
     @RequestMapping(value = "/plist",method = RequestMethod.GET)
     @ApiOperation(value = "获取分页数据")
     public RestResponse pList(
@@ -432,12 +438,16 @@ public class LineGatewayController extends AbstractRestController {
 //        Map<String,Long> map = telnumToLineGatewayService.getTelnumCall(telnum,null);
         long isCalled = 0;//map.get("isCalled");
         long isDialing = 0;//map.get("isDialing");
+        long isThrough = 0;
         isCalled += isCalled0;
-        isDialing += isDialing0+isThrough0;
+        isDialing += isDialing0;
+        isThrough += isThrough0;
         isCalled = isCalled>0?1:0;
         isDialing = isDialing>0?1:0;
+        isThrough = isThrough>0?1:0;
         resourceTelenum.setIsDialing(isDialing+"");
         resourceTelenum.setIsCalled(isCalled+"");
+        resourceTelenum.setIsThrough(isThrough+"");
         return resourceTelenumService.save(resourceTelenum);
     }
     private void batchUpCall(String line,String... nums){
@@ -459,13 +469,16 @@ public class LineGatewayController extends AbstractRestController {
         ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(telnum);
         long isCalled = map.get("isCalled");
         long isDialing = map.get("isDialing");
+        long isThrough = map.get("isThrough");
         isCalled = isCalled>0?1:0;
         isDialing = isDialing>0?1:0;
+        isThrough = isThrough>0?1:0;
         if(line.equals(resourceTelenum.getLineId())){
             resourceTelenum.setLineId("无");
         }
         resourceTelenum.setIsCalled(isCalled+ "");
         resourceTelenum.setIsDialing(isDialing + "");
+        resourceTelenum.setIsThrough(isThrough + "");
         resourceTelenumService.save(resourceTelenum);
     }
     private String vailLineGatewayVo(LineGatewayVo lineGatewayVo){

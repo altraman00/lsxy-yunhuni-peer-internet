@@ -134,7 +134,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public Map getTelnumCall(String telnum,String line) {
-        String sql = " SELECT CONVERT(IFNULL(sum(is_dialing+is_through),0),SIGNED) AS isDialing, CONVERT(IFNULL(SUM(is_called),0),SIGNED) AS isCalled  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 ";
+        String sql = " SELECT CONVERT(IFNULL(SUM(is_dialing),0),SIGNED) AS isDialing,CONVERT(IFNULL(SUM(is_through),0),SIGNED) AS isThrough, CONVERT(IFNULL(SUM(is_called),0),SIGNED) AS isCalled  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 ";
         if(StringUtils.isNotEmpty(line)){
             sql += " AND line_id<>'"+line+"' ";
         }
@@ -153,6 +153,11 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     public void updateIsThrough(String line, String isThrough) {
         String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET is_through='"+isThrough+"' WHERE  line_id='"+line+"' ";
         jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public TelnumToLineGateway findByTelNumberAndLineId(String telNumber, String lineId) {
+        return telnumToLineGatewayDao.findByTelNumberAndLineId(telNumber,lineId);
     }
 
 }
