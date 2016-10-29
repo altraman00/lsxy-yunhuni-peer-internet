@@ -16,6 +16,10 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app_extension")
 public class AppExtension extends IdEntity {
+
+    public final static Integer ENABLED = 1;
+    public final static Integer UNENABLED = 0;
+
     private String appId;//    app_id               varchar(32) comment '所属应用ID',
     private String tenantId; //tenant_id   租户id
     private String name;//    name                 varchar(100) comment '名称',

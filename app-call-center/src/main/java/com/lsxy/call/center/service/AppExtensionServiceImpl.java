@@ -10,9 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -35,7 +32,6 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         return this.appExtensionDao;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_UNCOMMITTED)
     private boolean exists(String user){
         if(StringUtil.isEmpty(user)){
             throw new NullPointerException();
@@ -44,7 +40,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     //注册
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_UNCOMMITTED)
+    @Override
     public boolean register(AppExtension appExtension){
         if(appExtension == null){
             throw new NullPointerException();
@@ -70,7 +66,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     //鉴权
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED)
+    @Override
     public boolean login(String tenantId,String appId,String user,String pass){
         if(StringUtil.isEmpty(tenantId)){
             return false;
@@ -99,7 +95,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         return false;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED)
+    @Override
     public boolean updateRegisterStatus(String id,Integer lastRegisterStatus){
         if(StringUtil.isEmpty(id)){
             return false;
@@ -119,8 +115,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         return false;
     }
 
-
-    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED)
+    @Override
     public boolean updateLastAction(String id,Integer lastAction){
         if(StringUtil.isEmpty(id)){
             return false;
@@ -131,6 +126,26 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         }
         appExtension.setLastAction(lastAction);
         appExtension.setLastActionTime(new Date());
+        try{
+            this.save(appExtension);
+            return true;
+        }catch (Throwable t){
+            logger.error("",t);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateAgent(String id,String agent,Integer enable){
+        if(StringUtil.isEmpty(id)){
+            return false;
+        }
+        AppExtension appExtension = this.findById(id);
+        if(appExtension == null){
+            return false;
+        }
+        appExtension.setAgent(agent);
+        appExtension.setEnabled(enable==null?0:enable);
         try{
             this.save(appExtension);
             return true;
