@@ -1,14 +1,13 @@
 package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.app.oc.rest.config.vo.LineGatewayToPublicEditPriorityVo;
+import com.lsxy.app.oc.rest.config.vo.EditPriorityVo;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
-import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/25.
@@ -102,9 +99,9 @@ public class LineGatewayToPublicController extends AbstractRestController {
         return RestResponse.success("删除成功");
     }
     @ApiOperation(value = "修改优先级")
-    @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/edit/priority/{id}",method = RequestMethod.PUT)
     public RestResponse modify(@ApiParam(name = "id",value = "线路id")
-                               @PathVariable String id,@RequestBody LineGatewayToPublicEditPriorityVo lineGatewayToPublicEditPriorityVo){
+                               @PathVariable String id,@RequestBody EditPriorityVo lineGatewayToPublicEditPriorityVo){
         int o2 = 0;
         try{ o2=Integer.valueOf(lineGatewayToPublicEditPriorityVo.getPriority());}catch (Exception e){
             return RestResponse.failed("0000","目标优先级只能为数字");

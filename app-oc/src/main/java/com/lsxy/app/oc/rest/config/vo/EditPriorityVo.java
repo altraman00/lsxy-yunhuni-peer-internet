@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
  * Created by zhangxb on 2016/10/25.
  */
 @ApiModel
-public class LineGatewayToPublicEditPriorityVo {
+public class EditPriorityVo {
     @ApiModelProperty(name="priority",value = "目标有限级")
     private String priority;
 

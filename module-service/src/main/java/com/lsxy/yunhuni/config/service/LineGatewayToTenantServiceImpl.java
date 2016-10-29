@@ -2,11 +2,13 @@ package com.lsxy.yunhuni.config.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToTenant;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToTenantDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -18,11 +20,11 @@ import java.util.List;
  */
 @Service
 public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayToTenant> implements LineGatewayToTenantService {
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Autowired
     LineGatewayToTenantDao lineGatewayToTenantDao;
     @Override
-
     public BaseDaoInterface<LineGatewayToTenant, Serializable> getDao() {
         return this.lineGatewayToTenantDao;
     }
@@ -45,5 +47,24 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
         }else{
             return null;
         }
+    }
+
+    @Override
+    public Page<LineGatewayToTenant> getPage(Integer pageNo, Integer pageSize) {
+        String hql = " FROM LineGatewayToTenant obj  ORDER BY obj.priority ";
+        Page page = this.pageList(hql,pageNo,pageSize);
+        return page;
+    }
+
+    @Override
+    public long findByLineIdAndTenantId(String lineId, String tenantId) {
+        String hql = " FROM LineGatewayToTenant obj where  obj.lineGateway.id='"+lineId+"' AND tenantId='"+tenantId+"' ";
+        return this.countByCustom(hql);
+    }
+    @Override
+    public int getMaxPriority() {
+        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public ";
+        int result = jdbcTemplate.queryForObject(sql,Integer.class);
+        return result;
     }
 }
