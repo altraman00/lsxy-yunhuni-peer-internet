@@ -98,9 +98,8 @@ public class DialActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        boolean dialSucc = false;
         try{
-            dialSucc = dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
+            dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         }catch (Throwable t){
             logger.error("ivr拨号失败:",t);
         }
@@ -114,9 +113,6 @@ public class DialActionHandler extends ActionHandler{
         state.setBusinessData(businessData);
         businessStateService.save(state);
 
-        if(!dialSucc){//拨号失败直接进行ivr下一步
-            ivrActionService.doAction(callId);
-        }
         return true;
     }
 

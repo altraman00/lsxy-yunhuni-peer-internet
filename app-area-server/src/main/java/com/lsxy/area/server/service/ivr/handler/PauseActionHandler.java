@@ -58,7 +58,7 @@ public class PauseActionHandler extends ActionHandler{
         if(attr != null){
             String duration_str = root.attribute("duration").getValue();
             if(StringUtils.isNotBlank(duration_str) && StringUtils.isNumeric(duration_str)){
-                duration = Integer.parseInt(duration_str);
+                duration = Integer.parseInt(duration_str) * 1000;
             }
         }
         mqService.publish(new IVRPauseActionEvent(callId,duration));
