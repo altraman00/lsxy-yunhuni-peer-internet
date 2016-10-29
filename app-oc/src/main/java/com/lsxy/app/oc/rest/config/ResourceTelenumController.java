@@ -313,8 +313,34 @@ public class ResourceTelenumController extends AbstractRestController {
         resourceTelenumService.save(resourceTelenum);
         return RestResponse.success("禁用号码成功");
     }
-
-
+    @ApiOperation(value = "关联线路-归属线路")
+    @RequestMapping(value = "/line/plist/{id}",method = RequestMethod.GET)
+    public RestResponse telnumLinePlistOne(
+            @ApiParam(name = "id",value = "号码id") @PathVariable String id,
+            @ApiParam(name = "pageNo",value = "第几页")@RequestParam(defaultValue = "1") Integer pageNo,
+            @ApiParam(name = "pageSize",value = "每页记录数")@RequestParam(defaultValue = "20") Integer pageSize
+    ){
+        ResourceTelenum resourceTelenum = resourceTelenumService.findById(id);
+        if(resourceTelenum==null){
+            return RestResponse.failed("0000","记录不存在");
+        }
+        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findById(resourceTelenum.getLineId());
+        return RestResponse.success(telnumToLineGateway);
+    }
+    @ApiOperation(value = "关联线路-列表")
+    @RequestMapping(value = "/line/plist/{id}",method = RequestMethod.GET)
+    public RestResponse telnumLinePlist(
+            @ApiParam(name = "id",value = "号码id") @PathVariable String id,
+            @ApiParam(name = "pageNo",value = "第几页")@RequestParam(defaultValue = "1") Integer pageNo,
+            @ApiParam(name = "pageSize",value = "每页记录数")@RequestParam(defaultValue = "20") Integer pageSize
+    ){
+        ResourceTelenum resourceTelenum = resourceTelenumService.findById(id);
+        if(resourceTelenum==null){
+            return RestResponse.failed("0000","记录不存在");
+        }
+        Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,null,resourceTelenum.getTelNumber(),null,null,null);
+        return RestResponse.success(page);
+    }
 
 
     /**
@@ -351,19 +377,19 @@ public class ResourceTelenumController extends AbstractRestController {
         String[] is = {"0","1"};
         if(isNull&&StringUtils.isEmpty(telnumTVo.getIsThrough()+"")){
         }else {
-            if (!Arrays.asList(is).contains(telnumTVo.getIsThrough())) {
+            if (!Arrays.asList(is).contains(telnumTVo.getIsThrough()+"")) {
                 return "可透传错误";
             }
         }
         if(isNull&&StringUtils.isEmpty(telnumTVo.getIsCalled()+"")){
         }else {
-            if (!Arrays.asList(is).contains(telnumTVo.getIsCalled())) {
+            if (!Arrays.asList(is).contains(telnumTVo.getIsCalled()+"")) {
                 return "可被叫错误";
             }
         }
         if(isNull&&StringUtils.isEmpty(telnumTVo.getIsDialing()+"")){
         }else {
-            if (!Arrays.asList(is).contains(telnumTVo.getIsDialing())) {
+            if (!Arrays.asList(is).contains(telnumTVo.getIsDialing()+"")) {
                 return "可主叫错误";
             }
         }
