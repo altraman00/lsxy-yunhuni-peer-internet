@@ -5,6 +5,7 @@ import com.lsxy.framework.api.exceptions.AccountNotFoundException;
 import com.lsxy.framework.api.exceptions.RegisterException;
 import com.lsxy.framework.api.tenant.model.Account;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.Page;
 
 import java.util.List;
 
@@ -117,4 +118,11 @@ public interface AccountService extends BaseService<Account> {
      * @return
      */
     Account findByEmailAndStatus(String email,int status);
+
+    /**
+     * 根据状态获取用户集合
+     * @param status
+     * @return
+     */
+    Page<Account> pList(Integer status, Integer pageNo, Integer pageSize);
 }
