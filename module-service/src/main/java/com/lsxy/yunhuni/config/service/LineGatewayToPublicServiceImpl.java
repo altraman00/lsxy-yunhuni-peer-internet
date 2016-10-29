@@ -100,8 +100,12 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
         List<LineGateway> lineGateways = new ArrayList<>();
         List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaIdOrderByPriorityDesc(areaId);
         for (LineGatewayToPublic ltp:ltps){
+            LineGateway lineGateway = ltp.getLineGateway();
             //TODO 判断线路是否可用
-            lineGateways.add(ltp.getLineGateway());
+            if("1".equals(lineGateway.getStatus())){
+                lineGateway.setPriority(ltp.getPriority());
+                lineGateways.add(lineGateway);
+            }
         }
         return lineGateways;
     }

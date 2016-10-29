@@ -143,12 +143,12 @@ public class AreaAndTelNumSelector {
 
     private TelnumFormat getTelnumFormat(String to, ResourceTelenum svTelnumber, LineGateway lg, TelnumToLineGateway telnumToLineGateway) {
         TelnumFormat telnumFormat1 = null;
-        if(telnumToLineGateway.getIsCalled() == "1"){
+        if("1".equals(telnumToLineGateway.getIsDialing())){
             //to1的传输数据类
             telnumFormat1 = new TelnumFormat(svTelnumber.getCallUri(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp());
-        }else if(telnumToLineGateway.getIsThrough() == "1"){
+        }else if("1".equals(telnumToLineGateway.getIsThrough())){
             //to1的传输数据类
             telnumFormat1 = new TelnumFormat(svTelnumber.getTelNumber(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
@@ -251,10 +251,5 @@ public class AreaAndTelNumSelector {
             return new ResourceTelenum();
         }
     }
-
-    public static void ttttt(String... a){
-        System.out.println(a.length);
-    }
-
 
 }

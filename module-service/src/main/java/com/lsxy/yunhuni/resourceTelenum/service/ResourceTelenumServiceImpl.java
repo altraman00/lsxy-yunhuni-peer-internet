@@ -152,8 +152,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 if(resourcesRent.getApp() != null && resourcesRent.getApp().getId().equals(app.getId())){
                     ResourceTelenum resourceTelenum = resourcesRent.getResourceTelenum();
                     if(resourceTelenum != null){
-                        //TODO 判断是否是可呼出号码
-                        appNums.add(resourceTelenum);
+                        // 判断是否是可呼出号码
+                        if("1".equals(resourceTelenum.getUsable())&& ("1".equals(resourceTelenum.getIsDialing()) || "1".equals(resourceTelenum.getIsThrough()))){
+                            appNums.add(resourceTelenum);
+                        }
                     }
                 }
             }
@@ -163,9 +165,12 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                     if(resourcesRent.getApp() == null){
                         ResourceTelenum resourceTelenum = resourcesRent.getResourceTelenum();
                         if(resourceTelenum != null ){
-                            //TODO 判断是否是同一个区域
-                            //TODO 判断是否是可呼出号码
-                            appNums.add(resourceTelenum);
+                            // 判断是否是同一个区域
+                            //判断是否是可呼出号码
+                            if("1".equals(resourceTelenum.getUsable())&& ("1".equals(resourceTelenum.getIsDialing()) || "1".equals(resourceTelenum.getIsThrough()))
+                                    && resourceTelenum.getAreaId().equals(app.getArea().getId())){
+                                appNums.add(resourceTelenum);
+                            }
                         }
                     }
                 }

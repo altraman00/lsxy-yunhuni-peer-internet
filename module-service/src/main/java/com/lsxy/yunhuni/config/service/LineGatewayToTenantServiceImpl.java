@@ -7,6 +7,7 @@ import com.lsxy.yunhuni.api.config.model.LineGatewayToTenant;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToTenantDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 /**
  * Created by liups on 2016/10/27.
  */
+@Service
 public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayToTenant> implements LineGatewayToTenantService {
 
     @Autowired
@@ -34,7 +36,10 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
             for(LineGatewayToTenant ltt:list){
                 LineGateway lineGateway = ltt.getLineGateway();
                 //TODO 判断线路是否可用
-                lineGateways.add(lineGateway);
+                if("1".equals(lineGateway.getStatus())){
+                    lineGateway.setPriority(ltt.getPriority());
+                    lineGateways.add(lineGateway);
+                }
             }
             return lineGateways;
         }else{
