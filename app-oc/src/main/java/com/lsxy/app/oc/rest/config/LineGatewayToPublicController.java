@@ -8,6 +8,7 @@ import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,22 +39,19 @@ public class LineGatewayToPublicController extends AbstractRestController {
     public RestResponse pList(
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
             @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize,
-            @ApiParam(name = "operator",value = "运营商") @RequestParam(required = false)String operator,
+            @ApiParam(name = "operator",value = "运营商 中国电信；中国移动；中国联通") @RequestParam(required = false)String operator,
             @ApiParam(name = "isThrough",value = "是否透传 1支持透传 0不支持透传")@RequestParam(required = false) String isThrough,
             @ApiParam(name = "status",value = "状态 1可用 0不可用") @RequestParam(required = false)String status,
-            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine,
-            @ApiParam(name = "order",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String order
+//            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine,
+            @ApiParam(name = "order",value = "quality:1按质量降序，quality:0按质量升序,capacity:1按容量降序capacity:0按容量降序") @RequestParam(required = false)String order
     ){
-        Page page= lineGatewayToPublicService.getPage(pageNo,pageSize,operator,isThrough,status,isPublicLine,order);
+        Page page= lineGatewayToPublicService.getPage(pageNo,pageSize,operator,isThrough,status,null,order);
         return RestResponse.success(page);
     }
     @ApiOperation(value = "将线路加入全局")
     @RequestMapping(value = "/add/{id}",method = RequestMethod.POST)
     public RestResponse addPublic(@ApiParam(name = "id",value = "线路id") @PathVariable String id){
         LineGateway lineGateway = lineGatewayService.findById(id);
-        if("1".equals(lineGateway.getIsPublicLine())){
-            return RestResponse.failed("0000","线路已经加入全局序列中");
-        }
         if(lineGateway!=null&& StringUtils.isNotEmpty(lineGateway.getId())){
             int re1 = lineGatewayToPublicService.findByLindId(id);
             if(re1>0){
@@ -89,10 +88,18 @@ public class LineGatewayToPublicController extends AbstractRestController {
                 lineGateway.setIsPublicLine("0");
                 lineGatewayService.save(lineGateway);
             }
+            //修正优先级
+            int o3 = lineGatewayToPublicService.getMaxPriority();
+            if(o3!=lineGatewayToPublic.getPriority()){
+                int re = upPriority(lineGatewayToPublic.getPriority(),o3,null);
+                if(re==-1){
+                    return RestResponse.failed("0000","删除成功，修正失败，请手动修正");
+                }
+            }
         }else{
             return RestResponse.failed("0000","线路不存在");
         }
-        return RestResponse.success("修改成功");
+        return RestResponse.success("删除成功");
     }
     @ApiOperation(value = "修改优先级")
     @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
@@ -115,22 +122,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
             if(o1==o2){
                 return RestResponse.failed("0000","目标优先级和当前优先级一致");
             }
-            boolean flag = true;
-            int begin = -1;
-            int end = -1;
-            if(o1<o2){
-                begin = o1+1;
-                end = o2;
-                flag = true;
-            }else{
-                begin = o2;
-                end = o1-1;
-                flag = false;
-            }
-            String[] sql = new String[2];
-            String sq1 = " UPDATE db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public SET priority++ WHERE priority BETWEEN '"+begin+"' AND '"+end+"' ";
-            String sq2 = " UPDATE db_lsxy_bi_yunhuni.tb_bi_linegateway_to_public SET priority='"+o2+"' WHERE id ='"+lineGatewayToPublic.getId()+"' ";
-            int re = lineGatewayService.batchModify(sql);
+            int re = upPriority(o1,o2,lineGatewayToPublic.getId());
             if(re==-1){
                 return RestResponse.failed("0000","修改失败，请重试");
             }
@@ -138,5 +130,26 @@ public class LineGatewayToPublicController extends AbstractRestController {
             return RestResponse.failed("0000","线路不存在");
         }
         return RestResponse.success("修改成功");
+    }
+    private int upPriority(int o1,int o2,String line){
+        String flag = "+1";
+        int begin = -1;
+        int end = -1;
+        if(o1<o2){
+            begin = o1+1;
+            end = o2;
+            flag = "-1";
+        }else{
+            begin = o2;
+            end = o1-1;
+            flag = "+1";
+        }
+        String[] sql = new String[2];
+        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE priority BETWEEN "+begin+" AND "+end+" ";
+        if(StringUtils.isNotEmpty(line)) {
+            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=" + o2 + " WHERE id ='" + line + "' ";
+        }
+        int re = lineGatewayService.batchModify(sql);
+        return re;
     }
 }

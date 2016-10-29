@@ -34,4 +34,6 @@ public interface TelnumToLineGatewayDao extends BaseDaoInterface<TelnumToLineGat
      * @return
      */
     TelnumToLineGateway findFirstByTelNumberAndIsCalled(String telNumber, String isCalled);
+
+    TelnumToLineGateway findByTelNumberAndLineId(String telNumber,String lineId);
 }

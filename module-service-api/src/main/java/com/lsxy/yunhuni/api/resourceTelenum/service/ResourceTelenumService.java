@@ -28,7 +28,6 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     ResourceTelenum findByTelNumber(String telNumber);
-
     /**
      * 清除过期的号码资源和租户的关系
      * @param expireTime 过期时间
@@ -61,7 +60,7 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * 获取分页信息
      * @return
      */
-    Page<ResourceTelenum> getPageByNotLine(String id,Integer pageNo, Integer pageSize, String operator, String number);
+    Page<ResourceTelenum> getPageByNotLine(String id,String areaCode,Integer pageNo, Integer pageSize, String operator, String number);
 
     /**
      * 用于呼叫号码选择，当from不为空时，则根据from的数量选择相应数量的呼出号码，当from为空时，择一个号码

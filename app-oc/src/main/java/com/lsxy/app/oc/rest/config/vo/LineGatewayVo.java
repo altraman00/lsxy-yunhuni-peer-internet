@@ -10,48 +10,42 @@ import java.math.BigDecimal;
  */
 @ApiModel
 public class LineGatewayVo {
-    @ApiModelProperty(name="tenantId",value = "所属租户")
-    private String tenantId;
     @ApiModelProperty(name="lineNumber",value = "线路标识")
     private String lineNumber;
     @ApiModelProperty(name="operator",value = "运营商 中国电信；中国移动；中国联通")
     private String operator;
     @ApiModelProperty(name="areaId",value = "区域编号")
     private String areaId;
-    @ApiModelProperty(name="lineType",value = "线路类型")
+    @ApiModelProperty(name="areaCode",value = "归属地区号")
+    private String areaCode;
+    @ApiModelProperty(name="fromPrefix",value = "呼入主叫前缀")
+    private String fromPrefix;
+    @ApiModelProperty(name="lineType",value = "线路类型,SIP")
     private String lineType;
-    @ApiModelProperty(name="sipProviderIp",value = "IP")
-    private String sipProviderIp;
-    @ApiModelProperty(name="sipProviderPort",value = "端口")
+    @ApiModelProperty(name="sipProviderIp",value = "IP端口")
     private String sipProviderPort;
-    @ApiModelProperty(name="sipAuthPassword",value = "domain")
+    @ApiModelProperty(name="sipProviderDomain",value = "domain端口")
     private String sipProviderDomain;
-    @ApiModelProperty(name="lineType",value = "鉴权方式")
+    @ApiModelProperty(name="lineType",value = "鉴权方式 1:账号密码 2:IP地址")
     private String sipAuthType;
     @ApiModelProperty(name="sipAuthAccount",value = "账号")
     private String sipAuthAccount;
     @ApiModelProperty(name="sipAuthPassword",value = "密码")
     private String sipAuthPassword;
-    @ApiModelProperty(name="areaCode",value = "归属地区号")
-    private String areaCode;
-    @ApiModelProperty(name="fromPrefix",value = "呼入主叫前缀")
-    private String fromPrefix;
-    @ApiModelProperty(name="fromPrefix",value = "手机区号规则：0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0")
+    @ApiModelProperty(name="mobileAreaRule",value = "手机区号规则：0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0")
     private String mobileAreaRule;
-    @ApiModelProperty(name="fromPrefix",value = "固话区号规则：0=一律加区号；1=一律不加区号；2=非与线路属于同一个归属地加区号")
+    @ApiModelProperty(name="telAreaRule",value = "固话区号规则：0=一律加区号；2=非与线路属于同一个归属地加区号")
     private String telAreaRule;
+    @ApiModelProperty(name="lingPrice",value = "成本价 单位元/分钟")
+    private BigDecimal lingPrice;
     @ApiModelProperty(name="isThrough",value = "是否透传：1=是，0=不是")
     private String isThrough;
-    @ApiModelProperty(name="lingPrice",value = "成本价")
-    private BigDecimal lingPrice;
     @ApiModelProperty(name="quality",value = "质量：数字1-10")
     private Integer quality;
-    @ApiModelProperty(name="priority",value = "手动优先级：数字0-99")
-    private Integer priority;
     @ApiModelProperty(name="capacity",value = "并发容量：数字")
     private Integer capacity;
 
-    public String getisThrough() {
+    public String getIsThrough() {
         return isThrough;
     }
 
@@ -59,13 +53,6 @@ public class LineGatewayVo {
         this.isThrough = isThrough;
     }
 
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
-    }
 
     public String getLineNumber() {
         return lineNumber;
@@ -99,13 +86,6 @@ public class LineGatewayVo {
         this.lineType = lineType;
     }
 
-    public String getSipProviderIp() {
-        return sipProviderIp;
-    }
-
-    public void setSipProviderIp(String sipProviderIp) {
-        this.sipProviderIp = sipProviderIp;
-    }
 
     public String getSipProviderPort() {
         return sipProviderPort;
@@ -193,14 +173,6 @@ public class LineGatewayVo {
 
     public void setQuality(Integer quality) {
         this.quality = quality;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
     }
 
     public Integer getCapacity() {

@@ -20,28 +20,26 @@ import java.math.BigDecimal;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_line_gateway")
 public class LineGateway extends IdEntity {
 
-    private String isThrough;//是否透传
-    private String tenantId;//所属租户
-    private String areaId;          //区域
-    private String lineNumber;  //线路网关编码
-    private BigDecimal lingPrice;   //线路网关单价
-    private String remark;
-    private Integer priority;//线路网关优先级
-    private String areaCode;//归属区号
+    private String lineNumber;  //线路标识
+    private String operator;//运营商 中国电信；中国移动；中国联通
+    private String areaId;//区域编号
+    private String areaCode;//归属地区号
     private String fromPrefix;//呼入主叫前缀
-    private String mobileAreaRule;//手机区号规则
-    private String telAreaRule;//固话区号规则
-    private String lineType;//默认sip
-    private String sipProviderIp;//线路网关IP
+    private String lineType;//线路类型 默认SIP
+    private String sipProviderIp;//IP端口
     private String sipProviderDomain;   //线路网关域名
-    private String sipAuthType;//鉴权方式
+    private String sipAuthType;//鉴权方式1:账号密码 2:IP地址
     private String sipAuthAccount;//账号
     private String sipAuthPassword;//密码
+    private String mobileAreaRule;//手机区号规则 0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0
+    private String telAreaRule;//固话区号规则 0=一律加区号；1=一律不加区号；2=非与线路属于同一个归属地加区号
+    private BigDecimal lingPrice;//线路网关单价
+    private String isThrough;//是否透传
+    private Integer quality;//质量 数字1-10
+    private Integer capacity;//容量 数字
+    private String remark;
     private String sipAuthIp;//sip接入点的外网IP地址
-    private Integer quality;//质量
     private String status;//状态
-    private String operator;//运营商
-    private Integer capacity;//容量
     private String isPublicLine;//是否全局线路
     @Column(name="is_through")
     public String getIsThrough() {
@@ -50,15 +48,6 @@ public class LineGateway extends IdEntity {
 
     public void setIsThrough(String isThrough) {
         this.isThrough = isThrough;
-    }
-
-    @Column(name="tenant_id")
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
     }
 
     @Column(name = "sip_provider_domain")
@@ -104,15 +93,6 @@ public class LineGateway extends IdEntity {
 
     public void setRemark(String remark) {
         this.remark = remark;
-    }
-
-    @Column(name = "priority")
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
     }
     @Column(name = "area_code")
     public String getAreaCode() {

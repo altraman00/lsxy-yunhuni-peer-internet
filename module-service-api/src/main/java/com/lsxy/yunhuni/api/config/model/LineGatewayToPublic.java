@@ -10,7 +10,7 @@ import javax.persistence.*;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_linegateway_to_public")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_linegateway_to_public")
 public class LineGatewayToPublic extends IdEntity {
     private LineGateway lineGateway;//线路网关
     private Integer priority;//优先级

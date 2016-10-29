@@ -109,7 +109,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             hql += " AND obj.operator='"+operator+"' ";
         }
         if(StringUtils.isNotEmpty(number)){
-            hql += " AND obj.number like '%"+number+"%' ";
+            hql += " AND obj.telNumber like '%"+number+"%' ";
         }
         hql+=" ORDER BY obj.createTime DESC ";
         Page page = this.pageList(hql,pageNo,pageSize);
@@ -117,13 +117,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public Page<ResourceTelenum> getPageByNotLine(String id, Integer pageNo, Integer pageSize, String operator, String number) {
-        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj where obj.deleted=0 AND obj.tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE line_id='"+id+"') ";
+    public Page<ResourceTelenum> getPageByNotLine(String id,String areaCode, Integer pageNo, Integer pageSize, String operator, String number) {
+        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj where obj.deleted=0 AND area_code='"+areaCode+"' AND obj.tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE line_id='"+id+"') ";
         if(StringUtils.isNotEmpty(operator)){
             sql +=" AND obj.operator='"+operator+"' ";
         }
         if(StringUtils.isNotEmpty(number)){
-            sql +=" AND obj.number LIKE '%"+operator+"%' ";
+            sql +=" AND obj.telNumber LIKE '%"+operator+"%' ";
         }
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;

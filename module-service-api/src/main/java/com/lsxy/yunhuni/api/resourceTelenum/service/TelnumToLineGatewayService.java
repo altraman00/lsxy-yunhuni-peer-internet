@@ -7,6 +7,7 @@ import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/9/2.
@@ -38,20 +39,40 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param number
      * @return
      */
-    Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String number,String isDialing,String isCalled,String isThrough);
+    Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String line,String number,String isDialing,String isCalled,String isThrough);
 
     /**
      * 批量删除
      * @param ids
      */
-    void batchDelete(String[] ids);
+    void batchDelete(String line,String[] ids);
 
     /**
-     * 批量增加
-     * @param id
-     * @param ids
+     * 透传-批量增加
      */
-    void batchInsert(String id,String[] ids);
+    void batchInsert(String id,String provider,String[] ids);
+    /**
+     * 获取号码是否可呼叫
+     * */
+    Map getTelnumCall(String telnum,String line);
 
+    /**
+     * 获取线路上的号码
+     */
+    List<String> getTelnumByLineId(String line);
 
+    /**
+     * 根据线路修改是否可透传
+     * @param line
+     * @param isThrough
+     */
+    void updateIsThrough(String line,String isThrough);
+
+    /**
+     * 根据号码和线路获取对象
+     * @param telNumber
+     * @param lineId
+     * @return
+     */
+    TelnumToLineGateway findByTelNumberAndLineId(String telNumber,String lineId);
 }

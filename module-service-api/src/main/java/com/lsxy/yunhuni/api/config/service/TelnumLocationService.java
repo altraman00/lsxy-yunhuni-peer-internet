@@ -31,10 +31,13 @@ public interface TelnumLocationService extends BaseService<TelnumLocation> {
 
     String getAreaCodeOfMobile(String s);
 
+    String getAreaNameByAreaCode(String areaCode);
+
     /**
      * 根据区号规则处理号码
      * @param num
      * @return
      */
     String solveNum(String num, String telPhoneRule,String mobileRule,String areaCode);
+
 }
