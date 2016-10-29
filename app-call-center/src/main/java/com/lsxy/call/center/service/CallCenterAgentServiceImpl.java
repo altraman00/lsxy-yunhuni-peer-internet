@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -136,12 +135,10 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         agentSkillService.save(skill);
         return true;
     }
-    //排队
-    public Map<String,Object> enqueue(){
-        return null;
+    //排队,通过 dubbo返回结果给  区域管理器
+    public void enqueue(String tenantId,String appId){
     }
 
-    public Map<String,Object> dequeue(String agent){
-        return null;
+    public void dequeue(String agent){
     }
 }
