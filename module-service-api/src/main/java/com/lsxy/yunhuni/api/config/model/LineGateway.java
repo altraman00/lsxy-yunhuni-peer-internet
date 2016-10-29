@@ -43,7 +43,7 @@ public class LineGateway extends IdEntity {
     private String isPublicLine;//是否全局线路
 
     @Transient
-    private Long priority;
+    private Integer priority;
 
     @Column(name="is_through")
     public String getIsThrough() {
@@ -220,11 +220,11 @@ public class LineGateway extends IdEntity {
         this.isPublicLine = isPublicLine;
     }
 
-    public Long getPriority() {
+    public Integer getPriority() {
         return priority;
     }
 
-    public void setPriority(Long priority) {
+    public void setPriority(Integer priority) {
         this.priority = priority;
     }
 }
