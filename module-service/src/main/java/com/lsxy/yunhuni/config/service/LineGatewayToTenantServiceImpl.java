@@ -50,8 +50,8 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
-    public Page<LineGatewayToTenant> getPage(Integer pageNo, Integer pageSize) {
-        String hql = " FROM LineGatewayToTenant obj  ORDER BY obj.priority ";
+    public Page<LineGatewayToTenant> getPage(String tenantId,Integer pageNo, Integer pageSize) {
+        String hql = " FROM LineGatewayToTenant obj WHERE obj.tenantId='"+tenantId+"' ORDER BY obj.priority ";
         Page page = this.pageList(hql,pageNo,pageSize);
         return page;
     }
@@ -63,7 +63,7 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
     }
     @Override
     public int getMaxPriority() {
-        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public ";
+        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant WHERE deleted=0";
         int result = jdbcTemplate.queryForObject(sql,Integer.class);
         return result;
     }

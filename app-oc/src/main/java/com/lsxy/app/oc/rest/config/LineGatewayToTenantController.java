@@ -37,9 +37,10 @@ public class LineGatewayToTenantController  extends AbstractRestController {
     @Autowired
     TenantService tenantService;
 
-    @RequestMapping(value = "/plist",method = RequestMethod.GET)
+    @RequestMapping(value = "/plist/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取分页数据")
     public RestResponse pList(
+            @ApiParam(name = "id",value = "租户id")  @PathVariable String id,
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
             @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize
 //            @ApiParam(name = "operator",value = "运营商 中国电信；中国移动；中国联通") @RequestParam(required = false)String operator,
@@ -48,7 +49,7 @@ public class LineGatewayToTenantController  extends AbstractRestController {
 ////            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine,
 //            @ApiParam(name = "order",value = "quality:1按质量降序，quality:0按质量升序,capacity:1按容量降序capacity:0按容量降序") @RequestParam(required = false)String order
     ){
-        Page page= lineGatewayToTenantService.getPage(pageNo,pageSize);
+        Page page= lineGatewayToTenantService.getPage(id,pageNo,pageSize);
         return RestResponse.success(page);
     }
     @RequestMapping(value = "/line/plist/{id}",method = RequestMethod.GET)
@@ -88,6 +89,7 @@ public class LineGatewayToTenantController  extends AbstractRestController {
                     //新建关系
                     LineGatewayToTenant lineGatewayToTenant = new LineGatewayToTenant();
                     lineGatewayToTenant.setLineGateway(lineGateway);
+                    lineGatewayToTenant.setTenantId(tenant.getId());
                     lineGatewayToTenant.setPriority(re2);
                     lineGatewayToTenantService.save(lineGatewayToTenant);
                 }
@@ -162,9 +164,9 @@ public class LineGatewayToTenantController  extends AbstractRestController {
             flag = "+1";
         }
         String[] sql = new String[2];
-        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant SET priority=priority"+flag+" WHERE priority BETWEEN "+begin+" AND "+end+" ";
+        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant SET priority=priority"+flag+" WHERE deleted=0 AND priority BETWEEN "+begin+" AND "+end+" ";
         if(StringUtils.isNotEmpty(line)) {
-            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant SET priority=" + o2 + " WHERE id ='" + line + "' ";
+            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant SET priority=" + o2 + " WHERE deleted=0 AND id ='" + line + "' ";
         }
         int re = lineGatewayService.batchModify(sql);
         return re;

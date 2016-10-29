@@ -90,7 +90,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         if(StringUtils.isNotEmpty(line)){
             hql += " AND obj.lineNumber like '%"+line+"%' ";
         }
-        hql += " AND obj.id NOT IN (select a.lineGateway.id from LineGatewayToTenant a where tenantId='"+tenantId+"') ";
+        hql += " AND obj.id NOT IN (select a.lineGateway.id from LineGatewayToTenant a where deleted=0 AND tenantId='"+tenantId+"') ";
         Page page = this.pageList(hql,pageNo,pageSize);
         return page;
     }

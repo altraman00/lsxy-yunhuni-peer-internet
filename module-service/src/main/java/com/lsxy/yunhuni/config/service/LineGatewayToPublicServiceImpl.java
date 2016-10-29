@@ -38,14 +38,14 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public int getMaxPriority() {
-        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public ";
+        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public WHERE deleted=0 ";
         int result = jdbcTemplate.queryForObject(sql,Integer.class);
         return result;
     }
 
     @Override
     public int findByLindId(String lindId) {
-        String sql = " SELECT COUNT(id) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public where line_id='"+lindId+"'";
+        String sql = " SELECT COUNT(id) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public where deleted=0 AND line_id='"+lindId+"'";
         int result = jdbcTemplate.queryForObject(sql,Integer.class);
         return result;
     }

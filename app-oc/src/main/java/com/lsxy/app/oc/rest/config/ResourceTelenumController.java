@@ -106,7 +106,7 @@ public class ResourceTelenumController extends AbstractRestController {
     }
     @ApiOperation(value = "修改号码")
     @RequestMapping(value = "/edit/{id}",method = RequestMethod.PUT)
-    public RestResponse release(@ApiParam(name = "id",value = "号码id") @PathVariable String id, @RequestBody TelnumTEditVo telnumTVo) {
+    public RestResponse edit(@ApiParam(name = "id",value = "号码id") @PathVariable String id, @RequestBody TelnumTEditVo telnumTVo) {
         ResourceTelenum resourceTelenum = resourceTelenumService.findById(id);
         if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
             return RestResponse.failed("0000","号码不存在");
@@ -314,11 +314,9 @@ public class ResourceTelenumController extends AbstractRestController {
         return RestResponse.success("禁用号码成功");
     }
     @ApiOperation(value = "关联线路-归属线路")
-    @RequestMapping(value = "/line/plist/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/line/one/{id}",method = RequestMethod.GET)
     public RestResponse telnumLinePlistOne(
-            @ApiParam(name = "id",value = "号码id") @PathVariable String id,
-            @ApiParam(name = "pageNo",value = "第几页")@RequestParam(defaultValue = "1") Integer pageNo,
-            @ApiParam(name = "pageSize",value = "每页记录数")@RequestParam(defaultValue = "20") Integer pageSize
+            @ApiParam(name = "id",value = "号码id") @PathVariable String id
     ){
         ResourceTelenum resourceTelenum = resourceTelenumService.findById(id);
         if(resourceTelenum==null){
