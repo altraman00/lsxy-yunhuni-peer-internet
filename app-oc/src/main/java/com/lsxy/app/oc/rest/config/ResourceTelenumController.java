@@ -341,7 +341,20 @@ public class ResourceTelenumController extends AbstractRestController {
         Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,null,resourceTelenum.getTelNumber(),null,null,null);
         return RestResponse.success(page);
     }
-
+    @ApiOperation(value = "关联线路-列表")
+    @RequestMapping(value = "/tenant/plist/{id}",method = RequestMethod.GET)
+    public RestResponse tenantPlist(
+            @ApiParam(name = "id",value = "号码id") @PathVariable String id,
+            @ApiParam(name = "pageNo",value = "第几页")@RequestParam(defaultValue = "1") Integer pageNo,
+            @ApiParam(name = "pageSize",value = "每页记录数")@RequestParam(defaultValue = "20") Integer pageSize
+    ){
+        ResourceTelenum resourceTelenum = resourceTelenumService.findById(id);
+        if(resourceTelenum==null){
+            return RestResponse.failed("0000","记录不存在");
+        }
+        Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,null,resourceTelenum.getTelNumber(),null,null,null);
+        return RestResponse.success(page);
+    }
 
     /**
      * 新增号码租户关系
