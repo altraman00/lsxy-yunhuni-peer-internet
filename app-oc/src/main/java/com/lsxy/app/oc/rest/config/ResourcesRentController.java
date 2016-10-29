@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Created by zhangxb on 2016/10/29.
  */
 @Api(value = "租户号码管理", description = "租户中心相关的接口" )
-@RequestMapping("/config/public")
+@RequestMapping("/config/rent")
 @RestController
 public class ResourcesRentController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(ResourcesRentController.class);
