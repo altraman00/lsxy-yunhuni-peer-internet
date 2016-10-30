@@ -1,12 +1,15 @@
 package com.lsxy.call.center.api.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import java.util.List;
 /**
  * Created by liuws on 2016/10/29.
  */
-@XStreamAlias("enqueue")
-public class Equeue {
+@XStreamAlias("equeue")
+public class EnQueue {
     private Condition condition;
 
     public Condition getCondition() {
@@ -18,7 +21,9 @@ public class Equeue {
     }
 
     public class Condition{
+        @XStreamAsAttribute
         private Integer expired;
+
         private And and;
         private Or or;
 
@@ -48,6 +53,7 @@ public class Equeue {
     }
 
     public class And{
+        @XStreamImplicit(itemFieldName="skill")
         private List<Skill> skills;
 
         public List<Skill> getSkills() {
@@ -60,6 +66,7 @@ public class Equeue {
     }
 
     public class Or{
+        @XStreamImplicit(itemFieldName="skill")
         private List<Skill> skills;
 
         public List<Skill> getSkills() {
@@ -72,7 +79,10 @@ public class Equeue {
     }
 
     public class Skill{
+        @XStreamAsAttribute
         private String name;
+
+        @XStreamAsAttribute
         private Double weight;
 
         public String getName() {
