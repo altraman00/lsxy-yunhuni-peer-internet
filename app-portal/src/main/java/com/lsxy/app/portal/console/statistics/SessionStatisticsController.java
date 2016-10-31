@@ -2,6 +2,7 @@ package com.lsxy.app.portal.console.statistics;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.yunhuni.api.statistics.model.*;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.DateUtils;
@@ -64,6 +65,30 @@ public class SessionStatisticsController extends AbstractPortalController {
         }
         list.add(getArrays(tempConsumeList,date,""));
         list.add(getArrays(tempVoiceCdrList,date,"amongCostTime"));
+        list.add(getArrays(tempVoiceCdrList,date,"amongCall"));
+        return RestResponse.success(list);
+    }
+    @RequestMapping("/list/api")
+    @ResponseBody
+    public RestResponse listApiCall(HttpServletRequest request,String type,String startTime,String appId){
+        List list = new ArrayList();
+        List tempConsumeList = getApiCallList(request,type,appId,startTime);
+        Object date = 12;
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
+        list.add(getArrays(tempConsumeList,date,""));
+        return RestResponse.success(list);
+    }
+    @RequestMapping("/list/session")
+    @ResponseBody
+    public RestResponse listSession(HttpServletRequest request,String type,String startTime,String appId){
+        List list = new ArrayList();
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
+        Object date = 12;
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
         list.add(getArrays(tempVoiceCdrList,date,"amongCall"));
         return RestResponse.success(list);
     }
@@ -147,7 +172,7 @@ public class SessionStatisticsController extends AbstractPortalController {
         for(int i=0;i<list.size();i++){
             Object obj = list.get(i);
             if(obj instanceof ConsumeMonth){
-                list1[((ConsumeMonth)obj).getMonth()-1]=((ConsumeMonth)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeMonth)obj).getMonth()-1]= StringUtil.getDecimal(((ConsumeMonth)obj).getAmongAmount().toString(),3);
             }else if(obj instanceof VoiceCdrMonth){
                 if("amongCostTime".equals(type)){
                     list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCostTime()/60;
@@ -155,7 +180,7 @@ public class SessionStatisticsController extends AbstractPortalController {
                     list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
                 }
             }else if(obj instanceof ConsumeDay){
-                list1[((ConsumeDay)obj).getDay()-1]=((ConsumeDay)obj).getAmongAmount().doubleValue();
+                list1[((ConsumeDay)obj).getDay()-1]=StringUtil.getDecimal(((ConsumeDay)obj).getAmongAmount().toString(),3);
             }else if(obj instanceof VoiceCdrDay){
                 if("amongCostTime".equals(type)){
                     list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCostTime()/60;

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -70,5 +71,11 @@ public class VoiceCdrController extends AbstractRestController {
         Map statistics= voiceCdrService.currentRecordStatistics(appId);
         return RestResponse.success(statistics);
     }
+//    @RequestMapping("/get_avg_ddr")
+//    public RestResponse getAvgCdr( String appId, String startTime, String endTime) throws Exception{
+//        Map map= voiceCdrService.getAvgCdr(getCurrentAccount().getTenant().getId(),appId,startTime,endTime);
+//        return RestResponse.success(map);
+//    }
+
 
 }
