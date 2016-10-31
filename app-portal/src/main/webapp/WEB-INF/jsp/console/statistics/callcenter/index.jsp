@@ -18,6 +18,28 @@
             <!-- /.aside -->
             <section id="content">
                 <section class="hbox stretch">
+                    <aside class="bg-green lter aside-sm hidden-print ybox" id="subNav">
+                        <section class="vbox">
+                            <div class="wrapper header"><span class="margin_lr"></span><span class="margin_lr border-left">&nbsp;呼叫中心统计</span>
+                            </div>
+                            <section class="scrollable">
+                                <div class="slim-scroll">
+                                    <nav class="hidden-xs">
+                                        <ul class="nav">
+                                            <li>
+                                                <div class="aside-li-a active">
+                                                    <a href="${ctx}/console/statistics/callcenter/index">综合统计分析</a>
+                                                </div>
+                                                <div class="aside-li-a">
+                                                    <a href="${ctx}/console/statistics/callcenter/detail">明细查询</a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </section>
+                        </section>
+                    </aside>
             <section class="vbox xbox">
                 <!-- 如果没有三级导航 这段代码注释-->
                 <!--<div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
