@@ -32,7 +32,7 @@ public class LineGatewayVo {
     private String sipAuthAccount;
     @ApiModelProperty(name="sipAuthPassword",value = "密码")
     private String sipAuthPassword;
-    @ApiModelProperty(name="sipAuthPassword",value = "sip接入点的外网IP地址")
+    @ApiModelProperty(name="sipAuthIp",value = "sip接入点的外网IP地址")
     private String sipAuthIp;
     @ApiModelProperty(name="mobileAreaRule",value = "手机区号规则：0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0")
     private String mobileAreaRule;
