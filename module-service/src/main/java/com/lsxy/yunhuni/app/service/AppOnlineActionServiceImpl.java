@@ -92,15 +92,18 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }
         //应用上线--选号
         if( app.getStatus() == App.STATUS_OFFLINE ){
-            if(action != null){
+            if(action == null){
+                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
+                this.save(newAction);
+            }else if(action != null && action.getAction() != AppOnlineAction.ACTION_SELECT_NUM){
                 for(AppOnlineAction a:actionList){
                     a.setStatus(AppOnlineAction.STATUS_DONE);
                     this.save(a);
                 }
+                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
+                this.save(newAction);
             }
-            AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
-            this.save(newAction);
-        }else if(action.getAction() != AppOnlineAction.ACTION_SELECT_NUM){
+        }else {
             throw new RuntimeException("数据错误");
         }
     }

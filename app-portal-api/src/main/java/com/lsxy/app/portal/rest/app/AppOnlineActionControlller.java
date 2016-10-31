@@ -63,18 +63,11 @@ public class AppOnlineActionControlller extends AbstractRestController {
         Tenant tenant = tenantService.findTenantByUserName(userName);
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
-            App app = appService.findById(appId);
-            //TODO 获取用户拥有的空闲号(可呼出的)
+            //TODO 获取用户拥有的空闲号(可呼入的)
             ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
 
-            //如果用户没有空闲的号码，则抛出异常
-            if((ownUnusedNums == null || ownUnusedNums.size() <= 0)
-//                    && (selectNum == null || selectNum.length <= 0)
-                    ){
-                return RestResponse.failed("0000","没有可用呼出号码");
-            }else{
-                appOnlineActionService.actionOfSelectNum(appId);
-            }
+            appOnlineActionService.actionOfSelectNum(appId);
+
             return RestResponse.success(ownUnusedNums);
         }else{
             return RestResponse.failed("0000","应用不属于用户");
@@ -93,10 +86,8 @@ public class AppOnlineActionControlller extends AbstractRestController {
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
             AppOnlineAction action = null;
-            App app = appService.findById(appId);
             try {
                 action = appOnlineActionService.actionOfOnline(tenant,appId,nums);
-
                 return RestResponse.success(action);
             } catch (TeleNumberBeOccupiedException e) {
 
