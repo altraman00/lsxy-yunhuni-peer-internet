@@ -60,18 +60,22 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId
      * @return
      */
-    @RequestMapping(value = "/select_ivr/{appId}",method = RequestMethod.GET)
+    @RequestMapping(value = "/select_num/{appId}",method = RequestMethod.GET)
     @ResponseBody
-    public RestResponse getSelectIvr(HttpServletRequest request,@PathVariable String appId){
+    public RestResponse getSelectNum(HttpServletRequest request, @PathVariable String appId){
         String token = getSecurityToken(request);
         RestResponse result;
         //是否实名认证
         boolean isRealAuth = findAuthStatus(token);
         if(isRealAuth){
-            String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/select_ivr/{1}";
+            String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/select_num/{1}";
             RestResponse<Map> response = buildSecurityRequest(token).get(url,Map.class,appId);
             Map<String,Object> data = response.getData();
-            if(response.isSuccess() && data != null && (data.get("selectIvr") != null || data.get("ownIvr") != null)){
+            if(response.isSuccess() && data != null &&
+//                    (data.get("selectIvr") != null ||
+                            data.get("ownNum") != null
+//                    )
+                    ){
                 result = RestResponse.success(data);
             }else{
                 result = failed(response.getErrorCode(),response.getErrorMsg());
@@ -89,29 +93,29 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param ivr
      * @return
      */
-    @RequestMapping(value = "/get_pay",method = RequestMethod.GET)
-    @ResponseBody
-    public RestResponse getPay(HttpServletRequest request,String appId,String ivr){
-        String token = getSecurityToken(request);
-        Map<String,Object> data = new HashMap<>();
-        RestResponse result;
-        //获取当前动作
-        RestResponse<AppOnlineAction> response = getPayRest(token, appId,ivr);
-        AppOnlineAction action = response.getData();
-        //获取账户余额
-        RestResponse<Billing> billingResponse = getBilling(token);
-        Billing billing = billingResponse.getData();
-        if(response.isSuccess() && action != null && billing != null){
-            data.put("action",action);
-            data.put("balance",billing.getBalance());
-            result = RestResponse.success(data);
-        }else{
-//            data.put("flag",false);
-//            data.put("msg","数据异常");
-            result = RestResponse.failed("0000","数据异常");
-        }
-        return result;
-    }
+//    @RequestMapping(value = "/get_pay",method = RequestMethod.GET)
+//    @ResponseBody
+//    public RestResponse getPay(HttpServletRequest request,String appId,String ivr){
+//        String token = getSecurityToken(request);
+//        Map<String,Object> data = new HashMap<>();
+//        RestResponse result;
+//        //获取当前动作
+//        RestResponse<AppOnlineAction> response = getPayRest(token, appId,ivr);
+//        AppOnlineAction action = response.getData();
+//        //获取账户余额
+//        RestResponse<Billing> billingResponse = getBilling(token);
+//        Billing billing = billingResponse.getData();
+//        if(response.isSuccess() && action != null && billing != null){
+//            data.put("action",action);
+//            data.put("balance",billing.getBalance());
+//            result = RestResponse.success(data);
+//        }else{
+////            data.put("flag",false);
+////            data.put("msg","数据异常");
+//            result = RestResponse.failed("0000","数据异常");
+//        }
+//        return result;
+//    }
 
 
     /**
@@ -120,10 +124,10 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId
      * @return
      */
-    private RestResponse<AppOnlineAction> getPayRest(String token, String appId,String ivr) {
-        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/get_pay?appId={1}&ivr={2}";
-        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId,ivr);
-    }
+//    private RestResponse<AppOnlineAction> getPayRest(String token, String appId,String ivr) {
+//        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/get_pay?appId={1}&ivr={2}";
+//        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId,ivr);
+//    }
 
 
     /**
@@ -132,51 +136,66 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId
      * @return
      */
-    @RequestMapping(value = "/pay",method = RequestMethod.GET)
-    @ResponseBody
-    public RestResponse pay(HttpServletRequest request,String appId){
-        String token = getSecurityToken(request);
-        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/pay?appId={1}";
-        RestResponse<AppOnlineAction> response = buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
-
-        return response;
-    }
-
+//    @RequestMapping(value = "/pay",method = RequestMethod.GET)
+//    @ResponseBody
+//    public RestResponse pay(HttpServletRequest request,String appId){
+//        String token = getSecurityToken(request);
+//        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/pay?appId={1}";
+//        RestResponse<AppOnlineAction> response = buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
+//
+//        return response;
+//    }
 
     /**
-     * 直接上线（没有IVR功能）
+     * 选定号码后上线
      * @param request
      * @param appId
      * @return
      */
-    @RequestMapping(value = "/direct_online",method = RequestMethod.GET)
+    @RequestMapping(value = "/online",method = RequestMethod.GET)
     @ResponseBody
-    public RestResponse directOnline(HttpServletRequest request,String appId){
+    public RestResponse online(HttpServletRequest request,String appId,String nums){
         String token = getSecurityToken(request);
-        RestResponse result;
-        //是否实名认证
-        boolean isRealAuth = findAuthStatus(token);
-        if(isRealAuth){
-            result = directOnlineRest(token,appId);
-
-        }else{
-            result = RestResponse.failed("0000","用户未实名认证");
-
-        }
-        return result;
+        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/online?appId={1}&nums={2}";
+        RestResponse<AppOnlineAction> response = buildSecurityRequest(token).get(url,AppOnlineAction.class,appId,nums);
+        return response;
     }
 
 
-    /**
-     * 直接上线rest调用
-     * @param token
-     * @param appId
-     * @return
-     */
-    private RestResponse<AppOnlineAction> directOnlineRest(String token, String appId) {
-        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/direct_online?appId={1}";
-        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
-    }
+//    /**
+//     * 直接上线（没有IVR功能）
+//     * @param request
+//     * @param appId
+//     * @return
+//     */
+//    @RequestMapping(value = "/direct_online",method = RequestMethod.GET)
+//    @ResponseBody
+//    public RestResponse directOnline(HttpServletRequest request,String appId){
+//        String token = getSecurityToken(request);
+//        RestResponse result;
+//        //是否实名认证
+//        boolean isRealAuth = findAuthStatus(token);
+//        if(isRealAuth){
+//            result = directOnlineRest(token,appId);
+//
+//        }else{
+//            result = RestResponse.failed("0000","用户未实名认证");
+//
+//        }
+//        return result;
+//    }
+
+
+//    /**
+//     * 直接上线rest调用
+//     * @param token
+//     * @param appId
+//     * @return
+//     */
+//    private RestResponse<AppOnlineAction> directOnlineRest(String token, String appId) {
+//        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/direct_online?appId={1}";
+//        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
+//    }
 
     /**
      * 重新选择IVR号吗
@@ -184,15 +203,15 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId
      * @return
      */
-    @RequestMapping(value = "/reset_ivr",method = RequestMethod.GET)
-    @ResponseBody
-    public RestResponse resetIvr(HttpServletRequest request,String appId){
-
-        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/reset_ivr?appId={1}";
-        RestResponse<AppOnlineAction> response = buildSecurityRequest(getSecurityToken(request)).get(url,AppOnlineAction.class,appId);
-
-        return response;
-    }
+//    @RequestMapping(value = "/reset_ivr",method = RequestMethod.GET)
+//    @ResponseBody
+//    public RestResponse resetIvr(HttpServletRequest request,String appId){
+//
+//        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/reset_ivr?appId={1}";
+//        RestResponse<AppOnlineAction> response = buildSecurityRequest(getSecurityToken(request)).get(url,AppOnlineAction.class,appId);
+//
+//        return response;
+//    }
 
     /**
      * 重设IVR号码rest调用
@@ -200,10 +219,10 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param appId
      * @return
      */
-    private RestResponse<AppOnlineAction> resetIvrRest(String token, String appId) {
-        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/reset_ivr?appId={1}";
-        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
-    }
+//    private RestResponse<AppOnlineAction> resetIvrRest(String token, String appId) {
+//        String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/reset_ivr?appId={1}";
+//        return buildSecurityRequest(token).get(url,AppOnlineAction.class,appId);
+//    }
 
 
     /**
@@ -230,11 +249,11 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param token
      * @return
      */
-    private RestResponse<Billing> getBilling(String token) {
-        //此处调用账务restApi
-        String billingUrl = PortalConstants.REST_PREFIX_URL + "/rest/billing/get";
-        return buildSecurityRequest(token).get(billingUrl,Billing.class);
-    }
+//    private RestResponse<Billing> getBilling(String token) {
+//        //此处调用账务restApi
+//        String billingUrl = PortalConstants.REST_PREFIX_URL + "/rest/billing/get";
+//        return buildSecurityRequest(token).get(billingUrl,Billing.class);
+//    }
 
     /**
      * 获取后台状态的rest请求方法
@@ -259,17 +278,17 @@ public class AppOnlineActionController extends AbstractPortalController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/balance",method = RequestMethod.GET)
-    @ResponseBody
-    public RestResponse getBalance(HttpServletRequest request){
-        RestResponse result;
-        RestResponse<Billing> response = getBilling(this.getSecurityToken(request));
-        if(response.isSuccess()&&response.getData() != null){
-            result = RestResponse.success(response.getData().getBalance());
-        }else{
-            result = RestResponse.failed("0000","数据异常");
-        }
-        return result;
-    }
+//    @RequestMapping(value = "/balance",method = RequestMethod.GET)
+//    @ResponseBody
+//    public RestResponse getBalance(HttpServletRequest request){
+//        RestResponse result;
+//        RestResponse<Billing> response = getBilling(this.getSecurityToken(request));
+//        if(response.isSuccess()&&response.getData() != null){
+//            result = RestResponse.success(response.getData().getBalance());
+//        }else{
+//            result = RestResponse.failed("0000","数据异常");
+//        }
+//        return result;
+//    }
 
 }

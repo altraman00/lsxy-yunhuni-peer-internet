@@ -393,7 +393,7 @@
         var ownIvr = [];
         //远端生成
 
-        ajaxsync(ctx + "/console/app_action/select_ivr/" + appId,null,function(response){
+        ajaxsync(ctx + "/console/app_action/select_num/" + appId,null,function(response){
             if(response.success && response.data != null ){
                 ivr = response.data.selectIvr;
                 ownIvr = response.data.ownIvr;

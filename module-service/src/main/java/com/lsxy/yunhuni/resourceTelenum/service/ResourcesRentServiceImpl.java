@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 租户号码租用service
@@ -75,7 +76,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public String[] findOwnUnusedNum(Tenant tenant) {
+    public List<Map<String,Object>> findOwnUnusedNum(Tenant tenant) {
         List<String> telNums = new ArrayList<>();
         List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
         if(list != null && list.size()>0){
@@ -84,7 +85,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 telNums.add(telNumber);
             }
         }
-        return telNums.toArray(new String[]{});
+//        return telNums.toArray(new String[]{});
+        return null;
     }
 
     @Override

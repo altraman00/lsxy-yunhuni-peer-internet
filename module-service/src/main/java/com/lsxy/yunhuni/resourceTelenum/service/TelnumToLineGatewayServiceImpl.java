@@ -33,18 +33,6 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         return this.telnumToLineGatewayDao;
     }
 
-    @Override
-    public String getAreaIdByTelnum(String telnum){
-        List<TelnumToLineGateway> telnumToLineGateways = telnumToLineGatewayDao.findByTelNumber(telnum);
-        if(telnumToLineGateways == null || telnumToLineGateways.size() <= 0){
-            throw new RuntimeException("数据异常，号码没有关联线路");
-        }
-        Random random = new Random();
-        Integer ranNum = random.nextInt(telnumToLineGateways.size());
-        String lineId = telnumToLineGateways.get(ranNum).getLineId();
-        LineGateway lineGateway = lineGatewayService.findById(lineId);
-        return lineGateway.getAreaId();
-    }
 
     @Override
     public List<String> getLineIdsByNumber(String number) {

@@ -18,8 +18,8 @@ public class AppOnlineAction extends IdEntity {
     public static final int TYPE_OFFLINE = 2; //下线
 
     public static final int ACTION_SELECT_NUM = 11; //选号
-    public static final int ACTION_PAYING = 12;     //支付
-    public static final int ACTION_CANCEL_PAY = 13; //上线取消（支付返回选号）
+//    public static final int ACTION_PAYING = 12;     //支付
+//    public static final int ACTION_CANCEL_PAY = 13; //上线取消（支付返回选号）
     public static final int ACTION_ONLINE = 14;     //上线完成
 
     public static final int ACTION_OFFLINE = 21;    //下线
