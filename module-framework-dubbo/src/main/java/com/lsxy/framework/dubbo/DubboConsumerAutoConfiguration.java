@@ -62,6 +62,9 @@ public class DubboConsumerAutoConfiguration extends DubboBasedAutoConfiguration 
                             consumerBean.setApplication(applicationConfig);
                             consumerBean.setRegistry(registryConfig);
                             consumerBean.setApplication(applicationConfig);
+                            consumerBean.setCheck(dubboConsumer.check());
+                            consumerBean.setLazy(dubboConsumer.lazy());
+
                             try {
                                 consumerBean.afterPropertiesSet();
                                 dubboReferences.put(id, consumerBean.getObject());

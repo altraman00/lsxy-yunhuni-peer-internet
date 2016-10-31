@@ -4,7 +4,6 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.StasticsCounter;
 import com.lsxy.area.api.CallService;
 import com.lsxy.framework.api.test.TestService;
-import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.MQStasticCounter;
 import com.lsxy.framework.mq.api.MQService;
@@ -18,9 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -37,10 +34,10 @@ public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
 
-    @Reference(timeout = 3000)
+    @Reference(timeout = 3000,check = false,lazy = true)
     private TestService testService;
 
-    @Reference(timeout = 3000)
+    @Reference(timeout = 3000,check = false)
     private CallService callService;
 
     @Autowired(required = false)
