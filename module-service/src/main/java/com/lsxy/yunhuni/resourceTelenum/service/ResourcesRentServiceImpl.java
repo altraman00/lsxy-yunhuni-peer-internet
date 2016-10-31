@@ -92,7 +92,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             }
         }
 //        return telNums.toArray(new String[]{});
-        return null;
+        return telNums;
     }
 
     @Override
