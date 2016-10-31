@@ -1,11 +1,14 @@
 package com.lsxy.call.center.service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.dao.AgentSkillDao;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
@@ -44,6 +47,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Autowired
     private AgentSkillDao agentSkillDao;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private DeQueueService deQueueService;
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
@@ -135,8 +141,31 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         agentSkillService.save(skill);
         return true;
     }
-    //排队,通过 dubbo返回结果给  区域管理器
-    public void enqueue(String tenantId,String appId){
+
+    /**
+     * 排队,通过 dubbo返回结果给  区域管理器
+     * @param tenantId
+     * @param appId
+     * @param callId 参与排队的callId
+     * @param enQueue
+     */
+    public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue){
+        if(StringUtil.isEmpty(tenantId)){
+            return;
+        }
+        if(StringUtil.isEmpty(appId)){
+            return;
+        }
+        if(enQueue == null){
+            return;
+        }
+        Integer expired = enQueue.getCondition().getExpired();
+        boolean isAnd = enQueue.getCondition().getAnd()!=null;
+        List<EnQueue.Skill> skills = enQueue.getCondition().getOr().getSkills();
+        if(isAnd){
+            skills = enQueue.getCondition().getAnd().getSkills();
+        }
+
     }
 
     public void dequeue(String agent){
