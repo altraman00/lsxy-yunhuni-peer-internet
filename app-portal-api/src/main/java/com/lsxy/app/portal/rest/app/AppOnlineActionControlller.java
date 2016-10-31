@@ -56,7 +56,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
      * @return
      */
     @RequestMapping("/select_num/{appId}")
-    public RestResponse<Map> getSelectNum(@PathVariable String appId){
+    public RestResponse<List> getSelectNum(@PathVariable String appId){
         List<Map<String,Object>> ownUnusedNums = null;
 //        String[] selectNum = null;
         String userName = getCurrentAccountUserName();
