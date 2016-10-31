@@ -34,7 +34,6 @@ import java.util.Map;
 @RestController
 public class AppOnlineActionControlller extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(AppOnlineActionControlller.class);
-//    public static final String ALTERNATIVE_IVR_PREFIX = "IVR_TELENUM_SEL_";     //个人备选IVR号存在redis中的前缀
 
     @Autowired
     AppOnlineActionService appOnlineActionService;
@@ -69,25 +68,10 @@ public class AppOnlineActionControlller extends AbstractRestController {
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
             App app = appService.findById(appId);
-            //获取用户拥有的空闲号
+            //TODO 获取用户拥有的空闲号(可呼出的)
             ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
 
-            //从号码池中选出5个空闲的号码放到Redis供用户选择(若Redis已有，则直接取Redis中的值)
-//            String temStr = redisCacheService.get(ALTERNATIVE_IVR_PREFIX + tenant.getId());
-//            String areaId = null;
-//            if(app.getArea() != null){
-//                areaId = app.getArea().getId();
-//            }
-//            if(StringUtils.isBlank(temStr)) {
-//                temStr = getFreeNumber(5,areaId);
-//            }
-//            if(StringUtils.isNotBlank(temStr)){
-//                redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
-//                selectNum = temStr.split(",");
-//            }
-//
-//            result.put("selectIvr",selectNum);
-            //如果号码池中没有号码，用户也没有空闲的号码，则抛出异常
+            //如果用户没有空闲的号码，则抛出异常
             if((ownUnusedNums == null || ownUnusedNums.size() <= 0)
 //                    && (selectNum == null || selectNum.length <= 0)
                     ){
@@ -100,30 +84,6 @@ public class AppOnlineActionControlller extends AbstractRestController {
             return RestResponse.failed("0000","应用不属于用户");
         }
     }
-
-    /**
-     * 获取或生成支付订单
-     * @param appId
-     * @param ivr
-     * @return
-     */
-//    @RequestMapping("/get_pay")
-//    public RestResponse getPay(String appId,String ivr){
-//        String userName = getCurrentAccountUserName();
-//        boolean isBelong = appService.isAppBelongToUser(userName, appId);
-//        Tenant tenant = tenantService.findTenantByUserName(userName);
-//        if(isBelong){
-//            boolean contains = false;
-//            String temStr = redisCacheService.get(ALTERNATIVE_IVR_PREFIX + tenant.getId());
-//            if(StringUtils.isNotBlank(temStr)){
-//                contains = temStr.contains(ivr.trim());//可选号码池中是否存在该ivr
-//            }
-//            AppOnlineAction action = appOnlineActionService.actionOfInPay(appId,ivr,tenant,contains);
-//            return RestResponse.success(action);
-//        }else{
-//            return RestResponse.failed("0000","应用不属于用户");
-//        }
-//    }
 
     /**
      * 支付上线
@@ -140,23 +100,10 @@ public class AppOnlineActionControlller extends AbstractRestController {
             App app = appService.findById(appId);
             try {
                 action = appOnlineActionService.actionOfOnline(tenant,appId,nums);
-                //将号码池中的号码清掉
-//                redisCacheService.del(ALTERNATIVE_IVR_PREFIX + tenant.getId());
+
                 return RestResponse.success(action);
-//            } catch (NotEnoughMoneyException e) {
-//                logger.error("支付余额不足",e);
-//                return RestResponse.failed("0000","余额不足");
             } catch (TeleNumberBeOccupiedException e) {
-                //号码资源被占用，则清空redis缓存的号码，重新从号码池中取新的号码
-//                logger.error("选定号码已被占用",e);
-//                String areaId = null;
-//                if(app.getArea() != null){
-//                    areaId = app.getArea().getId();
-//                }
-//                String temStr = getFreeNumber(5,areaId);
-//                if(StringUtils.isNotBlank(temStr)){
-//                    redisCacheService.set(ALTERNATIVE_IVR_PREFIX + tenant.getId(),temStr,30*60);
-//                }
+
                 return RestResponse.failed("0000","IVR号码已被占用，请重新选择号码！");
             }
         }else{
@@ -164,39 +111,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
         }
     }
 
-//    /**
-//     * 直接上线
-//     * @param appId
-//     * @return
-//     */
-//    @RequestMapping("/direct_online")
-//    public RestResponse directOnline(String appId){
-//        String userName = getCurrentAccountUserName();
-//        boolean isBelong = appService.isAppBelongToUser(userName, appId);
-//        if(isBelong){
-//            AppOnlineAction action = appOnlineActionService.actionOfDirectOnline(userName,appId);
-//            return RestResponse.success(action);
-//        }else{
-//            return RestResponse.failed("0000","应用不属于用户");
-//        }
-//    }
 
-    /**
-     * 重选IVR号码
-     * @param appId
-     * @return
-     */
-//    @RequestMapping("/reset_ivr")
-//    public RestResponse resetIvr(String appId){
-//        String userName = getCurrentAccountUserName();
-//        boolean isBelong = appService.isAppBelongToUser(userName, appId);
-//        if(isBelong){
-//            AppOnlineAction action = appOnlineActionService.resetIvr(userName,appId);
-//            return RestResponse.success(action);
-//        }else{
-//            return RestResponse.failed("0000","应用不属于用户");
-//        }
-//    }
 
     /**
      * 下线
@@ -214,25 +129,6 @@ public class AppOnlineActionControlller extends AbstractRestController {
             return RestResponse.failed("0000","应用不属于用户");
         }
     }
-
-    /**
-     * 从号码池中选出n个空闲的号码
-     * @param n
-     * @return
-     */
-    private String getFreeNumber(Integer n,String areaId){
-        String result = null;
-        //--start
-        //从号码池中选出5个空闲的号码
-        List<String> numbers = resourceTelenumService.getFreeTeleNum(n,areaId);
-        //--end
-        //生成字符串
-        if(numbers != null && numbers.size()>0){
-            result = StringUtil.join(numbers,",");
-        }
-        return result;
-    }
-
 
 }
 

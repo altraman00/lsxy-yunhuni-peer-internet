@@ -25,15 +25,6 @@ public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
      */
     void actionOfSelectNum(String appId);
 
-    /**
-     * 应用动作执行--正在支付
-     * @param appId 应用ID
-     * @param ivr ivr号
-     * @param tenant 租户
-     * @param contains IVR号是否属于可选号码池
-     * @return
-     */
-//    AppOnlineAction actionOfInPay(String appId, String ivr, Tenant tenant,boolean contains);
 
     /**
      * 应用动作执行--上线(应用包含ivr服务)
@@ -42,21 +33,6 @@ public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
      */
     AppOnlineAction actionOfOnline(Tenant tenant, String appId,String nums);
 
-    /**
-     * 应用没有定制IVR服务--直接上线
-     * @param userName
-     * @param appId
-     * @return
-     */
-//    AppOnlineAction actionOfDirectOnline(String userName, String appId);
-
-    /**
-     * 应用取消支付，重选号码
-     * @param userName
-     * @param appId
-     * @return
-     */
-//    AppOnlineAction resetIvr(String userName, String appId);
 
     /**
      * 应用下线
