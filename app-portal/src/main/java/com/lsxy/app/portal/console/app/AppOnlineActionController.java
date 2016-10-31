@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.lsxy.framework.web.rest.RestRequest.buildSecurityRequest;
@@ -69,13 +70,9 @@ public class AppOnlineActionController extends AbstractPortalController {
         boolean isRealAuth = findAuthStatus(token);
         if(isRealAuth){
             String url =  PortalConstants.REST_PREFIX_URL + "/rest/app_online/select_num/{1}";
-            RestResponse<Map> response = buildSecurityRequest(token).get(url,Map.class,appId);
-            Map<String,Object> data = response.getData();
-            if(response.isSuccess() && data != null &&
-//                    (data.get("selectIvr") != null ||
-                            data.get("ownNum") != null
-//                    )
-                    ){
+            RestResponse<List<Map>> response = buildSecurityRequest(token).getList(url,Map.class,appId);
+            List<Map> data = response.getData();
+            if(response.isSuccess() && data != null){
                 result = RestResponse.success(data);
             }else{
                 result = failed(response.getErrorCode(),response.getErrorMsg());

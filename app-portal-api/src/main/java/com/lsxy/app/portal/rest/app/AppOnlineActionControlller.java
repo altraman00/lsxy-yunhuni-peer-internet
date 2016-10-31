@@ -62,7 +62,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
      */
     @RequestMapping("/select_num/{appId}")
     public RestResponse<Map> getSelectNum(@PathVariable String appId){
-        Map result = new HashMap();
+        List<Map<String,Object>> ownUnusedNums = null;
 //        String[] selectNum = null;
         String userName = getCurrentAccountUserName();
         Tenant tenant = tenantService.findTenantByUserName(userName);
@@ -70,8 +70,8 @@ public class AppOnlineActionControlller extends AbstractRestController {
         if(isBelong){
             App app = appService.findById(appId);
             //获取用户拥有的空闲号
-            List<Map<String,Object>> ownUnusedNum = resourcesRentService.findOwnUnusedNum(tenant);
-            result.put("ownNum",ownUnusedNum);
+            ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
+
             //从号码池中选出5个空闲的号码放到Redis供用户选择(若Redis已有，则直接取Redis中的值)
 //            String temStr = redisCacheService.get(ALTERNATIVE_IVR_PREFIX + tenant.getId());
 //            String areaId = null;
@@ -88,14 +88,14 @@ public class AppOnlineActionControlller extends AbstractRestController {
 //
 //            result.put("selectIvr",selectNum);
             //如果号码池中没有号码，用户也没有空闲的号码，则抛出异常
-            if((ownUnusedNum == null || ownUnusedNum.size() <= 0)
+            if((ownUnusedNums == null || ownUnusedNums.size() <= 0)
 //                    && (selectNum == null || selectNum.length <= 0)
                     ){
                 return RestResponse.failed("0000","没有可用呼出号码");
             }else{
                 appOnlineActionService.actionOfSelectNum(appId);
             }
-            return RestResponse.success(result);
+            return RestResponse.success(ownUnusedNums);
         }else{
             return RestResponse.failed("0000","应用不属于用户");
         }
