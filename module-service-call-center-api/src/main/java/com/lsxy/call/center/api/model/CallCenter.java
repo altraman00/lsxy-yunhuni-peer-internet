@@ -14,7 +14,6 @@ import javax.persistence.Table;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center")
 public class CallCenter extends IdEntity {
-    public static String[] PRODUCT_CODE = {"callcenter1"};//呼叫中心产品计费项目
     public static int CALL_UP = 2;//呼出
     public static int CALL_IN = 1;//呼入
     public static int TO_MANUAL_RESULT_SUCESS = 1;//接听
