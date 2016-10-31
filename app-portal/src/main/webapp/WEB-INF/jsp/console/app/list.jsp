@@ -118,7 +118,7 @@
 
 <!---mobilebox-->
 <div class="shadow-bg" id="show-bg" ></div>
-<div id="mobilebox-1" class="appliation-modal-box" style="display: none;">
+<div id="mobilebox-1" class="appliation-modal-box" style="display:none ;">
     <div class="addmobile1" >
         <div class="title">应用上线流程<a class="close_a modalCancel" data-type="1"></a></div>
         <div class="content" >
@@ -127,14 +127,12 @@
                 <ul class="nav-modal">
                     <li><a class="spot" data-action="1"></a><span class="lines"></span> </li>
                     <li><a class="spot" data-action="2"></a><span class="lines"></span></li>
-                    <li><a class="spot" data-action="3"></a><span class="lines"></span></li>
-                    <li><a class="spot" data-action="4"></a> </li>
+                    <li><a class="spot" data-action="3"></a></li>
                 </ul>
-                <ul class="nav-modal-text">
+                <ul class="nav-modal-text navw-270">
                     <li><span class="text">实名认证</span> </li>
-                    <li><span class="text">IVR号码绑定</span> </li>
-                    <li class="ml-3"><span class="text">支付</span> </li>
-                    <li class="ml-30 mr-0"><span class="text">上线</span>  </li>
+                    <li><span class="text">号码绑定</span> </li>
+                    <li class="ml-20 mr-0"><span class="text">上线</span>  </li>
                 </ul>
             </div>
 
@@ -164,32 +162,61 @@
             </div>
 
             <div class="contentModal" style="display: none" data-action="2">
+
+                <!--没有可选号码-->
+                <div id="selectOwnIvr" style="display: none" >
+                    <div class="input text-center">
+                        我的号码列表没有可选号码，如需租用号码，请前往“号码管理”中的“我的号码”
+                    </div>
+                    <div class="input text-center" >
+                        <a type="button"  class="btn btn-primary btn-box tabModalBtn" href="number_call.html">立即前往</a>
+                    </div>
+                </div>
+
+                <!--可选号码-->
                 <div id="selectNewIvr" style="display: none">
                     <div class="input text-center">
-                        <p>您选择开通IVR功能，我们给您分配了一个IVR号码供应用使用IVR功能</p>
+                        <div class="info">
+                            若您选择开通IVR功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定
+                        </div>
                     </div>
-                    <div class="input text-center">
-                        <div class="defulatTips" id="creatIVR" ></div>
-                        <a onclick="nolike()" class="font14" id="noLike">不喜欢 换一个?</a>
+                    <div class="phone-table">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>手机号码</th>
+                                <th class="text-center">可呼入</th>
+                                <th class="text-center">可呼出</th>
+                                <th class="text-left-fixed"><span class="">归属地</span></th>
+                            </tr>
+                            </thead>
+                            <tbody id="phonelist">
+                            <tr>
+                                <td><input type="checkbox" name="" /></td>
+                                <td>13611460866</td>
+                                <td class="text-center" >✔</td>
+                                <td class="text-center">✘</td>
+                                <td class="text-left-fixed">0757</td>
+                            </tr>
+
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="hideIVR">
+                    <div class="input text-center" >
+                        <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3" data-fun="getOrder()" >下一步</a>
                     </div>
                 </div>
-                <div id="selectOwnIvr" >
-                    <div class="input text-center">
-                        <p>您选择开通IVR功能，请从您拥有的IVR号在选择一个供使用</p>
-                    </div>
-                    <div class="input text-center">
-                        <select id="ownIvr" >
-                        </select>
-                    </div>
-                </div>
-                <div class="input text-center" >
-                    <a type="button"  class="btn btn-primary btn-box tabModalBtn" data-id="3" data-fun="getOrder()" >下一步</a>
-                </div>
+
+
+
+
+
+
+
             </div>
 
-            <div class="contentModal" style="display: none" data-action="3">
+            <div class="contentModal" style="display: none" data-action="4">
                 <div class="input text-center mt-0">
                     <p>您需要支付：<span class="money" id="payAmount">1100.00</span> 元&nbsp;&nbsp;&nbsp; 账号余额：<span id="balance">1100.00</span> 元 &nbsp;&nbsp;&nbsp; <span class="nomoney" style="display: none">!!余额不足</span>
                         &nbsp;&nbsp;&nbsp;<a href="${ctx}/console/cost/recharge" target="_blank">充值</a>&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" id="refreshBalance">刷新余额</a> </p>
@@ -208,7 +235,7 @@
                 </div>
             </div>
 
-            <div class="contentModal" style="display:none " data-action="4">
+            <div class="contentModal" style="display:none " data-action="3">
                 <div class="input text-center" >
                     <img src="${resPrefixUrl }/images/index/l1.png" alt="" class="sre" />
                     <p>上线成功</p>
@@ -388,15 +415,16 @@
         var result = false;
         var appId = $('#modal-appid').val();
         $('.hideIVR').html('');
-        $('#ownIvr').html('');
-        var ivr = [];
+        $('#phonelist').html('');
+        var isCall =  ["✔", "✘"] ;
         var ownIvr = [];
-        //远端生成
+
+        $('#phonelist').html(html)
+
 
         ajaxsync(ctx + "/console/app_action/select_num/" + appId,null,function(response){
-            if(response.success && response.data != null ){
-                ivr = response.data.selectIvr;
-                ownIvr = response.data.ownIvr;
+            if(response.success ){
+                ownIvr = response.data;
                 result = true;
             }else{
                 result = false;
@@ -404,6 +432,27 @@
             }
         },"get");
 
+
+        //特殊判断 <i class="fa fa-exclamation-triangle"></i>
+        var html = '';
+        if(ownIvr==null){
+            $('#selectOwnIvr').show();
+            return ;
+        }
+
+        if(ownIvr.length>0){
+            $('#selectNewIvr').show();
+            for (var i = 0 ; i< ownIvr.length ; i ++){
+                html += '<tr><td><input type="checkbox" name="phonelist" value="'+ownIvr[i].phone+'" /></td>'
+                //特殊判断 <i class="fa fa-exclamation-triangle"></i>
+                html += '<td data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
+                //普通号码
+                //html +='<td>'+data[i].phone+'</td>'
+                html +='<td class="text-center" >'+isCall[ownIvr[i].isCalled]+'</td><td class="text-center" >'+isCall[ownIvr[i].isDialing]+'</td><td class="text-left-fixed" >'+ownIvr[i].areaCode+'</td></tr>'
+            }
+            $('#phonelist').html(html);
+        }
+        /*
         if(ownIvr.length > 0){
             $("#selectOwnIvr").show();
             $("#selectNewIvr").hide();
@@ -422,7 +471,7 @@
         }else{
             $("#noLike").replaceWith('<div class="tips-error text-center" >IVR号码池异常，请联系客服</div>');
         }
-        ivrnumber = 1;
+        ivrnumber = 1; */
         return result;
     }
 
@@ -513,6 +562,33 @@
         var result = false;
         var appId = $('#modal-appid').val();
         var ivr = $('#creatIVR').html();//当为创建支付订单时（Action），ivr取值有效，当为取出原有的订单时，ivr取值用数据库中的值（在后台中处理）
+
+
+        var number  = ''
+        $('input[name="phonelist"]:checked').each(function(){
+            if(number==''){
+                number += $(this).val();
+            }else{
+                number += ","+$(this).val();
+            }
+            //number.push($(this).val())
+            console.log("选中"+$(this).val())
+        })
+
+        console.log(number);
+
+        //异步请求
+        if(number.length<=0){
+            showtoast('请选择一个可呼入的号码')
+            return false
+        }
+
+
+        //校验选择号码
+
+
+
+        return true;
 
         ajaxsync(ctx + "/console/app_action/get_pay",{appId:appId,ivr:ivr},function(response){
             if(response.success && response.data.action != null && response.data.balance != null){
