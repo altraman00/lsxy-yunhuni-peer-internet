@@ -4,7 +4,6 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
-import com.lsxy.yunhuni.api.exceptions.NotEnoughMoneyException;
 
 /**
  * 应用上线动作接口
