@@ -20,7 +20,7 @@ import java.util.List;
 public class AppExtensionController extends AbstractRestController {
     private static final Logger logger = LoggerFactory.getLogger(AppExtensionController.class);
 
-    @Reference(timeout = 3000)
+    @Reference(timeout = 3000,check = false,lazy = true)
     AppExtensionService appExtensionService;
 
     @RequestMapping("/list/{appId}")

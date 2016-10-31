@@ -23,7 +23,7 @@ public class IVRCallController extends AbstractAPIController{
 
     private static final Logger logger = LoggerFactory.getLogger(IVRCallController.class);
 
-    @Reference(timeout=3000)
+    @Reference(timeout=3000,check = false,lazy = true)
     private IVRService ivrService;
 
     @RequestMapping(value = "/{accountId}/call/ivr_call",method = RequestMethod.POST)
