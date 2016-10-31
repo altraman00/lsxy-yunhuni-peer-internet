@@ -10,8 +10,10 @@ import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,19 +60,42 @@ public class AppOnlineActionControlller extends AbstractRestController {
      * @return
      */
     @RequestMapping("/select_num/{appId}")
-    public RestResponse<List> getSelectNum(@PathVariable String appId){
-        List<Map<String,Object>> ownUnusedNums = null;
-//        String[] selectNum = null;
+    public RestResponse<Map> getSelectNum(@PathVariable String appId){
+        Map<String,Object> result = new HashMap<>();
         String userName = getCurrentAccountUserName();
         Tenant tenant = tenantService.findTenantByUserName(userName);
         boolean isBelong = appService.isAppBelongToUser(userName, appId);
         if(isBelong){
+            String lastOnlineNums = appOnlineActionService.findLastOnlineNums(appId);
+            App app = appService.findById(appId);
             //TODO 获取用户拥有的空闲号(可呼入的)
-            ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
-
+            List<ResourceTelenum> ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
+            List<Map<String,Object>> telNums = new ArrayList<>();
+            boolean hasCalled = false;
+            for(ResourceTelenum telNumber:ownUnusedNums){
+                if(telNumber != null){
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("phone",telNumber.getTelNumber());
+                    //TODO 获取相关属性
+                    map.put("isCalled","1");
+                    //TODO 如果有呼入的，则将
+                    if(true){
+                        hasCalled = true;
+                    }
+                    map.put("isDialing","1");
+                    map.put("areaCode","020");
+                    if(StringUtils.isNotBlank(lastOnlineNums) && lastOnlineNums.contains(telNumber.getTelNumber())){
+                        map.put("lastUse",true);
+                    }
+                    telNums.add(map);
+                }
+            }
             appOnlineActionService.actionOfSelectNum(appId);
-
-            return RestResponse.success(ownUnusedNums);
+            if((app.getIsIvrService() != null && app.getIsIvrService() == 1) || (app.getIsCallCenter() != null && app.getIsCallCenter() == 1)){
+                result.put("needCalledNum",hasCalled);
+            }
+            result.put("ownNums",telNums);
+            return RestResponse.success(result);
         }else{
             return RestResponse.failed("0000","应用不属于用户");
         }

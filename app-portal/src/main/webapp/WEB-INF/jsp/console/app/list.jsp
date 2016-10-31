@@ -330,7 +330,7 @@
 
         ajaxsync(ctx + "/console/app_action/select_num/" + appId,null,function(response){
             if(response.success ){
-                ownIvr = response.data;
+                ownIvr = response.data.ownNums;
                 result = true;
             }else{
                 result = false;

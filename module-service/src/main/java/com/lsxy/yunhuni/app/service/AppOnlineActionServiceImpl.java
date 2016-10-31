@@ -257,4 +257,14 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         }
     }
 
+    @Override
+    public String findLastOnlineNums(String appId) {
+        AppOnlineAction action = appOnlineActionDao.findFirstByAppIdAndActionOrderByCreateTimeDesc(appId,AppOnlineAction.ACTION_ONLINE);
+        if(action != null){
+            return action.getTelNumber();
+        }else{
+            return null;
+        }
+    }
+
 }

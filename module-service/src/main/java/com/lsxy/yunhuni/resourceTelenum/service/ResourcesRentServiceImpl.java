@@ -74,24 +74,17 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public List<Map<String,Object>> findOwnUnusedNum(Tenant tenant) {
-        List<Map<String,Object>> telNums = new ArrayList<>();
+    public List<ResourceTelenum> findOwnUnusedNum(Tenant tenant) {
+        List<ResourceTelenum> telNums = new ArrayList<>();
         List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
         if(list != null && list.size()>0){
             for(ResourcesRent rent:list){
                 ResourceTelenum telNumber = rent.getResourceTelenum();
                 if(telNumber != null){
-                    Map<String,Object> map = new HashMap<>();
-                    map.put("phone",telNumber.getTelNumber());
-                    //TODO 获取相关属性
-                    map.put("isCalled","1");
-                    map.put("isDialing","1");
-                    map.put("areaCode","020");
-                    telNums.add(map);
+                    telNums.add(telNumber);
                 }
             }
         }
-//        return telNums.toArray(new String[]{});
         return telNums;
     }
 

@@ -45,4 +45,11 @@ public interface AppOnlineActionService extends BaseService<AppOnlineAction> {
      * @param appId
      */
     void resetAppOnlineAction(String appId);
+
+    /**
+     * 获取上一次上线的号码
+     * @param appId
+     * @return
+     */
+    String findLastOnlineNums(String appId);
 }
