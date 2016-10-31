@@ -32,18 +32,32 @@ public class LineGatewayVo {
     private String sipAuthAccount;
     @ApiModelProperty(name="sipAuthPassword",value = "密码")
     private String sipAuthPassword;
+    @ApiModelProperty(name="sipAuthPassword",value = "sip接入点的外网IP地址")
+    private String sipAuthIp;
     @ApiModelProperty(name="mobileAreaRule",value = "手机区号规则：0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0")
     private String mobileAreaRule;
     @ApiModelProperty(name="telAreaRule",value = "固话区号规则：0=一律加区号；2=非与线路属于同一个归属地加区号")
     private String telAreaRule;
-    @ApiModelProperty(name="lingPrice",value = "成本价 单位元/分钟")
-    private BigDecimal lingPrice;
+    @ApiModelProperty(name="linePrice",value = "成本价 单位元/分钟")
+    private BigDecimal linePrice;
     @ApiModelProperty(name="isThrough",value = "是否透传：1=是，0=不是")
     private String isThrough;
     @ApiModelProperty(name="quality",value = "质量：数字1-10")
     private Integer quality;
     @ApiModelProperty(name="capacity",value = "并发容量：数字")
     private Integer capacity;
+
+    public String getSipAuthIp() {
+        return sipAuthIp;
+    }
+
+    public void setSipAuthIp(String sipAuthIp) {
+        this.sipAuthIp = sipAuthIp;
+    }
+
+    public void setIsThrough(String isThrough) {
+        this.isThrough = isThrough;
+    }
 
     public String getIsThrough() {
         return isThrough;
@@ -159,12 +173,12 @@ public class LineGatewayVo {
         this.telAreaRule = telAreaRule;
     }
 
-    public BigDecimal getLingPrice() {
-        return lingPrice;
+    public BigDecimal getLinePrice() {
+        return linePrice;
     }
 
-    public void setLingPrice(BigDecimal lingPrice) {
-        this.lingPrice = lingPrice;
+    public void setLinePrice(BigDecimal linePrice) {
+        this.linePrice = linePrice;
     }
 
     public Integer getQuality() {

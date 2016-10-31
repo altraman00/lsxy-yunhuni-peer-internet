@@ -36,7 +36,7 @@ public class LineGateway extends IdEntity {
     private String sipAuthPassword;//密码
     private String mobileAreaRule;//手机区号规则 0=全部加0；1=全部不加0；2:=被叫归属地与线路归属地不一致，加0
     private String telAreaRule;//固话区号规则 0=一律加区号；1=一律不加区号；2=非与线路属于同一个归属地加区号
-    private BigDecimal lingPrice;//线路网关单价
+    private BigDecimal linePrice;//线路网关单价
     private String isThrough;//是否透传
     private Integer quality;//质量 数字1-10
     private Integer capacity;//容量 数字
@@ -82,14 +82,13 @@ public class LineGateway extends IdEntity {
     public void setLineNumber(String lineNumber) {
         this.lineNumber = lineNumber;
     }
-
     @Column(name = "line_price")
-    public BigDecimal getLingPrice() {
-        return lingPrice;
+    public BigDecimal getLinePrice() {
+        return linePrice;
     }
 
-    public void setLingPrice(BigDecimal lingPrice) {
-        this.lingPrice = lingPrice;
+    public void setLinePrice(BigDecimal linePrice) {
+        this.linePrice = linePrice;
     }
 
     @Column(name = "remark")
