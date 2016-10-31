@@ -529,13 +529,19 @@ public class LineGatewayController extends AbstractRestController {
         }
         String[] op = lineGatewayVo.getOperator().split(",");
         for(int i=0;i<op.length;i++){
-            if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(op.length)){
+            if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(op[i])){
                 return "运营商错误";
             }
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getAreaId())){
+            return "区域编号错误";
         }
         Area area = areaService.findById(lineGatewayVo.getAreaId());
         if(area==null||StringUtils.isEmpty(area.getId())){
             return "区域编号错误";
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getAreaCode())){
+            return "归属地区号不存在";
         }
         String areaName = telnumLocationService.getAreaNameByAreaCode(lineGatewayVo.getAreaCode());
         if(StringUtils.isEmpty(areaName)){
