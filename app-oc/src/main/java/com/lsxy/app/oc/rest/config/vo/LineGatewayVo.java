@@ -63,11 +63,6 @@ public class LineGatewayVo {
         return isThrough;
     }
 
-    public void setisThrough(String isThrough) {
-        this.isThrough = isThrough;
-    }
-
-
     public String getLineNumber() {
         return lineNumber;
     }
