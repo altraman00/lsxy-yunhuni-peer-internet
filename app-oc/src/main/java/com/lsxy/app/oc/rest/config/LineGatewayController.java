@@ -76,6 +76,9 @@ public class LineGatewayController extends AbstractRestController {
             @ApiParam(name = "status",value = "状态 1可用 0不可用") @RequestParam(required = false)String status,
             @ApiParam(name = "order",value = "quality:1按质量降序，quality:0按质量升序") @RequestParam(required = false)String order
     ){
+        if(StringUtils.isNotEmpty(operator)&&!Arrays.asList(ResourceTelenum.OPERATORS).contains(operator)){
+            RestResponse.failed("0000","运营商错误");
+        }
         Page page= lineGatewayService.getPage(pageNo,pageSize,operator,isThrough,status,null,order);
         return RestResponse.success(page);
     }
@@ -339,6 +342,10 @@ public class LineGatewayController extends AbstractRestController {
         }
         //先获取线路对象
         LineGateway lineGateway = lineGatewayService.findById(id);
+        //验证运营商
+        if((","+lineGateway.getOperator()+",").indexOf(","+telnumVo.getOperator()+",")==-1){
+            return RestResponse.failed("0000","号码运营商和线路运营不一致");
+        }
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
             //创建号码对象
             ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway.getId(),telnumVo.getAmount());
@@ -438,6 +445,10 @@ public class LineGatewayController extends AbstractRestController {
                         }
                         //先获取线路对象
                         LineGateway lineGateway = lineGatewayService.findById(id);
+                        //验证运营商
+                        if((","+lineGateway.getOperator()+",").indexOf(","+operator+",")==-1){
+                            return RestResponse.failed("0000","号码运营商和线路运营不一致");
+                        }
                         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
                             //创建号码对象
                             ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway.getId(),amount);
@@ -513,8 +524,14 @@ public class LineGatewayController extends AbstractRestController {
         resourceTelenumService.save(resourceTelenum);
     }
     private String vailLineGatewayVo(LineGatewayVo lineGatewayVo){
-        if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(lineGatewayVo.getOperator())){
+        if(StringUtils.isEmpty(lineGatewayVo.getOperator())){
             return "运营商错误";
+        }
+        String[] op = lineGatewayVo.getOperator().split(",");
+        for(int i=0;i<op.length;i++){
+            if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(op.length)){
+                return "运营商错误";
+            }
         }
         Area area = areaService.findById(lineGatewayVo.getAreaId());
         if(area==null||StringUtils.isEmpty(area.getId())){

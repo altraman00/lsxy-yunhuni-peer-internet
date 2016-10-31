@@ -8,6 +8,7 @@ import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 /**
  * Created by zhangxb on 2016/10/25.
@@ -42,6 +44,9 @@ public class LineGatewayToPublicController extends AbstractRestController {
 //            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine,
             @ApiParam(name = "order",value = "quality:1按质量降序，quality:0按质量升序,capacity:1按容量降序capacity:0按容量降序") @RequestParam(required = false)String order
     ){
+        if(StringUtils.isNotEmpty(operator)&&!Arrays.asList(ResourceTelenum.OPERATORS).contains(operator)){
+            RestResponse.failed("0000","运营商错误");
+        }
         Page page= lineGatewayToPublicService.getPage(pageNo,pageSize,operator,isThrough,status,null,order);
         return RestResponse.success(page);
     }

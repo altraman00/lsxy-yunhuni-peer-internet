@@ -156,7 +156,7 @@ public class ResourceTelenumController extends AbstractRestController {
             resourceTelenum.setTenant(tenant);
             resourceTelenum.setStatus(1);
         }
-        resourceTelenumService.save(resourceTelenum);
+        resourceTelenum = resourceTelenumService.save(resourceTelenum);
 
         //只更改租户
         if(tenantType != 0&&!isEditNum){
@@ -236,6 +236,10 @@ public class ResourceTelenumController extends AbstractRestController {
         resourceTelenum.setUsable("1");//设置可用
         //如果绑定线路的话，需要为号码设置区号
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())) {
+            //验证运营商
+            if((","+lineGateway.getOperator()+",").indexOf(","+resourceTelenum.getOperator()+",")==-1){
+                return RestResponse.failed("0000","号码运营商和线路运营不一致");
+            }
             resourceTelenum.setAreaId(lineGateway.getAreaId());
         }
         //创建号码
