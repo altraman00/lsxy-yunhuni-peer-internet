@@ -32,6 +32,7 @@ import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
+import com.lsxy.yunhuni.api.statistics.model.DayStatics;
 import com.lsxy.yunhuni.api.statistics.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -160,7 +161,12 @@ public class TenantController {
                     TenantVO tenantVO = new TenantVO();
                     BeanUtils.copyProperties(tenantVO, temp.get(i));
                     BigDecimal bigDecimal = calBillingService.getBalance(tenantVO.getId());
+                    DayStatics currentStatics = calBillingService.getCurrentStatics(tenantVO.getId());
                     tenantVO.setRemainCoin(bigDecimal.doubleValue());
+                    tenantVO.setCostCoin(currentStatics.getConsume());
+                    tenantVO.setTotalCoin(currentStatics.getRecharge());
+                    tenantVO.setSessionCount(currentStatics.getCallSum());
+                    tenantVO.setSessionTime(currentStatics.getCallCostTime()/60);
                     list1.add(tenantVO);
                 }
             }
@@ -626,6 +632,7 @@ public class TenantController {
 //        }
 //        dto.setSumAmount(sum);
         dto.setSumAmount(consumeDayService.getSumAmountByTenant(id,year+"-"+month));
+
         return RestResponse.success(dto);
     }
 

@@ -6,10 +6,13 @@ import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -46,6 +49,12 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
     @Autowired
     private CallSessionService callSessionService;
+
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
 
     @Override
     public String getEventName() {
@@ -122,16 +131,32 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             callSessionService.save(callSession);
         }
 
-        //通过ivr 拨号发起的呼叫在被叫方结束后 要继续ivr
-        if(state.getType().equalsIgnoreCase("ivr_dial")){
-            String ivr_call_id = null;
+        //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
+        if(!state.getType().equalsIgnoreCase("ivr_dial")){
+            String ivr_dial_call_id = null;
             if(state.getBusinessData() != null){
-                ivr_call_id = (String)state.getBusinessData().get("ivr_call_id");
+                ivr_dial_call_id = (String)state.getBusinessData().get("ivr_dial_call_id");
             }
-            if(StringUtils.isNotBlank(ivr_call_id)){
-                ivrActionService.doAction(ivr_call_id);
+            if(StringUtils.isNotBlank(ivr_dial_call_id)){
+                hugup(ivr_dial_call_id,state.getAreaId());
             }
         }
         return res;
+    }
+
+    public void hugup(String ivr_dial_call_id,String areaId){
+        BusinessState state_dial = businessStateService.get(ivr_dial_call_id);
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",state_dial.getResId())
+                .putIfNotEmpty("user_data",ivr_dial_call_id)
+                .put("areaId",areaId)
+                .build();
+
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
     }
 }

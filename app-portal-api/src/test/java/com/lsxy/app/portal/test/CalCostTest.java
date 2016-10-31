@@ -1,12 +1,19 @@
 package com.lsxy.app.portal.test;
 
 import com.lsxy.app.portal.MainClass;
+import com.lsxy.framework.api.tenant.model.TenantVO;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.JSONUtil2;
+import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.statistics.model.DayStatics;
+import com.lsxy.yunhuni.api.statistics.service.DayStaticsService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.user.model.OcUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +44,10 @@ public class CalCostTest {
     VoiceCdrHourService voiceCdrHourService;
     @Autowired
     ResourcesRentService resourcesRentService;
+    @Autowired
+    DayStaticsService dayStaticsService;
+    @Autowired
+    TenantService tenantService;
 
     @Test
     public void testCalCost(){
@@ -62,5 +73,26 @@ public class CalCostTest {
     public void testResourcesRent(){
 
         resourcesRentService.resourcesRentTask();
+    }
+
+    @Test
+    public void testDayStatics(){
+//        String type = "month";
+//        DayStatics statics;
+//        if("today".equals(type)){
+//            statics = calBillingService.getIncStaticsOfCurrentDay("40288ac9575612a30157561c7ff50004");
+//        }else  if("month".equals(type)){
+//            statics = calBillingService.getIncStaticsOfCurrentMonth("40288ac9575612a30157561c7ff50004");
+//        }else{
+//            statics = calBillingService.getCurrentStatics("40288ac9575612a30157561c7ff50004");
+//        }
+//        System.out.println(JSONUtil2.objectToJson(statics));
+        dayStaticsService.dayStatics(DateUtils.getPreDate(new Date()));
+    }
+
+    @Test
+    public void testTenantList(){
+        Page<TenantVO> tenantVOPage = tenantService.pageListBySearch(null, null, null, null, null, 1, 20);
+        System.out.println(tenantVOPage);
     }
 }

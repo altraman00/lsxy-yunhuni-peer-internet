@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -20,12 +21,7 @@ entities= {
             @FieldResult(name="regDate", column="regDate"),
             @FieldResult(name="authStatus", column="authStatus"),
             @FieldResult(name="accountStatus", column="accountStatus"),
-            @FieldResult(name="appCount", column="appCount"),
-            @FieldResult(name="remainCoin", column="remainCoin"),
-            @FieldResult(name="costCoin", column="costCoin"),
-            @FieldResult(name="totalCoin", column="totalCoin"),
-            @FieldResult(name="sessionCount", column="sessionCount"),
-            @FieldResult(name="sessionTime", column="sessionTime"),
+            @FieldResult(name="appCount", column="appCount")
         })
     }
 )
@@ -49,18 +45,23 @@ public class TenantVO implements Serializable {
     private Integer appCount;
 
     @JsonProperty("remain_coin")
+    @Transient
     private Double remainCoin;
 
     @JsonProperty("cost_coin")
-    private Double costCoin;
+    @Transient
+    private BigDecimal costCoin;
 
     @JsonProperty("total_coin")
-    private Double totalCoin;
+    @Transient
+    private BigDecimal totalCoin;
 
     @JsonProperty("session_count")
+    @Transient
     private Long sessionCount;
 
     @JsonProperty("session_time")
+    @Transient
     private Long sessionTime;
 
     @JsonProperty("account_status")
@@ -124,19 +125,19 @@ public class TenantVO implements Serializable {
         this.remainCoin = remainCoin;
     }
 
-    public Double getCostCoin() {
+    public BigDecimal getCostCoin() {
         return costCoin;
     }
 
-    public void setCostCoin(Double costCoin) {
+    public void setCostCoin(BigDecimal costCoin) {
         this.costCoin = costCoin;
     }
 
-    public Double getTotalCoin() {
+    public BigDecimal getTotalCoin() {
         return totalCoin;
     }
 
-    public void setTotalCoin(Double totalCoin) {
+    public void setTotalCoin(BigDecimal totalCoin) {
         this.totalCoin = totalCoin;
     }
 
@@ -149,12 +150,6 @@ public class TenantVO implements Serializable {
     }
 
     public Long getSessionTime() {//秒转换成分钟
-//        if(sessionTime !=null){
-//            if(!inited){
-//                inited = true;
-//                return (long)Math.round(sessionTime/60);
-//            }
-//        }
         return sessionTime;
     }
 
