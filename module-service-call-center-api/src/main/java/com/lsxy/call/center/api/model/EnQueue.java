@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by liuws on 2016/10/29.
  */
-@XStreamAlias("equeue")
+@XStreamAlias("enqueue")
 public class EnQueue {
     private Condition condition;
 
