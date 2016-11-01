@@ -325,7 +325,7 @@
         var appId = $('#modal-appid').val();
         $('.hideIVR').html('');
         $('#phonelist').html('');
-        var isCall =  ["✔", "✘"] ;
+        var isCall =  ["✘","✔"] ;
         var ownIvr = [];
         var needCalledNum = false;
         ajaxsync(ctx + "/console/app_action/select_num/" + appId,null,function(response){
@@ -360,7 +360,7 @@
                     html += '<td data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
                 }else{
                     //普通号码
-                    html +='<td>'+data[i].phone+'</td>'
+                    html +='<td>'+ownIvr[i].phone+'</td>'
                 }
                 html +='<td class="text-center" >'+isCall[ownIvr[i].isCalled]+'</td><td class="text-center" >'+isCall[ownIvr[i].isDialing]+'</td><td class="text-left-fixed" >'+ownIvr[i].areaCode+'</td></tr>'
             }
@@ -425,10 +425,9 @@
             if(result){
                 ajaxsync(ctx + "/console/app_action/offline",{'appId':id,'${_csrf.parameterName}':'${_csrf.token}'},function(response){
                     if(response.success){
-                        var isIvrService = response.data.isIvrService==1?1:0;
                         $('#trb-'+id).html('');
                         $('#statusapp-'+id).html('未上线').attr('style','color:#ff0000;');
-                        $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\''+ isIvrService +'\')">申请上线</a>');
+                        $('#trb-'+id).html('<a onclick="tabtarget(\''+id+'\',\'1\')">申请上线</a>');
                         showtoast('下线成功');
                     }else{
                         result = false;

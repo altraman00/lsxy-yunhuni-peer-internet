@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,14 +94,14 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         //应用上线--选号
         if( app.getStatus() == App.STATUS_OFFLINE ){
             if(action == null){
-                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
+                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,null,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
             }else if(action != null && action.getAction() != AppOnlineAction.ACTION_SELECT_NUM){
                 for(AppOnlineAction a:actionList){
                     a.setStatus(AppOnlineAction.STATUS_DONE);
                     this.save(a);
                 }
-                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
+                AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,null,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_SELECT_NUM,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
             }
         }else {
@@ -110,7 +111,10 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
 
     @Override
     public AppOnlineAction actionOfOnline(Tenant tenant, String appId,String nums){
-        List<String> numList = Arrays.asList(nums.split(","));
+        List<String> numList = new ArrayList<>();
+        if(StringUtils.isNotBlank(nums)){
+            numList = Arrays.asList(nums.split(","));
+        }
         App app = appService.findById(appId);
         AppOnlineAction action = null;
         List<AppOnlineAction> actionList = appOnlineActionDao.findByAppIdAndStatusOrderByCreateTimeDesc(appId, AppOnlineAction.STATUS_AVTIVE);
@@ -123,7 +127,18 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 //当应用有ivr功能时(或者为呼叫中心应用)，绑定IVR号码绑定
                 //判断ivr号码是否被占用
                 String areaId = this.bindNumToApp(app, numList, tenant);
-
+                //处理区域Id
+                if(StringUtils.isBlank(areaId)){
+                    //如果没有要绑定的号码，则选上一次上线的区域ID
+                    AppOnlineAction lastOnlineAction = appOnlineActionDao.findFirstByAppIdAndActionOrderByCreateTimeDesc(appId,AppOnlineAction.ACTION_ONLINE);
+                    if(lastOnlineAction != null){
+                        areaId = lastOnlineAction.getAreaId();
+                    }
+                }
+                if(StringUtils.isBlank(areaId)){
+                    //如果上一次上线的区域ID为空，则分配一个可用的区域ID
+                    areaId = areaService.getOneAvailableArea().getId();
+                }
                 //TODO 绑定应用与区域的关系
                 Area oldArea = app.getArea();
                 if(oldArea != null && !oldArea.getId().equals(areaId)){
@@ -141,7 +156,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 }
                 //先成新的动作--生成新的动作--上线中
                 AppOnlineAction newAction = new AppOnlineAction(nums,null,null,
-                        app,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
+                        app,areaId,AppOnlineAction.TYPE_ONLINE,AppOnlineAction.ACTION_ONLINE,AppOnlineAction.STATUS_AVTIVE);
                 this.save(newAction);
 
                 //应用状态改为上线
@@ -173,31 +188,33 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         //TODO
         for(String num : nums){
             ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(num);
-            if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenant().getId())){
-               //是这个租户，则查询租用记录，有没有正在用的
-               ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
-               if(resourcesRent == null){
-                   throw new TeleNumberBeOccupiedException("此号码已被应用占用：" + resourceTelenum.getTelNumber());
-               }else if(!resourcesRent.getTenant().getId().equals(tenant.getId()) || resourcesRent.getApp() != null){
-                   throw new TeleNumberBeOccupiedException("此号码不属于本租户：" + resourceTelenum.getTelNumber());
-               }else{
-                   if(StringUtils.isBlank(areaId)){
-                       //TODO 设置区域
-                       areaId = "area001";
-                       //TODO 区域不同，抛异常
-                   }else if(!areaId.equals("area001")){
-                       //TODO 抛异常
-                   }
-                   //TODO 号码是否是可呼出
-                   isCalled = true;
+            if(resourceTelenum != null){
+                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenant().getId())){
+                   //是这个租户，则查询租用记录，有没有正在用的
+                   ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
+                   if(resourcesRent == null){
+                       throw new TeleNumberBeOccupiedException("此号码已被应用占用：" + resourceTelenum.getTelNumber());
+                   }else if(!resourcesRent.getTenant().getId().equals(tenant.getId()) || resourcesRent.getApp() != null){
+                       throw new TeleNumberBeOccupiedException("此号码不属于本租户：" + resourceTelenum.getTelNumber());
+                   }else{
+                       if(StringUtils.isBlank(areaId)){
+                           //TODO 设置区域
+                           areaId = "area001";
+                           //TODO 区域不同，抛异常
+                       }else if(!areaId.equals("area001")){
+                           //TODO 抛异常
+                       }
+                       //TODO 号码是否是可呼出
+                       isCalled = true;
 
-                   resourcesRent.setApp(app);
-                   resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
-                   resourcesRentService.save(resourcesRent);
-               }
-            }else{
-                //如果号码被占用，则抛出异常
-                throw new TeleNumberBeOccupiedException("有一个或多个号码不属于本租户");
+                       resourcesRent.setApp(app);
+                       resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
+                       resourcesRentService.save(resourcesRent);
+                   }
+                }else{
+                    //如果号码被占用，则抛出异常
+                    throw new TeleNumberBeOccupiedException("有一个或多个号码不属于本租户");
+                }
             }
         }
         if((app.getIsIvrService() != null && app.getIsIvrService() == 1)||(app.getIsCallCenter() != null && app.getIsCallCenter() == 1)) {
@@ -223,7 +240,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             }
 
             //生成新的动作
-            AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
+            AppOnlineAction newAction = new AppOnlineAction(null,null,null,app,app.getArea().getId(),AppOnlineAction.TYPE_OFFLINE,AppOnlineAction.ACTION_OFFLINE,AppOnlineAction.STATUS_AVTIVE);
             this.save(newAction);
             //应用状态改为下线
             app.setStatus(App.STATUS_OFFLINE);
