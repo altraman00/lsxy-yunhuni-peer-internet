@@ -39,7 +39,7 @@ public class ResourceTelenum extends IdEntity{
     private String isDialing;//可主叫
     private String isCalled;//可被叫
     private String isThrough;//可被叫
-    private String type;//1采购线路2租户自带
+    private String type;//1采购线路0租户自带
     @Column(name = "is_through")
     public String getIsThrough() {
         return isThrough;
@@ -206,9 +206,9 @@ public class ResourceTelenum extends IdEntity{
         this.callUri = callUri;
         this.telNumber = telNumber;
         this.lineId = lineId;
-        this.status =0;
-        this.usable = "1";
-        this.type = "1";
+        this.status =0;//未被租用
+        this.usable = "1";//可用
+        this.type = "1";//采购线路
     }
 
     public ResourceTelenum() {

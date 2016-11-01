@@ -46,9 +46,9 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
 
     @Override
     public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine,String order) {
-        String hql = " FROM LineGateway obj WHERE 1=1";
+        String hql = " FROM LineGateway obj WHERE 1=1 ";
         if(StringUtils.isNotEmpty(operator)){
-            hql += " AND obj.operator = '"+operator+"' ";
+            hql += " AND obj.operator like '%"+operator+"%' ";
         }
         if(StringUtils.isNotEmpty(isThrough)){
             hql += " AND obj.isThrough = '"+isThrough+"' ";
@@ -77,6 +77,20 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         }else{
             hql += " ORDER BY obj.createTime DESC ";
         }
+        Page page = this.pageList(hql,pageNo,pageSize);
+        return page;
+    }
+
+    @Override
+    public Page<LineGateway> getNotTenantPage(Integer pageNo, Integer pageSize, String tenantId,String operator, String line) {
+        String hql = " FROM LineGateway obj WHERE 1=1 ";
+        if(StringUtils.isNotEmpty(operator)){
+            hql += " AND obj.operator like '%"+operator+"%' ";
+        }
+        if(StringUtils.isNotEmpty(line)){
+            hql += " AND obj.lineNumber like '%"+line+"%' ";
+        }
+        hql += " AND obj.id NOT IN (select a.lineGateway.id from LineGatewayToTenant a where deleted=0 AND tenantId='"+tenantId+"') ";
         Page page = this.pageList(hql,pageNo,pageSize);
         return page;
     }

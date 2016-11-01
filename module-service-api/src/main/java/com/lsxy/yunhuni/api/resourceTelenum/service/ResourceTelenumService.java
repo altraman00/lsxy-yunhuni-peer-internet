@@ -55,7 +55,7 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @param number
      * @return
      */
-    Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize, String operator, String number);
+    Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize,String number,String operator,String isThrough,String status);
     /**
      * 获取分页信息
      * @return

@@ -76,6 +76,9 @@ public class LineGatewayController extends AbstractRestController {
             @ApiParam(name = "status",value = "状态 1可用 0不可用") @RequestParam(required = false)String status,
             @ApiParam(name = "order",value = "quality:1按质量降序，quality:0按质量升序") @RequestParam(required = false)String order
     ){
+        if(StringUtils.isNotEmpty(operator)&&!Arrays.asList(ResourceTelenum.OPERATORS).contains(operator)){
+            RestResponse.failed("0000","运营商错误");
+        }
         Page page= lineGatewayService.getPage(pageNo,pageSize,operator,isThrough,status,null,order);
         return RestResponse.success(page);
     }
@@ -140,27 +143,58 @@ public class LineGatewayController extends AbstractRestController {
         }
         return RestResponse.success("修改成功");
     }
-    @ApiOperation(value = "修改状态")
-    @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
-    public RestResponse modifyStatus(@ApiParam(name = "id",value = "线路id")
-                                   @PathVariable String id,@RequestBody LineGatewayEditStatusVo lineGatewayEditStatusVo){
+    @ApiOperation(value = "启用线路")
+    @RequestMapping(value = "/enabled/{id}",method = RequestMethod.PUT)
+    public RestResponse enabled(
+            @ApiParam(name = "id",value = "线路id")
+            @PathVariable String id){
         LineGateway lineGateway = lineGatewayService.findById(id);
         if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
             return RestResponse.failed("0000","线路不存在");
         }
-        String status = lineGateway.getStatus();
-        if("0".equals(lineGatewayEditStatusVo.getStatus())||"1".equals(lineGatewayEditStatusVo.getStatus())) {
-            lineGateway.setStatus(lineGatewayEditStatusVo.getStatus());
-            lineGatewayService.save(lineGateway);
-            if("1".equals(status)&&"0".equals(lineGatewayEditStatusVo.getStatus())){
-                //更新号码的状态
-                batchUpCall(lineGateway.getId());
-            }
-        }else{
-            return RestResponse.failed("0000","状态错误");
-        }
-        return RestResponse.success("修改成功");
+        lineGateway.setStatus("1");
+        lineGatewayService.save(lineGateway);
+        return RestResponse.success("启用线路成功");
     }
+    @ApiOperation(value = "禁用线路")
+    @RequestMapping(value = "/disabled/{id}",method = RequestMethod.PUT)
+    public RestResponse disabled(
+            @ApiParam(name = "id",value = "线路id")
+            @PathVariable String id){
+        LineGateway lineGateway = lineGatewayService.findById(id);
+        if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
+            return RestResponse.failed("0000","线路不存在");
+        }
+//        //本来是启用现在改成禁用
+//        if("1".equals(lineGateway.getStatus())){
+//            //更新号码的状态
+//            batchUpCall(lineGateway.getId());
+//        }
+        lineGateway.setStatus("0");
+        lineGatewayService.save(lineGateway);
+        return RestResponse.success("禁用线路成功");
+    }
+//    @ApiOperation(value = "修改状态")
+//    @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
+//    public RestResponse modifyStatus(@ApiParam(name = "id",value = "线路id")
+//                                   @PathVariable String id,@RequestBody LineGatewayEditStatusVo lineGatewayEditStatusVo){
+//        LineGateway lineGateway = lineGatewayService.findById(id);
+//        if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
+//            return RestResponse.failed("0000","线路不存在");
+//        }
+//        String status = lineGateway.getStatus();
+//        if("0".equals(lineGatewayEditStatusVo.getStatus())||"1".equals(lineGatewayEditStatusVo.getStatus())) {
+//            lineGateway.setStatus(lineGatewayEditStatusVo.getStatus());
+//            lineGatewayService.save(lineGateway);
+//            if("1".equals(status)&&"0".equals(lineGatewayEditStatusVo.getStatus())){
+//                //更新号码的状态
+//                batchUpCall(lineGateway.getId());
+//            }
+//        }else{
+//            return RestResponse.failed("0000","状态错误");
+//        }
+//        return RestResponse.success("修改成功");
+//    }
     @ApiOperation(value = "删除线路")
     @RequestMapping(value = "/{id}",method = RequestMethod.DELETE)
     public RestResponse delete(@ApiParam(name="id",value = "线路id") @PathVariable  String id) throws InvocationTargetException, IllegalAccessException {
@@ -308,6 +342,10 @@ public class LineGatewayController extends AbstractRestController {
         }
         //先获取线路对象
         LineGateway lineGateway = lineGatewayService.findById(id);
+        //验证运营商
+        if((","+lineGateway.getOperator()+",").indexOf(","+telnumVo.getOperator()+",")==-1){
+            return RestResponse.failed("0000","号码运营商和线路运营不一致");
+        }
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
             //创建号码对象
             ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway.getId(),telnumVo.getAmount());
@@ -407,6 +445,10 @@ public class LineGatewayController extends AbstractRestController {
                         }
                         //先获取线路对象
                         LineGateway lineGateway = lineGatewayService.findById(id);
+                        //验证运营商
+                        if((","+lineGateway.getOperator()+",").indexOf(","+operator+",")==-1){
+                            return RestResponse.failed("0000","号码运营商和线路运营不一致");
+                        }
                         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
                             //创建号码对象
                             ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway.getId(),amount);
@@ -482,12 +524,24 @@ public class LineGatewayController extends AbstractRestController {
         resourceTelenumService.save(resourceTelenum);
     }
     private String vailLineGatewayVo(LineGatewayVo lineGatewayVo){
-        if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(lineGatewayVo.getOperator())){
+        if(StringUtils.isEmpty(lineGatewayVo.getOperator())){
             return "运营商错误";
+        }
+        String[] op = lineGatewayVo.getOperator().split(",");
+        for(int i=0;i<op.length;i++){
+            if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(op[i])){
+                return "运营商错误";
+            }
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getAreaId())){
+            return "区域编号错误";
         }
         Area area = areaService.findById(lineGatewayVo.getAreaId());
         if(area==null||StringUtils.isEmpty(area.getId())){
             return "区域编号错误";
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getAreaCode())){
+            return "归属地区号不存在";
         }
         String areaName = telnumLocationService.getAreaNameByAreaCode(lineGatewayVo.getAreaCode());
         if(StringUtils.isEmpty(areaName)){
@@ -497,12 +551,13 @@ public class LineGatewayController extends AbstractRestController {
         if(!Arrays.asList(rule).contains(lineGatewayVo.getMobileAreaRule())){
             return "手机区号规则错误";
         }
-        if(!Arrays.asList(rule).contains(lineGatewayVo.getTelAreaRule())){
+        String[] rule1 = {"0","2"};
+        if(!Arrays.asList(rule1).contains(lineGatewayVo.getTelAreaRule())){
             return "固话区号规则错误";
         }
         String[] is = {"0","1"};
         if(!Arrays.asList(is).contains(lineGatewayVo.getIsThrough())){
-            return "固话区号规则错误";
+            return "是否可透传规则错误";
         }
         if(lineGatewayVo.getQuality()>10||lineGatewayVo.getQuality()<1){
             return "质量范围错误";

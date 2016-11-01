@@ -3,6 +3,8 @@ package com.lsxy.app.oc.rest.config.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
+
 /**
  * Created by zhangxb on 2016/10/26.
  */
@@ -10,8 +12,8 @@ import io.swagger.annotations.ApiModelProperty;
 public class TelnumTEditVo {
     @ApiModelProperty(name="tenantId",value = "所属租户")
     private String tenantId;
-    @ApiModelProperty(name="tenantId",value = "所属线路")
-    private String lineId;
+//    @ApiModelProperty(name="tenantId",value = "所属线路")
+//    private String lineId;
     @ApiModelProperty(name="operator",value = "运营商 中国电信；中国移动；中国联通")
     private String operator;
     @ApiModelProperty(name="areaCode",value = "归属地区号")
@@ -27,7 +29,7 @@ public class TelnumTEditVo {
     @ApiModelProperty(name="telNumber",value = "号码")
     private String telNumber;
     @ApiModelProperty(name="amount",value = "号码占用费")
-    private String amount ;
+    private BigDecimal amount ;
 
 
 
@@ -63,11 +65,11 @@ public class TelnumTEditVo {
         this.operator = operator;
     }
 
-    public String getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -104,11 +106,11 @@ public class TelnumTEditVo {
         this.tenantId = tenantId;
     }
 
-    public String getLineId() {
-        return lineId;
-    }
-
-    public void setLineId(String lineId) {
-        this.lineId = lineId;
-    }
+//    public String getLineId() {
+//        return lineId;
+//    }
+//
+//    public void setLineId(String lineId) {
+//        this.lineId = lineId;
+//    }
 }

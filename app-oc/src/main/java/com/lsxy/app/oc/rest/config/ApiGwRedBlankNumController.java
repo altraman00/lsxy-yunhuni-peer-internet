@@ -79,7 +79,7 @@ public class ApiGwRedBlankNumController extends AbstractRestController {
         }
         apiGwRedBlankNum.setStatus(ApiGwRedBlankNum.STATUS_ENABLED);
         apiGwRedBlankNumService.save(apiGwRedBlankNum);
-        return RestResponse.success("删除成功");
+        return RestResponse.success("启用红黑名单成功");
     }
     @ApiOperation(value = "禁用红黑名单")
     @RequestMapping(value = "/disabled/{id}",method = RequestMethod.PUT)
@@ -92,6 +92,6 @@ public class ApiGwRedBlankNumController extends AbstractRestController {
         }
         apiGwRedBlankNum.setStatus(ApiGwRedBlankNum.STATUS_DISABLED);
         apiGwRedBlankNumService.save(apiGwRedBlankNum);
-        return RestResponse.success("删除成功");
+        return RestResponse.success("禁用红黑名单成功");
     }
 }

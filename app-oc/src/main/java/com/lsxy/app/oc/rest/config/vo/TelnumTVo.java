@@ -3,11 +3,13 @@ package com.lsxy.app.oc.rest.config.vo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
+
 /**
  * Created by zhangxb on 2016/10/26.
  */
 @ApiModel
-public class TelnumTVo {
+public class TelnumTVo extends TelnumTEditVo{
     @ApiModelProperty(name="type",value = "号码类型，1采购号码0租户自带")
     private String type;
     @ApiModelProperty(name="tenantId",value = "所属租户")
@@ -29,7 +31,7 @@ public class TelnumTVo {
     @ApiModelProperty(name="telNumber",value = "号码")
     private String telNumber;
     @ApiModelProperty(name="amount",value = "号码占用费")
-    private String amount ;
+    private BigDecimal amount ;
 
 
 
@@ -65,11 +67,11 @@ public class TelnumTVo {
         this.operator = operator;
     }
 
-    public String getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

@@ -1,7 +1,7 @@
 package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.app.oc.rest.config.vo.LineGatewayToPublicEditPriorityVo;
+import com.lsxy.app.oc.rest.config.vo.EditPriorityVo;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/25.
@@ -45,6 +44,9 @@ public class LineGatewayToPublicController extends AbstractRestController {
 //            @ApiParam(name = "isPublicLine",value = "1:全局线路;0:租户专属线路") @RequestParam(required = false)String isPublicLine,
             @ApiParam(name = "order",value = "quality:1按质量降序，quality:0按质量升序,capacity:1按容量降序capacity:0按容量降序") @RequestParam(required = false)String order
     ){
+        if(StringUtils.isNotEmpty(operator)&&!Arrays.asList(ResourceTelenum.OPERATORS).contains(operator)){
+            RestResponse.failed("0000","运营商错误");
+        }
         Page page= lineGatewayToPublicService.getPage(pageNo,pageSize,operator,isThrough,status,null,order);
         return RestResponse.success(page);
     }
@@ -102,9 +104,9 @@ public class LineGatewayToPublicController extends AbstractRestController {
         return RestResponse.success("删除成功");
     }
     @ApiOperation(value = "修改优先级")
-    @RequestMapping(value = "/edit/status/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/edit/priority/{id}",method = RequestMethod.PUT)
     public RestResponse modify(@ApiParam(name = "id",value = "线路id")
-                               @PathVariable String id,@RequestBody LineGatewayToPublicEditPriorityVo lineGatewayToPublicEditPriorityVo){
+                               @PathVariable String id,@RequestBody EditPriorityVo lineGatewayToPublicEditPriorityVo){
         int o2 = 0;
         try{ o2=Integer.valueOf(lineGatewayToPublicEditPriorityVo.getPriority());}catch (Exception e){
             return RestResponse.failed("0000","目标优先级只能为数字");
@@ -145,9 +147,9 @@ public class LineGatewayToPublicController extends AbstractRestController {
             flag = "+1";
         }
         String[] sql = new String[2];
-        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE priority BETWEEN "+begin+" AND "+end+" ";
+        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE priority BETWEEN deleted=0 AND "+begin+" AND "+end+" ";
         if(StringUtils.isNotEmpty(line)) {
-            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=" + o2 + " WHERE id ='" + line + "' ";
+            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=" + o2 + " WHERE deleted=0 AND id ='" + line + "' ";
         }
         int re = lineGatewayService.batchModify(sql);
         return re;
