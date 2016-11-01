@@ -3,6 +3,7 @@ package com.lsxy.area.server;
 import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
@@ -102,7 +103,14 @@ public class AreaAndTelNumSelector {
             if(testNums != null && testNums.size() > 0 && testNums.containsAll(tos)){
                 ResourceTelenum callNum = null;
                 //获取测试用的区域
-                String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+                String areaId = null;
+                Area area = app.getArea();
+                if(area != null){
+                    areaId = area.getId();
+                }
+                if(StringUtils.isBlank(areaId)){
+                    areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+                }
                 String testNum = SystemConfig.getProperty("portal.test.call.number");
                 if(StringUtils.isNotBlank(testNum)){
                     callNum = resourceTelenumService.findByTelNumber(testNum);
@@ -170,11 +178,15 @@ public class AreaAndTelNumSelector {
 
 
     public String getAreaId(App app){
-        if(app.getStatus() == app.STATUS_ONLINE){
-            return app.getArea().getId();
-        }else{
-            return SystemConfig.getProperty("area.server.test.area.id", "area001");
+        String areaId = null;
+        Area area = app.getArea();
+        if(area != null){
+            areaId = area.getId();
         }
+        if(StringUtils.isBlank(areaId)){
+            areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+        }
+        return areaId;
     }
 
     //排序接口
