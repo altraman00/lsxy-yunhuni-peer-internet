@@ -17,4 +17,12 @@ public interface AppOnlineActionDao extends BaseDaoInterface<AppOnlineAction, Se
      * @return
      */
     List<AppOnlineAction> findByAppIdAndStatusOrderByCreateTimeDesc(String appId, int statusAvtive);
+
+    /**
+     * 获取最后一次上线完成的动作
+     * @param appId
+     * @param actionOnline
+     * @return
+     */
+    AppOnlineAction findFirstByAppIdAndActionOrderByCreateTimeDesc(String appId, int actionOnline);
 }
