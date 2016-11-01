@@ -1,8 +1,10 @@
 package com.lsxy.app.oc.rest.tenant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.*;
@@ -46,13 +48,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
 
 /**
  * Created by Administrator on 2016/8/10.
@@ -124,6 +126,9 @@ public class TenantController {
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
+
+    @Reference(timeout = 3000)
+    AppExtensionService appExtensionService;
 
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
@@ -779,7 +784,19 @@ public class TenantController {
         TenantAppVO vo = new TenantAppVO(app);
         List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
+        //TODO sipRegistrar分机信息
         return RestResponse.success(vo);
+    }
+    @ApiOperation(value = "获取租户的app信息下的分机")
+    @RequestMapping(value="/tenants/{tenant}/app/extension/{appId}",method = RequestMethod.GET)
+    public RestResponse appExtension(@PathVariable String tenant,@PathVariable String appId) {
+        App app = appService.findById(appId);
+        if(app == null || app.getTenant() == null ||
+                !app.getTenant().getId().equals(tenant)){
+            return RestResponse.success(null);
+        }
+        List<AppExtension> appExtensions = appExtensionService.findByAppId(appId);
+        return RestResponse.success(appExtensions);
     }
 
     @ApiOperation(value = "获取租户的app放音文件列表")

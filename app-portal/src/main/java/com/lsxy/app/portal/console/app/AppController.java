@@ -94,9 +94,9 @@ public class AppController extends AbstractPortalController {
         App app = restResponse.getData();
         mav.addObject("app", app);
         List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
-        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
+//        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
         mav.addObject("testNumBindList",testNumBindList);
-        mav.addObject("appExtensionList",appExtensionList);
+        mav.addObject("sipRegistrar","sipRegistrar");
         mav.setViewName("/console/app/detail");
         return mav;
     }

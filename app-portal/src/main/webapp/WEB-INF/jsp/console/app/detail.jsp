@@ -192,11 +192,12 @@
                                                             分机接入信息：
                                                         </div>
                                                         <div class="col-md-9">
-                                                            <c:forEach items="${appExtensionList}" var="appExtension">
-                                                                <c:if test="${appExtension.telenum==app.id}">
-                                                                    <p>${appExtension.telenum} </p>
-                                                                </c:if>
-                                                            </c:forEach>
+                                                            <p>${sipRegistrar}</p>
+                                                            <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
+                                                                <%--<c:if test="${appExtension.telenum==app.id}">--%>
+                                                                    <%--<p>${appExtension.telenum} </p>--%>
+                                                                <%--</c:if>--%>
+                                                            <%--</c:forEach>--%>
                                                             <p class="text-danger">（未上线的分机接入信息只作临时使用，上线后平台会重新分配分机接入信息）</p>
                                                         </div>
                                                     </div>
