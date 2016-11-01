@@ -14,16 +14,14 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
-import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.stream.Collector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.l;
 
 /**
  * Created by liups on 2016/10/10.
