@@ -70,7 +70,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String line,String number, String isDialing, String isCalled, String isThrough) {
-        String hql = " FROM TelnumToLineGateway obj WHERE 1=1 ";
+        String hql = " FROM TelnumToLineGateway obj WHERE obj.deleted=0  ";
         if(StringUtils.isNotEmpty(line)){
             hql += " AND obj.lineId='"+line+"' ";
         }
