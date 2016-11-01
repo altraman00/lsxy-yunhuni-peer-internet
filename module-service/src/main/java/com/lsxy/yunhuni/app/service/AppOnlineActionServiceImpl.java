@@ -6,6 +6,7 @@ import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.model.AppOnlineAction;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
@@ -220,6 +221,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         if((app.getIsIvrService() != null && app.getIsIvrService() == 1)||(app.getIsCallCenter() != null && app.getIsCallCenter() == 1)) {
             if(!isCalled) {
                 //TODO 抛异常，没有可呼出号码
+                throw new RuntimeException("没有选定可呼入的号码");
             }
         }
         return areaId;
@@ -247,6 +249,10 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             //TODO 当区域和测试区域不一样时，如果是呼叫中心，则分机设为不可用
             //TODO 当区域和测试区域不一样时，进行区域迁移
             //TODO 应用区域设置为测试区域
+            String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+            Area area = new Area();
+            area.setId(areaId);
+            app.setArea(area);
             appService.save(app);
             //改变号码的租用关系
             List<ResourcesRent> rents = resourcesRentService.findByAppId(app.getId());

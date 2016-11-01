@@ -347,24 +347,24 @@
             return ;
         }
 
-        if(ownIvr.length>0){
-            if(needCalledNum){
-                $('#selectOwnIvr').show();
-            }else{
-                $('#selectNewIvr').show();
-            }
-            for (var i = 0 ; i< ownIvr.length ; i ++){
-                html += '<tr><td><input type="checkbox" name="phonelist" value="'+ownIvr[i].phone+'" /></td>'
-                //特殊判断 <i class="fa fa-exclamation-triangle"></i>
-                if(ownIvr[i].lastUsed){
-                    html += '<td data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
-                }else{
-                    //普通号码
-                    html +='<td>'+ownIvr[i].phone+'</td>'
+        if(needCalledNum){
+            $('#selectOwnIvr').show();
+        }else{
+            $('#selectNewIvr').show();
+            if(ownIvr.length>0){
+                for (var i = 0 ; i< ownIvr.length ; i ++){
+                    html += '<tr><td><input type="checkbox" name="phonelist" value="'+ownIvr[i].phone+'" /></td>'
+                    //特殊判断 <i class="fa fa-exclamation-triangle"></i>
+                    if(ownIvr[i].lastUsed){
+                        html += '<td data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
+                    }else{
+                        //普通号码
+                        html +='<td>'+ownIvr[i].phone+'</td>'
+                    }
+                    html +='<td class="text-center" >'+isCall[ownIvr[i].isCalled]+'</td><td class="text-center" >'+isCall[ownIvr[i].isDialing]+'</td><td class="text-left-fixed" >'+ownIvr[i].areaCode+'</td></tr>'
                 }
-                html +='<td class="text-center" >'+isCall[ownIvr[i].isCalled]+'</td><td class="text-center" >'+isCall[ownIvr[i].isDialing]+'</td><td class="text-left-fixed" >'+ownIvr[i].areaCode+'</td></tr>'
+                $('#phonelist').html(html);
             }
-            $('#phonelist').html(html);
         }
 
         return result;

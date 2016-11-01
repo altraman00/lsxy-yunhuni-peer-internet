@@ -37,7 +37,7 @@ public class App extends IdEntity {
     private Integer isRecording;//是否录音服务0否，1是
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
-    private Area area;  //所属区域（应用上线后要指定区域）
+    private Area area;  //所属区域（应用要指定区域,新建应用在测试区域）
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
     @Column(name = "is_call_center")
