@@ -271,9 +271,9 @@
 
     //初始时间
     function initialStartTime(id){
-        var starttime =  $(id).attr('data-time');
+        var starttime =  $(id).val();
         if(starttime==''){
-            starttime = $(id).val();
+            starttime = $(id).attr('data-time');
         }
         return starttime;
     }
@@ -306,9 +306,8 @@
     function initchart(){
         var type = $('input[name="calltime"]:checked').val();
         var app = $('#defaultapp').val();
-        var starttime = initialStartTime('#talkdate'+type);
-        console.info(starttime)
-        alert(starttime)
+        var starttime = initialStartTime("#calldate"+type);
+
         var param ={'type':type,'appId':app,'startTime':starttime, csrfParameterName:csrfToken};
         ajaxsync(ctx+"/console/statistics/session/list/session",param,function(result){
             var resultData = result.data;
@@ -327,7 +326,7 @@
     function inittalkchart() {
         var type = $('input[name="talktime"]:checked').val();
         var app = $('#defaultapp').val();
-        var starttime = initialStartTime('#calldate'+type);
+        var starttime = initialStartTime("#talkdate"+type);
 //        var param  = {starttime:starttime,type:type,app:app};
 //        if(type=='month'){
 //            var xd  = meetDataYear();
