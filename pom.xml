@@ -44,6 +44,7 @@
         <module>module-service-area-api</module>
         <module>module-framework-jmx</module>
         <module>module-framework-monitor</module>
+        <module>module-service-call-center-api</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -135,6 +136,11 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-service-area-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-service-call-center-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

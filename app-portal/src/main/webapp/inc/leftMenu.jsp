@@ -57,6 +57,9 @@
 								<a data-toggle="tooltip" data-placement='right' title='会话统计' href="${ctx}/console/statistics/session/index"  class="nav-router" data-router="statistics/session"><i class="fa fa-clock-o icon" aria-hidden="true"> </i> <span>会话统计</span> </a>
 							</li>
 							<li>
+								<a data-toggle="tooltip" data-placement='right' title='呼叫中心统计' href="${ctx}/console/statistics/callcenter/index" class="nav-router" data-router="statistics/callcenter"><i class="fa fa-phone-square icon" aria-hidden="true"> </i> <span>呼叫中心统计</span> </a>
+							</li>
+							<li>
 								<a data-toggle="tooltip" data-placement='right' title='详单查询' href="${ctx}/console/statistics/billdetail/notify" class="nav-router" data-router="statistics/billdetail"><i class="fa fa-clone icon" aria-hidden="true"> </i> <span>详单查询</span> </a>
 							</li>
 						</ul>

@@ -30,7 +30,7 @@ import java.util.Map;
 public class CallController extends AbstractAPIController{
     private static final Logger logger = LoggerFactory.getLogger(CallController.class);
 
-    @Reference(timeout=3000)
+    @Reference(timeout=3000,check = false,lazy = true)
     private CallService callService;
 
 //    @Autowired

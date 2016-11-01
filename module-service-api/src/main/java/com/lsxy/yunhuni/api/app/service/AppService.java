@@ -19,7 +19,12 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     List<App> findAppByUserName(String tenantId)  ;
-
+    /**
+     * 获取记录的集合
+     * @param tenantId 租户id
+     * @return
+     */
+    List<App> findAppByUserNameAndServiceType(String tenantId,String serviceType)  ;
     /**
      * 获取分页信息
      * @param tenantId 租户id
