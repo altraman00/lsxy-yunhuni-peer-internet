@@ -23,8 +23,6 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.Set;
 
-import static org.bouncycastle.asn1.ua.DSTU4145NamedCurves.params;
-
 /**
  * Created by liups on 2016/8/31.
  */

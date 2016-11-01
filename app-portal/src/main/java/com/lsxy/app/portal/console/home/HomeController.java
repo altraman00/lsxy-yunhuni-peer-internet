@@ -147,28 +147,31 @@ public class HomeController extends AbstractPortalController {
         int onlineApp = 0;
         if(appList != null){
             for(App app:appList){
-                AppStateVO appStateVO = new AppStateVO();
-                try {
-                    BeanUtils.copyProperties2(appStateVO,app,false);
-                } catch (Exception e) {
-                    logger.error("复制类属性异常",e);
-                }
+//                AppStateVO appStateVO = new AppStateVO();
+//                try {
+//                    BeanUtils.copyProperties2(appStateVO,app,false);
+//                } catch (Exception e) {
+//                    logger.error("复制类属性异常",e);
+//                }
 //                Map map = getStatistics(token, app);
-
+//
 //                appStateVO.setCallOfDay((Integer) map.get("dayCount"));
 //                appStateVO.setCallOfHour((Integer) map.get("hourCount"));
 //                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
-                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
+//                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
+//                    onlineApp++;
+//                    ResourcesRent rent = getIvrNumber(token,app.getId());
+//                    if(rent != null){
+//                        if(rent.getResourceTelenum()!=null) {
+//                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
+//                        }
+//                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
+//                    }
+//                }
+//                appStateVOs.add(appStateVO);
+                if(app.getStatus() == App.STATUS_ONLINE) {
                     onlineApp++;
-                    ResourcesRent rent = getIvrNumber(token,app.getId());
-                    if(rent != null){
-                        if(rent.getResourceTelenum()!=null) {
-                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
-                        }
-                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
-                    }
                 }
-                appStateVOs.add(appStateVO);
             }
         }
         vo.setOnLineApp(onlineApp);
