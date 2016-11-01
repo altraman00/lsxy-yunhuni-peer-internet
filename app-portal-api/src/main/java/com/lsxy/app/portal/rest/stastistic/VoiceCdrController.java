@@ -71,11 +71,11 @@ public class VoiceCdrController extends AbstractRestController {
         Map statistics= voiceCdrService.currentRecordStatistics(appId);
         return RestResponse.success(statistics);
     }
-    @RequestMapping("/get_avg_ddr")
-    public RestResponse getAvgCdr( String appId, String startTime, String endTime) throws Exception{
-        Map map= voiceCdrService.getAvgCdr(getCurrentAccount().getTenant().getId(),appId,startTime,endTime);
-        return RestResponse.success(map);
-    }
+//    @RequestMapping("/get_avg_ddr")
+//    public RestResponse getAvgCdr( String appId, String startTime, String endTime) throws Exception{
+//        Map map= voiceCdrService.getAvgCdr(getCurrentAccount().getTenant().getId(),appId,startTime,endTime);
+//        return RestResponse.success(map);
+//    }
 
 
 }

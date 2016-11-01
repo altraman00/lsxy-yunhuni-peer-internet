@@ -68,6 +68,18 @@ public class SessionStatisticsController extends AbstractPortalController {
         list.add(getArrays(tempVoiceCdrList,date,"amongCall"));
         return RestResponse.success(list);
     }
+    @RequestMapping("/list/call/time")
+    @ResponseBody
+    public RestResponse listCallTime(HttpServletRequest request,String type,String startTime,String appId){
+        List list = new ArrayList();
+        List tempVoiceCdrList = getVoiceCdrList(request,type,appId,startTime);
+        Object date = 12;
+        if(ConsumeStatisticsVo.TYPE_DAY.equals(type)){
+            date = DateUtils.parseDate(startTime,"yyyy-MM");
+        }
+        list.add(getArrays(tempVoiceCdrList,date,"amongCostTime"));
+        return RestResponse.success(list);
+    }
     @RequestMapping("/list/api")
     @ResponseBody
     public RestResponse listApiCall(HttpServletRequest request,String type,String startTime,String appId){

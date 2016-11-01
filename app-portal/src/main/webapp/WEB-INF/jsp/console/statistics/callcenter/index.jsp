@@ -14,10 +14,32 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
             <section id="content">
                 <section class="hbox stretch">
+                    <aside class="bg-green lter aside-sm hidden-print ybox" id="subNav">
+                        <section class="vbox">
+                            <div class="wrapper header"><span class="margin_lr"></span><span class="margin_lr border-left">&nbsp;呼叫中心统计</span>
+                            </div>
+                            <section class="scrollable">
+                                <div class="slim-scroll">
+                                    <nav class="hidden-xs">
+                                        <ul class="nav">
+                                            <li>
+                                                <div class="aside-li-a active">
+                                                    <a href="${ctx}/console/statistics/callcenter/index">综合统计分析</a>
+                                                </div>
+                                                <div class="aside-li-a">
+                                                    <a href="${ctx}/console/statistics/callcenter/detail">明细查询</a>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </section>
+                        </section>
+                    </aside>
             <section class="vbox xbox">
                 <!-- 如果没有三级导航 这段代码注释-->
                 <!--<div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
@@ -51,55 +73,66 @@
                             </header>
                             <div class="panel-body clearfix border-top-none remove-padding">
                                 <div class="row m-l-none m-r-none bg-light lter">
-                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
+                                    <div class="col-md-2 padder-v fix-padding" >
                                         <div class="warpbox">
                                             <div class="">
                                                 <i class="icon iconfont icon-oc-wallet bigicon"></i>
-                                                <span class="green money datatoday">188</span>
+                                                <span class="green money datatoday" id="callIn"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
                                                 呼入量（次）
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent">
+                                    <div class="col-md-2 padder-v fix-padding">
                                         <div class="warpbox">
                                             <div class="">
                                                 <i class="icon iconfont icon-oc-msg1 bigicon"></i>
-                                                <span class="green money datatoday">123456</span>
+                                                <span class="green money datatoday" id="callOut"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
                                                 呼出量（次）
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
+                                    <div class="col-md-2 padder-v fix-padding" >
                                         <div class="warpbox">
                                             <div class="">
                                                 <i class="icon iconfont icon-oc-mobile bigicon"></i>
-                                                <span class="green money datatoday">0</span>
+                                                <span class="green money datatoday" id="transferSuccess"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
                                                 转接成功（次）
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent">
+                                    <div class="col-md-2 padder-v fix-padding">
                                         <div class="warpbox">
                                             <div class="">
                                                 <i class="icon iconfont icon-oc-talktime bigicon"></i>
-                                                <span class="green money datatoday">0</span>
+                                                <span class="green money datatoday" id="formTime"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
                                                 平均排队时长（秒）
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 padder-v fix-padding width-twenty-percent" >
+                                    <div class="col-md-2 padder-v fix-padding">
+                                        <div class="warpbox">
+                                            <div class="">
+                                                <i class="icon iconfont icon-oc-recharge bigicon"></i>
+                                                <span class="green money datatoday" id="callTime"></span>
+                                            </div>
+                                            <div class="middle-font-size middle-font-color" >
+                                                平均通话时长（秒）
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 padder-v fix-padding" >
                                         <div class="warpbox remove-border">
                                             <div class="">
                                                 <i class="icon iconfont icon-oc-callrate bigicon"></i>
-                                                <span class="green money datatoday">0</span>
+                                                <span class="green money datatoday" id="callFail"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
                                                 呼入流失率（%）
@@ -114,8 +147,8 @@
                     <section class="panel panel-default pos-rlt clearfix ">
                         <div class="row margin-bottom-20" >
                             <div class="col-md-12">
-                                <input type="radio" name="calltime"  data-id="call" value="month" class="selectdata" checked/>日统计
-                                <input type="radio" name="calltime"  data-id="call" value="year" class="selectdata ml-15" />月统计
+                                <input type="radio" name="calltime"  data-id="call" value="day" class="selectdata" checked/>日统计
+                                <input type="radio" name="calltime"  data-id="call" value="month" class="selectdata ml-15" />月统计
                             </div>
                         </div>
 
@@ -123,9 +156,9 @@
                         <div class="row" id="calldate" >
                             <div class="col-md-12">
                                 <!--日统计-->
-                                <input type="text" class="datepicker currentMonth form-control date_block monthstart monthform"  value="2016-07" />
+                                <input type="text" class="datepicker currentMonth form-control date_block monthstart monthform" id="calldateday" value="${day}" data-time="${day}"/>
                                 <!--月统计-->
-                                <input type="text" class="datepicker  form-control currentYear date_block yearstart yearform" value="2016"  />
+                                <input type="text" class="datepicker  form-control currentYear date_block yearstart yearform" id="calldatemonth" value="${month}"  data-time="${month}"/>
                                 <button class="btn btn-primary finddatebtn" data-id="call" >查询</button>
                                 <span class="tips-error monthtips"></span>
                             </div>
@@ -148,16 +181,16 @@
                     <section class="panel panel-default pos-rlt clearfix">
                         <div class="row margin-bottom-20">
                             <div class="col-md-12">
-                                <input type="radio" name="talktime" value="month" data-id="talk" class="selectdata" checked/>日统计
-                                <input type="radio" name="talktime" value="year"  data-id="talk" class="selectdata ml-15" />月统计
+                                <input type="radio" name="talktime" value="day" data-id="talk" class="selectdata" checked/>日统计
+                                <input type="radio" name="talktime" value="month"  data-id="talk" class="selectdata ml-15" />月统计
                             </div>
                         </div>
 
                         <!--日统计-->
                         <div class="row" id="talkdate">
                             <div class="col-md-12">
-                                <input type="text" class="datepicker currentMonth form-control date_block monthtalkstart monthform" value="2016-07" />
-                                <input type="text" class="datepicker  form-control currentYear date_block yeartalkstart yearform" value="2016"  />
+                                <input type="text" class="datepicker currentMonth form-control date_block monthtalkstart monthform" id="talkdateday" value="${day}" data-time="${day}" />
+                                <input type="text" class="datepicker  form-control currentYear date_block yeartalkstart yearform" id="talkdatemonth" value="${month}" data-time="${month}" />
                                 <button class="btn btn-primary finddatebtn" data-id="talk" >查询</button>
                                 <span class="tips-error"></span>
                             </div>
@@ -206,7 +239,7 @@
     //呼叫次数统计
     $('input[name="calltime"]').click(function(){
         var v = $(this).val();
-        if(v=='year'){
+        if(v=='month'){
             $('#calldate .yearform').show();$('#calldate .monthform').hide();
         }else{
             $('#calldate .yearform').hide();$('#calldate .monthform').show();
@@ -217,9 +250,7 @@
     //呼通话时长统计
     $('input[name="talktime"]').click(function(){
         var v = $(this).val();
-
-
-        if(v=='year'){
+        if(v=='month'){
             $('#talkdate .yearform').show();$('#talkdate .monthform').hide();
         }else{
             $('#talkdate .yearform').hide();$('#talkdate .monthform').show();
@@ -240,10 +271,9 @@
 
     //初始时间
     function initialStartTime(id){
-        var starttime =  $('.'+id+'start').val();
-        var endtime = '';
+        var starttime =  $(id).val();
         if(starttime==''){
-            starttime = $('.'+id+'start').attr('data-time');
+            starttime = $(id).attr('data-time');
         }
         return starttime;
     }
@@ -276,30 +306,40 @@
     function initchart(){
         var type = $('input[name="calltime"]:checked').val();
         var app = $('#defaultapp').val();
-        var starttime = initialStartTime(type);
-        var param  = {starttime:starttime,type:type,app:app};
-        if(type=='year'){
-            var xd  = meetDataYear();
-        }else{
-            var xd  = meetDataMonth();
-        }
-        //呼叫次数统计
-        callcharts(xd,type);
+        var starttime = initialStartTime("#calldate"+type);
+
+        var param ={'type':type,'appId':app,'startTime':starttime, csrfParameterName:csrfToken};
+        ajaxsync(ctx+"/console/statistics/session/list/session",param,function(result){
+            var resultData = result.data;
+            callcharts(resultData[0],type);
+        });
+//        if(type=='month'){
+//            var xd  = meetDataYear();
+//        }else{
+//            var xd  = meetDataMonth();
+//        }
+////        呼叫次数统计
+//        callcharts(xd,type);
     }
 
     //通话时长触发函数
     function inittalkchart() {
         var type = $('input[name="talktime"]:checked').val();
         var app = $('#defaultapp').val();
-        var starttime = initialStartTime(type);
-        var param  = {starttime:starttime,type:type,app:app};
-        if(type=='year'){
-            var xd  = meetDataYear();
-        }else{
-            var xd  = meetDataMonth();
-        }
-        //呼叫次数统计
-        talkcharts(xd,type);
+        var starttime = initialStartTime("#talkdate"+type);
+//        var param  = {starttime:starttime,type:type,app:app};
+//        if(type=='month'){
+//            var xd  = meetDataYear();
+//        }else{
+//            var xd  = meetDataMonth();
+//        }
+//        //呼叫次数统计
+//        talkcharts(xd2,type);
+        var param ={'type':type,'appId':app,'startTime':starttime, csrfParameterName:csrfToken};
+        ajaxsync(ctx+"/console/statistics/session/list/call/time",param,function(result){
+            var resultData = result.data;
+            talkcharts(resultData[0],type);
+        });
 
     }
 
@@ -314,7 +354,7 @@
      */
     function callcharts(xd,type){
         var Xdata = monthData;
-        if(type=='year'){
+        if(type=='month'){
             var Xdata = timeData;
         }
         var callChart = echarts.init(document.getElementById('ecpanel'),'wonderland');
@@ -369,7 +409,7 @@
      */
     function talkcharts(xd,type){
         var Xdata = monthData;
-        if(type=='year'){
+        if(type=='month'){
             var Xdata = timeData;
         }
         var talkChart = echarts.init(document.getElementById('ecpaneltalk'),'wonderland');
@@ -466,18 +506,30 @@
         inittalkchart();
 
     });
-    $(function(){
+    function getCurrentMonth(){
         var app = $('#defaultapp').val();
-        console.info("|||||"+app)
-    });
+        var params = {'appId':app};
+        ajaxsync(ctx + "/console/statistics/callcenter/get_current_month", params, function (result) {
+            if(result.success){
+                //result.data
+                $('#callIn').html(result.data.callIn);//呼入量
+                $('#callOut').html(result.data.callOut);//呼出量
+                $('#transferSuccess').html(result.data.transferSuccess);//转接成功
+                $('#formTime').html(result.data.formTime);//排队时间
+                $('#callTime').html(result.data.callTime);//平均通话时长
+                $('#callFail').html(result.data.callFail);//呼入流失率
+            }
+        },"get");
+    }
+    window.onload = function(){
+        getCurrentMonth();
+    }
     //应用
     $('#myTab li a').click(function(){
         var app = $(this).attr('data-app');
-        console.info(app)
         $('#defaultapp').val(app);
         //初始化本月数据
-
-
+        getCurrentMonth();
         //初始化呼叫次数
         initchart();
         //初始化通话时长

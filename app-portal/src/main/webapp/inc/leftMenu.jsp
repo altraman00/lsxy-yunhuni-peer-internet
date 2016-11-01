@@ -1,4 +1,24 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
+<%@ page import="java.net.*" %>
+<%
+	Cookie cookie = null;
+	Cookie[] cookies = null;
+	cookies = request.getCookies();
+	String mini  = null;
+	String name  = null;
+	if( cookies != null ){
+		for (int i = 0; i < cookies.length; i++){
+			if(( cookies[i].getName( )).compareTo("hasMini") == 0 ){
+				mini = URLDecoder.decode(cookies[i].getValue(), "utf-8");
+			}
+		}
+	}
+	if(mini.compareTo("false")==0){
+		name = "aside-mini aside-transition";
+	}
+%>
+
+<aside class="bg-Green lter aside hidden-print <%= name %> " id="nav">
 <section class="w-f">
 	<header class="head bg_green lter text-center clearfix">
 		<a id='togglerMiniSidebar' href="#nav" data-toggle="class:nav-xs" class="text-center btn btn_b">
@@ -36,17 +56,6 @@
 						</ul>
 					</li>
 					<li class="border-top">
-						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="${ctx}/console/message/account_message/index" class="canbehover nav-router"  data-router="message" >
-							<i class="fa fa-envelope icon"> </i>
-							<span>消息中心</span>
-						</a>
-					</li>
-					<li class="border-top ">
-						<a data-toggle="tooltip" data-placement='right' title='客服中心' href="${ctx}/console/customer/index" class="canbehover nav-router" data-router="customer">
-							<i class="fa fa-comment-o icon"> </i>
-							<span>客服中心</span> </a>
-					</li>
-					<li class="border-top">
 						<a href="#" class="side-menu-link">
 							<i class="fa fa-caret-down icon"> </i><span>统计查询</span> </a>
 						<ul class="nav lt list">
@@ -64,8 +73,21 @@
 							</li>
 						</ul>
 					</li>
+					<li class="border-top">
+						<a  data-toggle="tooltip" data-placement='right' title='消息中心' href="${ctx}/console/message/account_message/index" class="canbehover nav-router"  data-router="message" >
+							<i class="fa fa-envelope icon"> </i>
+							<span>消息中心</span>
+						</a>
+					</li>
+					<li class="border-top ">
+						<a data-toggle="tooltip" data-placement='right' title='意见反馈' href="${ctx}/console/customer/index" class="canbehover nav-router" data-router="customer">
+							<i class="fa fa-comment-o icon"> </i>
+							<span>意见反馈</span> </a>
+					</li>
+
 				</ul>
 			</nav>
 			<!-- / nav --> </div>
 	</section>
 </section>
+</aside>
