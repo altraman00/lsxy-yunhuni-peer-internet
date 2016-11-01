@@ -300,7 +300,18 @@ public class AreaAndTelNumSelector {
         }
 
         public ResourceTelenum getOneTelnumber() {
-            return new ResourceTelenum();
+            String telNum = null;
+            if(this.toNum != null && toNum.size()> 0){
+                telNum = toNum.get(0).getFrom();
+            }
+            if(StringUtils.isBlank(telNum)){
+                if(this.to1Num != null && to1Num.size()> 0){
+                    telNum = to1Num.get(0).getFrom();
+                }
+            }
+            ResourceTelenum telenum = new ResourceTelenum();
+            telenum.setTelNumber(telNum);
+            return telenum;
         }
     }
 
