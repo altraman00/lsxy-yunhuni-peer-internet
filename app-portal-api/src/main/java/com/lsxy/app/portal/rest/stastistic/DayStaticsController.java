@@ -49,4 +49,24 @@ public class DayStaticsController extends AbstractRestController {
         map.put("costTime",Math.round(statics.getCallCostTime()/60.0));
         return RestResponse.success(map);
     }
+
+    /**
+     * 根据租户id，应用id，开始时间和结束时间来获取统计数据
+     * @param appId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @RequestMapping("/call_center/get")
+    public RestResponse getAmong(String appId,String startTime,String endTime){
+        Map map = new HashMap<>();
+        map.put("callIn","100");//呼入量
+        map.put("callOut","100");//呼出量
+        map.put("transferSuccess","100");//转接成功
+        map.put("formTime","1000");//排队时间
+        map.put("callTime","1000");//平均通话时长
+        map.put("callFail","1000");//呼入流失率
+        return RestResponse.success(map);
+    }
+
 }

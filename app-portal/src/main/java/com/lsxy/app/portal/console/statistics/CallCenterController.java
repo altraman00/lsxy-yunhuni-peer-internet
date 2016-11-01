@@ -12,12 +12,11 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.statistics.model.ApiCallDay;
 import com.lsxy.yunhuni.api.statistics.model.ApiCallMonth;
+import com.lsxy.yunhuni.api.statistics.model.VoiceCdrDay;
+import com.lsxy.yunhuni.api.statistics.model.VoiceCdrMonth;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,19 +33,26 @@ public class CallCenterController extends AbstractPortalController {
     public static final String TYPE_MONTH = "month";//月统计类型 按年查找输出 返回按年
     public static final String TYPE_DAY = "day";//日统计类型 按月查找输出 返回按月
     @RequestMapping("/index")
-    public ModelAndView index(HttpServletRequest request,String appId){
+    public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        if(StringUtils.isNotEmpty(appId)){
-
-        }
-        mav.addObject("appId",appId);
         List<App> appList = (List)getBillAppList(request, App.PRODUCT_CALL_CENTER).getData();
         mav.addObject("appList",appList);
-        String time = DateUtils.formatDate(new Date(),"yyyy-MM");
-        mav.addObject("time",time);
+        Date date = new Date();
+        String day = DateUtils.formatDate(date,"yyyy-MM");
+        String month = DateUtils.formatDate(date,"yyyy");
+        mav.addObject("day",day);
+        mav.addObject("month",month);
         mav.setViewName("/console/statistics/callcenter/index");
         return mav;
     }
+    @RequestMapping(value = "/get_current_month",method = RequestMethod.GET)
+    @ResponseBody
+    public RestResponse getCurrentMonth(HttpServletRequest request,String appId){
+        String token = getSecurityToken(request);
+        String url = PortalConstants.REST_PREFIX_URL + "/rest/day_statics/call_center/get?appId={1}";
+       return RestRequest.buildSecurityRequest(token).get(url, Map.class,appId);
+    }
+
     @RequestMapping("/detail")
     public ModelAndView detail(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                                String appId, String startTime, String endTime, String type, String callnum, String agent){
