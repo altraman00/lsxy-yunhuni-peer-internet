@@ -40,16 +40,6 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         return this.telnumToLineGatewayDao;
     }
 
-    @Override
-    public String getAreaIdByTelnum(String telnum){
-        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayDao.findFirstByTelNumber(telnum);
-        if(telnumToLineGateway == null ){
-            throw new RuntimeException("数据异常，号码没有关联线路");
-        }
-        String lineId = telnumToLineGateway.getLineId();
-        LineGateway lineGateway = lineGatewayService.findById(lineId);
-        return lineGateway.getAreaId();
-    }
 
     @Override
     public  List<TelnumToLineGateway> getDialingLinesByNumber(String number) {

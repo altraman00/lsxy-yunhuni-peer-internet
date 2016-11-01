@@ -42,34 +42,6 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         return this.resourceTelenumDao;
     }
 
-    @Override
-    public List<String> getFreeTeleNum(int count,String areaId){
-        //TODO 根据区域选择空闲的号码
-        List<String> result = new ArrayList<>();
-        List<ResourceTelenum> telenums = resourceTelenumDao.findFirst50ByStatusAndTelNumberNot(ResourceTelenum.STATUS_FREE,testCallNumber);
-        if(telenums != null && telenums.size() > 0){
-            int size = telenums.size();
-            if(size <= count){
-                //如果号码池中的号太少，则只取出号码池中的数量的号码即可
-                for(ResourceTelenum telenum:telenums){
-                    result.add(telenum.getTelNumber());
-                }
-            }else{
-                List<Integer> ranList = new ArrayList<>();
-                Random random = new Random();
-                for(int i = 0;i< count;i++){
-                    Integer ranNum = random.nextInt(size);
-                    if(ranList.contains(ranNum)){
-                        i--;
-                    }else{
-                        ranList.add(ranNum);
-                        result.add(telenums.get(ranNum).getTelNumber());
-                    }
-                }
-            }
-        }
-        return result;
-    }
 
     @Override
     public ResourceTelenum findByTelNumber(String telNumber) {
@@ -182,7 +154,6 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-
         ResourceTelenum notEmptyNum = null;
         //传入的参数大于0，则说明选号可能有多个，或者是指定了号码
         if(from.length > 0){

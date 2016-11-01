@@ -14,6 +14,7 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
@@ -27,10 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 租户号码租用service
@@ -88,16 +86,18 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public String[] findOwnUnusedNum(Tenant tenant) {
-        List<String> telNums = new ArrayList<>();
+    public List<ResourceTelenum> findOwnUnusedNum(Tenant tenant) {
+        List<ResourceTelenum> telNums = new ArrayList<>();
         List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
         if(list != null && list.size()>0){
             for(ResourcesRent rent:list){
-                String telNumber = rent.getResourceTelenum().getTelNumber();
-                telNums.add(telNumber);
+                ResourceTelenum telNumber = rent.getResourceTelenum();
+                if(telNumber != null){
+                    telNums.add(telNumber);
+                }
             }
         }
-        return telNums.toArray(new String[]{});
+        return telNums;
     }
 
     @Override

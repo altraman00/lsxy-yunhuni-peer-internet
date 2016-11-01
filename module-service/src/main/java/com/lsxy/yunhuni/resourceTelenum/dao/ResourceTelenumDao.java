@@ -15,12 +15,7 @@ import java.util.List;
  * Created by zhangxb on 2016/7/1.
  */
 public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, Serializable> {
-    /**
-     * 获取50个空闲的号码
-     * @param status
-     * @return
-     */
-    List<ResourceTelenum> findFirst50ByStatusAndTelNumberNot(Integer status,String testNum);
+
     /**
      * 根据号码获取资源
      * @param telNumber

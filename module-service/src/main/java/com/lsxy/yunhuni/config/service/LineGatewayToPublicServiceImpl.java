@@ -9,7 +9,6 @@ import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToPublicDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -98,7 +97,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     @Override
     public List<LineGateway> findAllLineGatewayByAreaId(String areaId) {
         List<LineGateway> lineGateways = new ArrayList<>();
-        List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaIdOrderByPriorityDesc(areaId);
+        List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaId(areaId);
         for (LineGatewayToPublic ltp:ltps){
             LineGateway lineGateway = ltp.getLineGateway();
             //TODO 判断线路是否可用
