@@ -3,6 +3,8 @@ package com.lsxy.yunhuni.api.app.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.config.model.Area;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -183,6 +185,7 @@ public class App extends IdEntity {
 
     @ManyToOne
     @JoinColumn(name = "area_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     public Area getArea() {
         return area;
     }

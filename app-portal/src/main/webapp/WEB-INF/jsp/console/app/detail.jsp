@@ -160,7 +160,10 @@
                                                         <div class="col-md-1 dev">
                                                             绑定测试号：
                                                         </div>
-                                                        <div class="col-md-8" >
+                                                        <div class="col-md-8"> <span id="testNumBind"
+                                                                <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
+                                                                    hidden
+                                                                </c:if>>
                                                             <c:set var="tempTestNum" value="0"></c:set>
                                                             <c:forEach items="${testNumBindList}" var="testNumBind">
                                                                 <c:if test="${testNumBind.app.id==app.id}">
@@ -172,6 +175,7 @@
                                                                         <span name="testNum">${testNumBind.number} </span>
                                                                     </c:if>
                                                                 </c:forEach>
+                                                            </span>
                                                                 <a
                                                                         <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
                                                                             class="modalShow" data-id="one"
