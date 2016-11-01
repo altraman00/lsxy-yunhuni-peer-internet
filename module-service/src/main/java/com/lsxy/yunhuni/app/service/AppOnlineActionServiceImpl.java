@@ -17,6 +17,7 @@ import com.lsxy.yunhuni.api.config.service.AreaService;
 import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.exceptions.TeleNumberBeOccupiedException;
+import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -72,6 +73,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
     CalBillingService calBillingService;
     @Autowired
     AreaSipService areaSipService;
+    @Autowired
+    VoiceFilePlayService voiceFilePlayService;
 
     @Override
     public BaseDaoInterface<AppOnlineAction, Serializable> getDao() {
@@ -146,8 +149,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                 }
                 Area oldArea = app.getArea();
                 if(oldArea != null && !oldArea.getId().equals(areaId)){
-                    //TODO 区域不一样时，进行区域迁移操作
-
+                    // 区域不一样时，进行区域迁移操作(重新同步放音文件)
+                    voiceFilePlayService.renewSyncByAppId(appId);
                 }
                 //绑定应用与区域的关系
                 Area area = new Area();
@@ -253,7 +256,8 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
             app.setStatus(App.STATUS_OFFLINE);
             String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
             if(!areaId.equals(app.getArea().getId())){
-                //TODO 当区域和测试区域不一样时，进行区域迁移
+                // 当区域和测试区域不一样时，进行区域迁移（重新同步放音文件）
+                voiceFilePlayService.renewSyncByAppId(appId);
             }
             //应用区域设置为测试区域
             Area area = new Area();
