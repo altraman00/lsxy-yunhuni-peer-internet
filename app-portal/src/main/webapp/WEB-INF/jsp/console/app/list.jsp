@@ -327,10 +327,11 @@
         $('#phonelist').html('');
         var isCall =  ["✔", "✘"] ;
         var ownIvr = [];
-
+        var needCalledNum = false;
         ajaxsync(ctx + "/console/app_action/select_num/" + appId,null,function(response){
             if(response.success ){
                 ownIvr = response.data.ownNums;
+                needCalledNum = response.data.needCalledNum;
                 result = true;
             }else{
                 result = false;
@@ -347,13 +348,20 @@
         }
 
         if(ownIvr.length>0){
-            $('#selectNewIvr').show();
+            if(needCalledNum){
+                $('#selectOwnIvr').show();
+            }else{
+                $('#selectNewIvr').show();
+            }
             for (var i = 0 ; i< ownIvr.length ; i ++){
                 html += '<tr><td><input type="checkbox" name="phonelist" value="'+ownIvr[i].phone+'" /></td>'
                 //特殊判断 <i class="fa fa-exclamation-triangle"></i>
-                html += '<td data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
-                //普通号码
-                //html +='<td>'+data[i].phone+'</td>'
+                if(ownIvr[i].lastUsed){
+                    html += '<td data-toggle="tooltip" data-placement="right"  title="此号码为该应用上一次进行号码绑定时选择的号码">'+ownIvr[i].phone+'<i class="fa fa-exclamation-triangle cursor orange" ></i> </td>'
+                }else{
+                    //普通号码
+                    html +='<td>'+data[i].phone+'</td>'
+                }
                 html +='<td class="text-center" >'+isCall[ownIvr[i].isCalled]+'</td><td class="text-center" >'+isCall[ownIvr[i].isDialing]+'</td><td class="text-left-fixed" >'+ownIvr[i].areaCode+'</td></tr>'
             }
             $('#phonelist').html(html);

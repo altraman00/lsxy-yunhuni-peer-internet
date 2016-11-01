@@ -85,14 +85,17 @@ public class AppOnlineActionControlller extends AbstractRestController {
                     map.put("isDialing","1");
                     map.put("areaCode","020");
                     if(StringUtils.isNotBlank(lastOnlineNums) && lastOnlineNums.contains(telNumber.getTelNumber())){
-                        map.put("lastUse",true);
+                        map.put("lastUsed",true);
                     }
                     telNums.add(map);
                 }
             }
             appOnlineActionService.actionOfSelectNum(appId);
             if((app.getIsIvrService() != null && app.getIsIvrService() == 1) || (app.getIsCallCenter() != null && app.getIsCallCenter() == 1)){
-                result.put("needCalledNum",hasCalled);
+                //如果 没有呼出号码，而且上线的应用需要呼出号码，则将needCalledNum设为true
+                if(hasCalled == false){
+                    result.put("needCalledNum",true);
+                }
             }
             result.put("ownNums",telNums);
             return RestResponse.success(result);
