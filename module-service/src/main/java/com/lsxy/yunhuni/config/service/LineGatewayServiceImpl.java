@@ -108,7 +108,9 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
             result = -1;
             transactionManager.rollback(status);
         } finally {
-            transactionManager.commit(status);
+            if(result == 0) {
+                transactionManager.commit(status);
+            }
         }
         return result;
     }
