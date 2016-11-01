@@ -162,10 +162,10 @@ public class VoiceFilePlayContrller extends AbstractPortalController {
         try {
             RestResponse<App> appResp = this.getAppById(request, appId);
             if(appResp.isSuccess() && appResp.getData() != null){
-                App app = appResp.getData();
-                if(app.getStatus() == App.STATUS_OFFLINE){
-                    throw new RuntimeException("请先上线应用");
-                }
+//                App app = appResp.getData();
+//                if(app.getStatus() == App.STATUS_OFFLINE){
+//                    throw new RuntimeException("请先上线应用");
+//                }
             }else{
                 throw new RuntimeException("获取app失败");
             }

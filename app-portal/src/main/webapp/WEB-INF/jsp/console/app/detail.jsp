@@ -80,7 +80,7 @@
                                                             ${app.name}
                                                             <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
                                                             <c:if test="${app.status==2}"><span class="text-danger">未上线</span></c:if>
-                                                            <input type="hidden" id="appStatus" value="${app.status}">
+                                                            <%--<input type="hidden" id="appStatus" value="${app.status}">--%>
                                                         </div>
                                                     </div>
                                                     <div class="row ">
@@ -454,12 +454,12 @@
                         showtoast("非常抱歉，本站的上传文件功能，暂时不支持IE9及以下的浏览器版本，请更换或者升级浏览器");
                     })
                 }
-                var appStatus = $("#appStatus").val();
-                if(appStatus == 2){
-                    $('#uploadButtonA').unbind("click").bind("click",function(){
-                        showtoast("请先上线应用");
-                    })
-                }
+//                var appStatus = $("#appStatus").val();
+//                if(appStatus == 2){
+//                    $('#uploadButtonA').unbind("click").bind("click",function(){
+//                        showtoast("请先上线应用");
+//                    })
+//                }
             }
             // 上传多个文件
             var cancelCancel=false;
