@@ -35,8 +35,9 @@ public class SelectorTest {
 
     @Test
     public void ttttt() throws AppOffLineException, UnsupportedEncodingException {
-        App app = appService.findById("40288aca57561f840157562530b20000");
+        App app = appService.findById("40288ac95778fd6f01577909260d0000");
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, null, "02082241195");
+        System.out.println(selector.getOneTelnumber().getTelNumber());
         String s = JSONUtil.objectToJson(selector.getToNum());
         List<Map<String, String>> maps = JSONUtil.parseList(s);
         System.out.println(JSONUtil.objectToJson(maps));
