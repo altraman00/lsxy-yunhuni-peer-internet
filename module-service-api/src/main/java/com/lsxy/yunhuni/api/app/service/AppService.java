@@ -75,4 +75,11 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     String findOneAvailableTelnumber(App app);
+
+    /**
+     * 获取分机注册信息
+     * @param appId
+     * @return
+     */
+    String findAppSipRegistrar(String appId);
 }

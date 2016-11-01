@@ -64,6 +64,19 @@ public class AppController extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app_extension/list/{1}";
         return  RestRequest.buildSecurityRequest(token).getList(uri, AppExtension.class,appId);
     }
+
+    /**
+     * 获取应用的分机信息
+     * @param request
+     * @param appId
+     * @return
+     */
+    private RestResponse findAppSipRegistrar(HttpServletRequest request,String appId){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app/get/sipregistrar/{1}";
+        return  RestRequest.buildSecurityRequest(token).getList(uri, String.class,appId);
+    }
+
     /**
      * 创建应用首页
      * @param request
@@ -96,7 +109,7 @@ public class AppController extends AbstractPortalController {
         List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
 //        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
         mav.addObject("testNumBindList",testNumBindList);
-        mav.addObject("sipRegistrar","sipRegistrar");
+        mav.addObject("sipRegistrar",findAppSipRegistrar(request,id).getData());
         mav.setViewName("/console/app/detail");
         return mav;
     }

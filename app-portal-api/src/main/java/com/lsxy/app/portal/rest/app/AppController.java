@@ -57,6 +57,12 @@ public class AppController extends AbstractRestController {
         long re = appService.countByTenantIdAndName(getCurrentAccount().getTenant().getId(),name);
         return RestResponse.success(re);
     }
+
+    @RequestMapping("/get/sipregistrar/{appId}")
+    public RestResponse getSipregistrar(@PathVariable String appId){
+        String sipRegistrar = appService.findAppSipRegistrar(appId);
+        return RestResponse.success(sipRegistrar);
+    }
     /**
      * 查找当前用户的应用
      * @throws Exception
