@@ -785,6 +785,7 @@ public class TenantController {
         List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
         //TODO sipRegistrar分机信息
+        vo.setSipRegistrar("sipRegistrar分机信息");
         return RestResponse.success(vo);
     }
     @ApiOperation(value = "获取租户的app信息下的分机")
