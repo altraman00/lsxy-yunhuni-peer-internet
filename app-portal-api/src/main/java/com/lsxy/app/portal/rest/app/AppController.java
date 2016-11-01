@@ -15,6 +15,7 @@ import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +62,13 @@ public class AppController extends AbstractRestController {
      * @throws Exception
      */
     @RequestMapping("/list")
-    public RestResponse listApp() throws Exception{
-        List<App> apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
+    public RestResponse listApp(String serviceType) throws Exception{
+        List<App> apps = null;
+        if(StringUtils.isNotEmpty(serviceType)) {
+            apps = appService.findAppByUserNameAndServiceType(getCurrentAccount().getTenant().getId(),serviceType);
+        }else{
+            apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
+        }
         return RestResponse.success(apps);
     }
 

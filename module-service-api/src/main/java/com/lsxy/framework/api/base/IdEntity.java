@@ -2,6 +2,7 @@ package com.lsxy.framework.api.base;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lsxy.framework.core.utils.JSONUtil;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -115,5 +116,10 @@ public abstract class IdEntity implements Serializable{
 
 	public void setVersion(int version) {
 		this.version = version;
+	}
+
+	@Override
+	public String toString(){
+		return JSONUtil.objectToJson(this);
 	}
 }

@@ -14,7 +14,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+             <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
         <section id="content">
@@ -70,6 +70,7 @@
                                         <th>#</th>
                                         <th>应用名称</th>
                                         <th>应用标识</th>
+                                        <th>选择服务</th>
                                         <th>应用状态</th>
                                         <th>应用创建时间</th>
                                         <th>操作</th>
@@ -81,8 +82,11 @@
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.name}</td>
                                             <td>${result.id}</td>
-                                            <c:if test="${result.status==1}"><td ><span style="color:#9dc940;"  id="statusapp-${result.id}">已上线</span></td></c:if>
-                                            <c:if test="${result.status==2}"><td ><span style="color:#ff0000;" id="statusapp-${result.id}">未上线</span></td></c:if>
+                                            <td><c:if test="${result.serviceType=='call_center'}">呼叫中心</c:if>
+                                                <c:if test="${result.serviceType=='voice'}">语音服务</c:if></td>
+                                            <td ><c:if test="${result.status==1}"><span style="color:#9dc940;"  id="statusapp-${result.id}">已上线</span></c:if>
+                                            <c:if test="${result.status==2}"><span style="color:#ff0000;" id="statusapp-${result.id}">未上线</span></c:if>
+                                            </td>
                                             <td><fmt:formatDate value="${result.createTime}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                             <td class="operation">
                                                 <a href="${ctx}/console/app/detail?id=${result.id}">详情</a> <span ></span>
