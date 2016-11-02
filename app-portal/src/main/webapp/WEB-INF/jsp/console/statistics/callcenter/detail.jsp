@@ -45,11 +45,12 @@
                 <aside>
                     <section class="vbox xbox">
                         <!-- 如果没有三级导航 这段代码注释-->
-                        <!--<div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
-                                class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
-                        </div>-->
+                        <div class="head-box"><a href="#subNav" data-toggle="class:hide">
+                            <i class=" iconfont icon-menu-left text"></i>
+                            <i class=" iconfont icon-menu-right text-active"></i>
+                        </a></div>
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;呼叫中心</span>
+                            <span class="border-left">&nbsp;明细查询</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <!--大图标 添加样子 application-tab -->
