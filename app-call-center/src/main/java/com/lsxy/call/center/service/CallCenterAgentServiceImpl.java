@@ -12,10 +12,7 @@ import com.lsxy.call.center.dao.CallCenterAgentDao;
 import com.lsxy.call.center.utils.EnqueueSQLUtil;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.core.utils.UUIDGenerator;
+import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.EnqueueEvent;
 import org.slf4j.Logger;
@@ -27,7 +24,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -211,19 +212,35 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
     }
 
-    public void enqueue(String tenantId, String appId, String agent){
-
-
+    /**
+     * 坐席找排队
+     * @param tenantId
+     * @param appId
+     * @param agentId
+     */
+    public void enqueue(String tenantId, String appId, String agentId){
+        CallCenterAgent agent = this.findById(agentId);
+        if(agent == null){
+            return;
+        }
+        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAgentAndActive(tenantId,appId,agentId,1);
+        Map<String,Object> params = new HashMap<>();
+        if(skills!=null && skills.size()>0){
+            for(AgentSkill skill : skills){
+                String varName = "var_" + skill.getName().hashCode();
+                params.put(varName, skill.getLevel() == null ?0 : skill.getLevel());
+            }
+        }
+        String enqueue_str = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
+        EnQueue enQueue = JSONUtil2.fromJson(enqueue_str,EnQueue.class);
+        String ex = enQueue.getFilter().getCondition().getWhere();
+        test(ex,params);
     }
-    public void dequeue(String agent){
-    }
 
-    /*public static void main(String[] args) {
+    public void test(String ex ,Map<String,Object> params){
         String skill_regex="(has|get)\\(\"(.+?)\"\\)";
         Pattern p  =Pattern.compile(skill_regex);
-        String ex = "get(\"haha0\") + get(\"haha1\")";
         Matcher m =  p.matcher(ex);
-        List<String> vars = new ArrayList<>();
         while(m.find()){
             String key = m.group(1);
             String val =  m.group(2);
@@ -233,12 +250,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 rel = rel + ">0";
             }
             ex = ex.replaceAll(key + "\\(\"(.+?)\"\\)",rel);
-            vars.add(varName);
         }
-        Map<String,Object> params = new HashMap<>();
-        for(String var : vars){
-            params.put(var, new Random().nextInt(100));
-        }
-        System.out.println(EnqueueSQLUtil.execExpression(ex,params).getValue());
-    }*/
+        EnqueueSQLUtil.execExpression(ex,params).getValue();
+    }
+    public void dequeue(String agent){
+    }
 }
