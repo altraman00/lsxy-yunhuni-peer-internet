@@ -60,16 +60,21 @@
                         <section class="scrollable wrapper w-f">
                             <section>
                                 <div class="col-md-12 ">
-                                    <div class="number_info">
-                                        <p>1、呼入号码作为应用使用IVR功能的拨入号使用，测试阶段可使用统一的测试呼入号码测试IVR功能，应用上线后可租用固定独立的呼入号码实现交互功能。</p>
-                                        <p>2、余额不足以支付每月扣除的100元月租费时，相关联的号码将过期。</p>
-                                        <p>3、下线应用后呼入号码自动与应用解除关联。</p>
-                                        <p>4、超过有效期7天的号码自动移除。</p>
-                                    </div>
+                                    <p class="number_info">
+                                        1.应用未上线前，会员可以使用平台的测试号码进行测试，应用上线后，会员需要租用固定的号码作为某些特定功能的呼入或呼出号码使用。<br/>
+                                        2.租用号码成功后，每个号码统一收取100元/月的号码月租费，余额不足以支付每月扣除号码月租费时，号码列表的号码将会过期，过期时间超过7天，号码则自动移除。<br/>
+                                        3.应用下线后，号码自动与应用解除关联，应用下线不影响号码月租费的收取。<br/>
+                                        4.会员根据自身业务需要，购买不同功能的号码。<br/>
+                                    </p>
                                 </div>
                             </section>
 
                             <section class="panel panel-default pos-rlt clearfix ">
+                                <div class="row">
+                                    <div class="col-md-12 text-right remove-padding">
+                                        <a id="call-number" class="btn btn-primary">号码租用</a>
+                                    </div>
+                                </div>
                                 <table class="table table-striped cost-table-history">
                                     <thead>
                                     <tr>
