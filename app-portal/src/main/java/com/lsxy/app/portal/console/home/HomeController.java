@@ -43,8 +43,8 @@ public class HomeController extends AbstractPortalController {
     public ModelAndView index(HttpServletRequest request){
         Map<String,Object> model = new HashMap<>();
         String token = getSecurityToken(request);
-        HomeVO homeVO = buildHomeVO(token);
-        model.put("homeVO",homeVO);
+//        HomeVO homeVO = buildHomeVO(token);
+        model.put("homeVO",new HomeVO());
         return new ModelAndView("console/home/index",model);
     }
     /**
