@@ -16,7 +16,6 @@
         <section class="hbox stretch">
             <!-- .aside -->
              <%@include file="/inc/leftMenu.jsp"%>
-            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
         <section id="content">
