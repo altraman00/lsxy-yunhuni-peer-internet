@@ -272,10 +272,10 @@ public class LineGatewayController extends AbstractRestController {
         for(int i=0;i<telnums.getTelnums().length;i++){
             TelnumToLineGatewayEditVo telnum = telnums.getTelnums()[i];
             if(StringUtils.isEmpty(telnum.getId())) {
-                RestResponse.failed("0000","不允许存在记录id为空");
+                return RestResponse.failed("0000","不允许存在记录id为空");
             }
             if(StringUtils.isEmpty(telnum.getIsCalled())&&StringUtils.isEmpty(telnum.getIsDialing())&&StringUtils.isEmpty(telnum.getIsThrough())){
-                RestResponse.failed("0000","不允许存在无修改项的记录");
+                return RestResponse.failed("0000","不允许存在无修改项的记录");
             }
             String sq = "  UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET ";
             if(StringUtils.isNotEmpty(telnum.getIsCalled())){
@@ -563,5 +563,19 @@ public class LineGatewayController extends AbstractRestController {
             return "质量范围错误";
         }
         return "";
+    }
+    @RequestMapping(value = "/tenant/plist/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "线路绑定租户信息-获取分页数据")
+    public RestResponse tenantPlist(
+            @ApiParam( name="id",value = "线路id")@PathVariable String id,
+            @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
+            @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize
+    ){
+        LineGateway lineGateway = lineGatewayService.findById(id);
+        if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
+            return RestResponse.failed("0000","线路不存");
+        }
+        Page page= resourceTelenumService.getTenatPageByLine(pageNo,pageSize,id);
+        return RestResponse.success(page);
     }
 }

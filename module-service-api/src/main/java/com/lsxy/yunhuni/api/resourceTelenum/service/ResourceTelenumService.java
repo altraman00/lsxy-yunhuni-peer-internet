@@ -8,6 +8,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 全局号码资源service
@@ -68,5 +69,5 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @param pageSize
      * @return
      */
-    Page<ResourceTelenum> getTenatPageByLine(Integer pageNo,Integer pageSize,String line);
+    Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line);
 }
