@@ -16,10 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by zhangxb on 2016/10/29.
@@ -43,7 +40,7 @@ public class ResourcesRentController extends AbstractRestController {
      * @throws MatchMutiEntitiesException
      */
     @ApiOperation(value = "号码列表")
-    @RequestMapping("/list/{id}")
+    @RequestMapping(value = "/list/{id}",method = RequestMethod.GET)
     public RestResponse pageList(@ApiParam(name = "id",value = "号码id") @PathVariable String id,
                                  @ApiParam(name = "pageNo",value = "第几页")@RequestParam(defaultValue = "1") Integer pageNo,
                                  @ApiParam(name = "pageSize",value = "每页记录数")@RequestParam(defaultValue = "20") Integer pageSize){
@@ -55,4 +52,17 @@ public class ResourcesRentController extends AbstractRestController {
         Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(tenant.getId(),pageNo,pageSize);
         return RestResponse.success(page);
     }
+//    @ApiOperation(value = "号码列表")
+//    @RequestMapping(value = "/list/{id}",method = RequestMethod.GET)
+//    public RestResponse pageList(@ApiParam(name = "线路id",value = "号码id") @PathVariable String id,
+//                                 @ApiParam(name = "pageNo",value = "第几页")@RequestParam(defaultValue = "1") Integer pageNo,
+//                                 @ApiParam(name = "pageSize",value = "每页记录数")@RequestParam(defaultValue = "20") Integer pageSize){
+//        Tenant tenant = tenantService.findById(id);
+//        if(tenant==null|| StringUtils.isEmpty(tenant.getId())){
+//            return RestResponse.failed("0000","租户不存在");
+//        }
+//        //获取该租户下的所有号码信息
+//        Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(tenant.getId(),pageNo,pageSize);
+//        return RestResponse.success(page);
+//    }
 }

@@ -104,7 +104,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize, String number,String operator,String isThrough,String status) {
-        String hql = " FROM ResourceTelenum obj WHERE 1=1 ";
+        String hql = " FROM ResourceTelenum obj WHERE deleted=0 ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.operator like '%"+operator+"%' ";
         }

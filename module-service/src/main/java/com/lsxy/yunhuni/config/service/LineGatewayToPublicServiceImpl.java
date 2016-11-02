@@ -52,7 +52,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public Page<LineGatewayToPublic> getPage(Integer pageNo, Integer pageSize, String operator, String isThrough, String status, String isPublicLine, String order) {
-        String hql = " FROM LineGatewayToPublic obj WHERE 1=1 ";
+        String hql = " FROM LineGatewayToPublic obj WHERE deleted=0 ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.lineGateway.operator = '"+operator+"' ";
         }

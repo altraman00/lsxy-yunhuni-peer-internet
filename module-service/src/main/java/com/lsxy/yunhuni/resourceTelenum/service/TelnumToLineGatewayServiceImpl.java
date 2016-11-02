@@ -80,7 +80,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String line,String number, String isDialing, String isCalled, String isThrough) {
-        String hql = " FROM TelnumToLineGateway obj WHERE 1=1 ";
+        String hql = " FROM TelnumToLineGateway obj WHERE deleted=0 ";
         if(StringUtils.isNotEmpty(line)){
             hql += " AND obj.lineId='"+line+"' ";
         }
@@ -150,7 +150,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public List<String> getTelnumByLineId(String line) {
-        String sql = " SELECT tel_number  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 AND line_id='"+line+"' ";
+        String sql = " SELECT DISTINCT tel_number  FROM  db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 AND line_id='"+line+"' ";
         List<String> list = jdbcTemplate.queryForList(sql,String.class);
         return list;
     }
