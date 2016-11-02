@@ -2,13 +2,13 @@ package com.lsxy.app.portal.console.statistics;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.session.model.CallCenter;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import org.apache.commons.lang.StringUtils;
@@ -153,30 +153,12 @@ public class BillDetailController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/callcenter")
-    public ModelAndView callcenter(HttpServletRequest request,
-                                   @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
-                                   String appId,String startTime,String endTime,String type,String callnum,String agent){
+    public ModelAndView callcenter(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,startTime,appId,App.PRODUCT_CALL_CENTER);
-        if(StringUtils.isEmpty(startTime)){
-            startTime = map.get("time");
-        }
-        if(StringUtils.isEmpty(endTime)){
-            endTime = map.get("time");
-        }
-        map.put("type",type);
-        map.put("callnum",callnum);
-        map.put("agent",agent);
-        map.put("startTime",startTime);
-        map.put("endTime",endTime);
+        Map<String,String> map = init(request,time,appId,App.PRODUCT_CALL_CENTER);
         mav.addAllObjects(map);
-        String token = getSecurityToken(request);
-        String uri =  PortalConstants.REST_PREFIX_URL  + "/rest/call_center/plist?pageNo={1}&pageSize={2}&appId={3}&startTime={4}&endTime={5}&type={6}&callnum={7}&agent={8}";
-        RestResponse<Page<CallCenter>> restRequest =  RestRequest.buildSecurityRequest(token).getPage(uri,CallCenter.class,pageNo,pageSize,appId,startTime,endTime,type,callnum,agent);
-        String uri2 = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/sum?appId={1}&startTime={2}&endTime={3}&type={4}&callnum={5}&agent={6}";
-        RestResponse restResponse2 = RestRequest.buildSecurityRequest(token).get(uri2, Map.class,appId,startTime,endTime,type,callnum,agent);
-        mav.addObject("sum",restResponse2.getData());
-        mav.addObject("pageObj",restRequest.getData());
+        mav.addObject("sum",sum(request,App.PRODUCT_CALL_CENTER,map.get("time"),map.get("appId")).getData());
+        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, App.PRODUCT_CALL_CENTER,map.get("time"),map.get("appId")).getData());
         mav.setViewName("/console/statistics/billdetail/callcenter");
         return mav;
     }
@@ -235,33 +217,14 @@ public class BillDetailController extends AbstractPortalController {
         }else if("callcenter".equals(path)){
             oType = CallSession.TYPE_VOICE_CALLBACK;
             title = "呼叫中心";
-            headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","坐席","转接结果","通话结束原因","转人工时间","接听时间","通话结束时间","消费金额"};
-            values = new String[]{"startTime","type:1=呼入;2=呼出","fromNum","toNum","agent","toManualResult:1=接听;2=呼叫坐席失败;3=主动放弃;4=超时","overReason","toManualTime","answerTime","endTime","cost"};
+            headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","消费金额","时长（秒）"};
+            values = new String[]{"callStartDt","ivrType:1=呼入;2=呼出","fromNum","toNum","cost","costTimeLong"};
             serviceType = App.PRODUCT_CALL_CENTER;
         }
         List list = null;
-        if(App.PRODUCT_CALL_CENTER.equals(serviceType)){
-            String startTime = request.getParameter("startTime");
-            String endTime = request.getParameter("endTime");
-            String type = request.getParameter("type");
-            String callnum = request.getParameter("callnum");
-            String agent = request.getParameter("agent");
-            String uri = PortalConstants.REST_PREFIX_URL  + "/rest/call_center/list?appId={1}&startTime={2}&endTime={3}&type={4}&callnum={5}&agent={6}";
-            RestResponse restResponse = RestRequest.buildSecurityRequest(getSecurityToken(request)).getList(uri, CallCenter.class,appId,startTime,endTime,type,callnum,agent);
-            list = (List)restResponse.getData();
-            time = startTime+" 至 "+endTime +" 坐席："+agent +" 呼叫号码："+callnum+" 类型：";
-            if(CallCenter.CALL_UP==Integer.valueOf(type)){
-                time +=" 呼出 ";
-            }else if(CallCenter.CALL_IN==Integer.valueOf(type)){
-                time += " 呼入 ";
-            }else{
-                time +="  ";
-            }
-        }else if(App.PRODUCT_VOICE.equals(serviceType)){
-            if(StringUtils.isNotEmpty(oType)){
-                Map<String,String> map = init(request,time,appId,serviceType);
-                list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
-            }
+        if(StringUtils.isNotEmpty(oType)){
+            Map<String,String> map = init(request,time,appId,serviceType);
+            list = (List)getList(request,oType,map.get("time"),map.get("appId")).getData();
         }
         String appName = "";
         if(StringUtils.isNotEmpty(appId)){

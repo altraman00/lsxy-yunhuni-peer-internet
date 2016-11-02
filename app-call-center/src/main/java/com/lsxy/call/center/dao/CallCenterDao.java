@@ -1,7 +1,7 @@
-package com.lsxy.yunhuni.session.dao;
+package com.lsxy.call.center.dao;
 
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.framework.api.base.BaseDaoInterface;
-import com.lsxy.yunhuni.api.session.model.CallCenter;
 
 import java.io.Serializable;
 

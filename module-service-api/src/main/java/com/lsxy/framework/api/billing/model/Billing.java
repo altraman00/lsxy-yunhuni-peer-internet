@@ -96,4 +96,5 @@ public class Billing extends IdEntity {
     public void setBalanceDate(Date balanceDate) {
         this.balanceDate = balanceDate;
     }
+
 }

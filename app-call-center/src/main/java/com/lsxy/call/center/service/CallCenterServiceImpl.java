@@ -1,16 +1,15 @@
-package com.lsxy.yunhuni.session.service;
+package com.lsxy.call.center.service;
 
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
+import com.lsxy.call.center.dao.CallCenterDao;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.yunhuni.api.session.model.CallCenter;
-import com.lsxy.yunhuni.api.session.service.CallCenterService;
-import com.lsxy.yunhuni.session.dao.CallCenterDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -20,6 +19,7 @@ import java.util.Map;
  * Created by zhangxb on 2016/10/22.
  */
 @Service
+@com.alibaba.dubbo.config.annotation.Service
 public class CallCenterServiceImpl extends AbstractService<CallCenter> implements CallCenterService {
     @Autowired
     private CallCenterDao callCenterDao;
