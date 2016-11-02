@@ -1,19 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false"%>
 <%@ page import="java.net.*" %>
 <%
-	Cookie cookie = null;
 	Cookie[] cookies = null;
 	cookies = request.getCookies();
 	String mini  = null;
 	String name  = null;
 	if( cookies != null ){
 		for (int i = 0; i < cookies.length; i++){
-			if(( cookies[i].getName( )).compareTo("hasMini") == 0 ){
+			if(cookies[i] != null && "hasMini".equals(cookies[i].getName())){
 				mini = URLDecoder.decode(cookies[i].getValue(), "utf-8");
 			}
 		}
 	}
-	if(mini.compareTo("false")==0){
+	if("false".equals(mini)){
 		name = "aside-mini aside-transition";
 	}
 %>
