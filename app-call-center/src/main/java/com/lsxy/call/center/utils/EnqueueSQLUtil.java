@@ -16,7 +16,7 @@ public final class EnqueueSQLUtil {
 
     private static final ExpressionFactory factory = ExpressionFactory.getInstance();
 
-    private static final String SQL_TEMPLATE="select a.id,a.app_id,a.tenant_id,a.type,a.user,a.telenum,a.agent:SHOWCOLUMS from tb_bi_app_extension a" +
+    private static final String SQL_TEMPLATE="select a.id,a.type,a.user,a.telenum,a.agent:SHOWCOLUMS from tb_bi_app_extension a" +
             " left join tb_bi_call_center_agent b on a.agent=b.id"+
             " left join (select agent :COLUMS" +
             " from tb_bi_call_center_agent_skill where tenant_id=\":TENANTID\" and app_id=\":APPID\" and active=1 and deleted=0 group by agent :HAVING) c on a.agent = c.agent" +
@@ -76,6 +76,13 @@ public final class EnqueueSQLUtil {
                 showColums += ",c.`"+skill+"`";
             }
         }
+        if(StringUtil.isBlank(sort) && skills.size()>0){
+            sort = "0";
+            for (String skill : skills){
+                sort += " + `"+skill+"`";
+            }
+            sort = " ORDER BY ("+sort+") desc";
+        }
         String sql = SQL_TEMPLATE
                 .replaceAll(":TENANTID",tenantId)
                 .replaceAll(":APPID",appId)
@@ -104,8 +111,8 @@ public final class EnqueueSQLUtil {
     }
 
     /*public static void main(String[] args) {
-        *//*String a = "has(\\\"haha1\\\") || get(\\\"haha2\\\") > 60 && id==\"1\"";
-        System.out.println(a.replaceAll("id\\s*?==\\s*?\"(\\S+?)\"","c.agent = \"$1\""));*//*
-       System.out.println(genSQL("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","(get(\"haha0\") + get(\"haha1\") * 0.6)/2 > 60","haha1"));
+        //String a = "has(\\\"haha1\\\") || get(\\\"haha2\\\") > 60 && id==\"1\"";
+        //System.out.println(a.replaceAll("id\\s*?==\\s*?\"(\\S+?)\"","c.agent = \"$1\""));
+       System.out.println(genSQL("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","(get(\"haha0\") + get(\"haha1\") * 0.6)/2 > 60",""));
     }*/
 }
