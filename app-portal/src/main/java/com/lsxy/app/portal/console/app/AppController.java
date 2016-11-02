@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +98,12 @@ public class AppController extends AbstractPortalController {
         List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
 //        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
         mav.addObject("testNumBindList",testNumBindList);
-        mav.addObject("sipRegistrar",app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
+        AreaSip areaSip = app.getAreaSip();
+        if(areaSip!=null){
+            mav.addObject("sipRegistrar",app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
+        }else{
+            mav.addObject("sipRegistrar","");
+        }
         mav.setViewName("/console/app/detail");
         return mav;
     }
