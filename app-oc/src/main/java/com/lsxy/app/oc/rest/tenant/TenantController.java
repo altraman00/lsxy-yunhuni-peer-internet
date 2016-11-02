@@ -14,6 +14,7 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
@@ -33,8 +34,7 @@ import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
-import com.lsxy.yunhuni.api.statistics.model.DayStatics;
+import com.lsxy.yunhuni.api.statistics.model.*;
 import com.lsxy.yunhuni.api.statistics.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -1047,5 +1048,116 @@ public class TenantController {
         }
 
     }
-
+    @ApiOperation(value = "租户用户中心的应用统计数据")
+    @RequestMapping(value = "/tenants/{id}/call_center/get",method = RequestMethod.GET)
+    public RestResponse getAmong(
+            @ApiParam(name = "id",value="租户id")@PathVariable String id,
+            @ApiParam(name = "appId",value="应用id")@RequestParam String appId,
+            @ApiParam(name = "startTime",value="开始时间")@RequestParam String startTime,
+            @ApiParam(name = "endTime",value="结束时间")@RequestParam String endTime
+    ){
+        Map map = new HashMap<>();
+        map.put("callIn","100");//呼入量
+        map.put("callOut","100");//呼出量
+        map.put("transferSuccess","100");//转接成功
+        map.put("formTime","1000");//排队时间
+        map.put("callTime","1000");//平均通话时长
+        map.put("callFail","1000");//呼入流失率
+        return RestResponse.success(map);
+    }
+    @ApiOperation(value = "租户用户中心的应用统计数据")
+    @RequestMapping(value = "/tenants/{id}/call_center/get",method = RequestMethod.GET)
+    public RestResponse getAppCdr(
+            @ApiParam(name = "id",value="租户id")@PathVariable String id,
+            @ApiParam(name = "appId",value="应用id")@RequestParam String appId,
+            @ApiParam(name = "type",value="amongCall=拨打次数;amongCostTime=通话时间")@RequestParam String type,
+            @ApiParam(name = "timeType",value="时间类型 年year 月month ")@RequestParam String timeType,
+            @ApiParam(name = "time",value="时间")@RequestParam String time
+    ){
+        //先教研租户和应用的关系
+        App app = appService.findById(appId);
+        if(app==null||StringUtils.isEmpty(id)||!app.getTenant().getId().equals(id)){
+            return RestResponse.failed("0000","租户id或者应用id错误");
+        }
+        if(StringUtils.isEmpty(time)){
+            return RestResponse.failed("0000","时间不能为空");
+        }
+        if(StringUtils.isEmpty(type)||!("amongCall".equals(type)||"amongCostTime".equals(type))){
+            return RestResponse.failed("0000","类型错误");
+        }
+        Date date1 = null;
+        Date date2 = null;
+        List tempVoiceCdrList = null;
+        Object date = 12;
+        if("year".equals(timeType)){
+            try{
+                date1 = DateUtils.parseDate(time,"yyyy");
+                date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(time)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+                tempVoiceCdrList =  voiceCdrMonthService.list(id,  appId,  App.PRODUCT_CALL_CENTER,  date1,  date2 );
+            }catch (Exception e){
+                return RestResponse.failed("0000","日期格式错误");
+            }
+        }else if("month".equals(timeType)){
+            try{
+                date1 = DateUtils.parseDate(time,"yyyy-MM");
+                date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(time,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+                tempVoiceCdrList =  voiceCdrDayService.list(id,  appId,  App.PRODUCT_CALL_CENTER,  date1,  date2 );
+                date = date1;
+            }catch (Exception e){
+                return RestResponse.failed("0000","日期格式错误");
+            }
+        }else{
+            return RestResponse.failed("0000","日期类型错误");
+        }
+        List list = new ArrayList();
+        list.add(getArrays(tempVoiceCdrList,date,type));
+        return RestResponse.success(list);
+    }
+    //呼叫中心的某应用，日期，坐席，呼叫号码，呼叫类型的分页数据
+    private int getLong(Object obj){
+        int r = 0;
+        if (obj instanceof Date) {
+            r = Integer.valueOf(DateUtils.getLastDate((Date)obj).split("-")[2]);
+        } else if (obj instanceof Integer) {
+            r =Integer.valueOf((Integer)obj);
+        }
+        return r;
+    }
+    /**
+     * 获取列表数据
+     * @param list 待处理的list
+     * @return
+     */
+    private Object[] getArrays(List list,Object date,String type) {
+        int leng = getLong(date);
+        Object[] list1 = new Object[leng];
+        for(int j=0;j<leng;j++){
+            list1[j]=0;
+        }
+        for(int i=0;i<list.size();i++){
+            Object obj = list.get(i);
+            if(obj instanceof ConsumeMonth){
+                list1[((ConsumeMonth)obj).getMonth()-1]= StringUtil.getDecimal(((ConsumeMonth)obj).getAmongAmount().toString(),3);
+            }else if(obj instanceof VoiceCdrMonth){
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
+                }
+            }else if(obj instanceof ConsumeDay){
+                list1[((ConsumeDay)obj).getDay()-1]=StringUtil.getDecimal(((ConsumeDay)obj).getAmongAmount().toString(),3);
+            }else if(obj instanceof VoiceCdrDay){
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
+                }
+            }else if(obj instanceof ApiCallDay){
+                list1[((ApiCallDay)obj).getDay()-1]=((ApiCallDay)obj).getAmongApi();
+            }else if(obj instanceof ApiCallMonth){
+                list1[((ApiCallMonth) obj).getMonth()-1]=((ApiCallMonth)obj).getAmongApi();
+            }
+        }
+        return list1;
+    }
 }
