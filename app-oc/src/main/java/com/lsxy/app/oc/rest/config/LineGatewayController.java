@@ -569,13 +569,14 @@ public class LineGatewayController extends AbstractRestController {
     public RestResponse tenantPlist(
             @ApiParam( name="id",value = "线路id")@PathVariable String id,
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
-            @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize
+            @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize,
+            @ApiParam(name = "tenantName",value = "用户名") @RequestParam (required = false)String tenantName
     ){
         LineGateway lineGateway = lineGatewayService.findById(id);
         if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
             return RestResponse.failed("0000","线路不存");
         }
-        Page page= resourceTelenumService.getTenatPageByLine(pageNo,pageSize,id);
+        Page page= resourceTelenumService.getTenatPageByLine(pageNo,pageSize,id,tenantName);
         return RestResponse.success(page);
     }
 }

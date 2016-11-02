@@ -69,5 +69,5 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @param pageSize
      * @return
      */
-    Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line);
+    Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line,String tenantName);
 }

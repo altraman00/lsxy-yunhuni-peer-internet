@@ -215,7 +215,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line) {
+    public Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line,String tenantName) {
         //先获取线路上的号码
         List<String> nums = telnumToLineGatewayService.getTelnumByLineId(line);
         int start = (pageNo-1)*pageSize;
@@ -231,9 +231,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-        String sql = " FROM (select DISTINCT tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") ) a";
+        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tel_number IN ("+innums+") ";
+        if(StringUtils.isNotEmpty(tenantName)){
+            sql += " AND  a.tenant_name LIKE '%"+tenantName+"%'";
+        }
+        sql += " ) b ";
         String countSql = " SELECT COUNT(1) "+sql;
-        String pageSql = " SELECT a.tenant_id "+sql;
+        String pageSql = " SELECT b.tenant_id "+sql;
         int total = jdbcTemplate.queryForObject(countSql,Integer.class);
         if(total == 0){
             return new Page<>(start,total,pageSize,null);
