@@ -232,20 +232,25 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-        String sql = " FROM (select DISTINCT tenant_id tdb_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") )";
+        String sql = " FROM (select DISTINCT tenant_id db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") )";
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
         pageSql +=" ORDER BY obj.last_time DESC";
-        Query pageQuery = em.createNativeQuery(pageSql,ResourceTelenum.class);
+        Query pageQuery = em.createNativeQuery(pageSql,String.class);
         int total = ((BigInteger)countQuery.getSingleResult()).intValue();
         if(total == 0){
             return new Page<>(start,total,pageSize,null);
         }
         pageQuery.setMaxResults(pageSize);
         pageQuery.setFirstResult(start);
-        List list = pageQuery.getResultList();
-        return new Page<>(start,total,pageSize,list);
+        //获取得到租户
+        List<String> list = pageQuery.getResultList();
+        String sql2 = " FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN "+innums+") ";
+        Query query2 = em.createNativeQuery(sql2,ResourceTelenum.class);
+        List<ResourceTelenum> list2 = query2.getResultList();
+
+        return new Page<>(start,total,pageSize,null);
 
     }
 
