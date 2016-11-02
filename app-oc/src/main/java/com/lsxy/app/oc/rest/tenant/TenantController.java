@@ -1061,7 +1061,7 @@ public class TenantController {
     @RequestMapping(value = "/tenants/{id}/call_center/current",method = RequestMethod.GET)
     public RestResponse getCallCenterByCurrent(
             @ApiParam(name = "id",value="租户id")@PathVariable String id,
-            @ApiParam(name = "appId",value="应用id")@RequestParam String appId
+            @ApiParam(name = "appId",value="应用id")@RequestParam(required = false) String appId
     ){
         Map map = new HashMap<>();
         map.put("callIn","100");//呼入量
@@ -1076,15 +1076,16 @@ public class TenantController {
     @RequestMapping(value = "/tenants/{id}/call_center",method = RequestMethod.GET)
     public RestResponse getCallCenterByType(
             @ApiParam(name = "id",value="租户id")@PathVariable String id,
-            @ApiParam(name = "appId",value="应用id")@RequestParam String appId,
+            @ApiParam(name = "appId",value="应用id")@RequestParam(required = false) String appId,
             @ApiParam(name = "type",value="amongCall=拨打次数;amongCostTime=通话时间")@RequestParam String type,
             @ApiParam(name = "timeType",value="时间类型 年year 月month ")@RequestParam String timeType,
             @ApiParam(name = "time",value="时间")@RequestParam String time
     ){
-        //先教研租户和应用的关系
-        App app = appService.findById(appId);
-        if(app==null||StringUtils.isEmpty(id)||!app.getTenant().getId().equals(id)){
-            return RestResponse.failed("0000","租户id或者应用id错误");
+        if(StringUtils.isNotEmpty(appId)) {
+            App app = appService.findById(appId);
+            if (app == null || StringUtils.isEmpty(id) || !app.getTenant().getId().equals(id)) {
+                return RestResponse.failed("0000", "租户id或者应用id错误");
+            }
         }
         if(StringUtils.isEmpty(time)){
             return RestResponse.failed("0000","时间不能为空");
@@ -1124,7 +1125,7 @@ public class TenantController {
     @RequestMapping(value = "/tenants/{id}/call_center/detail",method = RequestMethod.GET)
     public RestResponse getCallCenterByTenantAndApp(
             @ApiParam(name = "id",value="租户id")@PathVariable String id,
-            @ApiParam(name = "appId",value="应用id")@RequestParam String appId,
+            @ApiParam(name = "appId",value="应用id")@RequestParam(required = false) String appId,
             @ApiParam(name = "startTime",value="开始时间")@RequestParam String startTime,
             @ApiParam(name = "endTime",value="开始时间")@RequestParam String endTime,
             @ApiParam(name = "pageNo",value="第几页")@RequestParam(defaultValue = "1") Integer pageNo,
@@ -1133,9 +1134,11 @@ public class TenantController {
             @ApiParam(name = "callnum",value="手机号码")@RequestParam(required = false) String callnum,
             @ApiParam(name = "agent",value="坐席")@RequestParam(required = false) String agent
     ){
-        App app = appService.findById(appId);
-        if(app==null||StringUtils.isEmpty(id)||!app.getTenant().getId().equals(id)){
-            return RestResponse.failed("0000","租户id或者应用id错误");
+        if(StringUtils.isNotEmpty(appId)) {
+            App app = appService.findById(appId);
+            if (app == null || StringUtils.isEmpty(id) || !app.getTenant().getId().equals(id)) {
+                return RestResponse.failed("0000", "租户id或者应用id错误");
+            }
         }
         try{
             DateUtils.parseDate(startTime,"yyyy-MM-dd");
