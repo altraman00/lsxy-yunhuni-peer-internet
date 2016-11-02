@@ -14,16 +14,14 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
-import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.stream.Collector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.l;
 
 /**
  * Created by liups on 2016/10/10.
@@ -190,7 +188,7 @@ public class AreaAndTelNumSelector {
     }
 
     //排序接口
-    public List<TelnumFormat> sortTelnumSortEntity(List<TelnumSortEntity> list){
+    public static List<TelnumFormat> sortTelnumSortEntity(List<TelnumSortEntity> list){
         List<TelnumFormat> result = new ArrayList();
         List<TelnumSortEntity> entities = list.parallelStream().sorted((s1, s2) -> s1.getPriority().compareTo(s2.getPriority())).collect(Collectors.toList());
         for(TelnumSortEntity entity:entities){
@@ -200,7 +198,7 @@ public class AreaAndTelNumSelector {
     }
 
 
-    public class TelnumSortEntity{
+    public static class TelnumSortEntity{
         private Integer priority;
         private TelnumFormat telnumFormat;
 
@@ -218,7 +216,7 @@ public class AreaAndTelNumSelector {
         }
     }
 
-    public class TelnumFormat{
+    public static class TelnumFormat{
         protected String from;
         protected String to;
         protected String domain;
@@ -251,7 +249,7 @@ public class AreaAndTelNumSelector {
         }
     }
 
-    public class Selector{
+    public static class Selector{
         private String areaId;
         private List<TelnumFormat> toNum = new ArrayList<>();
         private List<TelnumFormat> to1Num = new ArrayList<>();

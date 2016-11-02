@@ -94,11 +94,6 @@ public class CalCostTest {
         System.out.println(areaCode);
     }
 
-    @Test
-    public void testNum2Line(){
-        String areaIdByTelnum = telnumToLineGatewayService.getAreaIdByTelnum("8675522730043");
-        System.out.println(areaIdByTelnum);
-    }
 
     @Test
     public void testNum(){
