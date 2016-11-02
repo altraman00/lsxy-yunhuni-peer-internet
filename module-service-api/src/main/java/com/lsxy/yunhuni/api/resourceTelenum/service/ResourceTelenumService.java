@@ -61,4 +61,12 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     List<ResourceTelenum> findDialingTelnumber(List<String> lineIds, App app, String... from);
+
+    /**
+     * 根据号码获取已租户为主体的号码列表
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    Page<ResourceTelenum> getTenatPageByLine(Integer pageNo,Integer pageSize,String line);
 }

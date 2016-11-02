@@ -10,10 +10,12 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -36,7 +38,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     private EntityManager em;
     @Autowired
     ResourcesRentService resourcesRentService;
-
+    @Autowired
+    TelnumToLineGatewayService telnumToLineGatewayService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
         return this.resourceTelenumDao;
@@ -208,6 +213,40 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
 
         return result;
+    }
+
+    @Override
+    public Page<ResourceTelenum> getTenatPageByLine(Integer pageNo, Integer pageSize, String line) {
+        //先获取线路上的号码
+        List<String> nums = telnumToLineGatewayService.getTelnumByLineId(line);
+        int start = (pageNo-1)*pageSize;
+        //线路上没有号码时，返回空集合
+        String innums = "";
+        if(nums.size()==0){
+            return new Page<>(start,0,pageSize,null);
+        }else{
+            for(int i=0;i<nums.size();i++){
+                innums += " '"+nums.get(i)+"' ";
+                if(i!=nums.size()-1){
+                    innums += " , ";
+                }
+            }
+        }
+        String sql = " FROM (select DISTINCT tenant_id tdb_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") )";
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT * "+sql;
+        Query countQuery = em.createNativeQuery(countSql);
+        pageSql +=" ORDER BY obj.last_time DESC";
+        Query pageQuery = em.createNativeQuery(pageSql,ResourceTelenum.class);
+        int total = ((BigInteger)countQuery.getSingleResult()).intValue();
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageQuery.setMaxResults(pageSize);
+        pageQuery.setFirstResult(start);
+        List list = pageQuery.getResultList();
+        return new Page<>(start,total,pageSize,list);
+
     }
 
 
