@@ -4,7 +4,9 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.AppExtensionService;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.*;
@@ -127,7 +129,8 @@ public class TenantController {
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
-
+    @Reference(timeout = 3000)
+    CallCenterService callCenterService;
     @Reference(timeout = 3000)
     AppExtensionService appExtensionService;
 
@@ -1048,13 +1051,11 @@ public class TenantController {
         }
 
     }
-    @ApiOperation(value = "租户用户中心的应用统计数据")
-    @RequestMapping(value = "/tenants/{id}/call_center/get",method = RequestMethod.GET)
-    public RestResponse getAmong(
+    @ApiOperation(value = "用户中心的应用的当月呼叫中心统计数据")
+    @RequestMapping(value = "/tenants/{id}/call_center/current",method = RequestMethod.GET)
+    public RestResponse getCallCenterByCurrent(
             @ApiParam(name = "id",value="租户id")@PathVariable String id,
-            @ApiParam(name = "appId",value="应用id")@RequestParam String appId,
-            @ApiParam(name = "startTime",value="开始时间")@RequestParam String startTime,
-            @ApiParam(name = "endTime",value="结束时间")@RequestParam String endTime
+            @ApiParam(name = "appId",value="应用id")@RequestParam String appId
     ){
         Map map = new HashMap<>();
         map.put("callIn","100");//呼入量
@@ -1065,9 +1066,9 @@ public class TenantController {
         map.put("callFail","1000");//呼入流失率
         return RestResponse.success(map);
     }
-    @ApiOperation(value = "租户用户中心的应用统计数据")
-    @RequestMapping(value = "/tenants/{id}/call_center/get",method = RequestMethod.GET)
-    public RestResponse getAppCdr(
+    @ApiOperation(value = "用户中心的应用的呼叫中心统计数据")
+    @RequestMapping(value = "/tenants/{id}/call_center",method = RequestMethod.GET)
+    public RestResponse getCallCenterByType(
             @ApiParam(name = "id",value="租户id")@PathVariable String id,
             @ApiParam(name = "appId",value="应用id")@RequestParam String appId,
             @ApiParam(name = "type",value="amongCall=拨打次数;amongCostTime=通话时间")@RequestParam String type,
@@ -1113,7 +1114,36 @@ public class TenantController {
         list.add(getArrays(tempVoiceCdrList,date,type));
         return RestResponse.success(list);
     }
-    //呼叫中心的某应用，日期，坐席，呼叫号码，呼叫类型的分页数据
+    @ApiOperation(value = "用户中心的应用的呼叫中心记录明细")
+    @RequestMapping(value = "/tenants/{id}/call_center/detail",method = RequestMethod.GET)
+    public RestResponse getCallCenterByTenantAndApp(
+            @ApiParam(name = "id",value="租户id")@PathVariable String id,
+            @ApiParam(name = "appId",value="应用id")@RequestParam String appId,
+            @ApiParam(name = "startTime",value="开始时间")@RequestParam String startTime,
+            @ApiParam(name = "endTime",value="开始时间")@RequestParam String endTime,
+            @ApiParam(name = "pageNo",value="第几页")@RequestParam(defaultValue = "1") Integer pageNo,
+            @ApiParam(name = "pageSize",value="每页记录数")@RequestParam(defaultValue = "20") Integer pageSize,
+            @ApiParam(name = "type",value="1呼入2呼出")@RequestParam(required = false) String type,
+            @ApiParam(name = "callnum",value="手机号码")@RequestParam(required = false) String callnum,
+            @ApiParam(name = "agent",value="坐席")@RequestParam(required = false) String agent
+    ){
+        App app = appService.findById(appId);
+        if(app==null||StringUtils.isEmpty(id)||!app.getTenant().getId().equals(id)){
+            return RestResponse.failed("0000","租户id或者应用id错误");
+        }
+        try{
+            DateUtils.parseDate(startTime,"yyyy-MM-dd");
+            DateUtils.parseDate(endTime,"yyyy-MM-dd");
+            startTime += " 00:00:00";
+            endTime += " 23:59:59";
+        }catch (Exception e){
+            return RestResponse.failed("0000","返回日期类型错误");
+        }
+        Page<CallCenter> page =  callCenterService.pList( pageNo,pageSize, id, appId, startTime, endTime, type,callnum, agent);
+        return RestResponse.success(page);
+    }
+
+
     private int getLong(Object obj){
         int r = 0;
         if (obj instanceof Date) {
