@@ -129,9 +129,9 @@ public class TenantController {
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
-    @Reference(timeout = 3000)
+    @Reference(timeout = 3000,check = false,lazy = true)
     CallCenterService callCenterService;
-    @Reference(timeout = 3000)
+    @Reference(timeout = 3000,check = false,lazy = true)
     AppExtensionService appExtensionService;
 
     @RequestMapping(value = "/list",method = RequestMethod.GET)
