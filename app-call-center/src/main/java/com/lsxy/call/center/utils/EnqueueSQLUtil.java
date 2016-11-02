@@ -27,9 +27,9 @@ public final class EnqueueSQLUtil {
             ":WHERE"+
             " group by agent" +
             ":SORT";
-    private static final String regex="(has|get)\\(\"(.+?)\"\\)";
-
-    private static final Pattern p  =Pattern.compile(regex);
+    private static final String skill_regex="(has|get)\\(\"(.+?)\"\\)";
+    private static final String id_regex = "id\\s*?==\\s*?\"(\\S+?)\"";
+    private static final Pattern p  =Pattern.compile(skill_regex);
 
     private EnqueueSQLUtil(){}
     
@@ -49,7 +49,7 @@ public final class EnqueueSQLUtil {
         String sort = "";
         String colums = "";
         if(StringUtil.isNotBlank(whereExpression)){
-            where = whereExpression.replaceAll(regex,"c.$2");
+            where = whereExpression.replaceAll(skill_regex,"c.$2").replaceAll(id_regex,"c.agent = \"$1\"");
             if(StringUtil.isBlank(where)){
                 where = "";
             }else{
@@ -59,7 +59,7 @@ public final class EnqueueSQLUtil {
         }
 
         if(StringUtil.isNotBlank(sortExpression)){
-            sort = sortExpression.replaceAll(regex,"c.$2");
+            sort = sortExpression.replaceAll(skill_regex,"c.$2").replaceAll(id_regex,"c.agent = \"$1\"");
             if(StringUtil.isBlank(sort)){
                 sort = "";
             }else{
@@ -89,7 +89,7 @@ public final class EnqueueSQLUtil {
             return;
         }
         Expression expression = factory.getExpression(str+";");
-        expression.initVariable("id",1);
+        expression.initVariable("id","1");
         try{
             expression.reParseAndEvaluate();
         }catch (Throwable t){
@@ -97,7 +97,9 @@ public final class EnqueueSQLUtil {
         }
     }
 
-    /*public static void main(String[] args) {
-        System.out.println(genSQL("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","has(\"haha1\") || get(\"haha2\") > 60",""));
-    }*/
+    //public static void main(String[] args) {
+        /*String a = "has(\\\"haha1\\\") || get(\\\"haha2\\\") > 60 && id==\"1\"";
+        System.out.println(a.replaceAll("id\\s*?==\\s*?\"(\\S+?)\"","c.agent = \"$1\""));*/
+       //System.out.println(genSQL("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","id==\"40288ae2581a382c01581a3880392ac8\"",""));
+    //}
 }
