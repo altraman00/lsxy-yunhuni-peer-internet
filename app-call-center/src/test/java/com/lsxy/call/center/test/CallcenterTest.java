@@ -65,28 +65,44 @@ public class CallcenterTest {
 
     @Test
     public void test3() throws ExecutionException, InterruptedException {
-        int size = 1000;
-        ExecutorService pool= Executors.newFixedThreadPool(50);
+        int size = 5000;
+        ExecutorService pool= Executors.newFixedThreadPool(100);
         List<Future> results = new ArrayList<>();
         for (int i =0;i<size;i++) {
             final int j = i;
             results.add(pool.submit(new Runnable() {
                 @Override
                 public void run() {
+                    AppExtension appExtension = new AppExtension();
+                    appExtension.setEnabled(AppExtension.ENABLED);
+                    appExtension.setTenantId("wegwegweg");
+                    appExtension.setAppId("gwegwegwe");
+                    appExtension.setName("11234561"+j);
+                    appExtension.setType(AppExtension.TYPE_SIP);
+                    appExtension.setUser("11234561"+j);
+                    appExtension.setPassword("11234561"+j);
+                    appExtension.setSecret("");
+                    appExtension.setRegistrar("");
+                    appExtension.setRegisterExpires(180000);
+                    appExtension.setLastRegisterTime(new Date());
+                    appExtension.setLastRegisterStatus(200);
+                    appExtensionService.register(appExtension);
+                    List<AppExtension> extensions = new ArrayList<AppExtension>();
+                    extensions.add(appExtension);
                     CallCenterAgent callCenterAgent = new CallCenterAgent();
-                    callCenterAgent.setName("test1"+j);
-                    callCenterAgent.setExtentions(appExtensionService.pageList(2,1).getResult());
+                    callCenterAgent.setName("1test1"+j);
+                    callCenterAgent.setExtentions(extensions);
                     callCenterAgent.setState(CallCenterAgent.STATE_IDLE);
                     List<AgentSkill> skills = new ArrayList<>();
                     for(int i =0;i<10;i++){
                         AgentSkill skill = new AgentSkill();
                         skill.setLevel(new Random().nextInt(100));
                         skill.setActive(1);
-                        skill.setName("haha"+i);
+                        skill.setName("1haha"+i);
                         skills.add(skill);
                     }
                     callCenterAgent.setSkills(skills);
-                    String agentId = callCenterAgentService.login("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000",callCenterAgent);
+                    String agentId = callCenterAgentService.login("wegwegweg","gwegwegwe",callCenterAgent);
                 }
             }));
         }

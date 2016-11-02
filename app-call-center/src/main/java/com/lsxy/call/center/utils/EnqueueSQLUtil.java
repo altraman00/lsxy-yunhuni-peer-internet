@@ -16,11 +16,10 @@ public final class EnqueueSQLUtil {
 
     private static final ExpressionFactory factory = ExpressionFactory.getInstance();
 
-    private static final String SQL_TEMPLATE="select a.id,a.app_id,a.tenant_id,a.type,a.user,a.telenum,c.* from tb_bi_app_extension a " +
-            " left join tb_bi_call_center_agent b on a.agent=b.id and b.tenant_id=\":TENANTID\" and b.app_id=\":APPID\" and b.deleted = 0 and b.state = 'idle'" +
-            " left join (select " +
-            " agent :COLUMS" +
-            " from tb_bi_call_center_agent_skill where tenant_id=\":TENANTID\" and app_id=\":APPID\" and active=1 and deleted=0 group by agent) c on c.agent = b.id" +
+    private static final String SQL_TEMPLATE="select a.id,a.app_id,a.tenant_id,a.type,a.user,a.telenum,a.agent:SHOWCOLUMS from tb_bi_app_extension a" +
+            " left join tb_bi_call_center_agent b on a.agent=b.id"+
+            " left join (select agent :COLUMS" +
+            " from tb_bi_call_center_agent_skill where tenant_id=\":TENANTID\" and app_id=\":APPID\" and active=1 and deleted=0 group by agent :HAVING) c on a.agent = c.agent" +
             " where a.tenant_id=\":TENANTID\" and a.app_id=\":APPID\" and a.enabled = 1 and a.deleted = 0 and a.last_register_status= 200 and a.agent <> ''" +
             " and b.tenant_id=\":TENANTID\" and b.app_id=\":APPID\" and b.deleted = 0 and b.state = 'idle'" +
             " and DATE_ADD(a.last_register_time,INTERVAL a.register_expires second)>=now()" +
@@ -45,21 +44,24 @@ public final class EnqueueSQLUtil {
         checkExpression(whereExpression);
         checkExpression(sortExpression);
         Set<String> skills = new HashSet<>();
+        String showColums = "";
+        String having = "";
         String where = "";
         String sort = "";
         String colums = "";
         if(StringUtil.isNotBlank(whereExpression)){
-            where = whereExpression.replaceAll(skill_regex,"c.$2").replaceAll(id_regex,"c.agent = \"$1\"");
+            where = whereExpression.replaceAll(skill_regex,"c.`$2`").replaceAll(id_regex,"c.agent = \"$1\"");
             if(StringUtil.isBlank(where)){
                 where = "";
             }else{
+                having = "having "+where.replaceAll("c.`","`");
                 where = " and ("+where+")";
             }
             putSkills(skills,whereExpression);
         }
 
         if(StringUtil.isNotBlank(sortExpression)){
-            sort = sortExpression.replaceAll(skill_regex,"c.$2").replaceAll(id_regex,"c.agent = \"$1\"");
+            sort = sortExpression.replaceAll(skill_regex,"c.`$2`").replaceAll(id_regex,"c.agent = \"$1\"");
             if(StringUtil.isBlank(sort)){
                 sort = "";
             }else{
@@ -71,14 +73,18 @@ public final class EnqueueSQLUtil {
             String colum = ",sum(case when name=\"%s\" then level end) as \"%s\"";
             for (String skill : skills){
                 colums+=String.format(colum,skill,skill);
+                showColums += ",c.`"+skill+"`";
             }
         }
         String sql = SQL_TEMPLATE
                 .replaceAll(":TENANTID",tenantId)
                 .replaceAll(":APPID",appId)
+                .replaceAll(":SHOWCOLUMS",showColums)
                 .replaceAll(":COLUMS",colums)
+                .replaceAll(":HAVING",having)
                 .replaceAll(":WHERE",where)
                 .replaceAll(":SORT",sort)
+                .replaceAll("==","=")
                 .replaceAll("&&","and")
                 .replaceAll("\\|\\|","or");
         return sql;
@@ -97,9 +103,9 @@ public final class EnqueueSQLUtil {
         }
     }
 
-    //public static void main(String[] args) {
-        /*String a = "has(\\\"haha1\\\") || get(\\\"haha2\\\") > 60 && id==\"1\"";
-        System.out.println(a.replaceAll("id\\s*?==\\s*?\"(\\S+?)\"","c.agent = \"$1\""));*/
-       //System.out.println(genSQL("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","id==\"40288ae2581a382c01581a3880392ac8\"",""));
-    //}
+    /*public static void main(String[] args) {
+        *//*String a = "has(\\\"haha1\\\") || get(\\\"haha2\\\") > 60 && id==\"1\"";
+        System.out.println(a.replaceAll("id\\s*?==\\s*?\"(\\S+?)\"","c.agent = \"$1\""));*//*
+       System.out.println(genSQL("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","(get(\"haha0\") + get(\"haha1\") * 0.6)/2 > 60","haha1"));
+    }*/
 }
