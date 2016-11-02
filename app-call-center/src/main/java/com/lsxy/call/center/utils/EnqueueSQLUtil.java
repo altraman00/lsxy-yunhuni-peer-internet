@@ -2,9 +2,13 @@ package com.lsxy.call.center.utils;
 
 import com.lsxy.call.center.expression.Expression;
 import com.lsxy.call.center.expression.ExpressionFactory;
+import com.lsxy.call.center.expression.tokens.DataType;
+import com.lsxy.call.center.expression.tokens.Valuable;
 import com.lsxy.framework.core.utils.StringUtil;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,10 +20,10 @@ public final class EnqueueSQLUtil {
 
     private static final ExpressionFactory factory = ExpressionFactory.getInstance();
 
-    private static final String SQL_TEMPLATE="select a.id,a.type,a.user,a.telenum,a.agent:SHOWCOLUMS from tb_bi_app_extension a" +
-            " left join tb_bi_call_center_agent b on a.agent=b.id"+
+    private static final String SQL_TEMPLATE="select a.id,a.type,a.user,a.telenum,a.agent:SHOWCOLUMS from db_lsxy_bi_yunhuni.tb_bi_app_extension a" +
+            " left join db_lsxy_bi_yunhuni.tb_bi_call_center_agent b on a.agent=b.id"+
             " left join (select agent :COLUMS" +
-            " from tb_bi_call_center_agent_skill where tenant_id=\":TENANTID\" and app_id=\":APPID\" and active=1 and deleted=0 group by agent :HAVING) c on a.agent = c.agent" +
+            " from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_skill where tenant_id=\":TENANTID\" and app_id=\":APPID\" and active=1 and deleted=0 group by agent :HAVING) c on a.agent = c.agent" +
             " where a.tenant_id=\":TENANTID\" and a.app_id=\":APPID\" and a.enabled = 1 and a.deleted = 0 and a.last_register_status= 200 and a.agent <> ''" +
             " and b.tenant_id=\":TENANTID\" and b.app_id=\":APPID\" and b.deleted = 0 and b.state = 'idle'" +
             " and DATE_ADD(a.last_register_time,INTERVAL a.register_expires second)>=now()" +
@@ -41,8 +45,8 @@ public final class EnqueueSQLUtil {
     }
 
     public static String genSQL(String tenantId,String appId,String whereExpression,String sortExpression){
-        checkExpression(whereExpression);
-        checkExpression(sortExpression);
+        execExpression(whereExpression,null);
+        execExpression(sortExpression,null);
         Set<String> skills = new HashSet<>();
         String showColums = "";
         String having = "";
@@ -50,6 +54,7 @@ public final class EnqueueSQLUtil {
         String sort = "";
         String colums = "";
         if(StringUtil.isNotBlank(whereExpression)){
+            whereExpression = whereExpression.replaceAll("[\\r\\n]"," ");
             where = whereExpression.replaceAll(skill_regex,"c.`$2`").replaceAll(id_regex,"c.agent = \"$1\"");
             if(StringUtil.isBlank(where)){
                 where = "";
@@ -61,6 +66,7 @@ public final class EnqueueSQLUtil {
         }
 
         if(StringUtil.isNotBlank(sortExpression)){
+            sortExpression = sortExpression.replaceAll("[\\r\\n]"," ");
             sort = sortExpression.replaceAll(skill_regex,"c.`$2`").replaceAll(id_regex,"c.agent = \"$1\"");
             if(StringUtil.isBlank(sort)){
                 sort = "";
@@ -97,17 +103,32 @@ public final class EnqueueSQLUtil {
         return sql;
     }
 
-    private static void checkExpression(String str){
+    public static Valuable execExpression(String str, Map<String,Object> vars){
         if(StringUtil.isBlank(str)){
-            return;
+            return null;
         }
         Expression expression = factory.getExpression(str+";");
         expression.initVariable("id","1");
+        if(vars != null && vars.size()>0){
+            Iterator<String> keys = vars.keySet().iterator();
+            while (keys.hasNext()){
+                String key = keys.next();
+                Object v = vars.get(key);
+                expression.initVariable(key,v);
+            }
+        }
+        Valuable value = null;
+        DataType type = null;
         try{
-            expression.reParseAndEvaluate();
+            value = expression.reParseAndEvaluate();
+            type = value.getDataType();
         }catch (Throwable t){
             throw new IllegalArgumentException(t);
         }
+        if(type == null || type != DataType.BOOLEAN && type != DataType.NUMBER){
+            throw new IllegalArgumentException("格式错误");
+        }
+        return value;
     }
 
     /*public static void main(String[] args) {

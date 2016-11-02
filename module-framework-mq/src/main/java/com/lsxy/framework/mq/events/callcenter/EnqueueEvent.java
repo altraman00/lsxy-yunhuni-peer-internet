@@ -18,8 +18,9 @@ public class EnqueueEvent extends AbstractDelayMQEvent{
 
     public EnqueueEvent(){}
 
-    public EnqueueEvent(String tenantId, String appId, String callId, Integer delay){
+    public EnqueueEvent(String key,String tenantId, String appId, String callId, Integer delay){
         super(delay);
+        this.key = key;
         this.tenantId = tenantId;
         this.appId = appId;
         this.callId = callId;

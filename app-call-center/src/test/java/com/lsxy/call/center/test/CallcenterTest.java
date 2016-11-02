@@ -4,8 +4,10 @@ import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -115,5 +117,34 @@ public class CallcenterTest {
     @Test
     public void test4(){
         callCenterAgentService.logout(callCenterAgentService.pageList(1,1).getResult().get(0).getId());
+    }
+
+    @Test
+    public void test5(){
+        EnQueue enQueue = EnQueueDecoder.decode("<enqueue\n" +
+                "            waitPlayFile=\"music.wav\"\n" +
+                "            playAgentNum=\"true\"\n" +
+                "            preAgentNumPlayFile=\"坐席.wav\"\n" +
+                "            postAgentNumPlayFile=\"为您服务.wav\"\n" +
+                "            holdPlayFile=\"wait.wav\"\n" +
+                "            conversationTimeout=\"3600\"\n" +
+                "            data=\"my queue data\"\n" +
+                ">\n" +
+                "    <filter data=\"this is filter 1\">\n" +
+                "        <condition timeout=\"20\" priority=\"60\" data=\"condition 1\">\n" +
+                "            <where>\n" +
+                "                <![CDATA[\n" +
+                "                has(\"haha0\") && get(\"haha1\") > 60.0\n" +
+                "                ]]>\n" +
+                "            </where>\n" +
+                "            <sort>\n" +
+                "                <![CDATA[\n" +
+                "                has(\"haha0\") && get(\"haha1\")\n" +
+                "                ]]>\n" +
+                "            </sort>\n" +
+                "        </condition>\n" +
+                "    </filter>\n" +
+                "</enqueue>");
+        callCenterAgentService.enqueue("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","",enQueue);
     }
 }

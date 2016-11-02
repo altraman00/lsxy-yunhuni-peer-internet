@@ -1,7 +1,7 @@
 package com.lsxy.area.server.service.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.DeQueueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class DeQueueServiceImpl implements DeQueueService {
 
 
     @Override
-    public void success(String tenantId, String appId, String callId, AppExtension appExtension) {
+    public void success(String tenantId, String appId, String callId, EnQueueResult result) {
         logger.info("=====================+success");
     }
 

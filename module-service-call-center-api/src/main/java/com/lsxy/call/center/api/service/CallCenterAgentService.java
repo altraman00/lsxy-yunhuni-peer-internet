@@ -1,6 +1,7 @@
 package com.lsxy.call.center.api.service;
 
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.framework.api.base.BaseService;
 
 /**
@@ -15,4 +16,6 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
     public boolean checkInSkill(String agent,String skillName,Integer active);
 
     public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Integer active);
+
+    public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue);
 }
