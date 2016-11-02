@@ -13,6 +13,7 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.slf4j.Logger;
@@ -152,6 +153,10 @@ public class AppController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         Tenant tenant = tenantService.findTenantByUserName(userName);
         app.setTenant(tenant);
+        String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+        Area area = new Area();
+        area.setId(areaId);
+        app.setArea(area);
         app = appService.save(app);
         return RestResponse.success(app);
     }

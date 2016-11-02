@@ -147,7 +147,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
             flag = "+1";
         }
         String[] sql = new String[2];
-        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE priority BETWEEN deleted=0 AND "+begin+" AND "+end+" ";
+        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE deleted=0 AND priority BETWEEN   "+begin+" AND "+end+" ";
         if(StringUtils.isNotEmpty(line)) {
             sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=" + o2 + " WHERE deleted=0 AND id ='" + line + "' ";
         }

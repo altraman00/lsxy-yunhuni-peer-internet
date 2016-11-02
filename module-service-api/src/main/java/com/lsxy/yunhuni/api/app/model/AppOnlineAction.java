@@ -18,8 +18,8 @@ public class AppOnlineAction extends IdEntity {
     public static final int TYPE_OFFLINE = 2; //下线
 
     public static final int ACTION_SELECT_NUM = 11; //选号
-    public static final int ACTION_PAYING = 12;     //支付
-    public static final int ACTION_CANCEL_PAY = 13; //上线取消（支付返回选号）
+//    public static final int ACTION_PAYING = 12;     //支付
+//    public static final int ACTION_CANCEL_PAY = 13; //上线取消（支付返回选号）
     public static final int ACTION_ONLINE = 14;     //上线完成
 
     public static final int ACTION_OFFLINE = 21;    //下线
@@ -36,6 +36,7 @@ public class AppOnlineAction extends IdEntity {
     private Integer payStatus;          //支付状态
     private BigDecimal amount;          //支付金额
     private App app;                    //应用
+    private String areaId;
     private Integer type;               //1、上线 2、下线
     private Integer action;             //上线动作（操作动作：11 选号，12支付，13上线取消（支付返回选号），14上线完成）下线动作（操作动作：21 下线）
     private Integer status;             //1 进行中，2 已完成
@@ -43,11 +44,12 @@ public class AppOnlineAction extends IdEntity {
     public AppOnlineAction() {
     }
 
-    public AppOnlineAction(String telNumber, Integer payStatus, BigDecimal amount, App app, Integer type, Integer action, Integer status) {
+    public AppOnlineAction(String telNumber, Integer payStatus, BigDecimal amount, App app, String areaId,Integer type, Integer action, Integer status) {
         this.telNumber = telNumber;
         this.payStatus = payStatus;
         this.amount = amount;
         this.app = app;
+        this.areaId = areaId;
         this.type = type;
         this.action = action;
         this.status = status;
@@ -88,6 +90,15 @@ public class AppOnlineAction extends IdEntity {
 
     public void setApp(App app) {
         this.app = app;
+    }
+
+    @Column(name = "area_id")
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
     }
 
     @Column(name = "type")

@@ -9,7 +9,6 @@ import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToPublicDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +51,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public Page<LineGatewayToPublic> getPage(Integer pageNo, Integer pageSize, String operator, String isThrough, String status, String isPublicLine, String order) {
-        String hql = " FROM LineGatewayToPublic obj WHERE deleted=0 ";
+        String hql = " FROM LineGatewayToPublic obj WHERE obj.deleted=0  ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.lineGateway.operator = '"+operator+"' ";
         }
@@ -98,7 +97,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     @Override
     public List<LineGateway> findAllLineGatewayByAreaId(String areaId) {
         List<LineGateway> lineGateways = new ArrayList<>();
-        List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaIdOrderByPriorityDesc(areaId);
+        List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaId(areaId);
         for (LineGatewayToPublic ltp:ltps){
             LineGateway lineGateway = ltp.getLineGateway();
             //TODO 判断线路是否可用

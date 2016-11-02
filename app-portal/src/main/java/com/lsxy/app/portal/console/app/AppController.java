@@ -7,6 +7,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.model.AppExtension;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,6 @@ public class AppController extends AbstractPortalController {
         mav.setViewName("/console/app/list");
         return mav;
     }
-
     /**
      * 获取租户下所有测试绑定号码
      * @param request
@@ -55,6 +55,16 @@ public class AppController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/test_num_bind/list";
         return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
+    }
+    /**
+     * 获取应用下全部分机
+     * @param request
+     * @return
+     */
+    private RestResponse getAppExtensionList(HttpServletRequest request,String appId){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/app_extension/list/{1}";
+        return  RestRequest.buildSecurityRequest(token).getList(uri, AppExtension.class,appId);
     }
     /**
      * 创建应用首页
@@ -86,7 +96,9 @@ public class AppController extends AbstractPortalController {
         App app = restResponse.getData();
         mav.addObject("app", app);
         List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
+        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
         mav.addObject("testNumBindList",testNumBindList);
+        mav.addObject("appExtensionList",appExtensionList);
         mav.setViewName("/console/app/detail");
         return mav;
     }

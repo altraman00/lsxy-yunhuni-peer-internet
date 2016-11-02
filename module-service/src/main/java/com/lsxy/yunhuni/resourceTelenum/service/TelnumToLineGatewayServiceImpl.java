@@ -40,16 +40,6 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         return this.telnumToLineGatewayDao;
     }
 
-    @Override
-    public String getAreaIdByTelnum(String telnum){
-        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayDao.findFirstByTelNumber(telnum);
-        if(telnumToLineGateway == null ){
-            throw new RuntimeException("数据异常，号码没有关联线路");
-        }
-        String lineId = telnumToLineGateway.getLineId();
-        LineGateway lineGateway = lineGatewayService.findById(lineId);
-        return lineGateway.getAreaId();
-    }
 
     @Override
     public  List<TelnumToLineGateway> getDialingLinesByNumber(String number) {
@@ -80,7 +70,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public Page<TelnumToLineGateway> getPage(Integer pageNo,Integer pageSize,String line,String number, String isDialing, String isCalled, String isThrough) {
-        String hql = " FROM TelnumToLineGateway obj WHERE deleted=0 ";
+        String hql = " FROM TelnumToLineGateway obj WHERE obj.deleted=0  ";
         if(StringUtils.isNotEmpty(line)){
             hql += " AND obj.lineId='"+line+"' ";
         }

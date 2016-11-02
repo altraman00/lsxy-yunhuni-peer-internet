@@ -529,13 +529,19 @@ public class LineGatewayController extends AbstractRestController {
         }
         String[] op = lineGatewayVo.getOperator().split(",");
         for(int i=0;i<op.length;i++){
-            if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(op.length)){
+            if(!Arrays.asList(ResourceTelenum.OPERATORS).contains(op[i])){
                 return "运营商错误";
             }
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getAreaId())){
+            return "区域编号错误";
         }
         Area area = areaService.findById(lineGatewayVo.getAreaId());
         if(area==null||StringUtils.isEmpty(area.getId())){
             return "区域编号错误";
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getAreaCode())){
+            return "归属地区号不存在";
         }
         String areaName = telnumLocationService.getAreaNameByAreaCode(lineGatewayVo.getAreaCode());
         if(StringUtils.isEmpty(areaName)){
@@ -545,12 +551,13 @@ public class LineGatewayController extends AbstractRestController {
         if(!Arrays.asList(rule).contains(lineGatewayVo.getMobileAreaRule())){
             return "手机区号规则错误";
         }
-        if(!Arrays.asList(rule).contains(lineGatewayVo.getTelAreaRule())){
+        String[] rule1 = {"0","2"};
+        if(!Arrays.asList(rule1).contains(lineGatewayVo.getTelAreaRule())){
             return "固话区号规则错误";
         }
         String[] is = {"0","1"};
         if(!Arrays.asList(is).contains(lineGatewayVo.getIsThrough())){
-            return "固话区号规则错误";
+            return "是否可透传规则错误";
         }
         if(lineGatewayVo.getQuality()>10||lineGatewayVo.getQuality()<1){
             return "质量范围错误";

@@ -46,7 +46,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
 
     @Override
     public Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine,String order) {
-        String hql = " FROM LineGateway obj WHERE deleted=0 ";
+        String hql = " FROM LineGateway obj WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.operator like '%"+operator+"%' ";
         }
@@ -83,7 +83,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
 
     @Override
     public Page<LineGateway> getNotTenantPage(Integer pageNo, Integer pageSize, String tenantId,String operator, String line) {
-        String hql = " FROM LineGateway obj WHERE deleted=0 ";
+        String hql = " FROM LineGateway obj WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.operator like '%"+operator+"%' ";
         }
@@ -108,7 +108,9 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
             result = -1;
             transactionManager.rollback(status);
         } finally {
-            transactionManager.commit(status);
+            if(result == 0) {
+                transactionManager.commit(status);
+            }
         }
         return result;
     }
