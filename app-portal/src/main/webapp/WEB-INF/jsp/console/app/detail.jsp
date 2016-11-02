@@ -48,9 +48,10 @@
                 <aside>
                     <section class="vbox xbox">
                         <!-- 如果没有三级导航 这段代码注释-->
-                        <div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
-                                class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
-                        </div>
+                        <div class="head-box"><a href="#subNav" data-toggle="class:hide">
+                            <i class=" iconfont icon-menu-left text"></i>
+                            <i class=" iconfont icon-menu-right text-active"></i>
+                        </a></div>
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;应用详情</span>
                         </div>
@@ -193,7 +194,7 @@
                                                                     <p>${appExtension.telenum} </p>
                                                                 </c:if>
                                                             </c:forEach>
-                                                            <p class="text-danger">（未上线的分机接入信息只作临时使用，上线后平台会重新分配分机接入信息）</p>
+                                                            <p class="text-danger">（上线后平台会重新分配分机接入信息）</p>
                                                         </div>
                                                     </div>
                                                     </c:if>
