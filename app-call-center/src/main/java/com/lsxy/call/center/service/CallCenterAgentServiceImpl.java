@@ -165,9 +165,10 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(isAnd){
             skills = enQueue.getCondition().getAnd().getSkills();
         }
-
     }
 
     public void dequeue(String agent){
     }
+
+
 }

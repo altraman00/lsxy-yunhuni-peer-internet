@@ -19,16 +19,16 @@ public class DeQueueServiceImpl implements DeQueueService {
 
     @Override
     public void success(String tenantId, String appId, String callId, AppExtension appExtension) {
-
+        logger.info("=====================+success");
     }
 
     @Override
     public void timeout(String tenantId, String appId, String callId) {
-
+        logger.info("=====================+timeout");
     }
 
     @Override
     public void fail(String tenantId, String appId, String callId, String reason) {
-
+        logger.info("=====================+fail");
     }
 }

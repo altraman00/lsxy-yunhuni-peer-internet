@@ -17,6 +17,10 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_app_extension")
 public class AppExtension extends IdEntity {
 
+    public final static String TYPE_SIP = "1";
+    public final static String TYPE_THIRD_SIP = "2";
+    public final static String TYPE_TELPHONE = "3";
+
     public final static Integer ENABLED = 1;
     public final static Integer UNENABLED = 0;
 
@@ -38,7 +42,7 @@ public class AppExtension extends IdEntity {
     private String ext;//    ext                  varchar(32) comment '分机短号（保留，不用）',
     private String did;//    did                  varchar(32) comment '分机直通号（保留，不用）',
     private String agent;//    agent                varchar(32),
-    @Column(name = "app_id ")
+    @Column(name = "app_id")
     public String getAppId() {
         return appId;
     }
@@ -46,7 +50,7 @@ public class AppExtension extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "tenant_id ")
+    @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
     }
@@ -55,7 +59,7 @@ public class AppExtension extends IdEntity {
         this.tenantId = tenantId;
     }
 
-    @Column(name = "name ")
+    @Column(name = "name")
     public String getName() {
         return name;
     }
@@ -63,7 +67,7 @@ public class AppExtension extends IdEntity {
     public void setName(String name) {
         this.name = name;
     }
-    @Column(name = "enabled ")
+    @Column(name = "enabled")
     public Integer getEnabled() {
         return enabled;
     }
@@ -71,7 +75,7 @@ public class AppExtension extends IdEntity {
     public void setEnabled(Integer enabled) {
         this.enabled = enabled;
     }
-    @Column(name = "type ")
+    @Column(name = "type")
     public String getType() {
         return type;
     }
@@ -79,7 +83,7 @@ public class AppExtension extends IdEntity {
     public void setType(String type) {
         this.type = type;
     }
-    @Column(name = "user ")
+    @Column(name = "user")
     public String getUser() {
         return user;
     }
@@ -87,7 +91,7 @@ public class AppExtension extends IdEntity {
     public void setUser(String user) {
         this.user = user;
     }
-    @Column(name = "password ")
+    @Column(name = "password")
     public String getPassword() {
         return password;
     }
@@ -95,7 +99,7 @@ public class AppExtension extends IdEntity {
     public void setPassword(String password) {
         this.password = password;
     }
-    @Column(name = "secret ")
+    @Column(name = "secret")
     public String getSecret() {
         return secret;
     }
@@ -103,7 +107,7 @@ public class AppExtension extends IdEntity {
     public void setSecret(String secret) {
         this.secret = secret;
     }
-    @Column(name = "registrar ")
+    @Column(name = "registrar")
     public String getRegistrar() {
         return registrar;
     }
@@ -111,7 +115,7 @@ public class AppExtension extends IdEntity {
     public void setRegistrar(String registrar) {
         this.registrar = registrar;
     }
-    @Column(name = "register_expires ")
+    @Column(name = "register_expires")
     public Integer getRegisterExpires() {
         return registerExpires;
     }
@@ -119,7 +123,7 @@ public class AppExtension extends IdEntity {
     public void setRegisterExpires(Integer registerExpires) {
         this.registerExpires = registerExpires;
     }
-    @Column(name = "telenum ")
+    @Column(name = "telenum")
     public String getTelenum() {
         return telenum;
     }
@@ -127,7 +131,7 @@ public class AppExtension extends IdEntity {
     public void setTelenum(String telenum) {
         this.telenum = telenum;
     }
-    @Column(name = "last_register_time ")
+    @Column(name = "last_register_time")
     public Date getLastRegisterTime() {
         return lastRegisterTime;
     }
@@ -135,7 +139,7 @@ public class AppExtension extends IdEntity {
     public void setLastRegisterTime(Date lastRegisterTime) {
         this.lastRegisterTime = lastRegisterTime;
     }
-    @Column(name = "last_register_status ")
+    @Column(name = "last_register_status")
     public Integer getLastRegisterStatus() {
         return lastRegisterStatus;
     }
@@ -144,14 +148,14 @@ public class AppExtension extends IdEntity {
         this.lastRegisterStatus = lastRegisterStatus;
     }
 
-    @Column(name = "last_action ")
+    @Column(name = "last_action")
     public Integer getLastAction() {
         return lastAction;
     }
     public void setLastAction(Integer lastAction) {
         this.lastAction = lastAction;
     }
-    @Column(name = "last_action_time ")
+    @Column(name = "last_action_time")
     public Date getLastActionTime() {
         return lastActionTime;
     }
@@ -159,7 +163,7 @@ public class AppExtension extends IdEntity {
     public void setLastActionTime(Date lastActionTime) {
         this.lastActionTime = lastActionTime;
     }
-    @Column(name = "ext ")
+    @Column(name = "ext")
     public String getExt() {
         return ext;
     }
@@ -167,7 +171,7 @@ public class AppExtension extends IdEntity {
     public void setExt(String ext) {
         this.ext = ext;
     }
-    @Column(name = "did ")
+    @Column(name = "did")
     public String getDid() {
         return did;
     }
@@ -175,7 +179,7 @@ public class AppExtension extends IdEntity {
     public void setDid(String did) {
         this.did = did;
     }
-    @Column(name = "agent ")
+    @Column(name = "agent")
     public String getAgent() {
         return agent;
     }

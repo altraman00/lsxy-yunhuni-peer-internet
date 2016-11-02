@@ -156,6 +156,25 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
+    public boolean updateEnable(String id,Integer enable){
+        if(StringUtil.isEmpty(id)){
+            return false;
+        }
+        AppExtension appExtension = this.findById(id);
+        if(appExtension == null){
+            return false;
+        }
+        appExtension.setEnabled(enable==null?0:enable);
+        try{
+            this.save(appExtension);
+            return true;
+        }catch (Throwable t){
+            logger.error("",t);
+        }
+        return false;
+    }
+
+    @Override
     public List<AppExtension> findByAppId(String appId) {
         return appExtensionDao.findByAppId(appId);
     }
