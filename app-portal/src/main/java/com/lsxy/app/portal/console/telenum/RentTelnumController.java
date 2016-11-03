@@ -5,6 +5,7 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,5 +80,20 @@ public class RentTelnumController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/res_rent/release?id={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri, ResourcesRent.class,id);
+    }
+    /**
+     * 呼入号码管理首页
+     * @param request
+     * @param pageNo 请求的页面
+     * @return
+     */
+    @RequestMapping("/telnum/plist" )
+    @ResponseBody
+    public RestResponse telnumPlist(HttpServletRequest request, @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize,
+                              String telnum,String type,String areaCode,String order
+    ){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/res_rent/telnum/plist?pageNo={1}&pageSize={2}&telnum=${3}&type={4}&areaCode={5}&order={6}";
+        return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class,pageNo,pageSize,telnum,type,areaCode);
     }
 }

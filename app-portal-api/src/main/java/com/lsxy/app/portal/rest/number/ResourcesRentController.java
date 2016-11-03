@@ -23,7 +23,6 @@ import java.util.List;
 @RequestMapping("/rest/res_rent")
 @RestController
 public class ResourcesRentController extends AbstractRestController{
-
     @Autowired
     ResourcesRentService resourcesRentService;
     @Autowired

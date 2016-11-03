@@ -33,7 +33,10 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     ResourceTelenum findOneFreeDialingNumber(List<String> lineIds);
-
+    /**
+     *  获取空闲号码
+     */
+    Page getPageByFreeNumber(Integer pageNo,  Integer pageSize, String telnum,String type,String areaCode,String order);
     /**
      * 根据呼叫URI查找号码
      * @param uri
