@@ -92,6 +92,20 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     }
 
     @Override
+    public Page<TelnumToLineGateway> getIsNotNullPage(Integer pageNo, Integer pageSize, String isNotNull, String number) {
+        String hql = " FROM TelnumToLineGateway obj WHERE obj.deleted=0  ";
+        if(StringUtils.isNotEmpty(isNotNull)){
+            hql += " AND obj.lineId<>'"+isNotNull+"' ";
+        }
+        if(StringUtils.isNotEmpty(number)){
+            hql += " AND obj.telNumber = '"+number+"' ";
+        }
+        hql += " ORDER BY obj.createTime DESC ";
+        Page page = this.pageList(hql,pageNo,pageSize);
+        return page;
+    }
+
+    @Override
     public void batchDelete(String line,String[] ids) {
         String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET deleted=1 WHERE line_id='"+line+"' AND id IN (";
         for(int i=0;i<ids.length;i++){

@@ -44,7 +44,13 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @return
      */
     Page<TelnumToLineGateway> getPage(Integer pageNo, Integer pageSize, String line, String number, String isDialing, String isCalled, String isThrough);
-
+    /**
+     * 根据号码选择线路ID
+     *
+     * @param number
+     * @return
+     */
+    Page<TelnumToLineGateway> getIsNotNullPage(Integer pageNo, Integer pageSize, String isNotNull, String number);
     /**
      * 批量删除
      *
