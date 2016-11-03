@@ -10,6 +10,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 呼入号码管理
@@ -81,12 +83,8 @@ public class RentTelnumController extends AbstractPortalController {
         String uri = restPrefixUrl +   "/rest/res_rent/release?id={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri, ResourcesRent.class,id);
     }
-    /**
-     * 呼入号码管理首页
-     * @param request
-     * @param pageNo 请求的页面
-     * @return
-     */
+    /** 获取号码列表
+     * **/
     @RequestMapping("/telnum/plist" )
     @ResponseBody
     public RestResponse telnumPlist(HttpServletRequest request, @RequestParam(defaultValue = "1")Integer pageNo,  @RequestParam(defaultValue = "20")Integer pageSize,
@@ -95,5 +93,50 @@ public class RentTelnumController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = restPrefixUrl +   "/rest/res_rent/telnum/plist?pageNo={1}&pageSize={2}&telnum=${3}&type={4}&areaCode={5}&order={6}";
         return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class,pageNo,pageSize,telnum,type,areaCode);
+    }
+    /** 获取用户的号码未支付订单
+     * **/
+    @RequestMapping("/telnum/order" )
+    @ResponseBody
+    public RestResponse telnumOrder(HttpServletRequest request){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/res_rent/telnum/order";
+        return  RestRequest.buildSecurityRequest(token).get(uri, Map.class);
+    }
+    /** 支付订单
+     * **/
+    @RequestMapping("/telnum/order/play/{id}" )
+    @ResponseBody
+    public RestResponse telnumPlay(HttpServletRequest request, @PathVariable String id){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/res_rent/telnum/order/play/{id}";
+        return  RestRequest.buildSecurityRequest(token).get(uri,String.class,id);
+    }
+    /** 取消订单
+     * **/
+    @RequestMapping("/telnum/order/delete/{id}" )
+    @ResponseBody
+    public RestResponse telnumDelete(HttpServletRequest request, @PathVariable String id){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/res_rent/telnum/delete/play/{id}";
+        return  RestRequest.buildSecurityRequest(token).get(uri,String.class,id);
+    }
+    /** 创建订单
+     * **/
+    @RequestMapping("/telnum/order/new" )
+    @ResponseBody
+    public RestResponse telnumDelete(HttpServletRequest request, String[] numIds){
+        String token = getSecurityToken(request);
+        String uri = restPrefixUrl +   "/rest/res_rent/telnum/new";
+        if(numIds.length>0){
+            uri+="?";
+        }
+        for(int i=0;i<numIds.length;i++){
+            uri +="numIds="+numIds[i];
+            if(i!=numIds.length-1){
+                uri+="&";
+            }
+        }
+        return  RestRequest.buildSecurityRequest(token).get(uri,String.class);
     }
 }

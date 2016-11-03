@@ -144,7 +144,7 @@
                             <%@include file="/inc/pagefooter.jsp" %>
 
                             <!--待支付订单-->
-                            <section class="panel panel-default pos-rlt clearfix" id="nopaid" style="display:">
+                            <section class="panel panel-default pos-rlt clearfix" hidden id="nopaid" style="display:">
                                 <div class="from-group hr">
                                     <h5 class="orange">待支付号码订单</h5>
                                 </div>
@@ -165,7 +165,6 @@
                                                 <th class="text-center">可呼入</th>
                                                 <th class="text-center">可呼出</th>
                                                 <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                                <th class="text-center">质量(1~5分)</th>
                                                 <th class="text-right">资源占用费</th>
                                             </tr>
                                             </thead>
@@ -175,7 +174,6 @@
                                                 <td class="text-center">✔</td>
                                                 <td class="text-center">✘</td>
                                                 <td class="text-center"><span class="text-center-l-fixed">020</span></td>
-                                                <td class="text-center">4</td>
                                                 <td class="text-right">￥122.000</td>
                                             </tr>
                                             <tr>
@@ -183,7 +181,6 @@
                                                 <td class="text-center">✔</td>
                                                 <td class="text-center">✘</td>
                                                 <td class="text-center"><span class="text-center-l-fixed">0757</span></td>
-                                                <td class="text-center">4</td>
                                                 <td class="text-right">￥122.000</td>
                                             </tr>
                                             </tbody>
@@ -235,8 +232,8 @@
                                     <span class="title">号码功能：</span>
                                     <select v-model="serach.phone" class="form-control select-box">
                                         <option value="-1">全部</option>
-                                        <option value="1">可呼入</option>
-                                        <option value="2">可呼出</option>
+                                        <option value="callin">可呼入</option>
+                                        <option value="callout">可呼出</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 remove-padding">
@@ -261,12 +258,6 @@
                                     <th class="text-center">可呼入</th>
                                     <th class="text-center">可呼出</th>
                                     <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                    <th class="text-center">质量(1~5分)
-              <span class="order-by-box">
-                  <i class="fa fa-sort-asc up {{ orderby==1 ? 'active' : '' }}" @click="sort(1)"></i>
-                  <i class="fa fa-sort-desc down {{ orderby==2 ? 'active' : '' }}" @click="sort(2)"></i>
-                </span>
-                                    </th>
                                     <th class="text-right">资源占用费
               <span class="order-by-box">
                   <i class="fa fa-sort-asc up {{ orderby==3 ? 'active' : '' }}" @click="sort(3)"></i>
@@ -282,7 +273,6 @@
                                     <td class="text-center">{{ isCall[item.call] }}</td>
                                     <td class="text-center">{{ isCall[item.callout]}}</td>
                                     <td class="text-center"><span class="text-center-l-fixed">{{ item.place}}</span></td>
-                                    <td class="text-center">{{ item.quality}}</td>
                                     <td class="text-right">￥{{ item.price}}</td>
                                 </tr>
                                 </tbody>
@@ -305,7 +295,6 @@
                                             <th class="text-center">可呼入</th>
                                             <th class="text-center">可呼出</th>
                                             <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                            <th class="text-center">质量(1~5分)</th>
                                             <th class="text-right">资源占用费</th>
                                         </tr>
                                         </thead>
@@ -316,7 +305,6 @@
                                             <td class="text-center">{{ isCall[item.call] }}</td>
                                             <td class="text-center">{{ isCall[item.callout]}}</td>
                                             <td class="text-center"><span class="text-center-l-fixed">{{ item.place}}</span></td>
-                                            <td class="text-center">{{ item.quality}}</td>
                                             <td class="text-right">￥{{ item.price}}</td>
                                         </tr>
                                         </tbody>
@@ -373,7 +361,6 @@
                                             <th class="text-center">可呼入</th>
                                             <th class="text-center">可呼出</th>
                                             <th class="text-center"><span class="text-center-l-fixed">归属地</span></th>
-                                            <th class="text-center">质量(1~5分)</th>
                                             <th class="text-right">资源占用费</th>
                                         </tr>
                                         </thead>
@@ -383,7 +370,6 @@
                                             <td class="text-center">{{ isCall[item.call] }}</td>
                                             <td class="text-center">{{ isCall[item.callout]}}</td>
                                             <td class="text-center"><span class="text-center-l-fixed">{{ item.place}}</span></td>
-                                            <td class="text-center">{{ item.quality}}</td>
                                             <td class="text-right">￥{{ item.price}}</td>
                                         </tr>
                                         </tbody>
@@ -516,21 +502,15 @@
                 this.paystatus = 1
                 //余额不足充值
                 this.paystatus = -1
-
-
             },
             setPhoneList: function (nowPage, listRows) {
-
                 //请求数据
                 var param = { name:this.serach.name,phone:this.serach.phone,place:this.serach.place}
-
-
-
-
-
-                var url = ''
+               alert(JSON.stringify(param))
+                // var params = {'${_csrf.parameterName}':'${_csrf.token}',name:this.serach.name,phone:this.serach.phone,place:this.serach.place};
+               // ajaxsync("${ctx}/console/telenum/callnum/telnum/order",params,function(data){
+               // var url = ''
                 //ajaxsync(url,param,function(result){
-
                 //});
                 //假数据
                 var data = [
@@ -635,57 +615,65 @@
 
     //加载待支付数据
     function noPay(){
-        $('#nopaid').show();
-        $('paycreatetime').html('2016-10-28');
-        $('paycreatetime').html('2016-10-29');
+        var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+        ajaxsync("${ctx}/console/telenum/callnum/telnum/order",params,function(data){
+            if(data.success){
+                if(data.data.order!=null){
+                    $('#nopaid').show();
+                    $('paycreatetime').html('2016-10-28');
+                    $('paycreatetime').html('2016-10-29');
 
-        var html = '';
-        var data = [
-            {
-                id: '1',
-                phone: '13611460986',
-                call: 0,
-                callout: 1,
-                place: '广州',
-                quality: 3,
-                price: '111.000'
-            },
-            {
-                id: '2',
-                phone: '13611460983',
-                call: 0,
-                callout: 1,
-                place: '广州',
-                quality: 3,
-                price: '111.000'
-            },
-            {
-                id: '3',
-                phone: '13611460984',
-                call: 0,
-                callout: 1,
-                place: '广州',
-                quality: 2,
-                price: '111.000'
-            },
-        ]
+                    var html = '';
+                    var data = [
+                        {
+                            id: '1',
+                            phone: '13611460986',
+                            call: 0,
+                            callout: 1,
+                            place: '广州',
+                            quality: 3,
+                            price: '111.000'
+                        },
+                        {
+                            id: '2',
+                            phone: '13611460983',
+                            call: 0,
+                            callout: 1,
+                            place: '广州',
+                            quality: 3,
+                            price: '111.000'
+                        },
+                        {
+                            id: '3',
+                            phone: '13611460984',
+                            call: 0,
+                            callout: 1,
+                            place: '广州',
+                            quality: 2,
+                            price: '111.000'
+                        },
+                    ]
 
-        /*   <td>{{ item.phone }}</td>
-         <td class="text-center">{{ isCall[item.call] }}</td>
-         <td class="text-center">{{ isCall[item.callout]}}</td>
-         <td>{{ item.place}}</td>
-         <td class="text-center">{{ item.quality}}</td>
-         <td>{{ item.price}}</td>*/
+                    /*   <td>{{ item.phone }}</td>
+                     <td class="text-center">{{ isCall[item.call] }}</td>
+                     <td class="text-center">{{ isCall[item.callout]}}</td>
+                     <td>{{ item.place}}</td>
+                     <td class="text-center">{{ item.quality}}</td>
+                     <td>{{ item.price}}</td>*/
 
 
-        for(var i =0 ; i<data.length; i++){
-            html +='<tr><td>'+data[i].phone+'</td><td class="text-center">'+data[i].call+'</td><td  class="text-center">'+data[i].callout+'</td><td class="text-center"><span class="text-center-l-fixed">'+data[i].place+'</span></td><td  class="text-center">'+data[i].quality+'</td><td class="text-right">￥'+data[i].price+'</td></tr>'
-        }
+                    for(var i =0 ; i<data.length; i++){
+                        html +='<tr><td>'+data[i].phone+'</td><td class="text-center">'+data[i].call+'</td><td  class="text-center">'+data[i].callout+'</td><td class="text-center"><span class="text-center-l-fixed">'+data[i].place+'</span></td><td  class="text-center">'+data[i].quality+'</td><td class="text-right">￥'+data[i].price+'</td></tr>'
+                    }
 
-        $('#nopaid-table').html(html);
-
+                    $('#nopaid-table').html(html);
+                }
+            }else{
+                alert(data.errorMsg);
+            }
+        },"get");
     }
-
+    noPay()
 
 
 
