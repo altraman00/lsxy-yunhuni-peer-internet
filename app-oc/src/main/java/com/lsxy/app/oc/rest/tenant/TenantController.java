@@ -1149,6 +1149,10 @@ public class TenantController {
             return RestResponse.failed("0000","返回日期类型错误");
         }
         Page<CallCenter> page =  callCenterService.pList( pageNo,pageSize, id, appId, startTime, endTime, type,callnum, agent);
+        Map sum = callCenterService.sum(id,appId,startTime,endTime,type,callnum,agent);
+        Map map = new HashMap<>();
+        map.put("pageObj",page);
+        map.put("sum",sum);
         return RestResponse.success(page);
     }
 
