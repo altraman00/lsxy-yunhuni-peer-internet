@@ -297,7 +297,7 @@ public class AreaAndTelNumSelector {
             this.to2Num = to2Num;
         }
 
-        public ResourceTelenum getOneTelnumber() {
+        public String getOneTelnumber() {
             String telNum = null;
             if(this.toNum != null && toNum.size()> 0){
                 telNum = toNum.get(0).getFrom();
@@ -307,9 +307,28 @@ public class AreaAndTelNumSelector {
                     telNum = to1Num.get(0).getFrom();
                 }
             }
-            ResourceTelenum telenum = new ResourceTelenum();
-            telenum.setTelNumber(telNum);
-            return telenum;
+            return telNum;
+        }
+        public String getToUri(){
+            String toUri = null;
+            if(this.toNum != null && toNum.size()> 0){
+                toUri = toNum.get(0).getTo() + "@" + toNum.get(0).getDomain();
+            }
+            return toUri;
+        }
+        public String getTo1Uri(){
+            String toUri = null;
+            if(this.to1Num != null && to1Num.size()> 0){
+                toUri = to1Num.get(0).getTo() + "@" + to1Num.get(0).getDomain();
+            }
+            return toUri;
+        }
+        public String getTo2Uri(){
+            String toUri = null;
+            if(this.to2Num != null && to2Num.size()> 0){
+                toUri = to2Num.get(0).getTo() + "@" + to2Num.get(0).getDomain();
+            }
+            return toUri;
         }
     }
 

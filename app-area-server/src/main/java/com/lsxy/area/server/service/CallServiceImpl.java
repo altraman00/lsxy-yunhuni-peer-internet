@@ -218,14 +218,14 @@ public class CallServiceImpl implements CallService {
         //TODO 获取号码
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,true, from1,to1,from2, to2);
         String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        String oneTelnumber = selector.getOneTelnumber();
 
         from1 = oneTelnumber;
         from2 = oneTelnumber;
         //TODO 获取线路IP和端口
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-        String to1_uri = to1+"@"+lineGateway.getSipProviderIp();
-        String to2_uri = to2+"@"+lineGateway.getSipProviderIp();
+//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String to1_uri = selector.getTo1Uri();
+        String to2_uri = selector.getTo2Uri();
 
         //保存双向回拔表
         VoiceCallback voiceCallback = new VoiceCallback(from1,from2,to1_uri,to2_uri);
@@ -275,7 +275,7 @@ public class CallServiceImpl implements CallService {
                                     .setUserdata(user_data)
                                     .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(lineGateway.getId())
+                                    .setLineGatewayId(null)
                                     .setBusinessData(data)
                                     .build();
 
@@ -349,12 +349,12 @@ public class CallServiceImpl implements CallService {
 
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        String oneTelnumber = selector.getOneTelnumber();
 
         from = oneTelnumber;
         //TODO 获取线路IP和端口
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-        String to_uri = to+"@"+lineGateway.getSipProviderIp();
+//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String to_uri = selector.getToUri();
         //TODO 获取线路IP和端口
 
         //保存语音通知
@@ -389,7 +389,7 @@ public class CallServiceImpl implements CallService {
                                     .setUserdata(user_data)
                                     .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(lineGateway.getId())
+                                    .setLineGatewayId(null)
                                     .setBusinessData(data)
                                     .build();
             businessStateService.save(cache);
@@ -435,12 +435,12 @@ public class CallServiceImpl implements CallService {
         //TODO
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        String oneTelnumber = selector.getOneTelnumber();
 
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Map<String, Object> params = new MapBuilder<String, Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
+                .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_ring_seconds",max_dial_duration)
                 .putIfNotEmpty("valid_keys",verify_code)
@@ -468,7 +468,7 @@ public class CallServiceImpl implements CallService {
                     .setCallBackUrl(app.getUrl())
                     .setUserdata(user_data)
                     .setAreaId(areaId)
-                    .setLineGatewayId(lineGateway.getId())
+                    .setLineGatewayId(null)
                     .setBusinessData(new MapBuilder<String,Object>()
                             .put("from",oneTelnumber)
                             .put("to",to)
@@ -510,9 +510,9 @@ public class CallServiceImpl implements CallService {
 
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        String oneTelnumber = selector.getOneTelnumber();
 
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         CaptchaCall captchaCall = new CaptchaCall();
         captchaCall.setStartTime(new Date());
@@ -527,7 +527,7 @@ public class CallServiceImpl implements CallService {
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getSipProviderIp());
+        callSession.setToNum(selector.getToUri());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -536,7 +536,7 @@ public class CallServiceImpl implements CallService {
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String, Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
+                .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("play_repeat",repeat)
@@ -570,7 +570,7 @@ public class CallServiceImpl implements CallService {
                     .setCallBackUrl(app.getUrl())
                     .setUserdata(userData)
                     .setAreaId(areaId)
-                    .setLineGatewayId(lineGateway.getId())
+                    .setLineGatewayId(null)
                     .setBusinessData(new MapBuilder<String,Object>()
                             .putIfNotEmpty("from",oneTelnumber)
                             .putIfNotEmpty("to",to)

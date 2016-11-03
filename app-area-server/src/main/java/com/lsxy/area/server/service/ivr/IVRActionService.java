@@ -278,9 +278,9 @@ public class IVRActionService {
             throw new RuntimeException(e);
         }
         String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        String oneTelnumber = selector.getOneTelnumber();
 
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenant.getId())
@@ -289,7 +289,7 @@ public class IVRActionService {
                 .setResId(res_id)
                 .setType("ivr_incoming")
                 .setAreaId(areaId)
-                .setLineGatewayId(lineGateway.getId())
+                .setLineGatewayId(null)
                 .setBusinessData(new MapBuilder<String,Object>()
                         //incoming事件from 和 to是相反的
                         .put("from",to)
