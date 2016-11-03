@@ -2,7 +2,6 @@ package com.lsxy.app.oc.rest.app;
 
 import com.alibaba.dubbo.common.utils.StringUtils;
 import com.lsxy.app.oc.base.AbstractRestController;
-import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -36,7 +35,7 @@ public class AppController extends AbstractRestController {
     @ApiOperation(value = "查找当前用户的应用")
     public RestResponse listApp(
             @ApiParam(name = "uid",value = "用户id") @PathVariable String uid,
-            @ApiParam(name = "serviceType",value = "应用类型 语言产品voice呼叫中心产品call_center") @PathVariable String serviceType
+            @ApiParam(name = "serviceType",value = "应用类型 语言产品voice呼叫中心产品call_center") @RequestParam(required = false) String serviceType
     ) throws Exception{
         List<App> apps = null;
         if(StringUtils.isNotEmpty(serviceType)){
