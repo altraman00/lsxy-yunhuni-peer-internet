@@ -45,8 +45,8 @@ public final class EnqueueSQLUtil {
     }
 
     public static String genSQL(String tenantId,String appId,String whereExpression,String sortExpression){
-        execExpression(whereExpression,null);
-        execExpression(sortExpression,null);
+        execWhereExpression(whereExpression,null);
+        execSortExpression(sortExpression,null);
         Set<String> skills = new HashSet<>();
         String showColums = "";
         String having = "";
@@ -103,9 +103,9 @@ public final class EnqueueSQLUtil {
         return sql;
     }
 
-    public static Valuable execExpression(String str, Map<String,Object> vars){
+    public static boolean execWhereExpression(String str, Map<String,Object> vars){
         if(StringUtil.isBlank(str)){
-            return null;
+            return false;
         }
         Expression expression = factory.getExpression(str+";");
         expression.initVariable("id","1");
@@ -125,10 +125,38 @@ public final class EnqueueSQLUtil {
         }catch (Throwable t){
             throw new IllegalArgumentException(t);
         }
-        if(type == null || type != DataType.BOOLEAN && type != DataType.NUMBER){
+        if(type == null || type != DataType.BOOLEAN){
             throw new IllegalArgumentException("格式错误");
         }
-        return value;
+        return value.getBooleanValue();
+    }
+
+    public static long execSortExpression(String str, Map<String,Object> vars){
+        if(StringUtil.isBlank(str)){
+            return Integer.MAX_VALUE;
+        }
+        Expression expression = factory.getExpression(str+";");
+        expression.initVariable("id","1");
+        if(vars != null && vars.size()>0){
+            Iterator<String> keys = vars.keySet().iterator();
+            while (keys.hasNext()){
+                String key = keys.next();
+                Object v = vars.get(key);
+                expression.initVariable(key,v);
+            }
+        }
+        Valuable value = null;
+        DataType type = null;
+        try{
+            value = expression.reParseAndEvaluate();
+            type = value.getDataType();
+        }catch (Throwable t){
+            throw new IllegalArgumentException(t);
+        }
+        if(type == null || type != DataType.NUMBER){
+            throw new IllegalArgumentException("格式错误");
+        }
+        return value.getNumberValue().longValue();
     }
 
     /*public static void main(String[] args) {

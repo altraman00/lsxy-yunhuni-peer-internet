@@ -212,6 +212,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
     }
 
+    String skill_regex="(has|get)\\(\"(.+?)\"\\)";
+    Pattern p  =Pattern.compile(skill_regex);
+
     /**
      * 坐席找排队
      * @param tenantId
@@ -231,15 +234,21 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 params.put(varName, skill.getLevel() == null ?0 : skill.getLevel());
             }
         }
-        String enqueue_str = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
-        EnQueue enQueue = JSONUtil2.fromJson(enqueue_str,EnQueue.class);
-        String ex = enQueue.getFilter().getCondition().getWhere();
-        test(ex,params);
+        String enqueue = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
+        if(getWhere(enqueue,params)){
+            getSort(enqueue,params);
+        }
     }
 
-    public void test(String ex ,Map<String,Object> params){
-        String skill_regex="(has|get)\\(\"(.+?)\"\\)";
-        Pattern p  =Pattern.compile(skill_regex);
+    public boolean getWhere(String enqueue , Map<String,Object> params){
+        if(StringUtil.isBlank(enqueue)){
+            return false;
+        }
+        EnQueue enQueue = JSONUtil2.fromJson(enqueue,EnQueue.class);
+        String ex = enQueue.getFilter().getCondition().getWhere();
+        if(StringUtil.isBlank(ex)){//没有条件,就是所有都满足
+            return true;
+        }
         Matcher m =  p.matcher(ex);
         while(m.find()){
             String key = m.group(1);
@@ -251,7 +260,30 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             ex = ex.replaceAll(key + "\\(\"(.+?)\"\\)",rel);
         }
-        EnqueueSQLUtil.execExpression(ex,params).getValue();
+        return EnqueueSQLUtil.execWhereExpression(ex,params);
+    }
+
+    public long getSort(String enqueue , Map<String,Object> params){
+        if(StringUtil.isBlank(enqueue)){
+            return Integer.MIN_VALUE;
+        }
+        EnQueue enQueue = JSONUtil2.fromJson(enqueue,EnQueue.class);
+        String ex = enQueue.getFilter().getCondition().getSort();
+        if(StringUtil.isBlank(ex)){//没有排序表达式
+            return Integer.MAX_VALUE;
+        }
+        Matcher m =  p.matcher(ex);
+        while(m.find()){
+            String key = m.group(1);
+            String val =  m.group(2);
+            String varName = "var_" + val.hashCode();
+            String rel = varName;
+            if(key.equals("has")){
+                rel = rel + ">0";
+            }
+            ex = ex.replaceAll(key + "\\(\"(.+?)\"\\)",rel);
+        }
+        return EnqueueSQLUtil.execSortExpression(ex,params);
     }
     public void dequeue(String agent){
     }
