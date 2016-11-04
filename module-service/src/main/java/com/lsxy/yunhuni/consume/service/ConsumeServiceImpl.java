@@ -140,4 +140,11 @@ public class ConsumeServiceImpl extends AbstractService<Consume> implements Cons
         return (BigDecimal) map.get("consume");
     }
 
+    @Override
+    public BigDecimal getConsumeByAppIdAndDate(String appId, Date startDate, Date endDate) {
+        String sql = "SELECT IFNULL(SUM(c.amount),0) as consume FROM db_lsxy_bi_yunhuni.tb_bi_consume c WHERE c.app_id=? AND c.dt >= ? AND c.dt < ? and c.deleted=0";
+        Map<String, Object> map = jdbcTemplate.queryForMap(sql, appId,startDate,endDate);
+        return (BigDecimal) map.get("consume");
+    }
+
 }
