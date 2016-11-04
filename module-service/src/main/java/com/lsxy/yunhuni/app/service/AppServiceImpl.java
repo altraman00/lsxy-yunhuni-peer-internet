@@ -54,6 +54,14 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
+    public List<App> findAppByUserNameAndServiceType(String tenantId, String serviceType) {
+        String hql = "from App obj where obj.tenant.id=?1 and obj.serviceType=?2 order by obj.status";
+        List<App> list = this.findByCustomWithParams(hql, tenantId,serviceType);
+
+        return list;
+    }
+
+    @Override
     public Page<App> pageList(String tenantId, Integer pageNo, Integer pageSize) {
         String hql = "from App obj where obj.tenant.id=?1 ";
         Page<App> page =  this.pageList(hql,pageNo,pageSize,tenantId);
@@ -97,7 +105,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(tenantId == null){
             throw new IllegalArgumentException();
         }
-        String hql = "from App obj where deleted != 1 and obj.tenant.id=?1 order by obj.status";
+        String hql = "from App obj where obj.tenant.id=?1 order by obj.status";
         List<App> list = this.findByCustomWithParams(hql, tenantId);
         return list;
     }

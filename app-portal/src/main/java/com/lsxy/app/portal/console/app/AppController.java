@@ -2,7 +2,8 @@ package com.lsxy.app.portal.console.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
-import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.app.portal.comm.PortalConstants;
+import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +30,6 @@ import java.util.Map;
 @RequestMapping("/console/app")
 public class AppController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(AppController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
     /**
      * 应用首页
      * @param request
@@ -45,7 +44,6 @@ public class AppController extends AbstractPortalController {
         mav.setViewName("/console/app/list");
         return mav;
     }
-
     /**
      * 获取租户下所有测试绑定号码
      * @param request
@@ -53,8 +51,18 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse getTestNumBindList(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/test_num_bind/list";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/test_num_bind/list";
         return  RestRequest.buildSecurityRequest(token).getList(uri, TestNumBind.class);
+    }
+    /**
+     * 获取应用下全部分机
+     * @param request
+     * @return
+     */
+    private RestResponse getAppExtensionList(HttpServletRequest request,String appId){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app_extension/list/{1}";
+        return  RestRequest.buildSecurityRequest(token).getList(uri, AppExtension.class,appId);
     }
     /**
      * 创建应用首页
@@ -86,7 +94,9 @@ public class AppController extends AbstractPortalController {
         App app = restResponse.getData();
         mav.addObject("app", app);
         List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
+        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
         mav.addObject("testNumBindList",testNumBindList);
+        mav.addObject("appExtensionList",appExtensionList);
         mav.setViewName("/console/app/detail");
         return mav;
     }
@@ -98,7 +108,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse findById(HttpServletRequest request,String id ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/app/get/{1}";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/get/{1}";
         return RestRequest.buildSecurityRequest(token).get(uri, App.class,id);
     }
     /**
@@ -110,7 +120,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse pageList(HttpServletRequest request,Integer pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl + "/rest/app/plist?pageNo={1}&pageSize={2}";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/plist?pageNo={1}&pageSize={2}";
         return RestRequest.buildSecurityRequest(token).getPage(uri,App.class,pageNo,pageSize);
     }
     @RequestMapping("/delete")
@@ -120,7 +130,7 @@ public class AppController extends AbstractPortalController {
         if(App.STATUS_OFFLINE==app.getStatus()) {
             //Rest删除应用
             String token = getSecurityToken(request);
-            String uri = restPrefixUrl + "/rest/app/delete?id={1}";
+            String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/delete?id={1}";
             RestResponse<App> response = RestRequest.buildSecurityRequest(token).get(uri, App.class, id);
             return response;
         }else{
@@ -182,7 +192,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse createApp(HttpServletRequest request,App app){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/create";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app/create";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(app, Map.class);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
@@ -195,7 +205,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse updateApp(HttpServletRequest request,App app){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/update";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app/update";
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = mapper.convertValue(app, Map.class);
         return RestRequest.buildSecurityRequest(token).post(uri,map, App.class);
@@ -208,7 +218,7 @@ public class AppController extends AbstractPortalController {
      */
     private RestResponse countName(HttpServletRequest request,String name){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/app/count/{1}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app/count/{1}";
         return RestRequest.buildSecurityRequest(token).get(uri, Long.class,name);
     }
 }

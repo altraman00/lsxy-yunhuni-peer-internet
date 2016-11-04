@@ -3,6 +3,8 @@ package com.lsxy.yunhuni.api.app.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.config.model.Area;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -18,7 +20,8 @@ import javax.persistence.*;
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线
     public static int STATUS_OFFLINE = 2;//没上线
-
+    public static String PRODUCT_VOICE = "voice";//语言产品
+    public static String PRODUCT_CALL_CENTER = "call_center";//语言产品
     private Tenant tenant;//所属租户
     private String name;//应用名字
     private Integer status;//应用状态
@@ -35,6 +38,24 @@ public class App extends IdEntity {
     private Integer isVoiceValidate;//是否语音验证码0否，1是
     private Integer isIvrService;//是否IVR定制服务0否，1是
     private Area area;  //所属区域（应用上线后要指定区域）
+    private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
+    private String serviceType;//服务类型
+    @Column(name = "is_call_center")
+    public Integer getIsCallCenter() {
+        return isCallCenter;
+    }
+
+    public void setIsCallCenter(Integer isCallCenter) {
+        this.isCallCenter = isCallCenter;
+    }
+    @Column(name = "service_type")
+    public String getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -164,6 +185,7 @@ public class App extends IdEntity {
 
     @ManyToOne
     @JoinColumn(name = "area_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     public Area getArea() {
         return area;
     }

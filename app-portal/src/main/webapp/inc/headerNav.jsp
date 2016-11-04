@@ -18,10 +18,10 @@
             <%--<i class="fa fa-fw fa-book"></i>文档中心--%>
         <%--</a></li>--%>
         <li class="hidden-xs a-color"> <a href="#" onclick="window.open('<%=SystemConfig.getProperty("global.official.website.url")%>')" class="dropdown-toggle" data-toggle="dropdown" onclick="window.location.href='news.html' ">
-            <img src="${resPrefixUrl }/images/index/index.png" class="header-index-img" alt="">官网首页</a>
+            <i class="iconfont icon-menu-index"></i>官网首页</a>
 
         </li>
-        <li class="hidden-xs"> <a href="#" class="dropdown-toggle" onclick="window.location.href='${ctx}/console/message/account_message/index'" data-toggle="dropdown"> <i class="fa fa-bell"></i> <span id="notReadMessageNum" class="bg-danger <c:if test="${homeVO.messageNum>0}">header-msg</c:if>" ></span> </a>
+        <li class="hidden-xs"> <a href="#" class="dropdown-toggle" onclick="window.location.href='${ctx}/console/message/account_message/index'" data-toggle="dropdown"> <i class="iconfont icon-menu-bell"></i> <span id="notReadMessageNum" class="bg-danger <c:if test="${homeVO.messageNum>0}">header-msg</c:if>" ></span> </a>
             <!--<section class="dropdown-menu aside-xl">-->
                 <!--<section class="panel bg-white">-->
                     <!--<header class="panel-heading b-light bg-light"> <strong>您有<span class="count">2</span>通知</strong> </header>-->
@@ -37,7 +37,7 @@
                 <!--</section>-->
             <!--</section>-->
         </li>
-        <li class="dropdown a-color"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="thumb-sm avatar pull-left"> <img src="${resPrefixUrl }/images/avatar.jpg"> </span>${currentUser.userName}<b class="caret"></b> </a>
+        <li class="dropdown a-color"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="thumb-sm avatar pull-left"> <img src="${resPrefixUrl }/images/index/avatar-small.png"> </span>${currentUser.userName}<b class="caret"></b> </a>
             <ul class="dropdown-menu animated fadeInRight">
                 <span class="arrow top"></span>
                 <li> <a href="${ctx}/console/account/safety/index">设置</a> </li>
