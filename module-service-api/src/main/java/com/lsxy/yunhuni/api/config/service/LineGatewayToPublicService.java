@@ -17,5 +17,4 @@ public interface LineGatewayToPublicService extends BaseService<LineGatewayToPub
 
     List<LineGateway> findAllLineGatewayByAreaId(String areaId);
     void deleteLine(String line);
-    void deleteLineGateWay(String line);
 }

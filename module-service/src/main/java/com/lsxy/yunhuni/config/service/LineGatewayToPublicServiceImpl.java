@@ -110,11 +110,6 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
-    public void deleteLineGateWay(String line) {
-
-    }
-
-    @Override
     public void deleteLine(String line) {
         String sql =  " update  db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public  set deleted=1 where deleted=0 and line_id='"+line+"'  ";
         jdbcTemplate.update(sql);
