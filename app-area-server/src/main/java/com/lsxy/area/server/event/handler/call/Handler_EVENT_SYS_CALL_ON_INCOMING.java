@@ -168,8 +168,10 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
          */
         String fromPrefix = lineGateway.getFromPrefix();
         int start = 0;
-        if(from.startsWith(fromPrefix)){
-            start = fromPrefix.length();
+        if(StringUtils.isNotBlank(fromPrefix)){
+            if(from.startsWith(fromPrefix)){
+                start = fromPrefix.length();
+            }
         }
         int end = from.indexOf("@");
         if(end == -1){
