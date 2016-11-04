@@ -79,7 +79,7 @@
         if(result&&text.length>0){
             ajaxsync(ctx+"/console/customer/edit",getFormJson("#customForm"),function(data){
                 if(data.success){
-                    showtoast("提交成功",ctx+"/console/customer/index");
+                    showtoast("提交成功",ctx+"/console/customer/index",1000);
                 }else{
                     showtoast(data.errorMsg);
                     $('#validateBtn').removeAttr('disabled');
