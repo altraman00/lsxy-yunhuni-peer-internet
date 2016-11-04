@@ -5,6 +5,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
 
 import java.io.Serializable;
 
@@ -16,10 +17,12 @@ public interface AgentSkillDao extends BaseDaoInterface<AgentSkill, Serializable
 
     @Modifying
     @Query("delete from AgentSkill where agent=:agent")
-    public long deleteByAgent(@Param("agent") String agent);
+    public int deleteByAgent(@Param("agent") String agent);
 
     @Modifying
     @Query("update AgentSkill a set active=:active where agent=:agent and name=:name")
-    public long updateActiveByAgent(@Param("active") Integer active,@Param("agent") String agent,@Param("name") String name);
+    public int updateActiveByAgent(@Param("active") Integer active,@Param("agent") String agent,@Param("name") String name);
+
+    public List<AgentSkill> findByTenantIdAndAppIdAgentAndActive(String tenantId,String appId,String agent,Integer active);
 
 }

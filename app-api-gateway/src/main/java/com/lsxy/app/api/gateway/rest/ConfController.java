@@ -22,7 +22,7 @@ import java.util.Map;
 public class ConfController extends AbstractAPIController{
     private static final Logger logger = LoggerFactory.getLogger(ConfController.class);
 
-    @Reference(timeout=3000)
+    @Reference(timeout=3000,check = false,lazy = true)
     private ConfService confService;
 
     @RequestMapping(value = "/{accountId}/conf/create",method = RequestMethod.POST)
