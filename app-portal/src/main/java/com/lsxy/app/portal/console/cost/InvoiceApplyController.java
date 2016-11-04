@@ -198,9 +198,9 @@ public class InvoiceApplyController extends AbstractPortalController {
         }
 
         String type = (String) paramsMap.get("type");
-        Integer authStatus = findAuthStatus(token);
+        int authStatus = findAuthStatus(token);
         if(1 == authStatus){
-            if(!authStatus.equals(type)){
+            if(!(authStatus==Integer.valueOf(type))){
                 throw new RuntimeException("个人实名认证的用户不能进行企业发票申请");
             }
         }else if(2 != authStatus){

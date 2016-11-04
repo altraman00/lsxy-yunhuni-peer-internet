@@ -17,7 +17,7 @@ public class ConfCreateInputDTO extends CommonDTO{
     @NotNull
     @Min(1)
     @Max(60 * 60 * 6)
-    private Integer maxDuration;// 呼叫最大接通时间（秒）
+    private Integer maxDuration;// 会议最大时间（秒）
 
     @JsonProperty("max_parts")
     @Min(1)

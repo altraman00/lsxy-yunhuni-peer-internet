@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.exceptions.*;
+import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,7 +48,7 @@ public class ConfServiceImpl implements ConfService {
     private static final Logger logger = LoggerFactory.getLogger(ConfServiceImpl.class);
 
     /**最大与会数**/
-    public static final int MAX_PARTS = 10;
+    public static final int MAX_PARTS = 8;
 
     /**key的过期时间 秒**/
     public static final int EXPIRE = 60 * 60 * 12;
@@ -89,6 +91,9 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private CallSessionService callSessionService;
 
+    @Autowired
+    private AreaAndTelNumSelector areaAndTelNumSelector;
+
     private boolean isEnableConfService(String tenantId,String appId){
         try {
             TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
@@ -110,11 +115,11 @@ public class ConfServiceImpl implements ConfService {
     public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
         App app = appService.findById(appId);
+        if(app == null){
+            throw new AppNotFoundException();
+        }
         String tenantId = app.getTenant().getId();
 
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
-        }
 
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -135,7 +140,9 @@ public class ConfServiceImpl implements ConfService {
             maxParts = MAX_PARTS;
         }
         //TODO
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Meeting meeting = new Meeting();
@@ -149,7 +156,7 @@ public class ConfServiceImpl implements ConfService {
                                 .putIfNotEmpty("user_data",confId)
                                 .putIfNotEmpty("max_seconds",maxDuration)
                                 .putIfNotEmpty("bg_file",bgmFile)
-                                .putIfNotEmpty("appid",appId)
+                                .putIfNotEmpty("areaId",areaId)
                                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
         try {
@@ -164,7 +171,7 @@ public class ConfServiceImpl implements ConfService {
                                 .setId(confId)
                                 .setType("sys_conf")
                                 .setUserdata(userData)
-                                .setAreaId(app.getArea().getId())
+                                .setAreaId(areaId)
                                 .setLineGatewayId(lineGateway.getId())
                                 .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
@@ -180,8 +187,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean dismiss(String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -209,10 +216,12 @@ public class ConfServiceImpl implements ConfService {
             //不能跨app操作
             throw new ConfNotExistsException();
         }
+        String areaId = areaAndTelNumSelector.getAreaId(app);
+
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",state.getResId())
                 .putIfNotEmpty("user_data",confId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
@@ -233,8 +242,8 @@ public class ConfServiceImpl implements ConfService {
             throw new NumberNotAllowToCallException();
         }
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String tenantId = app.getTenant().getId();
         String whiteList = app.getWhiteList();
@@ -269,7 +278,10 @@ public class ConfServiceImpl implements ConfService {
         String callId = UUIDGenerator.uuid();
 
         //TODO
-        String oneTelnumber = appService.findOneAvailableTelnumber(app);
+        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+        String areaId = result.get("areaId");
+        String oneTelnumber = result.get("oneTelnumber");
+
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         CallSession callSession = new CallSession();
@@ -289,7 +301,7 @@ public class ConfServiceImpl implements ConfService {
                 .putIfNotEmpty("max_answer_seconds",maxDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
@@ -304,7 +316,7 @@ public class ConfServiceImpl implements ConfService {
                                     .setAppId(app.getId())
                                     .setId(callId)
                                     .setType("sys_conf")
-                                    .setAreaId(app.getArea().getId())
+                                    .setAreaId(areaId)
                                     .setLineGatewayId(lineGateway.getId())
                                     .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("from",oneTelnumber)
@@ -325,8 +337,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean join(String ip, String appId, String confId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -354,8 +366,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean quit(String ip, String appId, String confId, String callId) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -378,11 +390,12 @@ public class ConfServiceImpl implements ConfService {
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",call_state.getResId())
                 .putIfNotEmpty("conf_res_id",conf_state.getResId())
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
@@ -397,8 +410,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean startPlay(String ip, String appId, String confId, List<String> playFiles) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -422,11 +435,12 @@ public class ConfServiceImpl implements ConfService {
             throw new IllegalArgumentException();
         }
         playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("file",StringUtils.join(playFiles,"|"))
                 .putIfNotEmpty("user_data",confId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, params);
@@ -441,8 +455,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean stopPlay(String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -460,11 +474,11 @@ public class ConfServiceImpl implements ConfService {
         if(conf_state == null || conf_state.getResId() == null){
             throw new IllegalArgumentException();
         }
-
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("user_data",confId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY_STOP, params);
@@ -479,8 +493,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean startRecord(String ip, String appId, String confId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -510,13 +524,14 @@ public class ConfServiceImpl implements ConfService {
                 maxDuration = (int)duration;
             }
         }
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
                 //TODO 文件名如何定
                 .putIfNotEmpty("record_file",UUIDGenerator.uuid())
                 .putIfNotEmpty("user_data",confId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
@@ -531,8 +546,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean stopRecord(String ip, String appId, String confId) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -549,11 +564,11 @@ public class ConfServiceImpl implements ConfService {
         if(conf_state == null || conf_state.getResId() == null){
             throw new IllegalArgumentException();
         }
-
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("user_data",confId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD_STOP, params);
@@ -568,8 +583,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean setVoiceMode(String ip, String appId, String confId, String callId, Integer voiceMode) throws YunhuniApiException {
         App app = appService.findById(appId);
-        if(app.getStatus() != app.STATUS_ONLINE){
-            throw new AppOffLineException();
+        if(app == null){
+            throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
         if(StringUtils.isNotBlank(whiteList)){
@@ -598,12 +613,13 @@ public class ConfServiceImpl implements ConfService {
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
+        String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("call_res_id",call_state.getResId())
                 .putIfNotEmpty("mode",voiceMode)
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("appid",appId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_SET_PART_VOICE_MODE, params);
@@ -653,7 +669,6 @@ public class ConfServiceImpl implements ConfService {
         }
 
         play_file = playFileUtil.convert(conf_state.getTenantId(),conf_state.getAppId(),play_file);
-
         Map<String, Object> params = new MapBuilder<String,Object>()
                                     .putIfNotEmpty("res_id",call_state.getResId())
                                     .putIfNotEmpty("conf_res_id",conf_state.getResId())
@@ -661,7 +676,7 @@ public class ConfServiceImpl implements ConfService {
                                     .putIfNotEmpty("voice_mode",voice_mode)
                                     .putIfNotEmpty("play_file",play_file)
                                     .putIfNotEmpty("user_data",call_id)
-                                    .putIfNotEmpty("appid", conf_state.getAppId())
+                                    .putIfNotEmpty("areaId", conf_state.getAreaId())
                                     .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_ENTER, params);
         try {
@@ -725,8 +740,34 @@ public class ConfServiceImpl implements ConfService {
      * @return
      */
     @Override
-    public List<String> getParts(String confId){
+    public Set<String> getParts(String confId){
         String key = key(confId);
-        return (List<String>)redisTemplate.opsForSet().members(key);
+        Set<String> results = null;
+        try{
+            results = redisTemplate.opsForSet().members(key);
+        }catch (Throwable t){
+            logger.error("获取会议成员失败",t);
+        }
+        return results;
+    }
+
+    /**
+     * 弹出会议成员，并清空
+     */
+    @Override
+    public Set<String> popParts(String confId){
+        String key = key(confId);
+        Set<String> results = null;
+        try{
+            results = redisTemplate.opsForSet().members(key);
+        }catch (Throwable t){
+            logger.error("获取会议成员失败",t);
+        }
+        try{
+            redisTemplate.delete(key);
+        }catch (Throwable t){
+            logger.info("删除会议成员缓存失败",t);
+        }
+        return results;
     }
 }

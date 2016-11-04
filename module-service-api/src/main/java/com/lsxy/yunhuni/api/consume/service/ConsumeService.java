@@ -49,11 +49,25 @@ public interface ConsumeService extends BaseService<Consume> {
     Page<Consume> pageListByTenantAndDate(String tenantId, Integer year, Integer month, Integer pageNo, Integer pageSize);
 
     /**
+     * 进行消费
+     */
+    void consume(Consume consume);
+
+    /**
      * 获取租户一个时间段的消费金额
      * @param tenantId 租户ID
-     * @param startDate 开始时间（大于等于）
-     * @param endDate 结束时间 （小于）
+     * @param startDate 开始时间（大于等于，非空）
+     * @param endDate 结束时间 （小于，非空）
      * @return
      */
     BigDecimal getConsumeByTenantIdAndDate(String tenantId, Date startDate, Date endDate);
+
+    /**
+     * 获取应用一个时间段的消费金额
+     * @param appId
+     * @param startDate 开始时间（大于等于，非空）
+     * @param endDate 结束时间 （小于，非空）
+     * @return
+     */
+    BigDecimal getConsumeByAppIdAndDate(String appId,Date startDate, Date endDate);
 }

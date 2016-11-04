@@ -81,7 +81,7 @@
                                                 <lable class="col-md-3 text-right">真实姓名：</lable>
                                                 <div class="col-md-4 ">
                                                     <input type="text" name="privateName" placeholder="" class="form-control input-form max30"/>
-                                                    <p class="tips">与所使用认证的证件一致的姓名</p>
+                                                    <p class="tips">请与提交的证件姓名保持一致</p>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -89,14 +89,14 @@
                                                 <div class="col-md-4">
                                                     <select class="form-control " name="idType" >
                                                         <option value="0">身份证</option>
-                                                        <option value="1">护照</option>
+                                                        <%--<option value="1">护照</option>--%>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">证件号码：</lable>
                                                 <div class="col-md-4" >
-                                                    <input type="text" name="idNumber" placeholder="" class="form-control input-form max30"/>
+                                                    <input type="text" name="idNumber" placeholder="" class="form-control input-form idcard"/>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -128,13 +128,14 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">公司名称：</lable>
                                                 <div class="col-md-4 ">
-                                                    <input type="text" name="corpName" data-fv-notempty="true" placeholder="" class="form-control input-form max50" id="form-username"/>
+                                                    <input type="text" name="corpName" data-fv-notempty="true" placeholder="" class="form-control input-form companyname" id="form-username"/>
+                                                    <p class="tips">请与提交的资料保持一致</p>
                                                 </div>
                                             </div>
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">办公地址：</lable>
                                                 <div class="col-md-4">
-                                                    <input type="text" name="addr" placeholder="" class="form-control input-form max100"/>
+                                                    <input type="text" name="addr" placeholder="" class="form-control input-form max100 notEmpty"/>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -148,7 +149,7 @@
                                             <div class="form-group">
                                                 <lable class="col-md-3 text-right">申请人：</lable>
                                                 <div class="col-md-4 ">
-                                                    <input type="text" name="proposer" placeholder="" class="form-control input-form max30" id="form-proposer"/>
+                                                    <input type="text" name="proposer" placeholder="" class="form-control input-form max30 notEmpty" id="form-proposer"/>
                                                 </div>
                                             </div>
                                             <div class="noticeInfo form-group">
@@ -184,14 +185,14 @@
                                                     <lable class="col-md-3 text-right extend_label">注册号：</lable>
                                                     <div class="col-md-4">
                                                         <input type="text" name="type02Prop01" placeholder="" class="form-control input-form limit15"/>
-                                                        <p class="tips">15位数字</p>
+                                                        <p class="tips">15位数字或者大写英文字母</p>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <lable class="col-md-3 text-right extend_label">税务登记号：</lable>
                                                     <div class="col-md-4">
                                                         <input type="text" name="type02Prop02" placeholder="" class="form-control input-form limit15"/>
-                                                        <p class="tips">15位数字</p>
+                                                        <p class="tips">15位数字或者大写英文字母</p>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -207,7 +208,7 @@
                                                     <lable class="col-md-3 text-right extend_label">税务登记号：</lable>
                                                     <div class="col-md-4">
                                                         <input type="text" name="type03Prop01" placeholder="" class="form-control input-form limit15"/>
-                                                        <p class="tips">15位数字</p>
+                                                        <p class="tips">15位数字或者大写英文字母</p>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -221,7 +222,7 @@
                                                     <lable class="col-md-3 text-right extend_label">营业执照号：</lable>
                                                     <div class="col-md-4">
                                                         <input type="text" name="type03Prop03" placeholder="" class="form-control input-form limit15"/>
-                                                        <p class="tips">15位数字</p>
+                                                        <p class="tips">15位数字或者大写英文字母</p>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">

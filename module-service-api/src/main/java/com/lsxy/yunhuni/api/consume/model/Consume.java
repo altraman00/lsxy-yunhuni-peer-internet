@@ -18,10 +18,10 @@ import java.util.Date;
 public class Consume extends IdEntity {
 
     private Date dt;//消费时间
-    private String type;//消费类型 或产品的标识码
+    private String type;//消费类型 或产品的标识码（不能为空）
     private BigDecimal amount;//消费金额
     private String remark;//备注
-    private String appId;//所属应用编号（仅用查询，如需关联应用等合并结构后改）
+    private String appId;//所属应用编号（不能为空，仅用查询，勿关联应用，当一个消费不属于任何应用时，设为0）
     private Tenant tenant;//所属租户
 
     public Consume() {

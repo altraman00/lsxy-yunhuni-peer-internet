@@ -40,16 +40,19 @@ public class AreaServerSelectSessionPolicy extends DefaultSelectSessionPolicy{
 
         if(message instanceof RPCRequest){
             RPCRequest request = (RPCRequest) message;
-            String appid = (String) request.getParameter("appid");
-            if(!StringUtil.isEmpty(appid)){
+//            String appid = (String) request.getParameter("appid");
+            String areaId = (String) request.getParameter("areaId");
+
+            if(!StringUtil.isEmpty(areaId)){
                 //根据应用所在的区域,找到对应的区域
-                App app = appService.findById(appid);
-                if(app.getStatus().equals(App.STATUS_ONLINE)){
-                    String areaid = app.getArea().getId();
-                    session = getRightSessionInArea(areaid);
-                }else{
-                    
-                }
+//                App app = appService.findById(appid);
+//                if(app.getStatus().equals(App.STATUS_ONLINE)){
+//                    String areaid = app.getArea().getId();
+//                    session = getRightSessionInArea(areaid);
+//                }else{
+//
+//                }
+                session = getRightSessionInArea(areaId);
             }else{
                 //如果不存在appid表示非应用请求指令,按照默认的负载均衡算法实现路由
                 session = super.select(message);
@@ -71,7 +74,7 @@ public class AreaServerSelectSessionPolicy extends DefaultSelectSessionPolicy{
         ListOrderedMap sessions = serverSessionContext.getSessionsByArea(areaid);
         if(sessions.size()>0){
             //统一个区域随机一个节点
-            int idx = RandomUtils.nextInt(1,sessions.size());
+            int idx = RandomUtils.nextInt(0,sessions.size());
             result = (Session) sessions.getValue(idx);
         }
         return result;

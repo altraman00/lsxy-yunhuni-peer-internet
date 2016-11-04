@@ -5,12 +5,10 @@ import com.lsxy.app.area.cti.Commander;
 import com.lsxy.app.area.cti.RpcError;
 import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
-import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
-import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
@@ -61,20 +59,8 @@ public class Handler_MN_CH_SYS_CALL_ANSWER extends RpcRequestHandler{
             cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.answer", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
-                    Map<String,String> params = (Map<String,String>) o;
                     if(logger.isDebugEnabled()){
                         logger.debug("调用sys.call.answer成功call_id={},result={}",call_id,o);
-                    }
-                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
-                            new MapBuilder<String,Object>()
-                                    .put("method", Constants.EVENT_SYS_CALL_ANSWER_SUCC)
-                                    .put("res_id",params.get("res_id"))
-                                    .put("user_data",params.get("user_data"))
-                                    .build());
-                    try {
-                        rpcCaller.invoke(sessionContext,req);
-                    } catch (Exception e) {
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_ANSWER_SUCC,e);
                     }
                 }
 

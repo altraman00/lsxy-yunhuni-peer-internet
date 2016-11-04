@@ -30,7 +30,7 @@ public class ConfInviteCallInputDTO extends CommonDTO{
 
     @JsonProperty("max_dial_duration")
     @Min(1)
-    @Max(60 * 60 * 6)
+    @Max(60 * 5)
     private Integer maxDialDuration;//最大拨号等待时间（秒）
 
     @JsonProperty("dial_voice_stop_cond")

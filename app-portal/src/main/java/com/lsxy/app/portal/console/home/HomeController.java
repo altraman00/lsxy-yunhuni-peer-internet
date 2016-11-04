@@ -70,20 +70,14 @@ public class HomeController extends AbstractPortalController {
     @ResponseBody
     public RestResponse getAvgDer(HttpServletRequest request,@PathVariable String type){
         String token = getSecurityToken(request);
-        Date date = new Date();
-        String date1 = null;
-        String date2 = null;
+        String searchType;
         if("today".equals(type)) {
-            String hour1 = DateUtils.formatDate(date, "yyyy-MM-dd");
-            date1 = hour1 + " 00:00:00";
-            date2 = hour1 + " 23:59:59";
+            searchType = "today";
         }else {
-            String month = DateUtils.formatDate(date, "yyyy-MM");
-            date1 = month + "-01 00:00:00";
-            date2 = DateUtils.getMonthLastTime(DateUtils.parseDate(date1));
+            searchType = "month";
         }
-        String url = PortalConstants.REST_PREFIX_URL +   "/rest/voice_cdr/get_avg_ddr?appId={1}&startTime={2}&endTime={3}";
-        return RestRequest.buildSecurityRequest(token).get(url, Map.class,null,date1,date2);
+        String url = PortalConstants.REST_PREFIX_URL +   "/rest/day_statics/get?type={1}";
+        return RestRequest.buildSecurityRequest(token).get(url, Map.class,searchType);
     }
 
     /**
@@ -133,7 +127,7 @@ public class HomeController extends AbstractPortalController {
         vo.setLineNum(1);
 
         //获取通话状况
-        Map callStatus = getAvgDdr(token,null,null,null);
+        Map callStatus = getAvgDdr(token,"all");
         //总平均通话时长
         vo.setLineAverageCallTime(callStatus.get("avgCostTime"));
         //总接通率
@@ -153,29 +147,18 @@ public class HomeController extends AbstractPortalController {
         int onlineApp = 0;
         if(appList != null){
             for(App app:appList){
-//                AppStateVO appStateVO = new AppStateVO();
-//                try {
-//                    BeanUtils.copyProperties2(appStateVO,app,false);
-//                } catch (Exception e) {
-//                    logger.error("复制类属性异常",e);
-//                }
+                AppStateVO appStateVO = new AppStateVO();
+                try {
+                    BeanUtils.copyProperties2(appStateVO,app,false);
+                } catch (Exception e) {
+                    logger.error("复制类属性异常",e);
+                }
 //                Map map = getStatistics(token, app);
-//
+
 //                appStateVO.setCallOfDay((Integer) map.get("dayCount"));
 //                appStateVO.setCallOfHour((Integer) map.get("hourCount"));
 //                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
-//                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
-//                    onlineApp++;
-//                    ResourcesRent rent = getIvrNumber(token,app.getId());
-//                    if(rent != null){
-//                        if(rent.getResourceTelenum()!=null) {
-//                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
-//                        }
-//                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
-//                    }
-//                }
-//                appStateVOs.add(appStateVO);
-                if(app.getStatus() == App.STATUS_ONLINE) {
+                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
                     onlineApp++;
                 }
             }
@@ -196,9 +179,9 @@ public class HomeController extends AbstractPortalController {
         return RestRequest.buildSecurityRequest(token).get(url, ResourcesRent.class,appId).getData();
     }
 
-    private Map getAvgDdr(String token,String appId,Date stratTime,Date endTime){
-        String url = PortalConstants.REST_PREFIX_URL +   "/rest/voice_cdr/get_avg_ddr?appId={1}&startTime={2}&endTime={3}";
-        return RestRequest.buildSecurityRequest(token).get(url, Map.class,appId,stratTime,endTime).getData();
+    private Map getAvgDdr(String token,String type){
+        String url = PortalConstants.REST_PREFIX_URL +   "/rest/day_statics/get?type={1}";
+        return RestRequest.buildSecurityRequest(token).get(url, Map.class,type).getData();
     }
     /**
      * 获取未读消息

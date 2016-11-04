@@ -11,6 +11,8 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
+import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.message.model.AccountMessage;
 import com.lsxy.yunhuni.api.message.service.AccountMessageService;
@@ -263,8 +265,32 @@ public class InvoiceApplyController extends AbstractRestController {
         InvoiceApply invoiceApply = invoiceApplyService.findById(id);
         Date startTime = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date endTime = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        List<ConsumeDay> List =  consumeDayService.list(invoiceApply.getTenant().getId(),null,false,startTime,endTime);
-        return RestResponse.success(List);
+        List<ConsumeDay> list =  consumeDayService.list(invoiceApply.getTenant().getId(),null,false,startTime,endTime);
+        changeTypeToChinese(list);
+        return RestResponse.success(list);
+    }
+    /**
+     * 将消费类型转换为中文，运用枚举
+     * @param consumes
+     */
+    private void changeTypeToChinese(List<ConsumeDay> consumes){
+        for(int i = 0;i < consumes.size();i++){
+            ConsumeDay consume = new ConsumeDay();
+            try {
+                BeanUtils.copyProperties(consume,consumes.get(i));
+            } catch (Exception e) {
+                logger.error("转换类属性出错",e);
+            }
+            String type = consume.getType();
+            try{
+                ConsumeCode consumeCode = ConsumeCode.valueOf(type);
+                consume.setType(consumeCode.getName());
+            }catch(Exception e){
+//                e.printStackTrace();
+                consume.setType("未知项目");
+            }
+            consumes.set(i,consume);
+        }
     }
     /**
      * 等待处理数量
