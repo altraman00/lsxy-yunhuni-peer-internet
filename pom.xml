@@ -26,6 +26,7 @@
         <module>app-api-gateway</module>
         <module>app-portal-api</module>
         <module>app-third-join-gateway</module>
+        <module>app-call-center</module>
         <module>module-framework-core</module>
         <module>module-framework-web</module>
         <module>module-framework-mq</module>
@@ -43,6 +44,7 @@
         <module>module-service-area-api</module>
         <module>module-framework-jmx</module>
         <module>module-framework-monitor</module>
+        <module>module-service-call-center-api</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -134,6 +136,11 @@
             <dependency>
                 <groupId>com.lsxy</groupId>
                 <artifactId>module-service-area-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lsxy</groupId>
+                <artifactId>module-service-call-center-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

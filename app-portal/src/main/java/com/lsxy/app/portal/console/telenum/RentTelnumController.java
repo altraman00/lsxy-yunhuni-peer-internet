@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.telenum;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -25,7 +26,6 @@ import java.util.Date;
 @RequestMapping("/console/telenum/callnum")
 public class RentTelnumController extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(RentTelnumController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
 
     /**
      * 呼入号码管理首页
@@ -53,7 +53,7 @@ public class RentTelnumController extends AbstractPortalController {
      */
     private RestResponse pageList(HttpServletRequest request,Integer  pageNo,Integer pageSize){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/res_rent/list?pageNo={1}&pageSize={2}";
         return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourcesRent.class,pageNo,pageSize);
     }
 
@@ -77,7 +77,7 @@ public class RentTelnumController extends AbstractPortalController {
      */
     private RestResponse releaseREST(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/release?id={1}";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/res_rent/release?id={1}";
         return  RestRequest.buildSecurityRequest(token).get(uri, ResourcesRent.class,id);
     }
 }
