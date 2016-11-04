@@ -7,6 +7,7 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -118,26 +119,17 @@ public class RentTelnumController extends AbstractPortalController {
     @ResponseBody
     public RestResponse telnumDelete(HttpServletRequest request, @PathVariable String id){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/delete/play/{id}";
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/order/delete/{id}";
         return  RestRequest.buildSecurityRequest(token).get(uri,String.class,id);
     }
     /** 创建订单
      * **/
     @RequestMapping("/telnum/order/new" )
     @ResponseBody
-    public RestResponse telnumDelete(HttpServletRequest request, String[] numIds){
+    public RestResponse telnumNew(HttpServletRequest request, String ids){
         String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/new";
-        if(numIds.length>0){
-            uri+="?";
-        }
-        for(int i=0;i<numIds.length;i++){
-            uri +="numIds="+numIds[i];
-            if(i!=numIds.length-1){
-                uri+="&";
-            }
-        }
-        return  RestRequest.buildSecurityRequest(token).get(uri,String.class);
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/order/new?ids={1}";
+        return  RestRequest.buildSecurityRequest(token).get(uri,TelenumOrder.class,ids);
     }
     @RequestMapping("/province/list" )
     @ResponseBody

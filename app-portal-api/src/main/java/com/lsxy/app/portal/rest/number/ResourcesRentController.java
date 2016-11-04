@@ -202,16 +202,16 @@ public class ResourcesRentController extends AbstractRestController{
 
     /**
      * 创建订单
-     * @param numIds
      * @return
      */
     @RequestMapping("/telnum/order/new" )
-    public RestResponse telnumPlist(String[] numIds) {
+    public RestResponse telnumNew(String ids) {
         String tenantId = getCurrentAccount().getTenant().getId();
         TelenumOrder temp = telenumOrderService.findByTenantIdAndStatus(tenantId,TelenumOrder.status_await);
         if(temp!=null&&StringUtils.isNotEmpty(temp.getId())){
             return RestResponse.failed("0000","存在未支付订单");
         }
+        String[] numIds = ids.split(",");
         for(int i=0;i<numIds.length;i++){
             ResourceTelenum resourceTelenum = resourceTelenumService.findById(numIds[i]);
             if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
@@ -254,7 +254,7 @@ public class ResourcesRentController extends AbstractRestController{
         c.add(Calendar.DAY_OF_MONTH, 1);
         telenumOrder.setTimeOut(c.getTime());
         telenumOrder = telenumOrderService.save(telenumOrder);
-        return RestResponse.success("创建成功");
+        return RestResponse.success(telenumOrder);
     }
     //释放号码
     private void clear(List<String> list){

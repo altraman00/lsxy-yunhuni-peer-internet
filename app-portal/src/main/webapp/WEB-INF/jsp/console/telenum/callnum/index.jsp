@@ -311,7 +311,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <a class="btn btn-primary" @click="payOrder" v-if="shoplist.length > 0">立即下单</a>
+                            <a class="btn btn-primary" @click="payOrder" v-if="shoplist.length > 0&&shoplist.length <=5 ">立即下单</a>
                             <button type="button" class="btn btn-default"
                                     data-dismiss="modal">关闭
                             </button>
@@ -481,6 +481,17 @@
             },
             payOrder:function(){
                 $('#call-modal').modal('hide');
+                var ids = "";
+                for(var i = 0;i<this.shop.length;i++){
+                    ids+=this.shop[i];
+                    if(i!=this.shop.length-1){
+                        ids+=",";
+                    }
+                }
+                var params = {'${_csrf.parameterName}':'${_csrf.token}',"ids":ids};
+                ajaxsync("${ctx}/console/telenum/callnum/telnum/order/new",params,function(result) {
+                    alert(JSON.stringify(result.data))
+                });
                 //立即下单，下单成功 ，获取订单数据，
                 //回调订单数据
                 var paylist = this.paylist
@@ -491,8 +502,6 @@
             },
             checkMoney:function(){
                 //判断是否需要充值，提交订单
-
-
                 //支付成功状态，同时3秒后刷新页面
                 this.paystatus = 1
                 //余额不足充值
@@ -511,6 +520,7 @@
                     this.serach.place='';
                 }
                 var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:nowPage,pageSize:listRows,telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:''};
+                var self =this;
                 ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
                     var re = result.data.result;
                     var data= [];
@@ -524,58 +534,8 @@
                         };
                         data.push(d);
                     }
-                    alert(JSON.stringify(data))
-                    this.phonelist = data;
+                    self.phonelist = data;
                 });
-//                var data = [
-//                    {
-//                        id: '1' + nowPage,
-//                        phone: '13611460986',
-//                        call: 0,
-//                        callout: 1,
-//                        place: '广州',
-//                        quality: nowPage,
-//                        price: '111.000'
-//                    },
-//                    {
-//                        id: '2' + nowPage,
-//                        phone: '13611460983',
-//                        call: 0,
-//                        callout: 1,
-//                        place: '广州',
-//                        quality: nowPage,
-//                        price: '111.000'
-//                    },
-//                    {
-//                        id: '3' + nowPage,
-//                        phone: '13611460984',
-//                        call: 0,
-//                        callout: 1,
-//                        place: '广州',
-//                        quality: nowPage,
-//                        price: '111.000'
-//                    },
-//                    {
-//                        id: '4' + nowPage,
-//                        phone: '13611460983',
-//                        call: 0,
-//                        callout: 1,
-//                        place: '广州',
-//                        quality: nowPage,
-//                        price: '111.000'
-//                    },
-//                    {
-//                        id: '5' + nowPage,
-//                        phone: '13611460984',
-//                        call: 0,
-//                        callout: 1,
-//                        place: '广州',
-//                        quality: nowPage,
-//                        price: '111.000'
-//                    },
-//                ]
-//                //赋值
-//                this.phonelist = data;
             }
         }
     })
