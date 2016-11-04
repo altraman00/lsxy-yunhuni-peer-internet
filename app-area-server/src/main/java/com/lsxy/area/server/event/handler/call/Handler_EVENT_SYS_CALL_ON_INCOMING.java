@@ -166,6 +166,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         4、7到8位,固话
         5、其他(不是手机号，不是固话,可能是座席，其他)
          */
+        from = from.replace("sip:","");
         String fromPrefix = lineGateway.getFromPrefix();
         int start = 0;
         if(StringUtils.isNotBlank(fromPrefix)){
@@ -198,7 +199,13 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                     }else{
                         throw new RuntimeException(new NumberNotAllowToCallException());
                     }
-                }else{
+                }else if(from.startsWith("1")){
+                    if(from.length() == 11){
+                        checkBlackNum = from;
+                    }else{
+                        throw new RuntimeException(new NumberNotAllowToCallException());
+                    }
+                } else{
                     String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
                     if(StringUtils.isNotBlank(areaCode)){
                         checkBlackNum = from.substring(areaCode.length());
