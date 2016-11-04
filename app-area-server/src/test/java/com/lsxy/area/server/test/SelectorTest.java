@@ -35,11 +35,11 @@ public class SelectorTest {
 
     @Test
     public void ttttt() throws AppOffLineException, UnsupportedEncodingException {
-        App app = appService.findById("40288aca57561f840157562530b20000");
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, "5498765", "02082241195");
-        String s = JSONUtil.objectToJson(selector.getToNum());
-        List<Map<String, String>> maps = JSONUtil.parseList(s);
-        System.out.println(JSONUtil.objectToJson(maps));
+//        App app = appService.findById("40288aca57561f840157562530b20000");
+//        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, "5498765", "02082241195");
+//        String s = JSONUtil.objectToJson(selector.getToNum());
+//        List<Map<String, String>> maps = JSONUtil.parseList(s);
+//        System.out.println(JSONUtil.objectToJson(maps));
     }
 
 }
