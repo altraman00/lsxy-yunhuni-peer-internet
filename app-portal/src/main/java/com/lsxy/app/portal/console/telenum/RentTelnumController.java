@@ -2,7 +2,6 @@ package com.lsxy.app.portal.console.telenum;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
-import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -92,7 +91,7 @@ public class RentTelnumController extends AbstractPortalController {
                               String telnum,String type,String areaCode,String order
     ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/telnum/plist?pageNo={1}&pageSize={2}&telnum={3}&type={4}&areaCode={5}&order={6}";
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/res_rent/telnum/plist?pageNo={1}&pageSize={2}&telnum={3}&type={4}&areaCode={5}&order={6}";
         return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class,pageNo,pageSize,telnum,type,areaCode,order);
     }
     /** 获取用户的号码未支付订单
@@ -101,7 +100,7 @@ public class RentTelnumController extends AbstractPortalController {
     @ResponseBody
     public RestResponse telnumOrder(HttpServletRequest request){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/telnum/order";
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/res_rent/telnum/order";
         return  RestRequest.buildSecurityRequest(token).get(uri, Map.class);
     }
     /** 支付订单
@@ -110,7 +109,7 @@ public class RentTelnumController extends AbstractPortalController {
     @ResponseBody
     public RestResponse telnumPlay(HttpServletRequest request, @PathVariable String id){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/telnum/order/play/{id}";
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/order/play/{id}";
         return  RestRequest.buildSecurityRequest(token).get(uri,String.class,id);
     }
     /** 取消订单
@@ -119,7 +118,7 @@ public class RentTelnumController extends AbstractPortalController {
     @ResponseBody
     public RestResponse telnumDelete(HttpServletRequest request, @PathVariable String id){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/telnum/delete/play/{id}";
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/delete/play/{id}";
         return  RestRequest.buildSecurityRequest(token).get(uri,String.class,id);
     }
     /** 创建订单
@@ -128,7 +127,7 @@ public class RentTelnumController extends AbstractPortalController {
     @ResponseBody
     public RestResponse telnumDelete(HttpServletRequest request, String[] numIds){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/telnum/new";
+        String uri = PortalConstants.REST_PREFIX_URL +   "/rest/res_rent/telnum/new";
         if(numIds.length>0){
             uri+="?";
         }

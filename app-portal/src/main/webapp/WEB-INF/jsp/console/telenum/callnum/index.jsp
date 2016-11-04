@@ -513,58 +513,71 @@
                     this.serach.place='';
                 }
                 var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:nowPage,pageSize:listRows,telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:''};
-                ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(data) {
-                    alert(JSON.stringify(data.data))
+                ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
+                    var re = result.data.result;
+                    var data= [];
+                    for(var i=0;i<re.length;i++){
+                        var d = {id:re[i].id,
+                            phone: re[i].telNumber,
+                            call: re[i].isCalled,
+                            callout: (re[i].isDialing+re[i].isThrough)>0?1:0,
+                            place: re[i].areaCode,
+                            price:  re[i].amount
+                        };
+                        data.push(d);
+                    }
+                    alert(JSON.stringify(data))
+                    this.phonelist = data;
                 });
-                var data = [
-                    {
-                        id: '1' + nowPage,
-                        phone: '13611460986',
-                        call: 0,
-                        callout: 1,
-                        place: '广州',
-                        quality: nowPage,
-                        price: '111.000'
-                    },
-                    {
-                        id: '2' + nowPage,
-                        phone: '13611460983',
-                        call: 0,
-                        callout: 1,
-                        place: '广州',
-                        quality: nowPage,
-                        price: '111.000'
-                    },
-                    {
-                        id: '3' + nowPage,
-                        phone: '13611460984',
-                        call: 0,
-                        callout: 1,
-                        place: '广州',
-                        quality: nowPage,
-                        price: '111.000'
-                    },
-                    {
-                        id: '4' + nowPage,
-                        phone: '13611460983',
-                        call: 0,
-                        callout: 1,
-                        place: '广州',
-                        quality: nowPage,
-                        price: '111.000'
-                    },
-                    {
-                        id: '5' + nowPage,
-                        phone: '13611460984',
-                        call: 0,
-                        callout: 1,
-                        place: '广州',
-                        quality: nowPage,
-                        price: '111.000'
-                    },
-                ]
-                //赋值
-                this.phonelist = data;
+//                var data = [
+//                    {
+//                        id: '1' + nowPage,
+//                        phone: '13611460986',
+//                        call: 0,
+//                        callout: 1,
+//                        place: '广州',
+//                        quality: nowPage,
+//                        price: '111.000'
+//                    },
+//                    {
+//                        id: '2' + nowPage,
+//                        phone: '13611460983',
+//                        call: 0,
+//                        callout: 1,
+//                        place: '广州',
+//                        quality: nowPage,
+//                        price: '111.000'
+//                    },
+//                    {
+//                        id: '3' + nowPage,
+//                        phone: '13611460984',
+//                        call: 0,
+//                        callout: 1,
+//                        place: '广州',
+//                        quality: nowPage,
+//                        price: '111.000'
+//                    },
+//                    {
+//                        id: '4' + nowPage,
+//                        phone: '13611460983',
+//                        call: 0,
+//                        callout: 1,
+//                        place: '广州',
+//                        quality: nowPage,
+//                        price: '111.000'
+//                    },
+//                    {
+//                        id: '5' + nowPage,
+//                        phone: '13611460984',
+//                        call: 0,
+//                        callout: 1,
+//                        place: '广州',
+//                        quality: nowPage,
+//                        price: '111.000'
+//                    },
+//                ]
+//                //赋值
+//                this.phonelist = data;
             }
         }
     })
