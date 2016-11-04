@@ -162,10 +162,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 //先给指定的号码选出数据库中对应的数据
                 if(StringUtils.isNotBlank(inFrom)){
                     //号码不为空，先看应用有没有绑定号码
-                    if(appNums == null || appNums.size()==0){
-                        throw new RuntimeException("找不到对应的号码");
-                    }
                     ResourceTelenum resultNum = null;
+//                    if(appNums == null || appNums.size()==0){
+//                        throw new RuntimeException("找不到对应的号码");
+//                    }
                     for(ResourceTelenum num:appNums){
                         if(inFrom.equals(num.getTelNumber())){
                             resultNum = num;
@@ -173,13 +173,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                         }
                     }
                     //找不出对应的绑定号码
-                    if(resultNum == null){
-                        throw new RuntimeException("找不到对应的号码");
-                    }else{
+//                    if(resultNum == null){
+//                        throw new RuntimeException("找不到对应的号码");
+//                    }else{
                         result.add(i,resultNum);
                         //下面会将这号码赋值给那些为空的号码
                         notEmptyNum = resultNum;
-                    }
+//                    }
                 }else{
                     //没指定号码直接设为空
                     result.add(i,null);

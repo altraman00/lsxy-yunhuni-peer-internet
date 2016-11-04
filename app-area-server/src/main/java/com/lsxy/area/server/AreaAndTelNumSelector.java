@@ -164,12 +164,12 @@ public class AreaAndTelNumSelector {
             //主叫
             entity = new TelnumSortEntity(svTelnumber.getCallUri(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
-                    lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getPriority());
+                    lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getId(),lg.getPriority());
         }else if("1".equals(telnumToLineGateway.getIsThrough())){
             //透传
             entity = new TelnumSortEntity(svTelnumber.getTelNumber(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
-                    lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getPriority());
+                    lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getId(),lg.getPriority());
         }
         return entity;
     }
@@ -202,8 +202,8 @@ public class AreaAndTelNumSelector {
         private Integer priority;
         private TelnumFormat telnumFormat;
 
-        public TelnumSortEntity(String from, String to, String domain, String proxy, Integer priority) {
-            this.telnumFormat = new TelnumFormat(from, to, domain, proxy);
+        public TelnumSortEntity(String from, String to, String domain, String proxy,String lineId, Integer priority) {
+            this.telnumFormat = new TelnumFormat(from, to, domain, proxy,lineId);
             this.priority = priority;
         }
 
@@ -217,19 +217,21 @@ public class AreaAndTelNumSelector {
     }
 
     public static class TelnumFormat{
-        protected String from;
-        protected String to;
-        protected String domain;
-        protected String proxy;
+        private String from;
+        private String to;
+        private String domain;
+        private String proxy;
+        private String lineId;
 
         public TelnumFormat() {
         }
 
-        public TelnumFormat(String from, String to, String domain, String proxy) {
+        public TelnumFormat(String from, String to, String domain, String proxy,String lineId) {
             this.from = from;
             this.to = to;
             this.domain = domain;
             this.proxy = proxy;
+            this.lineId = lineId;
         }
 
         public String getFrom() {
@@ -246,6 +248,10 @@ public class AreaAndTelNumSelector {
 
         public String getProxy() {
             return proxy;
+        }
+
+        public String getLineId() {
+            return lineId;
         }
     }
 
@@ -329,6 +335,18 @@ public class AreaAndTelNumSelector {
                 toUri = to2Num.get(0).getTo() + "@" + to2Num.get(0).getDomain();
             }
             return toUri;
+        }
+        public String getLineId(){
+            String lineId = null;
+            if(this.toNum != null && toNum.size()> 0){
+                lineId = toNum.get(0).getLineId();
+            }
+            if(StringUtils.isBlank(lineId)){
+                if(this.to1Num != null && to1Num.size()> 0){
+                    lineId = to1Num.get(0).getFrom();
+                }
+            }
+            return lineId;
         }
     }
 

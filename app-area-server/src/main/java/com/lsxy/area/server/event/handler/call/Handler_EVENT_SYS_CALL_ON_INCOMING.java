@@ -154,7 +154,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             return res;
         }
 
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to);
+        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId());
         return res;
     }
 

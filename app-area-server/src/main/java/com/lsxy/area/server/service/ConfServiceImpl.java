@@ -140,10 +140,7 @@ public class ConfServiceImpl implements ConfService {
             maxParts = MAX_PARTS;
         }
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,null,null);
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber();
-//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String areaId = areaAndTelNumSelector.getAreaId(app);
 
         Meeting meeting = new Meeting();
         meeting.setResId(null);
@@ -282,7 +279,7 @@ public class ConfServiceImpl implements ConfService {
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
 
-//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String lineId = selector.getLineId();
 
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
@@ -317,7 +314,7 @@ public class ConfServiceImpl implements ConfService {
                                     .setId(callId)
                                     .setType("sys_conf")
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(null)
+                                    .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("from",oneTelnumber)
                                         .putIfNotEmpty("to",to)

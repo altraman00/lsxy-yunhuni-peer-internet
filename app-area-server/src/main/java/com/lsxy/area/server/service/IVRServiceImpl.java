@@ -127,7 +127,7 @@ public class IVRServiceImpl implements IVRService {
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from, to);
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
-//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String lineId = selector.getLineId();
 
         VoiceIvr voiceIvr = new VoiceIvr();
         voiceIvr.setFromNum(oneTelnumber);
@@ -170,7 +170,7 @@ public class IVRServiceImpl implements IVRService {
                                     .setId(callId)
                                     .setType("ivr_call")
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(null)
+                                    .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()
                                             .putIfNotEmpty("from",from)
                                             .putIfNotEmpty("to",to)

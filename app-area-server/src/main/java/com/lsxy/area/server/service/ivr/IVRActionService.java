@@ -258,29 +258,22 @@ public class IVRActionService {
      * 询问是否接受，然后执行action
      * @return
      */
-    public boolean doActionIfAccept(App app, Tenant tenant,String res_id, String from, String to){
+    public boolean doActionIfAccept(App app, Tenant tenant,String res_id, String from, String to,String lineId){
         String call_id = UUIDGenerator.uuid();
         boolean accept = getAcceptRequest(app.getUrl(),from);
         if(!accept){
             reject(app,res_id,call_id);
         }else{
             answer(app,res_id,call_id);
-            saveIvrSessionCall(call_id,app,tenant,res_id,from,to);
+            saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId);
         }
         return true;
     }
 
-    private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to){
-        AreaAndTelNumSelector.Selector selector;
-        try {
-            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
-        } catch (AppOffLineException e) {
-            throw new RuntimeException(e);
-        }
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber();
+    private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to,String lineId){
 
-//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String areaId = areaAndTelNumSelector.getAreaId(app);
+
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenant.getId())
@@ -289,7 +282,7 @@ public class IVRActionService {
                 .setResId(res_id)
                 .setType("ivr_incoming")
                 .setAreaId(areaId)
-                .setLineGatewayId(null)
+                .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         //incoming事件from 和 to是相反的
                         .put("from",to)

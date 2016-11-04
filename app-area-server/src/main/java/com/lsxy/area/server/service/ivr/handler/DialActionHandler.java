@@ -182,7 +182,7 @@ public class DialActionHandler extends ActionHandler{
         }
         String areaId = selector.getAreaId();
         String oneTelnumber = selector.getOneTelnumber();
-//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String lineId = selector.getLineId();
 
 
         VoiceIvr voiceIvr = new VoiceIvr();
@@ -229,7 +229,7 @@ public class DialActionHandler extends ActionHandler{
                 .setId(callId)
                 .setType("ivr_dial")
                 .setAreaId(areaId)
-                .setLineGatewayId(null)
+                .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
