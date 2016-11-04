@@ -113,7 +113,11 @@ public abstract class AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list";
         return RestRequest.buildSecurityRequest(token).getList(uri, App.class);
     }
-
+    public RestResponse getBillAppList(HttpServletRequest request,String serviceType){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL + "/rest/app/list?serviceType={1}";
+        return RestRequest.buildSecurityRequest(token).getList(uri, App.class,serviceType);
+    }
     /**
      * 获取单个应用
      * @param request

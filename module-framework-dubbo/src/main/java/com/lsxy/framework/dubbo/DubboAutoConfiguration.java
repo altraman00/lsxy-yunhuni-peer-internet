@@ -3,11 +3,13 @@ package com.lsxy.framework.dubbo;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ProtocolConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
+import com.lsxy.framework.config.SystemConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 /**
  * dubbo auto configuration
@@ -39,7 +41,12 @@ public class DubboAutoConfiguration {
         ProtocolConfig protocolConfig = new ProtocolConfig();
 
         protocolConfig.setName(properties.getProtocol());
-        protocolConfig.setPort(properties.getPort());
+
+        String port = SystemConfig.getProperty(systemId+".dubbo.port");
+        if(StringUtils.isEmpty(port)){
+            port = properties.getPort().toString();
+        }
+        protocolConfig.setPort(Integer.parseInt(port));
         protocolConfig.setThreads(properties.getThreads());
         return protocolConfig;
     }

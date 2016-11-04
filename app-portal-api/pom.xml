@@ -84,6 +84,15 @@
             <version>0.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-service-call-center-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-dubbo</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
