@@ -353,7 +353,7 @@ public class CallServiceImpl implements CallService {
 
         from = oneTelnumber;
         //TODO 获取线路IP和端口
-//        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String lineId = selector.getLineId();
         String to_uri = selector.getToUri();
         //TODO 获取线路IP和端口
 
@@ -389,7 +389,7 @@ public class CallServiceImpl implements CallService {
                                     .setUserdata(user_data)
                                     .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(null)
+                                    .setLineGatewayId(lineId)
                                     .setBusinessData(data)
                                     .build();
             businessStateService.save(cache);
