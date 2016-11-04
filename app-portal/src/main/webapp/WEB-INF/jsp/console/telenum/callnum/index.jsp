@@ -95,21 +95,25 @@
                                         <tr id="app-${result.id}">
                                             <td scope="row">${s.index+1}</td>
                                             <td>${result.resourceTelenum.telNumber}</td>
-                                            private String isDialing;//可主叫
-                                            private String isCalled;//可被叫
+                                            <td>
+                                                <c:if test="${result.rentExpire.time<time.time}">
+                                                    <div style="color: red" >过期</div>
+                                                </c:if>
+                                                <c:if test="${result.rentExpire.time>time.time}">正常</c:if>
+                                            </td>
                                             <td class="text-center">
-                                                <c:if test="${result.isDialing==1||result.isThrough==1}">
+                                                <c:if test="${result.resourceTelenum.isDialing==1||result.resourceTelenum.isThrough==1}">
                                                     ✔
                                                 </c:if>
-                                                <c:if test="${result.isDialing==0&&result.isThrough==0}">
+                                                <c:if test="${result.resourceTelenum.isDialing==0&&result.resourceTelenum.isThrough==0}">
                                                     ✘
                                                 </c:if>
                                             </td>
                                             <td class="text-center">
-                                                <c:if test="${result.isCalled==1}">
+                                                <c:if test="${result.resourceTelenum.isCalled==1}">
                                                     ✔
                                                 </c:if>
-                                                <c:if test="${result.isCalled==0}">
+                                                <c:if test="${result.resourceTelenum.isCalled==0}">
                                                     ✘
                                                 </c:if>
                                             </td>
@@ -118,13 +122,7 @@
                                                     <a href="${ctx}/console/app/detail?id=${result.app.id}">${result.app.name}</a>
                                                 </c:if>
                                             </td>
-                                            <td class="text-left-fixed">${result.areaCode}</td>
-                                            <td>
-                                                <c:if test="${result.rentExpire.time<time.time}">
-                                                    <div style="color: red" >过期</div>
-                                                </c:if>
-                                                <c:if test="${result.rentExpire.time>time.time}">正常</c:if>
-                                            </td>
+                                            <td class="text-left-fixed">${result.resourceTelenum.areaCode}</td>
                                             <td>
                                                 <c:if test="${result.rentExpire.time<time.time}">
                                                     <div style="color: red" ><fmt:formatDate value="${result.rentExpire}" pattern="yyyy-MM-dd"/></div>
@@ -136,7 +134,7 @@
                                             <td>
                                                 <c:if test="${result.app==null}"><a  onclick="release('${result.id}')">释放</a></c:if>
                                             </td>
-                                        </>
+                                        </tr>
                                     </c:forEach>
                                     </tbody>
                                 </table>
