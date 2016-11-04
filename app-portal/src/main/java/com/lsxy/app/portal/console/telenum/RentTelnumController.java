@@ -92,8 +92,8 @@ public class RentTelnumController extends AbstractPortalController {
                               String telnum,String type,String areaCode,String order
     ){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/res_rent/telnum/plist?pageNo={1}&pageSize={2}&telnum=${3}&type={4}&areaCode={5}&order={6}";
-        return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class,pageNo,pageSize,telnum,type,areaCode);
+        String uri = restPrefixUrl +   "/rest/res_rent/telnum/plist?pageNo={1}&pageSize={2}&telnum={3}&type={4}&areaCode={5}&order={6}";
+        return  RestRequest.buildSecurityRequest(token).getPage(uri, ResourceTelenum.class,pageNo,pageSize,telnum,type,areaCode,order);
     }
     /** 获取用户的号码未支付订单
      * **/

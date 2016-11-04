@@ -142,18 +142,6 @@
                             </section>
                             <c:set var="pageUrl" value="${ctx}/console/telenum/callnum/index"></c:set>
                             <%@include file="/inc/pagefooter.jsp" %>
-                            <div id="test">
-                                <select v-model="selected">
-                                    <option v-for="yx in YX" :value="yx.text">
-                                        {{yx.text}}
-                                    </option>
-                                </select>
-                                <select v-model="city">
-                                    <option v-for="zy in selection" :value="zy.text" :selected="$index == 0 ? true : false">
-                                        {{zy.text}}-{{zy.value}}
-                                    </option>
-                                </select>
-                            </div>
                             <!--待支付订单-->
                             <section class="panel panel-default pos-rlt clearfix" hidden id="nopaid" style="display:">
                                 <div class="from-group hr">
@@ -249,19 +237,10 @@
                                 </div>
                                 <div class="col-md-4 remove-padding">
                                     <span class="title">归属地：</span>
-                                    <span class="title">省份</span>
-                                    <select  class="form-control select-box">
+                                    <select  v-model="serach.place"  class="form-control select-box">
                                         <option value="">全部</option>
-                                        <option value="1">广州</option>
-                                        <option value="2">上海</option>
+                                        <option value="020">广州</option>
                                     </select>
-                                    <span class="title">城市</span>
-                                    <select  class="form-control select-box">
-                                        <option value="-1">全部</option>
-                                        <option value="1">广州</option>
-                                        <option value="2">上海</option>
-                                    </select>
-                                    <span class="title">区号：<span v-model="serach.place"></span></span>
                                 </div>
                                 <div class="col-md-1 text-right remove-padding">
                                     <a  @click="find" class="btn btn-primary">查询</a>
@@ -427,31 +406,6 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/vue/vue.js'></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 <script>
-    var params = {'${_csrf.parameterName}':'${_csrf.token}'};
-    ajaxsync("${ctx}/console/telenum/callnum/province/list",params,function(data) {
-        alert(JSON.stringify(data.data));
-    });
-    var vue2 = new Vue({
-        el: '#test',
-        data: {
-            selected: '全部',
-            city:'',
-            YX: [  ]
-        },
-        computed: {
-            selection: {
-                get: function() {
-                    var that = this;
-                    return this.YX.filter(function(item) {
-                        return item.text == that.selected;
-                    })[0].ZY;
-                }
-            }
-        }
-    });
-
-
-
     $('#modal-find').click(function () {
 
     });
@@ -460,8 +414,8 @@
         data: {
             serach: {
                 name: '',
-                phone: -1,
-                place: -1
+                phone: '',
+                place: ''
             },
             isCall: ["✔", "✘"],
             paystatus:0,
@@ -475,8 +429,6 @@
             'shop': function (v) {
                 //判断是否有支付订单，如果有支付订单，则提示
                 //showtoast('您有未支付的订单，请完成支付后，再进行号码租用') return
-
-
                 var s = this.shoplist
                 var p = this.phonelist
                 //添加数据
@@ -550,14 +502,19 @@
             setPhoneList: function (nowPage, listRows) {
                 //请求数据
 //               saram = { name:this.serach.name,phone:this.serach.phone,place:this.serach.place}
-                var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:'',pageSize:'',telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:''};
-                alert(JSON.stringify(params));
-
-                // ajaxsync("${ctx}/console/telenum/callnum/telnum/order",params,function(data){
-               // var url = ''
-                //ajaxsync(url,param,function(result){
-                //});
-                //假数据
+                if(this.serach.name==-1){
+                    this.serach.name='';
+                }
+                if(this.serach.phone==-1){
+                    this.serach.phone='';
+                }
+                if(this.serach.place==-1){
+                    this.serach.place='';
+                }
+                var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:nowPage,pageSize:listRows,telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:''};
+                ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(data) {
+                    alert(JSON.stringify(data.data))
+                });
                 var data = [
                     {
                         id: '1' + nowPage,
@@ -627,7 +584,7 @@
         //获取数据总数
         var count = 11;
         //每页显示数量
-        var listRow = 3;
+        var listRow = 5;
         //显示多少个分页按钮
         var showPageCount = 4;
         //指定id，创建分页标签

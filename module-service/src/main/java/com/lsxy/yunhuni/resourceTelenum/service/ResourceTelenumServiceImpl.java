@@ -90,7 +90,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             hql += " order by obj.create_time desc ";
         }
         Page pgae = this.pageList(hql,pageNo,pageSize);
-        return null;
+        return pgae;
     }
 
     @Override
