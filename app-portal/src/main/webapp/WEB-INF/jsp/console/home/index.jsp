@@ -12,7 +12,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
             <section id="content">
                 <section class="hbox stretch">
@@ -248,8 +248,8 @@
                                                         <div class="warpbox">
                                                             <div class="">
                                                                 <i class="icon iconfont icon-oc-msg1 bigicon"></i>
-                                                                <span class="green money datatoday" id="today_session">123456</span>
-                                                                <span class="green money datamonth" id="month_session">123</span>
+                                                                <span class="green money datatoday" id="today_session">0</span>
+                                                                <span class="green money datamonth" id="month_session">0</span>
                                                             </div>
                                                             <div class="middle-font-size middle-font-color" >
                                                                 会话量(次)
@@ -261,7 +261,7 @@
                                                             <div class="">
                                                                 <i class="icon iconfont icon-oc-mobile bigicon"></i>
                                                                 <span class="green money datatoday" id="today_costTime">0</span>
-                                                                <span class="green money datamonth"  id="month_costTime">123</span>
+                                                                <span class="green money datamonth"  id="month_costTime">0</span>
                                                             </div>
                                                             <div class="middle-font-size middle-font-color" >
                                                                 话务量(分钟)
@@ -273,7 +273,7 @@
                                                             <div class="">
                                                                 <i class="icon iconfont icon-oc-talktime bigicon"></i>
                                                                 <span class="green money datatoday" id="today_avgCostTime">0</span>
-                                                                <span class="green money datamonth" id="month_avgCostTime">123</span>
+                                                                <span class="green money datamonth" id="month_avgCostTime">0</span>
                                                             </div>
                                                             <div class="middle-font-size middle-font-color" >
                                                                 平均通话时长(分钟)
@@ -285,7 +285,7 @@
                                                             <div class="">
                                                                 <i class="icon iconfont icon-oc-callrate bigicon"></i>
                                                                 <span class="green money datatoday" id="today_avgCall">0</span>
-                                                                <span class="green money datamonth" id="month_avgCall">123</span>
+                                                                <span class="green money datamonth" id="month_avgCall">0</span>
                                                             </div>
                                                             <div class="middle-font-size middle-font-color" >
                                                                 接通率(%)

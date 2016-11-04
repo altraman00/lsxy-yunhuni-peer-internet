@@ -243,6 +243,7 @@ public interface CalBillingService {
      */
     DayStatics getIncStaticsOfCurrentMonth(String tenantId);
 
+
     /**
      * 每日统计账务余额
      * @param date 统计日期

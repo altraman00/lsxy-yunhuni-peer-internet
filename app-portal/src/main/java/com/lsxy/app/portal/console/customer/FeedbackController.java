@@ -1,6 +1,7 @@
 package com.lsxy.app.portal.console.customer;
 
 import com.lsxy.app.portal.base.AbstractPortalController;
+import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.framework.api.customer.model.Feedback;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.web.rest.RestRequest;
@@ -24,7 +25,6 @@ import java.util.Map;
 @RequestMapping("/console/customer")
 public class FeedbackController  extends AbstractPortalController {
     private static final Logger logger = LoggerFactory.getLogger(FeedbackController.class);
-    private String restPrefixUrl = SystemConfig.getProperty("portal.rest.api.url");
 
     /**
      * 反馈意见首页
@@ -60,7 +60,7 @@ public class FeedbackController  extends AbstractPortalController {
      */
     private RestResponse save(HttpServletRequest request,String content,String status){
         String token = getSecurityToken(request);
-        String uri = restPrefixUrl +   "/rest/customer/feedback/save";
+        String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/customer/feedback/save";
         Map<String,Object> map = new HashMap<>();
         map.put("content",content);
         map.put("status",status);

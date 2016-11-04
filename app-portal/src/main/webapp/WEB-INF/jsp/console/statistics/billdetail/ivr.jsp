@@ -14,7 +14,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
         <section id="content">
@@ -57,6 +57,11 @@
                                         <li>
                                             <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
                                             </div>
                                         </li>
                                     </ul>
