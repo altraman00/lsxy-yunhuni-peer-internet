@@ -124,7 +124,12 @@ public class TenantController {
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
-
+    @RequestMapping(value = "/list",method = RequestMethod.GET)
+    @ApiOperation(value = "获取全部数据")
+    public RestResponse pList(){
+        List list= (List)tenantService.list();
+        return RestResponse.success(list);
+    }
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(

@@ -7,16 +7,19 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourcesRentDao;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 租户号码租用service
@@ -70,21 +71,33 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
+    public ResourcesRent findByResourceTelenumId(String id) {
+        String hql = "  From ResourcesRent obj WHERE obj.rentStatus<>'"+ResourcesRent.RENT_STATUS_RELEASE+"' AND obj.resourceTelenum.id='"+id+"' ";
+        try {
+            return this.findUnique(hql);
+        } catch (MatchMutiEntitiesException e) {
+            return null;
+        }
+    }
+
+    @Override
     public ResourcesRent findByResDataAndRentStatus(String resData, int status) {
         return resourcesRentDao.findByResDataAndRentStatus(resData,status);
     }
 
     @Override
-    public String[] findOwnUnusedNum(Tenant tenant) {
-        List<String> telNums = new ArrayList<>();
+    public List<ResourceTelenum> findOwnUnusedNum(Tenant tenant) {
+        List<ResourceTelenum> telNums = new ArrayList<>();
         List<ResourcesRent> list = resourcesRentDao.findByTenantIdAndRentStatus(tenant.getId(),ResourcesRent.RENT_STATUS_UNUSED);
         if(list != null && list.size()>0){
             for(ResourcesRent rent:list){
-                String telNumber = rent.getResourceTelenum().getTelNumber();
-                telNums.add(telNumber);
+                ResourceTelenum telNumber = rent.getResourceTelenum();
+                if(telNumber != null){
+                    telNums.add(telNumber);
+                }
             }
         }
-        return telNums.toArray(new String[]{});
+        return telNums;
     }
 
     @Override
@@ -129,6 +142,12 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 }
             }
         }
+    }
+
+    @Override
+    public List<ResourcesRent> findByTenantId(String tenantId) {
+        List<Integer> status = Arrays.asList(1, 2);
+        return resourcesRentDao.findByTenantIdAndRentStatusIn(tenantId,status);
     }
 
 }

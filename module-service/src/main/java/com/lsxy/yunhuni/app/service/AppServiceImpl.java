@@ -7,16 +7,18 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by liups on 2016/6/29.
@@ -109,17 +111,5 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         List<App> list = this.findByCustomWithParams(hql, tenantId);
         return list;
     }
-
-    @Override
-    public String findOneAvailableTelnumber(App app) {
-        if(app.getIsIvrService()==1){
-            List<ResourcesRent> resourcesRents = resourcesRentService.findByAppId(app.getId());
-            ResourcesRent resourcesRent = resourcesRents.get(0);
-            return resourcesRent.getResData();
-        }else{
-            return resourceTelenumService.findOneFreeNumber(app.getArea().getId());
-        }
-    }
-
 
 }

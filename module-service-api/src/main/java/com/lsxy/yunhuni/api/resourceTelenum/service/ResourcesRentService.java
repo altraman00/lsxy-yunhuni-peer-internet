@@ -3,9 +3,11 @@ package com.lsxy.yunhuni.api.resourceTelenum.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 租户号码租用service
@@ -33,7 +35,12 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     ResourcesRent findByResourceTelenumIdAndStatus(String id, int status);
-
+    /**
+     * 根据号码和租用状态查询租用关系
+     * @param id
+     * @return
+     */
+    ResourcesRent findByResourceTelenumId(String id);
     /**
      * 根据号码查询租用关系
      * @param resData
@@ -47,7 +54,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param tenant
      * @return
      */
-    String[] findOwnUnusedNum(Tenant tenant);
+    List<ResourceTelenum> findOwnUnusedNum(Tenant tenant);
 
     /**
      * 清除过期号资源和租户的关系
@@ -59,4 +66,10 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      */
     void resourcesRentTask();
 
+    /**
+     * 获取租户租用的号码
+     * @param id
+     * @return
+     */
+    List<ResourcesRent> findByTenantId(String id);
 }
