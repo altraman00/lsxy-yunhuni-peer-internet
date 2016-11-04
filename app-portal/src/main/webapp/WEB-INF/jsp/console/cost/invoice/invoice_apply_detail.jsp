@@ -15,7 +15,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+             <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
             <section id="content">
@@ -82,9 +82,10 @@
                     <aside>
                         <section class="vbox xbox">
                             <!-- 如果没有三级导航 这段代码注释-->
-                            <div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
-                                    class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
-                            </div>
+                            <div class="head-box"><a href="#subNav" data-toggle="class:hide">
+                                <i class=" iconfont icon-menu-left text"></i>
+                                <i class=" iconfont icon-menu-right text-active"></i>
+                            </a></div>
                             <section class=" w-f cost_invoice">
                                 <div class="wrapper header">
                                     <span class="border-left">&nbsp;开票详情</span>
