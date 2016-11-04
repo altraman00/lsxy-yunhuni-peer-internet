@@ -355,7 +355,7 @@ public class RedisCacheService {
 			
 		}
 
-		public void sremove(String key,String value){
+		public void sremove(final String key,final String... value){
 			redisTemplate.opsForSet().remove(key,value);
 		}
 
