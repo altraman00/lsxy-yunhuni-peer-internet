@@ -505,10 +505,11 @@
             },
             setPhoneList: function (nowPage, listRows) {
                 //请求数据
-                var param = { name:this.serach.name,phone:this.serach.phone,place:this.serach.place}
-               alert(JSON.stringify(param))
-                // var params = {'${_csrf.parameterName}':'${_csrf.token}',name:this.serach.name,phone:this.serach.phone,place:this.serach.place};
-               // ajaxsync("${ctx}/console/telenum/callnum/telnum/order",params,function(data){
+//               saram = { name:this.serach.name,phone:this.serach.phone,place:this.serach.place}
+                var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:'',pageSize:'',telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:''};
+                alert(JSON.stringify(params));
+
+                // ajaxsync("${ctx}/console/telenum/callnum/telnum/order",params,function(data){
                // var url = ''
                 //ajaxsync(url,param,function(result){
                 //});
