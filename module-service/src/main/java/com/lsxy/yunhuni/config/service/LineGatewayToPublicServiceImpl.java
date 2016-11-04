@@ -108,4 +108,9 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
         }
         return lineGateways;
     }
+
+    @Override
+    public void deleteLineGateWay(String line) {
+
+    }
 }

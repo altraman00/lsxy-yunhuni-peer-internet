@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -138,5 +139,17 @@ public class RentTelnumController extends AbstractPortalController {
             }
         }
         return  RestRequest.buildSecurityRequest(token).get(uri,String.class);
+    }
+    @RequestMapping("/province/list" )
+    @ResponseBody
+    public RestResponse getProvinceList(HttpServletRequest request){
+        List list = getTelnumLocationProvinceList(request);
+        return  RestResponse.success(list);
+    }
+    @RequestMapping("/city/list" )
+    @ResponseBody
+    public RestResponse getCityList(HttpServletRequest request,String province){
+        List list = getTelnumLocationList(request,province);
+        return  RestResponse.success(list);
     }
 }

@@ -6,6 +6,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -43,6 +44,27 @@ public class ResourcesRentController extends AbstractRestController{
     TelenumOrderItemService telenumOrderItemService;
     @Autowired
     ConsumeService consumeService;
+    @Autowired
+    TelnumLocationService telnumLocationService;
+    /**
+     * 根据省份获取城市
+     * @return
+     */
+    @RequestMapping("/telnum/location/city/list")
+    public RestResponse getTelnumLocationList(String province)   {
+        List list = telnumLocationService.getCityAndAreaCode(province);
+        return RestResponse.success(list);
+    }
+
+    /**
+     * 获取省份列表
+     * @return
+     */
+    @RequestMapping("/telnum/location/province/list")
+    public RestResponse getTelnumLocationProvinceList()   {
+        List list = telnumLocationService.getProvinceList();
+        return RestResponse.success(list);
+    }
     /**
      * 获取租户的呼入号码分页数据
      * @param pageNo

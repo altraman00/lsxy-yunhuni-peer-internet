@@ -142,7 +142,18 @@
                             </section>
                             <c:set var="pageUrl" value="${ctx}/console/telenum/callnum/index"></c:set>
                             <%@include file="/inc/pagefooter.jsp" %>
-
+                            <div id="test">
+                                <select v-model="selected">
+                                    <option v-for="yx in YX" :value="yx.text">
+                                        {{yx.text}}
+                                    </option>
+                                </select>
+                                <select v-model="city">
+                                    <option v-for="zy in selection" :value="zy.text" :selected="$index == 0 ? true : false">
+                                        {{zy.text}}-{{zy.value}}
+                                    </option>
+                                </select>
+                            </div>
                             <!--待支付订单-->
                             <section class="panel panel-default pos-rlt clearfix" hidden id="nopaid" style="display:">
                                 <div class="from-group hr">
@@ -231,18 +242,26 @@
                                 <div class="col-md-4">
                                     <span class="title">号码功能：</span>
                                     <select v-model="serach.phone" class="form-control select-box">
-                                        <option value="-1">全部</option>
+                                        <option value="">全部</option>
                                         <option value="callin">可呼入</option>
                                         <option value="callout">可呼出</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4 remove-padding">
                                     <span class="title">归属地：</span>
-                                    <select v-model="serach.place" class="form-control select-box">
+                                    <span class="title">省份</span>
+                                    <select  class="form-control select-box">
+                                        <option value="">全部</option>
+                                        <option value="1">广州</option>
+                                        <option value="2">上海</option>
+                                    </select>
+                                    <span class="title">城市</span>
+                                    <select  class="form-control select-box">
                                         <option value="-1">全部</option>
                                         <option value="1">广州</option>
                                         <option value="2">上海</option>
                                     </select>
+                                    <span class="title">区号：<span v-model="serach.place"></span></span>
                                 </div>
                                 <div class="col-md-1 text-right remove-padding">
                                     <a  @click="find" class="btn btn-primary">查询</a>
@@ -408,6 +427,31 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/vue/vue.js'></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 <script>
+    var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+    ajaxsync("${ctx}/console/telenum/callnum/province/list",params,function(data) {
+        alert(JSON.stringify(data.data));
+    });
+    var vue2 = new Vue({
+        el: '#test',
+        data: {
+            selected: '全部',
+            city:'',
+            YX: [  ]
+        },
+        computed: {
+            selection: {
+                get: function() {
+                    var that = this;
+                    return this.YX.filter(function(item) {
+                        return item.text == that.selected;
+                    })[0].ZY;
+                }
+            }
+        }
+    });
+
+
+
     $('#modal-find').click(function () {
 
     });
