@@ -1,6 +1,7 @@
 package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.app.oc.rest.config.vo.LineVo;
 import com.lsxy.app.oc.rest.config.vo.TelnumTEditVo;
 import com.lsxy.app.oc.rest.config.vo.TelnumTVo;
 import com.lsxy.app.oc.rest.config.vo.TelnumToLineGatewayBatchEditVo;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -326,10 +328,18 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findById(resourceTelenum.getLineId());
-        return RestResponse.success(telnumToLineGateway);
+        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),resourceTelenum.getLineId());
+        LineVo lineVo = new LineVo();
+        try {
+            EntityUtils.copyProperties(lineVo,telnumToLineGateway);
+        } catch (Exception e) {
+        }
+        if(telnumToLineGateway!=null) {
+            lineVo.setLineGateway(lineGatewayService.findById(telnumToLineGateway.getLineId()));
+        }
+        return RestResponse.success(lineVo);
     }
-    @ApiOperation(value = "关联线路-列表")
+    @ApiOperation(value = "关联线路-透传列表")
     @RequestMapping(value = "/line/plist/{id}",method = RequestMethod.GET)
     public RestResponse telnumLinePlist(
             @ApiParam(name = "id",value = "号码id") @PathVariable String id,
@@ -340,8 +350,22 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,null,resourceTelenum.getTelNumber(),null,null,null);
-        return RestResponse.success(page);
+        Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,resourceTelenum.getLineId(),resourceTelenum.getTelNumber());
+        List<LineVo> list = new ArrayList<>();
+        List<TelnumToLineGateway> list2 = page.getResult();
+        for(int i=0;i<list2.size();i++){
+            LineVo lineVo = new LineVo();
+            try {
+                EntityUtils.copyProperties(lineVo,list2.get(i));
+            } catch (Exception e) {
+            }
+            if(list2.get(i)!=null) {
+                lineVo.setLineGateway(lineGatewayService.findById(list2.get(i).getLineId()));
+            }
+            list.add(lineVo);
+        }
+        Page page2 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(), list);
+        return RestResponse.success(page2);
     }
     @ApiOperation(value = "关联线路-列表")
     @RequestMapping(value = "/tenant/plist/{id}",method = RequestMethod.GET)

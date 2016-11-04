@@ -5,15 +5,16 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -36,7 +37,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     private EntityManager em;
     @Autowired
     ResourcesRentService resourcesRentService;
-
+    @Autowired
+    TelnumToLineGatewayService telnumToLineGatewayService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
         return this.resourceTelenumDao;
@@ -76,7 +80,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page<ResourceTelenum> getPage(Integer pageNo, Integer pageSize, String number,String operator,String isThrough,String status) {
-        String hql = " FROM ResourceTelenum obj WHERE 1=1 ";
+        String hql = " FROM ResourceTelenum obj WHERE obj.deleted=0 ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.operator like '%"+operator+"%' ";
         }
@@ -208,6 +212,64 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
 
         return result;
+    }
+
+    @Override
+    public Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line,String tenantName) {
+        //先获取线路上的号码
+        List<String> nums = telnumToLineGatewayService.getTelnumByLineId(line);
+        int start = (pageNo-1)*pageSize;
+        //线路上没有号码时，返回空集合
+        String innums = "";
+        if(nums.size()==0){
+            return new Page<>(start,0,pageSize,null);
+        }else{
+            for(int i=0;i<nums.size();i++){
+                innums += " '"+nums.get(i)+"' ";
+                if(i!=nums.size()-1){
+                    innums += " , ";
+                }
+            }
+        }
+        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tel_number IN ("+innums+") ";
+        if(StringUtils.isNotEmpty(tenantName)){
+            sql += " AND  a.tenant_name LIKE '%"+tenantName+"%'";
+        }
+        sql += " ) b ";
+        String countSql = " SELECT COUNT(1) "+sql;
+        String pageSql = " SELECT b.tenant_id "+sql;
+        int total = jdbcTemplate.queryForObject(countSql,Integer.class);
+        if(total == 0){
+            return new Page<>(start,total,pageSize,null);
+        }
+        pageSql += " limit "+start+","+pageSize+" ";
+        //获取得到租户
+        List<String> list = jdbcTemplate.queryForList(pageSql,String.class);
+        String sql2 = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") ";
+        Query query2 = em.createNativeQuery(sql2,ResourceTelenum.class);
+        List<ResourceTelenum> list2 = query2.getResultList();
+        List<Map> result = new ArrayList<>();
+        for(int j=0;j<list.size();j++) {
+            Map map = null;
+            List<Map> list3= new ArrayList<>();
+            for (int i = 0; i < list2.size(); i++) {
+                if(list.get(j).equals(list2.get(i).getTenant().getId())){
+                    if(map==null) {
+                        map = new HashMap();
+                        map.put("tenantId", list2.get(i).getTenant().getId());
+                        map.put("tenantName", list2.get(i).getTenant().getTenantName());
+                    }
+                    Map temp = new HashMap<>();
+                    temp.put("numberId",list2.get(i).getId());
+                    temp.put("number",list2.get(i).getTelNumber());
+                    list3.add(temp);
+                }
+            }
+            map.put("numbers",list3);
+            result.add(map);
+        }
+        Page page =  new Page<>(start,total,pageSize,result);
+        return page;
     }
 
 

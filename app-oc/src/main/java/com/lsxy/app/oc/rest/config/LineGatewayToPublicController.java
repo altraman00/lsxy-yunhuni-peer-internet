@@ -115,7 +115,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
             return RestResponse.failed("0000","目标优先级不能为0");
         }
         int o3 = lineGatewayToPublicService.getMaxPriority();
-        if(o2>03){
+        if(o2>o3){
             return RestResponse.failed("0000","目标优先级不能超过当前最大优先级");
         }
         LineGatewayToPublic lineGatewayToPublic = lineGatewayToPublicService.findById(id);
@@ -147,7 +147,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
             flag = "+1";
         }
         String[] sql = new String[2];
-        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE priority BETWEEN deleted=0 AND "+begin+" AND "+end+" ";
+        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE deleted=0 AND priority BETWEEN   "+begin+" AND "+end+" ";
         if(StringUtils.isNotEmpty(line)) {
             sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=" + o2 + " WHERE deleted=0 AND id ='" + line + "' ";
         }

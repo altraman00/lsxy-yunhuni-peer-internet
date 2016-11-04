@@ -51,7 +51,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public Page<LineGatewayToPublic> getPage(Integer pageNo, Integer pageSize, String operator, String isThrough, String status, String isPublicLine, String order) {
-        String hql = " FROM LineGatewayToPublic obj WHERE 1=1 ";
+        String hql = " FROM LineGatewayToPublic obj WHERE obj.deleted=0  ";
         if(StringUtils.isNotEmpty(operator)){
             hql += " AND obj.lineGateway.operator = '"+operator+"' ";
         }
@@ -107,5 +107,11 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
             }
         }
         return lineGateways;
+    }
+
+    @Override
+    public void deleteLine(String line) {
+        String sql =  " update  db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public  set deleted=1 where deleted=0 and line_id='"+line+"'  ";
+        jdbcTemplate.update(sql);
     }
 }

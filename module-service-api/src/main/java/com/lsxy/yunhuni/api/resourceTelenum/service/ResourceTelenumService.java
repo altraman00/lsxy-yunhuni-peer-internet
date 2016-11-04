@@ -8,6 +8,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 全局号码资源service
@@ -61,4 +62,12 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     List<ResourceTelenum> findDialingTelnumber(List<String> lineIds, App app, String... from);
+
+    /**
+     * 根据号码获取已租户为主体的号码列表
+     * @param pageNo
+     * @param pageSize
+     * @return
+     */
+    Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line,String tenantName);
 }
