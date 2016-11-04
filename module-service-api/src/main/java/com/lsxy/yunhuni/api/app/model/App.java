@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.app.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
@@ -40,6 +41,8 @@ public class App extends IdEntity {
     private Area area;  //所属区域（应用要指定区域,新建应用在测试区域）
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
+    private AreaSip areaSip; //sip接入点信息
+
     @Column(name = "is_call_center")
     public Integer getIsCallCenter() {
         return isCallCenter;
@@ -192,5 +195,16 @@ public class App extends IdEntity {
 
     public void setArea(Area area) {
         this.area = area;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "sip_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    public AreaSip getAreaSip() {
+        return areaSip;
+    }
+
+    public void setAreaSip(AreaSip areaSip) {
+        this.areaSip = areaSip;
     }
 }
