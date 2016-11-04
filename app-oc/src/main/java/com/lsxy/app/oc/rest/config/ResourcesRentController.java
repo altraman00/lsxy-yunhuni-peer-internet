@@ -41,7 +41,7 @@ public class ResourcesRentController extends AbstractRestController {
      */
     @ApiOperation(value = "号码列表")
     @RequestMapping(value = "/list/{id}",method = RequestMethod.GET)
-    public RestResponse pageList(@ApiParam(name = "id",value = "号码id") @PathVariable String id,
+    public RestResponse pageList(@ApiParam(name = "id",value = "租户id") @PathVariable String id,
                                  @ApiParam(name = "pageNo",value = "第几页")@RequestParam(defaultValue = "1") Integer pageNo,
                                  @ApiParam(name = "pageSize",value = "每页记录数")@RequestParam(defaultValue = "20") Integer pageSize){
         Tenant tenant = tenantService.findById(id);
