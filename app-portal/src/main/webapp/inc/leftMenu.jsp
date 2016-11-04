@@ -65,7 +65,7 @@
 								<a data-toggle="tooltip" data-placement='right' title='会话统计' href="${ctx}/console/statistics/session/index"  class="nav-router" data-router="statistics/session"> <i class="iconfont icon-menu-session"></i> <span> <span>会话统计</span> </a>
 							</li>
 							<li>
-								<a data-toggle="tooltip" data-placement='right' title='呼叫中心统计' href="${ctx}/console/statistics/callcenter/index" class="nav-router" data-router="statistics/callcenter"><i class="iconfont icon-oc-mobile"></i> <span>呼叫中心统计</span> </a>
+								<a data-toggle="tooltip" data-placement='right' title='呼叫中心统计' href="${ctx}/console/statistics/callcenter/index" class="nav-router" data-router="statistics/callcenter"><i class="iconfont icon-menu-call"></i> <span>呼叫中心统计</span> </a>
 							</li>
 							<li>
 								<a data-toggle="tooltip" data-placement='right' title='详单查询' href="${ctx}/console/statistics/billdetail/notify" class="nav-router" data-router="statistics/billdetail"><i class="iconfont icon-menu-detail"></i> <span>详单查询</span> </a>
@@ -80,7 +80,7 @@
 					</li>
 					<li class="border-top ">
 						<a data-toggle="tooltip" data-placement='right' title='服务与支持' href="${ctx}/console/customer/index" class="canbehover nav-router" data-router="customer">
-							<i class="iconfont icon-menu-call"></i>
+							<i class="iconfont icon-menu-kefu"></i>
 							<span>服务与支持</span> </a>
 					</li>
 
