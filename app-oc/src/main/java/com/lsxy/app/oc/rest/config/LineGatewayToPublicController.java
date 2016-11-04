@@ -115,7 +115,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
             return RestResponse.failed("0000","目标优先级不能为0");
         }
         int o3 = lineGatewayToPublicService.getMaxPriority();
-        if(o2>03){
+        if(o2>o3){
             return RestResponse.failed("0000","目标优先级不能超过当前最大优先级");
         }
         LineGatewayToPublic lineGatewayToPublic = lineGatewayToPublicService.findById(id);

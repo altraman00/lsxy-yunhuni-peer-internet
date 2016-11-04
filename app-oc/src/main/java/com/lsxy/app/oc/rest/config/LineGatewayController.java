@@ -8,10 +8,8 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
-import com.lsxy.yunhuni.api.config.service.AreaService;
-import com.lsxy.yunhuni.api.config.service.LineGatewayService;
-import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
-import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
+import com.lsxy.yunhuni.api.config.model.LineGatewayToTenant;
+import com.lsxy.yunhuni.api.config.service.*;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
@@ -60,6 +58,8 @@ public class LineGatewayController extends AbstractRestController {
     ResourceTelenumService resourceTelenumService;
     @Autowired
     AreaService areaService;
+    @Autowired
+    LineGatewayToTenantService lineGatewayToTenantService;
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "获取全部数据")
     public RestResponse pList(){
@@ -206,6 +206,9 @@ public class LineGatewayController extends AbstractRestController {
         lineGatewayService.delete(lineGateway);
         //删除线路号码关联关系表
         telnumToLineGatewayService.deleteByLineId(lineGateway.getId());
+        //删除全局线路和归属线路
+        lineGatewayToTenantService.deleteLine(lineGateway.getId());
+        lineGatewayToPublicService.deleteLine(lineGateway.getId());
         //更新号码的状态
         batchUpCall(lineGateway.getId());
         return RestResponse.success("删除成功");

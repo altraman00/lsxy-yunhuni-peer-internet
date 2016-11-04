@@ -67,4 +67,10 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
         int result = jdbcTemplate.queryForObject(sql,Integer.class);
         return result;
     }
+
+    @Override
+    public void deleteLine(String line) {
+        String sql =  " update  db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant  set deleted=1 where deleted=0 and line_id='"+line+"'  ";
+        jdbcTemplate.update(sql);
+    }
 }

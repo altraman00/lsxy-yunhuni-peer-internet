@@ -20,4 +20,5 @@ public interface LineGatewayToTenantService extends BaseService<LineGatewayToTen
     Page<LineGatewayToTenant> getPage(String tenantId,Integer pageNo, Integer pageSize);
     long findByLineIdAndTenantId(String lineId,String tenantId);
     int getMaxPriority();
+    void deleteLine(String line);
 }
