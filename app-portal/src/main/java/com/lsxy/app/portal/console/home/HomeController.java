@@ -160,15 +160,7 @@ public class HomeController extends AbstractPortalController {
 //                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
                 if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
                     onlineApp++;
-                    ResourcesRent rent = getIvrNumber(token,app.getId());
-                    if(rent != null){
-                        if(rent.getResourceTelenum()!=null) {
-                            appStateVO.setIvr(rent.getResourceTelenum().getTelNumber());
-                        }
-                        appStateVO.setIvrExpire(new Date().getTime() > rent.getRentExpire().getTime());
-                    }
                 }
-                appStateVOs.add(appStateVO);
             }
         }
         vo.setOnLineApp(onlineApp);
