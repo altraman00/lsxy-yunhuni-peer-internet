@@ -1,9 +1,12 @@
 package com.lsxy.app.portal.rest.number;
 
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.framework.api.billing.model.Billing;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
+import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
@@ -46,6 +49,8 @@ public class ResourcesRentController extends AbstractRestController{
     ConsumeService consumeService;
     @Autowired
     TelnumLocationService telnumLocationService;
+    @Autowired
+    CalBillingService calBillingService;
     /**
      * 根据省份获取城市
      * @return
@@ -55,7 +60,11 @@ public class ResourcesRentController extends AbstractRestController{
         List list = telnumLocationService.getCityAndAreaCode(province);
         return RestResponse.success(list);
     }
-
+    @RequestMapping("/telnum/city")
+    public RestResponse getTelnum()   {
+        List list = telnumLocationService.getCityAndAreaCodeByTelenum();
+        return RestResponse.success(list);
+    }
     /**
      * 获取省份列表
      * @return
@@ -154,9 +163,11 @@ public class ResourcesRentController extends AbstractRestController{
         Tenant tenant = getCurrentAccount().getTenant();
         if(temp!=null&&StringUtils.isNotEmpty(temp.getId())&&tenant.getId().equals(temp.getTenantId())){
             if(temp.getStatus()==TelenumOrder.status_await) {
-                //扣费
-                Consume consume = new Consume(new Date(), ConsumeCode.flat_balance.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
-                consumeService.consume(consume);
+                //余额正数部分
+                Billing billing = calBillingService.getCalBilling(tenant.getId());
+                if(billing.getBalance().compareTo(temp.getAmount())==-1) {
+                    return RestResponse.failed("-1","余额不足");
+                }
                 //更新记录
                 temp.setStatus(TelenumOrder.Status_success);
                 telenumOrderService.save(temp);
@@ -165,8 +176,21 @@ public class ResourcesRentController extends AbstractRestController{
                     ResourceTelenum resourceTelenum = list.get(i).getTelnum();
                     resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
                     resourceTelenum.setTenant(tenant);
-                    resourceTelenumService.save(resourceTelenum);
+                    resourceTelenum = resourceTelenumService.save(resourceTelenum);
+                    ResourcesRent resourcesRent = new ResourcesRent();
+                    resourcesRent.setTenant(tenant);
+                    resourcesRent.setResourceTelenum(resourceTelenum);
+                    resourcesRent.setResData(resourceTelenum.getTelNumber());
+                    resourcesRent.setResName("号码资源");
+                    resourcesRent.setResType("1");
+                    Date date = DateUtils.getLastTimeOfMonth(new Date());
+                    resourcesRent.setRentExpire(date);
+                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+                    resourcesRentService.save(resourcesRent);
                 }
+                //扣费
+                Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
+                consumeService.consume(consume);
                 return RestResponse.success("支付成功");
             }else{
                 return RestResponse.failed("0000","订单状态不是未支付");
@@ -240,6 +264,7 @@ public class ResourcesRentController extends AbstractRestController{
                 telenumOrderItem.setAmount(resourceTelenum.getAmount());
                 telenumOrderItem.setTelnumOrderId(telenumOrder.getId());
                 telenumOrderItem.setTelnum(resourceTelenum);
+                telenumOrderItemService.save(telenumOrderItem);
                 list.add(numIds[i]);
                 bigDecimal=bigDecimal.add(resourceTelenum.getAmount());
             }else{

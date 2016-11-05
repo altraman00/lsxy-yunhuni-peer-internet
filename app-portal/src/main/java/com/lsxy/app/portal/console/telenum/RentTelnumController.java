@@ -139,8 +139,8 @@ public class RentTelnumController extends AbstractPortalController {
     }
     @RequestMapping("/city/list" )
     @ResponseBody
-    public RestResponse getCityList(HttpServletRequest request,String province){
-        List list = getTelnumLocationList(request,province);
+    public RestResponse getCityList(HttpServletRequest request){
+        List list = getTelnumCity(request);
         return  RestResponse.success(list);
     }
 }

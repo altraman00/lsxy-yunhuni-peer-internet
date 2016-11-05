@@ -136,4 +136,11 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
             }
         }
     }
+
+    @Override
+    public List<Map<String, Object>> getCityAndAreaCodeByTelenum() {
+        String sql = "SELECT DISTINCT city as city,area_code as areaCode FROM db_lsxy_bi_yunhuni.tb_oc_config_telnum_location WHERE area_code IN (SELECT DISTINCT area_code FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum WHERE deleted=0 AND status=0 AND usable=1 )";
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(sql);
+        return list;
+    }
 }

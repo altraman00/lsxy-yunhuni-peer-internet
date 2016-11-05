@@ -31,7 +31,7 @@
                                     <ul class="nav">
                                         <li>
                                             <div class="aside-li-a active">
-                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=1&pageSize=20">呼入号码管理</a>
+                                                <a href="${ctx}/console/telenum/callnum/index?pageNo=1&pageSize=20">我的号码</a>
                                             </div>
                                         </li>
                                         <li>
@@ -152,6 +152,7 @@
                                             注意：订单的有效期为24小时，请在订单过期时间内完成支付,否则订单将会被系统自动取消。
                                         </p>
                                         <p>
+                                            <span hidden id="orderid"></span>
                                             订单创建时间：<span id="paycreatetime" class="m-r-20">2016-03-03 16:00 </span>
                                             订单过期时间：<span id="paylasttime" class="m-r-20">2016-03-03 16:00</span>
                                             本次租用需要支付：￥<span id="paymoney" class="m-r-20 orange">2000.000</span>
@@ -185,7 +186,7 @@
                                         </table>
                                         <div class="text-right">
                                             <a  class="btn btn-primary btnpay">立即支付</a>
-                                            <a  class="btn btn-default" onclick="closepay(1)">取消订单</a>
+                                            <a  class="btn btn-default" onclick="closepay()">取消订单</a>
                                         </div>
                                     </div>
                                 </div>
@@ -236,9 +237,8 @@
                                 </div>
                                 <div class="col-md-4 remove-padding">
                                     <span class="title">归属地：</span>
-                                    <select  v-model="serach.place"  class="form-control select-box">
+                                    <select  v-model="serach.place"  class="form-control select-box" id="city_list">
                                         <option value="">全部</option>
-                                        <option value="020">广州</option>
                                     </select>
                                 </div>
                                 <div class="col-md-1 text-right remove-padding">
@@ -337,12 +337,12 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-12 text-center"  v-if="paystatus==1">
-                                    <img src="./images/register/icon_12.png" /><br/>
+                                    <img src="${resPrefixUrl }/images/register/icon_12.png" /><br/>
                                     <p>支付成功</p>
                                 </div>
 
                                 <div class="col-md-12 text-center"  v-if="paystatus==-1">
-                                    <img src="./images/register/sign-error-icon.png" /><br/>
+                                    <img src="${resPrefixUrl }/images/register/sign-error-icon.png" /><br/>
                                     <p>余额不足，支付失败</p>
                                 </div>
 
@@ -361,8 +361,8 @@
                                             <th class="text-right">资源占用费</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
-                                        <tr v-for="item in shoplist">
+                                        <tbody id="pay-modal2">
+                                        <tr v-for="item in shoplist" >
                                             <td>{{ item.phone }}</td>
                                             <td class="text-center">{{ isCall[item.call] }}</td>
                                             <td class="text-center">{{ isCall[item.callout]}}</td>
@@ -373,7 +373,7 @@
                                     </table>
                                     <div class="row">
                                         <div class="col-md-12 text-center">
-                                            本次租用需要支付：￥<span class="orange">2000.000</span>
+                                            本次租用需要支付：￥<span class="orange" id="order_play_cost"></span>
                                         </div>
                                     </div>
 
@@ -382,10 +382,10 @@
                         </div>
 
                         <div class="modal-footer">
-                            <a class="btn btn-primary" @click="checkMoney" v-if="paystatus==1">完成</a>
-                            <a class="btn btn-primary" href="cost_recharge.html" v-if="paystatus==-1">前往充值</a>
+                            <a class="btn btn-primary" @click="canne" v-if="paystatus==1">完成</a>
+                            <a class="btn btn-primary" href="${ctx}/console/cost/recharge" v-if="paystatus==-1">前往充值</a>
                             <a class="btn btn-primary" @click="checkMoney" v-if="paystatus==0">立即支付</a>
-                            <button type="button" class="btn btn-default"
+                            <button type="button" class="btn btn-default" v-if="paystatus!=1"
                                     data-dismiss="modal" onclick="cancelpay()">取消
                             </button>
                         </div>
@@ -405,6 +405,18 @@
 <script type="text/javascript" src='${resPrefixUrl }/js/vue/vue.js'></script>
 <script type="text/javascript" src='${resPrefixUrl }/js/page.js'></script>
 <script>
+    function getCityList(){
+        var html = '<option value="">全部</option>';
+        var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+        ajaxsubmit("${ctx}/console/telenum/callnum/city/list",params,function(result) {
+            var re = result.data;
+            for(var i=0;i<re.length;i++){
+                html += '<option value="'+re[i].areaCode+'">'+re[i].city+'</option>';
+            }
+            $('#city_list').html(html);
+        });
+    }
+    getCityList();
     $('#modal-find').click(function () {
 
     });
@@ -479,6 +491,9 @@
                 this.orderby = v
                 modalPage()
             },
+            canne:function(){
+                window.location.href=ctx+"/console/telenum/callnum/index";
+            },
             payOrder:function(){
                 $('#call-modal').modal('hide');
                 var ids = "";
@@ -488,24 +503,37 @@
                         ids+=",";
                     }
                 }
+                var paylist = this.paylist
+                //立即下单，下单成功 ，获取订单数据，
                 var params = {'${_csrf.parameterName}':'${_csrf.token}',"ids":ids};
                 ajaxsync("${ctx}/console/telenum/callnum/telnum/order/new",params,function(result) {
-                    alert(JSON.stringify(result.data))
+                    var re = result.data;
+                    $('#orderid').html(re.id);
+                    $('#order_play_cost').html(getAmont(re.amount));
+                    $('#pay-modal').modal('show');
+                    //回调订单数据
+                    noPay();
+
                 });
-                //立即下单，下单成功 ，获取订单数据，
-                //回调订单数据
-                var paylist = this.paylist
-
-                noPay()
-
-                $('#pay-modal').modal('show');
             },
             checkMoney:function(){
+                var t =this;
                 //判断是否需要充值，提交订单
-                //支付成功状态，同时3秒后刷新页面
-                this.paystatus = 1
-                //余额不足充值
-                this.paystatus = -1
+                var id = $('#orderid').html();
+                var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+                ajaxsync("${ctx}/console/telenum/callnum/telnum/order/play/"+id,params,function(result) {
+                    if(result.success){
+                        //支付成功状态，同时3秒后刷新页面
+                        t.paystatus = 1;
+                        $('#orderid').html('');
+                    }else{
+                        if(result.errorCode==-1){
+                            //余额不足充值
+                            t.paystatus = -1;
+                        }else{
+                        }
+                    }
+                });
             },
             setPhoneList: function (nowPage, listRows) {
                 //请求数据
@@ -572,7 +600,15 @@
         modalPage();
         $('#call-modal').modal('show');
     });
-
+    function getlongDate(longtime){
+        var ct =  new Date(longtime);
+        var year = ct.getFullYear();
+        var month = (ct.getMonth()+1)>10?(ct.getMonth()+1):"0"+(ct.getMonth()+1);
+        var day = ct.getDate()>10?ct.getDate():"0"+ct.getDate();
+        var hour = ct.getHours()>10?ct.getHours():"0"+ct.getHours();
+        var m = ct.getMinutes()>10?ct.getMinutes():"0"+ct.getMinutes();
+        return year+"-"+month+"-"+day+" "+hour+":"+m;
+    }
     /**
      * 分页回调方法
      * @param nowPage 当前页数
@@ -584,66 +620,73 @@
 
     $('.btnpay').click(function(){
         vue.clearpay();
-        $('#pay-modal').modal('show');
-    })
+        var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+        ajaxsync("${ctx}/console/telenum/callnum/telnum/order",params,function(data){
+            if(data.success){
+                if(data.data.order!=null){
+                    var order = data.data.order;
+                    $('#orderid').html(order.id);
+                    $('#order_play_cost').html(getAmont(order.amount));
+                    var re = data.data.list;
+                    var data= [];
+                    for(var i=0;i<re.length;i++){
+                        var d = {id:re[i].telnum.id,
+                            phone: re[i].telnum.telNumber,
+                            call: re[i].telnum.isCalled,
+                            callout: (re[i].telnum.isDialing+re[i].telnum.isThrough)>0?1:0,
+                            place: re[i].telnum.areaCode,
+                            price:  re[i].amount
+                        };
+                        data.push(d);
+                    }
 
+                    var html = '';
+                    for(var i =0 ; i<data.length; i++){
+                        html +='<tr><td>'+data[i].phone+'</td><td class="text-center">'+data[i].call+'</td><td  class="text-center">'+data[i].callout+'</td><td class="text-center"><span class="text-center-l-fixed">'+data[i].place+'</span></td><td class="text-right">￥'+data[i].price+'</td></tr>'
+                    }
+
+                    $('#pay-modal2').html(html);
+                    $('#pay-modal').modal('show');
+                }
+            }else{
+                alert("获取订单信息错误"+data.errorMsg);
+            }
+        },"get");
+
+    })
     //加载待支付数据
     function noPay(){
         var params = {'${_csrf.parameterName}':'${_csrf.token}'};
         ajaxsync("${ctx}/console/telenum/callnum/telnum/order",params,function(data){
             if(data.success){
                 if(data.data.order!=null){
+                    var order = data.data.order;
                     $('#nopaid').show();
-                    $('paycreatetime').html('2016-10-28');
-                    $('paycreatetime').html('2016-10-29');
-
+                    $('#orderid').html(order.id);
+                    $('#paycreatetime').html(getlongDate(order.createTime));
+                    $('#paylasttime').html(getlongDate(order.timeOut));
+                    $('#paymoney').html(getAmont(order.amount));
+                    var re = data.data.list;
+                    var data= [];
+                    for(var i=0;i<re.length;i++){
+                        var d = {id:re[i].telnum.id,
+                            phone: re[i].telnum.telNumber,
+                            call: re[i].telnum.isCalled,
+                            callout: (re[i].telnum.isDialing+re[i].telnum.isThrough)>0?1:0,
+                            place: re[i].telnum.areaCode,
+                            price:  re[i].amount
+                        };
+                        data.push(d);
+                    }
                     var html = '';
-                    var data = [
-                        {
-                            id: '1',
-                            phone: '13611460986',
-                            call: 0,
-                            callout: 1,
-                            place: '广州',
-                            quality: 3,
-                            price: '111.000'
-                        },
-                        {
-                            id: '2',
-                            phone: '13611460983',
-                            call: 0,
-                            callout: 1,
-                            place: '广州',
-                            quality: 3,
-                            price: '111.000'
-                        },
-                        {
-                            id: '3',
-                            phone: '13611460984',
-                            call: 0,
-                            callout: 1,
-                            place: '广州',
-                            quality: 2,
-                            price: '111.000'
-                        },
-                    ]
-
-                    /*   <td>{{ item.phone }}</td>
-                     <td class="text-center">{{ isCall[item.call] }}</td>
-                     <td class="text-center">{{ isCall[item.callout]}}</td>
-                     <td>{{ item.place}}</td>
-                     <td class="text-center">{{ item.quality}}</td>
-                     <td>{{ item.price}}</td>*/
-
-
                     for(var i =0 ; i<data.length; i++){
-                        html +='<tr><td>'+data[i].phone+'</td><td class="text-center">'+data[i].call+'</td><td  class="text-center">'+data[i].callout+'</td><td class="text-center"><span class="text-center-l-fixed">'+data[i].place+'</span></td><td  class="text-center">'+data[i].quality+'</td><td class="text-right">￥'+data[i].price+'</td></tr>'
+                        html +='<tr><td>'+data[i].phone+'</td><td class="text-center">'+data[i].call+'</td><td  class="text-center">'+data[i].callout+'</td><td class="text-center"><span class="text-center-l-fixed">'+data[i].place+'</span></td><td class="text-right">￥'+data[i].price+'</td></tr>'
                     }
 
                     $('#nopaid-table').html(html);
                 }
             }else{
-                alert(data.errorMsg);
+                alert("获取订单信息错误"+data.errorMsg);
             }
         },"get");
     }
@@ -658,45 +701,48 @@
 
     //取消
     function cancelpay() {
-        showtoast('您的订单尚未支付，请及时付款！')
+//        if($('#orderid').html()!=''){
+            showtoast('您的订单尚未支付，请及时付款！');
+//        }
+//        noPay();
     }
 
     /**
      * id 为号码标识
      * @param id
      */
-    function release(id){
-        $('#editmark-tips').html('');
-        bootbox.setLocale("zh_CN");
-        bootbox.dialog({
-                    title: "提示",
-                    message: '<div class="row">  ' +
-                    '<div class="col-md-12 text-center">您是否需要释放当前号码，如需再次使用需要重新购买新的号码 </div>  </div>',
-                    buttons: {
-                        success: {
-                            label: "确认",
-                            className: "btn-primary",
-                            callback: function () {
-                                showtoast("释放成功")
-
-
-                                //异步加载数据，释放成功
-                            }
-                        },
-                        cancel:{
-                            label: "关闭",
-                            className: "btn-default",
-                        }
-                    }
-                }
-        );
-    }
+//    function release(id){
+//        $('#editmark-tips').html('');
+//        bootbox.setLocale("zh_CN");
+//        bootbox.dialog({
+//                    title: "提示",
+//                    message: '<div class="row">  ' +
+//                    '<div class="col-md-12 text-center">您是否需要释放当前号码，如需再次使用需要重新购买新的号码 </div>  </div>',
+//                    buttons: {
+//                        success: {
+//                            label: "确认",
+//                            className: "btn-primary",
+//                            callback: function () {
+//                                showtoast("释放成功")
+//
+//
+//                                //异步加载数据，释放成功
+//                            }
+//                        },
+//                        cancel:{
+//                            label: "关闭",
+//                            className: "btn-default",
+//                        }
+//                    }
+//                }
+//        );
+//    }
 
     /**
      * id 为订单标识
      * @param id
      */
-    function closepay(id){
+    function closepay(){
         bootbox.setLocale("zh_CN");
         bootbox.dialog({
                     title: "提示",
@@ -707,8 +753,18 @@
                             label: "确认",
                             className: "btn-primary",
                             callback: function () {
+                                var id = $('#orderid').html();
                                 //取消成功 刷新页面
-                                showtoast('取消订单成功')
+                                var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+                                ajaxsync("${ctx}/console/telenum/callnum/telnum/order/delete/"+id,params,function(data){
+                                    if(data.success){
+                                        showtoast('取消订单成功')
+                                        $('#orderid').html('');
+                                        $('#nopaid').hide();
+                                    }else{
+                                        showtoast(data.errorMsg);
+                                    }
+                                },"post");
                                 //异步加载数据，释放成功
                             }
                         },
@@ -727,7 +783,7 @@
 <script type="text/javascript">
 function release(id){
     bootbox.setLocale("zh_CN");
-    bootbox.confirm("您是否需要释放当前号码，如需再次使用需要重新缴纳资源租用费", function(result) {
+    bootbox.confirm("您是否需要释放当前号码，如需再次使用需要重新购买新的号码", function(result) {
         if(result){
             var params = {'id':id,'${_csrf.parameterName}':'${_csrf.token}'};
             ajaxsync("${ctx}/console/telenum/callnum/release",params,function(data){

@@ -35,7 +35,7 @@ public class TelenumOrderItem extends IdEntity {
         this.telnumOrderId = telnumOrderId;
     }
     @OneToOne
-    @JoinColumn(name = "resource_telenum_id")
+    @JoinColumn(name = "telnum_id")
     public ResourceTelenum getTelnum() {
         return telnum;
     }
