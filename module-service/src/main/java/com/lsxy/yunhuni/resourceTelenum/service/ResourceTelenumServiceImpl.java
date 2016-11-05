@@ -68,6 +68,32 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
+    public Page getPageByFreeNumber(Integer pageNo, Integer pageSize, String telnum, String type, String areaCode, String order) {
+        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' ";
+        if(StringUtils.isNotEmpty(type)){
+            if("callin".equals(type)){
+                hql += " AND obj.isThrough=1 ";
+            }else if("callout".equals(type)){
+                hql += " AND (obj.isDialing=1 or obj.isThrough=1 )";
+            }
+        }
+        if(StringUtils.isNotEmpty(areaCode)){
+            hql += " AND obj.areaCode='"+areaCode+"' ";
+        }
+        if(StringUtils.isNotEmpty(order)){
+            if("amount:1".equals(order)){
+                hql += " order by obj.amount desc ";
+            }else if("amount:0".equals(order)){
+                hql += " order by obj.amount ";
+            }
+        }else{
+            hql += " order by obj.createTime desc ";
+        }
+        Page pgae = this.pageList(hql,pageNo,pageSize);
+        return pgae;
+    }
+
+    @Override
     public String findNumByCallUri(String uri) {
         ResourceTelenum telenum = resourceTelenumDao.findByCallUri(uri);
         if(telenum != null && ResourceTelenum.USABLE_TRUE.equals(telenum.getUsable())){
