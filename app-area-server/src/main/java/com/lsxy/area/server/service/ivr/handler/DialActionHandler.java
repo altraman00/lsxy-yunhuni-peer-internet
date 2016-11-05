@@ -2,10 +2,10 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.exceptions.AppNotFoundException;
 import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -70,6 +70,9 @@ public class DialActionHandler extends ActionHandler{
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
+
     @Override
     public String getAction() {
         return "dial";
@@ -99,20 +102,29 @@ public class DialActionHandler extends ActionHandler{
             return false;
         }
         try{
+            //更新下一步
+            Map<String,Object> businessData = state.getBusinessData();
+            if(businessData == null){
+                businessData = new HashMap<>();
+            }
+            businessData.put("next",next);
+            state.setBusinessData(businessData);
+            businessStateService.save(state);
             dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         }catch (Throwable t){
             logger.error("ivr拨号失败:",t);
+            App app = appService.findById(state.getAppId());
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","ivr.connect_end")
+                    .putIfNotEmpty("id",callId)
+                    .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                    .putIfNotEmpty("end_time",System.currentTimeMillis())
+                    .putIfNotEmpty("error","dial error")
+                    .build();
+            if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                ivrActionService.doAction(callId);
+            }
         }
-
-        //更新下一步
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
-
         return true;
     }
 
