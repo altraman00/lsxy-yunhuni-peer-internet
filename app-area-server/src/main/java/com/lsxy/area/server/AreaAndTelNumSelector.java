@@ -143,9 +143,15 @@ public class AreaAndTelNumSelector {
                 to2Num.add(entity2);
             }
         });
+        if(to1Num==null || to1Num.size()==0){
+            throw new RuntimeException("号码没有可用线路");
+        }
+        if(to2Num==null || to2Num.size()==0){
+            throw new RuntimeException("号码没有可用线路");
+        }
     }
 
-    private void addToTelnumSortEntity(String to, List<LineGateway> lineGateways, List<TelnumSortEntity> to1Num, ResourceTelenum telenum) {
+    private void addToTelnumSortEntity(String to, List<LineGateway> lineGateways, List<TelnumSortEntity> toNum, ResourceTelenum telenum) {
         List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(telenum.getTelNumber());
         //租户拥有的线路和号码能呼出的线路进行一次交集计算，并组装数据
         lineGateways.parallelStream().forEach(lg -> {
@@ -153,9 +159,12 @@ public class AreaAndTelNumSelector {
             if(first.isPresent()){
                 TelnumToLineGateway telnumToLineGateway = first.get();
                 TelnumSortEntity entity = getTelnumSortEntity(to, telenum, lg, telnumToLineGateway);
-                to1Num.add(entity);
+                toNum.add(entity);
             }
         });
+        if(toNum==null || toNum.size()==0){
+            throw new RuntimeException("号码没有可用线路");
+        }
     }
 
     private TelnumSortEntity getTelnumSortEntity(String to, ResourceTelenum svTelnumber, LineGateway lg, TelnumToLineGateway telnumToLineGateway) {
