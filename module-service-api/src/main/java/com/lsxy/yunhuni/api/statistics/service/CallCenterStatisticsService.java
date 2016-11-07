@@ -18,5 +18,5 @@ public interface CallCenterStatisticsService extends BaseService<CallCenterStati
 
     CallCenterStatistics getStatisticsByTenantId(String tenantId, Date date);
 
-    void incrIntoRedis(CallCenterStatistics callCenterStatistics);
+    void incrIntoRedis(CallCenterStatistics callCenterStatistics,Date date);
 }

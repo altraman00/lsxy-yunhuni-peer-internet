@@ -5,21 +5,21 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import com.lsxy.yunhuni.statistics.dao.CallCenterStatisticsDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -30,6 +30,8 @@ import java.util.concurrent.Future;
  */
 @Service
 public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterStatistics> implements CallCenterStatisticsService{
+    private static final Logger logger = LoggerFactory.getLogger(CallCenterStatisticsServiceImpl.class);
+
     String CC_STATISTICS_TENANT_PREFIX = "CC_STATISTICS_TENANT_";
     String CC_STATISTICS_APP_PREFIX = "CC_STATISTICS_APP_";
 
@@ -138,8 +140,12 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
     }
 
     @Override
-    public void incrIntoRedis(CallCenterStatistics callCenterStatistics) {
-
+    public void incrIntoRedis(CallCenterStatistics callCenterStatistics,Date date) {
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        String tenantKey = CC_STATISTICS_TENANT_PREFIX + callCenterStatistics.getTenantId() + "_" + dateStr;
+        String appKey = CC_STATISTICS_APP_PREFIX + callCenterStatistics.getAppId() + "_" + dateStr;
+        incrIntoRedis(tenantKey,callCenterStatistics);
+        incrIntoRedis(appKey,callCenterStatistics);
     }
 
     private void incrIntoRedis(String key,CallCenterStatistics ccStatistics){
@@ -156,10 +162,31 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         }
     }
 
+
+
+    private CallCenterStatistics getIncrFromRedisByTenantId(String tenantId,Date date){
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        String tenantKey = CC_STATISTICS_TENANT_PREFIX + tenantId + "_" + dateStr;
+        return getIncrFromRedis(tenantKey);
+    }
+
+    private CallCenterStatistics getIncrFromRedisByAppId(String appId,Date date){
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        String tenantKey = CC_STATISTICS_APP_PREFIX + appId + "_" + dateStr;
+        return getIncrFromRedis(tenantKey);
+    }
+
     private CallCenterStatistics getIncrFromRedis(String key){
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
         Map entries = hashOps.entries();
-        return null;
+        CallCenterStatistics current = new CallCenterStatistics(null,null,null,0L, 0L,0L,0L,0L,0L,0L);
+        try {
+            BeanUtils.copyProperties2(current,entries,false);
+        } catch (Exception e) {
+            logger.error("复制对象属性出错",e);
+        }
+        return current;
     }
+
 
 }
