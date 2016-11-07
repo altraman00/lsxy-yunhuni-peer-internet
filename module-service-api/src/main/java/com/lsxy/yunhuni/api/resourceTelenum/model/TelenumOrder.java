@@ -23,7 +23,7 @@ public class TelenumOrder extends IdEntity {
     public static final int status_await = 0;//待支付
     private String tenantId;//所属租户
     private Integer status;//状态
-    private Date timeOut;//超时时间
+    private Date deadline;//超时时间
     private BigDecimal amount;//费用
     @Column(name = "tenant_id")
     public String getTenantId() {
@@ -41,13 +41,13 @@ public class TelenumOrder extends IdEntity {
     public void setStatus(Integer status) {
         this.status = status;
     }
-    @Column(name = "time_out")
-    public Date getTimeOut() {
-        return timeOut;
+    @Column(name = "deadline")
+    public Date getDeadline() {
+        return deadline;
     }
 
-    public void setTimeOut(Date timeOut) {
-        this.timeOut = timeOut;
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
     }
     @Column(name = "amount")
     public BigDecimal getAmount() {
