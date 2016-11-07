@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -157,7 +158,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
 
     private CallCenterStatistics getIncrFromRedis(String key){
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
-        hashOps.entries();
+        Map entries = hashOps.entries();
         return null;
     }
 
