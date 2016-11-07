@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -364,4 +365,8 @@ public class RedisCacheService {
 			Set set = redisTemplate.opsForSet().members(key);
 			return set;
 		}
+
+	public BoundHashOperations getHashOps(String key){
+        return redisTemplate.boundHashOps(key);
+    }
 }
