@@ -365,7 +365,7 @@ public class LineGatewayController extends AbstractRestController {
     @RequestMapping(value="/telnum/upload/{id}", method=RequestMethod.POST)
     public RestResponse handleFileUpload(
             @ApiParam( name="id",value = "线路id")@PathVariable String id,
-            @ApiParam( name="file",value = "文件对象")@RequestParam("file") MultipartFile file
+            MultipartFile file
     ){
         if (!file.isEmpty()) {
            String fileName =  file.getOriginalFilename();
