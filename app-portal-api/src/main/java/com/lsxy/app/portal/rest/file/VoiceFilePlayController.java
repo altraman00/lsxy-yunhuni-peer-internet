@@ -80,7 +80,7 @@ public class VoiceFilePlayController extends AbstractRestController {
 //            billing.setFileRemainSize(billing.getFileRemainSize()+voiceFilePlay.getSize());
 //            billingService.save(billing);
         Account account = getCurrentAccount();
-        calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
+//        calBillingService.incAddFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         return voiceFilePlay;
     }
 
@@ -136,7 +136,7 @@ public class VoiceFilePlayController extends AbstractRestController {
 //        Billing billing = billingService.findBillingByUserName(getCurrentAccountUserName());
 //        billing.setFileRemainSize(billing.getFileRemainSize()-voiceFilePlay.getSize());
 //        billingService.save(billing);
-        calBillingService.incUseFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
+//        calBillingService.incUseFsize(account.getTenant().getId(),new Date(),voiceFilePlay.getSize());
         if(logger.isDebugEnabled()) {
             logger.debug("创建放音文件记录成功，应用{}，记录{}", appId, voiceFilePlay);
         }
