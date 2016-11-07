@@ -75,7 +75,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //登陆
     @Override
-    public String login(String tenantId,String appId,CallCenterAgent callCenterAgent){
+    public String login(String tenantId,String appId,CallCenterAgent callCenterAgent,List<AppExtension> extentions,List<AgentSkill> skills){
         if(StringUtil.isEmpty(tenantId)){
             throw new NullPointerException();
         }
@@ -86,19 +86,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         CallCenterAgent agent = new CallCenterAgent();
         agent.setTenantId(tenantId);
         agent.setAppId(appId);
-        agent.setName(callCenterAgent.getName());
-        agent.setState(callCenterAgent.getState());
-        if(StringUtil.isBlank(agent.getState())){
-            agent.setState(CallCenterAgent.STATE_DEFAULT);
-        }
+        agent.setAgentNo(callCenterAgent.getAgentNo());
+        agent.setAgentNum(callCenterAgent.getAgentNum());
+
         String agentId = this.save(agent).getId();
-        List<AppExtension>  extensions = callCenterAgent.getExtentions();
-        if(extensions!=null && extensions.size()>0){
-            for (AppExtension extension : extensions) {
-                appExtensionService.updateAgent(extension.getId(),agentId,extension.getEnabled());
+        if(extentions!=null && extentions.size()>0){
+            for (AppExtension extension : extentions) {
+                //TODO 设置坐席的分机
             }
         }
-        List<AgentSkill> skills = callCenterAgent.getSkills();
         if(skills!=null && skills.size()>0){
             for (AgentSkill obj : skills) {
                 AgentSkill skill = new AgentSkill();
@@ -120,7 +116,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Override
     public boolean logout(String agentId){
         agentSkillDao.deleteByAgent(agentId);
-        appExtensionDao.updateByAgent(AppExtension.UNENABLED,agentId);
+        //TODO 删除坐席的分机列表
         try {
             this.delete(agentId);
         } catch (Throwable e) {
@@ -135,7 +131,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(agent == null){
             return true;
         }
-        agent.setState(state);
+        //TODO 设置坐席的状态
         this.save(agent);
         return true;
     }
