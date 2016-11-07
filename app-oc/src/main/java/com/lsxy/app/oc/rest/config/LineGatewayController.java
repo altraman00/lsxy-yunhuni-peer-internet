@@ -367,7 +367,7 @@ public class LineGatewayController extends AbstractRestController {
             @ApiParam( name="id",value = "线路id")@PathVariable String id,
             MultipartFile file
     ){
-        if (!file.isEmpty()) {
+        if (file==null||!file.isEmpty()) {
            String fileName =  file.getOriginalFilename();
             boolean isE2007 = false;    //判断是否是excel2007格式
             if(fileName.endsWith("xlsx")) {
@@ -469,11 +469,11 @@ public class LineGatewayController extends AbstractRestController {
                     }
                 }
                 if(reason.length()>0){
-                    return RestResponse.success("第["+i+"]行开始处理处理失败;"+reason);
+                    return RestResponse.failed("0000","第["+i+"]行开始处理处理失败;"+reason);
                 }
                 return RestResponse.success("成功处理到第["+i+"]行;");
             } catch (Exception e) {
-                return RestResponse.success("第["+i+"]行开始处理处理失败;"+reason);
+                return RestResponse.failed("0000","第["+i+"]行开始处理处理失败;"+reason);
             }
         } else {
             return RestResponse.failed("0000","文件不存");

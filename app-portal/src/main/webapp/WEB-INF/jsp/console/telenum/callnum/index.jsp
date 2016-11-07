@@ -99,7 +99,7 @@
                                                 <c:if test="${result.rentExpire.time<time.time}">
                                                     <div style="color: red" >过期</div>
                                                 </c:if>
-                                                <c:if test="${result.rentExpire.time>time.time}">正常</c:if>
+                                                <c:if test="${result.rentExpire.time==null||result.rentExpire.time>time.time}">正常</c:if>
                                             </td>
                                             <td class="text-center">
                                                 <c:if test="${result.resourceTelenum.isDialing==1||result.resourceTelenum.isThrough==1}">
