@@ -418,6 +418,7 @@ public class IVRActionService {
         }
 
         if(state.getClosed()){
+            logger.info("IVR呼叫已关闭，call_id={}",call_id);
             return false;
         }
 
