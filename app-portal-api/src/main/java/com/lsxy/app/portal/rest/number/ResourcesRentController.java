@@ -140,7 +140,7 @@ public class ResourcesRentController extends AbstractRestController{
         TelenumOrder temp = telenumOrderService.findByTenantIdAndStatus(tenant.getId(),TelenumOrder.status_await);
         Map map = new HashMap();
         if(temp!=null&&StringUtils.isNotEmpty(temp.getId())&&tenant.getId().equals(temp.getTenantId())){
-            if((new Date().getTime()-temp.getTimeOut().getTime())>=0){
+            if((new Date().getTime()-temp.getDeadline().getTime())>=0){
                 temp.setStatus(TelenumOrder.status_fail);
                 telenumOrderService.save(temp);
             }else {
@@ -277,7 +277,7 @@ public class ResourcesRentController extends AbstractRestController{
         Calendar c = Calendar.getInstance();
         telenumOrder.setCreateTime(c.getTime());
         c.add(Calendar.DAY_OF_MONTH, 1);
-        telenumOrder.setTimeOut(c.getTime());
+        telenumOrder.setDeadline(c.getTime());
         telenumOrder = telenumOrderService.save(telenumOrder);
         return RestResponse.success(telenumOrder);
     }

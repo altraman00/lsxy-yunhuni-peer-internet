@@ -664,7 +664,7 @@
                     $('#nopaid').show();
                     $('#orderid').html(order.id);
                     $('#paycreatetime').html(getlongDate(order.createTime));
-                    $('#paylasttime').html(getlongDate(order.timeOut));
+                    $('#paylasttime').html(getlongDate(order.deadline));
                     $('#paymoney').html(getAmont(order.amount));
                     var re = data.data.list;
                     var data= [];
