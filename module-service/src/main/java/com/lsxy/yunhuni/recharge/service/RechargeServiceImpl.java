@@ -112,7 +112,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
         Date date = new Date();
         if(tenant != null){
             if(startTime != null && endTime != null){
-                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?? and obj.createTime between ?3 and ?4 order by obj.createTime desc";
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime between ?3 and ?4 order by obj.createTime desc";
                 page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId(),startTime,endTime);
             }else if(startTime != null && endTime == null){
                 String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime >= ?3 order by obj.createTime desc";
