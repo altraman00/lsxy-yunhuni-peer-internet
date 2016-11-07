@@ -416,6 +416,11 @@ public class IVRActionService {
             logger.info("没有找到call_id={}的state",call_id);
             return false;
         }
+
+        if(state.getClosed()){
+            return false;
+        }
+
         Map<String,Object> businessDate = state.getBusinessData();
         if(businessDate == null){
             businessDate = new HashMap<>();
