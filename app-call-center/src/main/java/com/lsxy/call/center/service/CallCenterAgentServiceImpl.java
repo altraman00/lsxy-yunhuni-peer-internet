@@ -1,7 +1,10 @@
 package com.lsxy.call.center.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.call.center.api.model.*;
+import com.lsxy.call.center.api.model.AgentSkill;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
@@ -12,19 +15,18 @@ import com.lsxy.call.center.dao.CallCenterAgentDao;
 import com.lsxy.call.center.utils.EnqueueSQLUtil;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.*;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.JSONUtil2;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.callcenter.EnqueueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -58,7 +60,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     private DeQueueService deQueueService;
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisCacheService redisCacheService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -166,7 +168,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
      */
     @Override
     public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue){
-        if(StringUtil.isEmpty(tenantId)){
+        /*if(StringUtil.isEmpty(tenantId)){
             return;
         }
         if(StringUtil.isEmpty(appId)){
@@ -209,7 +211,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }catch (Throwable t){
             logger.error("排队出错",t);
             deQueueService.fail(tenantId,appId,callId,t.getMessage());
-        }
+        }*/
     }
 
     String skill_regex="(has|get)\\(\"(.+?)\"\\)";
@@ -222,11 +224,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
      * @param agentId
      */
     public void enqueue(String tenantId, String appId, String agentId){
-        CallCenterAgent agent = this.findById(agentId);
+        /*CallCenterAgent agent = this.findById(agentId);
         if(agent == null){
             return;
         }
-        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAgentAndActive(tenantId,appId,agentId,1);
+        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAndAgentAndActive(tenantId,appId,agentId,1);
         Map<String,Object> params = new HashMap<>();
         if(skills!=null && skills.size()>0){
             for(AgentSkill skill : skills){
@@ -237,7 +239,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         String enqueue = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
         if(getWhere(enqueue,params)){
             getSort(enqueue,params);
-        }
+        }*/
     }
 
     public boolean getWhere(String enqueue , Map<String,Object> params){
