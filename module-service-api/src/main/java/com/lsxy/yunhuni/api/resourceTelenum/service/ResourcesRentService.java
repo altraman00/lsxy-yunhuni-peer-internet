@@ -72,4 +72,24 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     List<ResourcesRent> findByTenantId(String id);
+    /**
+     * 释放号码
+     */
+    void release(String id);
+
+    /**
+     * 支付订单
+     * @param id
+     * @param tenant
+     * @return
+     */
+    void telnumPlay(String id,Tenant tenant);
+    /**
+     * 取消订单
+     */
+    void telnumDelete(String id,Tenant tenant);
+    /**
+     * 创建订单
+     */
+    void telnumNew(Tenant tenant,String[] numIds);
 }
