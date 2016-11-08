@@ -26,7 +26,7 @@ public class LineGatewayVo {
     private String sipProviderIp;
     @ApiModelProperty(name="sipProviderDomain",value = "domain端口")
     private String sipProviderDomain;
-    @ApiModelProperty(name="lineType",value = "鉴权方式 1:账号密码 2:IP地址")
+    @ApiModelProperty(name="sipAuthType",value = "鉴权方式 1:账号密码 2:IP地址")
     private String sipAuthType;
     @ApiModelProperty(name="sipAuthAccount",value = "账号")
     private String sipAuthAccount;
