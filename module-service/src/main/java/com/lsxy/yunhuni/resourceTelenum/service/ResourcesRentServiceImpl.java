@@ -61,7 +61,14 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     TelenumOrderItemService telenumOrderItemService;
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
+        Tenant tenant = null;
+        tenant = tenantService.findById(userName);
+        if(tenant==null){
+            tenant = tenantService.findTenantByUserName(userName);
+        }
+        if(tenant==null){
+            throw new RuntimeException("租户不存在");
+        }
         String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 ";
         Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
@@ -210,7 +217,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         }
     }
     @Override
-    public void telnumNew(Tenant tenant,String[] numIds) {
+    public TelenumOrder telnumNew(Tenant tenant,String[] numIds) {
         TelenumOrder telenumOrder = new TelenumOrder();
         telenumOrder.setTenantId(tenant.getId());
         telenumOrder.setStatus(TelenumOrder.status_await);
@@ -230,6 +237,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 telenumOrderItem.setTelnumOrderId(telenumOrder.getId());
                 telenumOrderItem.setTelnum(resourceTelenum);
                 telenumOrderItemService.save(telenumOrderItem);
+                resourceTelenum.setStatus(ResourceTelenum.STATUS_LOCK);
+                resourceTelenumService.save(resourceTelenum);
                 list.add(numIds[i]);
                 bigDecimal=bigDecimal.add(resourceTelenum.getAmount());
             }else{
@@ -247,6 +256,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         telenumOrder.setCreateTime(c.getTime());
         c.add(Calendar.DAY_OF_MONTH, 1);
         telenumOrder.setDeadline(c.getTime());
-        telenumOrderService.save(telenumOrder);
+        telenumOrder = telenumOrderService.save(telenumOrder);
+        return telenumOrder;
     }
 }

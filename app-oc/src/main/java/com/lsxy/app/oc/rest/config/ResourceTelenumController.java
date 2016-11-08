@@ -200,7 +200,7 @@ public class ResourceTelenumController extends AbstractRestController {
         }else{
             resourceTelenum.setStatus(0);//设置没被租用
         }
-        resourceTelenum.setUsable("1");//设置可用
+        resourceTelenum.setUsable("0");//设置不可用
         //如果绑定线路的话，需要为号码设置区号
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())) {
             //验证运营商

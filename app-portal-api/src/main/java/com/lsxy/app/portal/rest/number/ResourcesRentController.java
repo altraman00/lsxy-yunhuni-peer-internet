@@ -198,7 +198,7 @@ public class ResourcesRentController extends AbstractRestController{
         Tenant tenant = getCurrentAccount().getTenant();
         TelenumOrder temp = telenumOrderService.findByTenantIdAndStatus(tenant.getId(),TelenumOrder.status_await);
         if(temp!=null&&StringUtils.isNotEmpty(temp.getId())){
-            return RestResponse.failed("0000","存在未支付订单");
+            return RestResponse.failed("0000","您有未支付的订单，请完成支付后，再进行号码租用");
         }
         String[] numIds = ids.split(",");
         for(int i=0;i<numIds.length;i++){
@@ -211,7 +211,7 @@ public class ResourcesRentController extends AbstractRestController{
                 return RestResponse.failed("0000","订单中有号码不存在");
             }
         }
-        resourcesRentService.telnumNew(tenant,numIds);
-        return RestResponse.success("创建订单成功");
+        temp = resourcesRentService.telnumNew(tenant,numIds);
+        return RestResponse.success(temp);
     }
 }
