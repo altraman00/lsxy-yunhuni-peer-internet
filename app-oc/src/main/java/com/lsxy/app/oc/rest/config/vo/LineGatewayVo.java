@@ -23,7 +23,7 @@ public class LineGatewayVo {
     @ApiModelProperty(name="lineType",value = "线路类型,SIP")
     private String lineType;
     @ApiModelProperty(name="sipProviderIp",value = "IP端口")
-    private String sipProviderPort;
+    private String sipProviderIp;
     @ApiModelProperty(name="sipProviderDomain",value = "domain端口")
     private String sipProviderDomain;
     @ApiModelProperty(name="lineType",value = "鉴权方式 1:账号密码 2:IP地址")
@@ -95,13 +95,12 @@ public class LineGatewayVo {
         this.lineType = lineType;
     }
 
-
-    public String getSipProviderPort() {
-        return sipProviderPort;
+    public String getSipProviderIp() {
+        return sipProviderIp;
     }
 
-    public void setSipProviderPort(String sipProviderPort) {
-        this.sipProviderPort = sipProviderPort;
+    public void setSipProviderIp(String sipProviderIp) {
+        this.sipProviderIp = sipProviderIp;
     }
 
     public String getSipProviderDomain() {

@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
@@ -73,4 +74,23 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * @return
      */
     Page<Map> getTenatPageByLine(Integer pageNo, Integer pageSize, String line,String tenantName);
+
+    /**
+     * 删除号码
+     */
+    void delete(String id);
+
+    /**
+     * 创建号码
+     */
+    void createNum(ResourceTelenum resourceTelenum,LineGateway lineGateway,Tenant tenant);
+
+    /**
+     * 修改号码
+     */
+    void editNum(ResourceTelenum resourceTelenum,int tenantType,boolean isEditNum,Tenant tenant,String telnum1,String telnum12);
+    /**
+     * 释放
+     */
+    void release(String id);
 }

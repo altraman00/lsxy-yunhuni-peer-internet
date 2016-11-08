@@ -59,17 +59,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
             if(re1>0){
                 return RestResponse.failed("0000","线路已经加入全局序列中");
             }else{
-                //获取当前最大编号
-                int re2 = lineGatewayToPublicService.getMaxPriority();
-                re2++;
-                //新建关系
-                LineGatewayToPublic lineGatewayToPublic = new LineGatewayToPublic();
-                lineGatewayToPublic.setLineGateway(lineGateway);
-                lineGatewayToPublic.setPriority(re2);
-                lineGatewayToPublicService.save(lineGatewayToPublic);
-                //修改线路状态标识为加入全局
-                lineGateway.setIsPublicLine("1");
-                lineGatewayService.save(lineGateway);
+                lineGatewayToPublicService.addPublic(id);
             }
         }else{
             return RestResponse.failed("0000","线路不存在");
@@ -82,22 +72,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
     public RestResponse removePublic(@ApiParam(name = "id",value = "全局线路id") @PathVariable String id) throws InvocationTargetException, IllegalAccessException {
         LineGatewayToPublic lineGatewayToPublic = lineGatewayToPublicService.findById(id);
         if(lineGatewayToPublic!=null&& StringUtils.isNotEmpty(lineGatewayToPublic.getId())){
-            //删除线路关系
-            lineGatewayToPublicService.delete(lineGatewayToPublic);
-            //修改对应线路关系
-            LineGateway lineGateway = lineGatewayToPublic.getLineGateway();
-            if(lineGateway!=null){
-                lineGateway.setIsPublicLine("0");
-                lineGatewayService.save(lineGateway);
-            }
-            //修正优先级
-            int o3 = lineGatewayToPublicService.getMaxPriority();
-            if(o3!=lineGatewayToPublic.getPriority()){
-                int re = upPriority(lineGatewayToPublic.getPriority(),o3,null);
-                if(re==-1){
-                    return RestResponse.failed("0000","删除成功，修正失败，请手动修正");
-                }
-            }
+            lineGatewayToPublicService.removePublic(id);
         }else{
             return RestResponse.failed("0000","线路不存在");
         }
@@ -124,7 +99,7 @@ public class LineGatewayToPublicController extends AbstractRestController {
             if(o1==o2){
                 return RestResponse.failed("0000","目标优先级和当前优先级一致");
             }
-            int re = upPriority(o1,o2,lineGatewayToPublic.getId());
+            int re = lineGatewayToPublicService.upPriority(o1,o2,lineGatewayToPublic.getId());
             if(re==-1){
                 return RestResponse.failed("0000","修改失败，请重试");
             }
@@ -133,25 +108,5 @@ public class LineGatewayToPublicController extends AbstractRestController {
         }
         return RestResponse.success("修改成功");
     }
-    private int upPriority(int o1,int o2,String line){
-        String flag = "+1";
-        int begin = -1;
-        int end = -1;
-        if(o1<o2){
-            begin = o1+1;
-            end = o2;
-            flag = "-1";
-        }else{
-            begin = o2;
-            end = o1-1;
-            flag = "+1";
-        }
-        String[] sql = new String[2];
-        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE deleted=0 AND priority BETWEEN   "+begin+" AND "+end+" ";
-        if(StringUtils.isNotEmpty(line)) {
-            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=" + o2 + " WHERE deleted=0 AND id ='" + line + "' ";
-        }
-        int re = lineGatewayService.batchModify(sql);
-        return re;
-    }
+
 }

@@ -1,9 +1,9 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 
 import java.util.List;
@@ -95,4 +95,15 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param telnum
      */
     void updateTelnum(String telnum1,String telnum);
+
+
+    void batchUpCall(String line,String... nums);
+
+    void modify(LineGateway lineGateway,String isThrough1,String isThrough2);
+
+    void deleteLine(String id);
+
+    void telnumDelete(String id,String[] ids,String[] idss);
+
+    void telnumCreate(ResourceTelenum resourceTelenum,TelnumToLineGateway telnumToLineGateway);
 }

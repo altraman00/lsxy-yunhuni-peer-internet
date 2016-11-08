@@ -4,8 +4,13 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.resourceTelenum.dao.TelnumToLineGatewayDao;
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +20,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -30,9 +36,14 @@ import java.util.Map;
 public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLineGateway> implements TelnumToLineGatewayService{
     @Autowired
     TelnumToLineGatewayDao telnumToLineGatewayDao;
-
+    @Autowired
+    ResourceTelenumService resourceTelenumService;
     @Autowired
     LineGatewayService lineGatewayService;
+    @Autowired
+    LineGatewayToTenantService lineGatewayToTenantService;
+    @Autowired
+    LineGatewayToPublicService lineGatewayToPublicService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Override
@@ -176,4 +187,80 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         jdbcTemplate.update(sql);
     }
 
+    @Override
+    public void batchUpCall(String line, String... nums) {
+        if(nums.length==0) {
+            //获取该线路的全部号码
+            List<String> list = this.getTelnumByLineId(line);
+            //修改号码中的状态
+            for (int i = 0; i < list.size(); i++) {
+                upCalls(line,list.get(i));
+            }
+        }else if(nums.length>0){
+            for(int i=0;i<nums.length;i++){
+                upCalls(line,nums[i]);
+            }
+        }
+    }
+    private void upCalls(String line,String telnum){
+        Map<String, Long> map = this.getTelnumCall(telnum, null);
+        ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(telnum);
+        long isCalled = map.get("isCalled");
+        long isDialing = map.get("isDialing");
+        long isThrough = map.get("isThrough");
+        isCalled = isCalled>0?1:0;
+        isDialing = isDialing>0?1:0;
+        isThrough = isThrough>0?1:0;
+        if(line.equals(resourceTelenum.getLineId())){
+            resourceTelenum.setLineId("无");
+        }
+        resourceTelenum.setIsCalled(isCalled+ "");
+        resourceTelenum.setIsDialing(isDialing + "");
+        resourceTelenum.setIsThrough(isThrough + "");
+        resourceTelenumService.save(resourceTelenum);
+    }
+
+    @Override
+    public void modify(LineGateway lineGateway,String isThrough1,String isThrough2) {
+        lineGatewayService.save(lineGateway);
+        //如果线路可透传状况发生变化，则需要维护线路中号码的可透传情况
+        if("0".equals(isThrough1)&&"1".equals(isThrough2)){
+            //对透传进行处理
+            this.updateIsThrough(lineGateway.getId(),"0");
+            //更新号码的状态
+            this.batchUpCall(lineGateway.getId());
+        }
+    }
+
+    @Override
+    public void deleteLine(String id) {
+        LineGateway lineGateway = lineGatewayService.findById(id);
+        //删除线路
+        try {
+            lineGatewayService.delete(lineGateway);
+        } catch (Exception e) {
+            throw new RuntimeException("删除失败");
+        }
+        //删除线路号码关联关系表
+        this.deleteByLineId(lineGateway.getId());
+        //删除全局线路和归属线路
+        lineGatewayToTenantService.deleteLine(lineGateway.getId());
+        lineGatewayToPublicService.deleteLine(lineGateway.getId());
+        //更新号码的状态
+        this.batchUpCall(lineGateway.getId());
+    }
+
+    @Override
+    public void telnumDelete(String id, String[] ids,String[] idss) {
+        this.batchDelete(id,ids);
+        //更新号码的状态
+        this.batchUpCall(id,idss);
+    }
+
+    @Override
+    public void telnumCreate(ResourceTelenum resourceTelenum, TelnumToLineGateway telnumToLineGateway) {
+        resourceTelenumService.save(resourceTelenum);
+        //创建号码线路对象
+        this.save(telnumToLineGateway);
+    }
 }

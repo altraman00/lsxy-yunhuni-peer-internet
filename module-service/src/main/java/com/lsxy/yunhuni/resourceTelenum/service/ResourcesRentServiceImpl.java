@@ -56,8 +56,6 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     @Autowired
     ConsumeService consumeService;
     @Autowired
-    ResourcesRentService resourcesRentService;
-    @Autowired
     TelenumOrderService telenumOrderService;
     @Autowired
     TelenumOrderItemService telenumOrderItemService;
@@ -161,9 +159,9 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public void release(String id) {
-        ResourcesRent resourcesRent = resourcesRentService.findById(id);
+        ResourcesRent resourcesRent = this.findById(id);
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
-        resourcesRentService.save(resourcesRent);
+        this.save(resourcesRent);
         ResourceTelenum resourceTelenum =  resourcesRent.getResourceTelenum();
         resourceTelenum.setTenant(null);
         resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
@@ -191,7 +189,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             Date date = DateUtils.getLastTimeOfMonth(new Date());
             resourcesRent.setRentExpire(date);
             resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
-            resourcesRentService.save(resourcesRent);
+            this.save(resourcesRent);
         }
         //扣费
         Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
