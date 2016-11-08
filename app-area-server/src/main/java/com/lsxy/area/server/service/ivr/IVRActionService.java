@@ -431,18 +431,7 @@ public class IVRActionService {
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
-            Map<String, Object> params = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("res_id",state.getResId())
-                    .putIfNotEmpty("user_data",call_id)
-                    .put("areaId",state.getAreaId())
-                    .build();
-
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
-            try {
-                rpcCaller.invoke(sessionContext, rpcrequest);
-            } catch (Throwable e) {
-                logger.error("调用失败",e);
-            }
+            hangup(state.getResId(),call_id,state.getAreaId());
             return  false;
         }
         String resXML = null;
@@ -491,6 +480,7 @@ public class IVRActionService {
                     .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
             logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
@@ -498,6 +488,19 @@ public class IVRActionService {
         }
     }
 
+    private void hangup(String res_id,String call_id,String area_id){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("user_data",call_id)
+                .put("areaId",area_id)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
+    }
     /**
      * 返回对应的ivr根元素
      * @param root
