@@ -261,7 +261,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tel_number IN ("+innums+") ";
+        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tenant_id IS NOT NULL  AND obj.tel_number IN ("+innums+") ";
         if(StringUtils.isNotEmpty(tenantName)){
             sql += " AND  a.tenant_name LIKE '%"+tenantName+"%'";
         }
@@ -275,6 +275,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         pageSql += " limit "+start+","+pageSize+" ";
         //获取得到租户
         List<String> list = jdbcTemplate.queryForList(pageSql,String.class);
+        System.out.println(list);
         String sql2 = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") ";
         Query query2 = em.createNativeQuery(sql2,ResourceTelenum.class);
         List<ResourceTelenum> list2 = query2.getResultList();
@@ -283,7 +284,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             Map map = null;
             List<Map> list3= new ArrayList<>();
             for (int i = 0; i < list2.size(); i++) {
-                if(list.get(j).equals(list2.get(i).getTenant().getId())){
+                Tenant tenant = list2.get(i).getTenant();
+                if(tenant!=null&&list.get(j).equals(tenant.getId())){
                     if(map==null) {
                         map = new HashMap();
                         map.put("tenantId", list2.get(i).getTenant().getId());
@@ -295,8 +297,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                     list3.add(temp);
                 }
             }
-            map.put("numbers",list3);
-            result.add(map);
+            if(map!=null) {
+                map.put("numbers",list3);
+                result.add(map);
+            }
         }
         Page page =  new Page<>(start,total,pageSize,result);
         return page;
