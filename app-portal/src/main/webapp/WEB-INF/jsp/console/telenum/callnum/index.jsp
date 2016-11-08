@@ -99,7 +99,7 @@
                                                 <c:if test="${result.rentExpire.time<time.time}">
                                                     <div style="color: red" >过期</div>
                                                 </c:if>
-                                                <c:if test="${result.rentExpire.time>time.time}">正常</c:if>
+                                                <c:if test="${result.rentExpire.time==null||result.rentExpire.time>time.time}">正常</c:if>
                                             </td>
                                             <td class="text-center">
                                                 <c:if test="${result.resourceTelenum.isDialing==1||result.resourceTelenum.isThrough==1}">
@@ -428,7 +428,7 @@
                 phone: '',
                 place: ''
             },
-            isCall: ["✔", "✘"],
+            isCall: [ "✘","✔"],
             paystatus:0,
             orderby:0,
             shop: [],
@@ -632,14 +632,13 @@
                     for(var i=0;i<re.length;i++){
                         var d = {id:re[i].telnum.id,
                             phone: re[i].telnum.telNumber,
-                            call: re[i].telnum.isCalled,
-                            callout: (re[i].telnum.isDialing+re[i].telnum.isThrough)>0?1:0,
+                            call: re[i].telnum.isCalled>0?"✔":"✘",
+                            callout: (re[i].telnum.isDialing+re[i].telnum.isThrough)>0?"✔":"✘",
                             place: re[i].telnum.areaCode,
                             price:  re[i].amount
                         };
                         data.push(d);
                     }
-
                     var html = '';
                     for(var i =0 ; i<data.length; i++){
                         html +='<tr><td>'+data[i].phone+'</td><td class="text-center">'+data[i].call+'</td><td  class="text-center">'+data[i].callout+'</td><td class="text-center"><span class="text-center-l-fixed">'+data[i].place+'</span></td><td class="text-right">￥'+data[i].price+'</td></tr>'
@@ -671,8 +670,8 @@
                     for(var i=0;i<re.length;i++){
                         var d = {id:re[i].telnum.id,
                             phone: re[i].telnum.telNumber,
-                            call: re[i].telnum.isCalled,
-                            callout: (re[i].telnum.isDialing+re[i].telnum.isThrough)>0?1:0,
+                            call: re[i].telnum.isCalled>0?"✔":"✘",
+                            callout: (re[i].telnum.isDialing+re[i].telnum.isThrough)>0?"✔":"✘",
                             place: re[i].telnum.areaCode,
                             price:  re[i].amount
                         };

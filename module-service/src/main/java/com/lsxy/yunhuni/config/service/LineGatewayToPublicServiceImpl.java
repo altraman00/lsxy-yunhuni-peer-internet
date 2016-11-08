@@ -5,6 +5,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToPublicDao;
 import org.apache.commons.lang.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,8 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     LineGatewayToPublicDao lineGatewayToPublicDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    LineGatewayService lineGatewayService;
     @Override
     public BaseDaoInterface<LineGatewayToPublic, Serializable> getDao() {
         return this.lineGatewayToPublicDao;
@@ -113,5 +117,68 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     public void deleteLine(String line) {
         String sql =  " update  db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public  set deleted=1 where deleted=0 and line_id='"+line+"'  ";
         jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public void addPublic(String id) {
+        LineGateway lineGateway = lineGatewayService.findById(id);
+        //获取当前最大编号
+        int re2 = this.getMaxPriority();
+        re2++;
+        //新建关系
+        LineGatewayToPublic lineGatewayToPublic = new LineGatewayToPublic();
+        lineGatewayToPublic.setLineGateway(lineGateway);
+        lineGatewayToPublic.setPriority(re2);
+        this.save(lineGatewayToPublic);
+        //修改线路状态标识为加入全局
+        lineGateway.setIsPublicLine("1");
+        lineGatewayService.save(lineGateway);
+    }
+
+    @Override
+    public void removePublic(String id) {
+        LineGatewayToPublic lineGatewayToPublic = this.findById(id);
+        //删除线路关系
+        try {
+            this.delete(lineGatewayToPublic);
+        } catch (Exception e) {
+            throw new RuntimeException("删除失败");
+        }
+        //修改对应线路关系
+        LineGateway lineGateway = lineGatewayToPublic.getLineGateway();
+        if(lineGateway!=null){
+            lineGateway.setIsPublicLine("0");
+            lineGatewayService.save(lineGateway);
+        }
+        //修正优先级
+        int o3 = this.getMaxPriority();
+        if(o3!=lineGatewayToPublic.getPriority()){
+            int re = upPriority(lineGatewayToPublic.getPriority(),o3,null);
+            if(re==-1){
+                throw new RuntimeException("删除成功，修正失败，请手动修正");
+            }
+        }
+    }
+    @Override
+    public int upPriority(int o1,int o2,String line){
+        String flag = "+1";
+        int begin = -1;
+        int end = -1;
+        if(o1<o2){
+            begin = o1+1;
+            end = o2;
+            flag = "-1";
+        }else{
+            begin = o2;
+            end = o1-1;
+            flag = "+1";
+        }
+        String[] sql = new String[2];
+        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=priority"+flag+" WHERE deleted=0 AND priority BETWEEN   "+begin+" AND "+end+" ";
+        if(StringUtils.isNotEmpty(line)) {
+            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public SET priority=" + o2 + " WHERE deleted=0 AND id ='" + line + "' ";
+        }
+        int re = lineGatewayService.batchModify(sql);
+        return re;
     }
 }

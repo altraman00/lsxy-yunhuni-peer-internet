@@ -4,8 +4,6 @@ import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.config.vo.LineVo;
 import com.lsxy.app.oc.rest.config.vo.TelnumTEditVo;
 import com.lsxy.app.oc.rest.config.vo.TelnumTVo;
-import com.lsxy.app.oc.rest.config.vo.TelnumToLineGatewayBatchEditVo;
-import com.lsxy.app.oc.rest.message.MessageVo;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
@@ -33,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,11 +96,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourcesRent==null||StringUtils.isEmpty(resourcesRent.getId())){
             return RestResponse.failed("0000","号码和租户不存在对于关系");
         }
-        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
-        resourcesRentService.save(resourcesRent);
-        resourceTelenum.setTenant(null);
-        resourceTelenum.setStatus(0);
-        resourceTelenumService.save(resourceTelenum);
+        resourceTelenumService.release(id);
         return RestResponse.success("释放号码成功");
     }
     @ApiOperation(value = "修改号码")
@@ -158,40 +151,8 @@ public class ResourceTelenumController extends AbstractRestController {
             resourceTelenum.setTenant(tenant);
             resourceTelenum.setStatus(1);
         }
-        resourceTelenum = resourceTelenumService.save(resourceTelenum);
-
-        //只更改租户
-        if(tenantType != 0&&!isEditNum){
-            if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
-                ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
-                if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系
-                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
-                    resourcesRentService.save(resourcesRent);
-                }
-            }
-            createResurcesRent(tenant, resourceTelenum);
-        }else if(tenantType==0&& isEditNum){//只更改手机号码
-            //修改号码和租户关系，更新手机号码
-            ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
-            if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//存在旧的关系不用释放
-                resourcesRent.setResData(resourceTelenum.getTelNumber());
-                resourcesRentService.save(resourcesRent);
-            }
-            //修正线路原来的记录号码线路关系
-            telnumToLineGatewayService.updateTelnum(telnum1,telnumTVo.getTelNumber());
-        }else if(tenantType!=0&&isEditNum){//同时修改租户和号码
-            if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
-                ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
-                if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系
-                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
-                    resourcesRentService.save(resourcesRent);
-                }
-            }
-            createResurcesRent(tenant, resourceTelenum);
-            //修正线路原来的记录号码线路关系
-            telnumToLineGatewayService.updateTelnum(telnum1,telnumTVo.getTelNumber());
-        }
-        return RestResponse.success("释放号码成功");
+        resourceTelenumService.editNum(resourceTelenum,tenantType,isEditNum,tenant,telnum1,telnumTVo.getTelNumber());
+        return RestResponse.success("修改号码成功");
     }
     @ApiOperation(value = "新建号码")
     @RequestMapping(value = "/new",method = RequestMethod.POST)
@@ -233,8 +194,12 @@ public class ResourceTelenumController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","新增线路失败");
         }
-        resourceTelenum.setTenant(tenant);//绑定租户
-        resourceTelenum.setStatus(0);//设置状态可用
+        if(tenant!=null) {
+            resourceTelenum.setTenant(tenant);//绑定租户
+            resourceTelenum.setStatus(1);//设置被租用
+        }else{
+            resourceTelenum.setStatus(0);//设置没被租用
+        }
         resourceTelenum.setUsable("1");//设置可用
         //如果绑定线路的话，需要为号码设置区号
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())) {
@@ -244,23 +209,7 @@ public class ResourceTelenumController extends AbstractRestController {
             }
             resourceTelenum.setAreaId(lineGateway.getAreaId());
         }
-        //创建号码
-        resourceTelenum = resourceTelenumService.save(resourceTelenum);
-        //创建线路号码关联
-        if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
-            //判断线路号码是否已关联，提示用户自己去更新；未关联，直接产生关联
-            TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),lineGateway.getId());
-            if(telnumToLineGateway!=null && StringUtils.isNotEmpty(telnumToLineGateway.getId())){
-                RestResponse.success("创建成功,号码和线路关系已存在");
-            }else{
-                telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(), lineGateway.getId(), resourceTelenum.getIsDialing(), resourceTelenum.getIsCalled(),resourceTelenum.getIsThrough(), resourceTelenum.getType());
-                telnumToLineGatewayService.save(telnumToLineGateway);
-            }
-        }
-        //判断是否需要添加号码租户的关系
-        if(tenant!=null &&StringUtils.isNotEmpty(tenant.getId())){
-            createResurcesRent(tenant, resourceTelenum);
-        }
+        resourceTelenumService.createNum(resourceTelenum,lineGateway,tenant);
         return RestResponse.success("创建成功");
     }
     @ApiOperation(value = "根据id查询号码")
@@ -281,16 +230,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
             return RestResponse.failed("0000","线路不存在");
         }
-        //删除号码
-        resourceTelenumService.delete(resourceTelenum);
-        //释放号码存在的关系
-        ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
-        if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){
-            resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
-            resourcesRentService.save(resourcesRent);
-        }
-        //删除该号码的号码线路关系
-        telnumToLineGatewayService.deleteByTelnum(resourceTelenum.getTelNumber());
+        resourceTelenumService.delete(id);
         return RestResponse.success("删除成功");
     }
     @ApiOperation(value = "启用号码")
@@ -380,23 +320,6 @@ public class ResourceTelenumController extends AbstractRestController {
         }
         Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,null,resourceTelenum.getTelNumber(),null,null,null);
         return RestResponse.success(page);
-    }
-
-    /**
-     * 新增号码租户关系
-     * @param tenant
-     * @param resourceTelenum
-     */
-    private void createResurcesRent(Tenant tenant, ResourceTelenum resourceTelenum) {
-        ResourcesRent resourcesRent = new ResourcesRent();
-        resourcesRent.setTenant(tenant);
-        resourcesRent.setResourceTelenum(resourceTelenum);
-        resourcesRent.setResName("号码资源");
-        resourcesRent.setResData(resourceTelenum.getTelNumber());
-        resourcesRent.setResType("1");//号码资源
-        resourcesRent.setRentDt(new Date());
-        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);//没有在使用，但号码属于租户
-        resourcesRentService.save(resourcesRent);
     }
 
     private String vailVo(TelnumTEditVo telnumTVo,boolean isNull){

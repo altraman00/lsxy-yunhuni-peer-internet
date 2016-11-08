@@ -95,14 +95,8 @@ public class ResourcesRentController extends AbstractRestController{
      */
     @RequestMapping("/release")
     public RestResponse release(String id)   {
-        ResourcesRent resourcesRent = resourcesRentService.findById(id);
-        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
-        resourcesRentService.save(resourcesRent);
-        ResourceTelenum resourceTelenum =  resourcesRent.getResourceTelenum();
-        resourceTelenum.setTenant(null);
-        resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
-        resourceTelenumService.save(resourceTelenum);
-        return RestResponse.success(resourcesRent);
+        resourcesRentService.release(id);
+        return RestResponse.success("释放成功");
     }
     @RequestMapping("/by_app/{appId}")
     public RestResponse getByAppId(@PathVariable String appId){
@@ -159,8 +153,8 @@ public class ResourcesRentController extends AbstractRestController{
      */
     @RequestMapping("/telnum/order/play/{id}" )
     public RestResponse telnumPlay(@PathVariable String id) {
-        TelenumOrder temp = telenumOrderService.findById(id);
         Tenant tenant = getCurrentAccount().getTenant();
+        TelenumOrder temp = telenumOrderService.findById(id);
         if(temp!=null&&StringUtils.isNotEmpty(temp.getId())&&tenant.getId().equals(temp.getTenantId())){
             if(temp.getStatus()==TelenumOrder.status_await) {
                 //余额正数部分
@@ -168,29 +162,7 @@ public class ResourcesRentController extends AbstractRestController{
                 if(billing.getBalance().compareTo(temp.getAmount())==-1) {
                     return RestResponse.failed("-1","余额不足");
                 }
-                //更新记录
-                temp.setStatus(TelenumOrder.Status_success);
-                telenumOrderService.save(temp);
-                List<TelenumOrderItem> list = telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(), temp.getId());
-                for (int i = 0; i < list.size(); i++) {
-                    ResourceTelenum resourceTelenum = list.get(i).getTelnum();
-                    resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
-                    resourceTelenum.setTenant(tenant);
-                    resourceTelenum = resourceTelenumService.save(resourceTelenum);
-                    ResourcesRent resourcesRent = new ResourcesRent();
-                    resourcesRent.setTenant(tenant);
-                    resourcesRent.setResourceTelenum(resourceTelenum);
-                    resourcesRent.setResData(resourceTelenum.getTelNumber());
-                    resourcesRent.setResName("号码资源");
-                    resourcesRent.setResType("1");
-                    Date date = DateUtils.getLastTimeOfMonth(new Date());
-                    resourcesRent.setRentExpire(date);
-                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
-                    resourcesRentService.save(resourcesRent);
-                }
-                //扣费
-                Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
-                consumeService.consume(consume);
+                resourcesRentService.telnumPlay(id,tenant);
                 return RestResponse.success("支付成功");
             }else{
                 return RestResponse.failed("0000","订单状态不是未支付");
@@ -205,19 +177,12 @@ public class ResourcesRentController extends AbstractRestController{
     @RequestMapping("/telnum/order/delete/{id}" )
     public RestResponse telnumDelete(@PathVariable String id) {
         TelenumOrder temp = telenumOrderService.findById(id);
-        String tenantId = getCurrentAccount().getTenant().getId();
-        if(temp!=null&&StringUtils.isNotEmpty(temp.getId())&&tenantId.equals(temp.getTenantId())){
+        Tenant tenant = getCurrentAccount().getTenant();
+        if(temp!=null&&StringUtils.isNotEmpty(temp.getId())&&tenant.getId().equals(temp.getTenantId())){
             if(temp.getStatus()==TelenumOrder.Status_success) {
                 return RestResponse.failed("0000","成功订单无法删除");
             }
-            temp.setStatus(TelenumOrder.status_fail);
-            telenumOrderService.save(temp);
-            List<TelenumOrderItem> list =  telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenantId,temp.getId());
-            for(int i=0;i<list.size();i++){
-                ResourceTelenum resourceTelenum = list.get(i).getTelnum();
-                resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
-                resourceTelenumService.save(resourceTelenum);
-            }
+            resourcesRentService.telnumDelete(id,tenant);
             return RestResponse.success("取消成功");
         }else {
             return RestResponse.failed("0000", "id无对应订单");
@@ -230,8 +195,8 @@ public class ResourcesRentController extends AbstractRestController{
      */
     @RequestMapping("/telnum/order/new" )
     public RestResponse telnumNew(String ids) {
-        String tenantId = getCurrentAccount().getTenant().getId();
-        TelenumOrder temp = telenumOrderService.findByTenantIdAndStatus(tenantId,TelenumOrder.status_await);
+        Tenant tenant = getCurrentAccount().getTenant();
+        TelenumOrder temp = telenumOrderService.findByTenantIdAndStatus(tenant.getId(),TelenumOrder.status_await);
         if(temp!=null&&StringUtils.isNotEmpty(temp.getId())){
             return RestResponse.failed("0000","存在未支付订单");
         }
@@ -246,47 +211,7 @@ public class ResourcesRentController extends AbstractRestController{
                 return RestResponse.failed("0000","订单中有号码不存在");
             }
         }
-        TelenumOrder telenumOrder = new TelenumOrder();
-        telenumOrder.setTenantId(tenantId);
-        telenumOrder.setStatus(TelenumOrder.status_await);
-        telenumOrder = telenumOrderService.save(telenumOrder);
-        List<String> list = new ArrayList();
-        BigDecimal bigDecimal = new BigDecimal(0);
-        for(int i=0;i<numIds.length;i++){
-            ResourceTelenum resourceTelenum = resourceTelenumService.findById(numIds[i]);
-            if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
-                telenumOrder.setStatus(TelenumOrder.status_fail);
-                return RestResponse.failed("0000","订单中有号码不存在");
-            }
-            if(resourceTelenum.getStatus()==ResourceTelenum.STATUS_FREE) {
-                TelenumOrderItem telenumOrderItem = new TelenumOrderItem();
-                telenumOrderItem.setTenantId(tenantId);
-                telenumOrderItem.setAmount(resourceTelenum.getAmount());
-                telenumOrderItem.setTelnumOrderId(telenumOrder.getId());
-                telenumOrderItem.setTelnum(resourceTelenum);
-                telenumOrderItemService.save(telenumOrderItem);
-                list.add(numIds[i]);
-                bigDecimal=bigDecimal.add(resourceTelenum.getAmount());
-            }else{
-                telenumOrder.setStatus(TelenumOrder.status_fail);
-                clear(list);
-                return RestResponse.failed("0000","订单中有号码不存在");
-            }
-        }
-        telenumOrder.setAmount(bigDecimal);
-        Calendar c = Calendar.getInstance();
-        telenumOrder.setCreateTime(c.getTime());
-        c.add(Calendar.DAY_OF_MONTH, 1);
-        telenumOrder.setDeadline(c.getTime());
-        telenumOrder = telenumOrderService.save(telenumOrder);
-        return RestResponse.success(telenumOrder);
-    }
-    //释放号码
-    private void clear(List<String> list){
-        for(int i=0;i<list.size();i++){
-            ResourceTelenum resourceTelenum = resourceTelenumService.findById(list.get(i));
-            resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
-            resourceTelenumService.save(resourceTelenum);
-        }
+        resourcesRentService.telnumNew(tenant,numIds);
+        return RestResponse.success("创建订单成功");
     }
 }

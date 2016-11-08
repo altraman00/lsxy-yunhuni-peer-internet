@@ -211,7 +211,21 @@ public class ResourceTelenum extends IdEntity{
         this.usable = "1";//可用
         this.type = "1";//采购线路
     }
-
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount,String isCalled,String isDialing,String isThrough,String areaId) {
+        this.operator = operator;
+        this.areaCode = areaCode;
+        this.amount = new BigDecimal(amount);
+        this.callUri = callUri;
+        this.telNumber = telNumber;
+        this.lineId = lineId;
+        this.status =0;//未被租用
+        this.usable = "1";//可用
+        this.type = "1";//采购线路
+        this.isCalled = isCalled;
+        this.isDialing = isDialing;
+        this.isThrough = isThrough;
+        this.areaId = areaId;
+    }
     public ResourceTelenum() {
     }
 }
