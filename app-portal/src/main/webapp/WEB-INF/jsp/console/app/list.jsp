@@ -178,7 +178,7 @@
                 <div id="selectNewIvr" style="display: none">
                     <div class="input text-center">
                         <div class="info">
-                            若您选择开通IVR功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定
+                            若您选择开通自定义IVR或者云呼叫中心功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定
                         </div>
                     </div>
                     <div class="phone-table">

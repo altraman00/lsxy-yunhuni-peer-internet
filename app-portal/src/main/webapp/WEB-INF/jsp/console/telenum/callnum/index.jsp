@@ -56,7 +56,7 @@
                             <i class=" iconfont icon-menu-right text-active"></i>
                         </a></div>
                         <div class="wrapper header">
-                            <span class="border-left">&nbsp;呼入号码</span>
+                            <span class="border-left">&nbsp;我的号码</span>
                         </div>
                         <section class="scrollable wrapper w-f">
                             <section>
@@ -495,6 +495,10 @@
                 window.location.href=ctx+"/console/telenum/callnum/index";
             },
             payOrder:function(){
+//                var id = $('#orderid').html();
+//                if(id!=''){
+//                    showtoast("您有未支付的订单，请完成支付后，再进行号码租用");
+//                }
                 $('#call-modal').modal('hide');
                 var ids = "";
                 for(var i = 0;i<this.shop.length;i++){
@@ -507,12 +511,18 @@
                 //立即下单，下单成功 ，获取订单数据，
                 var params = {'${_csrf.parameterName}':'${_csrf.token}',"ids":ids};
                 ajaxsync("${ctx}/console/telenum/callnum/telnum/order/new",params,function(result) {
-                    var re = result.data;
-                    $('#orderid').html(re.id);
-                    $('#order_play_cost').html(getAmont(re.amount));
-                    $('#pay-modal').modal('show');
-                    //回调订单数据
-                    noPay();
+                    if(result.success){
+                        showtoast("创建订单成功");
+                        var re = result.data;
+                        $('#orderid').html(re.id);
+                        $('#order_play_cost').html(getAmont(re.amount));
+                        $('#pay-modal').modal('show');
+                        //回调订单数据
+                        noPay();
+                    }else{
+                        showtoast(result.errorMsg)
+                    }
+
 
                 });
             },
@@ -547,7 +557,13 @@
                 if(this.serach.place==-1){
                     this.serach.place='';
                 }
-                var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:nowPage,pageSize:listRows,telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:''};
+                var order = '';
+                if(this.orderby==3){
+                    order = "amount:1";
+                }else if(this.orderby==4){
+                    order = "amount:0";
+                }
+                var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:nowPage,pageSize:listRows,telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:order};
                 var self =this;
                 ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
                     var re = result.data.result;
@@ -581,8 +597,21 @@
 
     //分页
     function modalPage() {
+        if(vue.serach.name==-1){
+            vue.serach.name='';
+        }
+        if(vue.serach.phone==-1){
+            vue.serach.phone='';
+        }
+        if(vue.serach.place==-1){
+            vue.serach.place='';
+        }
+        var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:1,pageSize:1,telnum:vue.serach.name,type:vue.serach.phone,areaCode:vue.serach.place,order:''};
         //获取数据总数
-        var count = 11;
+        var count = 0;
+        ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
+            count = result.data.totalCount;
+        });
         //每页显示数量
         var listRow = 5;
         //显示多少个分页按钮
@@ -648,7 +677,7 @@
                     $('#pay-modal').modal('show');
                 }
             }else{
-                alert("获取订单信息错误"+data.errorMsg);
+                showtoast("获取订单信息错误"+data.errorMsg);
             }
         },"get");
 
@@ -685,7 +714,7 @@
                     $('#nopaid-table').html(html);
                 }
             }else{
-                alert("获取订单信息错误"+data.errorMsg);
+                showtoast("获取订单信息错误"+data.errorMsg);
             }
         },"get");
     }
@@ -746,7 +775,7 @@
         bootbox.dialog({
                     title: "提示",
                     message: '<div class="row">  ' +
-                    '<div class="col-md-12 text-center">您确认取消此订单吗？</div>  </div>',
+                    '<div class="col-md-12 text-center">取消订单后，选择的号码将会被系统收回，请确认您此次的操作？</div>  </div>',
                     buttons: {
                         success: {
                             label: "确认",

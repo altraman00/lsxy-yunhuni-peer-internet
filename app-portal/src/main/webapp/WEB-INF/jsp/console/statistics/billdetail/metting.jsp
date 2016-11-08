@@ -119,7 +119,7 @@
                                                 <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
-                                                <th>会议标识ID</th>
+                                                <th>会议标识</th>
                                                 <th>呼叫时间</th>
                                                 <th>参与者</th>
                                                 <th>参与类型</th>
