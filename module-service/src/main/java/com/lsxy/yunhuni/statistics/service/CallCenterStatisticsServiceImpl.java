@@ -10,12 +10,15 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.model.DayStatics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import com.lsxy.yunhuni.statistics.dao.CallCenterStatisticsDao;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -43,6 +46,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
     AppService appService;
     @Autowired
     RedisCacheService redisCacheService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public BaseDaoInterface<CallCenterStatistics, Serializable> getDao() {
@@ -105,8 +110,16 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         if(lastStatisticsDate.getTime() < date.getTime()){
             Date startDate = DateUtils.nextDate(lastStatisticsDate);
             Date endDate = DateUtils.nextDate(startDate);
-            //TODO 获取统计日期内的数据
-            CallCenterStatistics current = new CallCenterStatistics(tenantId,null,startDate,0L, 0L,0L,0L,0L,0L,0L);
+            // 获取统计日期内的数据
+            CallCenterStatistics statistics = statistics(tenantId, null, startDate, endDate);
+            CallCenterStatistics current = new CallCenterStatistics(tenantId,null,startDate,
+                    lastStatistics.getCallIn() + statistics.getCallIn(),
+                    lastStatistics.getCallInSuccess() + statistics.getCallInSuccess(),
+                    lastStatistics.getCallOut() + statistics.getCallOut(),
+                    lastStatistics.getCallOutSuccess() + statistics.getCallOutSuccess(),
+                    lastStatistics.getToManualSuccess() + statistics.getToManualSuccess(),
+                    lastStatistics.getQueueNum() + statistics.getQueueNum(),
+                    lastStatistics.getQueueDuration() + statistics.getQueueDuration());
             this.save(current);
             tenantStatistics(current,date);
         }
@@ -120,23 +133,48 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         if(lastStatisticsDate.getTime() < date.getTime()){
             Date startDate =  DateUtils.nextDate(lastStatisticsDate);
             Date endDate = DateUtils.nextDate(startDate);
-            //TODO 获取统计日期内的数据
-
-            CallCenterStatistics current = new CallCenterStatistics(tenantId,null,startDate,0L, 0L,0L,0L,0L,0L,0L);
+            // 获取统计日期内的数据
+            CallCenterStatistics statistics = statistics(null, appId, startDate, endDate);
+            CallCenterStatistics current = new CallCenterStatistics(tenantId,null,startDate,
+                    lastStatistics.getCallIn() + statistics.getCallIn(),
+                    lastStatistics.getCallInSuccess() + statistics.getCallInSuccess(),
+                    lastStatistics.getCallOut() + statistics.getCallOut(),
+                    lastStatistics.getCallOutSuccess() + statistics.getCallOutSuccess(),
+                    lastStatistics.getToManualSuccess() + statistics.getToManualSuccess(),
+                    lastStatistics.getQueueNum() + statistics.getQueueNum(),
+                    lastStatistics.getQueueDuration() + statistics.getQueueDuration());
             this.save(current);
             appStatistics(current,date);
         }
     }
 
-    @Override
-    public CallCenterStatistics getStatisticsByTenantId(String tenantId, Date date) {
-        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
-        Date dt = DateUtils.parseDate(dateStr,"yyyyMMdd");
-        CallCenterStatistics dayStatistics = callCenterStatisticsDao.findFirstByTenantIdAndDtAndAppIdIsNull(tenantId,dt);
-        if(dayStatistics==null){
-            dayStatistics = callCenterStatisticsDao.findFirstByTenantIdAndDtLessThanAndAppIdIsNullOrderByDtDesc(tenantId,dt);
+
+    private CallCenterStatistics statistics(String tenantId,String appId,Date startDate,Date endDate){
+        String sql = "SELECT SUM(CASE WHEN c.type='1' THEN 1 ELSE 0) AS callIn, SUM(CASE WHEN (c.type='1' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0) AS callInSuccess, " +
+                "SUM(CASE WHEN c.type='2' THEN 1 ELSE 0) AS callOut, SUM(CASE WHEN (c.type='2' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0) AS callOutSuccess, " +
+                "SUM(CASE WHEN c.to_manual_result=1 THEN 1 ELSE 0) AS toManualSuccess, " +
+                "SUM(CASE WHEN c.to_manual_time IS NOT NULL THEN 1 ELSE 0) AS queueNum,SUM(c.to_manual_time) AS queueDuration " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_call_center c WHERE 1=1 ";
+        if(startDate != null){
+            sql = sql + "AND c.end_time >= '" + DateUtils.formatDate(startDate) + "' ";
         }
-        return dayStatistics;
+        if(endDate != null){
+            sql = sql + "AND c.end_time < '" + DateUtils.formatDate(endDate) + "' ";
+        }
+        if(StringUtils.isNotBlank(tenantId)){
+            sql = sql + "AND c.tenant_id = '" + tenantId + "' ";
+        }
+        if(StringUtils.isNotBlank(appId)){
+            sql = sql + "AND c.app_id = '" + appId + "' ";
+        }
+        Map map = jdbcTemplate.queryForMap(sql);
+        CallCenterStatistics current = new CallCenterStatistics();
+        try {
+            BeanUtils.copyProperties2(current,map,false);
+        } catch (Exception e) {
+            logger.error("复制对象属性出错",e);
+        }
+        return current;
     }
 
     @Override
@@ -147,6 +185,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         incrIntoRedis(tenantKey,callCenterStatistics);
         incrIntoRedis(appKey,callCenterStatistics);
     }
+
 
     private void incrIntoRedis(String key,CallCenterStatistics ccStatistics){
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
@@ -162,20 +201,6 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         }
     }
 
-
-
-    private CallCenterStatistics getIncrFromRedisByTenantId(String tenantId,Date date){
-        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
-        String tenantKey = CC_STATISTICS_TENANT_PREFIX + tenantId + "_" + dateStr;
-        return getIncrFromRedis(tenantKey);
-    }
-
-    private CallCenterStatistics getIncrFromRedisByAppId(String appId,Date date){
-        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
-        String tenantKey = CC_STATISTICS_APP_PREFIX + appId + "_" + dateStr;
-        return getIncrFromRedis(tenantKey);
-    }
-
     private CallCenterStatistics getIncrFromRedis(String key){
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
         Map entries = hashOps.entries();
@@ -188,5 +213,170 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         return current;
     }
 
+    @Override
+    public CallCenterStatistics getStatisticsByTenantId(String tenantId, Date date) {
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        Date dt = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        CallCenterStatistics dayStatistics = callCenterStatisticsDao.findFirstByTenantIdAndDtAndAppIdIsNull(tenantId,dt);
+        if(dayStatistics==null){
+            dayStatistics = callCenterStatisticsDao.findFirstByTenantIdAndDtLessThanAndAppIdIsNullOrderByDtDesc(tenantId,dt);
+        }
+        return dayStatistics;
+    }
+
+    @Override
+    public CallCenterStatistics getCurrentStatisticsByTenantId(String tenantId) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        Date preDate = DateUtils.getPreDate(date);
+        CallCenterStatistics statistics = this.getStatisticsByTenantId(tenantId,preDate);
+        if(statistics == null){
+            statistics = getIncrFromRedisByTenantId(tenantId,date);
+        }else{
+            statistics = getTenantStatistics(statistics,date);
+        }
+        return statistics;
+    }
+
+    private CallCenterStatistics getTenantStatistics(CallCenterStatistics statistics, Date date) {
+        Date dt = statistics.getDt();
+        if(dt.getTime() < date.getTime()){
+            String tenantId = statistics.getTenantId();
+            Date nextDate = DateUtils.nextDate(dt);
+            CallCenterStatistics incr = getIncrFromRedisByTenantId(tenantId, nextDate);
+            CallCenterStatistics nextDayStatics = new CallCenterStatistics(tenantId,null,nextDate,
+                    statistics.getCallIn() + incr.getCallIn(),
+                    statistics.getCallInSuccess() + incr.getCallInSuccess(),
+                    statistics.getCallOut() + incr.getCallOut(),
+                    statistics.getCallOutSuccess() + incr.getCallOutSuccess(),
+                    statistics.getToManualSuccess() + incr.getToManualSuccess(),
+                    statistics.getQueueNum() + incr.getQueueNum(),
+                    statistics.getQueueDuration() + incr.getQueueDuration());
+            return getTenantStatistics(nextDayStatics, date);
+        }else{
+            return statistics;
+        }
+    }
+
+
+    private CallCenterStatistics getIncrFromRedisByTenantId(String tenantId,Date date){
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        String tenantKey = CC_STATISTICS_TENANT_PREFIX + tenantId + "_" + dateStr;
+        return getIncrFromRedis(tenantKey);
+    }
+
+    @Override
+    public CallCenterStatistics getStatisticsByAppId(String appId, Date date) {
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        Date dt = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        CallCenterStatistics dayStatistics = callCenterStatisticsDao.findFirstByAppIdAndDt(appId,dt);
+        if(dayStatistics==null){
+            dayStatistics = callCenterStatisticsDao.findFirstByAppIdAndDtLessThanOrderByDtDesc(appId,dt);
+        }
+        return dayStatistics;
+    }
+
+
+    private CallCenterStatistics getIncrFromRedisByAppId(String appId,Date date){
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        String tenantKey = CC_STATISTICS_APP_PREFIX + appId + "_" + dateStr;
+        return getIncrFromRedis(tenantKey);
+    }
+
+    @Override
+    public CallCenterStatistics getCurrentStatisticsByAppId(String appId) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        Date preDate = DateUtils.getPreDate(date);
+        CallCenterStatistics statistics = this.getStatisticsByAppId(appId,preDate);
+        if(statistics == null){
+            statistics = getIncrFromRedisByAppId(appId,date);
+        }else{
+            statistics = getAppStatistics(statistics,date);
+        }
+        return statistics;
+    }
+
+    private CallCenterStatistics getAppStatistics(CallCenterStatistics statistics, Date date) {
+        Date dt = statistics.getDt();
+        if(dt.getTime() < date.getTime()){
+            String appId = statistics.getAppId();
+            Date nextDate = DateUtils.nextDate(dt);
+            CallCenterStatistics incr = getIncrFromRedisByAppId(appId, nextDate);
+            CallCenterStatistics nextDayStatics = new CallCenterStatistics(statistics.getTenantId(),appId,nextDate,
+                    statistics.getCallIn() + incr.getCallIn(),
+                    statistics.getCallInSuccess() + incr.getCallInSuccess(),
+                    statistics.getCallOut() + incr.getCallOut(),
+                    statistics.getCallOutSuccess() + incr.getCallOutSuccess(),
+                    statistics.getToManualSuccess() + incr.getToManualSuccess(),
+                    statistics.getQueueNum() + incr.getQueueNum(),
+                    statistics.getQueueDuration() + incr.getQueueDuration());
+            return getAppStatistics(nextDayStatics, date);
+        }else{
+            return statistics;
+        }
+    }
+
+    @Override
+    public CallCenterStatistics getIncStaticsOfCurrentMonthByTenantId(String tenantId) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        Date firstTimeOfMonth = DateUtils.getFirstTimeOfMonth(date);
+        CallCenterStatistics result;
+        if(date.equals(firstTimeOfMonth)){
+            result = getIncrFromRedisByTenantId(tenantId,date);
+        }else{
+            CallCenterStatistics current = getCurrentStatisticsByTenantId(tenantId);
+            Date preMonthDate = DateUtils.getPreDate(firstTimeOfMonth);
+            CallCenterStatistics preMonth = this.getStatisticsByTenantId(tenantId,preMonthDate);
+            if(current != null && preMonth != null){
+                preMonth = getTenantStatistics(preMonth,preMonthDate);
+                result = new CallCenterStatistics(tenantId,null,date,
+                        current.getCallIn() - preMonth.getCallIn(),
+                        current.getCallInSuccess() - preMonth.getCallInSuccess(),
+                        current.getCallOut() - preMonth.getCallOut(),
+                        current.getCallOutSuccess() - preMonth.getCallOutSuccess(),
+                        current.getToManualSuccess() - preMonth.getToManualSuccess(),
+                        current.getQueueNum() - preMonth.getQueueNum(),
+                        current.getQueueDuration() - preMonth.getQueueDuration());
+            }else{
+                result = getIncrFromRedisByTenantId(tenantId,date);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public CallCenterStatistics getIncStaticsOfCurrentMonthByAppId(String AppId) {
+        Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+        Date firstTimeOfMonth = DateUtils.getFirstTimeOfMonth(date);
+        CallCenterStatistics result;
+        if(date.equals(firstTimeOfMonth)){
+            result = getIncrFromRedisByAppId(AppId,date);
+        }else{
+            CallCenterStatistics current = getCurrentStatisticsByAppId(AppId);
+            Date preMonthDate = DateUtils.getPreDate(firstTimeOfMonth);
+            CallCenterStatistics preMonth = this.getStatisticsByAppId(AppId,preMonthDate);
+            if(current != null && preMonth != null){
+                preMonth = getAppStatistics(preMonth,preMonthDate);
+                result = new CallCenterStatistics(preMonth.getTenantId(),AppId,date,
+                        current.getCallIn() - preMonth.getCallIn(),
+                        current.getCallInSuccess() - preMonth.getCallInSuccess(),
+                        current.getCallOut() - preMonth.getCallOut(),
+                        current.getCallOutSuccess() - preMonth.getCallOutSuccess(),
+                        current.getToManualSuccess() - preMonth.getToManualSuccess(),
+                        current.getQueueNum() - preMonth.getQueueNum(),
+                        current.getQueueDuration() - preMonth.getQueueDuration());
+            }else{
+                result = getIncrFromRedisByAppId(AppId,date);
+            }
+        }
+        return result;
+    }
 
 }

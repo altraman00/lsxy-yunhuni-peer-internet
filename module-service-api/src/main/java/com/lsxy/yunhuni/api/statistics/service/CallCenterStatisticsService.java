@@ -19,4 +19,14 @@ public interface CallCenterStatisticsService extends BaseService<CallCenterStati
     CallCenterStatistics getStatisticsByTenantId(String tenantId, Date date);
 
     void incrIntoRedis(CallCenterStatistics callCenterStatistics,Date date);
+
+    CallCenterStatistics getCurrentStatisticsByTenantId(String tenantId);
+
+    CallCenterStatistics getStatisticsByAppId(String appId, Date date);
+
+    CallCenterStatistics getCurrentStatisticsByAppId(String appId);
+
+    CallCenterStatistics getIncStaticsOfCurrentMonthByTenantId(String tenantId);
+
+    CallCenterStatistics getIncStaticsOfCurrentMonthByAppId(String AppId);
 }

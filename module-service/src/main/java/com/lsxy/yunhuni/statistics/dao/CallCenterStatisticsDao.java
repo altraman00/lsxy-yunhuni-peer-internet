@@ -18,4 +18,8 @@ public interface CallCenterStatisticsDao extends BaseDaoInterface<CallCenterStat
     CallCenterStatistics findFirstByTenantIdAndDtAndAppIdIsNull(String tenantId, Date dt);
 
     CallCenterStatistics findFirstByTenantIdAndDtLessThanAndAppIdIsNullOrderByDtDesc(String tenantId, Date dt);
+
+    CallCenterStatistics findFirstByAppIdAndDt(String appId, Date dt);
+
+    CallCenterStatistics findFirstByAppIdAndDtLessThanOrderByDtDesc(String appId, Date dt);
 }
