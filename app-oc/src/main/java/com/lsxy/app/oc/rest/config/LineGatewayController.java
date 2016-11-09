@@ -194,6 +194,35 @@ public class LineGatewayController extends AbstractRestController {
         }
         //删除线路
         telnumToLineGatewayService.deleteLine(lineGateway.getId());
+        //删除线路号码关联关系表并更新号码状况
+        List<TelnumToLineGateway> list = telnumToLineGatewayService.getListByLine(lineGateway.getId());
+        for(int i=0;i<list.size();i++){
+            TelnumToLineGateway telnumToLineGateway = list.get(i);
+            telnumToLineGatewayService.delete(telnumToLineGateway);
+            //是归属线路
+            if("1".equals(telnumToLineGateway.getIsDialing())||"1".equals(telnumToLineGateway.getIsCalled())){
+                ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
+                //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                    //删除归属线路关系
+                    resourceTelenum1.setLine(null);
+                    //设置号码不可主叫不可被叫
+                    resourceTelenum1.setIsCalled("0");
+                    resourceTelenum1.setIsDialing("0");
+                    resourceTelenumService.save(resourceTelenum1);
+                }
+            }
+            //是透传线路
+            if("1".equals(telnumToLineGateway.getIsThrough())){
+                //获取是否还拥有可透传的号码
+                ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
+                //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                    resourceTelenum1.setIsThrough((telnumToLineGateway.getTelNumber())+"");
+                    resourceTelenumService.save(resourceTelenum1);
+                }
+            }
+        }
         return RestResponse.success("删除成功");
     }
     @ApiOperation(value = "线路配套号码-列表")
@@ -222,6 +251,8 @@ public class LineGatewayController extends AbstractRestController {
         Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,id,number,isDialing,isCalled,isThrough);
         return RestResponse.success(page);
     }
+
+
     @ApiOperation(value = "线路配套号码-批量删除")
     @RequestMapping(value = "/telnum/{id}",method = RequestMethod.DELETE)
     public RestResponse telnumDelete(
@@ -231,20 +262,46 @@ public class LineGatewayController extends AbstractRestController {
         if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
             return RestResponse.failed("0000","线路不存在");
         }
-        String[] idss = new String[ids.getIds().length];
         for(int i=0;i<ids.getIds().length;i++){
-            TelnumToLineGateway telnumToLineGateway= telnumToLineGatewayService.findById(ids.getIds()[i]);
-            if(telnumToLineGateway==null||StringUtils.isEmpty(telnumToLineGateway.getId())){
-                return RestResponse.failed("",ids.getIds()[i]+"无对应号码，删除失败");
+            //获取号码线路关系
+            TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findById(ids.getIds()[i]);
+            if(telnumToLineGateway!=null&&StringUtils.isNotEmpty(telnumToLineGateway.getId())){//如果号码存在
+                //删除号码线路关系
+                try {
+                    telnumToLineGatewayService.delete(telnumToLineGateway);
+                } catch (Exception e) {
+                    //删除失败
+                    return RestResponse.failed("0000","第["+(i+1)+"]个删除失败");
+                }
+                //是归属线路
+                if("1".equals(telnumToLineGateway.getIsDialing())||"1".equals(telnumToLineGateway.getIsCalled())){
+                    ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
+                    //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                    if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                        //删除归属线路关系
+                        resourceTelenum1.setLine(null);
+                        //设置号码不可主叫不可被叫
+                        resourceTelenum1.setIsCalled("0");
+                        resourceTelenum1.setIsDialing("0");
+                        resourceTelenumService.save(resourceTelenum1);
+                    }
+                }
+                //是透传线路
+                if("1".equals(telnumToLineGateway.getIsThrough())){
+                    //获取是否还拥有可透传的号码
+                    ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
+                    //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                    if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                        resourceTelenum1.setIsThrough(telnumToLineGatewayService.getIsThrough(telnumToLineGateway.getTelNumber())+"");
+                        resourceTelenumService.save(resourceTelenum1);
+                    }
+                }
             }
-            idss[i] = telnumToLineGateway.getTelNumber();
         }
-        telnumToLineGatewayService.telnumDelete(lineGateway.getId(),ids.getIds(),idss);
-//        telnumToLineGatewayService.batchDelete(id,ids.getIds());
-//        //更新号码的状态
-//        telnumToLineGatewayService.batchUpCall(lineGateway.getId(),idss);
         return RestResponse.success("删除成功");
     }
+
+
     @ApiOperation(value = "线路配套号码-批量修改")
     @RequestMapping(value = "/telnum/edit/{id}",method = RequestMethod.PUT)
     public RestResponse modify(
@@ -254,44 +311,75 @@ public class LineGatewayController extends AbstractRestController {
         if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
             return RestResponse.failed("0000","线路不存在");
         }
-        String[] sql = new String[telnums.getTelnums().length];
-        int in = 0;
         for(int i=0;i<telnums.getTelnums().length;i++){
             TelnumToLineGatewayEditVo telnum = telnums.getTelnums()[i];
             if(StringUtils.isEmpty(telnum.getId())) {
-                return RestResponse.failed("0000","不允许存在记录id为空");
+               continue;
+                // return RestResponse.failed("0000","不允许存在记录id为空");
             }
             if(StringUtils.isEmpty(telnum.getIsCalled())&&StringUtils.isEmpty(telnum.getIsDialing())&&StringUtils.isEmpty(telnum.getIsThrough())){
-                return RestResponse.failed("0000","不允许存在无修改项的记录");
+                continue;
+                //return RestResponse.failed("0000","不允许存在无修改项的记录");
             }
-            String sq = "  UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET ";
-            if(StringUtils.isNotEmpty(telnum.getIsCalled())){
-                sq += " is_called = '"+telnum.getIsCalled()+"' ,";
+            //获取号码线路关系
+            TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findById(telnum.getId());
+            boolean flag1 = false;
+            boolean flag2 = false;
+            //修改被叫
+            if(("0".equals(telnum.getIsCalled())||"1".equals(telnum.getIsCalled()))&&!telnumToLineGateway.getIsCalled().equals(telnum.getIsCalled())){
+                flag1=true;
+                telnumToLineGateway.setIsCalled(telnum.getIsCalled());
             }
-            if(StringUtils.isNotEmpty(telnum.getIsDialing())){
-                sq += " is_dialing = '"+telnum.getIsDialing()+"' ,";
+            //修改主叫
+            if(("0".equals(telnum.getIsDialing())||"1".equals(telnum.getIsDialing()))&&!telnumToLineGateway.getIsDialing().equals(telnum.getIsDialing())){
+                flag1=true;
+                telnumToLineGateway.setIsDialing(telnum.getIsDialing());
             }
-            if(StringUtils.isNotEmpty(telnum.getIsThrough())){
-                sq += " is_through = '"+telnum.getIsThrough()+"' ,";
+            //修改透传
+            if(("0".equals(telnum.getIsThrough())||"1".equals(telnum.getIsThrough()))&&!telnumToLineGateway.getIsThrough().equals(telnum.getIsThrough())){
+                flag2=true;
+                telnumToLineGateway.setIsThrough(telnum.getIsThrough());
             }
-            int r = sq.lastIndexOf(",");
-            if( r !=-1){
-                sq = sq.substring(0,r);
-                sq += " WHERE line_id='"+lineGateway.getId()+"' AND id = '"+telnum.getId()+"' ";
-                sql[in] = sq;
-                in++;
+            telnumToLineGateway = telnumToLineGatewayService.save(telnumToLineGateway);
+            //如果是修改主被叫，需要修改归属线路
+            if(flag1){
+                if("1".equals(telnumToLineGateway.getIsDialing())||"1".equals(telnumToLineGateway.getIsCalled())){
+                    ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
+                    //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                    if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                        //修正归属线路关系
+                        resourceTelenum1.setLine(lineGateway);
+                        resourceTelenum1.setIsCalled(telnumToLineGateway.getIsCalled());
+                        resourceTelenum1.setIsDialing(telnumToLineGateway.getIsDialing());
+                        resourceTelenumService.save(resourceTelenum1);
+                    }
+                }else if("0".equals(telnumToLineGateway.getIsDialing())||"0".equals(telnumToLineGateway.getIsCalled())){
+                    ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
+                    //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                    if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                        //当前号码的归属线路是当前线路，删除归属线路关系
+                        if(resourceTelenum1.getLine()!=null&&lineGateway.getId().equals(resourceTelenum1.getLine().getId())){
+                            //删除归属线路关系
+                            resourceTelenum1.setLine(lineGateway);
+                            //设置号码不可主叫不可被叫
+                            resourceTelenum1.setIsCalled("0");
+                            resourceTelenum1.setIsDialing("0");
+                            resourceTelenumService.save(resourceTelenum1);
+                        }
+                    }
+                }
+            }
+            //如果修改线路号码关系属性
+            if(flag2){
+                //获取是否还拥有可透传的号码
+                ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
+                //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
+                if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                    resourceTelenum1.setIsThrough(telnumToLineGatewayService.getIsThrough(telnumToLineGateway.getTelNumber())+"");
+                    resourceTelenumService.save(resourceTelenum1);
+                }
             }
         }
-        if(in==0){
-            return RestResponse.failed("0000","无修改项目");
-        }else{
-            int result = lineGatewayService.batchModify(sql);
-            if(result==-1){
-                return RestResponse.failed("0000","后台修改失败，请重试");
-            }
-        }
-        //更新号码的状态
-        telnumToLineGatewayService.batchUpCall(lineGateway.getId());
         return RestResponse.success("修改成功");
     }
     @ApiOperation(value = "新建透传号码")
@@ -319,9 +407,17 @@ public class LineGatewayController extends AbstractRestController {
         if(StringUtils.isEmpty(telnumVo.getTelNumber())){
             return RestResponse.failed("0000","号码不能为空");
         }
+        Pattern p = Pattern.compile("^[0-9]{1,32}$");
+        Matcher matcher = p.matcher(telnumVo.getTelNumber());
+        if (!matcher.matches()) {
+            return RestResponse.failed("0000","号码格式错误");
+        }
         ResourceTelenum temp = resourceTelenumService.findByTelNumber(telnumVo.getTelNumber());
         if(temp!=null){
             return RestResponse.failed("0000","该号码已存在号码池中");
+        }
+        if(StringUtils.isEmpty(telnumVo.getCallUri())){
+            return RestResponse.failed("0000","呼出URI不能为空");
         }
         String temp2 = resourceTelenumService.findNumByCallUri(telnumVo.getCallUri());
         if(StringUtils.isNotEmpty(temp2)){
@@ -335,13 +431,21 @@ public class LineGatewayController extends AbstractRestController {
         }
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
             //创建号码对象
-            ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway,telnumVo.getAmount()
-                    ,telnumVo.getIsCalled()+"",telnumVo.getIsDialing()+"","0",lineGateway.getAreaId());
-            TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(telnumVo.getTelNumber(),lineGateway.getId(),telnumVo.getIsDialing()+"",telnumVo.getIsCalled()+"",0+"","1");
-//            resourceTelenumService.save(resourceTelenum);
-//            //创建号码线路对象
-//            telnumToLineGatewayService.save(telnumToLineGateway);
-            telnumToLineGatewayService.telnumCreate(resourceTelenum,telnumToLineGateway);
+            //是否是归属线路
+            ResourceTelenum resourceTelenum = null;
+            if(telnumVo.getIsCalled()==1||telnumVo.getIsDialing()==1) {//是归属线路
+                resourceTelenum = new ResourceTelenum(
+                        telnumVo.getTelNumber(), telnumVo.getCallUri(), telnumVo.getOperator(), lineGateway.getAreaCode(), lineGateway, telnumVo.getAmount()
+                        , telnumVo.getIsCalled() + "", telnumVo.getIsDialing() + "", "0", lineGateway.getAreaId());
+            }else{//不是归属线路
+                resourceTelenum = new ResourceTelenum(
+                        telnumVo.getTelNumber(), telnumVo.getCallUri(), telnumVo.getOperator(), lineGateway.getAreaCode(), null, telnumVo.getAmount()
+                        , telnumVo.getIsCalled() + "", telnumVo.getIsDialing() + "", "0", lineGateway.getAreaId());
+            }
+            resourceTelenum = resourceTelenumService.save(resourceTelenum);
+            //创建线路和号码关系
+            TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(),lineGateway.getId(),telnumVo.getIsDialing()+"",telnumVo.getIsCalled()+"",0+"","1");
+            telnumToLineGatewayService.save(telnumToLineGateway);
         }else{
             return RestResponse.failed("0000","线路不存在");
         }
@@ -442,13 +546,18 @@ public class LineGatewayController extends AbstractRestController {
                             return RestResponse.failed("0000","号码运营商和线路运营不一致");
                         }
                         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
-                            //创建号码对象
-                            ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway,amount,isCalled,isDialing,"0",lineGateway.getAreaId());
+                            //是否是归属线路
+                            ResourceTelenum resourceTelenum = null;
+                            if("1".equals(isCalled)||"1".equals(isDialing)) {//是归属线路
+                                //创建号码对象
+                                resourceTelenum = new ResourceTelenum(telnum, callUri, operator, areaCode, lineGateway, amount, isCalled, isDialing, "0", lineGateway.getAreaId());
+                            }else{//不是归属线路
+                                resourceTelenum = new ResourceTelenum(telnum, callUri, operator, areaCode, null, amount, isCalled, isDialing, "0", lineGateway.getAreaId());
+                            }
+                            resourceTelenum = resourceTelenumService.save(resourceTelenum);
                             //创建号码线路对象
                             TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(),lineGateway.getId(),isDialing,isCalled,"0","1");
-                            telnumToLineGatewayService.telnumCreate(resourceTelenum,telnumToLineGateway);
-//                            resourceTelenumService.save(resourceTelenum);
-//                            telnumToLineGatewayService.save(telnumToLineGateway);
+                            telnumToLineGatewayService.save(telnumToLineGateway);
                         }else{
                             reason = "线路不存在";
                             break;
@@ -499,7 +608,7 @@ public class LineGatewayController extends AbstractRestController {
         if(StringUtils.isEmpty(lineGatewayVo.getLineType())){
             return "线路类型为空";
         }
-        if(StringUtils.isEmpty(lineGatewayVo.getSipAuthIp())){
+        if(StringUtils.isEmpty(lineGatewayVo.getSipProviderIp())){
             return "IP端口为空";
         }
         if(StringUtils.isEmpty(lineGatewayVo.getSipProviderDomain())){
