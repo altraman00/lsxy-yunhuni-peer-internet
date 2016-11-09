@@ -35,6 +35,10 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
         return this.lineGatewayToTenantDao;
     }
 
+    @Override
+    public LineGatewayToTenant findById(String id) {
+        return getDao().findOne(id);
+    }
 
     @Override
     public List<LineGateway> findByTenantIdAndAreaId(String tenantId,String areaId) {
