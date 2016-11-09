@@ -278,6 +278,13 @@ public class LineGatewayController extends AbstractRestController {
                     ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
                     //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                     if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                        //本身有归属线路
+                        if(resourceTelenum1.getLine()!=null&&!lineGateway.getId().equals(resourceTelenum1.getLine().getId())){
+                            TelnumToLineGateway telnumToLineGateway12 = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum1.getTelNumber(),resourceTelenum1.getLine().getId());
+                            telnumToLineGateway12.setIsCalled("0");
+                            telnumToLineGateway12.setIsDialing("0");
+                            telnumToLineGatewayService.save(telnumToLineGateway12);
+                        }
                         //删除归属线路关系
                         resourceTelenum1.setLine(null);
                         //设置号码不可主叫不可被叫
@@ -347,6 +354,13 @@ public class LineGatewayController extends AbstractRestController {
                     ResourceTelenum resourceTelenum1 = resourceTelenumService.findByTelNumber(telnumToLineGateway.getTelNumber());
                     //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                     if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
+                        //本身有归属线路
+                        if(resourceTelenum1.getLine()!=null&&!lineGateway.getId().equals(resourceTelenum1.getLine().getId())){
+                            TelnumToLineGateway telnumToLineGateway12 = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum1.getTelNumber(),resourceTelenum1.getLine().getId());
+                            telnumToLineGateway12.setIsCalled("0");
+                            telnumToLineGateway12.setIsDialing("0");
+                            telnumToLineGatewayService.save(telnumToLineGateway12);
+                        }
                         //修正归属线路关系
                         resourceTelenum1.setLine(lineGateway);
                         resourceTelenum1.setIsCalled(telnumToLineGateway.getIsCalled());
