@@ -158,6 +158,11 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
                 }
             }
         });
+        for(int i=0;i<ids.length;i++){
+            ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(ids[i]);
+            resourceTelenum.setIsThrough("1");
+            resourceTelenumService.save(resourceTelenum);
+        }
     }
 
     @Override
