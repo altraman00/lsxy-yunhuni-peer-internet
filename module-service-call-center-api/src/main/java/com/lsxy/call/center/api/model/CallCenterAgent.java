@@ -24,8 +24,9 @@ public class CallCenterAgent extends IdEntity {
     public final static String STATE_DEFAULT = STATE_ONLINE;
     private String tenantId;
     private String appId;
+    private String channelId;
     private String agentNo;//坐席id
-    private String agentNum;//作息工号
+    private String agentNum;//坐席工号
 
 
     @Column(name = "tenant_id")
@@ -44,6 +45,15 @@ public class CallCenterAgent extends IdEntity {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    @Column(name = "channe_id")
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 
     @Column(name = "agent_no")

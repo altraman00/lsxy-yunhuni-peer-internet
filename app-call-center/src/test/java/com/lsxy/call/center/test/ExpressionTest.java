@@ -29,6 +29,4 @@ public class ExpressionTest {
         vars.put("haha1",22);
         System.out.println(ExpressionUtils.execSortExpression("get(\"haha0\") + get(\"haha1\");",vars));
     }
-
-
 }
