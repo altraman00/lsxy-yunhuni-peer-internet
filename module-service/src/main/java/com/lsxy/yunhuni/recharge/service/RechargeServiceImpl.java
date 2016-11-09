@@ -68,7 +68,7 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             if(tenant != null){
                 String orderId = UUIDGenerator.uuid();
                 Calendar c = Calendar.getInstance();
-                c.add(Calendar.DAY_OF_MONTH, 2);
+                c.add(Calendar.DAY_OF_MONTH, 1);
                 Date deadline = c.getTime();
                 recharge = new Recharge(tenant,amount, RechargeSource.USER,rechargeType, RechargeStatus.NOTPAID,orderId,null,deadline);
                 rechargeDao.save(recharge);
