@@ -106,9 +106,18 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
             return RestResponse.failed("0000","号码不存在");
         }
-        String re = vailVo(telnumTVo,true);
-        if(StringUtils.isNotEmpty(re)){
-            return RestResponse.failed("0000","新增线路失败:"+re);
+        if(StringUtils.isEmpty(telnumTVo.getOperator())){
+            return RestResponse.failed("0000","运营商错误");
+        }
+        if (!Arrays.asList(ResourceTelenum.OPERATORS).contains(telnumTVo.getOperator())) {
+            return RestResponse.failed("0000","运营商错误");
+        }
+        if(StringUtils.isEmpty(telnumTVo.getAreaCode())){
+            return RestResponse.failed("0000","归属地区号不存在");
+        }
+        String areaName = telnumLocationService.getAreaNameByAreaCode(telnumTVo.getAreaCode());
+        if (StringUtils.isEmpty(areaName)) {
+            return RestResponse.failed("0000","归属地区号不存在");
         }
         boolean isEditNum = false;
         String telnum1 = resourceTelenum.getTelNumber();
@@ -147,10 +156,6 @@ public class ResourceTelenumController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","修改线路失败");
         }
-        if(tenantType!=0){
-            resourceTelenum.setTenant(tenant);
-            resourceTelenum.setStatus(1);
-        }
         resourceTelenumService.editNum(resourceTelenum,tenantType,isEditNum,tenant,telnum1,telnumTVo.getTelNumber());
         return RestResponse.success("修改号码成功");
     }
@@ -158,9 +163,39 @@ public class ResourceTelenumController extends AbstractRestController {
     @RequestMapping(value = "/new",method = RequestMethod.POST)
     public RestResponse create(
             @RequestBody TelnumTVo telnumTVo){
-        String re = vailVo(telnumTVo,false);
-        if(StringUtils.isNotEmpty(re)){
-            return RestResponse.failed("0000","新增线路失败:"+re);
+        if(StringUtils.isEmpty(telnumTVo.getOperator())){
+            return RestResponse.failed("0000","运营商错误");
+        }
+        if (!Arrays.asList(ResourceTelenum.OPERATORS).contains(telnumTVo.getOperator())) {
+            return RestResponse.failed("0000","运营商错误");
+        }
+        if(StringUtils.isEmpty(telnumTVo.getAreaCode())){
+            return RestResponse.failed("0000","归属地区号不存在");
+        }
+        String areaName = telnumLocationService.getAreaNameByAreaCode(telnumTVo.getAreaCode());
+        if (StringUtils.isEmpty(areaName)) {
+            return RestResponse.failed("0000","归属地区号不存在");
+        }
+        String[] is = {"0","1"};
+        if(StringUtils.isNotEmpty(telnumTVo.getIsThrough()+"")&&!Arrays.asList(is).contains(telnumTVo.getIsThrough()+"")){
+            return RestResponse.failed("0000","可透传错误");
+        }
+        if(StringUtils.isNotEmpty(telnumTVo.getIsCalled()+"")&&!Arrays.asList(is).contains(telnumTVo.getIsCalled()+"")){
+            return RestResponse.failed("0000","可被叫错误");
+        }
+        if(StringUtils.isNotEmpty(telnumTVo.getIsDialing()+"")&&!Arrays.asList(is).contains(telnumTVo.getIsDialing()+"")){
+            return RestResponse.failed("0000","可主叫错误");
+        }
+        if(StringUtils.isEmpty(telnumTVo.getTelNumber())){
+            return RestResponse.failed("0000","号码格式错误");
+        }
+        Pattern p = Pattern.compile("^[0-9]{1,32}$");
+        Matcher matcher = p.matcher(telnumTVo.getTelNumber());
+        if (!matcher.matches()) {
+            return RestResponse.failed("0000","号码格式错误");
+        }
+        if(StringUtils.isEmpty(telnumTVo.getCallUri())){
+            return RestResponse.failed("0000","呼叫URI错误");
         }
         //验证号码和呼叫URI
         ResourceTelenum temp = resourceTelenumService.findByTelNumber(telnumTVo.getTelNumber());
@@ -194,12 +229,6 @@ public class ResourceTelenumController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","新增线路失败");
         }
-        if(tenant!=null) {
-            resourceTelenum.setTenant(tenant);//绑定租户
-            resourceTelenum.setStatus(1);//设置被租用
-        }else{
-            resourceTelenum.setStatus(0);//设置没被租用
-        }
         resourceTelenum.setUsable("0");//设置不可用
         //如果绑定线路的话，需要为号码设置区号
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())) {
@@ -207,8 +236,8 @@ public class ResourceTelenumController extends AbstractRestController {
             if((","+lineGateway.getOperator()+",").indexOf(","+resourceTelenum.getOperator()+",")==-1){
                 return RestResponse.failed("0000","号码运营商和线路运营不一致");
             }
+            //设置区号与线路一致
             resourceTelenum.setAreaId(lineGateway.getAreaId());
-            resourceTelenum.setLine(lineGateway);
         }
         resourceTelenumService.createNum(resourceTelenum,lineGateway,tenant);
         return RestResponse.success("创建成功");
@@ -321,49 +350,5 @@ public class ResourceTelenumController extends AbstractRestController {
         }
         Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,null,resourceTelenum.getTelNumber(),null,null,null);
         return RestResponse.success(page);
-    }
-
-    private String vailVo(TelnumTEditVo telnumTVo,boolean isNull){
-        if(isNull&&StringUtils.isEmpty(telnumTVo.getOperator())){
-        }else {
-            if (!Arrays.asList(ResourceTelenum.OPERATORS).contains(telnumTVo.getOperator())) {
-                return "运营商错误";
-            }
-        }
-        if(isNull&&StringUtils.isEmpty(telnumTVo.getAreaCode())){
-        }else {
-            String areaName = telnumLocationService.getAreaNameByAreaCode(telnumTVo.getAreaCode());
-            if (StringUtils.isEmpty(areaName)) {
-                return "归属地区号不存在";
-            }
-        }
-        String[] is = {"0","1"};
-        if(isNull&&StringUtils.isEmpty(telnumTVo.getIsThrough()+"")){
-        }else {
-            if (!Arrays.asList(is).contains(telnumTVo.getIsThrough()+"")) {
-                return "可透传错误";
-            }
-        }
-        if(isNull&&StringUtils.isEmpty(telnumTVo.getIsCalled()+"")){
-        }else {
-            if (!Arrays.asList(is).contains(telnumTVo.getIsCalled()+"")) {
-                return "可被叫错误";
-            }
-        }
-        if(isNull&&StringUtils.isEmpty(telnumTVo.getIsDialing()+"")){
-        }else {
-            if (!Arrays.asList(is).contains(telnumTVo.getIsDialing()+"")) {
-                return "可主叫错误";
-            }
-        }
-        if(isNull&&StringUtils.isEmpty(telnumTVo.getTelNumber())){
-        }else {
-            Pattern p = Pattern.compile("^[0-9]{1,32}$");
-            Matcher matcher = p.matcher(telnumTVo.getTelNumber());
-            if (!matcher.matches()) {
-                return "号码格式错误";
-            }
-        }
-        return "";
     }
 }

@@ -339,13 +339,24 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }else{
                 telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(), lineGateway.getId(), resourceTelenum.getIsDialing(), resourceTelenum.getIsCalled(),resourceTelenum.getIsThrough(), resourceTelenum.getType());
                 telnumToLineGatewayService.save(telnumToLineGateway);
+                //一条号码有且只有在一条线路上可主叫或者可被叫
+                if("1".equals(telnumToLineGateway.getIsCalled())||"1".equals(telnumToLineGateway.getIsDialing())){
+                    //设置归属线路
+                    resourceTelenum.setLine(lineGateway);
+                    this.save(resourceTelenum);
+                }
             }
         }
-        //判断是否需要添加号码租户的关系
-        if(tenant!=null &&StringUtils.isNotEmpty(tenant.getId())){
+        if(tenant!=null) {
+            resourceTelenum.setTenant(tenant);//绑定租户
+            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);//设置被租用
+            this.save(resourceTelenum);
+            //判断是否需要添加号码租户的关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
-            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
+        }else{
+            resourceTelenum.setTenant(null);//没有租户
+            resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);//设置没被租用
             this.save(resourceTelenum);
         }
     }
@@ -367,19 +378,20 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                     resourcesRentService.save(resourcesRent);
                 }
             }
+            //新建租用关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
+            //修改号码租用关系
+            resourceTelenum.setTenant(tenant);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }else if(tenantType==0&& isEditNum){//只更改手机号码
             //修改号码和租户关系，更新手机号码
             ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
-            if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//存在旧的关系不用释放
+            if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//存在旧的关系不用释放，只修改手机号码
                 resourcesRent.setResData(resourceTelenum.getTelNumber());
                 resourcesRentService.save(resourcesRent);
             }
-            //修正线路原来的记录号码线路关系
-            telnumToLineGatewayService.updateTelnum(telnum1,telnum12);
         }else if(tenantType!=0&&isEditNum){//同时修改租户和号码
             if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
                 ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
@@ -388,12 +400,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                     resourcesRentService.save(resourcesRent);
                 }
             }
+            //新建租用关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
+            //修改号码租用关系
+            resourceTelenum.setTenant(tenant);
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
-            //修正线路原来的记录号码线路关系
-            telnumToLineGatewayService.updateTelnum(telnum1,telnum12);
         }
     }
 
