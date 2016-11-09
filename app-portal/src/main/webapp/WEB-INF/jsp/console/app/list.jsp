@@ -177,9 +177,11 @@
                 <!--可选号码-->
                 <div id="selectNewIvr" style="display: none">
                     <div class="input text-center">
-                        <div class="info">
-                            若您选择开通自定义IVR或者云呼叫中心功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定
-                        </div>
+                        <div class="info" style="text-align: left;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;若您选择开通自定义IVR或者云呼叫中心功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定</div>
+                        <%--<div class="number_info text-center">--%>
+                            <%--若您选择开通自定义IVR或者云呼叫中心功能，则需要从我的号码列表中<br/>--%>
+                            <%--选择一个可呼入的号码与该应用绑定<br/>--%>
+                        <%--</div>--%>
                     </div>
                     <div class="phone-table">
                         <table class="table table-striped">

@@ -219,7 +219,7 @@ public class ResourceTelenumController extends AbstractRestController {
             @PathVariable String id){
         ResourceTelenum resourceTelenum = resourceTelenumService.findById(id);
         if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
-            return RestResponse.failed("0000","线路不存在");
+            return RestResponse.failed("0000","号码不存在");
         }
         return RestResponse.success(resourceTelenum);
     }
