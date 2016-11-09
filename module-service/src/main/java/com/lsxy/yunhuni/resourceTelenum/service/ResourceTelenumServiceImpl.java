@@ -17,6 +17,8 @@ import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -350,6 +351,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #resourceTelenum.id", beforeInvocation = true)
+            }
+    )
     public void editNum(ResourceTelenum resourceTelenum,int tenantType,boolean isEditNum,Tenant tenant,String telnum1,String telnum12) {
         resourceTelenum = this.save(resourceTelenum);
         //只更改租户
@@ -392,6 +398,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
+            }
+    )
     public void release(String id) {
         ResourceTelenum resourceTelenum = this.findById(id);
         ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
