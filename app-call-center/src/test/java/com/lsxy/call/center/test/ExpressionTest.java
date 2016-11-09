@@ -13,7 +13,9 @@ public class ExpressionTest {
     public static void main(String[] args) {
 
         Map<String,Integer> vars = new HashMap<>();
-        System.out.println(ExpressionUtils.invalidSortExpression("get(\"haha0\") + get(\"haha1\");"));;
+        vars.put("haha0",11);
+        vars.put("haha1",22);
+        System.out.println(ExpressionUtils.execSortExpression("get(\"haha0\") + get(\"haha1\");",vars));
     }
 
 
