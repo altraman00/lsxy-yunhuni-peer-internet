@@ -8,6 +8,8 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
+import com.lsxy.framework.mq.events.callcenter.ModifyConditionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +50,18 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         }
         AbstractMQEvent event = null;
         if(condition.getId() != null){
+            boolean modify_where = false;
+            boolean modify_sort = false;
+            boolean modify_priority = false;
+
             Condition oldCondition = this.findById(condition.getId());
+            modify_where = !(oldCondition.getWhereExpression() == null?"":oldCondition.getWhereExpression())
+                                .equals(condition.getWhereExpression() == null?"":condition.getWhereExpression());
+            modify_sort = !(oldCondition.getSortExpression() == null?"":oldCondition.getSortExpression())
+                                .equals(condition.getSortExpression() == null?"":condition.getSortExpression());
+            modify_priority = Integer.compare(oldCondition.getPriority() == null ? 0 : oldCondition.getPriority(),
+                                              condition.getPriority() == null ? 0 : condition.getPriority()) != 0;
+
             oldCondition.setWhereExpression(condition.getWhereExpression());
             oldCondition.setSortExpression(condition.getSortExpression());
             oldCondition.setPriority(condition.getPriority());
@@ -56,12 +69,21 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
             oldCondition.setFetchTimeout(condition.getFetchTimeout());
             oldCondition.setRemark(condition.getRemark());
             condition = oldCondition;
+            condition = super.save(condition);
             //修改条件事件
+            event = new ModifyConditionEvent(condition.getId(),condition.getTenantId(),condition.getAppId(),
+                                                modify_where,modify_sort,modify_priority);
         }else{
+            condition = super.save(condition);
             //创建条件事件
+            event = new CreateConditionEvent(condition.getId(),condition.getTenantId(),condition.getAppId());
         }
-        condition = super.save(condition);
         mqService.publish(event);
         return condition;
+    }
+
+    public static void main(String[] args) {
+        String a = null;
+        System.out.println("1111111111"+a);
     }
 }
