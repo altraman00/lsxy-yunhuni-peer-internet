@@ -211,8 +211,8 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         isCalled = isCalled>0?1:0;
         isDialing = isDialing>0?1:0;
         isThrough = isThrough>0?1:0;
-        if(line.equals(resourceTelenum.getLineId())){
-            resourceTelenum.setLineId("无");
+        if(line.equals(resourceTelenum.getLine().getId())){
+            resourceTelenum.setLine(null);
         }
         resourceTelenum.setIsCalled(isCalled+ "");
         resourceTelenum.setIsDialing(isDialing + "");

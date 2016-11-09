@@ -208,6 +208,7 @@ public class ResourceTelenumController extends AbstractRestController {
                 return RestResponse.failed("0000","号码运营商和线路运营不一致");
             }
             resourceTelenum.setAreaId(lineGateway.getAreaId());
+            resourceTelenum.setLine(lineGateway);
         }
         resourceTelenumService.createNum(resourceTelenum,lineGateway,tenant);
         return RestResponse.success("创建成功");
@@ -268,7 +269,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),resourceTelenum.getLineId());
+        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),resourceTelenum.getLine().getId());
         LineVo lineVo = new LineVo();
         try {
             EntityUtils.copyProperties(lineVo,telnumToLineGateway);
@@ -290,7 +291,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,resourceTelenum.getLineId(),resourceTelenum.getTelNumber());
+        Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,resourceTelenum.getLine().getId(),resourceTelenum.getTelNumber());
         List<LineVo> list = new ArrayList<>();
         List<TelnumToLineGateway> list2 = page.getResult();
         for(int i=0;i<list2.size();i++){

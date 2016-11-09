@@ -335,7 +335,7 @@ public class LineGatewayController extends AbstractRestController {
         }
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
             //创建号码对象
-            ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway.getId(),telnumVo.getAmount()
+            ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway,telnumVo.getAmount()
                     ,telnumVo.getIsCalled()+"",telnumVo.getIsDialing()+"","0",lineGateway.getAreaId());
             TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(telnumVo.getTelNumber(),lineGateway.getId(),telnumVo.getIsDialing()+"",telnumVo.getIsCalled()+"",0+"","1");
 //            resourceTelenumService.save(resourceTelenum);
@@ -443,7 +443,7 @@ public class LineGatewayController extends AbstractRestController {
                         }
                         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
                             //创建号码对象
-                            ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway.getId(),amount,isCalled,isDialing,"0",lineGateway.getAreaId());
+                            ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway,amount,isCalled,isDialing,"0",lineGateway.getAreaId());
                             //创建号码线路对象
                             TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(),lineGateway.getId(),isDialing,isCalled,"0","1");
                             telnumToLineGatewayService.telnumCreate(resourceTelenum,telnumToLineGateway);
