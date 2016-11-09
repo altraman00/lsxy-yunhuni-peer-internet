@@ -1,12 +1,15 @@
 package com.lsxy.yunhuni.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
@@ -21,6 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -65,6 +69,32 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
         ResourceTelenum resourceTelenum = resourceTelenumDao.findOneFreeNumber(testCallNumber,lineIds,random);
         return resourceTelenum;
+    }
+
+    @Override
+    public Page getPageByFreeNumber(Integer pageNo, Integer pageSize, String telnum, String type, String areaCode, String order) {
+        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' ";
+        if(StringUtils.isNotEmpty(type)){
+            if("callin".equals(type)){
+                hql += " AND obj.isThrough=1 ";
+            }else if("callout".equals(type)){
+                hql += " AND (obj.isDialing=1 or obj.isThrough=1 )";
+            }
+        }
+        if(StringUtils.isNotEmpty(areaCode)){
+            hql += " AND obj.areaCode='"+areaCode+"' ";
+        }
+        if(StringUtils.isNotEmpty(order)){
+            if("amount:1".equals(order)){
+                hql += " order by obj.amount desc ";
+            }else if("amount:0".equals(order)){
+                hql += " order by obj.amount ";
+            }
+        }else{
+            hql += " order by obj.createTime desc ";
+        }
+        Page pgae = this.pageList(hql,pageNo,pageSize);
+        return pgae;
     }
 
     @Override
@@ -272,5 +302,99 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         return page;
     }
 
+    @Override
+    public void delete(String id) {
+        ResourceTelenum resourceTelenum = this.findById(id);
+        //删除号码
+        try {
+            this.delete(resourceTelenum);
+        } catch (Exception e) {
+            throw new RuntimeException("删除异常");
+        }
+        //释放号码存在的关系
+        ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
+        if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){
+            resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
+            resourcesRentService.save(resourcesRent);
+        }
+        //删除该号码的号码线路关系
+        telnumToLineGatewayService.deleteByTelnum(resourceTelenum.getTelNumber());
+    }
 
+    @Override
+    public void createNum(ResourceTelenum resourceTelenum,LineGateway lineGateway,Tenant tenant) {
+        //创建号码
+        resourceTelenum = this.save(resourceTelenum);
+        //创建线路号码关联
+        if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
+            //判断线路号码是否已关联，提示用户自己去更新；未关联，直接产生关联
+            TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),lineGateway.getId());
+            if(telnumToLineGateway!=null && StringUtils.isNotEmpty(telnumToLineGateway.getId())){
+//                return RestResponse.success("创建成功,号码和线路关系已存在");
+            }else{
+                telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(), lineGateway.getId(), resourceTelenum.getIsDialing(), resourceTelenum.getIsCalled(),resourceTelenum.getIsThrough(), resourceTelenum.getType());
+                telnumToLineGatewayService.save(telnumToLineGateway);
+            }
+        }
+        //判断是否需要添加号码租户的关系
+        if(tenant!=null &&StringUtils.isNotEmpty(tenant.getId())){
+            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            resourcesRentService.save(resourcesRent1);
+            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
+            this.save(resourceTelenum);
+        }
+    }
+
+    @Override
+    public void editNum(ResourceTelenum resourceTelenum,int tenantType,boolean isEditNum,Tenant tenant,String telnum1,String telnum12) {
+        resourceTelenum = this.save(resourceTelenum);
+        //只更改租户
+        if(tenantType != 0&&!isEditNum){
+            if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
+                ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
+                if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系
+                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
+                    resourcesRentService.save(resourcesRent);
+                }
+            }
+            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            resourcesRentService.save(resourcesRent1);
+            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
+            this.save(resourceTelenum);
+        }else if(tenantType==0&& isEditNum){//只更改手机号码
+            //修改号码和租户关系，更新手机号码
+            ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
+            if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//存在旧的关系不用释放
+                resourcesRent.setResData(resourceTelenum.getTelNumber());
+                resourcesRentService.save(resourcesRent);
+            }
+            //修正线路原来的记录号码线路关系
+            telnumToLineGatewayService.updateTelnum(telnum1,telnum12);
+        }else if(tenantType!=0&&isEditNum){//同时修改租户和号码
+            if(tenantType==2){//如果修改租户，需要删除号码和租户的关系
+                ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
+                if(resourcesRent!=null&&StringUtils.isNotEmpty(resourcesRent.getId())){//释放存在旧的关系
+                    resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
+                    resourcesRentService.save(resourcesRent);
+                }
+            }
+            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            resourcesRentService.save(resourcesRent1);
+            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
+            this.save(resourceTelenum);
+            //修正线路原来的记录号码线路关系
+            telnumToLineGatewayService.updateTelnum(telnum1,telnum12);
+        }
+    }
+
+    @Override
+    public void release(String id) {
+        ResourceTelenum resourceTelenum = this.findById(id);
+        ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
+        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
+        resourcesRentService.save(resourcesRent);
+        resourceTelenum.setTenant(null);
+        resourceTelenum.setStatus(0);
+        this.save(resourceTelenum);
+    }
 }

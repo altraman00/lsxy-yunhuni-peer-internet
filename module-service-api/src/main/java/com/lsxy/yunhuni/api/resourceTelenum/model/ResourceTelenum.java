@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_oc_resource_telenum")
 public class ResourceTelenum extends IdEntity{
+    public static final int STATUS_LOCK = 2;//临时被锁定
     public static final int STATUS_RENTED = 1; //已被租用
     public static final int STATUS_FREE = 0;    //未被租用
     public static final String USABLE_TRUE = "1";    //未被租用
@@ -38,7 +39,7 @@ public class ResourceTelenum extends IdEntity{
     private BigDecimal amount ;//号码占用费
     private String isDialing;//可主叫
     private String isCalled;//可被叫
-    private String isThrough;//可被叫
+    private String isThrough;//可透传
     private String type;//1采购线路0租户自带
     @Column(name = "is_through")
     public String getIsThrough() {
@@ -210,7 +211,21 @@ public class ResourceTelenum extends IdEntity{
         this.usable = "1";//可用
         this.type = "1";//采购线路
     }
-
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount,String isCalled,String isDialing,String isThrough,String areaId) {
+        this.operator = operator;
+        this.areaCode = areaCode;
+        this.amount = new BigDecimal(amount);
+        this.callUri = callUri;
+        this.telNumber = telNumber;
+        this.lineId = lineId;
+        this.status =0;//未被租用
+        this.usable = "1";//可用
+        this.type = "1";//采购线路
+        this.isCalled = isCalled;
+        this.isDialing = isDialing;
+        this.isThrough = isThrough;
+        this.areaId = areaId;
+    }
     public ResourceTelenum() {
     }
 }

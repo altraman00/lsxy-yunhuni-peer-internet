@@ -170,7 +170,7 @@
                         我的号码列表没有可选号码，如需租用号码，请前往“号码管理”中的“我的号码”
                     </div>
                     <div class="input text-center" >
-                        <a type="button"  class="btn btn-primary btn-box tabModalBtn" href="number_call.html">立即前往</a>
+                        <a type="button"  class="btn btn-primary btn-box tabModalBtn" href="${ctx}/console/telenum/callnum/index">立即前往</a>
                     </div>
                 </div>
 
@@ -178,7 +178,7 @@
                 <div id="selectNewIvr" style="display: none">
                     <div class="input text-center">
                         <div class="info">
-                            若您选择开通IVR功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定
+                            若您选择开通自定义IVR或者云呼叫中心功能，则需要从我的号码列表中选择一个可呼入的号码与该应用绑定
                         </div>
                     </div>
                     <div class="phone-table">

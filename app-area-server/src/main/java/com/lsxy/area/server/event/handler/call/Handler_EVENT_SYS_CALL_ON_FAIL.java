@@ -3,12 +3,16 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -41,6 +45,9 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
     @Autowired
     private CallSessionService callSessionService;
 
+    @Autowired
+    private IVRActionService ivrActionService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_FAIL;
@@ -71,6 +78,26 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
         if(callSession != null){
             callSession.setStatus(CallSession.STATUS_EXCEPTION);
             callSessionService.save(callSession);
+        }
+
+        if("ivr_dial".equals(state.getType())){//ivr拨号失败需要继续ivr
+            Map<String,Object> businessData = state.getBusinessData();
+            if(businessData != null){
+                String ivr_call_id = (String)businessData.get("ivr_call_id");
+                if(StringUtil.isNotEmpty(ivr_call_id)){
+                    App app = appService.findById(state.getAppId());
+                    Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("event","ivr.connect_end")
+                            .putIfNotEmpty("id",ivr_call_id)
+                            .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                            .putIfNotEmpty("end_time",System.currentTimeMillis())
+                            .putIfNotEmpty("error","dial error")
+                            .build();
+                    if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                        ivrActionService.doAction(ivr_call_id);
+                    }
+                }
+            }
         }
         return res;
     }

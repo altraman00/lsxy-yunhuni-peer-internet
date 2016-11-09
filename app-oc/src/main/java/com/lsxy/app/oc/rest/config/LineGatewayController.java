@@ -8,7 +8,6 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
-import com.lsxy.yunhuni.api.config.model.LineGatewayToTenant;
 import com.lsxy.yunhuni.api.config.service.*;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
@@ -18,9 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -31,10 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,8 +93,8 @@ public class LineGatewayController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","新增线路失败");
         }
-        //默认启用线路
-        lineGateway.setStatus("1");
+        //默认禁用线路
+        lineGateway.setStatus("0");
         //默认没有加入全局线路中
         lineGateway.setIsPublicLine("0");
         lineGatewayService.save(lineGateway);
@@ -133,14 +130,7 @@ public class LineGatewayController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","修改线路失败");
         }
-        lineGatewayService.save(lineGateway);
-        //如果线路可透传状况发生变化，则需要维护线路中号码的可透传情况
-        if("0".equals(lineGatewayVo.getIsThrough())&&"1".equals(isThrough)){
-            //对透传进行处理
-            telnumToLineGatewayService.updateIsThrough(lineGateway.getId(),"0");
-            //更新号码的状态
-            batchUpCall(lineGateway.getId());
-        }
+        telnumToLineGatewayService.modify(lineGateway,lineGatewayVo.getIsThrough(),isThrough);
         return RestResponse.success("修改成功");
     }
     @ApiOperation(value = "启用线路")
@@ -203,14 +193,7 @@ public class LineGatewayController extends AbstractRestController {
             return RestResponse.failed("0000","线路不存在");
         }
         //删除线路
-        lineGatewayService.delete(lineGateway);
-        //删除线路号码关联关系表
-        telnumToLineGatewayService.deleteByLineId(lineGateway.getId());
-        //删除全局线路和归属线路
-        lineGatewayToTenantService.deleteLine(lineGateway.getId());
-        lineGatewayToPublicService.deleteLine(lineGateway.getId());
-        //更新号码的状态
-        batchUpCall(lineGateway.getId());
+        telnumToLineGatewayService.deleteLine(lineGateway.getId());
         return RestResponse.success("删除成功");
     }
     @ApiOperation(value = "线路配套号码-列表")
@@ -256,9 +239,10 @@ public class LineGatewayController extends AbstractRestController {
             }
             idss[i] = telnumToLineGateway.getTelNumber();
         }
-        telnumToLineGatewayService.batchDelete(id,ids.getIds());
-        //更新号码的状态
-        batchUpCall(lineGateway.getId(),idss);
+        telnumToLineGatewayService.telnumDelete(lineGateway.getId(),ids.getIds(),idss);
+//        telnumToLineGatewayService.batchDelete(id,ids.getIds());
+//        //更新号码的状态
+//        telnumToLineGatewayService.batchUpCall(lineGateway.getId(),idss);
         return RestResponse.success("删除成功");
     }
     @ApiOperation(value = "线路配套号码-批量修改")
@@ -307,7 +291,7 @@ public class LineGatewayController extends AbstractRestController {
             }
         }
         //更新号码的状态
-        batchUpCall(lineGateway.getId());
+        telnumToLineGatewayService.batchUpCall(lineGateway.getId());
         return RestResponse.success("修改成功");
     }
     @ApiOperation(value = "新建透传号码")
@@ -351,11 +335,13 @@ public class LineGatewayController extends AbstractRestController {
         }
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
             //创建号码对象
-            ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway.getId(),telnumVo.getAmount());
-            resourceTelenum = upCall(resourceTelenum,telnumVo.getTelNumber(),telnumVo.getIsCalled(),telnumVo.getIsDialing(),0);
-            //创建号码线路对象
-            TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(),lineGateway.getId(),telnumVo.getIsCalled()+"",telnumVo.getIsCalled()+"",0+"","1");
-            telnumToLineGatewayService.save(telnumToLineGateway);
+            ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway.getId(),telnumVo.getAmount()
+                    ,telnumVo.getIsCalled()+"",telnumVo.getIsDialing()+"","0",lineGateway.getAreaId());
+            TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(telnumVo.getTelNumber(),lineGateway.getId(),telnumVo.getIsDialing()+"",telnumVo.getIsCalled()+"",0+"","1");
+//            resourceTelenumService.save(resourceTelenum);
+//            //创建号码线路对象
+//            telnumToLineGatewayService.save(telnumToLineGateway);
+            telnumToLineGatewayService.telnumCreate(resourceTelenum,telnumToLineGateway);
         }else{
             return RestResponse.failed("0000","线路不存在");
         }
@@ -365,9 +351,9 @@ public class LineGatewayController extends AbstractRestController {
     @RequestMapping(value="/telnum/upload/{id}", method=RequestMethod.POST)
     public RestResponse handleFileUpload(
             @ApiParam( name="id",value = "线路id")@PathVariable String id,
-            @ApiParam( name="file",value = "文件对象")@RequestParam("file") MultipartFile file
+            MultipartFile file
     ){
-        if (!file.isEmpty()) {
+        if (file==null||!file.isEmpty()) {
            String fileName =  file.getOriginalFilename();
             boolean isE2007 = false;    //判断是否是excel2007格式
             if(fileName.endsWith("xlsx")) {
@@ -396,7 +382,10 @@ public class LineGatewayController extends AbstractRestController {
                         break;
                     }
                     //号码
-                    String telnum = row.getCell(0).getStringCellValue().trim();
+                    String telnum = "";
+                    try {
+                        telnum = row.getCell(0).getStringCellValue().trim();
+                    }catch (Exception e){break;}
                     Pattern p = Pattern.compile("^[0-9]{1,32}$");
                     Matcher matcher = p.matcher(telnum);
                     if (!matcher.matches()) {
@@ -454,11 +443,12 @@ public class LineGatewayController extends AbstractRestController {
                         }
                         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
                             //创建号码对象
-                            ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway.getId(),amount);
-                            resourceTelenum = upCall(resourceTelenum,telnum,Integer.valueOf(isCalled),Integer.valueOf(isDialing),0);
+                            ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway.getId(),amount,isCalled,isDialing,"0",lineGateway.getAreaId());
                             //创建号码线路对象
-                            TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(),lineGateway.getId(),isCalled,isCalled,"0","1");
-                            telnumToLineGatewayService.save(telnumToLineGateway);
+                            TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(),lineGateway.getId(),isDialing,isCalled,"0","1");
+                            telnumToLineGatewayService.telnumCreate(resourceTelenum,telnumToLineGateway);
+//                            resourceTelenumService.save(resourceTelenum);
+//                            telnumToLineGatewayService.save(telnumToLineGateway);
                         }else{
                             reason = "线路不存在";
                             break;
@@ -469,62 +459,15 @@ public class LineGatewayController extends AbstractRestController {
                     }
                 }
                 if(reason.length()>0){
-                    return RestResponse.success("第["+i+"]行开始处理处理失败;"+reason);
+                    return RestResponse.failed("0000","第["+i+"]行开始处理处理失败;"+reason);
                 }
                 return RestResponse.success("成功处理到第["+i+"]行;");
             } catch (Exception e) {
-                return RestResponse.success("第["+i+"]行开始处理处理失败;"+reason);
+                return RestResponse.failed("0000","第["+i+"]行开始处理处理失败;"+reason);
             }
         } else {
             return RestResponse.failed("0000","文件不存");
         }
-    }
-    private ResourceTelenum upCall(ResourceTelenum resourceTelenum,String telnum,int isCalled0,int isDialing0,int isThrough0){
-//        Map<String,Long> map = telnumToLineGatewayService.getTelnumCall(telnum,null);
-        long isCalled = 0;//map.get("isCalled");
-        long isDialing = 0;//map.get("isDialing");
-        long isThrough = 0;
-        isCalled += isCalled0;
-        isDialing += isDialing0;
-        isThrough += isThrough0;
-        isCalled = isCalled>0?1:0;
-        isDialing = isDialing>0?1:0;
-        isThrough = isThrough>0?1:0;
-        resourceTelenum.setIsDialing(isDialing+"");
-        resourceTelenum.setIsCalled(isCalled+"");
-        resourceTelenum.setIsThrough(isThrough+"");
-        return resourceTelenumService.save(resourceTelenum);
-    }
-    private void batchUpCall(String line,String... nums){
-        if(nums.length==0) {
-            //获取该线路的全部号码
-            List<String> list = telnumToLineGatewayService.getTelnumByLineId(line);
-            //修改号码中的状态
-            for (int i = 0; i < list.size(); i++) {
-                upCalls(line,list.get(i));
-            }
-        }else if(nums.length>0){
-            for(int i=0;i<nums.length;i++){
-                upCalls(line,nums[i]);
-            }
-        }
-    }
-    private void upCalls(String line,String telnum){
-        Map<String, Long> map = telnumToLineGatewayService.getTelnumCall(telnum, null);
-        ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(telnum);
-        long isCalled = map.get("isCalled");
-        long isDialing = map.get("isDialing");
-        long isThrough = map.get("isThrough");
-        isCalled = isCalled>0?1:0;
-        isDialing = isDialing>0?1:0;
-        isThrough = isThrough>0?1:0;
-        if(line.equals(resourceTelenum.getLineId())){
-            resourceTelenum.setLineId("无");
-        }
-        resourceTelenum.setIsCalled(isCalled+ "");
-        resourceTelenum.setIsDialing(isDialing + "");
-        resourceTelenum.setIsThrough(isThrough + "");
-        resourceTelenumService.save(resourceTelenum);
     }
     private String vailLineGatewayVo(LineGatewayVo lineGatewayVo){
         if(StringUtils.isEmpty(lineGatewayVo.getOperator())){

@@ -17,4 +17,15 @@ public interface LineGatewayToPublicService extends BaseService<LineGatewayToPub
 
     List<LineGateway> findAllLineGatewayByAreaId(String areaId);
     void deleteLine(String line);
+
+    /**
+     * 加入全局线路
+     */
+    void addPublic(String id);
+    /**
+     * 移除全局线路
+     */
+    void removePublic(String id);
+
+    int upPriority(int o1,int o2,String line);
 }

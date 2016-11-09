@@ -38,6 +38,15 @@ public class ResourcesRent extends IdEntity {
     public ResourcesRent() {
     }
 
+    public ResourcesRent(Tenant tenant, ResourceTelenum resourceTelenum, String resName, String resType, Date rentDt, Integer rentStatus) {
+        this.tenant = tenant;
+        this.resourceTelenum = resourceTelenum;
+        this.resData = resourceTelenum.getTelNumber();
+        this.resName = resName;
+        this.resType = resType;
+        this.rentDt = rentDt;
+        this.rentStatus = rentStatus;
+    }
     public ResourcesRent(Tenant tenant, App app, ResourceTelenum resourceTelenum, String resName, String resType, Date rentDt, Date rentExpire, Integer rentStatus) {
         this.tenant = tenant;
         this.app = app;

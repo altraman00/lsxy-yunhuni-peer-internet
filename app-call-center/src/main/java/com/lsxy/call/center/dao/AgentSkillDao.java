@@ -23,6 +23,6 @@ public interface AgentSkillDao extends BaseDaoInterface<AgentSkill, Serializable
     @Query("update AgentSkill a set active=:active where agent=:agent and name=:name")
     public int updateActiveByAgent(@Param("active") Integer active,@Param("agent") String agent,@Param("name") String name);
 
-    public List<AgentSkill> findByTenantIdAndAppIdAgentAndActive(String tenantId,String appId,String agent,Integer active);
+    public List<AgentSkill> findByTenantIdAndAppIdAndAgentAndActive(String tenantId,String appId,String agent,Integer active);
 
 }
