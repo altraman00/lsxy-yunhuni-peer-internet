@@ -124,8 +124,8 @@
                                                 <th>呼叫类型</th>
                                                 <th>主叫</th>
                                                 <th>被叫</th>
-                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 <th>时长（秒）</th>
+                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -138,11 +138,11 @@
                                                     </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
+                                                    <td>${result.costTimeLong}</td>
                                                     <td>
                                                         <span style="float:left;width: 80px" ><span style="float:right;" >
                                                             ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
                                                         </span></span></td>
-                                                    <td>${result.costTimeLong}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
