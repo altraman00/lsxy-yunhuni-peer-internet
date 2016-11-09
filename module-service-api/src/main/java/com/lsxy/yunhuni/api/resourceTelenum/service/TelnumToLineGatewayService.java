@@ -23,6 +23,7 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
 
     LineGateway getCalledLineByNumber(String number);
 
+    List<TelnumToLineGateway> getListByLine(String line);
     /**
      * 根据线路逻辑上删除
      *
@@ -106,4 +107,6 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
     void telnumDelete(String id,String[] ids,String[] idss);
 
     void telnumCreate(ResourceTelenum resourceTelenum,TelnumToLineGateway telnumToLineGateway);
+
+    int getIsThrough(String telnum);
 }

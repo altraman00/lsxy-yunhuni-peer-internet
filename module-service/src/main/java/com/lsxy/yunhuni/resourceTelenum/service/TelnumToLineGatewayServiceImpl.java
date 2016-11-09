@@ -15,6 +15,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.resourceTelenum.dao.TelnumToLineGatewayDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,12 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         }else{
             return null;
         }
+    }
+
+    @Override
+    public List<TelnumToLineGateway> getListByLine(String line) {
+        String hql = " From TelnumToLineGateway obj WHERE obj.lineId='"+line+"'";
+        return this.list(hql);
     }
 
     @Override
@@ -151,6 +158,11 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
                 }
             }
         });
+        for(int i=0;i<ids.length;i++){
+            ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(ids[i]);
+            resourceTelenum.setIsThrough("1");
+            resourceTelenumService.save(resourceTelenum);
+        }
     }
 
     @Override
@@ -172,7 +184,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
 
     @Override
     public void updateIsThrough(String line, String isThrough) {
-        String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET is_through='"+isThrough+"' WHERE  line_id='"+line+"' ";
+        String sql = " UPDATE db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway SET is_through='"+isThrough+"' WHERE  deleted=0 AND  line_id='"+line+"' ";
         jdbcTemplate.update(sql);
     }
 
@@ -241,13 +253,9 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         } catch (Exception e) {
             throw new RuntimeException("删除失败");
         }
-        //删除线路号码关联关系表
-        this.deleteByLineId(lineGateway.getId());
         //删除全局线路和归属线路
         lineGatewayToTenantService.deleteLine(lineGateway.getId());
         lineGatewayToPublicService.deleteLine(lineGateway.getId());
-        //更新号码的状态
-        this.batchUpCall(lineGateway.getId());
     }
 
     @Override
@@ -262,5 +270,11 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         resourceTelenumService.save(resourceTelenum);
         //创建号码线路对象
         this.save(telnumToLineGateway);
+    }
+
+    @Override
+    public int getIsThrough(String telnum) {
+        String sql = " select IFNULL(sum(is_through),0) FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway where deleted=0 and tel_number='"+telnum+"'";
+        return jdbcTemplate.queryForObject(sql,Integer.class);
     }
 }
