@@ -23,11 +23,11 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelenumOrderItemService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelenumOrderService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourcesRentDao;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -165,6 +165,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
+    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
     public void release(String id) {
         ResourcesRent resourcesRent = this.findById(id);
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);

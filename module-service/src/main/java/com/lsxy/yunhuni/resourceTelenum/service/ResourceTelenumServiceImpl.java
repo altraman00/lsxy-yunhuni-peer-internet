@@ -17,6 +17,8 @@ import com.lsxy.yunhuni.resourceTelenum.dao.ResourceTelenumDao;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -130,7 +131,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page<ResourceTelenum> getPageByNotLine(String id,String areaCode, Integer pageNo, Integer pageSize, String operator, String number) {
-        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj where obj.deleted=0 AND area_code='"+areaCode+"' AND obj.tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE line_id='"+id+"') ";
+        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj where obj.deleted=0 AND area_code='"+areaCode+"' AND obj.tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE obj.deleted=0 AND line_id='"+id+"') ";
         if(StringUtils.isNotEmpty(operator)){
             sql +=" AND obj.operator like '%"+operator+"%' ";
         }
@@ -261,7 +262,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tel_number IN ("+innums+") ";
+        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tenant_id IS NOT NULL  AND obj.tel_number IN ("+innums+") ";
         if(StringUtils.isNotEmpty(tenantName)){
             sql += " AND  a.tenant_name LIKE '%"+tenantName+"%'";
         }
@@ -275,6 +276,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         pageSql += " limit "+start+","+pageSize+" ";
         //获取得到租户
         List<String> list = jdbcTemplate.queryForList(pageSql,String.class);
+        System.out.println(list);
         String sql2 = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") ";
         Query query2 = em.createNativeQuery(sql2,ResourceTelenum.class);
         List<ResourceTelenum> list2 = query2.getResultList();
@@ -283,7 +285,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             Map map = null;
             List<Map> list3= new ArrayList<>();
             for (int i = 0; i < list2.size(); i++) {
-                if(list.get(j).equals(list2.get(i).getTenant().getId())){
+                Tenant tenant = list2.get(i).getTenant();
+                if(tenant!=null&&list.get(j).equals(tenant.getId())){
                     if(map==null) {
                         map = new HashMap();
                         map.put("tenantId", list2.get(i).getTenant().getId());
@@ -295,8 +298,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                     list3.add(temp);
                 }
             }
-            map.put("numbers",list3);
-            result.add(map);
+            if(map!=null) {
+                map.put("numbers",list3);
+                result.add(map);
+            }
         }
         Page page =  new Page<>(start,total,pageSize,result);
         return page;
@@ -346,6 +351,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #resourceTelenum.id", beforeInvocation = true)
+            }
+    )
     public void editNum(ResourceTelenum resourceTelenum,int tenantType,boolean isEditNum,Tenant tenant,String telnum1,String telnum12) {
         resourceTelenum = this.save(resourceTelenum);
         //只更改租户
@@ -388,6 +398,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
+            }
+    )
     public void release(String id) {
         ResourceTelenum resourceTelenum = this.findById(id);
         ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());

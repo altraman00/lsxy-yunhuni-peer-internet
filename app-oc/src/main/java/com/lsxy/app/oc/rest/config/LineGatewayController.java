@@ -335,7 +335,7 @@ public class LineGatewayController extends AbstractRestController {
         }
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
             //创建号码对象
-            ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway.getId(),telnumVo.getAmount()
+            ResourceTelenum resourceTelenum = new ResourceTelenum(telnumVo.getTelNumber(),telnumVo.getCallUri(),telnumVo.getOperator(),lineGateway.getAreaCode(),lineGateway,telnumVo.getAmount()
                     ,telnumVo.getIsCalled()+"",telnumVo.getIsDialing()+"","0",lineGateway.getAreaId());
             TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(telnumVo.getTelNumber(),lineGateway.getId(),telnumVo.getIsDialing()+"",telnumVo.getIsCalled()+"",0+"","1");
 //            resourceTelenumService.save(resourceTelenum);
@@ -443,7 +443,7 @@ public class LineGatewayController extends AbstractRestController {
                         }
                         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())){
                             //创建号码对象
-                            ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway.getId(),amount,isCalled,isDialing,"0",lineGateway.getAreaId());
+                            ResourceTelenum resourceTelenum = new ResourceTelenum(telnum,callUri,operator,areaCode,lineGateway,amount,isCalled,isDialing,"0",lineGateway.getAreaId());
                             //创建号码线路对象
                             TelnumToLineGateway telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(),lineGateway.getId(),isDialing,isCalled,"0","1");
                             telnumToLineGatewayService.telnumCreate(resourceTelenum,telnumToLineGateway);
@@ -470,8 +470,11 @@ public class LineGatewayController extends AbstractRestController {
         }
     }
     private String vailLineGatewayVo(LineGatewayVo lineGatewayVo){
+        if(StringUtils.isEmpty(lineGatewayVo.getLineNumber())){
+            return "线路标识为空";
+        }
         if(StringUtils.isEmpty(lineGatewayVo.getOperator())){
-            return "运营商错误";
+            return "运营商为空";
         }
         String[] op = lineGatewayVo.getOperator().split(",");
         for(int i=0;i<op.length;i++){
@@ -480,18 +483,41 @@ public class LineGatewayController extends AbstractRestController {
             }
         }
         if(StringUtils.isEmpty(lineGatewayVo.getAreaId())){
-            return "区域编号错误";
+            return "区域编号为空";
         }
         Area area = areaService.findById(lineGatewayVo.getAreaId());
         if(area==null||StringUtils.isEmpty(area.getId())){
             return "区域编号错误";
         }
         if(StringUtils.isEmpty(lineGatewayVo.getAreaCode())){
-            return "归属地区号不存在";
+            return "归属地区号为空";
         }
         String areaName = telnumLocationService.getAreaNameByAreaCode(lineGatewayVo.getAreaCode());
         if(StringUtils.isEmpty(areaName)){
             return "归属地区号不存在";
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getLineType())){
+            return "线路类型为空";
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getSipAuthIp())){
+            return "IP端口为空";
+        }
+        if(StringUtils.isEmpty(lineGatewayVo.getSipProviderDomain())){
+            return "domain端口为空";
+        }
+        if("1".equals(lineGatewayVo.getSipAuthType())){
+            if(StringUtils.isEmpty(lineGatewayVo.getSipAuthAccount())){
+                return "账号为空";
+            }
+            if(StringUtils.isEmpty(lineGatewayVo.getSipAuthPassword())){
+                return "密码为空";
+            }
+        }else if("2".equals(lineGatewayVo.getSipAuthType())){
+            if(StringUtils.isEmpty(lineGatewayVo.getSipAuthIp())){
+                return "sip接入点的外网IP地址为空";
+            }
+        }else{
+            return "鉴权方式错误";
         }
         String[] rule = {"0","1","2"};
         if(!Arrays.asList(rule).contains(lineGatewayVo.getMobileAreaRule())){
@@ -501,12 +527,18 @@ public class LineGatewayController extends AbstractRestController {
         if(!Arrays.asList(rule1).contains(lineGatewayVo.getTelAreaRule())){
             return "固话区号规则错误";
         }
+        if(lineGatewayVo.getLinePrice()==null){
+            return "成本价为空";
+        }
         String[] is = {"0","1"};
         if(!Arrays.asList(is).contains(lineGatewayVo.getIsThrough())){
             return "是否可透传规则错误";
         }
-        if(lineGatewayVo.getQuality()>10||lineGatewayVo.getQuality()<1){
+        if(lineGatewayVo.getQuality()==null||lineGatewayVo.getQuality()>10||lineGatewayVo.getQuality()<1){
             return "质量范围错误";
+        }
+        if(lineGatewayVo.getCapacity()==null){
+            return "并发容量为空";
         }
         return "";
     }

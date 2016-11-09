@@ -82,7 +82,7 @@ public class RentTelnumController extends AbstractPortalController {
     private RestResponse releaseREST(HttpServletRequest request,String id){
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/res_rent/release?id={1}";
-        return  RestRequest.buildSecurityRequest(token).get(uri, ResourcesRent.class,id);
+        return  RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
     }
     /** 获取号码列表
      * **/
