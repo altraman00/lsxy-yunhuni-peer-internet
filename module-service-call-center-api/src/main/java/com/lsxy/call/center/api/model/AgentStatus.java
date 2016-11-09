@@ -8,6 +8,8 @@ import java.io.Serializable;
  */
 public class AgentStatus implements Serializable{
 
+    private String extension;
+    
     private String state;
 
     private long lastTime;
