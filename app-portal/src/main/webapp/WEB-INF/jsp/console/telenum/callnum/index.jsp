@@ -102,18 +102,18 @@
                                                 <c:if test="${result.rentExpire.time==null||result.rentExpire.time>time.time}">正常</c:if>
                                             </td>
                                             <td class="text-center">
-                                                <c:if test="${result.resourceTelenum.isDialing==1||result.resourceTelenum.isThrough==1}">
-                                                    ✔
-                                                </c:if>
-                                                <c:if test="${result.resourceTelenum.isDialing==0&&result.resourceTelenum.isThrough==0}">
-                                                    ✘
-                                                </c:if>
-                                            </td>
-                                            <td class="text-center">
                                                 <c:if test="${result.resourceTelenum.isCalled==1}">
                                                     ✔
                                                 </c:if>
                                                 <c:if test="${result.resourceTelenum.isCalled==0}">
+                                                    ✘
+                                                </c:if>
+                                            </td>
+                                            <td class="text-center">
+                                                <c:if test="${result.resourceTelenum.isDialing==1||result.resourceTelenum.isThrough==1}">
+                                                    ✔
+                                                </c:if>
+                                                <c:if test="${result.resourceTelenum.isDialing==0&&result.resourceTelenum.isThrough==0}">
                                                     ✘
                                                 </c:if>
                                             </td>
