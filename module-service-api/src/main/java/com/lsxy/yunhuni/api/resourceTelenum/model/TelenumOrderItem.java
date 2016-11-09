@@ -1,6 +1,8 @@
 package com.lsxy.yunhuni.api.resourceTelenum.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -36,6 +38,7 @@ public class TelenumOrderItem extends IdEntity {
     }
     @OneToOne
     @JoinColumn(name = "telnum_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     public ResourceTelenum getTelnum() {
         return telnum;
     }
