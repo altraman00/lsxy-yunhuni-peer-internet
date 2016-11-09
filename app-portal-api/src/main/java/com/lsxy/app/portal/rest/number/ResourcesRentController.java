@@ -139,6 +139,12 @@ public class ResourcesRentController extends AbstractRestController{
                 telenumOrderService.save(temp);
             }else {
                 List<TelenumOrderItem> list = telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(), temp.getId());
+                BigDecimal bigDecimal = new BigDecimal(0);
+                for(int i=0;i<list.size();i++){
+                    bigDecimal=bigDecimal.add(list.get(i).getAmount());
+                }
+                temp.setAmount(bigDecimal);
+                temp = telenumOrderService.save(temp);
                 map.put("order", temp);
                 map.put("list", list);
             }
