@@ -69,9 +69,6 @@ public class ResourceTelenum extends IdEntity{
         this.areaId = areaId;
     }
 
-
-
-
     @Column(name = "is_dialing")
     public String getIsDialing() {
         return isDialing;
