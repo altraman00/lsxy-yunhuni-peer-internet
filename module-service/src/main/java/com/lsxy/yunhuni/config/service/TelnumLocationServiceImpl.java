@@ -81,11 +81,15 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
     @Override
     public String getAreaNameByAreaCode(String areaCode) {
         String sql = "SELECT DISTINCT IFNULL(city,'') FROM db_lsxy_bi_yunhuni.tb_oc_config_telnum_location WHERE area_code='"+areaCode+"'";
-        String result = null;
+        List<String> result = null;
+        String re = "";
         try {
-            result = jdbcTemplate.queryForObject(sql, String.class);
+            result = jdbcTemplate.queryForList(sql, String.class);
+            if(result.size()>0) {
+                re = result.get(0);
+            }
         }catch (Exception e){}//捕获空指针异常
-        return result;
+        return re;
     }
 
 
