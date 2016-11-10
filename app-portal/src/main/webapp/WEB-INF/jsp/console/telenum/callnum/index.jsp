@@ -211,7 +211,7 @@
                                 &times;
                             </button>
                             <h4 class="modal-title" id="myModalLabel">
-                                号码租户
+                                号码租用
                             </h4>
                         </div>
                         <div class="modal-body">
@@ -331,7 +331,7 @@
                                 &times;
                             </button>
                             <h4 class="modal-title" id="">
-                                号码租户
+                                号码租用
                             </h4>
                         </div>
                         <div class="modal-body">

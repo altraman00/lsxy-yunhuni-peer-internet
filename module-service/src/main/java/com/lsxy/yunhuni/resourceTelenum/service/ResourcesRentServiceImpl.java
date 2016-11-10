@@ -149,7 +149,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     resourcesRentDao.updateResourceRentExpireTime(resourcesRent.getId(),expireDate);
                     //TODO 支付
                     //插入消费记录
-                    Consume consume = new Consume(curTime, ConsumeCode.rent_number.name(),cost,ConsumeCode.rent_number.getName(),appId,tenant);
+                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant);
                     consumeService.save(consume);
                     //Redis中消费增加
                     calBillingService.incConsume(tenant.getId(),curTime,cost);
@@ -204,7 +204,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         consumeService.consume(consume);
         //TODO 号码月租费
         BigDecimal bigDecimal = new BigDecimal(100);
-        Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant);
+        Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant);
         consumeService.consume(consume1);
     }
 
