@@ -9,10 +9,20 @@ import java.io.Serializable;
 public class AgentStatus implements Serializable{
 
     private String extension;
-    
+
     private String state;
 
+    private long lastRegTime;
+
     private long lastTime;
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
 
     public String getState() {
         return state;
@@ -20,6 +30,14 @@ public class AgentStatus implements Serializable{
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public long getLastRegTime() {
+        return lastRegTime;
+    }
+
+    public void setLastRegTime(long lastRegTime) {
+        this.lastRegTime = lastRegTime;
     }
 
     public long getLastTime() {

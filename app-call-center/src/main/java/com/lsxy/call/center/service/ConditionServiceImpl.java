@@ -82,8 +82,4 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         return condition;
     }
 
-    public static void main(String[] args) {
-        String a = null;
-        System.out.println("1111111111"+a);
-    }
 }
