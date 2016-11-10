@@ -209,7 +209,7 @@ public class ResourceTelenum extends IdEntity{
         this.telNumber = telNumber;
         this.line = line;
         this.status =0;//未被租用
-        this.usable = "1";//可用
+        this.usable = "0";//不可用
         this.type = "1";//采购线路
     }
     public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,LineGateway line, String amount,String isCalled,String isDialing,String isThrough,String areaId) {
@@ -220,7 +220,7 @@ public class ResourceTelenum extends IdEntity{
         this.telNumber = telNumber;
         this.line = line;
         this.status =0;//未被租用
-        this.usable = "1";//可用
+        this.usable = "0";//不可用
         this.type = "1";//采购线路
         this.isCalled = isCalled;
         this.isDialing = isDialing;
