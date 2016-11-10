@@ -637,10 +637,10 @@ public class LineGatewayController extends AbstractRestController {
             return "线路类型为空";
         }
         if(StringUtils.isEmpty(lineGatewayVo.getSipProviderIp())){
-            return "IP端口为空";
+            return "IP+端口为空";
         }
         if(StringUtils.isEmpty(lineGatewayVo.getSipProviderDomain())){
-            return "domain端口为空";
+            return "域名+端口为空";
         }
         if("1".equals(lineGatewayVo.getSipAuthType())){
             if(StringUtils.isEmpty(lineGatewayVo.getSipAuthAccount())){
