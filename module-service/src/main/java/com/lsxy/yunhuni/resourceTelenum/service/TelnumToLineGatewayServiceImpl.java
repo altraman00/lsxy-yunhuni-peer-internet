@@ -275,6 +275,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     @Override
     public int getIsThrough(String telnum) {
         String sql = " select IFNULL(sum(is_through),0) FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway where deleted=0 and tel_number='"+telnum+"'";
-        return jdbcTemplate.queryForObject(sql,Integer.class);
+        int re =  jdbcTemplate.queryForObject(sql,Integer.class);
+        return re>0?1:0;
     }
 }
