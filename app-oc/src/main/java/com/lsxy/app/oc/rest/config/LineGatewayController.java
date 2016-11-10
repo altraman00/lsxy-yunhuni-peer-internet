@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -249,7 +250,20 @@ public class LineGatewayController extends AbstractRestController {
             }
         }
         Page page = telnumToLineGatewayService.getPage(pageNo,pageSize,id,number,isDialing,isCalled,isThrough);
-        return RestResponse.success(page);
+        List<TelnumToLineGatewayVo> list = new ArrayList();
+        for(int i=0;i<page.getResult().size();i++){
+            TelnumToLineGatewayVo temp = new TelnumToLineGatewayVo();
+            try {
+                BeanUtils.copyProperties(temp,page.getResult().get(i));
+            } catch (Exception e) {
+
+            }
+            ResourceTelenum r1 = resourceTelenumService.findByTelNumber(temp.getTelNumber());
+            temp.setResourceTelenum(r1);
+            list.add(temp);
+        }
+        Page p1 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),list);
+        return RestResponse.success(p1);
     }
 
 
