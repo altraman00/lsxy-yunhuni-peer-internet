@@ -219,7 +219,7 @@ public class ResourceTelenumController extends AbstractRestController {
         //线路是租户自带线路时，必选租户
         if("0".equals(telnumTVo.getType())){
             if (StringUtils.isEmpty(telnumTVo.getTenantId())) {
-                return RestResponse.failed("0000", "所选租户不存在");
+                return RestResponse.failed("0000", "所选租户不能为空");
             }
             tenant = tenantService.findById(telnumTVo.getTenantId());
             if (tenant == null || StringUtils.isEmpty(tenant.getId())) {
