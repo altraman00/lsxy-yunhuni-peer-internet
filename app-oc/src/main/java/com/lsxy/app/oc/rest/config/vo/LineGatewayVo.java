@@ -43,9 +43,9 @@ public class LineGatewayVo {
     @ApiModelProperty(name="isThrough",value = "是否透传：1=是，0=不是")
     private String isThrough;
     @ApiModelProperty(name="quality",value = "质量：数字1-10")
-    private Integer quality;
+    private int quality;
     @ApiModelProperty(name="capacity",value = "并发容量：数字")
-    private Integer capacity;
+    private int capacity;
 
     public String getSipAuthIp() {
         return sipAuthIp;

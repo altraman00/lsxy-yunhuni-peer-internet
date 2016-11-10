@@ -637,10 +637,10 @@ public class LineGatewayController extends AbstractRestController {
             return "线路类型为空";
         }
         if(StringUtils.isEmpty(lineGatewayVo.getSipProviderIp())){
-            return "IP端口为空";
+            return "IP+端口为空";
         }
         if(StringUtils.isEmpty(lineGatewayVo.getSipProviderDomain())){
-            return "domain端口为空";
+            return "域名+端口为空";
         }
         if("1".equals(lineGatewayVo.getSipAuthType())){
             if(StringUtils.isEmpty(lineGatewayVo.getSipAuthAccount())){
@@ -671,11 +671,19 @@ public class LineGatewayController extends AbstractRestController {
         if(!Arrays.asList(is).contains(lineGatewayVo.getIsThrough())){
             return "是否可透传规则错误";
         }
-        if(lineGatewayVo.getQuality()==null||lineGatewayVo.getQuality()>10||lineGatewayVo.getQuality()<1){
-            return "质量范围错误";
+        if(lineGatewayVo.getQuality()==null){
+            return "质量范围为空";
+        }else{
+            if(lineGatewayVo.getQuality()>10||lineGatewayVo.getQuality()<1){
+                return "质量范围只能在[1,10]";
+            }
         }
         if(lineGatewayVo.getCapacity()==null){
             return "并发容量为空";
+        }else{
+            if(lineGatewayVo.getCapacity()<1||lineGatewayVo.getCapacity()>1000){
+                return "并发容量只能在[1,1000]";
+            }
         }
         return "";
     }
