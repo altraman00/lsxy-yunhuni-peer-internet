@@ -47,7 +47,7 @@ public class CallCenterAgent extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "channe_id")
+    @Column(name = "channel_id")
     public String getChannelId() {
         return channelId;
     }
