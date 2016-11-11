@@ -203,7 +203,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
         consumeService.consume(consume);
         //TODO 号码月租费
-        BigDecimal bigDecimal = new BigDecimal(100);
+        BigDecimal bigDecimal = new BigDecimal(100*list.size());
         Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant);
         consumeService.consume(consume1);
     }
