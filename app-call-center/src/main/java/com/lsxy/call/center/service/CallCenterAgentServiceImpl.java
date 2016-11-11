@@ -1,7 +1,10 @@
 package com.lsxy.call.center.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.call.center.api.model.*;
+import com.lsxy.call.center.api.model.AgentSkill;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
@@ -9,26 +12,20 @@ import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.dao.AgentSkillDao;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
-import com.lsxy.call.center.utils.EnqueueSQLUtil;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.framework.core.utils.*;
+import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
-import com.lsxy.framework.mq.events.callcenter.EnqueueEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -58,7 +55,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     private DeQueueService deQueueService;
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisCacheService redisCacheService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -73,7 +70,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //登陆
     @Override
-    public String login(String tenantId,String appId,CallCenterAgent callCenterAgent){
+    public String login(String tenantId,String appId,CallCenterAgent callCenterAgent,List<AppExtension> extentions,List<AgentSkill> skills){
         if(StringUtil.isEmpty(tenantId)){
             throw new NullPointerException();
         }
@@ -84,19 +81,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         CallCenterAgent agent = new CallCenterAgent();
         agent.setTenantId(tenantId);
         agent.setAppId(appId);
-        agent.setName(callCenterAgent.getName());
-        agent.setState(callCenterAgent.getState());
-        if(StringUtil.isBlank(agent.getState())){
-            agent.setState(CallCenterAgent.STATE_DEFAULT);
-        }
+        agent.setAgentNo(callCenterAgent.getAgentNo());
+        agent.setAgentNum(callCenterAgent.getAgentNum());
+
         String agentId = this.save(agent).getId();
-        List<AppExtension>  extensions = callCenterAgent.getExtentions();
-        if(extensions!=null && extensions.size()>0){
-            for (AppExtension extension : extensions) {
-                appExtensionService.updateAgent(extension.getId(),agentId,extension.getEnabled());
+        if(extentions!=null && extentions.size()>0){
+            for (AppExtension extension : extentions) {
+                //TODO 设置坐席的分机
             }
         }
-        List<AgentSkill> skills = callCenterAgent.getSkills();
         if(skills!=null && skills.size()>0){
             for (AgentSkill obj : skills) {
                 AgentSkill skill = new AgentSkill();
@@ -118,7 +111,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Override
     public boolean logout(String agentId){
         agentSkillDao.deleteByAgent(agentId);
-        appExtensionDao.updateByAgent(AppExtension.UNENABLED,agentId);
+        //TODO 删除坐席的分机列表
         try {
             this.delete(agentId);
         } catch (Throwable e) {
@@ -133,7 +126,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         if(agent == null){
             return true;
         }
-        agent.setState(state);
+        //TODO 设置坐席的状态
         this.save(agent);
         return true;
     }
@@ -157,6 +150,13 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         return true;
     }
 
+    @Override
+    public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
+        String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel_id=\"\"+channelId+\"\" and deleted = 0";
+
+        return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
+    }
     /**
      * 排队,通过 dubbo返回结果给  区域管理器
      * @param tenantId
@@ -166,7 +166,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
      */
     @Override
     public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue){
-        if(StringUtil.isEmpty(tenantId)){
+        /*if(StringUtil.isEmpty(tenantId)){
             return;
         }
         if(StringUtil.isEmpty(appId)){
@@ -209,11 +209,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }catch (Throwable t){
             logger.error("排队出错",t);
             deQueueService.fail(tenantId,appId,callId,t.getMessage());
-        }
+        }*/
     }
-
-    String skill_regex="(has|get)\\(\"(.+?)\"\\)";
-    Pattern p  =Pattern.compile(skill_regex);
 
     /**
      * 坐席找排队
@@ -222,11 +219,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
      * @param agentId
      */
     public void enqueue(String tenantId, String appId, String agentId){
-        CallCenterAgent agent = this.findById(agentId);
+        /*CallCenterAgent agent = this.findById(agentId);
         if(agent == null){
             return;
         }
-        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAgentAndActive(tenantId,appId,agentId,1);
+        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAndAgentAndActive(tenantId,appId,agentId,1);
         Map<String,Object> params = new HashMap<>();
         if(skills!=null && skills.size()>0){
             for(AgentSkill skill : skills){
@@ -237,54 +234,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         String enqueue = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
         if(getWhere(enqueue,params)){
             getSort(enqueue,params);
-        }
+        }*/
     }
 
-    public boolean getWhere(String enqueue , Map<String,Object> params){
-        if(StringUtil.isBlank(enqueue)){
-            return false;
-        }
-        EnQueue enQueue = JSONUtil2.fromJson(enqueue,EnQueue.class);
-        String ex = enQueue.getFilter().getCondition().getWhere();
-        if(StringUtil.isBlank(ex)){//没有条件,就是所有都满足
-            return true;
-        }
-        Matcher m =  p.matcher(ex);
-        while(m.find()){
-            String key = m.group(1);
-            String val =  m.group(2);
-            String varName = "var_" + val.hashCode();
-            String rel = varName;
-            if(key.equals("has")){
-                rel = rel + ">0";
-            }
-            ex = ex.replaceAll(key + "\\(\"(.+?)\"\\)",rel);
-        }
-        return EnqueueSQLUtil.execWhereExpression(ex,params);
-    }
-
-    public long getSort(String enqueue , Map<String,Object> params){
-        if(StringUtil.isBlank(enqueue)){
-            return Integer.MIN_VALUE;
-        }
-        EnQueue enQueue = JSONUtil2.fromJson(enqueue,EnQueue.class);
-        String ex = enQueue.getFilter().getCondition().getSort();
-        if(StringUtil.isBlank(ex)){//没有排序表达式
-            return Integer.MAX_VALUE;
-        }
-        Matcher m =  p.matcher(ex);
-        while(m.find()){
-            String key = m.group(1);
-            String val =  m.group(2);
-            String varName = "var_" + val.hashCode();
-            String rel = varName;
-            if(key.equals("has")){
-                rel = rel + ">0";
-            }
-            ex = ex.replaceAll(key + "\\(\"(.+?)\"\\)",rel);
-        }
-        return EnqueueSQLUtil.execSortExpression(ex,params);
-    }
-    public void dequeue(String agent){
-    }
 }
