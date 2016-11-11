@@ -74,7 +74,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page getPageByFreeNumber(Integer pageNo, Integer pageSize, String telnum, String type, String areaCode, String order) {
-        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' ";
+        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' and obj.usable=1";
         if(StringUtils.isNotEmpty(type)){
             if("callin".equals(type)){
                 hql += " AND obj.isThrough=1 ";
