@@ -106,15 +106,7 @@ public class LineGatewayToTenantController  extends AbstractRestController {
         LineGatewayToTenant lineGatewayToTenant = lineGatewayToTenantService.findById(id);
         if(lineGatewayToTenant!=null&& StringUtils.isNotEmpty(lineGatewayToTenant.getId())){
             //删除线路关系
-            lineGatewayToTenantService.delete(lineGatewayToTenant);
-            //修正优先级
-            int o3 = lineGatewayToTenantService.getMaxPriority();
-            if(o3!=lineGatewayToTenant.getPriority()){
-                int re = upPriority(lineGatewayToTenant.getPriority(),o3,null);
-                if(re==-1){
-                    return RestResponse.failed("0000","删除成功，修正失败，请手动修正");
-                }
-            }
+            lineGatewayToTenantService.removeTenantLine(id);
         }else{
             return RestResponse.failed("0000","线路不存在");
         }
@@ -128,11 +120,11 @@ public class LineGatewayToTenantController  extends AbstractRestController {
         try{ o2=Integer.valueOf(editPriorityVo.getPriority());}catch (Exception e){
             return RestResponse.failed("0000","目标优先级只能为数字");
         }
-        if(o2==0){
-            return RestResponse.failed("0000","目标优先级不能为0");
+        if(o2==0||o2<0){
+            return RestResponse.failed("0000","目标优先级必须大于0");
         }
         int o3 = lineGatewayToTenantService.getMaxPriority();
-        if(o2>03){
+        if(o2>o3){
             return RestResponse.failed("0000","目标优先级不能超过当前最大优先级");
         }
         LineGatewayToTenant lineGatewayToTenant = lineGatewayToTenantService.findById(id);
@@ -141,7 +133,7 @@ public class LineGatewayToTenantController  extends AbstractRestController {
             if(o1==o2){
                 return RestResponse.failed("0000","目标优先级和当前优先级一致");
             }
-            int re = upPriority(o1,o2,lineGatewayToTenant.getId());
+            int re = lineGatewayToTenantService.upPriority(o1,o2,lineGatewayToTenant.getId());
             if(re==-1){
                 return RestResponse.failed("0000","修改失败，请重试");
             }
@@ -150,25 +142,5 @@ public class LineGatewayToTenantController  extends AbstractRestController {
         }
         return RestResponse.success("修改成功");
     }
-    private int upPriority(int o1,int o2,String line){
-        String flag = "+1";
-        int begin = -1;
-        int end = -1;
-        if(o1<o2){
-            begin = o1+1;
-            end = o2;
-            flag = "-1";
-        }else{
-            begin = o2;
-            end = o1-1;
-            flag = "+1";
-        }
-        String[] sql = new String[2];
-        sql[0] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant SET priority=priority"+flag+" WHERE deleted=0 AND priority BETWEEN "+begin+" AND "+end+" ";
-        if(StringUtils.isNotEmpty(line)) {
-            sql[1] = " UPDATE db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant SET priority=" + o2 + " WHERE deleted=0 AND id ='" + line + "' ";
-        }
-        int re = lineGatewayService.batchModify(sql);
-        return re;
-    }
+
 }

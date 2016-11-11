@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.config.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToTenant;
@@ -20,4 +21,12 @@ public interface LineGatewayToTenantService extends BaseService<LineGatewayToTen
     Page<LineGatewayToTenant> getPage(String tenantId,Integer pageNo, Integer pageSize);
     long findByLineIdAndTenantId(String lineId,String tenantId);
     int getMaxPriority();
+    void deleteLine(String line);
+
+    int upPriority(int o1,int o2,String line);
+
+    /**
+     * 移除私有线路
+     */
+    void removeTenantLine(String id);
 }

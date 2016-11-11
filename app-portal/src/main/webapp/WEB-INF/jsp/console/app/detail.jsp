@@ -61,7 +61,7 @@
                                     <div class="col-md-12 padder-v fix-padding">
                                         <a href="${ctx}/console/app/index?id=${app.id}" class="btn btn-primary query">应用编辑</a>
                                         <c:if test="${app.serviceType=='call_center'}">
-                                            <a href="" class="btn btn-call margin_left-20">呼叫中心管理</a>
+                                            <%--<a href="" class="btn btn-call margin_left-20">呼叫中心管理</a>--%>
                                         </c:if>
                                     </div>
                                 </div>
@@ -199,7 +199,7 @@
                                                                     <%--<p>${appExtension.telenum} </p>--%>
                                                                 <%--</c:if>--%>
                                                             <%--</c:forEach>--%>
-                                                            <p class="text-danger">（未上线的分机接入信息只作临时使用，上线后平台会重新分配分机接入信息）</p>
+                                                            <p class="text-danger">（上线后平台会重新分配分机接入信息）</p>
                                                         </div>
                                                     </div>
                                                     </c:if>
