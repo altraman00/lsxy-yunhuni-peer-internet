@@ -2,6 +2,7 @@ package com.lsxy.area.server.event.handler.call;
 
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
+import com.lsxy.area.api.exceptions.NumberNotAllowToCallException;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -13,14 +14,20 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
+import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +77,16 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     @Autowired
     private VoiceIvrService voiceIvrService;
 
+    @Autowired
+    private ResourceTelenumService resourceTelenumService;
+
+    @Autowired
+    private TelnumToLineGatewayService telnumToLineGatewayService;
+    @Autowired
+    private ApiGwRedBlankNumService apiGwRedBlankNumService;
+    @Autowired
+    private TelnumLocationService telNumLocationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_INCOMING;
@@ -92,8 +109,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String from_uri = (String)params.get("from_uri");//主叫sip地址
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
         String begin_time = (String)params.get("begin_time");
-        String from = resolveTelNum(from_uri);//主叫号码
-        String to = resolveTelNum(to_uri);//被叫号码
+        String to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
+        LineGateway calledLine = telnumToLineGatewayService.getCalledLineByNumber(to);
+        String from = resolveFromTelNum(from_uri,calledLine);//主叫号码
 
         Tenant tenant = null;
         App app = null;
@@ -140,14 +158,64 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         return res;
     }
 
-    private static String resolveTelNum(String sip_uri){
-        int start = sip_uri.indexOf(":") + 1;
-        int end = sip_uri.indexOf("@");
-
-        if(end == -1){
-            end = sip_uri.length();
+    private String resolveFromTelNum(String from,LineGateway lineGateway){
+        /*
+        1、去掉前缀,去掉@后面部分
+        2、1开头肯定是手机号
+        3、0开头: 010 固话 01*** 手机号
+        4、7到8位,固话
+        5、其他(不是手机号，不是固话,可能是座席，其他)
+         */
+        String fromPrefix = lineGateway.getFromPrefix();
+        int start = 0;
+        if(from.startsWith(fromPrefix)){
+            start = fromPrefix.length();
         }
-        return sip_uri.substring(start,end);
+        int end = from.indexOf("@");
+        if(end == -1){
+            end = from.length();
+        }
+        from = from.substring(start, end);
+        //用于检验黑名单的号码
+        String checkBlackNum = from;
+        //TODO 座席呼平台多少位？
+        //TODO 如何判断座席
+        if(from.length() >= 7 && from.length() <= 8){
+            //固话不带区号，加上区号
+            from = lineGateway.getAreaCode() + from;
+        }else if(from.length() >= 11 && from.length() <= 12){
+            //手机或固话
+            if(from.startsWith("0") || from.startsWith("1")){
+                if(from.startsWith("01")){
+                    if((!from.startsWith("010")) && from.length() == 12){
+                        //手机号加0
+                        from = from.substring(1);
+                        checkBlackNum = from;
+                    }else if(from.startsWith("010")){
+                        checkBlackNum = from.substring(3);
+                    }else{
+                        throw new RuntimeException(new NumberNotAllowToCallException());
+                    }
+                }else{
+                    String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
+                    if(StringUtils.isNotBlank(areaCode)){
+                        checkBlackNum = from.substring(areaCode.length());
+                    }else{
+                        throw new RuntimeException(new NumberNotAllowToCallException());
+                    }
+                }
+            }else{
+                throw new RuntimeException(new NumberNotAllowToCallException());
+            }
+        }else{
+            throw new RuntimeException(new NumberNotAllowToCallException());
+        }
+        boolean isBlackNum = apiGwRedBlankNumService.isBlackNum(checkBlackNum);
+        if(isBlackNum){
+            throw new RuntimeException(new NumberNotAllowToCallException());
+        }
+        return from;
     }
+
 }
 
