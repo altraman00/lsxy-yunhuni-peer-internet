@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.app.model;
 
 import com.lsxy.framework.api.base.IdEntity;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -40,16 +41,25 @@ public class AppOnlineAction extends IdEntity {
     private Integer type;               //1、上线 2、下线
     private Integer action;             //上线动作（操作动作：11 选号，12支付，13上线取消（支付返回选号），14上线完成）下线动作（操作动作：21 下线）
     private Integer status;             //1 进行中，2 已完成
+    private String sipId;
 
     public AppOnlineAction() {
     }
 
-    public AppOnlineAction(String telNumber, Integer payStatus, BigDecimal amount, App app, String areaId,Integer type, Integer action, Integer status) {
+    public AppOnlineAction(App app, Integer type, Integer action, Integer status) {
+        this.app = app;
+        this.type = type;
+        this.action = action;
+        this.status = status;
+    }
+
+    public AppOnlineAction(String telNumber, Integer payStatus, BigDecimal amount, App app, String areaId,String sipId,Integer type, Integer action, Integer status) {
         this.telNumber = telNumber;
         this.payStatus = payStatus;
         this.amount = amount;
         this.app = app;
         this.areaId = areaId;
+        this.sipId = sipId;
         this.type = type;
         this.action = action;
         this.status = status;
@@ -126,5 +136,14 @@ public class AppOnlineAction extends IdEntity {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    @Column(name = "sip_id")
+    public String getSipId() {
+        return sipId;
+    }
+
+    public void setSipId(String sipId) {
+        this.sipId = sipId;
     }
 }

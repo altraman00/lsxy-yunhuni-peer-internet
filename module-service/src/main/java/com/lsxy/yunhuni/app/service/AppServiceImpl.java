@@ -111,5 +111,9 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         List<App> list = this.findByCustomWithParams(hql, tenantId);
         return list;
     }
-
+    @Override
+    public String findAppSipRegistrar(String appId) {
+        //TODO 分机注册信息
+        return "待实现";
+    }
 }

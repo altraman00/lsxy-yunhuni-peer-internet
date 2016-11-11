@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,10 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
             Tenant tenant = tenantService.findTenantByUserName(username);
             if(tenant != null){
                 String orderId = UUIDGenerator.uuid();
-                recharge = new Recharge(tenant,amount, RechargeSource.USER,rechargeType, RechargeStatus.NOTPAID,orderId,null);
+                Calendar c = Calendar.getInstance();
+                c.add(Calendar.DAY_OF_MONTH, 1);
+                Date deadline = c.getTime();
+                recharge = new Recharge(tenant,amount, RechargeSource.USER,rechargeType, RechargeStatus.NOTPAID,orderId,null,deadline);
                 rechargeDao.save(recharge);
             }
         }
@@ -105,19 +109,20 @@ public class RechargeServiceImpl extends AbstractService<Recharge> implements Re
     public Page<Recharge> pageListByUserNameAndTime(String userName, Integer pageNo, Integer pageSize, Date startTime, Date endTime) throws MatchMutiEntitiesException {
         Page<Recharge> page = null;
         Tenant tenant = tenantService.findTenantByUserName(userName);
+        Date date = new Date();
         if(tenant != null){
             if(startTime != null && endTime != null){
-                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime between ?2 and ?3 order by obj.createTime desc";
-                page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),startTime,endTime);
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime between ?3 and ?4 order by obj.createTime desc";
+                page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId(),startTime,endTime);
             }else if(startTime != null && endTime == null){
-                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime >= ?2 order by obj.createTime desc";
-                page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),startTime);
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime >= ?3 order by obj.createTime desc";
+                page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId(),startTime);
             }else if(startTime == null && endTime != null){
-                String hql = "from Recharge obj where obj.tenant.id=?1 and obj.createTime <= ?2 order by obj.createTime desc";
-                page =  this.pageList(hql,pageNo,pageSize,tenant.getId(),endTime);
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 and obj.createTime <= ?3 order by obj.createTime desc";
+                page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId(),endTime);
             }else{
-                String hql = "from Recharge obj where obj.tenant.id=?1 order by obj.createTime desc";
-                page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
+                String hql = "from Recharge obj where (obj.status='PAID' or (obj.status='NOTPAID' and obj.deadline>=?1 )) and obj.tenant.id=?2 order by obj.createTime desc";
+                page =  this.pageList(hql,pageNo,pageSize,date,tenant.getId());
             }
         }
         return page;

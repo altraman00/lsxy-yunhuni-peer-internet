@@ -8,74 +8,140 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XStreamAlias("enqueue")
 public class EnQueue {
     @XStreamAsAttribute
-    private String waitPlayFile;
+    private String channel;
 
     @XStreamAsAttribute
-    private Boolean playAgentNum;
+    private Integer conversation_level;
 
     @XStreamAsAttribute
-    private String preAgentNumPlayFile;
+    private Integer conversation_timeout;
 
     @XStreamAsAttribute
-    private String postAgentNumPlayFile;
+    private String reserve_state;
 
     @XStreamAsAttribute
-    private String holdPlayFile;
+    private boolean fail_overflow;
 
     @XStreamAsAttribute
-    private String conversationTimeout;
+    private String wait_voice;
+
+    @XStreamAsAttribute
+    private Integer ring_mode;
+
+    @XStreamAsAttribute
+    private String ring_voice;
+
+    @XStreamAsAttribute
+    private String hold_voice;
+
+    @XStreamAsAttribute
+    private boolean play_num;
+
+    @XStreamAsAttribute
+    private String pre_num_voice;
+
+    @XStreamAsAttribute
+    private String post_num_voice;
 
     @XStreamAsAttribute
     private String data;
 
-    private Filter filter;
+    private Route route;
 
-    public String getWaitPlayFile() {
-        return waitPlayFile;
+    public String getChannel() {
+        return channel;
     }
 
-    public void setWaitPlayFile(String waitPlayFile) {
-        this.waitPlayFile = waitPlayFile;
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
-    public Boolean getPlayAgentNum() {
-        return playAgentNum;
+    public Integer getConversation_level() {
+        return conversation_level;
     }
 
-    public void setPlayAgentNum(Boolean playAgentNum) {
-        this.playAgentNum = playAgentNum;
+    public void setConversation_level(Integer conversation_level) {
+        this.conversation_level = conversation_level;
     }
 
-    public String getPreAgentNumPlayFile() {
-        return preAgentNumPlayFile;
+    public Integer getConversation_timeout() {
+        return conversation_timeout;
     }
 
-    public void setPreAgentNumPlayFile(String preAgentNumPlayFile) {
-        this.preAgentNumPlayFile = preAgentNumPlayFile;
+    public void setConversation_timeout(Integer conversation_timeout) {
+        this.conversation_timeout = conversation_timeout;
     }
 
-    public String getPostAgentNumPlayFile() {
-        return postAgentNumPlayFile;
+    public String getReserve_state() {
+        return reserve_state;
     }
 
-    public void setPostAgentNumPlayFile(String postAgentNumPlayFile) {
-        this.postAgentNumPlayFile = postAgentNumPlayFile;
+    public void setReserve_state(String reserve_state) {
+        this.reserve_state = reserve_state;
     }
 
-    public String getHoldPlayFile() {
-        return holdPlayFile;
+    public boolean isFail_overflow() {
+        return fail_overflow;
     }
 
-    public void setHoldPlayFile(String holdPlayFile) {
-        this.holdPlayFile = holdPlayFile;
+    public void setFail_overflow(boolean fail_overflow) {
+        this.fail_overflow = fail_overflow;
     }
 
-    public String getConversationTimeout() {
-        return conversationTimeout;
+    public String getWait_voice() {
+        return wait_voice;
     }
 
-    public void setConversationTimeout(String conversationTimeout) {
-        this.conversationTimeout = conversationTimeout;
+    public void setWait_voice(String wait_voice) {
+        this.wait_voice = wait_voice;
+    }
+
+    public Integer getRing_mode() {
+        return ring_mode;
+    }
+
+    public void setRing_mode(Integer ring_mode) {
+        this.ring_mode = ring_mode;
+    }
+
+    public String getRing_voice() {
+        return ring_voice;
+    }
+
+    public void setRing_voice(String ring_voice) {
+        this.ring_voice = ring_voice;
+    }
+
+    public String getHold_voice() {
+        return hold_voice;
+    }
+
+    public void setHold_voice(String hold_voice) {
+        this.hold_voice = hold_voice;
+    }
+
+    public boolean isPlay_num() {
+        return play_num;
+    }
+
+    public void setPlay_num(boolean play_num) {
+        this.play_num = play_num;
+    }
+
+    public String getPre_num_voice() {
+        return pre_num_voice;
+    }
+
+    public void setPre_num_voice(String pre_num_voice) {
+        this.pre_num_voice = pre_num_voice;
+    }
+
+    public String getPost_num_voice() {
+        return post_num_voice;
+    }
+
+    public void setPost_num_voice(String post_num_voice) {
+        this.post_num_voice = post_num_voice;
     }
 
     public String getData() {
@@ -86,27 +152,16 @@ public class EnQueue {
         this.data = data;
     }
 
-    public Filter getFilter() {
-        return filter;
+    public Route getRoute() {
+        return route;
     }
 
-    public void setFilter(Filter filter) {
-        this.filter = filter;
+    public void setRoute(Route route) {
+        this.route = route;
     }
 
-    public class Filter{
-        @XStreamAsAttribute
-        private String data;
-
+    public class Route{
         private Condition condition;
-
-        public String getData() {
-            return data;
-        }
-
-        public void setData(String data) {
-            this.data = data;
-        }
 
         public Condition getCondition() {
             return condition;
@@ -118,59 +173,16 @@ public class EnQueue {
     }
     public class Condition{
         @XStreamAsAttribute
-        private Integer timeout;
+        private String id;
 
-        @XStreamAsAttribute
-        private Integer priority;
-
-        @XStreamAsAttribute
-        private String data;
-
-        private String where;
-
-        private String sort;
-
-        public Integer getTimeout() {
-            return timeout;
+        public String getId() {
+            return id;
         }
 
-        public void setTimeout(Integer timeout) {
-            this.timeout = timeout;
-        }
-
-        public Integer getPriority() {
-            return priority;
-        }
-
-        public void setPriority(Integer priority) {
-            this.priority = priority;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public void setData(String data) {
-            this.data = data;
-        }
-
-        public String getWhere() {
-            return where;
-        }
-
-        public void setWhere(String where) {
-            this.where = where;
-        }
-
-        public String getSort() {
-            return sort;
-        }
-
-        public void setSort(String sort) {
-            this.sort = sort;
+        public void setId(String id) {
+            this.id = id;
         }
     }
-
 }
 
 

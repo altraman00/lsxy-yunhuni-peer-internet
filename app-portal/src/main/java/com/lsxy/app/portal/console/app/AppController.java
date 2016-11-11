@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class AppController extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL  +   "/rest/app_extension/list/{1}";
         return  RestRequest.buildSecurityRequest(token).getList(uri, AppExtension.class,appId);
     }
+
     /**
      * 创建应用首页
      * @param request
@@ -94,9 +96,14 @@ public class AppController extends AbstractPortalController {
         App app = restResponse.getData();
         mav.addObject("app", app);
         List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
-        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
+//        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
         mav.addObject("testNumBindList",testNumBindList);
-        mav.addObject("appExtensionList",appExtensionList);
+        AreaSip areaSip = app.getAreaSip();
+        if(areaSip!=null){
+            mav.addObject("sipRegistrar",app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
+        }else{
+            mav.addObject("sipRegistrar","");
+        }
         mav.setViewName("/console/app/detail");
         return mav;
     }

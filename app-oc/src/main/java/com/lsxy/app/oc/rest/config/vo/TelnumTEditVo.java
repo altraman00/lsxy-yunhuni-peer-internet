@@ -18,12 +18,12 @@ public class TelnumTEditVo {
     private String operator;
     @ApiModelProperty(name="areaCode",value = "归属地区号")
     private String areaCode;
-    @ApiModelProperty(name="isDialing",value = "可主叫，1是0否")
-    private int isDialing;
-    @ApiModelProperty(name="isCalled",value = "可被叫，1是0否")
-    private int isCalled;
-    @ApiModelProperty(name="isThrough",value = "是否可透传，1是0否")
-    private int isThrough;
+//    @ApiModelProperty(name="isDialing",value = "可主叫，1是0否")
+//    private int isDialing;
+//    @ApiModelProperty(name="isCalled",value = "可被叫，1是0否")
+//    private int isCalled;
+//    @ApiModelProperty(name="isThrough",value = "是否可透传，1是0否")
+//    private int isThrough;
     @ApiModelProperty(name="callUri",value = "呼出URI")
     private String callUri;
     @ApiModelProperty(name="telNumber",value = "号码")
@@ -73,31 +73,6 @@ public class TelnumTEditVo {
         this.amount = amount;
     }
 
-    public int getIsDialing() {
-        return isDialing;
-    }
-
-    public void setIsDialing(int isDialing) {
-        this.isDialing = isDialing;
-    }
-
-    public int getIsCalled() {
-        return isCalled;
-    }
-
-    public void setIsCalled(int isCalled) {
-        this.isCalled = isCalled;
-    }
-
-    public int getIsThrough() {
-        return isThrough;
-    }
-
-    public void setIsThrough(int isThrough) {
-        this.isThrough = isThrough;
-    }
-
-
     public String getTenantId() {
         return tenantId;
     }
@@ -106,11 +81,4 @@ public class TelnumTEditVo {
         this.tenantId = tenantId;
     }
 
-//    public String getLineId() {
-//        return lineId;
-//    }
-//
-//    public void setLineId(String lineId) {
-//        this.lineId = lineId;
-//    }
 }

@@ -3,6 +3,8 @@ package com.lsxy.yunhuni.api.resourceTelenum.model;
 import com.lsxy.framework.api.base.IdEntity;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_oc_resource_telenum")
 public class ResourceTelenum extends IdEntity{
+    public static final int STATUS_LOCK = 2;//临时被锁定
     public static final int STATUS_RENTED = 1; //已被租用
     public static final int STATUS_FREE = 0;    //未被租用
     public static final String USABLE_TRUE = "1";    //未被租用
@@ -29,7 +32,7 @@ public class ResourceTelenum extends IdEntity{
     private String callUri;//呼出URI,
     private String source;//来源
     private String usable;//是否可用
-    private String lineId; //所属线路
+    private LineGateway line; //所属线路
     private String operator;//运营商
     private String provider;//供应商
     private String remark;//备注
@@ -38,7 +41,7 @@ public class ResourceTelenum extends IdEntity{
     private BigDecimal amount ;//号码占用费
     private String isDialing;//可主叫
     private String isCalled;//可被叫
-    private String isThrough;//可被叫
+    private String isThrough;//可透传
     private String type;//1采购线路0租户自带
     @Column(name = "is_through")
     public String getIsThrough() {
@@ -65,9 +68,6 @@ public class ResourceTelenum extends IdEntity{
     public void setAreaId(String areaId) {
         this.areaId = areaId;
     }
-
-
-
 
     @Column(name = "is_dialing")
     public String getIsDialing() {
@@ -118,13 +118,15 @@ public class ResourceTelenum extends IdEntity{
     public void setUsable(String usable) {
         this.usable = usable;
     }
-    @Column(name = "line_id")
-    public String getLineId() {
-        return lineId;
+    @OneToOne
+    @JoinColumn(name = "line_id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    public LineGateway getLine() {
+        return line;
     }
 
-    public void setLineId(String lineId) {
-        this.lineId = lineId;
+    public void setLine(LineGateway line) {
+        this.line = line;
     }
 
     @Column(name = "amount")
@@ -199,18 +201,32 @@ public class ResourceTelenum extends IdEntity{
         this.remark = remark;
     }
 
-    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount) {
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,LineGateway line, String amount) {
         this.operator = operator;
         this.areaCode = areaCode;
         this.amount = new BigDecimal(amount);
         this.callUri = callUri;
         this.telNumber = telNumber;
-        this.lineId = lineId;
+        this.line = line;
         this.status =0;//未被租用
-        this.usable = "1";//可用
+        this.usable = "0";//不可用
         this.type = "1";//采购线路
     }
-
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,LineGateway line, String amount,String isCalled,String isDialing,String isThrough,String areaId) {
+        this.operator = operator;
+        this.areaCode = areaCode;
+        this.amount = new BigDecimal(amount);
+        this.callUri = callUri;
+        this.telNumber = telNumber;
+        this.line = line;
+        this.status =0;//未被租用
+        this.usable = "0";//不可用
+        this.type = "1";//采购线路
+        this.isCalled = isCalled;
+        this.isDialing = isDialing;
+        this.isThrough = isThrough;
+        this.areaId = areaId;
+    }
     public ResourceTelenum() {
     }
 }

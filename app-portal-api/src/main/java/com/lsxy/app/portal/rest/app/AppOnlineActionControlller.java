@@ -68,7 +68,7 @@ public class AppOnlineActionControlller extends AbstractRestController {
         if(isBelong){
             String lastOnlineNums = appOnlineActionService.findLastOnlineNums(appId);
             App app = appService.findById(appId);
-            //TODO 获取用户拥有的空闲号(可呼入的)
+            //获取用户拥有的空闲号
             List<ResourceTelenum> ownUnusedNums = resourcesRentService.findOwnUnusedNum(tenant);
             List<Map<String,Object>> telNums = new ArrayList<>();
             boolean hasCalled = false;
@@ -76,14 +76,18 @@ public class AppOnlineActionControlller extends AbstractRestController {
                 if(telNumber != null){
                     Map<String,Object> map = new HashMap<>();
                     map.put("phone",telNumber.getTelNumber());
-                    //TODO 获取相关属性
-                    map.put("isCalled","1");
-                    //TODO 如果有呼入的，则将
-                    if(true){
+                    //获取相关属性
+                    map.put("isCalled",StringUtils.isBlank(telNumber.getIsCalled())?"0":telNumber.getIsCalled());
+                    //如果有可呼入的号码
+                    if("1".equals(telNumber.getIsCalled())){
                         hasCalled = true;
                     }
-                    map.put("isDialing","1");
-                    map.put("areaCode","020");
+                    if("1".equals(telNumber.getIsDialing()) || "1".equals(telNumber.getIsThrough())){
+                        map.put("isDialing","1");
+                    }else{
+                        map.put("isDialing","0");
+                    }
+                    map.put("areaCode",telNumber.getAreaCode());
                     if(StringUtils.isNotBlank(lastOnlineNums) && lastOnlineNums.contains(telNumber.getTelNumber())){
                         map.put("lastUsed",true);
                     }
