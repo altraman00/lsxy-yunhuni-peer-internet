@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Set;
@@ -142,6 +143,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
             // Continue with the Filters
             chain.doFilter(request, response);
             if(logger.isDebugEnabled()){
+                logger.debug("API调用完成：{}", apiuri);
                 logger.debug("执行体执行完毕,花费:{}ms",(System.currentTimeMillis() - start));
             }
 

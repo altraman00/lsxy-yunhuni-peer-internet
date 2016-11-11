@@ -18,6 +18,7 @@ import javax.persistence.*;
 public class VoiceFileRecord extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
+    private String areaId; //录音所在区域
     private String name;//文件名 生成规则uuid
     private String url;//录音文件URL
     private String ossUrl;//录音文件URL
@@ -43,6 +44,15 @@ public class VoiceFileRecord extends IdEntity {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    @Column(name="area_id")
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
     }
 
     @Column(name="url")

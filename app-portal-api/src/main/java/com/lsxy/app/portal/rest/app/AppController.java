@@ -13,6 +13,9 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
+import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.apache.commons.lang.StringUtils;
@@ -47,6 +50,8 @@ public class AppController extends AbstractRestController {
     private OSSService ossService;
     @Autowired
     private MQService mqService;
+    @Autowired
+    private AreaSipService areaSipService;
     /**
      * 根据应用名字查找应用数
      * @param name 应用名字
@@ -158,6 +163,13 @@ public class AppController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         Tenant tenant = tenantService.findTenantByUserName(userName);
         app.setTenant(tenant);
+        String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+        //应用新建 时落到测试区域，并指定一个sip接入点
+        Area area = new Area();
+        area.setId(areaId);
+        app.setArea(area);
+        AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
+        app.setAreaSip(areaSip);
         app = appService.save(app);
         return RestResponse.success(app);
     }
