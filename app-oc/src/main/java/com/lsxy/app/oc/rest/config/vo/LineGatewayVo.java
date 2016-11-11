@@ -45,7 +45,7 @@ public class LineGatewayVo {
     @ApiModelProperty(name="quality",value = "质量：数字1-10")
     private int quality;
     @ApiModelProperty(name="capacity",value = "并发容量：数字")
-    private int capacity;
+    private String capacity;
 
     public String getSipAuthIp() {
         return sipAuthIp;
@@ -183,11 +183,15 @@ public class LineGatewayVo {
         this.quality = quality;
     }
 
-    public Integer getCapacity() {
+    public void setQuality(int quality) {
+        this.quality = quality;
+    }
+
+    public String getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(Integer capacity) {
+    public void setCapacity(String capacity) {
         this.capacity = capacity;
     }
 }
