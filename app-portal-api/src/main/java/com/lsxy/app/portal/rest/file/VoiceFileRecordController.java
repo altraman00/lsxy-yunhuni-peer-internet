@@ -1,12 +1,20 @@
 package com.lsxy.app.portal.rest.file;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.portal.base.AbstractRestController;
+import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.*;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.session.model.MeetingMember;
+import com.lsxy.yunhuni.api.session.model.VoiceCdr;
+import com.lsxy.yunhuni.api.session.service.MeetingMemberService;
+import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +38,12 @@ public class VoiceFileRecordController extends AbstractRestController {
     private  String path= SystemConfig.getProperty("portal.realauth.resource.upload.file.path");
     @Autowired
     VoiceFileRecordService voiceFileRecordService;
+    @Autowired
+    VoiceCdrService voiceCdrService;
+    @Autowired
+    MeetingMemberService meetingMemberService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private CallCenterConversationMemberService callCenterConversationMemberService;
     /**
      * 根据放音文件id删除放音文件
      * @param id
@@ -122,6 +136,72 @@ public class VoiceFileRecordController extends AbstractRestController {
         Tenant tenant = getCurrentAccount().getTenant();
         Page<VoiceFileRecord> page = voiceFileRecordService.pageList(pageNo,pageSize,appId,tenant.getId());
         return RestResponse.success(page);
+    }
+
+    @RequestMapping("/cdr/download")
+    public RestResponse cdrDownload(String id){
+        Tenant tenant = getCurrentAccount().getTenant();
+        VoiceCdr voiceCdr = voiceCdrService.findById(id);
+        if(tenant==null||voiceCdr==null||!tenant.getId().equals(voiceCdr.getTenantId())){
+            return RestResponse.failed("0000","验证失败，无法下载");
+        }
+        List<VoiceFileRecord> list = getFile(id);
+        if(list==null){
+            return RestResponse.failed("0000","不存在录音文件");
+        }
+        return RestResponse.success();
+    }
+
+
+    private List<VoiceFileRecord> getFile(String id){
+        //根据cdr获取业务类型，和业务id，根据业务id和业务类型获取录音文件列表，
+        VoiceCdr voiceCdr = voiceCdrService.findById(id);
+        if(voiceCdr!=null&& StringUtils.isNotEmpty(voiceCdr.getId())) {
+            ProductCode p1 = ProductCode.changeApiCmdToProductCode(voiceCdr.getType());
+            //语音会议
+            if (ProductCode.sys_conf.getRemark().equals(p1.getRemark())) {
+                //获取会议操作者
+                MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
+                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId=?1 ";
+                //使用会议id
+                List list = (List) voiceFileRecordService.list(hql, meetingMember.getMeeting().getId());
+                return list;
+            }
+            //自定义IVR
+            else if (ProductCode.ivr_call.getRemark().equals(p1.getRemark())) {
+                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId=?1 ";
+                //使用ivr的id
+                List list = (List) voiceFileRecordService.list(hql, voiceCdr.getSessionId());
+                return list;
+            }
+            //语音回拔
+            else if (ProductCode.duo_call.getRemark().equals(p1.getRemark())) {
+                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId=?1 ";
+                //使用双向回拨的id
+                List list = (List) voiceFileRecordService.list(hql, voiceCdr.getSessionId());
+                return list;
+            }
+            //呼叫中心
+            else if (ProductCode.call_center.getRemark().equals(p1.getRemark())) {
+                //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
+                List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
+                if (temp.size() == 0) {
+                    return null;
+                }
+                String te = "";
+                for (int i = 0; i < temp.size(); i++) {
+                    te += "'" + temp.get(i) + "'";
+                    if (i != temp.size() - 1) {
+                        te += ",";
+                    }
+                }
+                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?)";
+                //使用ivr的id
+                List list = (List) voiceFileRecordService.list(hql, te);
+                return list;
+            }
+        }
+        return null;
     }
 
 }

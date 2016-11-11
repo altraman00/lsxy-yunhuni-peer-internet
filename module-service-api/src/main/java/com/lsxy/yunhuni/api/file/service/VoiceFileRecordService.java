@@ -49,10 +49,5 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      */
     List<VoiceFileRecord> list(String appid, String tenantId, Date startTime,Date endTime);
 
-    /**
-     * 根据cdr的id获取录音文件的下载
-     */
-    List<VoiceFileRecord> getListByCdrId(String id);
-
 
 }
