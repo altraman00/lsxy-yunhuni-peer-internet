@@ -31,7 +31,7 @@ public class ConditionTest {
     }
 
     @Test
-    public void test(){
+    public void test() throws InterruptedException {
         Channel channel = new Channel();
         channel.setTenantId("40288aca574060400157406339080002");
         channel.setAppId("40288aca574060400157406427f20005");
@@ -49,5 +49,7 @@ public class ConditionTest {
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
         conditionService.save(condition);
+
+        Thread.sleep(50000);
     }
 }

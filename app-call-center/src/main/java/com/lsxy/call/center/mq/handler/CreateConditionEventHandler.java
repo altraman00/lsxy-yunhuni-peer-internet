@@ -1,6 +1,8 @@
 package com.lsxy.call.center.mq.handler;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.call.center.api.model.Condition;
+import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
@@ -20,6 +22,9 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
     @Autowired
     private RedisCacheService redisCacheService;
 
+    @Autowired
+    private ConditionService conditionService;
+
     @Reference(lazy = true,check = false,timeout = 3000)
     private DeQueueService deQueueService;
 
@@ -28,6 +33,18 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
         if(logger.isDebugEnabled()){
             logger.debug("处理CallCenter.CreateConditionEvent{}",message.toJson());
         }
+        if(message.getId() == null ||
+                message.getTenantId() == null ||
+                message.getAppId() == null){
+            logger.info("处理CallCenter.CreateConditionEvent出错，参数错误！");
+            return;
+        }
+        Condition condition = conditionService.findById(message.getId());
+        if(condition == null){
+            logger.info("处理CallCenter.CreateConditionEvent出错，条件不存在！");
+            return;
+        }
+        //初始化CAs ACs CQs
 
     }
 }

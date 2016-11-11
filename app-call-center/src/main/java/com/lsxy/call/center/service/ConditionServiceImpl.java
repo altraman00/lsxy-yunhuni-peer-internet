@@ -1,6 +1,8 @@
 package com.lsxy.call.center.service;
 
+import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.model.Condition;
+import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.dao.ConditionDao;
 import com.lsxy.call.center.utils.ExpressionUtils;
@@ -30,6 +32,9 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     private ConditionDao conditionDao;
 
     @Autowired
+    private ChannelService channelService;
+
+    @Autowired
     private MQService mqService;
 
     @Override
@@ -42,11 +47,25 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(condition == null){
             throw new NullPointerException();
         }
+        if(condition.getTenantId() == null){
+            throw new IllegalArgumentException("tenantId 不能为null");
+        }
+        if(condition.getAppId() == null){
+            throw new IllegalArgumentException("appId 不能为null");
+        }
+        if(condition.getChannelId() == null){
+            throw new IllegalArgumentException("channelId 不能为null");
+        }
         if(!ExpressionUtils.invalidSortExpression(condition.getSortExpression())){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("sort expression 错误");
         }
         if(!ExpressionUtils.invalidWhereExpression(condition.getWhereExpression())){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("where expression 错误");
+        }
+        //通道是否存在
+        Channel channel = channelService.findById(condition.getChannelId());
+        if(channel == null){
+            throw new IllegalArgumentException("channel 不存在");
         }
         AbstractMQEvent event = null;
         if(condition.getId() != null){
