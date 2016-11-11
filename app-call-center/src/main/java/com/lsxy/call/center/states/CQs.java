@@ -31,6 +31,12 @@ public class CQs {
         redisCacheService.zadd(key, queueId, System.currentTimeMillis());
     }
 
+    public boolean exists(String conditionId, String queueId){
+        String key = getKey(conditionId);
+        Double score = redisCacheService.zScore(key, queueId);
+        return score != null;
+    }
+
     public void remove(String conditionId,String... queueIds){
         redisCacheService.zrem(getKey(conditionId),queueIds);
     }

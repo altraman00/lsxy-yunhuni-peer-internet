@@ -2,6 +2,7 @@ package com.lsxy.call.center.mq.handler;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.service.DeQueueService;
+import com.lsxy.call.center.states.CQs;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.callcenter.EnqueueEvent;
@@ -20,6 +21,9 @@ public class EnQueueEventHandler implements MQMessageHandler<EnqueueEvent> {
     @Autowired
     private RedisCacheService redisCacheService;
 
+    @Autowired
+    private CQs cQs;
+
     @Reference(lazy = true,check = false,timeout = 3000)
     private DeQueueService deQueueService;
 
@@ -28,8 +32,8 @@ public class EnQueueEventHandler implements MQMessageHandler<EnqueueEvent> {
         if(logger.isDebugEnabled()){
             logger.debug("处理CallCenter.EnQueueEvent{}",message.toJson());
         }
-        if(redisCacheService.get(message.getKey())!=null){//排队超时
-            redisCacheService.del(message.getKey());
+        if(cQs.exists(message.getConditionId(),message.getQueueId())){//排队超时
+            cQs.remove(message.getConditionId(),message.getQueueId());
             deQueueService.timeout(message.getTenantId(),message.getAppId(),message.getCallId());
         }
     }

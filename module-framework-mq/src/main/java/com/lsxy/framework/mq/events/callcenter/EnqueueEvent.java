@@ -8,7 +8,9 @@ import com.lsxy.framework.mq.topic.MQTopicConstants;
  */
 public class EnqueueEvent extends AbstractDelayMQEvent{
 
-    private String key;
+    private String conditionId;
+
+    private String queueId;
 
     private String tenantId;
 
@@ -18,9 +20,10 @@ public class EnqueueEvent extends AbstractDelayMQEvent{
 
     public EnqueueEvent(){}
 
-    public EnqueueEvent(String key,String tenantId, String appId, String callId, Integer delay){
+    public EnqueueEvent(String conditionId,String queueId,String tenantId, String appId, String callId, Integer delay){
         super(delay);
-        this.key = key;
+        this.conditionId = conditionId;
+        this.queueId = queueId;
         this.tenantId = tenantId;
         this.appId = appId;
         this.callId = callId;
@@ -30,12 +33,20 @@ public class EnqueueEvent extends AbstractDelayMQEvent{
         return MQTopicConstants.TOPIC_CALL_CENTER;
     }
 
-    public String getKey() {
-        return key;
+    public String getConditionId() {
+        return conditionId;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setConditionId(String conditionId) {
+        this.conditionId = conditionId;
+    }
+
+    public String getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(String queueId) {
+        this.queueId = queueId;
     }
 
     public String getTenantId() {
