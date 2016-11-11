@@ -150,6 +150,13 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         return true;
     }
 
+    @Override
+    public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
+        String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel_id=\"\"+channelId+\"\" and deleted = 0";
+
+        return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
+    }
     /**
      * 排队,通过 dubbo返回结果给  区域管理器
      * @param tenantId
