@@ -49,7 +49,7 @@
         <maximumMessageSize>8192</maximumMessageSize>
 
         <!-- This are static fields -->
-        <additionalFields>systemId=${systemId},env=local</additionalFields>
+        <additionalFields>systemId=${systemId},env=development</additionalFields>
         <!-- Optional: Specify field types -->
         <additionalFieldTypes>systemId=String,env=String</additionalFieldTypes>
 
