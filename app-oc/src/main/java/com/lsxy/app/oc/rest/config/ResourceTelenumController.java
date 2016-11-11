@@ -331,7 +331,8 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,resourceTelenum.getLine().getId(),resourceTelenum.getTelNumber());
+        String lineId = resourceTelenum.getLine()!=null?resourceTelenum.getLine().getId():"";
+        Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,lineId,resourceTelenum.getTelNumber());
         List<LineVo> list = new ArrayList<>();
         List<TelnumToLineGateway> list2 = page.getResult();
         for(int i=0;i<list2.size();i++){
