@@ -40,7 +40,7 @@ public class ApiGwRedBlankNumServiceImpl extends AbstractService<ApiGwRedBlankNu
 
     @Override
     public Page<ApiGwRedBlankNum> getPage(Integer pageNo, Integer pageSize, Integer type) {
-        String hql = " FROM ApiGwRedBlankNum obj WHERE 1=1 ";
+        String hql = " FROM ApiGwRedBlankNum obj WHERE obj.deleted=0  ";
         if(type!=null){
             hql +=" AND obj.type='"+type+"' ";
         }

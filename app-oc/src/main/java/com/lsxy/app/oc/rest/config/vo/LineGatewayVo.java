@@ -23,10 +23,10 @@ public class LineGatewayVo {
     @ApiModelProperty(name="lineType",value = "线路类型,SIP")
     private String lineType;
     @ApiModelProperty(name="sipProviderIp",value = "IP端口")
-    private String sipProviderPort;
+    private String sipProviderIp;
     @ApiModelProperty(name="sipProviderDomain",value = "domain端口")
     private String sipProviderDomain;
-    @ApiModelProperty(name="lineType",value = "鉴权方式 1:账号密码 2:IP地址")
+    @ApiModelProperty(name="sipAuthType",value = "鉴权方式 1:账号密码 2:IP地址")
     private String sipAuthType;
     @ApiModelProperty(name="sipAuthAccount",value = "账号")
     private String sipAuthAccount;
@@ -43,9 +43,9 @@ public class LineGatewayVo {
     @ApiModelProperty(name="isThrough",value = "是否透传：1=是，0=不是")
     private String isThrough;
     @ApiModelProperty(name="quality",value = "质量：数字1-10")
-    private Integer quality;
+    private int quality;
     @ApiModelProperty(name="capacity",value = "并发容量：数字")
-    private Integer capacity;
+    private String capacity;
 
     public String getSipAuthIp() {
         return sipAuthIp;
@@ -95,13 +95,12 @@ public class LineGatewayVo {
         this.lineType = lineType;
     }
 
-
-    public String getSipProviderPort() {
-        return sipProviderPort;
+    public String getSipProviderIp() {
+        return sipProviderIp;
     }
 
-    public void setSipProviderPort(String sipProviderPort) {
-        this.sipProviderPort = sipProviderPort;
+    public void setSipProviderIp(String sipProviderIp) {
+        this.sipProviderIp = sipProviderIp;
     }
 
     public String getSipProviderDomain() {
@@ -184,11 +183,15 @@ public class LineGatewayVo {
         this.quality = quality;
     }
 
-    public Integer getCapacity() {
+    public void setQuality(int quality) {
+        this.quality = quality;
+    }
+
+    public String getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(Integer capacity) {
+    public void setCapacity(String capacity) {
         this.capacity = capacity;
     }
 }

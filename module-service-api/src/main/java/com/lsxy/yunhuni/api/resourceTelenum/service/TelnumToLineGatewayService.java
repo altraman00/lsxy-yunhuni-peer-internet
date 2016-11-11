@@ -1,9 +1,9 @@
 package com.lsxy.yunhuni.api.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
 
 import java.util.List;
@@ -23,6 +23,7 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
 
     LineGateway getCalledLineByNumber(String number);
 
+    List<TelnumToLineGateway> getListByLine(String line);
     /**
      * 根据线路逻辑上删除
      *
@@ -44,7 +45,13 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @return
      */
     Page<TelnumToLineGateway> getPage(Integer pageNo, Integer pageSize, String line, String number, String isDialing, String isCalled, String isThrough);
-
+    /**
+     * 根据号码选择线路ID
+     *
+     * @param number
+     * @return
+     */
+    Page<TelnumToLineGateway> getIsNotNullPage(Integer pageNo, Integer pageSize, String isNotNull, String number);
     /**
      * 批量删除
      *
@@ -89,4 +96,17 @@ public interface TelnumToLineGatewayService extends BaseService<TelnumToLineGate
      * @param telnum
      */
     void updateTelnum(String telnum1,String telnum);
+
+
+    void batchUpCall(String line,String... nums);
+
+    void modify(LineGateway lineGateway,String isThrough1,String isThrough2);
+
+    void deleteLine(String id);
+
+    void telnumDelete(String id,String[] ids,String[] idss);
+
+    void telnumCreate(ResourceTelenum resourceTelenum,TelnumToLineGateway telnumToLineGateway);
+
+    int getIsThrough(String telnum);
 }

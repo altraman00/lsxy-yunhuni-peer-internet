@@ -16,14 +16,18 @@ import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrderItem;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelenumOrderItemService;
+import com.lsxy.yunhuni.api.resourceTelenum.service.TelenumOrderService;
 import com.lsxy.yunhuni.resourceTelenum.dao.ResourcesRentDao;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -51,10 +55,20 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     CalBillingService calBillingService;
     @Autowired
     ConsumeService consumeService;
-
+    @Autowired
+    TelenumOrderService telenumOrderService;
+    @Autowired
+    TelenumOrderItemService telenumOrderItemService;
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
-        Tenant tenant = tenantService.findTenantByUserName(userName);
+        Tenant tenant = null;
+        tenant = tenantService.findById(userName);
+        if(tenant==null){
+            tenant = tenantService.findTenantByUserName(userName);
+        }
+        if(tenant==null){
+            throw new RuntimeException("租户不存在");
+        }
         String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 ";
         Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
@@ -135,7 +149,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     resourcesRentDao.updateResourceRentExpireTime(resourcesRent.getId(),expireDate);
                     //TODO 支付
                     //插入消费记录
-                    Consume consume = new Consume(curTime, ConsumeCode.rent_number.name(),cost,ConsumeCode.rent_number.getName(),appId,tenant);
+                    Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant);
                     consumeService.save(consume);
                     //Redis中消费增加
                     calBillingService.incConsume(tenant.getId(),curTime,cost);
@@ -150,4 +164,104 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         return resourcesRentDao.findByTenantIdAndRentStatusIn(tenantId,status);
     }
 
+    @Override
+    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
+    public void release(String id) {
+        ResourcesRent resourcesRent = this.findById(id);
+        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
+        this.save(resourcesRent);
+        ResourceTelenum resourceTelenum =  resourcesRent.getResourceTelenum();
+        resourceTelenum.setTenant(null);
+        resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
+        resourceTelenumService.save(resourceTelenum);
+    }
+
+    @Override
+    public void telnumPlay(String id,Tenant tenant) {
+        TelenumOrder temp = telenumOrderService.findById(id);
+        //更新记录
+        temp.setStatus(TelenumOrder.Status_success);
+        telenumOrderService.save(temp);
+        List<TelenumOrderItem> list = telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(), temp.getId());
+        for (int i = 0; i < list.size(); i++) {
+            ResourceTelenum resourceTelenum = list.get(i).getTelnum();
+            resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
+            resourceTelenum.setTenant(tenant);
+            resourceTelenum = resourceTelenumService.save(resourceTelenum);
+            ResourcesRent resourcesRent = new ResourcesRent();
+            resourcesRent.setTenant(tenant);
+            resourcesRent.setResourceTelenum(resourceTelenum);
+            resourcesRent.setResData(resourceTelenum.getTelNumber());
+            resourcesRent.setResName("号码资源");
+            resourcesRent.setResType("1");
+            Date date = DateUtils.getLastTimeOfMonth(new Date());
+            resourcesRent.setRentExpire(date);
+            resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
+            this.save(resourcesRent);
+        }
+        //扣费
+        Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
+        consumeService.consume(consume);
+        //TODO 号码月租费
+        BigDecimal bigDecimal = new BigDecimal(100*list.size());
+        Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant);
+        consumeService.consume(consume1);
+    }
+
+
+    @Override
+    public void telnumDelete(String id,Tenant tenant) {
+        TelenumOrder temp = telenumOrderService.findById(id);
+        temp.setStatus(TelenumOrder.status_fail);
+        telenumOrderService.save(temp);
+        List<TelenumOrderItem> list =  telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(),temp.getId());
+        for(int i=0;i<list.size();i++){
+            ResourceTelenum resourceTelenum = list.get(i).getTelnum();
+            resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
+            resourceTelenumService.save(resourceTelenum);
+        }
+    }
+    @Override
+    public TelenumOrder telnumNew(Tenant tenant,String[] numIds) {
+        TelenumOrder telenumOrder = new TelenumOrder();
+        telenumOrder.setTenantId(tenant.getId());
+        telenumOrder.setStatus(TelenumOrder.status_await);
+        telenumOrder = telenumOrderService.save(telenumOrder);
+        List<String> list = new ArrayList();
+        BigDecimal bigDecimal = new BigDecimal(0);
+        for(int i=0;i<numIds.length;i++){
+            ResourceTelenum resourceTelenum = resourceTelenumService.findById(numIds[i]);
+            if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
+                telenumOrder.setStatus(TelenumOrder.status_fail);
+                throw new RuntimeException("订单中有号码不存在");
+            }
+            if(resourceTelenum.getStatus()==ResourceTelenum.STATUS_FREE) {
+                TelenumOrderItem telenumOrderItem = new TelenumOrderItem();
+                telenumOrderItem.setTenantId(tenant.getId());
+                telenumOrderItem.setAmount(resourceTelenum.getAmount());
+                telenumOrderItem.setTelnumOrderId(telenumOrder.getId());
+                telenumOrderItem.setTelnum(resourceTelenum);
+                telenumOrderItemService.save(telenumOrderItem);
+                resourceTelenum.setStatus(ResourceTelenum.STATUS_LOCK);
+                resourceTelenumService.save(resourceTelenum);
+                list.add(numIds[i]);
+                bigDecimal=bigDecimal.add(resourceTelenum.getAmount());
+            }else{
+//                telenumOrder.setStatus(TelenumOrder.status_fail);
+//                for(int j=0;j<list.size();j++){
+//                    ResourceTelenum resourceTelenum1 = resourceTelenumService.findById(list.get(j));
+//                    resourceTelenum1.setStatus(ResourceTelenum.STATUS_FREE);
+//                    resourceTelenumService.save(resourceTelenum1);
+//                }
+                throw new RuntimeException("订单中有号码不存在");
+            }
+        }
+        telenumOrder.setAmount(bigDecimal);
+        Calendar c = Calendar.getInstance();
+        telenumOrder.setCreateTime(c.getTime());
+        c.add(Calendar.DAY_OF_MONTH, 1);
+        telenumOrder.setDeadline(c.getTime());
+        telenumOrder = telenumOrderService.save(telenumOrder);
+        return telenumOrder;
+    }
 }

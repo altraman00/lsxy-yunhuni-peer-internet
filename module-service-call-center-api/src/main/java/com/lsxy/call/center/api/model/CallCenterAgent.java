@@ -6,8 +6,6 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import java.util.List;
 
 /**
  * 坐席
@@ -26,12 +24,9 @@ public class CallCenterAgent extends IdEntity {
     public final static String STATE_DEFAULT = STATE_ONLINE;
     private String tenantId;
     private String appId;
-    private String name;
-    private String state;
-
-    private List<AppExtension> extentions;
-
-    private List<AgentSkill> skills;
+    private String channelId;
+    private String agentNo;//坐席id
+    private String agentNum;//坐席工号
 
 
     @Column(name = "tenant_id")
@@ -52,40 +47,31 @@ public class CallCenterAgent extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "name")
-    public String getName() {
-        return name;
+    @Column(name = "channel_id")
+    public String getChannelId() {
+        return channelId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 
-    @Column(name = "state")
-    public String getState() {
-        return state;
+    @Column(name = "agent_no")
+    public String getAgentNo() {
+        return agentNo;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setAgentNo(String agentNo) {
+        this.agentNo = agentNo;
     }
 
-    @Transient
-    public List<AppExtension> getExtentions() {
-        return extentions;
+    @Column(name = "agent_num")
+    public String getAgentNum() {
+        return agentNum;
     }
 
-    public void setExtentions(List<AppExtension> extentions) {
-        this.extentions = extentions;
-    }
-
-    @Transient
-    public List<AgentSkill> getSkills() {
-        return skills;
-    }
-
-    public void setSkills(List<AgentSkill> skills) {
-        this.skills = skills;
+    public void setAgentNum(String agentNum) {
+        this.agentNum = agentNum;
     }
 }
 

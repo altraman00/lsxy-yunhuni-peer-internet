@@ -31,7 +31,7 @@
                                         <ul class="nav">
                                             <li>
                                                 <div class="aside-li-a ">
-                                                    <a href="${ctx}/console/telenum/callnum/index">呼入号码管理</a>
+                                                    <a href="${ctx}/console/telenum/callnum/index">我的号码</a>
                                                 </div>
                                             </li>
                                             <li>

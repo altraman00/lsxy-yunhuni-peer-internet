@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.api.file.service;
 
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 
 import java.util.Date;
@@ -19,7 +20,7 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @param pageSize 每页记录数
      * @return
      */
-    public Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize, String appId, String tenantId);
+    Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize, String appId, String tenantId);
 
     /**
      * 统计存储文件
@@ -27,7 +28,7 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @param tenantId
      * @return
      */
-    public Map sumAndCount(String appId, String tenantId, Date startTime,Date endTime);
+    Map sumAndCount(String appId, String tenantId, Date startTime,Date endTime);
     /**
      * 批量更新删除状态为删除
      * @param appid
@@ -36,7 +37,7 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @param endTime
      * @return
      */
-    public int batchDelete(String appid, String tenantId, Date startTime,Date endTime);
+    int batchDelete(String appid, String tenantId, Date startTime,Date endTime);
 
     /**
      * 获取数据
@@ -46,5 +47,12 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @param endTime
      * @return
      */
-    public List<VoiceFileRecord> list(String appid, String tenantId, Date startTime,Date endTime);
+    List<VoiceFileRecord> list(String appid, String tenantId, Date startTime,Date endTime);
+
+    /**
+     * 根据cdr的id获取录音文件的下载
+     */
+    List<VoiceFileRecord> getListByCdrId(String id);
+
+
 }

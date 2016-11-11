@@ -1,9 +1,6 @@
 package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.CallCenterMainClass;
-import com.lsxy.call.center.api.model.AgentSkill;
-import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
@@ -15,14 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Created by Liuws on 2016/7/14.
@@ -44,12 +34,12 @@ public class CallcenterTest {
     }
     @Test
     public void test(){
-        callCenterAgentService.login("","",null);
+        /*callCenterAgentService.login("","",null);*/
     }
 
     @Test
     public void test2(){
-        AppExtension appExtension = new AppExtension();
+        /*AppExtension appExtension = new AppExtension();
         appExtension.setEnabled(1);
         appExtension.setTenantId("40288ac9575612a30157561c7ff50004");
         appExtension.setAppId("40288ac957e1812e0157e18a994e0000");
@@ -62,12 +52,12 @@ public class CallcenterTest {
         appExtension.setRegisterExpires(18000);
         appExtension.setLastRegisterTime(new Date());
         appExtension.setLastRegisterStatus(200);
-        appExtensionService.register(appExtension);
+        appExtensionService.register(appExtension);*/
     }
 
     @Test
     public void test3() throws ExecutionException, InterruptedException {
-        int size = 5000;
+        /*int size = 5000;
         ExecutorService pool= Executors.newFixedThreadPool(100);
         List<Future> results = new ArrayList<>();
         for (int i =0;i<size;i++) {
@@ -92,7 +82,8 @@ public class CallcenterTest {
                     List<AppExtension> extensions = new ArrayList<AppExtension>();
                     extensions.add(appExtension);
                     CallCenterAgent callCenterAgent = new CallCenterAgent();
-                    callCenterAgent.setName("1test1"+j);
+                    callCenterAgent.setAgentNo("1test1"+j);
+                    callCenterAgent.setAgentNum("1test1"+j);
                     callCenterAgent.setExtentions(extensions);
                     callCenterAgent.setState(CallCenterAgent.STATE_IDLE);
                     List<AgentSkill> skills = new ArrayList<>();
@@ -111,7 +102,7 @@ public class CallcenterTest {
         for (Future f: results) {
             f.get();
         }
-        pool.shutdown();
+        pool.shutdown();*/
     }
 
     @Test

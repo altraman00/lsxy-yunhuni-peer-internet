@@ -40,4 +40,10 @@ public interface TelnumLocationService extends BaseService<TelnumLocation> {
      */
     String solveNum(String num, String telPhoneRule,String mobileRule,String areaCode);
 
+    /**
+     * 获取号码中的城市
+     * @return
+     */
+    List<Map<String,Object>> getCityAndAreaCodeByTelenum( );
+
 }
