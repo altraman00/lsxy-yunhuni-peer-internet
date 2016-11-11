@@ -33,7 +33,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize,String appId,String tenantId) {
-        String hql = " from VoiceFileRecord obj where obj.app_id=?1 and obj.tenant_id=?2 ";
+        String hql = " from VoiceFileRecord obj where obj.appId=?1 and obj.tenantId=?2 ";
         Page<VoiceFileRecord> page = this.pageList(hql,pageNo,pageSize,appId,tenantId);
         return page;
     }
