@@ -153,7 +153,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Override
     public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
         String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
-                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel_id=\"\"+channelId+\"\" and deleted = 0";
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel_id=\""+channelId+"\" and deleted = 0";
 
         return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
     }
