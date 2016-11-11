@@ -6,6 +6,7 @@ import com.lsxy.yunhuni.api.config.model.LineGateway;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * 全局号码资源
@@ -17,14 +18,132 @@ import javax.persistence.*;
 public class ResourceTelenum extends IdEntity{
     public static final int STATUS_RENTED = 1; //已被租用
     public static final int STATUS_FREE = 0;    //未被租用
+    public static final String USABLE_TRUE = "1";    //未被租用
+    public static final String USABLE_FALSE = "0";    //未被租用
+    public static final String[] OPERATORS = {"中国电信","中国移动","中国联通"};
 
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
     private Tenant tenant;//所属租户
-//    private LineGateway line;  //所属线路
-    private String operator; //运营商
-    private String provider;    //供应商
-    private String remark;      //备注
+    private String level;//号码等级,
+    private String callUri;//呼出URI,
+    private String source;//来源
+    private String usable;//是否可用
+    private String lineId; //所属线路
+    private String operator;//运营商
+    private String provider;//供应商
+    private String remark;//备注
+    private String areaCode;//归属地区号
+    private String areaId;//区域
+    private BigDecimal amount ;//号码占用费
+    private String isDialing;//可主叫
+    private String isCalled;//可被叫
+    private String isThrough;//可被叫
+    private String type;//1采购线路0租户自带
+    @Column(name = "is_through")
+    public String getIsThrough() {
+        return isThrough;
+    }
+
+    public void setIsThrough(String isThrough) {
+        this.isThrough = isThrough;
+    }
+
+    @Column(name = "type")
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    @Column(name = "area_id")
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+
+
+
+    @Column(name = "is_dialing")
+    public String getIsDialing() {
+        return isDialing;
+    }
+
+    public void setIsDialing(String isDialing) {
+        this.isDialing = isDialing;
+    }
+    @Column(name = "is_called")
+    public String getIsCalled() {
+        return isCalled;
+    }
+
+    public void setIsCalled(String isCalled) {
+        this.isCalled = isCalled;
+    }
+
+    @Column(name = "level")
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+    @Column(name = "call_uri")
+    public String getCallUri() {
+        return callUri;
+    }
+
+    public void setCallUri(String callUri) {
+        this.callUri = callUri;
+    }
+    @Column(name = "source")
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+    @Column(name = "usable")
+    public String getUsable() {
+        return usable;
+    }
+
+    public void setUsable(String usable) {
+        this.usable = usable;
+    }
+    @Column(name = "line_id")
+    public String getLineId() {
+        return lineId;
+    }
+
+    public void setLineId(String lineId) {
+        this.lineId = lineId;
+    }
+
+    @Column(name = "amount")
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    @Column(name = "area_code")
+    public String getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
+    }
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -78,5 +197,20 @@ public class ResourceTelenum extends IdEntity{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount) {
+        this.operator = operator;
+        this.areaCode = areaCode;
+        this.amount = new BigDecimal(amount);
+        this.callUri = callUri;
+        this.telNumber = telNumber;
+        this.lineId = lineId;
+        this.status =0;//未被租用
+        this.usable = "1";//可用
+        this.type = "1";//采购线路
+    }
+
+    public ResourceTelenum() {
     }
 }
