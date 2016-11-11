@@ -126,10 +126,6 @@ public class LineGatewayController extends AbstractRestController {
         if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
             return RestResponse.failed("0000","线路不存在");
         }
-        String re = vailLineGatewayVo(lineGatewayVo);
-        if(StringUtils.isNotEmpty(re)){
-            return RestResponse.failed("0000","修改线路失败:"+re);
-        }
         String isThrough = lineGateway.getIsThrough();
         try {
             BeanUtils.copyProperties2(lineGateway,lineGatewayVo,false);
