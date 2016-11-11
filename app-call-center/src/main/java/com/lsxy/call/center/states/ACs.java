@@ -24,9 +24,15 @@ public class ACs {
         return PREFIXED_KEY + agentId;
     }
 
-    public void add(String agentId,String conditionId,Integer priority){
-        String key = getKey(agentId);
-        redisCacheService.zadd(key,conditionId,priority);
+    public void delete(String agentId){
+        redisCacheService.del(getKey(agentId));
     }
 
+    public void add(String agentId,String conditionId,Integer priority){
+        redisCacheService.zadd(getKey(agentId),conditionId,priority == null?0:priority);
+    }
+
+    public void remove(String agentId,String... conditionIds){
+        redisCacheService.zrem(getKey(agentId),conditionIds);
+    }
 }
