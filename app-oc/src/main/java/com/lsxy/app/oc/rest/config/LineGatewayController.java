@@ -128,7 +128,7 @@ public class LineGatewayController extends AbstractRestController {
         }
         String re = vailLineGatewayVo(lineGatewayVo);
         if(StringUtils.isNotEmpty(re)){
-            return RestResponse.failed("0000","修改线路失败:"+re);
+            return RestResponse.failed("0000","新增线路失败:"+re);
         }
         String isThrough = lineGateway.getIsThrough();
         try {

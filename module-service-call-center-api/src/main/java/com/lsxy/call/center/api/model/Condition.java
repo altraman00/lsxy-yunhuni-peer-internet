@@ -15,6 +15,12 @@ import javax.persistence.Table;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_condition")
 public class Condition extends IdEntity{
 
+    private String tenantId;
+
+    private String appId;
+
+    private String channelId;
+
     private String whereExpression;
 
     private String sortExpression;
@@ -26,6 +32,33 @@ public class Condition extends IdEntity{
     private Integer fetchTimeout;
 
     private String remark;
+
+    @Column(name = "tenant_id")
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    @Column(name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    @Column(name = "channel_id")
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
 
     @Column(name="where_expression")
     public String getWhereExpression() {
