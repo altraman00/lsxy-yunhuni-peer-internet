@@ -94,6 +94,7 @@ public class LineGatewayController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","新增线路失败");
         }
+        lineGateway.setCapacity(Integer.valueOf(lineGatewayVo.getCapacity()));
         //默认禁用线路
         lineGateway.setStatus("0");
         //默认没有加入全局线路中
@@ -130,6 +131,9 @@ public class LineGatewayController extends AbstractRestController {
             BeanUtils.copyProperties2(lineGateway,lineGatewayVo,false);
         }catch (Exception e){
             return RestResponse.failed("0000","修改线路失败");
+        }
+        if(StringUtils.isNotEmpty(lineGatewayVo.getCapacity())) {
+            lineGateway.setCapacity(Integer.valueOf(lineGatewayVo.getCapacity()));
         }
         telnumToLineGatewayService.modify(lineGateway,lineGatewayVo.getIsThrough(),isThrough);
         return RestResponse.success("修改成功");
@@ -678,11 +682,21 @@ public class LineGatewayController extends AbstractRestController {
                 return "质量范围只能在[1,10]";
             }
         }
-        if(lineGatewayVo.getCapacity()==null){
+        if(StringUtils.isEmpty(lineGatewayVo.getCapacity())){
             return "并发容量为空";
         }else{
-            if(lineGatewayVo.getCapacity()<1||lineGatewayVo.getCapacity()>1000){
-                return "并发容量只能在[1,1000]";
+            Pattern p1 = Pattern.compile("^[0-9]{1,4}$");
+            Matcher matcher = p1.matcher(lineGatewayVo.getCapacity());
+            if (!matcher.matches()) {
+                return "并发容量格式错误";
+            }
+            try{
+               int i =  Integer.valueOf(lineGatewayVo.getCapacity());
+                if(i<1||i>1000){
+                    return "并发容量只能在[1,1000]";
+                }
+            }catch (Exception e){
+                return "并发容量格式错误";
             }
         }
         return "";
