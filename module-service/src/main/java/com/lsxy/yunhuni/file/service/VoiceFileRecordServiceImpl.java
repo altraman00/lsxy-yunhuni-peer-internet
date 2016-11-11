@@ -63,4 +63,10 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         return list;
     }
 
+    @Override
+    public List<VoiceFileRecord> getListDistinctUrl(String... sessionId) {
+        String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?)";
+        return null;
+    }
+
 }

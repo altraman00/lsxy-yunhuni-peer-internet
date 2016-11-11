@@ -49,5 +49,5 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      */
     List<VoiceFileRecord> list(String appid, String tenantId, Date startTime,Date endTime);
 
-
+    List<VoiceFileRecord> getListDistinctUrl(String ...sessionId);
 }
