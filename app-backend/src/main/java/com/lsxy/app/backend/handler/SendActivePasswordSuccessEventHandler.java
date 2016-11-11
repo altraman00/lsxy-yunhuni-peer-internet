@@ -50,10 +50,10 @@ public class SendActivePasswordSuccessEventHandler implements MQMessageHandler<S
                     //↓↓↓↓↓测试环境专用，往测试人员发邮件--start-->
                     String testEmail = SystemConfig.getProperty("global.mail.tester.email");
                     if(StringUtils.isNotBlank(testEmail)){
-                        mailService.send("重置密码",testEmail,"02-portal-notify-reset-password.vm",params);
+                        mailService.send("重置密码",testEmail,"04-portal-notify-activate-password.vm",params);
                     }
                     //↑↑↑↑↑测试环境专用，往测试人员发邮件--end-->
-                    mailService.send("重置密码",email,"02-portal-notify-reset-password.vm",params);
+                    mailService.send("重置密码",email,"04-portal-notify-activate-password.vm",params);
                     //将参数和对应的邮箱存取redis里
                     long expireTime = Long.parseLong(SystemConfig.getProperty("account.email.expire","72"));
                     if(logger.isDebugEnabled()){

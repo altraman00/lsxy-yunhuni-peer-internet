@@ -5,6 +5,7 @@ import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
+import com.lsxy.yunhuni.api.resourceTelenum.model.TelenumOrder;
 
 import java.util.List;
 import java.util.Map;
@@ -72,4 +73,24 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @return
      */
     List<ResourcesRent> findByTenantId(String id);
+    /**
+     * 释放号码
+     */
+    void release(String id);
+
+    /**
+     * 支付订单
+     * @param id
+     * @param tenant
+     * @return
+     */
+    void telnumPlay(String id,Tenant tenant);
+    /**
+     * 取消订单
+     */
+    void telnumDelete(String id,Tenant tenant);
+    /**
+     * 创建订单
+     */
+    TelenumOrder telnumNew(Tenant tenant, String[] numIds);
 }
