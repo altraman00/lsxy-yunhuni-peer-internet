@@ -498,92 +498,92 @@ public class CalBillingServiceImpl implements CalBillingService{
         容量剩余
      */
 
-//    @Override
-//    public Long getFsize(String tenantId) {
-//        Long size;
-//        Date date = new Date();
-//        Billing billing = billingService.findBillingByTenantId(tenantId);
-//        if(billing == null){
-//            throw new RuntimeException("用户账务表不存在");
-//        }
-//        Date balanceDate = billing.getBalanceDate();
-//        String balanceDateStr = null;
-//        if(balanceDate != null){
-//            DateUtils.formatDate(balanceDate, "yyyyMMdd");
-//        }
-//        Date preDate = DateUtils.getPreDate(date);
-//        String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
-//        if(preDateStr.equals(balanceDateStr)){
-//            //昨日结算
-//            size = getFsizeByPreDateSum(tenantId, date, billing.getFileRemainSize());
-//        }else{
-//            //前日结算
-//            size = getFsizeByPrePreDateSum(tenantId, date, billing.getFileRemainSize());
-//        }
-//
-//        return size;
-//    }
-//
-//    /**
-//     * 获取容量剩余（昨日结算+昨日增加-昨日消费）
-//     * @param tenantId
-//     * @param date
-//     * @param fileRemainSize
-//     * @return
-//     */
-//    private Long getFsizeByPreDateSum(String tenantId, Date date, Long fileRemainSize) {
-//        Long useSize = getUseFsize(tenantId, date);
-//        Long addSize = getAddFsize(tenantId, date);
-//        return fileRemainSize + addSize - useSize;
-//    }
-//
-//    /**
-//     * 获取容量剩余（前日结算+前日增加-前日消费+昨日增加-昨日消费）
-//     * @param tenantId
-//     * @param date
-//     * @param fileRemainSize
-//     * @return
-//     */
-//    private Long getFsizeByPrePreDateSum(String tenantId, Date date, Long fileRemainSize) {
-//        Long useSize = getUseFsize(tenantId, date);
-//        Long addSize = getAddFsize(tenantId, date);
-//        Date preDate = DateUtils.getPreDate(date);
-//        Long preUseSize = getUseFsize(tenantId, preDate);
-//        Long preAddSize = getAddFsize(tenantId, preDate);
-//        return fileRemainSize + addSize - useSize + preAddSize - preUseSize;
-//    }
-//
-//
-//    /**
-//     * 从redis中获取当天的容量使用量
-//     * @param tenantId
-//     * @param date
-//     * @return
-//     */
-//    private Long getUseFsize(String tenantId, Date date){
-//        return getIncrLong(tenantId,date, USE_FSIZE_PREFIX);
-//    }
-//
-//    /**
-//     * 从redis中获取当天的容量增加量
-//     * @param tenantId
-//     * @param date
-//     * @return
-//     */
-//    private Long getAddFsize(String tenantId, Date date){
-//        return getIncrLong(tenantId,date, ADD_FSIZE_PREFIX);
-//    }
-//
-//    @Override
-//    public void incAddFsize(String tenantId, Date date, Long size){
-//        incLong(tenantId,date,size, ADD_FSIZE_PREFIX);
-//    }
-//
-//
-//    @Override
-//    public void incUseFsize(String tenantId, Date date, Long size){
-//        incLong(tenantId,date,size, USE_FSIZE_PREFIX);
-//    }
+    @Override
+    public Long getFsize(String tenantId) {
+        Long size;
+        Date date = new Date();
+        Billing billing = billingService.findBillingByTenantId(tenantId);
+        if(billing == null){
+            throw new RuntimeException("用户账务表不存在");
+        }
+        Date balanceDate = billing.getBalanceDate();
+        String balanceDateStr = null;
+        if(balanceDate != null){
+            DateUtils.formatDate(balanceDate, "yyyyMMdd");
+        }
+        Date preDate = DateUtils.getPreDate(date);
+        String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
+        if(preDateStr.equals(balanceDateStr)){
+            //昨日结算
+            size = getFsizeByPreDateSum(tenantId, date, billing.getFileRemainSize());
+        }else{
+            //前日结算
+            size = getFsizeByPrePreDateSum(tenantId, date, billing.getFileRemainSize());
+        }
+
+        return size;
+    }
+
+    /**
+     * 获取容量剩余（昨日结算+昨日增加-昨日消费）
+     * @param tenantId
+     * @param date
+     * @param fileRemainSize
+     * @return
+     */
+    private Long getFsizeByPreDateSum(String tenantId, Date date, Long fileRemainSize) {
+        Long useSize = getUseFsize(tenantId, date);
+        Long addSize = getAddFsize(tenantId, date);
+        return fileRemainSize + addSize - useSize;
+    }
+
+    /**
+     * 获取容量剩余（前日结算+前日增加-前日消费+昨日增加-昨日消费）
+     * @param tenantId
+     * @param date
+     * @param fileRemainSize
+     * @return
+     */
+    private Long getFsizeByPrePreDateSum(String tenantId, Date date, Long fileRemainSize) {
+        Long useSize = getUseFsize(tenantId, date);
+        Long addSize = getAddFsize(tenantId, date);
+        Date preDate = DateUtils.getPreDate(date);
+        Long preUseSize = getUseFsize(tenantId, preDate);
+        Long preAddSize = getAddFsize(tenantId, preDate);
+        return fileRemainSize + addSize - useSize + preAddSize - preUseSize;
+    }
+
+
+    /**
+     * 从redis中获取当天的容量使用量
+     * @param tenantId
+     * @param date
+     * @return
+     */
+    private Long getUseFsize(String tenantId, Date date){
+        return getIncrLong(tenantId,date, USE_FSIZE_PREFIX);
+    }
+
+    /**
+     * 从redis中获取当天的容量增加量
+     * @param tenantId
+     * @param date
+     * @return
+     */
+    private Long getAddFsize(String tenantId, Date date){
+        return getIncrLong(tenantId,date, ADD_FSIZE_PREFIX);
+    }
+
+    @Override
+    public void incAddFsize(String tenantId, Date date, Long size){
+        incLong(tenantId,date,size, ADD_FSIZE_PREFIX);
+    }
+
+
+    @Override
+    public void incUseFsize(String tenantId, Date date, Long size){
+        incLong(tenantId,date,size, USE_FSIZE_PREFIX);
+    }
 
 
     @Override
@@ -599,7 +599,7 @@ public class CalBillingServiceImpl implements CalBillingService{
         billing.setConferenceRemain(this.getConference(tenantId));
         billing.setVoiceRemain(this.getVoice(tenantId));
         //TODO 从redis 中取出剩余空间
-//        billing.setFileRemainSize(this.getFsize(tenantId));
+        billing.setFileRemainSize(this.getFsize(tenantId));
         return billing;
     }
 
@@ -741,8 +741,8 @@ public class CalBillingServiceImpl implements CalBillingService{
                 Long sms = this.getSmsByPreDateSum(tenantId, date, billing.getSmsRemain());
                 billing.setSmsRemain(sms);
                 //TODO 统计容量
-//                Long size = this.getFsizeByPreDateSum(tenantId, date, billing.getFileRemainSize());
-//                billing.setFileRemainSize(size);
+                Long size = this.getFsizeByPreDateSum(tenantId, date, billing.getFileRemainSize());
+                billing.setFileRemainSize(size);
                 //更新结算时间
                 billing.setBalanceDate(date);
                 billingService.save(billing);

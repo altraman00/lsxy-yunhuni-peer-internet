@@ -128,30 +128,30 @@ public interface CalBillingService {
      * @param num 条
      */
     void incAddSms(String tenantId, Date date, Long num);
-//
-//
-//    /**
-//     * 获取剩余容量
-//     * @param tenantId
-//     * @return
-//     */
-//    Long getFsize(String tenantId);
-//
-//    /**
-//     * redis中的剩余容量使用量增加
-//     * @param tenantId 租户ID
-//     * @param date 日期
-//     * @param size byte
-//     */
-//    void incUseFsize(String tenantId, Date date, Long size);
-//
-//    /**
-//     * redis中的剩余容量增加
-//     * @param tenantId 租户ID
-//     * @param date 日期
-//     * @param size byte
-//     */
-//    void incAddFsize(String tenantId, Date date, Long size);
+
+
+    /**
+     * 获取剩余容量
+     * @param tenantId
+     * @return
+     */
+    Long getFsize(String tenantId);
+
+    /**
+     * redis中的剩余容量使用量增加
+     * @param tenantId 租户ID
+     * @param date 日期
+     * @param size byte
+     */
+    void incUseFsize(String tenantId, Date date, Long size);
+
+    /**
+     * redis中的剩余容量增加
+     * @param tenantId 租户ID
+     * @param date 日期
+     * @param size byte
+     */
+    void incAddFsize(String tenantId, Date date, Long size);
 
 
     /**
