@@ -1,17 +1,13 @@
 package com.lsxy.call.center.mq.handler;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.ConditionService;
-import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
-import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.ExpressionUtils;
-import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
 import org.slf4j.Logger;
@@ -30,9 +26,6 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
     private static final Logger logger = LoggerFactory.getLogger(CreateConditionEventHandler.class);
 
     @Autowired
-    private RedisCacheService redisCacheService;
-
-    @Autowired
     private CallCenterAgentService callCenterAgentService;
 
     @Autowired
@@ -46,12 +39,6 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
 
     @Autowired
     private CAs cAs;
-
-    @Autowired
-    private CQs cQs;
-
-    @Reference(lazy = true,check = false,timeout = 3000)
-    private DeQueueService deQueueService;
 
     @Override
     public void handleMessage(CreateConditionEvent message) throws JMSException {
@@ -69,7 +56,8 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
             logger.info("处理CallCenter.CreateConditionEvent出错，条件不存在！");
             return;
         }
-        //初始化CAs ACs CQs
+        //初始化CAs ACs
+        long start = System.currentTimeMillis();
         List<String> agentIds = callCenterAgentService
                                         .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
         if(agentIds == null || agentIds.size() == 0){
@@ -79,6 +67,7 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
         for (String agentId : agentIds) {
             init(agentId,condition);
         }
+        logger.info("处理CallCenter.CreateConditionEvent耗时={}",(System.currentTimeMillis() - start));
     }
 
     /**
@@ -100,7 +89,7 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
                 aCs.add(agentId,condition.getId(),condition.getPriority());
             }
         }catch (Throwable t){
-            logger.error("",t);
+            logger.error("处理CallCenter.CreateConditionEvent出错",t);
         }
     }
 }
