@@ -1151,9 +1151,9 @@ public class TenantController {
         Page<CallCenter> page =  callCenterService.pList( pageNo,pageSize, id, appId, startTime, endTime, type,callnum, agent);
         Map sum = callCenterService.sum(id,appId,startTime,endTime,type,callnum,agent);
         Map map = new HashMap<>();
-        map.put("page",page);
+        map.put("pageObj",page);
         map.put("sum",sum);
-        return RestResponse.success(map);
+        return RestResponse.success(page);
     }
 
 
