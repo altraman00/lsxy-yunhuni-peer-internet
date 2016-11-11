@@ -3,8 +3,12 @@ package com.lsxy.yunhuni.file.service;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.session.model.VoiceCdr;
+import com.lsxy.yunhuni.api.session.service.VoiceCdrService;
 import com.lsxy.yunhuni.file.dao.VoiceFileRecordDao;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +34,8 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    VoiceCdrService voiceCdrService;
 
     @Override
     public Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize,String appId,String tenantId) {
@@ -64,4 +70,34 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
         return list;
     }
+
+    @Override
+    public List<VoiceFileRecord> getListByCdrId(String id) {
+        //根据cdr获取业务类型，和业务id，根据业务id和业务类型获取录音文件列表，
+        VoiceCdr voiceCdr = voiceCdrService.findById(id);
+        if(voiceCdr!=null&&StringUtils.isNotEmpty(voiceCdr.getId())){
+            ProductCode p1 = ProductCode.changeApiCmdToProductCode(voiceCdr.getType());
+            //语音会议
+            if(ProductCode.sys_conf.getRemark().equals(p1.getRemark())){
+
+            }
+            //自定义IVR
+            else if(ProductCode.ivr_call.getRemark().equals(p1.getRemark())){
+
+            }
+            //语音回拔
+            else if(ProductCode.duo_call.getRemark().equals(p1.getRemark())){
+                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId=?1 AND obj.sessionCode=?2 ";
+                List list= this.list(hql,voiceCdr.getSessionId(),voiceCdr.getType());
+                return list;
+            }
+            //呼叫中心
+            else if(ProductCode.call_center.getRemark().equals(p1.getRemark())){
+
+            }
+
+        }
+        return null;
+    }
+
 }
