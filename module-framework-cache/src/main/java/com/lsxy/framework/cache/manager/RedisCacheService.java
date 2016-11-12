@@ -11,6 +11,7 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
@@ -54,21 +55,38 @@ public class RedisCacheService {
 			throws TransactionExecFailedException {
 		boolean result = (boolean) redisTemplate
 				.execute(new RedisCallback() {
-					@Override
+					/*@Override
 					public Object doInRedis(RedisConnection connection)
 							throws DataAccessException {
 						if(logger.isDebugEnabled()){
 							logger.debug("ready to set nx:"+key+">>>>"+ value);
 						}
 						boolean ret = connection.setNX(key.getBytes(), value.getBytes());
-						//默认缓存2天
-						connection.expire(key.getBytes(), expire);
+						if(ret){//防止没获取到锁也能刷新锁的过期时间
+							//默认缓存2天
+							connection.expire(key.getBytes(), expire);
+						}
 						if(logger.isDebugEnabled()){
 							logger.debug("set nx result:"+ret);
 						}
 						return ret;
+					}*/
+					public Object doInRedis(RedisConnection connection)
+							throws DataAccessException {
+						if(logger.isDebugEnabled()){
+							logger.debug("ready to set nx:"+key+">>>>"+ value);
+						}
+						String script = "local ok = redis.call('setnx', '"+key+"', '"+value+"')\n" +
+								"if ok == 1 then\n" +
+								"  redis.call('expire', '"+key+"', "+expire+")\n" +
+								"end\n" +
+								"return ok";
+						Long ret = (Long)((Jedis)connection.getNativeConnection()).eval(script);
+						if(logger.isDebugEnabled()){
+							logger.debug("set nx result:"+ret);
+						}
+						return ret != null && ret == 1;
 					}
-
 				});
 		//如果结果为空表示设置失败了
 		if(result == false)
