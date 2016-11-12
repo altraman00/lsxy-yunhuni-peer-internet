@@ -13,6 +13,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
+import com.lsxy.framework.mq.events.callcenter.DeleteConditionEvent;
 import com.lsxy.framework.mq.events.callcenter.ModifyConditionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +75,15 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         }
         if(condition.getId() != null){
             Condition oldCondition = this.findById(condition.getId());
+            if(oldCondition == null){
+                throw new IllegalArgumentException("condition 不存在");
+            }
+            if(!oldCondition.getTenantId().equals(condition.getTenantId())){
+                throw new IllegalArgumentException("condition 不存在");
+            }
+            if(!oldCondition.getAppId().equals(condition.getAppId())){
+                throw new IllegalArgumentException("condition 不存在");
+            }
             ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
             if(!lock.lock()){
                 throw new java.lang.IllegalStateException("系统繁忙");
@@ -118,5 +128,42 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
             }
         }
         return condition;
+    }
+
+    @Override
+    public void delete(String tenantId,String appId,String conditionId){
+        if(conditionId == null){
+            throw new NullPointerException();
+        }
+        if(tenantId == null){
+            throw new IllegalArgumentException("tenantId 不能为null");
+        }
+        if(appId == null){
+            throw new IllegalArgumentException("appId 不能为null");
+        }
+        Condition condition = this.findById(conditionId);
+        if(condition == null){
+            throw new IllegalArgumentException("condition 不存在");
+        }
+        if(!tenantId.equals(condition.getTenantId())){
+            throw new IllegalArgumentException("condition 不存在");
+        }
+        if(!appId.equals(condition.getAppId())){
+            throw new IllegalArgumentException("condition 不存在");
+        }
+
+        ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
+        if(!lock.lock()){
+            throw new java.lang.IllegalStateException("系统繁忙");
+        }
+        try {
+            this.delete(conditionId);
+            AbstractMQEvent event = new DeleteConditionEvent(condition.getId(),
+                    condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+            mqService.publish(event);
+        } catch (Throwable t) {
+            lock.unlock();
+            throw new RuntimeException(t);
+        }
     }
 }

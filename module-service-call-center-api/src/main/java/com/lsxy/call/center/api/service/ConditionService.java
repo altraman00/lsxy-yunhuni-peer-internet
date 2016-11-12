@@ -8,4 +8,5 @@ import com.lsxy.framework.api.base.BaseService;
  */
 public interface ConditionService extends BaseService<Condition> {
 
+    public void delete(String tenantId,String appId,String conditionId);
 }
