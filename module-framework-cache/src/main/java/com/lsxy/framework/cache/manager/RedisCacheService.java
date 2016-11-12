@@ -57,11 +57,17 @@ public class RedisCacheService {
 					@Override
 					public Object doInRedis(RedisConnection connection)
 							throws DataAccessException {
-						logger.debug("ready to set nx:"+key+">>>>"+ value);
+						if(logger.isDebugEnabled()){
+							logger.debug("ready to set nx:"+key+">>>>"+ value);
+						}
 						boolean ret = connection.setNX(key.getBytes(), value.getBytes());
 						//默认缓存2天
-						connection.expire(key.getBytes(), expire);
-						logger.debug("set nx result:"+ret);
+						if(ret){
+							connection.expire(key.getBytes(), expire);
+						}
+						if(logger.isDebugEnabled()){
+							logger.debug("set nx result:"+ret);
+						}
 						return ret;
 					}
 
