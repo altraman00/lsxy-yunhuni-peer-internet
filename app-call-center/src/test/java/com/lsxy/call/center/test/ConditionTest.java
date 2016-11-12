@@ -84,7 +84,9 @@ public class ConditionTest {
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
         condition = conditionService.save(condition);
-
+        Thread.sleep(1);
+        condition.setWhereExpression("(get(\"haha0\") + get(\"haha1\")) > 1000;");
+        conditionService.save(condition);
         Thread.sleep(50000);
     }
 }

@@ -7,6 +7,7 @@ import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.api.service.DeQueueService;
+import com.lsxy.call.center.states.lock.ModifyConditionLock;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
@@ -89,8 +90,9 @@ public class ModifyConditionEventHandler implements MQMessageHandler<ModifyCondi
                 init(agentId,condition);
             }
         }
+        ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
+        lock.unlock();
         logger.info("处理CallCenter.ModifyConditionEvent耗时={}",(System.currentTimeMillis() - start));
-
     }
 
     /**

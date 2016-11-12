@@ -28,7 +28,7 @@ public class DistributeLock {
     }
 
     public DistributeLock(RedisCacheService redis,String key){
-        this(redis,key,10);
+        this(redis,key,60);
     }
 
     public boolean lock(){

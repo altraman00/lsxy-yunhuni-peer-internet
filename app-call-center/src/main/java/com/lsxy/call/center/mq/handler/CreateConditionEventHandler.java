@@ -5,9 +5,11 @@ import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.ConditionService;
+import com.lsxy.call.center.states.lock.ModifyConditionLock;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
 import org.slf4j.Logger;
@@ -33,6 +35,9 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
 
     @Autowired
     private ConditionService conditionService;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     @Autowired
     private ACs aCs;
@@ -67,6 +72,8 @@ public class CreateConditionEventHandler implements MQMessageHandler<CreateCondi
         for (String agentId : agentIds) {
             init(agentId,condition);
         }
+        ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
+        lock.unlock();
         logger.info("处理CallCenter.CreateConditionEvent耗时={}",(System.currentTimeMillis() - start));
     }
 
