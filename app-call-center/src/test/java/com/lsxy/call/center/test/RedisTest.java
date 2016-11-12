@@ -1,6 +1,7 @@
 package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.CallCenterMainClass;
+import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
@@ -32,5 +33,15 @@ public class RedisTest {
 
         System.out.println("============================");
         System.out.println(score);
+    }
+
+    @Test
+    public void test2() throws TransactionExecFailedException {
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000; i++) {
+            redisCacheService.setTransactionFlag(start + "test2221" + i,"test2221",300);
+        }
+        System.out.println(System.currentTimeMillis() - start);
+        System.out.println("=======================");
     }
 }

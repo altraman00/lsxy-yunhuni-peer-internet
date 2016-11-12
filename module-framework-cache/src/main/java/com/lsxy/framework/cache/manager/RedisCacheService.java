@@ -55,6 +55,7 @@ public class RedisCacheService {
 			throws TransactionExecFailedException {
 		boolean result = (boolean) redisTemplate
 				.execute(new RedisCallback() {
+
 					/*@Override
 					public Object doInRedis(RedisConnection connection)
 							throws DataAccessException {
@@ -264,23 +265,7 @@ public class RedisCacheService {
 	     */
 	    public void setTransactionFlag(final String key, final String value)
 				throws TransactionExecFailedException {
-				boolean result = (boolean) redisTemplate
-						.execute(new RedisCallback() {
-							@Override
-							public Object doInRedis(RedisConnection connection)
-									throws DataAccessException {
-								logger.debug("ready to set nx:"+key+">>>>"+ value);
-								boolean ret = connection.setNX(key.getBytes(), value.getBytes());
-								//默认缓存2天
-								connection.expire(key.getBytes(), 48*60*60);
-								logger.debug("set nx result:"+ret);
-								return ret;
-							}
-
-						});
-				//如果结果为空表示设置失败了
-				if(result == false)
-					throw new TransactionExecFailedException();
+			this.setTransactionFlag(key,value,48*60*60);
 		}
 
 	    
