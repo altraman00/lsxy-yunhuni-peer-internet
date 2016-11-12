@@ -62,9 +62,7 @@ public class RedisCacheService {
 						}
 						boolean ret = connection.setNX(key.getBytes(), value.getBytes());
 						//默认缓存2天
-						if(ret){
-							connection.expire(key.getBytes(), expire);
-						}
+						connection.expire(key.getBytes(), expire);
 						if(logger.isDebugEnabled()){
 							logger.debug("set nx result:"+ret);
 						}
