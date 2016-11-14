@@ -1,9 +1,25 @@
 package com.lsxy.app.api.gateway.rest.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.lsxy.app.api.gateway.dto.callcenter.ConditionCreateInputDTO;
+import com.lsxy.app.api.gateway.dto.callcenter.ConditionModifyInputDTO;
+import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
+import com.lsxy.app.api.gateway.rest.ConfController;
+import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.ConditionService;
-import org.springframework.web.bind.annotation.RestController;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by liuws on 2016/11/14.
@@ -11,7 +27,91 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ConditionController extends AbstractAPIController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ConfController.class);
+
     @Reference(timeout=3000,check = false,lazy = true)
     private ConditionService conditionService;
 
+    @Autowired
+    private AppService appService;
+
+    @RequestMapping(value = "/{account_id}/callcenter/conditions",method = RequestMethod.POST)
+    public ApiGatewayResponse save(HttpServletRequest request, @PathVariable String accountId,
+                                   @RequestHeader(value = "AppID") String appId,
+                                   @Valid @RequestBody ConditionCreateInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("创建条件API参数,accountId={},appId={},dto={}",accountId,appId,dto);
+        }
+        App app = appService.findById(appId);
+        Condition condition = new Condition();
+        condition.setTenantId(app.getTenant().getId());
+        condition.setAppId(app.getId());
+        condition.setChannelId(dto.getChannelId());
+        condition.setWhereExpression(dto.getWhereExpression());
+        condition.setSortExpression(dto.getSortExpression());
+        condition.setPriority(dto.getPriority());
+        condition.setQueueTimeout(dto.getQueueTimeout());
+        condition.setFetchTimeout(dto.getFetchTimeout());
+        condition.setRemark(dto.getRemark());
+        condition = conditionService.save(condition);
+        Map<String,String> result = new HashMap<>();
+        result.put("conditionId",condition.getId());
+        return ApiGatewayResponse.success(result);
+    }
+
+    @RequestMapping(value = "/{account_id}/callcenter/conditions/{id}",method = RequestMethod.PUT)
+    public ApiGatewayResponse modify(HttpServletRequest request, @PathVariable String accountId,
+                                   @RequestHeader(value = "AppID") String appId,
+                                   @PathVariable String id,
+                                   @Valid @RequestBody ConditionModifyInputDTO dto) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("创建条件API参数,accountId={},appId={},dto={}",accountId,appId,dto);
+        }
+        App app = appService.findById(appId);
+        Condition condition = new Condition();
+        condition.setId(id);
+        condition.setTenantId(app.getTenant().getId());
+        condition.setAppId(app.getId());
+        condition.setWhereExpression(dto.getWhereExpression());
+        condition.setSortExpression(dto.getSortExpression());
+        condition.setPriority(dto.getPriority());
+        condition.setQueueTimeout(dto.getQueueTimeout());
+        condition.setFetchTimeout(dto.getFetchTimeout());
+        condition.setRemark(dto.getRemark());
+        conditionService.save(condition);
+        return ApiGatewayResponse.success(true);
+    }
+
+    @RequestMapping(value = "/{account_id}/callcenter/conditions/{id}",method = RequestMethod.DELETE)
+    public ApiGatewayResponse delete(HttpServletRequest request, @PathVariable String accountId,
+                                     @RequestHeader(value = "AppID") String appId,
+                                     @PathVariable String id) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("删除条件API参数,accountId={},appId={},id={}",accountId,appId,id);
+        }
+        App app = appService.findById(appId);
+        conditionService.delete(app.getTenant().getId(),app.getId(),id);
+        return ApiGatewayResponse.success(true);
+    }
+
+    @RequestMapping(value = "/{account_id}/callcenter/conditions",method = RequestMethod.GET)
+    public ApiGatewayResponse conditions(HttpServletRequest request, @PathVariable String accountId,
+                                       @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("条件列表API参数,accountId={},appId={},id={}",accountId,appId);
+        }
+        App app = appService.findById(appId);
+        return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId()));
+    }
+
+    @RequestMapping(value = "/{account_id}/callcenter/conditions/{id}",method = RequestMethod.GET)
+    public ApiGatewayResponse findOne(HttpServletRequest request, @PathVariable String accountId,
+                                      @RequestHeader(value = "AppID") String appId,
+                                      @PathVariable String id) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("获取条件API参数,accountId={},appId={},id={}",accountId,appId,id);
+        }
+        App app = appService.findById(appId);
+        return ApiGatewayResponse.success(conditionService.findOne(app.getTenant().getId(),app.getId(),id));
+    }
 }
