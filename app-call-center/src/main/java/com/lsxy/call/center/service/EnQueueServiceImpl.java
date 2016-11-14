@@ -6,6 +6,9 @@ import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.api.service.EnQueueService;
+import com.lsxy.call.center.states.statics.ACs;
+import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.states.statics.CQs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,15 @@ public class EnQueueServiceImpl implements EnQueueService{
 
     @Autowired
     private ConditionService conditionService;
+
+    @Autowired
+    private CAs cAs;
+
+    @Autowired
+    private ACs aCs;
+
+    @Autowired
+    private CQs cQs;
 
     /**
      * 排队,通过 dubbo返回结果给  区域管理器
