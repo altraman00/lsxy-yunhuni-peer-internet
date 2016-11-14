@@ -185,7 +185,7 @@ public class VoiceFileRecordController extends AbstractRestController {
             else if (ProductCode.call_center.getRemark().equals(p1.getRemark())) {
                 //根据sessionid获取呼叫中心交互成员，在获取呼叫中心交谈，在获取文件
                 List<String> temp = callCenterConversationMemberService.getListBySessionId(voiceCdr.getSessionId());
-                if (temp.size() == 0) {
+                if (temp==null||temp.size() == 0) {
                     return null;
                 }
                 String te = "";
