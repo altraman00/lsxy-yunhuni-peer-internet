@@ -1,6 +1,6 @@
 package com.lsxy.area.server.test;
 
-import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.AreaServerMainClass;
 import com.lsxy.framework.config.Constants;

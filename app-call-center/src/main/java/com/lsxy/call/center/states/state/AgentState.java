@@ -69,7 +69,7 @@ public class AgentState {
         return Long.parseLong(obj.toString());
     }
 
-    public void setLastRegTime(String agentId,long lastRegTime) {
+    public void setLastRegTime(String agentId,Long lastRegTime) {
         redisCacheService.hput(getKey(agentId),"lastRegTime",lastRegTime);
     }
 
@@ -81,7 +81,7 @@ public class AgentState {
         return Long.parseLong(obj.toString());
     }
 
-    public void setLastTime(String agentId,long lastTime) {
+    public void setLastTime(String agentId,Long lastTime) {
         redisCacheService.hput(getKey(agentId),"lastTime",lastTime);
     }
 
@@ -92,9 +92,9 @@ public class AgentState {
 
         private String state;
 
-        private long lastRegTime;
+        private Long lastRegTime;
 
-        private long lastTime;
+        private Long lastTime;
 
         public String getExtension() {
             return extension;
@@ -116,15 +116,15 @@ public class AgentState {
             return lastRegTime;
         }
 
-        public void setLastRegTime(long lastRegTime) {
+        public void setLastRegTime(Long lastRegTime) {
             this.lastRegTime = lastRegTime;
         }
 
-        public long getLastTime() {
+        public Long getLastTime() {
             return lastTime;
         }
 
-        public void setLastTime(long lastTime) {
+        public void setLastTime(Long lastTime) {
             this.lastTime = lastTime;
         }
     }

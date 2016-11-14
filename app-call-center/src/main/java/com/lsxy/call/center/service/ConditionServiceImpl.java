@@ -63,10 +63,10 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(condition.getChannelId() == null){
             throw new IllegalArgumentException("channelId 不能为null");
         }
-        if(!ExpressionUtils.invalidSortExpression(condition.getSortExpression())){
+        if(!ExpressionUtils.validSortExpression(condition.getSortExpression())){
             throw new IllegalArgumentException("sort expression 错误");
         }
-        if(!ExpressionUtils.invalidWhereExpression(condition.getWhereExpression())){
+        if(!ExpressionUtils.validWhereExpression(condition.getWhereExpression())){
             throw new IllegalArgumentException("where expression 错误");
         }
         //通道是否存在
