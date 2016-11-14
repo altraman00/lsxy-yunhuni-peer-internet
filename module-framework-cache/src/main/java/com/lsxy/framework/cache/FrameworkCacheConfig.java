@@ -57,7 +57,6 @@ public class FrameworkCacheConfig extends CachingConfigurerSupport {
         template.setKeySerializer(template.getStringSerializer());
         template.setHashKeySerializer(template.getStringSerializer());
 
-        template.setHashValueSerializer(template.getStringSerializer());
         template.setValueSerializer(template.getStringSerializer());
         template.setConnectionFactory(factory);
         return template;
