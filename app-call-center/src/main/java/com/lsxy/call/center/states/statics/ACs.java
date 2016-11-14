@@ -1,4 +1,4 @@
-package com.lsxy.call.center.states;
+package com.lsxy.call.center.states.statics;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import org.slf4j.Logger;
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * 管理坐席的条件的zset
+ * 管理坐席的条件，按优先级排序
  * key callcenter.acs_agentid
  *     item ==>  cid:priority
  */

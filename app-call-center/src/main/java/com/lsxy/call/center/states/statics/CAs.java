@@ -1,4 +1,4 @@
-package com.lsxy.call.center.states;
+package com.lsxy.call.center.states.statics;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import org.slf4j.Logger;
@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * 管理条件下的坐席，按分值排序
  * Created by liuws on 2016/11/11.
  */
 @Component

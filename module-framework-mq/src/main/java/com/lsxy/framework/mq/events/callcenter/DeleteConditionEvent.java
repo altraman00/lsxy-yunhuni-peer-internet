@@ -1,33 +1,31 @@
 package com.lsxy.framework.mq.events.callcenter;
 
-import com.lsxy.framework.mq.api.AbstractDelayMQEvent;
+import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.topic.MQTopicConstants;
 
 /**
- * Created by liuws on 2016/9/13.
+ * Created by liuws on 2016/11/9.
  */
-public class EnqueueEvent extends AbstractDelayMQEvent{
+public class DeleteConditionEvent extends AbstractMQEvent {
 
     private String conditionId;
-
-    private String queueId;
 
     private String tenantId;
 
     private String appId;
 
-    private String callId;
+    private String channelId;
 
-    public EnqueueEvent(){}
+    public DeleteConditionEvent(){
+    }
 
-    public EnqueueEvent(String conditionId,String queueId,String tenantId, String appId, String callId, Integer delay){
-        super(delay);
+    public DeleteConditionEvent(String conditionId, String tenantId, String appId,String channelId){
         this.conditionId = conditionId;
-        this.queueId = queueId;
         this.tenantId = tenantId;
         this.appId = appId;
-        this.callId = callId;
+        this.channelId = channelId;
     }
+
     @Override
     public String getTopicName() {
         return MQTopicConstants.TOPIC_CALL_CENTER;
@@ -39,14 +37,6 @@ public class EnqueueEvent extends AbstractDelayMQEvent{
 
     public void setConditionId(String conditionId) {
         this.conditionId = conditionId;
-    }
-
-    public String getQueueId() {
-        return queueId;
-    }
-
-    public void setQueueId(String queueId) {
-        this.queueId = queueId;
     }
 
     public String getTenantId() {
@@ -65,11 +55,11 @@ public class EnqueueEvent extends AbstractDelayMQEvent{
         this.appId = appId;
     }
 
-    public String getCallId() {
-        return callId;
+    public String getChannelId() {
+        return channelId;
     }
 
-    public void setCallId(String callId) {
-        this.callId = callId;
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 }

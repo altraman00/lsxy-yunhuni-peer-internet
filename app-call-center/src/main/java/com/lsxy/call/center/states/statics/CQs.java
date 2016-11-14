@@ -1,4 +1,4 @@
-package com.lsxy.call.center.states;
+package com.lsxy.call.center.states.statics;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import org.slf4j.Logger;
@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * 条件下的排队，按排队时间排序
  * Created by liuws on 2016/11/11.
  */
 @Component
@@ -29,6 +30,12 @@ public class CQs {
     public void add(String conditionId, String queueId) {
         String key = getKey(conditionId);
         redisCacheService.zadd(key, queueId, System.currentTimeMillis());
+    }
+
+    public boolean exists(String conditionId, String queueId){
+        String key = getKey(conditionId);
+        Double score = redisCacheService.zScore(key, queueId);
+        return score != null;
     }
 
     public void remove(String conditionId,String... queueIds){

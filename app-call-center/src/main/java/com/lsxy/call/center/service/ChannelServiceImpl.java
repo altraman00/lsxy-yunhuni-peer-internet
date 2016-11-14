@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -29,4 +30,51 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         return channelDao;
     }
 
+    @Override
+    public void delete(String tenantId, String appId, String channelId) {
+        Channel channel = this.findOne(tenantId,appId,channelId);
+        if(channel != null){
+            try{
+                this.delete(channel);
+            }catch (Throwable t){
+                logger.error("删除channel失败",t);
+            }
+        }
+    }
+
+    @Override
+    public Channel findOne(String tenantId, String appId, String channelId) {
+        if(channelId == null){
+            throw new IllegalArgumentException("channelId 不能为null");
+        }
+        if(tenantId == null){
+            throw new IllegalArgumentException("tenantId 不能为null");
+        }
+        if(appId == null){
+            throw new IllegalArgumentException("appId 不能为null");
+        }
+        Channel channel = this.findById(channelId);
+        if(channel == null){
+            throw new IllegalArgumentException("channel 不存在");
+        }
+        if(!tenantId.equals(channel.getTenantId())){
+            throw new IllegalArgumentException("channel 不存在");
+        }
+        if(!appId.equals(channel.getAppId())){
+            throw new IllegalArgumentException("channel 不存在");
+        }
+        return channel;
+    }
+
+    @Override
+    public List<Channel> getAll(String tenantId, String appId) {
+        if(tenantId == null){
+            throw new IllegalArgumentException("tenantId 不能为null");
+        }
+        if(appId == null){
+            throw new IllegalArgumentException("appId 不能为null");
+        }
+
+        return this.channelDao.findByTenantIdAndAppId(tenantId,appId);
+    }
 }

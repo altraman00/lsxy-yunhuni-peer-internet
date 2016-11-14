@@ -1,8 +1,5 @@
 package com.lsxy.framework.cache.manager;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Set;
-
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,8 +11,12 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.PostConstruct;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Redis操作方法
@@ -23,7 +24,7 @@ import javax.annotation.PostConstruct;
  *
  */
 @Component
-@DependsOn("lsxyRedisTemplate")
+@DependsOn("businessRedisTemplate")
 @SuppressWarnings({"unchecked","rawtypes"})
 public class RedisCacheService {
 	
@@ -36,9 +37,9 @@ public class RedisCacheService {
 	private final static Log logger = LogFactory.getLog(RedisCacheService.class);
 
 	@Autowired
-	@Qualifier("lsxyRedisTemplate")
+	@Qualifier("businessRedisTemplate")
     private RedisTemplate redisTemplate;
-    
+
 	 private static String redisCode = "utf-8";
 
 	@PostConstruct
@@ -55,17 +56,39 @@ public class RedisCacheService {
 			throws TransactionExecFailedException {
 		boolean result = (boolean) redisTemplate
 				.execute(new RedisCallback() {
-					@Override
+
+					/*@Override
 					public Object doInRedis(RedisConnection connection)
 							throws DataAccessException {
-						logger.debug("ready to set nx:"+key+">>>>"+ value);
+						if(logger.isDebugEnabled()){
+							logger.debug("ready to set nx:"+key+">>>>"+ value);
+						}
 						boolean ret = connection.setNX(key.getBytes(), value.getBytes());
-						//默认缓存2天
-						connection.expire(key.getBytes(), expire);
-						logger.debug("set nx result:"+ret);
+						if(ret){//防止没获取到锁也能刷新锁的过期时间
+							//默认缓存2天
+							connection.expire(key.getBytes(), expire);
+						}
+						if(logger.isDebugEnabled()){
+							logger.debug("set nx result:"+ret);
+						}
 						return ret;
+					}*/
+					public Object doInRedis(RedisConnection connection)
+							throws DataAccessException {
+						if(logger.isDebugEnabled()){
+							logger.debug("ready to set nx:"+key+">>>>"+ value);
+						}
+						String script = "local ok = redis.call('setnx', '"+key+"', '"+value+"')\n" +
+								"if ok == 1 then\n" +
+								"  redis.call('expire', '"+key+"', "+expire+")\n" +
+								"end\n" +
+								"return ok";
+						Long ret = (Long)((Jedis)connection.getNativeConnection()).eval(script);
+						if(logger.isDebugEnabled()){
+							logger.debug("set nx result:"+ret);
+						}
+						return ret != null && ret == 1;
 					}
-
 				});
 		//如果结果为空表示设置失败了
 		if(result == false)
@@ -243,23 +266,7 @@ public class RedisCacheService {
 	     */
 	    public void setTransactionFlag(final String key, final String value)
 				throws TransactionExecFailedException {
-				boolean result = (boolean) redisTemplate
-						.execute(new RedisCallback() {
-							@Override
-							public Object doInRedis(RedisConnection connection)
-									throws DataAccessException {
-								logger.debug("ready to set nx:"+key+">>>>"+ value);
-								boolean ret = connection.setNX(key.getBytes(), value.getBytes());
-								//默认缓存2天
-								connection.expire(key.getBytes(), 48*60*60);
-								logger.debug("set nx result:"+ret);
-								return ret;
-							}
-
-						});
-				//如果结果为空表示设置失败了
-				if(result == false)
-					throw new TransactionExecFailedException();
+			this.setTransactionFlag(key,value,48*60*60);
 		}
 
 	    
@@ -351,9 +358,12 @@ public class RedisCacheService {
 			return redisTemplate.opsForZSet().rangeByScore(key, min, max);
 		}
 
-		public void zadd(String key,String value,double score) {
+		public void zadd(final String key,final String value,double score) {
 			redisTemplate.opsForZSet().add(key, value, score);
-			
+		}
+
+		public Double zScore(final String key,final String value) {
+			return redisTemplate.opsForZSet().score(key,value);
 		}
 
 		public void sadd(final String key, final Object ... values) {
@@ -363,5 +373,29 @@ public class RedisCacheService {
 		public Set smembers(final String key) {
 			Set set = redisTemplate.opsForSet().members(key);
 			return set;
+		}
+
+		public Map hgetAll(final String key){
+			return redisTemplate.opsForHash().entries(key);
+		}
+
+		public Object hget(final String key,final String field){
+			return redisTemplate.opsForHash().get(key,field);
+		}
+
+		public void hputAll(final String key,final Map map){
+			redisTemplate.opsForHash().putAll(key,map);
+		}
+
+		public void hput(final String key,final String field,final Object value){
+			redisTemplate.opsForHash().put(key,field,value);
+		}
+
+		public boolean hputIfAbsent(final String key,final String field,final Object value){
+			return redisTemplate.opsForHash().putIfAbsent(key,field,value);
+		}
+
+		public void hdel(final String key,final String field){
+			redisTemplate.opsForHash().delete(key,field);
 		}
 }
