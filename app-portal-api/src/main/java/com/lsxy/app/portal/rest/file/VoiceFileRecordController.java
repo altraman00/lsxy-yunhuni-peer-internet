@@ -146,10 +146,18 @@ public class VoiceFileRecordController extends AbstractRestController {
             return RestResponse.failed("0000","验证失败，无法下载");
         }
         List<VoiceFileRecord> list = getFile(id);
-        if(list==null){
-            return RestResponse.failed("0000","不存在录音文件");
+        if(list==null||list.size()==0){
+            return RestResponse.failed("0000","无对应的录音文件");
         }
-        return RestResponse.success();
+        //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
+        for(int i=0;i<list.size();i++){
+            VoiceFileRecord voiceFileRecord = list.get(i);
+            if(1!=voiceFileRecord.getStatus()){
+                //发起文件上传
+            }
+        }
+        String ossUri = getOssTempUri(list.get(0).getOssUrl());
+        return RestResponse.success(ossUri);
     }
 
 

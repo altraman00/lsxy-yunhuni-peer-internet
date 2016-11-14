@@ -122,8 +122,9 @@
                                                 <th>呼叫时间</th>
                                                 <th>主叫</th>
                                                 <th>被叫</th>
-                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 <th>时长（秒）</th>
+                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
+                                                <th>操作</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -132,8 +133,9 @@
                                                     <td><fmt:formatDate value="${result.callStartDt}" pattern="yyyy-MM-dd HH:mm:ss"></fmt:formatDate> </td>
                                                     <td>${result.fromNum}</td>
                                                     <td>${result.toNum}</td>
-                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
                                                     <td>${result.costTimeLong}</td>
+                                                    <td><span style="float:left;width: 80px" ><span style="float:right;" >￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber></span></span></td>
+                                                    <td><a onclick="cdrDownload('${result.id}')">下载</a></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
@@ -166,6 +168,16 @@
         $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback/download");
         $('#mainForm').submit();
         $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/callback");
+    }
+    function cdrDownload(id){
+        var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+        ajaxsync("${ctx}/console/app/file/record/cdr/download/"+id,params,function(result) {
+            if(result.success){
+               window.open(result.data)
+            }else{
+                showtoast(result.errorMsg)
+            }
+        });
     }
 </script>
 </body>
