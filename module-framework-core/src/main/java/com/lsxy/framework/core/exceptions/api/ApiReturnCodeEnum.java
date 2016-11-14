@@ -33,7 +33,9 @@ public enum ApiReturnCodeEnum {
     NumberNotAllowToCall("020001","号码不允许呼叫"),
     ConfNotExists("030000","会议不存在"),
     OutOfConfMaxParts("030001","超过最大与会数"),
-    DuoCallbackNumIsSample("070000","双向回拔的号码不能是同一号码");
+    DuoCallbackNumIsSample("070000","双向回拔的号码不能是同一号码"),
+    ExtensionUserExist("080101","分机账号已存在"),
+    ExtensionBindingToAgent("080102","分机已绑定座席");
 
     private String code;
     private String msg;

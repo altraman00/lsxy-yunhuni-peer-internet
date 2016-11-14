@@ -22,12 +22,10 @@ public class AppExtension extends IdEntity {
 
     private String appId;//    app_id               varchar(32) comment '所属应用ID',
     private String tenantId; //tenant_id   租户id
-    private String name;//    name                 varchar(100) comment '名称',
     private String type;//    type                 varchar(30),
     private String user;//    user                 varchar(50) comment 'SIP注册用户名，全局唯一。格式是6到12位数字',
     private String password;//    password             varchar(50) comment 'SIP注册密码',
     private String secret;//    secret               varchar(100) comment '全局唯一的内部SIP登录地址获取密钥',
-    private String registrar;//    registrar            varchar(100) comment 'SIP注册点地址。该分机需要向这个注册点进行注册。格式：<host>[:port]，默认端口5060',
     private String telenum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
     private String ext;//    ext                  varchar(32) comment '分机短号（保留，不用）',
     private String did;//    did                  varchar(32) comment '分机直通号（保留，不用）',
@@ -48,15 +46,6 @@ public class AppExtension extends IdEntity {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
-    }
-
-    @Column(name = "name")
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Column(name = "type")
@@ -90,14 +79,6 @@ public class AppExtension extends IdEntity {
 
     public void setSecret(String secret) {
         this.secret = secret;
-    }
-    @Column(name = "registrar")
-    public String getRegistrar() {
-        return registrar;
-    }
-
-    public void setRegistrar(String registrar) {
-        this.registrar = registrar;
     }
 
     @Column(name = "telenum")

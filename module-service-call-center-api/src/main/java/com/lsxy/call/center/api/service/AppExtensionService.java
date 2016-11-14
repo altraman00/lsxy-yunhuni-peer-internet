@@ -2,6 +2,8 @@ package com.lsxy.call.center.api.service;
 
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.exceptions.api.ExtensionUserExistException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
  */
 public interface AppExtensionService extends BaseService<AppExtension> {
 
-    String register(AppExtension appExtension);
+    String register(AppExtension appExtension) throws YunhuniApiException;
 
     boolean login(String tenantId,String appId,String user,String pass);
 
@@ -22,8 +24,8 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      */
     List<AppExtension> findByAppId(String appId);
 
-    void delete(String extensionId,String appId);
+    void delete(String extensionId,String appId) throws YunhuniApiException;
 
 
-    Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize);
+    Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
 }

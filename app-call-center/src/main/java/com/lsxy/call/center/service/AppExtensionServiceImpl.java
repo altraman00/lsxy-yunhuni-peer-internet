@@ -1,13 +1,16 @@
 package com.lsxy.call.center.service;
 
 import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.model.AppExtensionStatus;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
+import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.exceptions.api.ExtensionBindingToAgentException;
+import com.lsxy.framework.core.exceptions.api.ExtensionUserExistException;
+import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.lang.StringUtils;
@@ -17,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -37,6 +37,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     @Autowired
     RedisCacheService redisCacheService;
 
+    @Autowired
+    ExtensionState extensionState;
+
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
         return this.appExtensionDao;
@@ -51,35 +54,31 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     //注册
     @Override
-    public String register(AppExtension appExtension){
+    public String register(AppExtension appExtension) throws YunhuniApiException {
         if(appExtension == null){
             throw new NullPointerException();
         }
-        if(StringUtil.isEmpty(appExtension.getTenantId())){
+        if(StringUtil.isBlank(appExtension.getTenantId())){
             throw new NullPointerException();
         }
-        if(StringUtil.isEmpty(appExtension.getAppId())){
+        if(StringUtil.isBlank(appExtension.getAppId())){
             throw new NullPointerException();
         }
-        if(StringUtil.isEmpty(appExtension.getUser())){
+        if(StringUtil.isBlank(appExtension.getUser())){
             throw new NullPointerException();
         }
-        if(StringUtil.isEmpty(appExtension.getPassword())){
+        if(StringUtil.isBlank(appExtension.getPassword())){
+            throw new NullPointerException();
+        }
+        if(StringUtil.isBlank(appExtension.getType())){
             throw new NullPointerException();
         }
         if(this.exists(appExtension.getUser())){
-            throw new RuntimeException("已存在的分机账号");
+            throw new ExtensionUserExistException();
         }
         this.save(appExtension);
         //TODO 初始化状态状态
-        Map map = new HashMap<>();
-        AppExtensionStatus extensionStatus = new AppExtensionStatus();
-        extensionStatus.setLastRegisterStatus(1);
-        try {
-            BeanUtils.copyProperties2(map,extensionStatus,false);
-        } catch (Exception e) {
-        }
-        redisCacheService.hputAll(AppExtensionStatus.EXTENSION_STATUS_PREFIX + appExtension.getId(),map);
+        extensionState.setLastRegisterStatus(appExtension.getId(),200);
 
         return appExtension.getId();
     }
@@ -120,31 +119,23 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
-    public void delete(String extensionId, String appId) {
+    public void delete(String extensionId, String appId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
             try {
-                AppExtensionStatus status = new AppExtensionStatus();
-                Map map = redisCacheService.hgetAll(AppExtensionStatus.EXTENSION_STATUS_PREFIX + extensionId);
-                try {
-                    BeanUtils.copyProperties2(status,map,false);
-                } catch (Exception e) {
-                }
-                //TODO 获取分机状态，座席如果没绑定座席则：
-                if(StringUtils.isBlank(status.getBindingAgent())){
+                String agent = extensionState.getAgent(extensionId);
+                if(StringUtils.isBlank(agent)){
                     this.delete(extension);
                     redisCacheService.del(extensionId);
                 }else{
-                    throw new RuntimeException("删除分机失败，分机绑定了座席");
+                    throw new ExtensionBindingToAgentException();
                 }
             } catch (Exception e) {
                 logger.error("删除分机失败",e);
-                //TODO 抛异常
-                throw new RuntimeException("删除分机失败");
+                throw new RequestIllegalArgumentException();
             }
         }else{
-            //TODO 抛异常
-            throw new RuntimeException("删除分机失败,参数不正确");
+            throw new RequestIllegalArgumentException();
         }
     }
 
@@ -153,5 +144,6 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         String hql = "from AppExtension obj where obj.appId=?1";
         return this.pageList(hql, pageNo, pageSize, appId);
     }
+
 
 }
