@@ -31,6 +31,7 @@ public class AppExtension extends IdEntity {
     private String telenum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
     private String ext;//    ext                  varchar(32) comment '分机短号（保留，不用）',
     private String did;//    did                  varchar(32) comment '分机直通号（保留，不用）',
+    private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
 
     @Column(name = "app_id")
     public String getAppId() {
@@ -125,5 +126,13 @@ public class AppExtension extends IdEntity {
         this.did = did;
     }
 
+    @Column(name = "ipaddr")
+    public String getIpaddr() {
+        return ipaddr;
+    }
+
+    public void setIpaddr(String ipaddr) {
+        this.ipaddr = ipaddr;
+    }
 }
 
