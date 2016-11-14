@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 import java.io.Serializable;
 
@@ -132,8 +133,26 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
 
     @Override
     public void delete(String tenantId,String appId,String conditionId){
+        Condition condition = this.findOne(tenantId,appId,conditionId);
+        ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
+        if(!lock.lock()){
+            throw new java.lang.IllegalStateException("系统繁忙");
+        }
+        try {
+            this.delete(conditionId);
+            AbstractMQEvent event = new DeleteConditionEvent(condition.getId(),
+                    condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+            mqService.publish(event);
+        } catch (Throwable t) {
+            lock.unlock();
+            throw new RuntimeException(t);
+        }
+    }
+
+    @Override
+    public Condition findOne(String tenantId,String appId,String conditionId){
         if(conditionId == null){
-            throw new NullPointerException();
+            throw new IllegalArgumentException("conditionId 不能为null");
         }
         if(tenantId == null){
             throw new IllegalArgumentException("tenantId 不能为null");
@@ -151,19 +170,32 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(!appId.equals(condition.getAppId())){
             throw new IllegalArgumentException("condition 不存在");
         }
+        return condition;
+    }
 
-        ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
-        if(!lock.lock()){
-            throw new java.lang.IllegalStateException("系统繁忙");
+    @Override
+    public List<Condition> getAll(String tenantId, String appId){
+        if(tenantId == null){
+            throw new IllegalArgumentException("tenantId 不能为null");
         }
-        try {
-            this.delete(conditionId);
-            AbstractMQEvent event = new DeleteConditionEvent(condition.getId(),
-                    condition.getTenantId(),condition.getAppId(),condition.getChannelId());
-            mqService.publish(event);
-        } catch (Throwable t) {
-            lock.unlock();
-            throw new RuntimeException(t);
+        if(appId == null){
+            throw new IllegalArgumentException("appId 不能为null");
         }
+
+        return this.conditionDao.findByTenantIdAndAppId(tenantId,appId);
+    }
+
+    @Override
+    public List<Condition> getAll(String tenantId, String appId,String channelId){
+        if(tenantId == null){
+            throw new IllegalArgumentException("tenantId 不能为null");
+        }
+        if(appId == null){
+            throw new IllegalArgumentException("appId 不能为null");
+        }
+        if(channelId == null){
+            throw new IllegalArgumentException("channelId 不能为null");
+        }
+        return this.conditionDao.findByTenantIdAndAppIdAndChannelId(tenantId,appId,channelId);
     }
 }

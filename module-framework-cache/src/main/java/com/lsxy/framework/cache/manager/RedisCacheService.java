@@ -15,6 +15,7 @@ import redis.clients.jedis.Jedis;
 
 import javax.annotation.PostConstruct;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -357,11 +358,11 @@ public class RedisCacheService {
 			return redisTemplate.opsForZSet().rangeByScore(key, min, max);
 		}
 
-		public void zadd(String key,String value,double score) {
+		public void zadd(final String key,final String value,double score) {
 			redisTemplate.opsForZSet().add(key, value, score);
 		}
 
-		public Double zScore(String key,String value) {
+		public Double zScore(final String key,final String value) {
 			return redisTemplate.opsForZSet().score(key,value);
 		}
 
@@ -372,5 +373,29 @@ public class RedisCacheService {
 		public Set smembers(final String key) {
 			Set set = redisTemplate.opsForSet().members(key);
 			return set;
+		}
+
+		public Map hgetAll(final String key){
+			return redisTemplate.opsForHash().entries(key);
+		}
+
+		public Object hget(final String key,final String field){
+			return redisTemplate.opsForHash().get(key,field);
+		}
+
+		public void hputAll(final String key,final Map map){
+			redisTemplate.opsForHash().putAll(key,map);
+		}
+
+		public void hput(final String key,final String field,final Object value){
+			redisTemplate.opsForHash().put(key,field,value);
+		}
+
+		public boolean hputIfAbsent(final String key,final String field,final Object value){
+			return redisTemplate.opsForHash().putIfAbsent(key,field,value);
+		}
+
+		public void hdel(final String key,final String field){
+			redisTemplate.opsForHash().delete(key,field);
 		}
 }
