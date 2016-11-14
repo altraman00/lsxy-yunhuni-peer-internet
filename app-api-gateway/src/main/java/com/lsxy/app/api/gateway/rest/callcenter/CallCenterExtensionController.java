@@ -1,7 +1,8 @@
-package com.lsxy.app.api.gateway.rest;
+package com.lsxy.app.api.gateway.rest.callcenter;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
+import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.framework.core.utils.Page;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by liups on 2016/11/14.
  */
 @RestController
-public class CallCenterExtensionController extends AbstractAPIController{
+public class CallCenterExtensionController extends AbstractAPIController {
     private static final Logger logger = LoggerFactory.getLogger(CallCenterExtensionController.class);
 
     @Reference(timeout=3000,check = false,lazy = true)
@@ -32,7 +33,6 @@ public class CallCenterExtensionController extends AbstractAPIController{
         extension.setAppId(appId);
         extension.setTenantId(app.getTenant().getId());
         String extensionId = appExtensionService.register(extension);
-        //TODO 初始化状态状态
         return ApiGatewayResponse.success(extensionId);
     }
 
