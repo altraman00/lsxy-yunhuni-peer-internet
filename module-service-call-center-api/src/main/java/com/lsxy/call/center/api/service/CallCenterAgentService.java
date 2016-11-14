@@ -3,7 +3,6 @@ package com.lsxy.call.center.api.service;
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.framework.api.base.BaseService;
 
 import java.util.List;
@@ -22,6 +21,4 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
     public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Integer active);
 
     public List<String> getAgentIdsByChannel(String tenantId, String appId, String channelId);
-
-    public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue);
 }
