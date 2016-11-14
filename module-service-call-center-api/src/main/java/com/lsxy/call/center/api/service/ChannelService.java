@@ -16,4 +16,5 @@ public interface ChannelService extends BaseService<Channel> {
 
     public List<Channel> getAll(String tenantId, String appId);
 
+
 }

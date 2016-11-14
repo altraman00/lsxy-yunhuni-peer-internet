@@ -1,6 +1,6 @@
 package com.lsxy.area.server;
 
-import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.Area;

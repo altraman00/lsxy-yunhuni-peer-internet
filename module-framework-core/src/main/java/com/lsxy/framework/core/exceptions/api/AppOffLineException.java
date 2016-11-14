@@ -1,6 +1,4 @@
-package com.lsxy.area.api.exceptions;
-
-import com.lsxy.area.api.ApiReturnCodeEnum;
+package com.lsxy.framework.core.exceptions.api;
 
 /**
  * 应用没上线会抛出此异常

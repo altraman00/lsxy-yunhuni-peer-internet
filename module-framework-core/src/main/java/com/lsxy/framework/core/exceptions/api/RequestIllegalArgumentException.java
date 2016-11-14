@@ -1,6 +1,4 @@
-package com.lsxy.area.api.exceptions;
-
-import com.lsxy.area.api.ApiReturnCodeEnum;
+package com.lsxy.framework.core.exceptions.api;
 
 /**
  * 请求参数错误

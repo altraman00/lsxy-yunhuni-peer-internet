@@ -1,6 +1,4 @@
-package com.lsxy.area.api.exceptions;
-
-import com.lsxy.area.api.ApiReturnCodeEnum;
+package com.lsxy.framework.core.exceptions.api;
 
 /**
  * Created by liups on 2016/8/26.
