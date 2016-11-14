@@ -1,8 +1,8 @@
 package com.lsxy.app.api.gateway.rest;
 
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
-import com.lsxy.area.api.ApiReturnCodeEnum;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.ApiReturnCodeEnum;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.MethodArgumentNotValidException;

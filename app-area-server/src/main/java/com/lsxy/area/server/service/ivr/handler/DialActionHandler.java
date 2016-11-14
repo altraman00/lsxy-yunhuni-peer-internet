@@ -2,8 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.exceptions.AppNotFoundException;
-import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;

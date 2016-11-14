@@ -2,7 +2,7 @@ package com.lsxy.area.server.service.ivr;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.exceptions.AppOffLineException;
+import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.framework.api.tenant.model.Tenant;

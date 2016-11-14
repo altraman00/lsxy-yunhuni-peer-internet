@@ -1,4 +1,4 @@
-package com.lsxy.area.api;
+package com.lsxy.framework.core.exceptions.api;
 
 /**
  * Created by liuws on 2016/8/27.

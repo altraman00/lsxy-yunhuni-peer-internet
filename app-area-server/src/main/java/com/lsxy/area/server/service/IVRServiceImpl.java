@@ -4,7 +4,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.IVRService;
-import com.lsxy.area.api.exceptions.*;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
