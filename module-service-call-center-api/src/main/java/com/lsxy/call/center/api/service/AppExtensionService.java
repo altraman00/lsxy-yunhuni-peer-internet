@@ -2,6 +2,7 @@ package com.lsxy.call.center.api.service;
 
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.utils.Page;
 
 import java.util.List;
 
@@ -10,9 +11,9 @@ import java.util.List;
  */
 public interface AppExtensionService extends BaseService<AppExtension> {
 
-    public boolean register(AppExtension appExtension);
+    String register(AppExtension appExtension);
 
-    public boolean login(String tenantId,String appId,String user,String pass);
+    boolean login(String tenantId,String appId,String user,String pass);
 
     /**
      * 根据应用id获取对于的分机
@@ -21,5 +22,8 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      */
     List<AppExtension> findByAppId(String appId);
 
+    void delete(String extensionId,String appId);
 
+
+    Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize);
 }

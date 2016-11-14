@@ -5,13 +5,16 @@ import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -40,7 +43,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     //注册
     @Override
-    public boolean register(AppExtension appExtension){
+    public String register(AppExtension appExtension){
         if(appExtension == null){
             throw new NullPointerException();
         }
@@ -57,11 +60,10 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new NullPointerException();
         }
         if(this.exists(appExtension.getUser())){
-            logger.info("已存在的分机账号{}",appExtension);
-            return false;
+            throw new RuntimeException("已存在的分机账号");
         }
         this.save(appExtension);
-        return true;
+        return appExtension.getId();
     }
 
     //鉴权
@@ -97,6 +99,30 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     @Override
     public List<AppExtension> findByAppId(String appId) {
         return appExtensionDao.findByAppId(appId);
+    }
+
+    @Override
+    public void delete(String extensionId, String appId) {
+        AppExtension extension = this.findById(extensionId);
+        if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
+            try {
+                //TODO 获取分机状态，座席如果没绑定座席则：
+                this.delete(extension);
+            } catch (Exception e) {
+                logger.error("删除分机失败",e);
+                //TODO 抛异常
+                throw new RuntimeException("删除分机失败");
+            }
+        }else{
+            //TODO 抛异常
+            throw new RuntimeException("删除分机失败,参数不正确");
+        }
+    }
+
+    @Override
+    public Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) {
+        String hql = "from AppExtension obj where obj.appId=?1";
+        return this.pageList(hql, pageNo, pageSize, appId);
     }
 
 }
