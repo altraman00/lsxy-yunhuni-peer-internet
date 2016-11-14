@@ -213,6 +213,11 @@ public class ResourceTelenumController extends AbstractRestController {
             if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
                 return RestResponse.failed("0000","所选线路不存在");
             }
+        }else{
+            //无线路时
+            telnumTVo.setIsCalled(0);
+            telnumTVo.setIsDialing(0);
+            telnumTVo.setIsThrough(0);
         }
         //如果有选择租户，则检验租户是否存在
         Tenant tenant = null;
