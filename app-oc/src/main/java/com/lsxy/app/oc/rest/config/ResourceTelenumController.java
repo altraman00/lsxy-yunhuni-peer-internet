@@ -217,22 +217,22 @@ public class ResourceTelenumController extends AbstractRestController {
         //如果有选择租户，则检验租户是否存在
         Tenant tenant = null;
         //线路是租户自带线路时，必选租户
-        if("0".equals(telnumTVo.getType())){
-            if (StringUtils.isEmpty(telnumTVo.getTenantId())) {
-                return RestResponse.failed("0000", "所选租户不能为空");
-            }
-            tenant = tenantService.findById(telnumTVo.getTenantId());
-            if (tenant == null || StringUtils.isEmpty(tenant.getId())) {
-                return RestResponse.failed("0000", "所选租户不存在");
-            }
-        }else {
+//        if("0".equals(telnumTVo.getType())){
+//            if (StringUtils.isEmpty(telnumTVo.getTenantId())) {
+//                return RestResponse.failed("0000", "所选租户不能为空");
+//            }
+//            tenant = tenantService.findById(telnumTVo.getTenantId());
+//            if (tenant == null || StringUtils.isEmpty(tenant.getId())) {
+//                return RestResponse.failed("0000", "所选租户不存在");
+//            }
+//        }else {
             if (StringUtils.isNotEmpty(telnumTVo.getTenantId())) {
                 tenant = tenantService.findById(telnumTVo.getTenantId());
                 if (tenant == null || StringUtils.isEmpty(tenant.getId())) {
                     return RestResponse.failed("0000", "所选租户不存在");
                 }
             }
-        }
+//        }
         //拷贝对象
         ResourceTelenum resourceTelenum = new ResourceTelenum();
         try {
