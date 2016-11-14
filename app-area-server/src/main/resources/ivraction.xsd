@@ -38,7 +38,6 @@
         <xs:simpleContent>
             <xsd:extension base="playfile">
                 <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
-                <xs:attribute name="repeat" type="positivenumber"></xs:attribute>
             </xsd:extension>
         </xs:simpleContent>
     </xs:complexType>
@@ -48,7 +47,6 @@
             <xs:element name="play" type="play"></xs:element>
         </xs:sequence>
         <xs:attribute name="finish_keys" type="finish_keys"></xs:attribute>
-        <xs:attribute name="repeat" type="positivenumber"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="record">

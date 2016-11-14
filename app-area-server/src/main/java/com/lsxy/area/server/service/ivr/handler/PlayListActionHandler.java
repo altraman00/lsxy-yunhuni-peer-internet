@@ -56,7 +56,6 @@ public class PlayListActionHandler extends ActionHandler{
         }
 
         String finish_keys = root.attributeValue("finish_keys");
-        String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
         List<Element> peles = root.elements("play");
 
@@ -66,8 +65,8 @@ public class PlayListActionHandler extends ActionHandler{
             }
         }
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},plays={}",
-                    getAction(),finish_keys,repeat,plays);
+            logger.debug("开始处理ivr[{}]动作，finish_keys={},plays={}",
+                    getAction(),finish_keys,plays);
         }
 
         Map<String,Object> businessData = state.getBusinessData();
