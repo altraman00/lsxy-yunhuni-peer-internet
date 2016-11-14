@@ -8,18 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.util.PathMatcher;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by Tandy on 2016/7/7.
@@ -28,7 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class ASyncSaveApiLogTask {
     private static final Logger logger = LoggerFactory.getLogger(ASyncSaveApiLogTask.class);
 
-    private static List<RequestMappingInfo> RequestMappingInfoList = null;
+    private static List<RequestMappingInfo> requestMappingInfoList = null;
 
     @Autowired
     private ApiInvokeLogService apiInvokeLogService;
@@ -90,20 +85,20 @@ public class ASyncSaveApiLogTask {
      * @return
      */
     public List<RequestMappingInfo> getRequestMappingInfoList(){
-        if(RequestMappingInfoList != null){
-            return RequestMappingInfoList;
+        if(requestMappingInfoList != null){
+            return requestMappingInfoList;
         }else{
             synchronized(ASyncSaveApiLogTask.class){
-                if(RequestMappingInfoList != null){
-                    return RequestMappingInfoList;
+                if(requestMappingInfoList != null){
+                    return requestMappingInfoList;
                 }else{
-                    RequestMappingInfoList = new ArrayList<>();
+                    requestMappingInfoList = new ArrayList<>();
                     Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
                     for (Iterator<RequestMappingInfo> iterator = map.keySet().iterator(); iterator.hasNext();) {
                         RequestMappingInfo info = iterator.next();
-                        RequestMappingInfoList.add(info);
+                        requestMappingInfoList.add(info);
                     }
-                    return RequestMappingInfoList;
+                    return requestMappingInfoList;
                 }
             }
         }
