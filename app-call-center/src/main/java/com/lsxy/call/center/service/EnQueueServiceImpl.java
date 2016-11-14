@@ -1,8 +1,10 @@
 package com.lsxy.call.center.service;
 
+import com.lsxy.call.center.api.model.CallCenterQueue;
 import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.model.EnQueue;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.api.service.EnQueueService;
@@ -11,6 +13,8 @@ import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 /**
  * Created by liuws on 2016/11/14.
@@ -24,6 +28,9 @@ public class EnQueueServiceImpl implements EnQueueService{
 
     @Autowired
     private ConditionService conditionService;
+
+    @Autowired
+    private CallCenterQueueService callCenterQueueService;
 
     @Autowired
     private CAs cAs;
@@ -64,8 +71,17 @@ public class EnQueueServiceImpl implements EnQueueService{
         if(condition == null){
             throw new IllegalArgumentException("条件不存在");
         }
+        if(!condition.getChannelId().equals(channel.getAppId())){
+            throw new IllegalArgumentException("条件-通道不匹配");
+        }
         //创建排队记录
-
+        CallCenterQueue queue = new CallCenterQueue();
+        queue.setTenantId(tenantId);
+        queue.setAppId(appId);
+        queue.setCondition(conditionId);
+        queue.setStartTime(new Date());
+        queue.setRelevanceId("");
+        callCenterQueueService.save(queue);
         //lua脚本
     }
 
