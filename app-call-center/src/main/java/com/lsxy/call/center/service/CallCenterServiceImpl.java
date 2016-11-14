@@ -32,7 +32,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
 
     @Override
     public Page<CallCenter> pList(Integer pageNo,Integer pageSize,String tenantId, String appId, String startTime, String endTime, String type,String callnum, String agent) {
-        String hql = " FROM CallCenter obj where 1=1";
+        String hql = " FROM CallCenter obj where deleted=0 ";
         if(StringUtil.isNotEmpty(tenantId)){
             hql += " AND  obj.tenantId='"+tenantId+"' ";
         }
@@ -60,7 +60,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
 
     @Override
     public List<CallCenter> getAllList(String tenantId, String appId, String startTime, String endTime, String type, String callnum, String agent) {
-        String hql = " FROM CallCenter obj where 1=1";
+        String hql = " FROM CallCenter obj where deleted=0 ";
         if(StringUtil.isNotEmpty(tenantId)){
             hql += " AND  obj.tenantId='"+tenantId+"' ";
         }

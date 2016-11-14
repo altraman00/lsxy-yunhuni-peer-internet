@@ -216,16 +216,16 @@ public class CallServiceImpl implements CallService {
         }
 
         //TODO 获取号码
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to1,to2);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,true, from1,to1,from2, to2);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         from1 = oneTelnumber;
         from2 = oneTelnumber;
         //TODO 获取线路IP和端口
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-        String to1_uri = to1+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
-        String to2_uri = to2+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
+        String to1_uri = to1+"@"+lineGateway.getSipProviderIp();
+        String to2_uri = to2+"@"+lineGateway.getSipProviderIp();
 
         //保存双向回拔表
         VoiceCallback voiceCallback = new VoiceCallback(from1,from2,to1_uri,to2_uri);
@@ -347,14 +347,14 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         from = oneTelnumber;
         //TODO 获取线路IP和端口
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
-        String to_uri = to+"@"+lineGateway.getIp()+":"+lineGateway.getPort();
+        String to_uri = to+"@"+lineGateway.getSipProviderIp();
         //TODO 获取线路IP和端口
 
         //保存语音通知
@@ -433,14 +433,14 @@ public class CallServiceImpl implements CallService {
         //TODO 待定
         String callId = UUIDGenerator.uuid();
         //TODO
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         Map<String, Object> params = new MapBuilder<String, Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_ring_seconds",max_dial_duration)
                 .putIfNotEmpty("valid_keys",verify_code)
@@ -508,9 +508,9 @@ public class CallServiceImpl implements CallService {
             throw new BalanceNotEnoughException();
         }
 
-        Map<String, String> result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
@@ -527,7 +527,7 @@ public class CallServiceImpl implements CallService {
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        callSession.setToNum(to+"@"+lineGateway.getSipProviderIp());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -536,7 +536,7 @@ public class CallServiceImpl implements CallService {
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String, Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("play_repeat",repeat)

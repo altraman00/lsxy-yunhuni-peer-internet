@@ -135,16 +135,7 @@ public class DialActionHandler extends ActionHandler{
 
     public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
         App app = appService.findById(appId);
-        Map<String, String> result;
-        try {
-            result = areaAndTelNumSelector.getTelnumberAndAreaId(app);
-        } catch (AppOffLineException e) {
-            return false;
-        }
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
 
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
 
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
@@ -182,6 +173,17 @@ public class DialActionHandler extends ActionHandler{
             logger.error("",t);
         }
 
+        AreaAndTelNumSelector.Selector selector;
+        try {
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
+        } catch (AppOffLineException e) {
+            return false;
+        }
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+
+
         VoiceIvr voiceIvr = new VoiceIvr();
         voiceIvr.setFromNum(oneTelnumber);
         voiceIvr.setToNum(to);
@@ -193,7 +195,7 @@ public class DialActionHandler extends ActionHandler{
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getIp()+":"+lineGateway.getPort());
+        callSession.setToNum(to+"@"+lineGateway.getSipProviderIp());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -202,7 +204,7 @@ public class DialActionHandler extends ActionHandler{
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getIp()+":"+lineGateway.getPort())
+                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
                 .putIfNotEmpty("ring_play_file",ring_play_file)

@@ -26,6 +26,15 @@ public class ApiGwRedBlankNum extends IdEntity {
     private Integer status; //状态:1启用2禁用
     private String remark;  //备注
 
+    public ApiGwRedBlankNum() {
+    }
+
+    public ApiGwRedBlankNum(String number, Integer type) {
+        this.number = number;
+        this.type = type;
+        this.status = STATUS_ENABLED;
+    }
+
     @Column(name = "number")
     public String getNumber() {
         return number;
