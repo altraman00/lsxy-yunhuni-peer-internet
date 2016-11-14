@@ -123,8 +123,8 @@
                                                 <th>呼叫时间</th>
                                                 <th>参与者</th>
                                                 <th>参与类型</th>
-                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 <th>时长（秒）</th>
+                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -142,12 +142,12 @@
                                                         <c:if test="${result.joinType == 1}">邀请加入</c:if>
                                                         <c:if test="${result.joinType == 2}">呼入加入</c:if>
                                                     </td>
+                                                    <td>${result.costTimeLong}</td>
                                                     <td>
                                                         <span style="float:left;width: 80px" ><span style="float:right;" >
                                                         ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
                                                         </span></span>
                                                     </td>
-                                                    <td>${result.costTimeLong}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
