@@ -1,12 +1,26 @@
 package com.lsxy.call.center.service;
 
+import com.lsxy.call.center.api.model.Channel;
+import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.model.EnQueue;
+import com.lsxy.call.center.api.service.ChannelService;
+import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.api.service.EnQueueService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by liuws on 2016/11/14.
  */
+@Service
+@com.alibaba.dubbo.config.annotation.Service
 public class EnQueueServiceImpl implements EnQueueService{
+
+    @Autowired
+    private ChannelService channelService;
+
+    @Autowired
+    private ConditionService conditionService;
 
     /**
      * 排队,通过 dubbo返回结果给  区域管理器
@@ -16,51 +30,31 @@ public class EnQueueServiceImpl implements EnQueueService{
      * @param enQueue
      */
     @Override
-    public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue){
-        /*if(StringUtil.isEmpty(tenantId)){
-            return;
+    public void lookupAgent(String tenantId, String appId, String callId, EnQueue enQueue){
+        if(tenantId == null){
+            throw new IllegalArgumentException("tenantId 不能为null");
         }
-        if(StringUtil.isEmpty(appId)){
-            return;
+        if(appId == null){
+            throw new IllegalArgumentException("appId 不能为null");
+        }
+        if(callId == null){
+            throw new IllegalArgumentException("callId 不能为null");
         }
         if(enQueue == null){
-            return;
+            throw new IllegalArgumentException("enQueue 不能为null");
         }
-        try{
-            int timeout = 60;
-            String where = "";
-            String sort = "";
-            if(enQueue.getFilter()!=null && enQueue.getFilter().getCondition()!=null){
-                timeout = enQueue.getFilter().getCondition().getTimeout();
-                where = enQueue.getFilter().getCondition().getWhere();
-                sort = enQueue.getFilter().getCondition().getWhere();
-            }
-            String sql = EnqueueSQLUtil.genSQL(tenantId,appId,where,sort);
-            List<EnQueueResult> results = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<EnQueueResult>(EnQueueResult.class));
-            EnQueueResult result = null;
-            if(results != null && results.size()>0){
-                for (EnQueueResult res: results) {
-                    boolean locked = "1".equals(redisTemplate.opsForValue().getAndSet("agent_lock_"+res.getAgent(),"1"));
-                    if(!locked){
-                        result = res;
-                        break;
-                    }
-                }
-            }
-            if(result != null){
-                deQueueService.success(tenantId,appId,callId,result);
-            }else{
-                //将排队放入redis
-                String key = "enqueue_" +tenantId+"_"+appId + UUIDGenerator.uuid();
-                redisTemplate.opsForValue().set(key,"1");
-                //排队队列左进右出
-                redisTemplate.opsForList().leftPush("enqueue_"+tenantId+"_"+appId, JSONUtil.objectToJson(enQueue));
-                mqService.publish(new EnqueueEvent(key,tenantId,appId,callId,timeout));
-            }
-        }catch (Throwable t){
-            logger.error("排队出错",t);
-            deQueueService.fail(tenantId,appId,callId,t.getMessage());
-        }*/
+        Channel channel = channelService.findOne(tenantId,appId,enQueue.getChannel());
+        if(channel == null){
+            throw new IllegalArgumentException("通道不存在");
+        }
+        String conditionId = enQueue.getRoute().getCondition().getId();
+        Condition condition = conditionService.findOne(tenantId,appId,conditionId);
+        if(condition == null){
+            throw new IllegalArgumentException("条件不存在");
+        }
+        //创建排队记录
+
+        //lua脚本
     }
 
     /**
@@ -69,23 +63,9 @@ public class EnQueueServiceImpl implements EnQueueService{
      * @param appId
      * @param agentId
      */
-    public void enqueue(String tenantId, String appId, String agentId){
-        /*CallCenterAgent agent = this.findById(agentId);
-        if(agent == null){
-            return;
-        }
-        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAndAgentAndActive(tenantId,appId,agentId,1);
-        Map<String,Object> params = new HashMap<>();
-        if(skills!=null && skills.size()>0){
-            for(AgentSkill skill : skills){
-                String varName = "var_" + skill.getName().hashCode();
-                params.put(varName, skill.getLevel() == null ?0 : skill.getLevel());
-            }
-        }
-        String enqueue = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
-        if(getWhere(enqueue,params)){
-            getSort(enqueue,params);
-        }*/
+    @Override
+    public void lookupQueue(String tenantId, String appId,String conditionId, String agentId){
+
     }
 
 }

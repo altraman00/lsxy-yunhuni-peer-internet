@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -62,28 +61,28 @@ public class ExtensionState {
         redisCacheService.hput(getKey(extensionId),"lastAction",lastAction);
     }
 
-    public Date getLastActionTime(String extensionId) {
+    public Long getLastActionTime(String extensionId) {
         Object obj = redisCacheService.hget(getKey(extensionId),"lastActionTime");
         if(obj == null){
             return null;
         }
-        return new Date(Long.parseLong(obj.toString()));
+        return Long.parseLong(obj.toString());
     }
 
-    public void setLastActionTime(String extensionId,Date lastActionTime) {
-        redisCacheService.hput(getKey(extensionId),"lastActionTime",lastActionTime.getTime());
+    public void setLastActionTime(String extensionId,Long lastActionTime) {
+        redisCacheService.hput(getKey(extensionId),"lastActionTime",lastActionTime);
     }
 
-    public Date getLastRegisterTime(String extensionId) {
+    public Long getLastRegisterTime(String extensionId) {
         Object obj = redisCacheService.hget(getKey(extensionId),"lastRegisterTime");
         if(obj == null){
             return null;
         }
-        return new Date(Long.parseLong(obj.toString()));
+        return Long.parseLong(obj.toString());
     }
 
-    public void setLastRegisterTime(String extensionId,Date lastRegisterTime) {
-        redisCacheService.hput(getKey(extensionId),"lastRegisterTime",lastRegisterTime.getTime());
+    public void setLastRegisterTime(String extensionId,Long lastRegisterTime) {
+        redisCacheService.hput(getKey(extensionId),"lastRegisterTime",lastRegisterTime);
     }
 
     public Integer getLastRegisterStatus(String extensionId) {
@@ -115,8 +114,8 @@ public class ExtensionState {
 
         private String agent;
         private Integer lastAction;//    last_action          int comment '最近的动作',
-        private Date lastActionTime;//    last_action_time     datetime comment '最近的动作发生的时间',
-        private Date lastRegisterTime;//    last_register_time   datetime comment '最近注册成功的时间。注册成功后超过register_expires无新的成功注册，视为注册超时，当离线处理。',
+        private Long lastActionTime;//    last_action_time     datetime comment '最近的动作发生的时间',
+        private Long lastRegisterTime;//    last_register_time   datetime comment '最近注册成功的时间。注册成功后超过register_expires无新的成功注册，视为注册超时，当离线处理。',
         private Integer lastRegisterStatus;//    last_register_status int comment '最近注册状态 2xx: 成功。0表示没有任何注册',
         private Integer registerExpires;//    register_expires     int comment '注册超过该时间后，需要重新中注册。该值应出现在SIP服务器返回的Register回复消息的Expires头域中。',
 
@@ -136,19 +135,19 @@ public class ExtensionState {
             this.lastAction = lastAction;
         }
 
-        public Date getLastActionTime() {
+        public Long getLastActionTime() {
             return lastActionTime;
         }
 
-        public void setLastActionTime(Date lastActionTime) {
+        public void setLastActionTime(Long lastActionTime) {
             this.lastActionTime = lastActionTime;
         }
 
-        public Date getLastRegisterTime() {
+        public Long getLastRegisterTime() {
             return lastRegisterTime;
         }
 
-        public void setLastRegisterTime(Date lastRegisterTime) {
+        public void setLastRegisterTime(Long lastRegisterTime) {
             this.lastRegisterTime = lastRegisterTime;
         }
 
