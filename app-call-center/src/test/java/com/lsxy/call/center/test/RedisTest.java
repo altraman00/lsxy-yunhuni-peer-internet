@@ -26,7 +26,7 @@ public class RedisTest {
     }
     @Test
     public void test(){
-        redisCacheService.zadd("callcenter.acs_40288ae2585219bd01585219e7010001","fwegw",11);
+        redisCacheService.zadd("callcenter.acs_40288ae2585219bd01585219e7010001","fwegw222",11);
         Double score = redisCacheService
                 .zScore("callcenter.acs_40288ae2585219bd01585219e7010001",
                         "40288ae2585219bd01585219e7f2000c");

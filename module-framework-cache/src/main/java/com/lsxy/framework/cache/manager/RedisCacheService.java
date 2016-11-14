@@ -24,7 +24,7 @@ import java.util.Set;
  *
  */
 @Component
-@DependsOn("lsxyRedisTemplate")
+@DependsOn("businessRedisTemplate")
 @SuppressWarnings({"unchecked","rawtypes"})
 public class RedisCacheService {
 	
@@ -37,9 +37,9 @@ public class RedisCacheService {
 	private final static Log logger = LogFactory.getLog(RedisCacheService.class);
 
 	@Autowired
-	@Qualifier("lsxyRedisTemplate")
+	@Qualifier("businessRedisTemplate")
     private RedisTemplate redisTemplate;
-    
+
 	 private static String redisCode = "utf-8";
 
 	@PostConstruct
