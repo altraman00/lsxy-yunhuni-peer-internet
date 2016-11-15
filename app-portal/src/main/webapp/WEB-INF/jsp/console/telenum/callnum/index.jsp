@@ -211,7 +211,7 @@
                                 &times;
                             </button>
                             <h4 class="modal-title" id="myModalLabel">
-                                号码租户
+                                号码租用
                             </h4>
                         </div>
                         <div class="modal-body">
@@ -331,7 +331,7 @@
                                 &times;
                             </button>
                             <h4 class="modal-title" id="">
-                                号码租户
+                                号码租用
                             </h4>
                         </div>
                         <div class="modal-body">
@@ -632,10 +632,10 @@
     function getlongDate(longtime){
         var ct =  new Date(longtime);
         var year = ct.getFullYear();
-        var month = (ct.getMonth()+1)>10?(ct.getMonth()+1):"0"+(ct.getMonth()+1);
-        var day = ct.getDate()>10?ct.getDate():"0"+ct.getDate();
-        var hour = ct.getHours()>10?ct.getHours():"0"+ct.getHours();
-        var m = ct.getMinutes()>10?ct.getMinutes():"0"+ct.getMinutes();
+        var month = (ct.getMonth()+1)>=10?(ct.getMonth()+1):"0"+(ct.getMonth()+1);
+        var day = ct.getDate()>=10?ct.getDate():"0"+ct.getDate();
+        var hour = ct.getHours()>=10?ct.getHours():"0"+ct.getHours();
+        var m = ct.getMinutes()>=10?ct.getMinutes():"0"+ct.getMinutes();
         return year+"-"+month+"-"+day+" "+hour+":"+m;
     }
     /**

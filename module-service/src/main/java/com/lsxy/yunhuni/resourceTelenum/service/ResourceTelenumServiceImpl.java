@@ -74,7 +74,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page getPageByFreeNumber(Integer pageNo, Integer pageSize, String telnum, String type, String areaCode, String order) {
-        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' ";
+        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' and obj.usable=1";
         if(StringUtils.isNotEmpty(type)){
             if("callin".equals(type)){
                 hql += " AND obj.isThrough=1 ";
@@ -131,7 +131,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page<ResourceTelenum> getPageByNotLine(String id,String areaCode, Integer pageNo, Integer pageSize, String operator, String number) {
-        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj where obj.deleted=0 AND area_code='"+areaCode+"' AND obj.tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE obj.deleted=0 AND line_id='"+id+"') ";
+        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum  where deleted=0 And usable='1' AND area_code='"+areaCode+"' AND tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 AND line_id='"+id+"') ";
         if(StringUtils.isNotEmpty(operator)){
             sql +=" AND obj.operator like '%"+operator+"%' ";
         }
@@ -141,7 +141,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         String countSql = " SELECT COUNT(1) "+sql;
         String pageSql = " SELECT * "+sql;
         Query countQuery = em.createNativeQuery(countSql);
-        pageSql +=" group by obj.create_time desc";
+        pageSql +=" group by create_time desc";
         Query pageQuery = em.createNativeQuery(pageSql,ResourceTelenum.class);
         int total = ((BigInteger)countQuery.getSingleResult()).intValue();
         int start = (pageNo-1)*pageSize;

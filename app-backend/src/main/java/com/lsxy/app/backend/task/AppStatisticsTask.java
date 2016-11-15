@@ -39,9 +39,9 @@ public class AppStatisticsTask {
     public void month(){
         Date date=new Date();
         String month = DateUtils.formatDate(date, "yyyy-MM");
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + month;
+        String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + month;
         //执行互斥处理消息
-        String flagValue = redisCacheService.get("scheduled_" + cacheKey);
+        String flagValue = redisCacheService.get( cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
             if(logger.isDebugEnabled()){
                 logger.debug("["+cacheKey+"]缓存中已被设置标记，该任务被"+flagValue+"处理了");
@@ -112,9 +112,9 @@ public class AppStatisticsTask {
     public void days(){
         Date date=new Date();
         String day = DateUtils.formatDate(date, "yyyy-MM-dd");
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
+        String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
         //执行互斥处理消息
-        String flagValue = redisCacheService.get("scheduled_" + cacheKey);
+        String flagValue = redisCacheService.get( cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
             if(logger.isDebugEnabled()){
                 logger.debug("["+cacheKey+"]缓存中已被设置标记，该任务被"+flagValue+"处理了");
@@ -185,9 +185,9 @@ public class AppStatisticsTask {
     public void hour(){
         Date date=new Date();
         String hour = DateUtils.formatDate(date, "yyyy-MM-dd HH");
-        String cacheKey = Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName()+ " " + hour;
+        String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName()+ " " + hour;
         //执行互斥处理消息
-        String flagValue = redisCacheService.get("scheduled_" + cacheKey);
+        String flagValue = redisCacheService.get( cacheKey);
         if(StringUtil.isNotEmpty(flagValue)){
             if(logger.isDebugEnabled()){
                 logger.debug("["+cacheKey+"]缓存中已被设置标记，该任务被"+flagValue+"处理了");

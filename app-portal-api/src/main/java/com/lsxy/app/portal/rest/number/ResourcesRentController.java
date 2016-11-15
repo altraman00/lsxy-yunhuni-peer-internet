@@ -141,6 +141,9 @@ public class ResourcesRentController extends AbstractRestController{
                 List<TelenumOrderItem> list = telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(), temp.getId());
                 BigDecimal bigDecimal = new BigDecimal(0);
                 for(int i=0;i<list.size();i++){
+                    TelenumOrderItem telenumOrderItem = list.get(i);
+                    telenumOrderItem.setAmount(telenumOrderItem.getTelnum().getAmount());
+                    telenumOrderItemService.save(telenumOrderItem);
                     bigDecimal=bigDecimal.add(list.get(i).getAmount());
                 }
                 temp.setAmount(bigDecimal);
@@ -164,8 +167,11 @@ public class ResourcesRentController extends AbstractRestController{
         if(temp!=null&&StringUtils.isNotEmpty(temp.getId())&&tenant.getId().equals(temp.getTenantId())){
             if(temp.getStatus()==TelenumOrder.status_await) {
                 //余额正数部分
+                List<TelenumOrderItem> list = telenumOrderItemService.findByTenantIdAndTelenumOrderId(tenant.getId(), temp.getId());
+                BigDecimal bigDecimal = new BigDecimal(100*list.size());
+                bigDecimal = bigDecimal.add(temp.getAmount());
                 Billing billing = calBillingService.getCalBilling(tenant.getId());
-                if(billing.getBalance().compareTo(temp.getAmount())==-1) {
+                if(billing.getBalance().compareTo(bigDecimal)==-1) {
                     return RestResponse.failed("-1","余额不足");
                 }
                 resourcesRentService.telnumPlay(id,tenant);

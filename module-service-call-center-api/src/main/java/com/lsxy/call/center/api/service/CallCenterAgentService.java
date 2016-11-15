@@ -21,5 +21,7 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
 
     public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Integer active);
 
+    public List<String> getAgentIdsByChannel(String tenantId, String appId, String channelId);
+
     public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue);
 }

@@ -142,29 +142,16 @@ public class HomeController extends AbstractPortalController {
         }
         List<App> appList = getApps(token);
 
-        List<AppStateVO> appStateVOs = new ArrayList<>();
         vo.setAppSize(appList.size());
         int onlineApp = 0;
         if(appList != null){
             for(App app:appList){
-                AppStateVO appStateVO = new AppStateVO();
-                try {
-                    BeanUtils.copyProperties2(appStateVO,app,false);
-                } catch (Exception e) {
-                    logger.error("复制类属性异常",e);
-                }
-//                Map map = getStatistics(token, app);
-
-//                appStateVO.setCallOfDay((Integer) map.get("dayCount"));
-//                appStateVO.setCallOfHour((Integer) map.get("hourCount"));
-//                appStateVO.setCurrentCall((Integer) map.get("currentSession"));
-                if(app.getStatus() == App.STATUS_ONLINE &&app.getIsIvrService() != null && app.getIsIvrService() == 1){
+                if(app.getStatus() == App.STATUS_ONLINE){
                     onlineApp++;
                 }
             }
         }
         vo.setOnLineApp(onlineApp);
-        vo.setAppStateVOs(appStateVOs);
         vo.setTime(org.apache.tools.ant.util.DateUtils.format(new Date(),"yyyy-MM"));
         return vo;
     }
