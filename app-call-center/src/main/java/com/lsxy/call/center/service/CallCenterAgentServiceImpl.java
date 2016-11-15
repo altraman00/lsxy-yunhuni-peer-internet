@@ -9,6 +9,7 @@ import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.AgentSkillDao;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
+import com.lsxy.call.center.states.lock.ExtensionLock;
 import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
@@ -52,6 +53,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     ChannelService channelService;
     @Autowired
     ExtensionState extensionState;
+    @Autowired
+    RedisCacheService redisCacheService;
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
@@ -74,27 +77,36 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             //TODO 注册没有过期
             throw new AgentHasAlreadyLoggedInException();
         }
-        if(StringUtils.isNotBlank(agent.getExtension())){
-            AppExtension extension = appExtensionService.findOne(agent.getAppId(),agent.getExtension());
+        //分机ID
+        String extensionId = agent.getExtension();
+        ExtensionLock extensionLock;
+        if(StringUtils.isNotBlank(extensionId)){
+            AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
             if(extension == null){
                 throw new ExtensionNotExistException();
             }
-            //TODO 获取分机锁
-
-            //TODO 获取锁失败 抛异常
-
-            String extentionAgent = extensionState.getAgent(agent.getExtension());
-            if(StringUtils.isNotBlank(extentionAgent)){
-                //TODO 释放分机锁
+            //获取分机锁
+            extensionLock = new ExtensionLock(redisCacheService,extensionId);
+            boolean lock = extensionLock.lock();
+            //获取锁失败 抛异常
+            if(!lock){
                 throw new ExtensionBindingToAgentException();
+            }
+            try{
+                String extentionAgent = extensionState.getAgent(extensionId);
+                if(StringUtils.isNotBlank(extentionAgent)){
+                    throw new ExtensionBindingToAgentException();
+                }
+            }finally {
+                extensionLock.unlock();
             }
 
         }
 
         String agentId = this.save(agent).getId();
 
-        if(StringUtils.isNotBlank(agent.getExtension())){
-            extensionState.setAgent(agent.getExtension(),agentId);
+        if(StringUtils.isNotBlank(extensionId)){
+            extensionState.setAgent(extensionId,agentId);
             //TODO 释放分机锁
         }
 
@@ -165,4 +177,5 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
         return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
     }
+
 }

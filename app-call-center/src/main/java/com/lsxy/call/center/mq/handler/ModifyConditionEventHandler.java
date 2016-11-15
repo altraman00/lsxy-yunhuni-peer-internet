@@ -106,7 +106,7 @@ public class ModifyConditionEventHandler implements MQMessageHandler<ModifyCondi
             List<AgentSkill> skills = agentSkillService.findByAgent(condition.getTenantId(),condition.getAppId(),agentId);
             Map<String,Integer> vars = new HashMap<>();
             for (AgentSkill skill:skills) {
-                vars.put(skill.getName(),skill.getLevel());
+                vars.put(skill.getName(),skill.getScore());
             }
             if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),vars)){
                 long score = ExpressionUtils.execSortExpression(condition.getSortExpression(),vars);
