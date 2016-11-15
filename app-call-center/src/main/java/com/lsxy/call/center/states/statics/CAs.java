@@ -19,7 +19,11 @@ public class CAs {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    private String getKey(String conditionId) {
+    public String getPrefixed(){
+        return PREFIXED_KEY;
+    }
+
+    public String getKey(String conditionId) {
         return PREFIXED_KEY + conditionId;
     }
 

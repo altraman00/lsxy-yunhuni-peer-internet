@@ -28,7 +28,8 @@ public class LuaTest {
 
     @Test
     public void test(){
+        /*String script = "redis.call";
 
-
+        System.out.println(redisCacheService.eval(script));*/
     }
 }

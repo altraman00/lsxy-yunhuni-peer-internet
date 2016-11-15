@@ -46,15 +46,15 @@ public class RedisCacheService {
 	public void init(){
 	}
 
-	private Object eval(final Jedis jedis, final String script){
-		return jedis.eval(script);
+	private Object eval(final Jedis jedis, final String script,final int keyCount,final String... params){
+		return jedis.eval(script,keyCount,params);
 	}
 
-	public Object eval(final String script){
+	public Object eval(final String script,final int keyCount,final String... params){
 		return redisTemplate.execute(new RedisCallback() {
 			@Override
 			public Object doInRedis(RedisConnection connection) throws DataAccessException {
-				return eval((Jedis)connection.getNativeConnection(),script);
+				return eval((Jedis)connection.getNativeConnection(),script,keyCount,params);
 			}
 		});
 	}
@@ -91,12 +91,12 @@ public class RedisCacheService {
 						if(logger.isDebugEnabled()){
 							logger.debug("ready to set nx:"+key+">>>>"+ value);
 						}
-						String script = "local ok = redis.call('setnx', '"+key+"', '"+value+"')\n" +
+						String script = "local ok = redis.call('setnx', KEYS[1], ARGV[1])\n" +
 								"if ok == 1 then\n" +
-								"  redis.call('expire', '"+key+"', "+expire+")\n" +
+								"  redis.call('expire', KEYS[1], ARGV[2])\n" +
 								"end\n" +
 								"return ok";
-						Long ret = (Long)eval((Jedis)connection.getNativeConnection(),script);
+						Long ret = (Long)eval((Jedis)connection.getNativeConnection(),script,1,key,value,""+expire);
 						if(logger.isDebugEnabled()){
 							logger.debug("set nx result:"+ret);
 						}
