@@ -9,7 +9,10 @@ import com.lsxy.call.center.api.service.AgentSkillService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.api.service.ConditionService;
+import com.lsxy.call.center.states.state.AgentState;
+import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.config.Constants;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,12 @@ public class ConditionTest {
 
     @Autowired
     private AgentSkillService agentSkillService;
+
+    @Autowired
+    private ExtensionState extensionState;
+
+    @Autowired
+    private AgentState agentState;
 
     static {
         //将 spring boot 的默认配置文件设置为系统配置文件
@@ -84,9 +93,17 @@ public class ConditionTest {
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
         condition = conditionService.save(condition);
-        Thread.sleep(1);
-        condition.setWhereExpression("(get(\"haha0\") + get(\"haha1\")) > 1000;");
-        conditionService.save(condition);
         Thread.sleep(50000);
+
+        String exid = UUIDGenerator.uuid();
+        extensionState.setAgent(exid,agent.getId());
+        extensionState.setLastRegisterStatus(exid,200);
+        extensionState.setLastRegisterTime(exid,new Date().getTime());
+        extensionState.setRegisterExpires(exid,1000);
+
+        agentState.setExtension(agent.getId(),exid);
+        agentState.setLastRegTime(agent.getId(),new Date().getTime());
+        agentState.setLastTime(agent.getId(),new Date().getTime());
+        agentState.setState(agent.getId(),"IDLE");
     }
 }

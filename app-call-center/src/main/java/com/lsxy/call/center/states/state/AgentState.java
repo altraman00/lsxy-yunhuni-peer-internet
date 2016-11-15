@@ -74,7 +74,7 @@ public class AgentState {
     }
 
     public void setLastRegTime(String agentId,Long lastRegTime) {
-        redisCacheService.hput(getKey(agentId),"lastRegTime",lastRegTime);
+        redisCacheService.hput(getKey(agentId),"lastRegTime",lastRegTime.toString());
     }
 
     public Long getLastTime(String agentId) {
@@ -86,7 +86,7 @@ public class AgentState {
     }
 
     public void setLastTime(String agentId,Long lastTime) {
-        redisCacheService.hput(getKey(agentId),"lastTime",lastTime);
+        redisCacheService.hput(getKey(agentId),"lastTime",lastTime.toString());
     }
 
 
