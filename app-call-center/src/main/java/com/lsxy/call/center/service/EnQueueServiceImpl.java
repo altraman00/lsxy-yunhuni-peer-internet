@@ -49,7 +49,7 @@ public class EnQueueServiceImpl implements EnQueueService{
      * @param enQueue
      */
     @Override
-    public void lookupAgent(String tenantId, String appId, String callId, EnQueue enQueue){
+    public void lookupAgent(String tenantId, String appId,String num, String callId, EnQueue enQueue){
         if(tenantId == null){
             throw new IllegalArgumentException("tenantId 不能为null");
         }
@@ -80,9 +80,13 @@ public class EnQueueServiceImpl implements EnQueueService{
         queue.setAppId(appId);
         queue.setCondition(conditionId);
         queue.setStartTime(new Date());
+        //TODO 这个id 存啥
         queue.setRelevanceId("");
+        queue.setNum(num);
+        queue.setOriginCallId(callId);
         callCenterQueueService.save(queue);
         //lua脚本
+
     }
 
     /**

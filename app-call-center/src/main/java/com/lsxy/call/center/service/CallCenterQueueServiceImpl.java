@@ -8,12 +8,15 @@ import com.lsxy.framework.base.AbstractService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 
 /**
  * Created by liuws on 2016/11/14.
  */
+@Service
+@com.alibaba.dubbo.config.annotation.Service
 public class CallCenterQueueServiceImpl extends AbstractService<CallCenterQueue> implements CallCenterQueueService {
 
     private static final Logger logger = LoggerFactory.getLogger(CallCenterQueueServiceImpl.class);

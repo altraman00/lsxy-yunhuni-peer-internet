@@ -46,6 +46,19 @@ public class RedisCacheService {
 	public void init(){
 	}
 
+	private Object eval(final Jedis jedis, final String script){
+		return jedis.eval(script);
+	}
+
+	public Object eval(final String script){
+		return redisTemplate.execute(new RedisCallback() {
+			@Override
+			public Object doInRedis(RedisConnection connection) throws DataAccessException {
+				return eval((Jedis)connection.getNativeConnection(),script);
+			}
+		});
+	}
+
 	/**
 	 * 执行设置值，如果由于并发导致设置标记位导致设置失败，丢出TransactionExecFailedException异常
 	 * @param key
@@ -83,7 +96,7 @@ public class RedisCacheService {
 								"  redis.call('expire', '"+key+"', "+expire+")\n" +
 								"end\n" +
 								"return ok";
-						Long ret = (Long)((Jedis)connection.getNativeConnection()).eval(script);
+						Long ret = (Long)eval((Jedis)connection.getNativeConnection(),script);
 						if(logger.isDebugEnabled()){
 							logger.debug("set nx result:"+ret);
 						}
