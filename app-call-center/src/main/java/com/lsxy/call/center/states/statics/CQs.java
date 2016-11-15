@@ -19,7 +19,11 @@ public class CQs {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    private String getKey(String conditionId) {
+    public static String getPrefixed(){
+        return PREFIXED_KEY;
+    }
+
+    public static String getKey(String conditionId) {
         return PREFIXED_KEY + conditionId;
     }
 

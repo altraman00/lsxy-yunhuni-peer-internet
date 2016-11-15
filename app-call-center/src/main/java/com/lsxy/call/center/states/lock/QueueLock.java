@@ -9,6 +9,10 @@ public class QueueLock extends DistributeLock {
 
     private static final String PREFIXED = "call.center.queuelock_";
 
+    public static String getPrefixed(){
+        return PREFIXED;
+    }
+
     public QueueLock(RedisCacheService redis, String queueId){
         super(redis,PREFIXED+queueId);
     }

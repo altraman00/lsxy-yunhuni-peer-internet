@@ -23,7 +23,11 @@ public class ExtensionState {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    private String getKey(String extensionId){
+    public static String getPrefixed(){
+        return STATE_PREFIXED_KEY;
+    }
+
+    public static String getKey(String extensionId){
         return STATE_PREFIXED_KEY + extensionId;
     }
 
