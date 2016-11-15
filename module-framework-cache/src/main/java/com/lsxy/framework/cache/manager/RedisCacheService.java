@@ -59,6 +59,15 @@ public class RedisCacheService {
 		});
 	}
 
+	public Object eval(final String script){
+		return redisTemplate.execute(new RedisCallback() {
+			@Override
+			public Object doInRedis(RedisConnection connection) throws DataAccessException {
+				return eval((Jedis)connection.getNativeConnection(),script,0);
+			}
+		});
+	}
+
 	/**
 	 * 执行设置值，如果由于并发导致设置标记位导致设置失败，丢出TransactionExecFailedException异常
 	 * @param key
