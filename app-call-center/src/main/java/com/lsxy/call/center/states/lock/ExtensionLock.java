@@ -9,6 +9,10 @@ public class ExtensionLock extends DistributeLock {
 
     private static final String PREFIXED = "call.center.extensionlock_";
 
+    public static String getPrefixed(){
+        return PREFIXED;
+    }
+
     public ExtensionLock(RedisCacheService redis, String extensionId){
         super(redis,PREFIXED+extensionId);
     }

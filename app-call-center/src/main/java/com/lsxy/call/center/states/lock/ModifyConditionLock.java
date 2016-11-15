@@ -10,6 +10,10 @@ public class ModifyConditionLock extends DistributeLock {
 
     private static final String PREFIXED = "call.center.modifyconditionlock_";
 
+    public static String getPrefixed(){
+        return PREFIXED;
+    }
+
     public ModifyConditionLock(RedisCacheService redis, String agentId){
         super(redis,PREFIXED+agentId,1800);
     }

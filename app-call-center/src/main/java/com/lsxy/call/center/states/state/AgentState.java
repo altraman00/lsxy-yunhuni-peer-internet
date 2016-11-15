@@ -23,7 +23,11 @@ public class AgentState {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    private String getKey(String agentId){
+    public static String getPrefixed(){
+        return STATE_PREFIXED_KEY;
+    }
+
+    public static String getKey(String agentId){
         return STATE_PREFIXED_KEY + agentId;
     }
 

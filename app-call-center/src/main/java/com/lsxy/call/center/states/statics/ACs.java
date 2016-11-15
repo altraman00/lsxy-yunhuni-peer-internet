@@ -20,11 +20,11 @@ public class ACs {
     @Autowired
     private RedisCacheService redisCacheService;
 
-    public String getPrefixed(){
+    public static String getPrefixed(){
         return PREFIXED_KEY;
     }
 
-    public String getKey(String agentId){
+    public static String getKey(String agentId){
         return PREFIXED_KEY + agentId;
     }
 
