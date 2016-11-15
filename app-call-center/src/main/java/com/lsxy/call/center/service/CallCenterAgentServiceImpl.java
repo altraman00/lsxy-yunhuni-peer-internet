@@ -6,6 +6,7 @@ import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.AgentSkillDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
 import com.lsxy.call.center.states.lock.ExtensionLock;
+import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
@@ -22,10 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -55,11 +53,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Autowired
     ExtensionState extensionState;
     @Autowired
+    AgentState agentState;
+    @Autowired
     RedisCacheService redisCacheService;
     @Autowired
     private ACs aCs;
     @Autowired
     private CAs cAs;
+    @Autowired
+    AgentActionLogService agentActionLogService;
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
@@ -77,10 +79,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
         CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndChannelAndName(agent.getAppId(),agent.getChannel(),agent.getName());
         if(oldAgent != null){
+            Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
             //TODO 注册是否过期，过期执行注销过程
-
-            //TODO 注册没有过期
-            throw new AgentHasAlreadyLoggedInException();
+            if(lastRegTime == null || (System.currentTimeMillis() - lastRegTime) > 5 * 60 * 1000){
+                //TODO 注销
+            }else{
+                //TODO 注册没有过期
+                throw new AgentHasAlreadyLoggedInException();
+            }
         }
         //分机ID
         String extensionId = agent.getExtension();
@@ -94,16 +100,19 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         //获取分机锁
         ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
         boolean lock = extensionLock.lock();
+        //获取锁失败 抛异常
+        if(!lock){
+            throw new ExtensionBindingToAgentException();
+        }
         try{
-            //获取锁失败 抛异常
-            if(!lock){
-                throw new ExtensionBindingToAgentException();
-            }
             String extentionAgent = extensionState.getAgent(extensionId);
             if(StringUtils.isNotBlank(extentionAgent)){
                 throw new ExtensionBindingToAgentException();
             }
             String agentId = this.save(agent).getId();
+            //匹配的条件集合
+            List<Condition> suitedConditions = new ArrayList<>();
+            Map<String,Long> conditionScore = new HashMap<>();
             if(agent.getSkills()!=null && agent.getSkills().size()>0){
                 Map<String,Integer> vars = new HashMap<>();
                 for (AgentSkill obj : agent.getSkills()) {
@@ -124,16 +133,34 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 }
                 //查询指定通道下所有条件集合，查出匹配的条件
                 List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
-                List<Condition> suitedConditions = new ArrayList<>();
                 for(Condition condition:conditions){
                     if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),vars)){
+                        long score = ExpressionUtils.execSortExpression(condition.getSortExpression(), vars);
+                        conditionScore.put(condition.getId(),score);
                         suitedConditions.add(condition);
                     }
                 }
+            }
+            //写入登录日志
+            agentActionLogService.agentLogin(agent);
+            //转成lua?
+            //TODO 设置座席分机
+            agentState.setExtension(agentId,extensionId);
+            agentState.setState(agentId,agent.getState());
+            agentState.setLastRegTime(agentId,System.currentTimeMillis());
+            agentState.setLastTime(agentId,System.currentTimeMillis());
+            //TODO 设置分机座席
+            extensionState.setAgent(extensionId,agentId);
+            for(Condition condition:suitedConditions){
+                //TODO 设置条件座席
+                cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
+                //TODO 设置座席条件
+                aCs.add(agentId,condition.getId(),condition.getPriority());
+            }
+            //TODO 如果座席是空闲，触发座席找排队
+            if(agent.getState().contains("idle")){
 
             }
-
-            extensionState.setAgent(extensionId,agentId);
             return agentId;
         }finally{
             extensionLock.unlock();
