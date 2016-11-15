@@ -1,6 +1,7 @@
 package com.lsxy.call.center.utils;
 
 import com.lsxy.call.center.service.AgentSkillServiceImpl;
+import com.lsxy.framework.core.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,11 @@ public class Lua {
 
     public static final String LOOKUPAGENT = loadLua("/lua/lookupAgent.lua");
 
+    /**
+     * 加载lua脚本
+     * @param path
+     * @return
+     */
     private static String loadLua(String path){
         StringBuffer lua = new StringBuffer();
         BufferedReader reader = null;
@@ -29,6 +35,14 @@ public class Lua {
             String read;
             reader = new BufferedReader(new InputStreamReader(input, Charset.forName("UTF-8")));
             while ((read = reader.readLine()) != null) {
+                if(read.trim().startsWith("--") && !read.trim().startsWith("--[[") && !read.trim().startsWith("--]]")){
+                    //忽略单行注释 节省网络io
+                    continue;
+                }
+                if(StringUtil.isEmpty(read)){
+                    //忽略空行
+                    continue;
+                }
                 lua.append(read).append("\n");
             }
         }catch (Throwable t){

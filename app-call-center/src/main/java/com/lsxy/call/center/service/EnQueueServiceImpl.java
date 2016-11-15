@@ -11,6 +11,8 @@ import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
+import com.lsxy.call.center.utils.Lua;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,9 @@ public class EnQueueServiceImpl implements EnQueueService{
 
     @Autowired
     private CallCenterQueueService callCenterQueueService;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     @Autowired
     private CAs cAs;
@@ -86,7 +91,7 @@ public class EnQueueServiceImpl implements EnQueueService{
         queue.setOriginCallId(callId);
         callCenterQueueService.save(queue);
         //lua脚本
-
+        String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,1,"");
     }
 
     /**
