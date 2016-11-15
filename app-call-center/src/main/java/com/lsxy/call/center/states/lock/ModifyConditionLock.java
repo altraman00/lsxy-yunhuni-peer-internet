@@ -8,7 +8,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 public class ModifyConditionLock extends DistributeLock {
 
 
-    private static final String PREFIXED = "call.center.modifyconditionlock_";
+    private static final String PREFIXED = "callcenter.modifyconditionlock_";
 
     public static String getPrefixed(){
         return PREFIXED;

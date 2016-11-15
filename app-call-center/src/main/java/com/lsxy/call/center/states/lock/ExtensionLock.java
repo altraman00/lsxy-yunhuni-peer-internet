@@ -7,7 +7,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
  */
 public class ExtensionLock extends DistributeLock {
 
-    private static final String PREFIXED = "call.center.extensionlock_";
+    private static final String PREFIXED = "callcenter.extensionlock_";
 
     public static String getPrefixed(){
         return PREFIXED;
