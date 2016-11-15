@@ -145,5 +145,22 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         return this.pageList(hql, pageNo, pageSize, appId);
     }
 
+    @Override
+    public AppExtension findOne(String appId, String extensionId) {
+        if(StringUtils.isBlank(appId)){
+            logger.error("appId 不能为空");
+            throw new IllegalArgumentException("appId 不能为空");
+        }
+        if(StringUtils.isBlank(extensionId)){
+            logger.error("extension 不能为空");
+            throw new IllegalArgumentException("extension 不能为空");
+        }
+        AppExtension extension = this.findById(extensionId);
+        if(!appId.equals(extension.getAppId())){
+            throw new IllegalArgumentException("extension不属于该App");
+        }
+        return extension;
+    }
+
 
 }

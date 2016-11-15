@@ -28,4 +28,7 @@ public interface AppExtensionService extends BaseService<AppExtension> {
 
 
     Page<AppExtension> getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException;
+
+
+    AppExtension findOne(String appId, String extensionId);
 }

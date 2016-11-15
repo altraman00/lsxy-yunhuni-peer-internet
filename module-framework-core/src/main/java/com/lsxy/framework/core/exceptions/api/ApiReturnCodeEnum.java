@@ -35,7 +35,10 @@ public enum ApiReturnCodeEnum {
     OutOfConfMaxParts("030001","超过最大与会数"),
     DuoCallbackNumIsSample("070000","双向回拔的号码不能是同一号码"),
     ExtensionUserExist("080101","分机账号已存在"),
-    ExtensionBindingToAgent("080102","分机已绑定座席");
+    ExtensionBindingToAgent("080102","分机已绑定座席"),
+    ExtensionNotExist("080103","分机不存在"),
+    AgentHasAlreadyLoggedIn("080201","座席已经登录");
+
 
     private String code;
     private String msg;

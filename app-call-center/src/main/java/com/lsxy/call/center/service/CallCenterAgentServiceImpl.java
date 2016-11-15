@@ -4,19 +4,20 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.service.AgentSkillService;
-import com.lsxy.call.center.api.service.AppExtensionService;
-import com.lsxy.call.center.api.service.CallCenterAgentService;
-import com.lsxy.call.center.api.service.DeQueueService;
+import com.lsxy.call.center.api.model.Channel;
+import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.AgentSkillDao;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
+import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,30 +38,20 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Autowired
     private CallCenterAgentDao callCenterAgentDao;
-
     @Autowired
     private AgentSkillService agentSkillService;
-
     @Autowired
     private AppExtensionService appExtensionService;
-
-    @Autowired
-    private AppExtensionDao appExtensionDao;
-
     @Autowired
     private AgentSkillDao agentSkillDao;
-
     @Reference(lazy = true,check = false,timeout = 3000)
     private DeQueueService deQueueService;
-
-    @Autowired
-    private RedisCacheService redisCacheService;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     @Autowired
-    private MQService mqService;
+    ChannelService channelService;
+    @Autowired
+    ExtensionState extensionState;
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
@@ -69,36 +60,54 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //登陆
     @Override
-    public String login(String tenantId,String appId,CallCenterAgent callCenterAgent,List<AppExtension> extentions,List<AgentSkill> skills){
-        if(StringUtil.isEmpty(tenantId)){
-            throw new NullPointerException();
+    public String login(CallCenterAgent agent) throws YunhuniApiException {
+        Channel channel;
+        try{
+            channel = channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+        }catch (IllegalArgumentException e){
+            throw new RequestIllegalArgumentException();
         }
-        if(StringUtil.isEmpty(appId)){
-            throw new NullPointerException();
-        }
+        CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndChannelAndName(agent.getAppId(),agent.getChannel(),agent.getName());
+        if(oldAgent != null){
+            //TODO 注册是否过期，过期执行注销过程
 
-        CallCenterAgent agent = new CallCenterAgent();
-        agent.setTenantId(tenantId);
-        agent.setAppId(appId);
-        agent.setAgentNo(callCenterAgent.getAgentNo());
-        agent.setAgentNum(callCenterAgent.getAgentNum());
+            //TODO 注册没有过期
+            throw new AgentHasAlreadyLoggedInException();
+        }
+        if(StringUtils.isNotBlank(agent.getExtension())){
+            AppExtension extension = appExtensionService.findOne(agent.getAppId(),agent.getExtension());
+            if(extension == null){
+                throw new ExtensionNotExistException();
+            }
+            //TODO 获取分机锁
+
+            //TODO 获取锁失败 抛异常
+
+            String extentionAgent = extensionState.getAgent(agent.getExtension());
+            if(StringUtils.isNotBlank(extentionAgent)){
+                //TODO 释放分机锁
+                throw new ExtensionBindingToAgentException();
+            }
+
+        }
 
         String agentId = this.save(agent).getId();
-        if(extentions!=null && extentions.size()>0){
-            for (AppExtension extension : extentions) {
-                //TODO 设置坐席的分机
-            }
+
+        if(StringUtils.isNotBlank(agent.getExtension())){
+            extensionState.setAgent(agent.getExtension(),agentId);
+            //TODO 释放分机锁
         }
-        if(skills!=null && skills.size()>0){
-            for (AgentSkill obj : skills) {
+
+        if(agent.getSkills()!=null && agent.getSkills().size()>0){
+            for (AgentSkill obj : agent.getSkills()) {
                 AgentSkill skill = new AgentSkill();
                 try {
                     BeanUtils.copyProperties(skill,obj);
                 } catch (Throwable e) {
                     throw new IllegalArgumentException(e);
                 }
-                skill.setTenantId(tenantId);
-                skill.setAppId(appId);
+                skill.setTenantId(agent.getTenantId());
+                skill.setAppId(agent.getAppId());
                 skill.setAgent(agentId);
                 agentSkillService.save(skill);
             }
@@ -137,14 +146,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
     //技能追加
     @Override
-    public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Integer active){
+    public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Boolean active){
         AgentSkill skill = new AgentSkill();
         skill.setTenantId(tenantId);
         skill.setAppId(appId);
         skill.setAgent(agent);
         skill.setName(name);
-        skill.setLevel(level);
-        skill.setActive(active);
+        skill.setScore(level);
+        skill.setEnabled(active);
         agentSkillService.save(skill);
         return true;
     }
