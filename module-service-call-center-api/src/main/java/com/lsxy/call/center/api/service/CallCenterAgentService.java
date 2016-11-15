@@ -18,7 +18,7 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
 
     public boolean logout(String agentId);
 
-    public boolean checkInSkill(String agent,String skillName,Integer active);
+    public boolean checkInSkill(String agent,String skillName,Boolean enable);
 
     public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Boolean active);
 

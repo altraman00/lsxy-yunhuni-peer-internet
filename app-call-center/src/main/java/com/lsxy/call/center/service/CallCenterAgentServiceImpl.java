@@ -1,23 +1,19 @@
 package com.lsxy.call.center.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.call.center.api.model.AgentSkill;
-import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.Channel;
+import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.AgentSkillDao;
-import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
 import com.lsxy.call.center.states.lock.ExtensionLock;
 import com.lsxy.call.center.states.state.ExtensionState;
+import com.lsxy.call.center.states.statics.ACs;
+import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.mq.api.MQService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +22,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -52,9 +51,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Autowired
     ChannelService channelService;
     @Autowired
+    ConditionService conditionService;
+    @Autowired
     ExtensionState extensionState;
     @Autowired
     RedisCacheService redisCacheService;
+    @Autowired
+    private ACs aCs;
+    @Autowired
+    private CAs cAs;
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
@@ -79,52 +84,60 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
         //分机ID
         String extensionId = agent.getExtension();
-        ExtensionLock extensionLock;
-        if(StringUtils.isNotBlank(extensionId)){
-            AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
-            if(extension == null){
-                throw new ExtensionNotExistException();
-            }
-            //获取分机锁
-            extensionLock = new ExtensionLock(redisCacheService,extensionId);
-            boolean lock = extensionLock.lock();
+        if(StringUtils.isBlank(extensionId)){
+           throw new RequestIllegalArgumentException();
+        }
+        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
+        //获取分机锁
+        ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
+        boolean lock = extensionLock.lock();
+        try{
             //获取锁失败 抛异常
             if(!lock){
                 throw new ExtensionBindingToAgentException();
             }
-            try{
-                String extentionAgent = extensionState.getAgent(extensionId);
-                if(StringUtils.isNotBlank(extentionAgent)){
-                    throw new ExtensionBindingToAgentException();
+            String extentionAgent = extensionState.getAgent(extensionId);
+            if(StringUtils.isNotBlank(extentionAgent)){
+                throw new ExtensionBindingToAgentException();
+            }
+            String agentId = this.save(agent).getId();
+            if(agent.getSkills()!=null && agent.getSkills().size()>0){
+                Map<String,Integer> vars = new HashMap<>();
+                for (AgentSkill obj : agent.getSkills()) {
+                    if(StringUtils.isBlank(obj.getName())){
+                        throw new RequestIllegalArgumentException();
+                    }
+                    if(obj.getScore() == null){
+                        throw new RequestIllegalArgumentException();
+                    }
+                    if(obj.getEnabled() == null){
+                        throw new RequestIllegalArgumentException();
+                    }
+                    obj.setTenantId(agent.getTenantId());
+                    obj.setAppId(agent.getAppId());
+                    obj.setAgent(agentId);
+                    agentSkillService.save(obj);
+                    vars.put(obj.getName(),obj.getScore());
                 }
-            }finally {
-                extensionLock.unlock();
+                //查询指定通道下所有条件集合，查出匹配的条件
+                List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+                List<Condition> suitedConditions = new ArrayList<>();
+                for(Condition condition:conditions){
+                    if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),vars)){
+                        suitedConditions.add(condition);
+                    }
+                }
+
             }
 
-        }
-
-        String agentId = this.save(agent).getId();
-
-        if(StringUtils.isNotBlank(extensionId)){
             extensionState.setAgent(extensionId,agentId);
-            //TODO 释放分机锁
+            return agentId;
+        }finally{
+            extensionLock.unlock();
         }
-
-        if(agent.getSkills()!=null && agent.getSkills().size()>0){
-            for (AgentSkill obj : agent.getSkills()) {
-                AgentSkill skill = new AgentSkill();
-                try {
-                    BeanUtils.copyProperties(skill,obj);
-                } catch (Throwable e) {
-                    throw new IllegalArgumentException(e);
-                }
-                skill.setTenantId(agent.getTenantId());
-                skill.setAppId(agent.getAppId());
-                skill.setAgent(agentId);
-                agentSkillService.save(skill);
-            }
-        }
-        return agentId;
     }
 
     //注销
@@ -152,8 +165,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
     //技能迁入迁出
     @Override
-    public boolean checkInSkill(String agent,String skillName,Integer active){
-        agentSkillDao.updateActiveByAgent(active,agent,skillName);
+    public boolean checkInSkill(String agent,String skillName,Boolean enable){
+        agentSkillDao.updateActiveByAgent(enable,agent,skillName);
         return true;
     }
     //技能追加

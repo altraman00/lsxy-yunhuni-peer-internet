@@ -83,6 +83,7 @@ public class CallCenterAgent extends IdEntity {
         this.num = num;
     }
 
+    @Transient
     public String getState() {
         return state;
     }
@@ -91,6 +92,7 @@ public class CallCenterAgent extends IdEntity {
         this.state = state;
     }
 
+    @Transient
     public List<AgentSkill> getSkills() {
         return skills;
     }
@@ -99,6 +101,7 @@ public class CallCenterAgent extends IdEntity {
         this.skills = skills;
     }
 
+    @Transient
     public String getExtension() {
         return extension;
     }
