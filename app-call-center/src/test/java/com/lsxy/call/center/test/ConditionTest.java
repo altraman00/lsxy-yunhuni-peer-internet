@@ -58,9 +58,9 @@ public class ConditionTest {
         CallCenterAgent agent = new CallCenterAgent();
         agent.setTenantId(channel.getTenantId());
         agent.setAppId(channel.getAppId());
-        agent.setChannelId(channel.getId());
-        agent.setAgentNum(""+new Random(100000).nextInt());
-        agent.setAgentNo("hehe"+new Random(100000).nextInt());
+        agent.setChannel(channel.getId());
+        agent.setNum(""+new Random(100000).nextInt());
+        agent.setName("hehe"+new Random(100000).nextInt());
         agent = callCenterAgentService.save(agent);
 
         for (int i = 0; i < 10 ; i++) {
@@ -69,8 +69,8 @@ public class ConditionTest {
             skill.setAppId(channel.getAppId());
             skill.setAgent(agent.getId());
             skill.setName("haha" + i);
-            skill.setLevel(new Random().nextInt(100));
-            skill.setActive(1);
+            skill.setScore(new Random().nextInt(100));
+            skill.setEnabled(true);
             agentSkillService.save(skill);
         }
         Condition condition = new Condition();
