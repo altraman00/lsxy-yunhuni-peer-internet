@@ -54,15 +54,14 @@ public class PlayActionHandler extends ActionHandler{
             return false;
         }
         String finish_keys = root.attributeValue("finish_keys");
-        String repeat = root.attributeValue("repeat");
         List<String> plays = new ArrayList<String>();
         if(StringUtils.isNotBlank(root.getTextTrim())){
             plays.add(root.getTextTrim());
         }
 
         if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，finish_keys={},repeat={},play={}",
-                    getAction(),finish_keys,repeat,plays);
+            logger.debug("开始处理ivr[{}]动作，finish_keys={},play={}",
+                    getAction(),finish_keys,plays);
         }
         Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();

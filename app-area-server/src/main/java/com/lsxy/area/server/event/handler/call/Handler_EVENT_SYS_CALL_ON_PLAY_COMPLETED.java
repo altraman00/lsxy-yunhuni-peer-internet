@@ -101,9 +101,10 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
                     .putIfNotEmpty("error",params.get("error"))
                     .putIfNotEmpty("key",params.get("finish_key"))
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                ivrActionService.doAction(call_id);
+            }
         }
-        ivrActionService.doAction(call_id);
         return res;
     }
 }

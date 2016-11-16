@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * 通过这个类向开发者发送事件通知
@@ -139,6 +140,39 @@ public class NotifyCallbackUtil {
         }
     }
 
+    public boolean postNotifySync(final String url, final Map<String,Object> data,final Integer timeout,int retry){
+        boolean success = false;
+        RequestConfig c = this.config;
+        if(timeout != null){
+            c = RequestConfig.custom().setConnectionRequestTimeout(timeout*1000).setSocketTimeout(timeout*1000)
+                    .setConnectTimeout(timeout*1000).build();
+        }
+        data.put("action","event_notify");
+        do{
+            try{
+                HttpPost post = new HttpPost(url);
+                post.setConfig(c);
+                post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
+                StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
+                post.setEntity(se);
+                post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
+                Future<HttpResponse> future=client.execute(post,null);
+                HttpResponse response = future.get();
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    success = true;
+                }
+                if(!success && logger.isDebugEnabled()){
+                    logger.error("发送事件通知失败http status={}",response.getStatusLine().getStatusCode());
+                }
+            }catch (Throwable t){
+                logger.error("调用{}失败",url,t);
+            }
+            if(!success){
+                --retry;
+            }
+        }while (!success && retry>0);
+        return success;
+    }
     /*public static void main(String[] args) {
         NotifyCallbackUtil a = new NotifyCallbackUtil();
         a.init();

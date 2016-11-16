@@ -9,6 +9,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -30,13 +31,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by tandy on 16/8/18.
@@ -80,7 +79,7 @@ public class ConfServiceImpl implements ConfService {
     private PlayFileUtil playFileUtil;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisCacheService redisCacheService;
 
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
@@ -706,7 +705,7 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public boolean outOfParts(String confId){
         String key = key(confId);
-        return redisTemplate.opsForSet().size(key) >= MAX_PARTS;
+        return redisCacheService.ssize(key) >= MAX_PARTS;
     }
 
     /**
@@ -716,8 +715,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public void incrPart(String confId,String callId){
         String key = key(confId);
-        redisTemplate.opsForSet().add(key,callId);
-        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+        redisCacheService.sadd(key,callId);
+        redisCacheService.expire(key,EXPIRE);
     }
 
     /**
@@ -727,8 +726,8 @@ public class ConfServiceImpl implements ConfService {
     @Override
     public void decrPart(String confId,String callId){
         String key = key(confId);
-        redisTemplate.opsForSet().remove(key,callId);
-        redisTemplate.expire(key,EXPIRE, TimeUnit.SECONDS);
+        redisCacheService.sremove(key,callId);
+        redisCacheService.expire(key,EXPIRE);
     }
 
     /**
@@ -741,7 +740,7 @@ public class ConfServiceImpl implements ConfService {
         String key = key(confId);
         Set<String> results = null;
         try{
-            results = redisTemplate.opsForSet().members(key);
+            results = redisCacheService.smembers(key);
         }catch (Throwable t){
             logger.error("获取会议成员失败",t);
         }
@@ -756,12 +755,12 @@ public class ConfServiceImpl implements ConfService {
         String key = key(confId);
         Set<String> results = null;
         try{
-            results = redisTemplate.opsForSet().members(key);
+            results = redisCacheService.smembers(key);
         }catch (Throwable t){
             logger.error("获取会议成员失败",t);
         }
         try{
-            redisTemplate.delete(key);
+            redisCacheService.del(key);
         }catch (Throwable t){
             logger.info("删除会议成员缓存失败",t);
         }
