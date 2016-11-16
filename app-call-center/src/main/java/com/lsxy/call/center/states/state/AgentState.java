@@ -20,6 +20,8 @@ public class AgentState {
 
     private static final String STATE_PREFIXED_KEY = "callcenter.agent.state_";
 
+    public static final int REG_EXPIRE = 1000 * 60 * 5;
+
     @Autowired
     private RedisCacheService redisCacheService;
 
