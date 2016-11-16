@@ -328,14 +328,14 @@ public class IVRActionService {
     }
 
     private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to){
-        Map<String, String> result;
+        AreaAndTelNumSelector.Selector selector;
         try {
-            result = areaAndTelNumSelector.getTelnumberAndAreaId(app,to);
+            selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         } catch (AppOffLineException e) {
             throw new RuntimeException(e);
         }
-        String areaId = result.get("areaId");
-        String oneTelnumber = result.get("oneTelnumber");
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
 
         LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
         //保存业务数据，后续事件要用到

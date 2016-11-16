@@ -23,28 +23,12 @@ public class XStreamTest {
                 @Override
                 public void run() {
                     EnQueue equeue = EnQueueDecoder.decode("<enqueue\n" +
-                            "            waitPlayFile=\"music.wav\"\n" +
-                            "            playAgentNum=\"true\"\n" +
-                            "            preAgentNumPlayFile=\"坐席.wav\"\n" +
-                            "            postAgentNumPlayFile=\"为您服务.wav\"\n" +
-                            "            holdPlayFile=\"wait.wav\"\n" +
-                            "            conversationTimeout=\"3600\"\n" +
-                            "            data=\"my queue data\"\n" +
+                            "        channel=\"channel1\"\n" +
+                            "        data=\"your or data whatever here!\"\n" +
                             ">\n" +
-                            "    <filter data=\"this is filter 1\">\n" +
-                            "        <condition timeout=\"20\" priority=\"60\" data=\"condition 1\">\n" +
-                            "            <where>\n" +
-                            "                <![CDATA[\n" +
-                            "                '投诉' in skills and skills['手机'] > 60.0\n" +
-                            "                ]]>\n" +
-                            "            </where>\n" +
-                            "            <sort>\n" +
-                            "                <![CDATA[\n" +
-                            "                (skills['投诉'] * 0.4 + skills['手机'] * 0.6) / 2.0\n" +
-                            "                ]]>\n" +
-                            "            </sort>\n" +
-                            "        </condition>\n" +
-                            "    </filter>\n" +
+                            "    <route>\n" +
+                            "        <condition id=\"condition1\"/>\n" +
+                            "    </route>\n" +
                             "</enqueue>");
                     System.out.println(JSONUtil.objectToJson(equeue));
                     countDownLatch.countDown();

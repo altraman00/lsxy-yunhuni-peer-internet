@@ -35,10 +35,10 @@
                                     }
                                 });
                             }
-                            //                        marqueeContent[0]="<span >云呼你有新的讯息1</span>";
-                            //                        marqueeContent[1]="<span >云呼你有新的讯息2</span>";
-                            //                        marqueeContent[2]="<span >云呼你有新的讯息3云呼你有新的讯息3</span>";
-                            //                        marqueeContent[3]="<span >云呼你有新的讯息4</span>";
+                            //                        marqueeContent[0]="<span >壹云有新的讯息1</span>";
+                            //                        marqueeContent[1]="<span >壹云有新的讯息2</span>";
+                            //                        marqueeContent[2]="<span >壹云有新的讯息3壹云有新的讯息3</span>";
+                            //                        marqueeContent[3]="<span >壹云有新的讯息4</span>";
                             var marqueeInterval=new Array();
                             var marqueeId=0;
                             var marqueeDelay=2000;
@@ -174,19 +174,19 @@
                                             <p>
                                                 <span class="iconfont icon-oc-api smallicon inline-block develop-icon"></span>
                                                 <span class="index-key"><strong>接口API:</strong></span>
-                                                <span class="index-api" id="restapi">${homeVO.restApi}</span>
+                                                <span class="index-api restapi" id="restapi">${homeVO.restApi}</span>
                                             <span>
                                               <%--<a href="#"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>API文档</a>--%>
-                                              <a id="copyapi" data-clipboard-text="${homeVO.restApi}"><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
+                                              <a id="copyapi" ><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
                                             </span>
                                             </p>
                                             <p>
                                                 <span class="iconfont icon-oc-secrekey smallicon inline-block develop-icon"></span>
                                                 <span class="index-key"><strong>密钥:</strong></span>
-                                                <span class="index-api" id="secretkey">${homeVO.secretKey}</span>
+                                                <span class="index-api secretkey" >${homeVO.secretKey}</span>
                                             <span>
                                               <a class='reset_confirm'><i class="iconfont icon-resert smallicon inline-block develop-icon"></i>重新生成</a>
-                                              <a id="copysecrekey" data-clipboard-text="${homeVO.secretKey}" ><i class="iconfont icon-oc-small-copy"></i>复制</a>
+                                              <a id="copysecrekey"  ><i class="iconfont icon-oc-small-copy" style="font-size: 1.6=="></i>复制</a>
                                             </span>
                                             <span>
                                               <a class='tips-error tips-key'></a>
@@ -195,9 +195,9 @@
                                             <p>
                                                 <span class="iconfont icon-oc-certid smallicon inline-block develop-icon"></span>
                                                 <span class="index-key"><strong>鉴权账号:</strong></span>
-                                                <span class="index-api" id="certid" >${homeVO.certId}</span>
+                                                <span class="index-api certid" >${homeVO.certId}</span>
                                             <span>
-                                              <a id="copycertid" data-clipboard-text="${homeVO.certId}" ><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
+                                              <a id="copycertid" ><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
                                             </span>
                                             </p>
                                         </div>
@@ -800,9 +800,53 @@
 </script>
 
 
-<script type="text/javascript" src="${resPrefixUrl}/js/zero/ZeroClipboard.js"></script>
 <script type="text/javascript">
-    if(window.clipboardData){
+
+    var copyapiBtn = document.querySelector('#copyapi')
+    var copysecrekeyBtn = document.querySelector('#copysecrekey')
+    var copycertidBtn = document.querySelector('#copycertid')
+
+    // 点击的时候调用 copyTextToClipboard() 方法就好了.
+    copyapiBtn.onclick = function() {
+        copyTextToClipboard('${homeVO.restApi}')
+    }
+
+    copysecrekeyBtn.onclick = function() {
+        copyTextToClipboard('${homeVO.secretKey}')
+    }
+
+    copycertidBtn.onclick = function() {
+        copyTextToClipboard('${homeVO.certId}')
+    }
+
+
+    function copyTextToClipboard(text) {
+        var textArea = document.createElement("textarea")
+        textArea.style.position = 'fixed'
+        textArea.style.top = 0
+        textArea.style.left = 0
+        textArea.style.width = '2em'
+        textArea.style.height = '2em'
+        textArea.style.padding = 0
+        textArea.style.border = 'none'
+        textArea.style.outline = 'none'
+        textArea.style.boxShadow = 'none'
+        textArea.style.background = 'transparent'
+        textArea.value = text
+        document.body.appendChild(textArea)
+        textArea.select()
+        try {
+            var msg = document.execCommand('copy') ? '成功' : '失败'
+            showtoast('复制'+msg);
+        } catch (err) {
+            alert('不能使用这种方法复制内容');
+        }
+        document.body.removeChild(textArea)
+    }
+
+
+
+   /* if(window.clipboardData){
         //支持IE
         var restapi = document.getElementById("restapi");
         restapi.onclick = function(){
@@ -840,7 +884,7 @@
 
 
     }
-
+*/
 
 
 

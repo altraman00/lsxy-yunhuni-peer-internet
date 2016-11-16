@@ -14,13 +14,6 @@ public interface AppExtensionService extends BaseService<AppExtension> {
 
     public boolean login(String tenantId,String appId,String user,String pass);
 
-    public boolean updateRegisterStatus(String id,Integer lastRegisterStatus);
-
-    public boolean updateLastAction(String id,Integer lastAction);
-
-    public boolean updateAgent(String id,String agent,Integer enable);
-
-    public boolean updateEnable(String id,Integer enable);
     /**
      * 根据应用id获取对于的分机
      * @param appId
