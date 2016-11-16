@@ -47,8 +47,9 @@ for i=1,cas_size do
                 and (extension['lastRegisterTime'] + extension['registerExpires']) >= cur_time)
         then
             result = agent_id
-            break
+            return result
         end
     end
 end
+
 return result

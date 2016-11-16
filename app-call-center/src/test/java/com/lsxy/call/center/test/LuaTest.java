@@ -4,9 +4,12 @@ import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.states.lock.AgentLock;
+import com.lsxy.call.center.states.lock.QueueLock;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
+import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.Constants;
@@ -85,6 +88,22 @@ public class LuaTest {
         latch.await();
         System.out.println("总："+(System.currentTimeMillis() -start1));
     }
+
+    @Test
+    public void test3() throws InterruptedException {
+        long start = System.currentTimeMillis();
+        String agent = "40288ae2586b014801586b0174080043";
+        String queueId = (String)redisCacheService.eval(Lua.LOKUPQUEUE,6,
+                ACs.getKey(agent),AgentState.getKey(agent),
+                ExtensionState.getPrefixed(),AgentLock.getKey(agent),
+                QueueLock.getPrefixed(), CQs.getPrefixed(),
+                ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
+                AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING);
+
+        System.out.println(queueId);
+        System.out.println(System.currentTimeMillis() -start);
+    }
+
     @Test
     public void  test2(){
         System.out.println(redisCacheService.eval("return redis.call('HGETALL','callcenter.agent.state_40288ae2586715c601586715f5cd0000')"));;

@@ -1,5 +1,6 @@
 package com.lsxy.call.center.service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.states.lock.AgentLock;
@@ -48,7 +49,7 @@ public class EnQueueServiceImpl implements EnQueueService{
     @Autowired
     private RedisCacheService redisCacheService;
 
-    @Autowired
+    @Reference(lazy = true,check = false,timeout = 3000)
     private DeQueueService deQueueService;
 
     @Autowired

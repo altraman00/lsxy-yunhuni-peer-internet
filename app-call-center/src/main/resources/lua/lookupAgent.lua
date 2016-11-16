@@ -53,9 +53,10 @@ for i=1,cas_size do
 				redis.call('EXPIRE', agent_lock_key_prefix..agent_id, '60')
 				redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
 				result = agent_id
-				break
+				return result
 			end
 		end
 	end
 end
+
 return result

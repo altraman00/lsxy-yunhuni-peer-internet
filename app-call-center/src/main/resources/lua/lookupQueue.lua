@@ -81,7 +81,7 @@ for i = 1, aCs_size do
             redis.call('EXPIRE', q_lock_key, '60')
             redis.call('HSET',agent_state_key,'state',fetching)
             result = cQs[j]
-            break
+            return result
         end
     end
 end
