@@ -158,7 +158,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.info("没有开通ivr或者callcenter服务");
             return res;
         }
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId());
+        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),app.getIsCallCenter());
         return res;
     }
 
