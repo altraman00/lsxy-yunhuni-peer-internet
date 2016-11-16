@@ -96,13 +96,15 @@ public class Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED extends EventHandler {
 
         if(StringUtils.isNotBlank(app.getUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","connect_end")
+                    .putIfNotEmpty("event","ivr.connect_end")
                     .putIfNotEmpty("id",call_id)
                     .putIfNotEmpty("begin_time",begin_time)
                     .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("error",params.get("error"))
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                ivrActionService.doAction(call_id);
+            }
         }
 
         if(logger.isDebugEnabled()){
@@ -111,7 +113,6 @@ public class Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        ivrActionService.doAction(call_id);
         return res;
     }
 

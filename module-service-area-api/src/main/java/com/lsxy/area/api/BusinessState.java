@@ -16,12 +16,13 @@ public class BusinessState implements Serializable{
     private String callBackUrl;
     private String areaId;
     private String lineGatewayId;
+    private boolean closed;
     private Map<String,Object> businessData;
 
     public BusinessState() {
     }
 
-    public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl, String areaId, String lineGatewayId, Map<String, Object> businessData) {
+    public BusinessState(String tenantId, String appId, String id, String type, String userdata, String resId, String callBackUrl, String areaId, String lineGatewayId,boolean closed, Map<String, Object> businessData) {
         this.tenantId = tenantId;
         this.appId = appId;
         this.id = id;
@@ -31,6 +32,7 @@ public class BusinessState implements Serializable{
         this.callBackUrl = callBackUrl;
         this.areaId = areaId;
         this.lineGatewayId = lineGatewayId;
+        this.closed = closed;
         this.businessData = businessData;
     }
 
@@ -114,6 +116,13 @@ public class BusinessState implements Serializable{
         this.lineGatewayId = lineGatewayId;
     }
 
+    public boolean getClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
 
     public static class Builder{
 
@@ -126,6 +135,8 @@ public class BusinessState implements Serializable{
         private String callBackUrl;
         private String areaId;
         private String lineGatewayId;
+        private boolean closed;
+
         private Map<String,Object> businessData;
 
         public Builder(){}
@@ -175,13 +186,18 @@ public class BusinessState implements Serializable{
             return this;
         }
 
+        public Builder setClosed(boolean closed) {
+            this.closed = closed;
+            return this;
+        }
+
         public Builder setBusinessData(Map<String, Object> businessData) {
             this.businessData = businessData;
             return this;
         }
 
         public BusinessState build(){
-            return new BusinessState(tenantId,appId,id,type,userdata,resId,callBackUrl,areaId,lineGatewayId,businessData);
+            return new BusinessState(tenantId,appId,id,type,userdata,resId,callBackUrl,areaId,lineGatewayId,closed,businessData);
         }
     }
 }
