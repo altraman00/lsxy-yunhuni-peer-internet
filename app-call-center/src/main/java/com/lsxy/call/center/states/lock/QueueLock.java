@@ -7,7 +7,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
  */
 public class QueueLock extends DistributeLock {
 
-    private static final String PREFIXED = "call.center.queuelock_";
+    private static final String PREFIXED = "callcenter.queuelock_";
 
     public static String getPrefixed(){
         return PREFIXED;

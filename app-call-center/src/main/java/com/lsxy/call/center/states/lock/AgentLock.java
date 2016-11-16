@@ -8,7 +8,7 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 public class AgentLock extends DistributeLock {
 
 
-    private static final String PREFIXED = "call.center.agentlock_";
+    private static final String PREFIXED = "callcenter.agentlock_";
 
     public static String getPrefixed(){
         return PREFIXED;

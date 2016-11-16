@@ -1,6 +1,5 @@
 package com.lsxy.call.center.utils;
 
-import com.lsxy.call.center.service.AgentSkillServiceImpl;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,7 @@ import java.nio.charset.Charset;
  * Created by liuws on 2016/11/15.
  */
 public class Lua {
-    private static final Logger logger = LoggerFactory.getLogger(AgentSkillServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(Lua.class);
 
     public static final String LOOKUPAGENT = loadLua("/lua/lookupAgent.lua");
 
@@ -41,6 +40,10 @@ public class Lua {
                 }
                 if(StringUtil.isEmpty(read)){
                     //忽略空行
+                    continue;
+                }
+                //非调试模式下不需要redis.log
+                if(read.trim().startsWith("redis.log(") && !logger.isDebugEnabled()){
                     continue;
                 }
                 lua.append(read).append("\n");

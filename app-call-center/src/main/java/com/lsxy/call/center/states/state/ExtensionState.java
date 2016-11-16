@@ -62,7 +62,7 @@ public class ExtensionState {
     }
 
     public void setLastAction(String extensionId,Integer lastAction) {
-        redisCacheService.hput(getKey(extensionId),"lastAction",lastAction);
+        redisCacheService.hput(getKey(extensionId),"lastAction",lastAction.toString());
     }
 
     public Long getLastActionTime(String extensionId) {
@@ -74,7 +74,7 @@ public class ExtensionState {
     }
 
     public void setLastActionTime(String extensionId,Long lastActionTime) {
-        redisCacheService.hput(getKey(extensionId),"lastActionTime",lastActionTime);
+        redisCacheService.hput(getKey(extensionId),"lastActionTime",lastActionTime.toString());
     }
 
     public Long getLastRegisterTime(String extensionId) {
@@ -86,7 +86,7 @@ public class ExtensionState {
     }
 
     public void setLastRegisterTime(String extensionId,Long lastRegisterTime) {
-        redisCacheService.hput(getKey(extensionId),"lastRegisterTime",lastRegisterTime);
+        redisCacheService.hput(getKey(extensionId),"lastRegisterTime",lastRegisterTime.toString());
     }
 
     public Integer getLastRegisterStatus(String extensionId) {
@@ -98,7 +98,7 @@ public class ExtensionState {
     }
 
     public void setLastRegisterStatus(String extensionId,Integer lastRegisterStatus) {
-        redisCacheService.hput(getKey(extensionId),"lastRegisterStatus",lastRegisterStatus);
+        redisCacheService.hput(getKey(extensionId),"lastRegisterStatus",lastRegisterStatus.toString());
     }
 
     public Integer getRegisterExpires(String extensionId) {
@@ -110,7 +110,7 @@ public class ExtensionState {
     }
 
     public void setRegisterExpires(String extensionId,Integer registerExpires) {
-        redisCacheService.hput(getKey(extensionId),"registerExpires",registerExpires);
+        redisCacheService.hput(getKey(extensionId),"registerExpires",registerExpires.toString());
     }
 
 

@@ -48,7 +48,15 @@ public class LuaTest {
     public void test1(){
         System.out.println(System.currentTimeMillis());
         System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,4,
-                CAs.getKey("40288ae25865c111015865c146d1000b"),
+                CAs.getKey("40288ae25867b181015867b1a9e7000c"),
                 AgentState.getPrefixed(), ExtensionState.getPrefixed(), AgentLock.getPrefixed()));
+    }
+    @Test
+    public void  test2(){
+        System.out.println(redisCacheService.eval("return redis.call('HGETALL','callcenter.agent.state_40288ae2586715c601586715f5cd0000')"));;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(System.currentTimeMillis());
     }
 }

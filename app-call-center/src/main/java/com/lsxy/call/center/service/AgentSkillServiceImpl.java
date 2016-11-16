@@ -39,7 +39,7 @@ public class AgentSkillServiceImpl extends AbstractService<AgentSkill> implement
     @Override
     public List<AgentSkill> findByAgent(String tenantId,String appId,String agentId){
         String sql = "select name,score from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_skill " +
-                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and agent=\""+agentId+"\" and active = 1 and deleted = 0";
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and agent=\""+agentId+"\" and enabled = 1 and deleted = 0";
 
         return jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<AgentSkill>(AgentSkill.class));
     }
