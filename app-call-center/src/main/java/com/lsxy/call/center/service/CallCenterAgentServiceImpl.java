@@ -1,9 +1,11 @@
 package com.lsxy.call.center.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.call.center.api.model.*;
+import com.lsxy.call.center.api.model.AgentSkill;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.*;
-import com.lsxy.call.center.dao.AgentSkillDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
 import com.lsxy.call.center.states.lock.AgentLock;
 import com.lsxy.call.center.states.lock.ExtensionLock;
@@ -16,6 +18,8 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.FileUtil;
+import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +28,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -42,8 +47,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     private AgentSkillService agentSkillService;
     @Autowired
     private AppExtensionService appExtensionService;
-    @Autowired
-    private AgentSkillDao agentSkillDao;
     @Reference(lazy = true,check = false,timeout = 3000)
     private DeQueueService deQueueService;
     @Autowired
@@ -78,7 +81,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }catch (IllegalArgumentException e){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent oldAgent = callCenterAgentDao.findByChannelAndName(agent.getChannel(),agent.getName());
+        CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndChannelAndName(agent.getAppId(),agent.getChannel(),agent.getName());
         if(oldAgent != null){
             Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
             //TODO 注册是否过期，过期执行注销过程
@@ -176,7 +179,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }catch (IllegalArgumentException e){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent agent = callCenterAgentDao.findByChannelAndName(channel,agentName);
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
         if(agent == null){
             //TODO 座席不存在
             throw new RequestIllegalArgumentException();
@@ -199,7 +202,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     throw new RuntimeException("座席正忙");
                 }
             }
-            agentSkillDao.deleteByAgent(agentId);
+            agentSkillService.deleteByAgent(agentId);
             try {
                 this.delete(agentId);
                 //写入注销日志
@@ -226,6 +229,16 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     }
 
+    @Override
+    public void keepAlive(String appId, String channel, String agentName) throws YunhuniApiException{
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
+        if(agent == null){
+            //TODO 座席不存在
+            throw new RequestIllegalArgumentException();
+        }
+        agentState.setLastRegTime(agent.getId(),System.currentTimeMillis());
+    }
+
     //设置坐席状态
     public boolean setState(String id,String state){
         CallCenterAgent agent = this.findById(id);
@@ -239,7 +252,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     //技能迁入迁出
     @Override
     public boolean checkInSkill(String agent,String skillName,Boolean enable){
-        agentSkillDao.updateActiveByAgent(enable,agent,skillName);
+//        agentSkillDao.updateActiveByAgent(enable,agent,skillName);
         return true;
     }
     //技能追加
@@ -262,6 +275,82 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel=\""+channelId+"\" and deleted = 0";
 
         return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
+    }
+
+    @Override
+    public CallCenterAgent get(String appId, String channel, String agentName) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel, agentName);
+        if(agent == null){
+            //TODO 座席不存在
+            throw new RequestIllegalArgumentException();
+        }
+        AgentState.Model model = agentState.get(agent.getId());
+        agent.setState(model.getState());
+        agent.setExtension(model.getExtension());
+        List<AgentSkill> skills = agentSkillService.findAllByAgent(agent.getId());
+        agent.setSkills(skills);
+        return agent;
+    }
+
+    @Override
+    public Page getPage(String appId, String channel, Integer pageNo, Integer pageSize) throws YunhuniApiException{
+        List<String> agentIds = new ArrayList<>();
+        String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.channel=?2";
+        Page page = this.pageList(hql, pageNo, pageSize, appId);
+        List<CallCenterAgent> result = page.getResult();
+        result.parallelStream().forEach(agent ->agentIds.add(agent.getId()));
+        List<AgentSkill> skills = agentSkillService.findAllByAgents(agentIds);
+        Map<String, List<AgentSkill>> collect = skills.parallelStream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
+        result.parallelStream().forEach(agent -> {
+            AgentState.Model model = agentState.get(agent.getId());
+            agent.setState(model.getState());
+            agent.setExtension(model.getExtension());
+            agent.setSkills(collect.get(agent.getId()));
+        });
+        return page;
+    }
+
+    @Override
+    public void extension(String appId, String channel, String agentName,String extensionId) throws YunhuniApiException{
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
+        if(agent == null){
+            //TODO 座席不存在
+            throw new RequestIllegalArgumentException();
+        }
+        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
+        //获取分机锁
+        ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
+        boolean lock = extensionLock.lock();
+        //获取锁失败 抛异常
+        if(!lock){
+            throw new ExtensionBindingToAgentException();
+        }
+        try{
+            String extentionAgent = extensionState.getAgent(extensionId);
+            if(StringUtils.isNotBlank(extentionAgent)){
+                if(extentionAgent.equals(agent.getId())){
+                    return;
+                }else{
+                    throw new ExtensionBindingToAgentException();
+                }
+            }
+
+
+        }finally {
+            extensionLock.unlock();
+        }
+
+    }
+
+    public static void main(String[] args) {
+        try{
+            return;
+        }finally {
+            System.out.println("aaaaaaa");
+        }
     }
 
 }

@@ -25,4 +25,7 @@ public interface AgentSkillDao extends BaseDaoInterface<AgentSkill, Serializable
 
     public List<AgentSkill> findByTenantIdAndAppIdAndAgentAndEnabled(String tenantId,String appId,String agent,Boolean enabled);
 
+    List<AgentSkill> findByAgent(String agentId);
+
+    List<AgentSkill> findByAgentIn(List<String> agentIds);
 }

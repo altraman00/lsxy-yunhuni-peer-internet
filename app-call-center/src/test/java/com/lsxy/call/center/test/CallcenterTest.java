@@ -111,7 +111,7 @@ public class CallcenterTest {
 
     @Test
     public void test4(){
-        callCenterAgentService.logout(app.getTenant().getId(), appId, channel, callCenterAgentService.pageList(1,1).getResult().get(0).getId(), force);
+//        callCenterAgentService.logout(app.getTenant().getId(), appId, channel, callCenterAgentService.pageList(1,1).getResult().get(0).getId(), force);
     }
 
     @Test

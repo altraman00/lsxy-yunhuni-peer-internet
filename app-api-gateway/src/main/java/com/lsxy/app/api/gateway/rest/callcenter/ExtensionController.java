@@ -45,8 +45,8 @@ public class ExtensionController extends AbstractAPIController {
 
     @RequestMapping(value = "/{account_id}/callcenter/extension",method = RequestMethod.GET)
     public ApiGatewayResponse listExtensions(HttpServletRequest request,@RequestHeader("AppID") String appId,
-                                             @RequestParam(defaultValue = "1") Integer  pageNo,
-                                             @RequestParam(defaultValue = "20")  Integer pageSize) throws YunhuniApiException {
+                                             @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
+                                             @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
         Page page = appExtensionService.getPage(appId,pageNo,pageSize);
         return ApiGatewayResponse.success(page);
     }
