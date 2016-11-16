@@ -49,11 +49,6 @@
                                                 <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>
-                                        <%--<li>--%>
-                                            <%--<div class="aside-li-a">--%>
-                                                <%--<a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>--%>
-                                            <%--</div>--%>
-                                        <%--</li>--%>
                                         <li>
                                             <div class="aside-li-a active">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
@@ -62,6 +57,11 @@
                                         <li>
                                             <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
                                             </div>
                                         </li>
                                     </ul>
