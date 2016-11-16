@@ -14,7 +14,11 @@ public class AgentLock extends DistributeLock {
         return PREFIXED;
     }
 
+    public static String getKey(String agentId){
+        return PREFIXED + agentId;
+    }
+
     public AgentLock(RedisCacheService redis, String agentId){
-        super(redis,PREFIXED+agentId);
+        super(redis,getKey(agentId));
     }
 }

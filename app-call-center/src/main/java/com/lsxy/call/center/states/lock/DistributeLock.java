@@ -20,7 +20,6 @@ public class DistributeLock {
 
     private long expire;
 
-
     public DistributeLock(RedisCacheService redis,String key,long expire){
         this.redis = redis;
         this.key = key;

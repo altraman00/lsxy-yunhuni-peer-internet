@@ -3,6 +3,7 @@ package com.lsxy.call.center.service;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.states.lock.AgentLock;
+import com.lsxy.call.center.states.lock.QueueLock;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
@@ -37,6 +38,12 @@ public class EnQueueServiceImpl implements EnQueueService{
 
     @Autowired
     private CallCenterQueueService callCenterQueueService;
+
+    @Autowired
+    private AppExtensionService appExtensionService;
+
+    @Autowired
+    private CallCenterAgentService callCenterAgentService;
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -130,7 +137,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             }else{
                 //找到坐席修改排队状态
                 try{
-                    queue.setResult("select");
+                    queue.setResult(CallCenterQueue.RESULT_SELETEED);
                     queue.setEndTime(new Date());
                     queue.setAgent(agent);
                     callCenterQueueService.save(queue);
@@ -139,7 +146,9 @@ public class EnQueueServiceImpl implements EnQueueService{
                 }
                 try{
                     EnQueueResult result = new EnQueueResult();
-                    deQueueService.success(tenantId,appId,callId,result);
+                    result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
+                    result.setAgent(callCenterAgentService.findById(agent));
+                    deQueueService.success(tenantId,appId,callId,queue.getId(),result);
                 }catch (Throwable t1){
                     try{
                         agentState.setState(agent,AgentState.Model.STATE_IDLE);
@@ -152,7 +161,7 @@ public class EnQueueServiceImpl implements EnQueueService{
         }catch (Throwable e){
             logger.error("排队找坐席出错",e);
             try{
-                queue.setResult("fail");
+                queue.setResult(CallCenterQueue.RESULT_FAIL);
                 queue.setEndTime(new Date());
                 callCenterQueueService.save(queue);
             }catch (Throwable t){
@@ -166,11 +175,43 @@ public class EnQueueServiceImpl implements EnQueueService{
      * 坐席找排队
      * @param tenantId
      * @param appId
-     * @param agentId
+     * @param agent
      */
     @Override
-    public void lookupQueue(String tenantId, String appId,String conditionId, String agentId){
-
+    public void lookupQueue(String tenantId, String appId,String conditionId, String agent){
+        String queueId = (String)redisCacheService.eval(Lua.LOKUPQUEUE,6,
+            ACs.getKey(agent),AgentState.getKey(agent),
+            ExtensionState.getPrefixed(),AgentLock.getKey(agent),
+            QueueLock.getPrefixed(),CQs.getPrefixed(),
+            ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
+            AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
+            conditionId);
+        if(StringUtil.isEmpty(queueId)){
+            //找到排队，修改排队状态
+            CallCenterQueue queue = callCenterQueueService.findById(queueId);
+            if(queue != null){
+                try{
+                    queue.setResult(CallCenterQueue.RESULT_SELETEED);
+                    queue.setEndTime(new Date());
+                    queue.setAgent(agent);
+                    callCenterQueueService.save(queue);
+                }catch (Throwable t){
+                    logger.info("修改排队状态失败",t);
+                }
+                try{
+                    EnQueueResult result = new EnQueueResult();
+                    result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
+                    result.setAgent(callCenterAgentService.findById(agent));
+                    deQueueService.success(tenantId,appId,queue.getOriginCallId(),queueId,result);
+                }catch (Throwable t1){
+                    try{
+                        agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                    }catch (Throwable t2){
+                        logger.info("",t2);
+                    }
+                }
+            }
+        }
     }
 
 }
