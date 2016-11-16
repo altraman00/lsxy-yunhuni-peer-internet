@@ -409,11 +409,11 @@ public class RedisCacheService {
 			redisTemplate.opsForHash().putAll(key,map);
 		}
 
-		public void hput(final String key,final String field,final Object value){
+		public void hput(final String key,final String field,final String value){
 			redisTemplate.opsForHash().put(key,field,value);
 		}
 
-		public boolean hputIfAbsent(final String key,final String field,final Object value){
+		public boolean hputIfAbsent(final String key,final String field,final String value){
 			return redisTemplate.opsForHash().putIfAbsent(key,field,value);
 		}
 
