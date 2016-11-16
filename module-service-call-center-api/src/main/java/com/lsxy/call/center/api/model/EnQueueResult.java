@@ -6,50 +6,23 @@ package com.lsxy.call.center.api.model;
  */
 public class EnQueueResult{
 
-    private String id;
-    private String type;
-    private String user;
-    private String telenum;
-    private String agent;
+    private AppExtension extension;
+    private CallCenterAgent agent;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getTelenum() {
-        return telenum;
-    }
-
-    public void setTelenum(String telenum) {
-        this.telenum = telenum;
-    }
-
-    public String getAgent() {
+    public CallCenterAgent getAgent() {
         return agent;
     }
 
-    public void setAgent(String agent) {
+    public void setAgent(CallCenterAgent agent) {
         this.agent = agent;
+    }
+
+    public AppExtension getExtension() {
+        return extension;
+    }
+
+    public void setExtension(AppExtension extension) {
+        this.extension = extension;
     }
 }
 

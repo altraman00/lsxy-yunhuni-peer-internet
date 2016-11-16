@@ -18,7 +18,7 @@ public class DeQueueServiceImpl implements DeQueueService {
 
 
     @Override
-    public void success(String tenantId, String appId, String callId, EnQueueResult result) {
+    public void success(String tenantId, String appId, String callId,String queueId, EnQueueResult result) {
         logger.info("=====================+success");
     }
 

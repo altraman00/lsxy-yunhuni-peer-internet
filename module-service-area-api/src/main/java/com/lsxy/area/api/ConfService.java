@@ -1,6 +1,6 @@
 package com.lsxy.area.api;
 
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 
 import java.util.List;
 import java.util.Set;

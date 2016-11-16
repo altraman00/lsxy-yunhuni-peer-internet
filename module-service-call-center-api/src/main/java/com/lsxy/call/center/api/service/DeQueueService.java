@@ -7,7 +7,7 @@ import com.lsxy.call.center.api.model.EnQueueResult;
  */
 public interface DeQueueService{
 
-    public void success(String tenantId, String appId, String callId, EnQueueResult result);
+    public void success(String tenantId, String appId, String callId,String queueId, EnQueueResult result);
 
     public void timeout(String tenantId, String appId, String callId);
 
