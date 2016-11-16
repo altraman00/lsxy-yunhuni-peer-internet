@@ -45,7 +45,11 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     @Override
     public void delete(String id) {
         try{
-            redisCacheService.expire(getKey(id),EXPIRE_RELEASE);
+            BusinessState state = get(id);
+            if(state != null){
+                state.setClosed(true);
+                redisCacheService.set(getKey(id), JSONUtil.objectToJson(state),EXPIRE_RELEASE);
+            }
         }catch (Throwable t){
         }
     }
