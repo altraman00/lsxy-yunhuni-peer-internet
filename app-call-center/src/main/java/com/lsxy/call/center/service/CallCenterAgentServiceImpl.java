@@ -5,6 +5,7 @@ import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.AgentSkillDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
+import com.lsxy.call.center.states.lock.AgentLock;
 import com.lsxy.call.center.states.lock.ExtensionLock;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
@@ -23,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -76,7 +78,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }catch (IllegalArgumentException e){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndChannelAndName(agent.getAppId(),agent.getChannel(),agent.getName());
+        CallCenterAgent oldAgent = callCenterAgentDao.findByChannelAndName(agent.getChannel(),agent.getName());
         if(oldAgent != null){
             Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
             //TODO 注册是否过期，过期执行注销过程
@@ -168,11 +170,49 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //注销
     @Override
-    public boolean logout(String agentId){
-        agentSkillDao.deleteByAgent(agentId);
+    public boolean logout(String tenantId, String appId, String channel, String agentName, boolean force) throws YunhuniApiException {
+        try{
+            channelService.findOne(tenantId, appId, channel);
+        }catch (IllegalArgumentException e){
+            throw new RequestIllegalArgumentException();
+        }
+        CallCenterAgent agent = callCenterAgentDao.findByChannelAndName(channel,agentName);
+        if(agent == null){
+            //TODO 座席不存在
+            throw new RequestIllegalArgumentException();
+        }
+        AgentLock agentLock = new AgentLock(redisCacheService, agent.getId());
+        boolean lock = agentLock.lock();
+        if(!lock){
+            //获取锁失败
+            throw new ExtensionBindingToAgentException();
+        }
+        try{
+            String agentId = agent.getId();
+            String state = agentState.getState(agentId);
+            if(StringUtils.isNotBlank(state) && (state.contains("fetching")||state.contains("talking"))){
+                //TODO 座席正忙
+                throw new RuntimeException("座席正忙");
+            }
+            agentSkillDao.deleteByAgent(agentId);
+            try {
+                this.delete(agentId);
+            } catch (Exception e) {
+                logger.error("删除座席出错",e);
+            }
+            String extension = agentState.getExtension(agentId);
+            //TODO LUA?
+            if(StringUtils.isNotBlank(extension)){
+                extensionState.deleteAgent(extension);
+            }
+            agentState.delete(agentId);
+
+        }finally {
+            agentLock.unlock();
+        }
+
         //TODO 删除坐席的分机列表
         try {
-            this.delete(agentId);
         } catch (Throwable e) {
             throw new IllegalArgumentException(e);
         }
