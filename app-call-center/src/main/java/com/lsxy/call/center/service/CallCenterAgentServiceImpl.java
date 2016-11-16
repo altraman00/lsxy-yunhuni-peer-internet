@@ -170,7 +170,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //注销
     @Override
-    public boolean logout(String tenantId, String appId, String channel, String agentName, boolean force) throws YunhuniApiException {
+    public void logout(String tenantId, String appId, String channel, String agentName, boolean force) throws YunhuniApiException {
         try{
             channelService.findOne(tenantId, appId, channel);
         }catch (IllegalArgumentException e){
@@ -190,13 +190,20 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         try{
             String agentId = agent.getId();
             String state = agentState.getState(agentId);
+
             if(StringUtils.isNotBlank(state) && (state.contains("fetching")||state.contains("talking"))){
-                //TODO 座席正忙
-                throw new RuntimeException("座席正忙");
+                if(force){
+                    //TODO 切断平台和座席之间的呼叫
+                }else{
+                    //TODO 座席正忙
+                    throw new RuntimeException("座席正忙");
+                }
             }
             agentSkillDao.deleteByAgent(agentId);
             try {
                 this.delete(agentId);
+                //写入注销日志
+                agentActionLogService.agentLogout(agent);
             } catch (Exception e) {
                 logger.error("删除座席出错",e);
             }
@@ -206,17 +213,17 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 extensionState.deleteAgent(extension);
             }
             agentState.delete(agentId);
-
+            Set<String> conditionIds = aCs.getAll(agentId);
+            if(conditionIds != null){
+                for(String conditionId:conditionIds){
+                    cAs.remove(conditionId,agentId);
+                }
+            }
+            aCs.delete(agentId);
         }finally {
             agentLock.unlock();
         }
 
-        //TODO 删除坐席的分机列表
-        try {
-        } catch (Throwable e) {
-            throw new IllegalArgumentException(e);
-        }
-        return true;
     }
 
     //设置坐席状态
