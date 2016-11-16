@@ -337,20 +337,13 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     throw new ExtensionBindingToAgentException();
                 }
             }
-
-
+            extensionState.setAgent(extensionId,agent.getId());
+            agentState.setExtension(agent.getId(),extensionId);
         }finally {
             extensionLock.unlock();
         }
 
     }
 
-    public static void main(String[] args) {
-        try{
-            return;
-        }finally {
-            System.out.println("aaaaaaa");
-        }
-    }
 
 }
