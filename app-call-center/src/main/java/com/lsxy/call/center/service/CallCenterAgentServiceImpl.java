@@ -47,21 +47,21 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    ChannelService channelService;
+    private ChannelService channelService;
     @Autowired
-    ConditionService conditionService;
+    private ConditionService conditionService;
     @Autowired
-    ExtensionState extensionState;
+    private ExtensionState extensionState;
     @Autowired
-    AgentState agentState;
+    private AgentState agentState;
     @Autowired
-    RedisCacheService redisCacheService;
+    private RedisCacheService redisCacheService;
     @Autowired
     private ACs aCs;
     @Autowired
     private CAs cAs;
     @Autowired
-    AgentActionLogService agentActionLogService;
+    private AgentActionLogService agentActionLogService;
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
@@ -71,9 +71,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     //登陆
     @Override
     public String login(CallCenterAgent agent) throws YunhuniApiException {
-        Channel channel;
         try{
-            channel = channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+            channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
         }catch (IllegalArgumentException e){
             throw new RequestIllegalArgumentException();
         }
