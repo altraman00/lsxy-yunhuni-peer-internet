@@ -144,7 +144,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }
-
         if(tenant == null){
             logger.error("找不到对应的租户:{}",params);
             return res;
@@ -153,7 +152,12 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.error("找不到对应的APP:{}", params);
             return res;
         }
-
+        if((app.getIsIvrService() ==null || app.getIsIvrService() != 1) &&
+                (app.getIsCallCenter() == null || app.getIsCallCenter() != 1)
+                ){
+            logger.info("没有开通ivr或者callcenter服务");
+            return res;
+        }
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId());
         return res;
     }
