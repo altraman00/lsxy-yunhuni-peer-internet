@@ -1,6 +1,7 @@
 package com.lsxy.yunhuni.api.file.service;
 
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
@@ -47,7 +48,28 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @param endTime
      * @return
      */
-    List<VoiceFileRecord> list(String appid, String tenantId, Date startTime,Date endTime);
+    List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime,Date endTime);
 
-    List<VoiceFileRecord> getListDistinctUrl(String ...sessionId);
+    List<VoiceFileRecord> getListBySessionId(String sessionId);
+
+    void batchUpdateOssDelete(List<String> id,int status);
+    void batchUpdateAADelete(List<String> id,int status);
+    void batchDelete(Date createTime,String tenantId);
+    /**
+     * 根据创建时间，租户，区域获取录音文件OSS文件存在
+     */
+    List<Map> getOSSListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId,String areaId);
+    /**
+     * 根据创建时间，租户，区域获取录音文件AA文件存在
+     */
+    List<Map> getAAListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId,String areaId);
+    /**
+     * 根据创建时间，租户，区域获取OSS文件存在区域
+     */
+    List<String> getOssAreaByCreateTimeAndTenantId(Date createTime,String tenantId);
+    /**
+     * 根据创建时间，租户，区域获取AA文件存在的区域
+     */
+    List<String> getAAAreaByCreateTimeAndTenantId(Date createTime,String tenantId);
+    List<VoiceFileRecord> getListByCreateTimeAndTenantId(Date createTime,String tenantId);
 }

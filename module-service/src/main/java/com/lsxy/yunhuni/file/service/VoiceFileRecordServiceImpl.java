@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -57,16 +58,91 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
 
     @Override
-    public List<VoiceFileRecord> list(String appid, String tenantId, Date startTime, Date endTime) {
+    public List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime, Date endTime) {
         String hql = " from VoiceFileRecord obj where obj.app_id=?1 and obj.tenant_id=?2 and obj.createTime<=?3 and obj.createTime>=?4";
         List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
         return list;
     }
 
     @Override
-    public List<VoiceFileRecord> getListDistinctUrl(String... sessionId) {
-        String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?)";
-        return null;
+    public List<VoiceFileRecord> getListBySessionId(String sessionId) {
+        String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?1)";
+        List list = this.list(hql, sessionId);
+        return list;
     }
+
+    @Override
+    public void batchUpdateOssDelete(List<String> id, int status) {
+        String ids = "";
+        for(int i=0;i<id.size();i++){
+            ids += "'"+id.get(i)+"'";
+            if(i!=id.size()-1){
+                ids+=",";
+            }
+        }
+        String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set oss_deleted=? where id in (?)";
+        jdbcTemplate.update(sql,status,ids);
+    }
+
+    @Override
+    public void batchUpdateAADelete(List<String> id, int status) {
+        String ids = "";
+        for(int i=0;i<id.size();i++){
+            ids += "'"+id.get(i)+"'";
+            if(i!=id.size()-1){
+                ids+=",";
+            }
+        }
+        String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set oss_deleted=? where id in (?)";
+        jdbcTemplate.update(sql,status,ids);
+    }
+
+    @Override
+    public void batchDelete(Date createTime, String tenantId) {
+        String sql = " update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set deleted=1 WHERE deleted=0 AND tenant_id= ? AND create_time <=? ";
+        jdbcTemplate.update(sql,createTime,tenantId);
+    }
+
+    @Override
+    public List<Map> getOSSListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId, String areaId) {
+        String sql = " SELECT id,oss_url AS ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND area_id=? AND create_time <=? AND status=1 AND oss_deleted<>1 ";
+        List<Map> list = jdbcTemplate.queryForList(sql,Map.class,tenantId,areaId,createTime);
+        return list;
+    }
+
+    @Override
+    public List<Map> getAAListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId, String areaId) {
+        String sql = " SELECT id,url FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND area_id=? AND create_time <=? AND aa_deleted<>1 ";
+        List<Map> list = jdbcTemplate.queryForList(sql,Map.class,tenantId,areaId,createTime);
+        return list;
+    }
+
+    @Override
+    public List<String> getOssAreaByCreateTimeAndTenantId(Date createTime, String tenantId) {
+        String sql = " SELECT DISTINCT area_id FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND create_time <=? AND status=1 AND oss_deleted<>1";
+        List<String> list = jdbcTemplate.queryForList(sql,String.class,tenantId,createTime);
+        return list;
+    }
+
+    @Override
+    public List<String> getAAAreaByCreateTimeAndTenantId(Date createTime, String tenantId) {
+        String sql = " SELECT DISTINCT area_id FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND create_time <=? AND aa_deleted<>1 ";
+        List<String> list = jdbcTemplate.queryForList(sql,String.class,tenantId,createTime);
+        return list;
+    }
+
+    @Override
+    public List<VoiceFileRecord> getListByCreateTimeAndTenantId(Date createTime, String tenantId) {
+        String hql = " from  VoiceFileRecord obj where obj.createTime<=?1 and obj.tenant.id=?2 ";
+        Page page = this.pageList(hql,1,20,createTime,tenantId);
+        List<VoiceFileRecord> list = new ArrayList<>();
+        while(page.getCurrentPageNo()<page.getTotalPageCount()){
+            list.addAll(page.getResult());
+            int index = Integer.valueOf(page.getCurrentPageNo()+"");
+            page = this.pageList(hql,index+1,20,createTime,tenantId);
+        }
+        return list;
+    }
+
 
 }

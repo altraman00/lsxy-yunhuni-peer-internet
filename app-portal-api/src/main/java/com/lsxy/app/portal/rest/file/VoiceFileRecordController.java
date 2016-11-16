@@ -6,6 +6,8 @@ import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.*;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.portal.VoiceFileRecordSyncEvent;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
@@ -44,6 +46,8 @@ public class VoiceFileRecordController extends AbstractRestController {
     MeetingMemberService meetingMemberService;
     @Reference(timeout=3000,check = false,lazy = true)
     private CallCenterConversationMemberService callCenterConversationMemberService;
+    @Autowired
+    MQService mqService;
     /**
      * 根据放音文件id删除放音文件
      * @param id
@@ -74,7 +78,7 @@ public class VoiceFileRecordController extends AbstractRestController {
         Tenant tenant = getCurrentAccount().getTenant();
         int result = voiceFileRecordService.batchDelete(appId,tenant.getId(),startTime,endTime);
         if(result>0){
-            List<VoiceFileRecord> list = voiceFileRecordService.list(appId,tenant.getId(),startTime,endTime);
+            List<VoiceFileRecord> list = voiceFileRecordService.getList(appId,tenant.getId(),startTime,endTime);
             //开始删除文件
             for(int i=0;i<list.size();i++){
                 boolean flag = false;
@@ -98,7 +102,7 @@ public class VoiceFileRecordController extends AbstractRestController {
     @RequestMapping("/batch/download")
     public RestResponse batchDownload(String appId,Date startTime,Date endTime){
         Tenant tenant = getCurrentAccount().getTenant();
-        List<VoiceFileRecord> list = voiceFileRecordService.list(appId,tenant.getId(),startTime,endTime);
+        List<VoiceFileRecord> list = voiceFileRecordService.getList(appId,tenant.getId(),startTime,endTime);
         //生成文件名 开始时间yyyyMMdd+结束时间yyyyMMdd+随机数(3位)+文件类型后缀
         String fileName = path+DateUtils.formatDate(startTime,"yyyyMMdd")+"-"+DateUtils.formatDate(endTime,"yyyyMMdd")+"-"+RandomNumberUtil.randomLong(3)+".zip";
         List<String> orgins = new ArrayList();
@@ -137,7 +141,33 @@ public class VoiceFileRecordController extends AbstractRestController {
         Page<VoiceFileRecord> page = voiceFileRecordService.pageList(pageNo,pageSize,appId,tenant.getId());
         return RestResponse.success(page);
     }
-
+    @RequestMapping("/file/download")
+    public RestResponse fileDownload(String id){
+        Tenant tenant = getCurrentAccount().getTenant();
+        VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(id);
+        if(tenant==null||voiceFileRecord==null||!tenant.getId().equals(voiceFileRecord.getTenantId())){
+            return RestResponse.failed("0000","验证失败，无法下载");
+        }
+        if(voiceFileRecord.getStatus()==1){
+            String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
+            return RestResponse.success(ossUri);
+        }
+        List<VoiceFileRecord> list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
+        if(list==null||list.size()==0){
+            return RestResponse.failed("0000","无对应的录音文件");
+        }
+        //先判断是否文件已上传，如果是的话，直接生成临时下载链接，否则
+        for(int i=0;i<list.size();i++){
+            VoiceFileRecord temp = list.get(i);
+            if(1!=temp.getStatus()){
+                //发起文件上传
+                mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(),voiceFileRecord.getAppId(),voiceFileRecord.getId(),VoiceFileRecordSyncEvent.TYPE_FILE));
+                return RestResponse.failed("0000","等待");
+            }
+        }
+        String ossUri = getOssTempUri(list.get(0).getOssUrl());
+        return RestResponse.success(ossUri);
+    }
     @RequestMapping("/cdr/download")
     public RestResponse cdrDownload(String id){
         Tenant tenant = getCurrentAccount().getTenant();
@@ -154,6 +184,8 @@ public class VoiceFileRecordController extends AbstractRestController {
             VoiceFileRecord voiceFileRecord = list.get(i);
             if(1!=voiceFileRecord.getStatus()){
                 //发起文件上传
+                mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(),voiceCdr.getAppId(),voiceCdr.getId(),VoiceFileRecordSyncEvent.TYPE_CDR));
+                return RestResponse.failed("0000","等待");
             }
         }
         String ossUri = getOssTempUri(list.get(0).getOssUrl());
@@ -170,23 +202,20 @@ public class VoiceFileRecordController extends AbstractRestController {
             if (ProductCode.sys_conf.getRemark().equals(p1.getRemark())) {
                 //获取会议操作者
                 MeetingMember meetingMember = meetingMemberService.findById(voiceCdr.getSessionId());
-                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId=?1 ";
                 //使用会议id
-                List list = (List) voiceFileRecordService.list(hql, meetingMember.getMeeting().getId());
+                List list = voiceFileRecordService.getListBySessionId(meetingMember.getMeeting().getId());
                 return list;
             }
             //自定义IVR
             else if (ProductCode.ivr_call.getRemark().equals(p1.getRemark())) {
-                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId=?1 ";
                 //使用ivr的id
-                List list = (List) voiceFileRecordService.list(hql, voiceCdr.getSessionId());
+                List list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
                 return list;
             }
             //语音回拔
             else if (ProductCode.duo_call.getRemark().equals(p1.getRemark())) {
-                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId=?1 ";
                 //使用双向回拨的id
-                List list = (List) voiceFileRecordService.list(hql, voiceCdr.getSessionId());
+                List list = voiceFileRecordService.getListBySessionId(voiceCdr.getSessionId());
                 return list;
             }
             //呼叫中心
@@ -203,9 +232,8 @@ public class VoiceFileRecordController extends AbstractRestController {
                         te += ",";
                     }
                 }
-                String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?)";
                 //使用ivr的id
-                List list = (List) voiceFileRecordService.list(hql, te);
+                List list = voiceFileRecordService.getListBySessionId( te);
                 return list;
             }
         }
