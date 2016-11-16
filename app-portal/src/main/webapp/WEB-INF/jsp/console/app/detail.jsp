@@ -14,7 +14,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print" id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
         <section id="content">
@@ -48,9 +48,10 @@
                 <aside>
                     <section class="vbox xbox">
                         <!-- 如果没有三级导航 这段代码注释-->
-                        <div class="head-box"><a href="#subNav" data-toggle="class:hide"> <i
-                                class="fa fa-angle-left text"></i> <i class="fa fa-angle-right text-active"></i> </a>
-                        </div>
+                        <div class="head-box"><a href="#subNav" data-toggle="class:hide">
+                            <i class=" iconfont icon-menu-left text"></i>
+                            <i class=" iconfont icon-menu-right text-active"></i>
+                        </a></div>
                         <div class="wrapper header">
                             <span class="border-left">&nbsp;应用详情</span>
                         </div>
@@ -59,125 +60,155 @@
                                 <div class="row m-l-none m-r-none bg-light lter">
                                     <div class="col-md-12 padder-v fix-padding">
                                         <a href="${ctx}/console/app/index?id=${app.id}" class="btn btn-primary query">应用编辑</a>
-                                    </div>
-                                </div>
-                            </section>
-                            <section class="panel panel-default pos-rlt clearfix appliaction-detail">
-                                <%--<div class="row ">--%>
-                                    <%--<div class="col-md-1 remove-padding width-130">--%>
-                                        <%--应用状态：--%>
-                                    <%--</div>--%>
-                                    <%--<div class="col-md-10 ">--%>
-                                        <%--<p>--%>
-                                            <%--<c:if test="${app.status==1}"><span class="success">已上线</span></c:if>--%>
-                                            <%--<c:if test="${app.status==2}"><span class="nosuccess">未上线</span></c:if>--%>
-                                        <%--</p>--%>
-                                    <%--</div>--%>
-                                <%--</div>--%>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-">
-                                        应用名称：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.name}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                            <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
-                                            <c:if test="${app.status==2}"><span style="color:#ff0000;">未上线</span></c:if>
-                                            <input type="hidden" id="appStatus" value="${app.status}">
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用标识：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.id}</p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用描述：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p><c:if test="${app.description==null||app.description==''}">无</c:if><c:if test="${app.description!=null}">${app.description}</c:if></p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        应用类型：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.type}</p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        所属行业：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>${app.industry}</p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">服务器白名单：</div>
-                                    <div class="col-md-10 ">
-                                        <p><c:if test="${app.whiteList==null||app.whiteList==''}">无</c:if><c:if test="${app.whiteList!=null}">${app.whiteList}</c:if></p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        监听通知：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p>
-                                            <c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if>
-                                            <c:if test="${app.isAuth!='1'}">没有启动监听</c:if>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        回调URL：
-                                    </div>
-                                    <div class="col-md-10 ">
-                                        <p><span style="color:#428bca;">${app.url}</span></p>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-1 remove-padding width-130">
-                                        绑定测试号：
-                                    </div>
-                                    <c:set var="tempTestNum" value="0"></c:set>
-                                    <c:forEach items="${testNumBindList}" var="testNumBind">
-                                        <c:if test="${testNumBind.app.id==app.id}">
-                                            <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
+                                        <c:if test="${app.serviceType=='call_center'}">
+                                            <%--<a href="" class="btn btn-call margin_left-20">呼叫中心管理</a>--%>
                                         </c:if>
-                                    </c:forEach>
-                                    <div class="col-md-3 " id="testNumBind"
-                                            <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
-                                                hidden
-                                            </c:if>
-                                    >
-                                        <c:forEach items="${testNumBindList}" var="testNumBind">
-                                            <c:if test="${testNumBind.app.id==app.id}">
-                                                <span name="testNum">${testNumBind.number} </span>
-                                            </c:if>
-                                        </c:forEach>
-                                    </div>
-
-                                    <div class="col-md-4 " >
-                                        <a
-                                                <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
-                                                    class="modalShow" data-id="one"
-                                                </c:if>
-                                                <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
-                                                    onclick="showTestNumBind()"
-                                                </c:if>
-                                        >绑定交互测试号</a>
                                     </div>
                                 </div>
-                                <div class="row border-block"></div>
                             </section>
+                                <!--新的应用详情-->
+                                <section class="panel panel-default pos-rlt clearfix appliaction-detail">
+                                    <div class="row">
+                                        <div class="col-md-6 remove-padding-left">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading"><i class="iconfont icon-call-base"></i><span class="title">基础信息</span></div>
+                                                <div class="panel-body basebox">
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            应用名称：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            ${app.name}
+                                                            <c:if test="${app.status==1}"><span style="color:#9dc940;">已上线</span></c:if>
+                                                            <c:if test="${app.status==2}"><span class="text-danger">未上线</span></c:if>
+                                                            <%--<input type="hidden" id="appStatus" value="${app.status}">--%>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            应用描述：
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <p><c:if test="${app.description==null||app.description==''}">无</c:if><c:if test="${app.description!=null}">${app.description}</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            应用类型：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>${app.type}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            所属行业：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>${app.industry}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 base">
+                                                            选择服务：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><c:if test="${app.serviceType=='call_center'}">呼叫中心</c:if>
+                                                                <c:if test="${app.serviceType=='voice'}">语音</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 remove-padding-left">
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading"><i class="iconfont icon-call-developer"></i><span class="title">开发者信息</span></div>
+                                                <div class="panel-body devbox">
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            应用标识：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>${app.id}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            服务器白名单：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><c:if test="${app.whiteList==null||app.whiteList==''}">无</c:if><c:if test="${app.whiteList!=null}">${app.whiteList}</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            监听通知：
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><c:if test="${app.isAuth=='1'}">启用监听    启用了鉴权</c:if>
+                                                                <c:if test="${app.isAuth!='1'}">没有启动监听</c:if></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            回调URL：
+                                                        </div>
+                                                        <div class="col-md-8 ">
+                                                            <p><span style="color:#428bca;">${app.url}</span></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row ">
+                                                        <div class="col-md-1 dev">
+                                                            绑定测试号：
+                                                        </div>
+                                                        <div class="col-md-8"> <span id="testNumBind"
+                                                                <c:if test="${testNumBindList==null || fn:length(testNumBindList)==0 || tempTestNum==0}">
+                                                                    hidden
+                                                                </c:if>>
+                                                            <c:set var="tempTestNum" value="0"></c:set>
+                                                            <c:forEach items="${testNumBindList}" var="testNumBind">
+                                                                <c:if test="${testNumBind.app.id==app.id}">
+                                                                    <c:set var="tempTestNum" value="${tempTestNum+1}"></c:set>
+                                                                </c:if>
+                                                            </c:forEach>
+                                                                <c:forEach items="${testNumBindList}" var="testNumBind">
+                                                                    <c:if test="${testNumBind.app.id==app.id}">
+                                                                        <span name="testNum">${testNumBind.number} </span>
+                                                                    </c:if>
+                                                                </c:forEach>
+                                                            </span>
+                                                                <a
+                                                                        <c:if test="${testNumBindList!=null && fn:length(testNumBindList)> 0}">
+                                                                            class="modalShow" data-id="one"
+                                                                        </c:if>
+                                                                        <c:if test="${testNumBindList==null || fn:length(testNumBindList)== 0}">
+                                                                            onclick="showTestNumBind()"
+                                                                        </c:if>
+                                                                >绑定交互测试号</a>
+                                                        </div>
+                                                    </div>
+                                                    <c:if test="${app.serviceType=='call_center'}">
+                                                    <div class="row">
+                                                        <div class="col-md-1 dev">
+                                                            分机接入信息：
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <p>${sipRegistrar}</p>
+                                                            <%--<c:forEach items="${appExtensionList}" var="appExtension">--%>
+                                                                <%--<c:if test="${appExtension.telenum==app.id}">--%>
+                                                                    <%--<p>${appExtension.telenum} </p>--%>
+                                                                <%--</c:if>--%>
+                                                            <%--</c:forEach>--%>
+                                                            <p class="text-danger">（上线后平台会重新分配分机接入信息）</p>
+                                                        </div>
+                                                    </div>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <!--新的应用详情结束-->
                             <section class="panel panel-default pos-rlt clearfix application-tab">
                                 <ul id="myTab" class="nav nav-tabs">
                                     <li class="active" data-id="play">
@@ -191,8 +222,7 @@
                                 <div id="myTabContent" class="tab-content" style="">
                                     <div class="tab-pane fade in active" id="play">
                                         <p class="application_info">
-                                            1、当您的应用需使用IVR服务时，请上传语音文件至放音媒体库，语音文件均需要审核<br/>
-                                            2、每个账号默认拥有200M的存储空间，多个应用共享，若有特殊需要增加容量请联系客户经理
+                                            当您的应用需要开通语音通知、自定义IVR或者云呼叫中心时，请上传语音文件至放音媒体库，语音文件均需要审核
                                         </p>
                                         <div class="form-group">
                                             <div class="col-md-3 remove-padding"><input type="text" class="form-control" placeholder="文件名" id="name"/></div>
@@ -426,12 +456,12 @@
                         showtoast("非常抱歉，本站的上传文件功能，暂时不支持IE9及以下的浏览器版本，请更换或者升级浏览器");
                     })
                 }
-                var appStatus = $("#appStatus").val();
-                if(appStatus == 2){
-                    $('#uploadButtonA').unbind("click").bind("click",function(){
-                        showtoast("请先上线应用");
-                    })
-                }
+//                var appStatus = $("#appStatus").val();
+//                if(appStatus == 2){
+//                    $('#uploadButtonA').unbind("click").bind("click",function(){
+//                        showtoast("请先上线应用");
+//                    })
+//                }
             }
             // 上传多个文件
             var cancelCancel=false;
@@ -453,8 +483,8 @@
                         var result=  re.test(filename);
                         if(result){
                             if(data.files[0].size <= (5* 1024 * 1024)) {
-                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
-                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
+//                                ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+//                                    if((response.data.fileTotalSize-response.data.fileRemainSize)>=data.files[0].size){
                                         ajaxsync(ctx + "/console/app/file/play/verify/name",{csrfParameterName:csrfToken,'appId':appId,'name':filename},function(response1){
                                             if(response1.data==0){
                                                 $('#progress').show();
@@ -484,11 +514,11 @@
                                                 });
                                             }
                                         },"post");
-                                    }else{
-                                        $('#progress').hide();
-                                        showtoast("存储空间不足，无法上传");
-                                    }
-                                },"post");
+//                                    }else{
+//                                        $('#progress').hide();
+//                                        showtoast("存储空间不足，无法上传");
+//                                    }
+//                                },"post");
                             }else{
                                 $('#progress').hide();
                                 showtoast("上传文件超过5M");
@@ -513,7 +543,7 @@
                         cancelCancel=true;
                         $('.modal-loadding').hide();
                         $('.modalCancel-app-up').click();
-                        fileTotalSoze();
+//                        fileTotalSoze();
                         upplay();
                     },
                     progressall: function (e, data) {
@@ -625,16 +655,16 @@
         var html  = "";
         //异步查询文件信息
 
-        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
-            if(response.success){
-                //添加加载文件信息
-                html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
-                html+='<p>--统计完成</p>';
-                $('#scrolldiv'+id).append(html);
-            }else{
-                showtoast(response.errorMsg);
-            }
-        },"post");
+//        ajaxsync(ctx + "/console/app/file/record/sum",{'appId':appId,'startTime':starttime,'endTime':endtime,csrfParameterName:csrfToken},function(response){
+//            if(response.success){
+//                //添加加载文件信息
+//                html  = '  <p>--共计  '+  response.data.total+'  个文件   '+resultFileSize(response.data.size )+'</p>';
+//                html+='<p>--统计完成</p>';
+//                $('#scrolldiv'+id).append(html);
+//            }else{
+//                showtoast(response.errorMsg);
+//            }
+//        },"post");
 
         //two 表示的是批量下载
         if(id=='two'){
@@ -802,7 +832,7 @@
                 ajaxsync(ctx + "/console/app/file/play/delete",{'id':id,csrfParameterName:csrfToken},function(response){
                     if(response.success){
                         showtoast("删除成功");
-                        fileTotalSoze();
+//                        fileTotalSoze();
                         $('#play-'+id).remove();
                         if(pagePlay){
                             pagePlay.count--;
@@ -871,9 +901,9 @@
     }
     var fileTotalSoze = function(){
 
-        ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
-            $('#voiceFilePlay').html("共计" + resultFileSize(response.data.fileTotalSize) + ",已占用" + resultFileSize(response.data.fileRemainSize)+ "");
-        },"post");
+//        ajaxsync(ctx + "/console/app/file/play/total",{csrfParameterName:csrfToken},function(response){
+//            $('#voiceFilePlay').html("共计" + resultFileSize(response.data.fileTotalSize) + ",已占用" + resultFileSize(response.data.fileRemainSize)+ "");
+//        },"post");
 
     };
     var resultFileSize = function(temp){
@@ -981,7 +1011,7 @@
         }
     });
 
-    fileTotalSoze();
+//    fileTotalSoze();
 </script>
 
 </body>

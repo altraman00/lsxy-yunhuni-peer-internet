@@ -34,14 +34,14 @@ public class OssFileController extends AbstractRestController {
         response.reset();
         response.setHeader("Content-Disposition", "attachment; filename="+addr);
         response.setContentType("application/octet-stream; charset=utf-8");
-        handle(response, uri);
+        handle(response,SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
     }
     @ApiOperation(value = "获取资源流")
     @RequestMapping(value = "/img" ,method = RequestMethod.GET)
     public void getImg(HttpServletResponse response, @RequestParam String uri){
 //        String type = uri.substring(uri.lastIndexOf(".")+1, uri.length());
 //        response.setContentType("image/"+ type); //必须设置ContentType为image/图片类型
-        handle(response, uri);
+        handle(response,SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
     }
 
     /**
@@ -49,11 +49,11 @@ public class OssFileController extends AbstractRestController {
      * @param response
      * @param uri
      */
-    private void handle(HttpServletResponse response, String uri) {
+    private void handle(HttpServletResponse response,String type, String uri) {
         InputStream in = null;
         ServletOutputStream out = null;
         try {
-            in = ossService.getFileStream(SystemConfig.getProperty("global.oss.aliyun.bucket"), uri);
+            in = ossService.getFileStream(type, uri);
             out = response.getOutputStream();
             byte[] buffer = new byte[4 * 1024];
             int length;
@@ -70,5 +70,10 @@ public class OssFileController extends AbstractRestController {
                 logger.error("文件流关闭异常",e);
             }
         }
+    }
+    @ApiOperation(value = "获取上传号码的excel模板")
+    @RequestMapping(value = "/telnum" ,method = RequestMethod.GET)
+    public void getNumber(HttpServletResponse response) {
+        handle(response,SystemConfig.getProperty("global.oss.aliyun.bucket")+"-open", "oc/files/telnum.xlsx");
     }
 }

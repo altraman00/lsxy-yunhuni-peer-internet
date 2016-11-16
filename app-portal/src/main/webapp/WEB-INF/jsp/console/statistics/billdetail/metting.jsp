@@ -14,7 +14,7 @@
     <section class='aside-section'>
         <section class="hbox stretch">
             <!-- .aside -->
-            <aside class="bg-Green lter aside hidden-print"  id="nav"><%@include file="/inc/leftMenu.jsp"%></aside>
+            <%@include file="/inc/leftMenu.jsp"%>
             <!-- /.aside -->
 
         <section id="content">
@@ -57,6 +57,11 @@
                                         <li>
                                             <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -114,12 +119,12 @@
                                                 <th colspan="6"><span class="p-money">总消费金额(元)：<fmt:formatNumber value="${sum_cost}" pattern="0.000"></fmt:formatNumber> 元</span></th>
                                             </tr>
                                             <tr>
-                                                <th>会议标识ID</th>
+                                                <th>会议标识</th>
                                                 <th>呼叫时间</th>
                                                 <th>参与者</th>
                                                 <th>参与类型</th>
-                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                                 <th>时长（秒）</th>
+                                                <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -137,12 +142,12 @@
                                                         <c:if test="${result.joinType == 1}">邀请加入</c:if>
                                                         <c:if test="${result.joinType == 2}">呼入加入</c:if>
                                                     </td>
+                                                    <td>${result.costTimeLong}</td>
                                                     <td>
                                                         <span style="float:left;width: 80px" ><span style="float:right;" >
                                                         ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
                                                         </span></span>
                                                     </td>
-                                                    <td>${result.costTimeLong}</td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>

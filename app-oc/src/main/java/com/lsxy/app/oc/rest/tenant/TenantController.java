@@ -1,8 +1,12 @@
 package com.lsxy.app.oc.rest.tenant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.oc.rest.dashboard.vo.ConsumeAndurationStatisticVO;
 import com.lsxy.app.oc.rest.tenant.vo.*;
+import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.AppExtensionService;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.*;
@@ -12,6 +16,7 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mail.MailConfigNotEnabledException;
 import com.lsxy.framework.mail.MailContentNullException;
 import com.lsxy.framework.mq.api.MQService;
@@ -21,6 +26,7 @@ import com.lsxy.yunhuni.api.apicertificate.model.ApiCertificate;
 import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -31,7 +37,7 @@ import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.recharge.service.RechargeService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
-import com.lsxy.yunhuni.api.statistics.model.ConsumeMonth;
+import com.lsxy.yunhuni.api.statistics.model.*;
 import com.lsxy.yunhuni.api.statistics.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,15 +49,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
 
 /**
  * Created by Administrator on 2016/8/10.
@@ -123,7 +130,17 @@ public class TenantController {
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
+    @Reference(timeout = 3000,check = false,lazy = true)
+    CallCenterService callCenterService;
+    @Reference(timeout = 3000,check = false,lazy = true)
+    AppExtensionService appExtensionService;
 
+    @RequestMapping(value = "/list",method = RequestMethod.GET)
+    @ApiOperation(value = "获取全部数据")
+    public RestResponse pList(){
+        List list= (List)tenantService.list();
+        return RestResponse.success(list);
+    }
     @ApiOperation(value = "租户列表")
     @RequestMapping(value = "/tenants",method = RequestMethod.GET)
     public RestResponse tenants(
@@ -160,7 +177,12 @@ public class TenantController {
                     TenantVO tenantVO = new TenantVO();
                     BeanUtils.copyProperties(tenantVO, temp.get(i));
                     BigDecimal bigDecimal = calBillingService.getBalance(tenantVO.getId());
+                    DayStatics currentStatics = calBillingService.getCurrentStatics(tenantVO.getId());
                     tenantVO.setRemainCoin(bigDecimal.doubleValue());
+                    tenantVO.setCostCoin(currentStatics.getConsume());
+                    tenantVO.setTotalCoin(currentStatics.getRecharge());
+                    tenantVO.setSessionCount(currentStatics.getCallSum());
+                    tenantVO.setSessionTime(currentStatics.getCallCostTime()/60);
                     list1.add(tenantVO);
                 }
             }
@@ -773,7 +795,24 @@ public class TenantController {
         TenantAppVO vo = new TenantAppVO(app);
         List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
+        AreaSip areaSip = app.getAreaSip();
+        if(areaSip!=null){
+            vo.setSipRegistrar(app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
+        }else{
+            vo.setSipRegistrar("");
+        }
         return RestResponse.success(vo);
+    }
+    @ApiOperation(value = "获取租户的app信息下的分机")
+    @RequestMapping(value="/tenants/{tenant}/app/extension/{appId}",method = RequestMethod.GET)
+    public RestResponse appExtension(@PathVariable String tenant,@PathVariable String appId) {
+        App app = appService.findById(appId);
+        if(app == null || app.getTenant() == null ||
+                !app.getTenant().getId().equals(tenant)){
+            return RestResponse.success(null);
+        }
+        List<AppExtension> appExtensions = appExtensionService.findByAppId(appId);
+        return RestResponse.success(appExtensions);
     }
 
     @ApiOperation(value = "获取租户的app放音文件列表")
@@ -1018,5 +1057,150 @@ public class TenantController {
         }
 
     }
+    @ApiOperation(value = "用户中心的应用的当月呼叫中心统计数据")
+    @RequestMapping(value = "/tenants/{id}/call_center/current",method = RequestMethod.GET)
+    public RestResponse getCallCenterByCurrent(
+            @ApiParam(name = "id",value="租户id")@PathVariable String id,
+            @ApiParam(name = "appId",value="应用id")@RequestParam(required = false) String appId
+    ){
+        Map map = new HashMap<>();
+        map.put("callIn","100");//呼入量
+        map.put("callOut","100");//呼出量
+        map.put("transferSuccess","100");//转接成功
+        map.put("formTime","1000");//排队时间
+        map.put("callTime","1000");//平均通话时长
+        map.put("callFail","1000");//呼入流失率
+        return RestResponse.success(map);
+    }
+    @ApiOperation(value = "用户中心的应用的呼叫中心统计数据")
+    @RequestMapping(value = "/tenants/{id}/call_center",method = RequestMethod.GET)
+    public RestResponse getCallCenterByType(
+            @ApiParam(name = "id",value="租户id")@PathVariable String id,
+            @ApiParam(name = "appId",value="应用id")@RequestParam(required = false) String appId,
+            @ApiParam(name = "type",value="amongCall=拨打次数;amongCostTime=通话时间")@RequestParam String type,
+            @ApiParam(name = "timeType",value="时间类型 年year 月month ")@RequestParam String timeType,
+            @ApiParam(name = "time",value="时间")@RequestParam String time
+    ){
+        if(StringUtils.isNotEmpty(appId)) {
+            App app = appService.findById(appId);
+            if (app == null || StringUtils.isEmpty(id) || !app.getTenant().getId().equals(id)) {
+                return RestResponse.failed("0000", "租户id或者应用id错误");
+            }
+        }
+        if(StringUtils.isEmpty(time)){
+            return RestResponse.failed("0000","时间不能为空");
+        }
+        if(StringUtils.isEmpty(type)||!("amongCall".equals(type)||"amongCostTime".equals(type))){
+            return RestResponse.failed("0000","类型错误");
+        }
+        Date date1 = null;
+        Date date2 = null;
+        List tempVoiceCdrList = null;
+        Object date = 12;
+        if("year".equals(timeType)){
+            try{
+                date1 = DateUtils.parseDate(time,"yyyy");
+                date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(time)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
+                tempVoiceCdrList =  voiceCdrMonthService.list(id,  appId,  App.PRODUCT_CALL_CENTER,  date1,  date2 );
+            }catch (Exception e){
+                return RestResponse.failed("0000","日期格式错误");
+            }
+        }else if("month".equals(timeType)){
+            try{
+                date1 = DateUtils.parseDate(time,"yyyy-MM");
+                date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(time,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
+                tempVoiceCdrList =  voiceCdrDayService.list(id,  appId,  App.PRODUCT_CALL_CENTER,  date1,  date2 );
+                date = date1;
+            }catch (Exception e){
+                return RestResponse.failed("0000","日期格式错误");
+            }
+        }else{
+            return RestResponse.failed("0000","日期类型错误");
+        }
+        List list = new ArrayList();
+        list.add(getArrays(tempVoiceCdrList,date,type));
+        return RestResponse.success(list);
+    }
+    @ApiOperation(value = "用户中心的应用的呼叫中心记录明细")
+    @RequestMapping(value = "/tenants/{id}/call_center/detail",method = RequestMethod.GET)
+    public RestResponse getCallCenterByTenantAndApp(
+            @ApiParam(name = "id",value="租户id")@PathVariable String id,
+            @ApiParam(name = "appId",value="应用id")@RequestParam(required = false) String appId,
+            @ApiParam(name = "startTime",value="开始时间")@RequestParam String startTime,
+            @ApiParam(name = "endTime",value="开始时间")@RequestParam String endTime,
+            @ApiParam(name = "pageNo",value="第几页")@RequestParam(defaultValue = "1") Integer pageNo,
+            @ApiParam(name = "pageSize",value="每页记录数")@RequestParam(defaultValue = "20") Integer pageSize,
+            @ApiParam(name = "type",value="1呼入2呼出")@RequestParam(required = false) String type,
+            @ApiParam(name = "callnum",value="手机号码")@RequestParam(required = false) String callnum,
+            @ApiParam(name = "agent",value="坐席")@RequestParam(required = false) String agent
+    ){
+        if(StringUtils.isNotEmpty(appId)) {
+            App app = appService.findById(appId);
+            if (app == null || StringUtils.isEmpty(id) || !app.getTenant().getId().equals(id)) {
+                return RestResponse.failed("0000", "租户id或者应用id错误");
+            }
+        }
+        try{
+            DateUtils.parseDate(startTime,"yyyy-MM-dd");
+            DateUtils.parseDate(endTime,"yyyy-MM-dd");
+            startTime += " 00:00:00";
+            endTime += " 23:59:59";
+        }catch (Exception e){
+            return RestResponse.failed("0000","返回日期类型错误");
+        }
+        Page<CallCenter> page =  callCenterService.pList( pageNo,pageSize, id, appId, startTime, endTime, type,callnum, agent);
+        Map sum = callCenterService.sum(id,appId,startTime,endTime,type,callnum,agent);
+        Map map = new HashMap<>();
+        map.put("page",page);
+        map.put("sum",sum);
+        return RestResponse.success(map);
+    }
 
+
+    private int getLong(Object obj){
+        int r = 0;
+        if (obj instanceof Date) {
+            r = Integer.valueOf(DateUtils.getLastDate((Date)obj).split("-")[2]);
+        } else if (obj instanceof Integer) {
+            r =Integer.valueOf((Integer)obj);
+        }
+        return r;
+    }
+    /**
+     * 获取列表数据
+     * @param list 待处理的list
+     * @return
+     */
+    private Object[] getArrays(List list,Object date,String type) {
+        int leng = getLong(date);
+        Object[] list1 = new Object[leng];
+        for(int j=0;j<leng;j++){
+            list1[j]=0;
+        }
+        for(int i=0;i<list.size();i++){
+            Object obj = list.get(i);
+            if(obj instanceof ConsumeMonth){
+                list1[((ConsumeMonth)obj).getMonth()-1]= StringUtil.getDecimal(((ConsumeMonth)obj).getAmongAmount().toString(),3);
+            }else if(obj instanceof VoiceCdrMonth){
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrMonth)obj).getMonth()-1]=((VoiceCdrMonth)obj).getAmongCall();
+                }
+            }else if(obj instanceof ConsumeDay){
+                list1[((ConsumeDay)obj).getDay()-1]=StringUtil.getDecimal(((ConsumeDay)obj).getAmongAmount().toString(),3);
+            }else if(obj instanceof VoiceCdrDay){
+                if("amongCostTime".equals(type)){
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCostTime()/60;
+                }else if("amongCall".equals(type)) {
+                    list1[((VoiceCdrDay)obj).getDay()-1]=((VoiceCdrDay)obj).getAmongCall();
+                }
+            }else if(obj instanceof ApiCallDay){
+                list1[((ApiCallDay)obj).getDay()-1]=((ApiCallDay)obj).getAmongApi();
+            }else if(obj instanceof ApiCallMonth){
+                list1[((ApiCallMonth) obj).getMonth()-1]=((ApiCallMonth)obj).getAmongApi();
+            }
+        }
+        return list1;
+    }
 }

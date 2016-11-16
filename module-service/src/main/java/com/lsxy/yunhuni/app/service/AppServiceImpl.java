@@ -7,16 +7,18 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by liups on 2016/6/29.
@@ -49,6 +51,14 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     public List<App> findAppByUserName(String tenantId){
         String hql = "from App obj where obj.tenant.id=?1 order by obj.status";
         List<App> list = this.findByCustomWithParams(hql, tenantId);
+
+        return list;
+    }
+
+    @Override
+    public List<App> findAppByUserNameAndServiceType(String tenantId, String serviceType) {
+        String hql = "from App obj where obj.tenant.id=?1 and obj.serviceType=?2 order by obj.status";
+        List<App> list = this.findByCustomWithParams(hql, tenantId,serviceType);
 
         return list;
     }
@@ -97,21 +107,13 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         if(tenantId == null){
             throw new IllegalArgumentException();
         }
-        String hql = "from App obj where deleted != 1 and obj.tenant.id=?1 order by obj.status";
+        String hql = "from App obj where obj.tenant.id=?1 order by obj.status";
         List<App> list = this.findByCustomWithParams(hql, tenantId);
         return list;
     }
-
     @Override
-    public String findOneAvailableTelnumber(App app) {
-        if(app.getIsIvrService()==1){
-            List<ResourcesRent> resourcesRents = resourcesRentService.findByAppId(app.getId());
-            ResourcesRent resourcesRent = resourcesRents.get(0);
-            return resourcesRent.getResData();
-        }else{
-            return resourceTelenumService.findOneFreeNumber(app.getArea().getId());
-        }
+    public String findAppSipRegistrar(String appId) {
+        //TODO 分机注册信息
+        return "待实现";
     }
-
-
 }

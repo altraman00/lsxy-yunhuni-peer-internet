@@ -13,8 +13,12 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.Area;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
+import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +50,8 @@ public class AppController extends AbstractRestController {
     private OSSService ossService;
     @Autowired
     private MQService mqService;
+    @Autowired
+    private AreaSipService areaSipService;
     /**
      * 根据应用名字查找应用数
      * @param name 应用名字
@@ -56,13 +62,24 @@ public class AppController extends AbstractRestController {
         long re = appService.countByTenantIdAndName(getCurrentAccount().getTenant().getId(),name);
         return RestResponse.success(re);
     }
+
+    @RequestMapping("/get/sipregistrar/{appId}")
+    public RestResponse getSipregistrar(@PathVariable String appId){
+        String sipRegistrar = appService.findAppSipRegistrar(appId);
+        return RestResponse.success(sipRegistrar);
+    }
     /**
      * 查找当前用户的应用
      * @throws Exception
      */
     @RequestMapping("/list")
-    public RestResponse listApp() throws Exception{
-        List<App> apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
+    public RestResponse listApp(String serviceType) throws Exception{
+        List<App> apps = null;
+        if(StringUtils.isNotEmpty(serviceType)) {
+            apps = appService.findAppByUserNameAndServiceType(getCurrentAccount().getTenant().getId(),serviceType);
+        }else{
+            apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
+        }
         return RestResponse.success(apps);
     }
 
@@ -152,6 +169,13 @@ public class AppController extends AbstractRestController {
         String userName = getCurrentAccountUserName();
         Tenant tenant = tenantService.findTenantByUserName(userName);
         app.setTenant(tenant);
+        String areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
+        //应用新建 时落到测试区域，并指定一个sip接入点
+        Area area = new Area();
+        area.setId(areaId);
+        app.setArea(area);
+        AreaSip areaSip = areaSipService.getOneAreaSipByAreaId(areaId);
+        app.setAreaSip(areaSip);
         app = appService.save(app);
         return RestResponse.success(app);
     }

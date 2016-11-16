@@ -18,14 +18,33 @@ import javax.persistence.*;
 public class VoiceFileRecord extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属应用
+    private String areaId; //录音所在区域
     private String name;//文件名 生成规则uuid
     private String url;//录音文件URL
     private String ossUrl;//录音文件URL
     private Long duration;//时长
     private Long size;//文件大小
-    private String sessionId;//所属会话 会议、双向回拔或ivr的ID
+    private String sessionId;//所属会话 会议-id双向回拔-idivr id呼叫中心-交谈id
     private String sessionCode;//会话类型
-    private Integer status; //状态
+    private Integer status; //文件是否已同步:1已同步0未同步-1同步失败
+    private Integer ossDeleted;//oss文件删除状态 1 已删除，-1删除失败
+    private Integer aaDeleted;//区域文件删除状态 1 已删除，-1删除失败
+    @Column(name="oss_deleted")
+    public Integer getOssDeleted() {
+        return ossDeleted;
+    }
+
+    public void setOssDeleted(Integer ossDeleted) {
+        this.ossDeleted = ossDeleted;
+    }
+    @Column(name="aa_deleted")
+    public Integer getAaDeleted() {
+        return aaDeleted;
+    }
+
+    public void setAaDeleted(Integer aaDeleted) {
+        this.aaDeleted = aaDeleted;
+    }
 
     @Column(name="tenant_id")
     public String getTenantId() {
@@ -43,6 +62,15 @@ public class VoiceFileRecord extends IdEntity {
 
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    @Column(name="area_id")
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
     }
 
     @Column(name="url")

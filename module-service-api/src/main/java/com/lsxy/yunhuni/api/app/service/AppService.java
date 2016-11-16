@@ -3,6 +3,7 @@ package com.lsxy.yunhuni.api.app.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
 import java.util.List;
@@ -19,7 +20,12 @@ public interface AppService extends BaseService<App> {
      * @return
      */
     List<App> findAppByUserName(String tenantId)  ;
-
+    /**
+     * 获取记录的集合
+     * @param tenantId 租户id
+     * @return
+     */
+    List<App> findAppByUserNameAndServiceType(String tenantId,String serviceType)  ;
     /**
      * 获取分页信息
      * @param tenantId 租户id
@@ -64,10 +70,11 @@ public interface AppService extends BaseService<App> {
      */
     List<App> getAppsByTenantId(String tenantId);
 
+
     /**
-     * 用于呼叫号码选择，有ivr号码则选择绑定的ivr号码，没有则随便给一个可以用的
-     * @param app
+     * 获取分机注册信息
+     * @param appId
      * @return
      */
-    String findOneAvailableTelnumber(App app);
+    String findAppSipRegistrar(String appId);
 }

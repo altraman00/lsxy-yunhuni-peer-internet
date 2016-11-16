@@ -73,4 +73,10 @@ public interface VoiceFilePlayService extends BaseService<VoiceFilePlay> {
      * @return
      */
     List<VoiceFilePlay> findByFileName(String tenantId, String appId, String name);
+
+    /**
+     * 将同步状态更新为
+     * @param appId
+     */
+    void renewSyncByAppId(String appId);
 }
