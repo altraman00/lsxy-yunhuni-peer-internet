@@ -29,4 +29,6 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
     Page getPage(String appId, String channel, Integer pageNo, Integer pageSize) throws YunhuniApiException;
 
     void extension(String appId, String channel, String agentName,String extensionId) throws YunhuniApiException;
+
+    void state(String appId, String channel, String agentName, String state) throws YunhuniApiException;
 }

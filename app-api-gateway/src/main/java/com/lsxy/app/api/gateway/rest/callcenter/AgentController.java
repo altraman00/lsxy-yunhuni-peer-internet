@@ -9,6 +9,7 @@ import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,30 @@ public class AgentController extends AbstractAPIController {
         return ApiGatewayResponse.success();
     }
 
+    @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/state",method = RequestMethod.POST)
+    public ApiGatewayResponse state(HttpServletRequest request, @RequestHeader("AppID") String appId,
+                                        @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
+        String state = (String) map.get("state");
+        String channel = (String) map.get("channel");
+        //TODO 校验数据有效性
+        if(StringUtils.isBlank(state)){
+            throw new RuntimeException("状态不能为空");
+        }
+        callCenterAgentService.state(appId,channel,agentName,state);
+        return ApiGatewayResponse.success();
+    }
 
+    @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/skills",method = RequestMethod.POST)
+    public ApiGatewayResponse skills(HttpServletRequest request, @RequestHeader("AppID") String appId,
+                                    @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
+        String state = (String) map.get("state");
+        String channel = (String) map.get("channel");
+        //TODO 校验数据有效性
+        if(StringUtils.isBlank(state)){
+            throw new RuntimeException("状态不能为空");
+        }
+        callCenterAgentService.state(appId,channel,agentName,state);
+        return ApiGatewayResponse.success();
+    }
 
 }

@@ -194,7 +194,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             String agentId = agent.getId();
             String state = agentState.getState(agentId);
 
-            if(StringUtils.isNotBlank(state) && (state.contains("fetching")||state.contains("talking"))){
+            if(StringUtils.isNotBlank(state) && (state.contains(AgentState.Model.STATE_FETCHING)||state.contains(AgentState.Model.STATE_TALKING))){
                 if(force){
                     //TODO 切断平台和座席之间的呼叫
                 }else{
@@ -239,16 +239,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         agentState.setLastRegTime(agent.getId(),System.currentTimeMillis());
     }
 
-    //设置坐席状态
-    public boolean setState(String id,String state){
-        CallCenterAgent agent = this.findById(id);
-        if(agent == null){
-            return true;
-        }
-        //TODO 设置坐席的状态
-        this.save(agent);
-        return true;
-    }
     //技能迁入迁出
     @Override
     public boolean checkInSkill(String agent,String skillName,Boolean enable){
@@ -347,6 +337,36 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             agentState.setExtension(agent.getId(),extensionId);
         }finally {
             extensionLock.unlock();
+        }
+
+    }
+
+    @Override
+    public void state(String appId, String channel, String agentName, String state) throws YunhuniApiException{
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
+        if(agent == null){
+            //TODO 座席不存在
+            throw new RequestIllegalArgumentException();
+        }
+
+        AgentLock agentLock = new AgentLock(redisCacheService, agent.getId());
+        boolean lock = agentLock.lock();
+        if(!lock){
+            //获取锁失败
+            throw new ExtensionBindingToAgentException();
+        }
+        try{
+            String curState = agentState.getState(agent.getId());
+            if(curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING)){
+                //TODO 座席正忙
+                throw new RuntimeException("座席正忙");
+            }
+            agentState.setState(agent.getId(),state);
+            if(state.contains(AgentState.Model.STATE_IDLE)){
+                //TODO 找排队事件
+            }
+        }finally {
+            agentLock.unlock();
         }
 
     }
