@@ -176,7 +176,6 @@
 <script type="text/javascript" >
     function appSubmit(appId){
         $('#appId').val(appId);
-        alert(appId)
         $('#mainForm').submit();
     }
     function downVoid(id) {
