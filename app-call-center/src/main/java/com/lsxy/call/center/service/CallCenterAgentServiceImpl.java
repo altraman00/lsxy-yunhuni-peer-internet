@@ -285,9 +285,12 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             throw new RequestIllegalArgumentException();
         }
         AgentState.Model model = agentState.get(agent.getId());
+        //状态
         agent.setState(model.getState());
+        //分机
         agent.setExtension(model.getExtension());
         List<AgentSkill> skills = agentSkillService.findAllByAgent(agent.getId());
+        //技能
         agent.setSkills(skills);
         return agent;
     }
@@ -298,8 +301,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.channel=?2";
         Page page = this.pageList(hql, pageNo, pageSize, appId);
         List<CallCenterAgent> result = page.getResult();
+        //将所有座席ID放入集合中
         result.parallelStream().forEach(agent ->agentIds.add(agent.getId()));
+        //查询这些座席的技能
         List<AgentSkill> skills = agentSkillService.findAllByAgents(agentIds);
+        //分组这些技能，以座席Id为key放入Map中
         Map<String, List<AgentSkill>> collect = skills.parallelStream().collect(Collectors.groupingBy(AgentSkill::getAgent, Collectors.toList()));
         result.parallelStream().forEach(agent -> {
             AgentState.Model model = agentState.get(agent.getId());
@@ -344,6 +350,5 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
 
     }
-
 
 }
