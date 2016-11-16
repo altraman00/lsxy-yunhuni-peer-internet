@@ -112,5 +112,12 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/cdr/download?id={1}";
         return RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
     }
+    @RequestMapping("/file/download/{id}")
+    @ResponseBody
+    public RestResponse fileDownload(HttpServletRequest request, @PathVariable String id){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/file/download?id={1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
+    }
 
 }

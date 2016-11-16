@@ -22,6 +22,7 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @return
      */
     Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize, String appId, String tenantId);
+    Page<Map> getPageList(Integer pageNo, Integer pageSize, String appId, String tenantId, String type,Date start, Date end);
 
     /**
      * 统计存储文件
@@ -29,7 +30,7 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @param tenantId
      * @return
      */
-    Map sumAndCount(String appId, String tenantId, Date startTime,Date endTime);
+    Map sumAndCount(String appId, String tenantId,String type,Date start,Date end);
     /**
      * 批量更新删除状态为删除
      * @param appid
