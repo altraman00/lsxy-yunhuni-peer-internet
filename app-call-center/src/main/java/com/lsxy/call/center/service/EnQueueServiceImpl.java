@@ -1,18 +1,20 @@
 package com.lsxy.call.center.service;
 
-import com.lsxy.call.center.api.model.CallCenterQueue;
-import com.lsxy.call.center.api.model.Channel;
-import com.lsxy.call.center.api.model.Condition;
-import com.lsxy.call.center.api.model.EnQueue;
-import com.lsxy.call.center.api.service.CallCenterQueueService;
-import com.lsxy.call.center.api.service.ChannelService;
-import com.lsxy.call.center.api.service.ConditionService;
-import com.lsxy.call.center.api.service.EnQueueService;
+import com.lsxy.call.center.api.model.*;
+import com.lsxy.call.center.api.service.*;
+import com.lsxy.call.center.states.lock.AgentLock;
+import com.lsxy.call.center.states.state.AgentState;
+import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import java.util.Date;
 @Service
 @com.alibaba.dubbo.config.annotation.Service
 public class EnQueueServiceImpl implements EnQueueService{
+
+    private static final Logger logger = LoggerFactory.getLogger(EnQueueServiceImpl.class);
 
     @Autowired
     private ChannelService channelService;
@@ -38,6 +42,12 @@ public class EnQueueServiceImpl implements EnQueueService{
     private RedisCacheService redisCacheService;
 
     @Autowired
+    private DeQueueService deQueueService;
+
+    @Autowired
+    private AgentState agentState;
+
+    @Autowired
     private CAs cAs;
 
     @Autowired
@@ -45,6 +55,9 @@ public class EnQueueServiceImpl implements EnQueueService{
 
     @Autowired
     private CQs cQs;
+
+    @Autowired
+    private MQService mqService;
 
     /**
      * 排队,通过 dubbo返回结果给  区域管理器
@@ -55,43 +68,98 @@ public class EnQueueServiceImpl implements EnQueueService{
      */
     @Override
     public void lookupAgent(String tenantId, String appId,String num, String callId, EnQueue enQueue){
-        if(tenantId == null){
-            throw new IllegalArgumentException("tenantId 不能为null");
+        CallCenterQueue queue = null;
+        try{
+            if(tenantId == null){
+                throw new IllegalArgumentException("tenantId 不能为null");
+            }
+            if(appId == null){
+                throw new IllegalArgumentException("appId 不能为null");
+            }
+            if(callId == null){
+                throw new IllegalArgumentException("callId 不能为null");
+            }
+            if(enQueue == null){
+                throw new IllegalArgumentException("enQueue 不能为null");
+            }
+            Channel channel = channelService.findOne(tenantId,appId,enQueue.getChannel());
+            if(channel == null){
+                throw new IllegalArgumentException("通道不存在");
+            }
+            String conditionId = enQueue.getRoute().getCondition().getId();
+            Condition condition = conditionService.findOne(tenantId,appId,conditionId);
+            if(condition == null){
+                throw new IllegalArgumentException("条件不存在");
+            }
+            if(!condition.getChannelId().equals(channel.getAppId())){
+                throw new IllegalArgumentException("条件-通道不匹配");
+            }
+            //创建排队记录
+            queue = new CallCenterQueue();
+            queue.setTenantId(tenantId);
+            queue.setAppId(appId);
+            queue.setCondition(conditionId);
+            queue.setStartTime(new Date());
+            //TODO 这个id 存啥
+            queue.setRelevanceId("");
+            queue.setNum(num);
+            queue.setOriginCallId(callId);
+            queue = callCenterQueueService.save(queue);
+            //lua脚本找坐席
+            String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,4,
+                    CAs.getKey(condition.getId()),AgentState.getPrefixed(),
+                    ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
+                    ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
+                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING
+
+            );
+            if(StringUtil.isEmpty(agent)){
+                //没有找到可用坐席
+                cQs.add(conditionId,queue.getId());
+                mqService.publish(new EnqueueTimeoutEvent(conditionId,queue.getId(),
+                        tenantId,appId,callId,condition.getQueueTimeout()));
+                String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,4,
+                        CAs.getKey(condition.getId()),AgentState.getPrefixed(),
+                        ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
+                        ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
+                        AgentState.Model.STATE_IDLE
+                );
+                if(StringUtil.isNotEmpty(agent_idle)){
+                    lookupQueue(tenantId,appId,conditionId,agent_idle);
+                }
+            }else{
+                //找到坐席修改排队状态
+                try{
+                    queue.setResult("select");
+                    queue.setEndTime(new Date());
+                    queue.setAgent(agent);
+                    callCenterQueueService.save(queue);
+                }catch (Throwable t){
+                    logger.info("修改排队状态失败",t);
+                }
+                try{
+                    EnQueueResult result = new EnQueueResult();
+                    deQueueService.success(tenantId,appId,callId,result);
+                }catch (Throwable t1){
+                    try{
+                        agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                    }catch (Throwable t2){
+                        logger.info("",t2);
+                    }
+                    throw t1;
+                }
+            }
+        }catch (Throwable e){
+            logger.error("排队找坐席出错",e);
+            try{
+                queue.setResult("fail");
+                queue.setEndTime(new Date());
+                callCenterQueueService.save(queue);
+            }catch (Throwable t){
+                logger.info("修改排队状态失败",t);
+            }
+            deQueueService.fail(tenantId,appId,callId,e.getMessage());
         }
-        if(appId == null){
-            throw new IllegalArgumentException("appId 不能为null");
-        }
-        if(callId == null){
-            throw new IllegalArgumentException("callId 不能为null");
-        }
-        if(enQueue == null){
-            throw new IllegalArgumentException("enQueue 不能为null");
-        }
-        Channel channel = channelService.findOne(tenantId,appId,enQueue.getChannel());
-        if(channel == null){
-            throw new IllegalArgumentException("通道不存在");
-        }
-        String conditionId = enQueue.getRoute().getCondition().getId();
-        Condition condition = conditionService.findOne(tenantId,appId,conditionId);
-        if(condition == null){
-            throw new IllegalArgumentException("条件不存在");
-        }
-        if(!condition.getChannelId().equals(channel.getAppId())){
-            throw new IllegalArgumentException("条件-通道不匹配");
-        }
-        //创建排队记录
-        CallCenterQueue queue = new CallCenterQueue();
-        queue.setTenantId(tenantId);
-        queue.setAppId(appId);
-        queue.setCondition(conditionId);
-        queue.setStartTime(new Date());
-        //TODO 这个id 存啥
-        queue.setRelevanceId("");
-        queue.setNum(num);
-        queue.setOriginCallId(callId);
-        callCenterQueueService.save(queue);
-        //lua脚本
-        String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,1,"");
     }
 
     /**

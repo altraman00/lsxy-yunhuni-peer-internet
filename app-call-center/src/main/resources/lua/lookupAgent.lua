@@ -6,6 +6,8 @@ local agent_lock_key_prefix = KEYS[4]
 
 local agent_reg_expire = tonumber(ARGV[1])
 local cur_time = tonumber(ARGV[2])
+local idle = ARGV[3]
+local fetching = ARGV[4]
 local result
 
 local cas = redis.call('ZREVRANGE',cAs_key,0,-1)
@@ -34,7 +36,7 @@ for i=1,cas_size do
 	redis.log(redis.LOG_WARNING,agent['state'])
 	redis.log(redis.LOG_WARNING,agent['extension'])
 	redis.log(redis.LOG_WARNING,agent['lastRegTime'])
-	if(agent and agent['state'] == 'IDLE'
+	if(agent and agent['state'] == idle
 		and agent['extension'] and agent['lastRegTime']
 			and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
 	then
@@ -49,7 +51,7 @@ for i=1,cas_size do
 			redis.log(redis.LOG_WARNING,ok)
 			if ok == 1 then
 				redis.call('EXPIRE', agent_lock_key_prefix..agent_id, '60')
-				redis.call('HSET',agent_state_key_prefix..agent_id,'state','BUSY')
+				redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
 				result = agent_id
 				break
 			end
