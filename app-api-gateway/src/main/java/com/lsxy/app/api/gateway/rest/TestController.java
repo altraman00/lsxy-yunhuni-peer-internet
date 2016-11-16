@@ -37,7 +37,7 @@ public class TestController {
     @Reference(timeout = 3000,check = false,lazy = true)
     private TestService testService;
 
-    @Reference(timeout = 3000,check = false)
+    @Reference(timeout = 3000,check = false,lazy = true)
     private CallService callService;
 
     @Autowired(required = false)
