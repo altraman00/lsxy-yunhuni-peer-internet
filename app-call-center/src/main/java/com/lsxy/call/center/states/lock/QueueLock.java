@@ -13,7 +13,11 @@ public class QueueLock extends DistributeLock {
         return PREFIXED;
     }
 
+    public static String getKey(String queueId){
+        return PREFIXED + queueId;
+    }
+
     public QueueLock(RedisCacheService redis, String queueId){
-        super(redis,PREFIXED+queueId);
+        super(redis,getKey(queueId));
     }
 }

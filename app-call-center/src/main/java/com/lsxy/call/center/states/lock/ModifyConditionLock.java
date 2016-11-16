@@ -14,7 +14,11 @@ public class ModifyConditionLock extends DistributeLock {
         return PREFIXED;
     }
 
-    public ModifyConditionLock(RedisCacheService redis, String agentId){
-        super(redis,PREFIXED+agentId,1800);
+    public static String getKey(String conditionId){
+        return PREFIXED + conditionId;
+    }
+
+    public ModifyConditionLock(RedisCacheService redis, String conditionId){
+        super(redis,getKey(conditionId),1800);
     }
 }

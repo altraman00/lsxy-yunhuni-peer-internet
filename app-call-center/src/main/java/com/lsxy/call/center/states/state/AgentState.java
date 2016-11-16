@@ -20,6 +20,8 @@ public class AgentState {
 
     private static final String STATE_PREFIXED_KEY = "callcenter.agent.state_";
 
+    public static final int REG_EXPIRE = 1000 * 60 * 5;
+
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -95,6 +97,12 @@ public class AgentState {
 
 
     public class Model implements Serializable{
+        public static final String STATE_ONLINE = "online";
+        public static final String STATE_IDLE = "idle";
+        public static final String STATE_FETCHING = "fetching";
+        public static final String STATE_TALKING = "talking";
+        public static final String STATE_BUSY = "busy";
+        public static final String STATE_AWAY = "away";
 
         private String extension;
 

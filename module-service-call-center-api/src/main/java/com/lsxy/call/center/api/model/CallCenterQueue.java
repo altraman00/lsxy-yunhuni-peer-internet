@@ -15,6 +15,8 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_queue")
 public class CallCenterQueue extends IdEntity {
+    public static final String RESULT_FAIL = "fail";
+    public static final String RESULT_SELETEED = "selected";
     private String tenantId;
     private String appId;
     private String condition;

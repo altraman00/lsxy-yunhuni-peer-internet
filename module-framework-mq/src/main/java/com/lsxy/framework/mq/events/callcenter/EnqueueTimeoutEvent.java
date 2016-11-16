@@ -6,7 +6,7 @@ import com.lsxy.framework.mq.topic.MQTopicConstants;
 /**
  * Created by liuws on 2016/9/13.
  */
-public class EnqueueEvent extends AbstractDelayMQEvent{
+public class EnqueueTimeoutEvent extends AbstractDelayMQEvent{
 
     private String conditionId;
 
@@ -18,9 +18,9 @@ public class EnqueueEvent extends AbstractDelayMQEvent{
 
     private String callId;
 
-    public EnqueueEvent(){}
+    public EnqueueTimeoutEvent(){}
 
-    public EnqueueEvent(String conditionId,String queueId,String tenantId, String appId, String callId, Integer delay){
+    public EnqueueTimeoutEvent(String conditionId, String queueId, String tenantId, String appId, String callId, Integer delay){
         super(delay);
         this.conditionId = conditionId;
         this.queueId = queueId;

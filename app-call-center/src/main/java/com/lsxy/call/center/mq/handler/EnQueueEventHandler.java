@@ -5,7 +5,7 @@ import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.mq.api.MQMessageHandler;
-import com.lsxy.framework.mq.events.callcenter.EnqueueEvent;
+import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.jms.JMSException;
 
 @Component
-public class EnQueueEventHandler implements MQMessageHandler<EnqueueEvent> {
+public class EnQueueEventHandler implements MQMessageHandler<EnqueueTimeoutEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(EnQueueEventHandler.class);
 
@@ -28,7 +28,7 @@ public class EnQueueEventHandler implements MQMessageHandler<EnqueueEvent> {
     private DeQueueService deQueueService;
 
     @Override
-    public void handleMessage(EnqueueEvent message) throws JMSException {
+    public void handleMessage(EnqueueTimeoutEvent message) throws JMSException {
         if(logger.isDebugEnabled()){
             logger.debug("处理CallCenter.EnQueueEvent{}",message.toJson());
         }

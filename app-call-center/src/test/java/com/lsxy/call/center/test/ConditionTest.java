@@ -19,7 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -64,46 +65,46 @@ public class ConditionTest {
             channel = channelService.save(channel);
         }
 
-        CallCenterAgent agent = new CallCenterAgent();
-        agent.setTenantId(channel.getTenantId());
-        agent.setAppId(channel.getAppId());
-        agent.setChannel(channel.getId());
-        agent.setNum(""+new Random(100000).nextInt());
-        agent.setName("hehe"+new Random(100000).nextInt());
-        agent = callCenterAgentService.save(agent);
-
-        for (int i = 0; i < 10 ; i++) {
-            AgentSkill skill = new AgentSkill();
-            skill.setTenantId(channel.getTenantId());
-            skill.setAppId(channel.getAppId());
-            skill.setAgent(agent.getId());
-            skill.setName("haha" + i);
-            skill.setScore(new Random().nextInt(100));
-            skill.setEnabled(true);
-            agentSkillService.save(skill);
+        String skill_prefix = UUIDGenerator.uuid();
+        for (int i = 0; i < 500; i++) {
+            CallCenterAgent agent = new CallCenterAgent();
+            agent.setTenantId(channel.getTenantId());
+            agent.setAppId(channel.getAppId());
+            agent.setChannel(channel.getId());
+            agent.setNum(""+new Random(100000).nextInt());
+            agent.setName("hehe"+new Random(100000).nextInt());
+            agent = callCenterAgentService.save(agent);
+            for (int j = 0; j < 10 ; j++) {
+                AgentSkill skill = new AgentSkill();
+                skill.setTenantId(channel.getTenantId());
+                skill.setAppId(channel.getAppId());
+                skill.setAgent(agent.getId());
+                skill.setName(skill_prefix + j);
+                skill.setScore(new Random().nextInt(100));
+                skill.setEnabled(true);
+                agentSkillService.save(skill);
+            }
+            String exid = UUIDGenerator.uuid();
+            extensionState.setAgent(exid,agent.getId());
+            extensionState.setLastRegisterStatus(exid,200);
+            extensionState.setLastRegisterTime(exid,new Date().getTime());
+            extensionState.setRegisterExpires(exid,10000000);
+            agentState.setExtension(agent.getId(),exid);
+            agentState.setLastRegTime(agent.getId(),new Date().getTime());
+            agentState.setLastTime(agent.getId(),new Date().getTime());
+            agentState.setState(agent.getId(),"IDLE");
         }
         Condition condition = new Condition();
         condition.setTenantId(channel.getTenantId());
         condition.setAppId(channel.getAppId());
         condition.setChannelId(channel.getId());
-        condition.setWhereExpression("(get(\"haha0\") + get(\"haha1\")) > 60;");
-        condition.setSortExpression("get(\"haha0\") + get(\"haha1\");");
+        condition.setWhereExpression("(get(\""+skill_prefix+"0\") + get(\""+skill_prefix+"1\")) > 60;");
+        condition.setSortExpression("get(\""+skill_prefix+"0\") + get(\""+skill_prefix+"1\");");
         condition.setPriority(10);
         condition.setQueueTimeout(33);
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
         condition = conditionService.save(condition);
         Thread.sleep(50000);
-
-        String exid = UUIDGenerator.uuid();
-        extensionState.setAgent(exid,agent.getId());
-        extensionState.setLastRegisterStatus(exid,200);
-        extensionState.setLastRegisterTime(exid,new Date().getTime());
-        extensionState.setRegisterExpires(exid,1000);
-
-        agentState.setExtension(agent.getId(),exid);
-        agentState.setLastRegTime(agent.getId(),new Date().getTime());
-        agentState.setLastTime(agent.getId(),new Date().getTime());
-        agentState.setState(agent.getId(),"IDLE");
     }
 }

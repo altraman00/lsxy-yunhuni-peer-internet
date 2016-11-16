@@ -13,7 +13,11 @@ public class ExtensionLock extends DistributeLock {
         return PREFIXED;
     }
 
+    public static String getKey(String extensionId){
+        return PREFIXED + extensionId;
+    }
+
     public ExtensionLock(RedisCacheService redis, String extensionId){
-        super(redis,PREFIXED+extensionId);
+        super(redis,getKey(extensionId));
     }
 }

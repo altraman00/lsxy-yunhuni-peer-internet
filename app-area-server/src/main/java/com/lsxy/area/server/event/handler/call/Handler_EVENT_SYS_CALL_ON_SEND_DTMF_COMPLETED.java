@@ -94,9 +94,10 @@ public class Handler_EVENT_SYS_CALL_ON_SEND_DTMF_COMPLETED extends EventHandler{
                     .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("error",params.get("error"))
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                ivrActionService.doAction(call_id);
+            }
         }
-        ivrActionService.doAction(call_id);
         return res;
     }
 }
