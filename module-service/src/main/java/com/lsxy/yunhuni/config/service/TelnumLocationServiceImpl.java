@@ -48,6 +48,12 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
         }
         if(num.startsWith("1") && num.length()==11){
             return TelnumLocationService.TYPE_MOBILE;
+        }else if(num.startsWith("01")){
+            if(num.startsWith("010")){
+                return TelnumLocationService.TYPE_TELEPHONE;
+            }else{
+                return TelnumLocationService.TYPE_MOBILE;
+            }
         }else{
             return TelnumLocationService.TYPE_TELEPHONE;
         }
@@ -96,6 +102,11 @@ public class TelnumLocationServiceImpl extends AbstractService<TelnumLocation> i
     @Override
     public String solveNum(String num, String telPhoneRule,String mobileRule, String areaCode) {
         int typeOfNum = getTypeOfNum(num);
+        if(num.startsWith("0") && typeOfNum == TYPE_MOBILE){
+            //如果是手机号加0，先把0去掉，再进行规则处理
+            num = num.substring(1,num.length());
+        }
+
         switch (typeOfNum){
             //固话
             case TYPE_TELEPHONE:{

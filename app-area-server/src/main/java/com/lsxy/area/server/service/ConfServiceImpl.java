@@ -139,10 +139,7 @@ public class ConfServiceImpl implements ConfService {
             maxParts = MAX_PARTS;
         }
         //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,null,null);
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String areaId = areaAndTelNumSelector.getAreaId(app);
 
         Meeting meeting = new Meeting();
         meeting.setResId(null);
@@ -171,7 +168,7 @@ public class ConfServiceImpl implements ConfService {
                                 .setType("sys_conf")
                                 .setUserdata(userData)
                                 .setAreaId(areaId)
-                                .setLineGatewayId(lineGateway.getId())
+                                .setLineGatewayId(null)
                                 .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
                                         .put("max_parts",maxParts,MAX_PARTS)//最大与会数
@@ -279,14 +276,14 @@ public class ConfServiceImpl implements ConfService {
         //TODO
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
         String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
+        String oneTelnumber = selector.getOneTelnumber();
 
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String lineId = selector.getLineId();
 
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getSipProviderIp());
+        callSession.setToNum(selector.getToUri());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -295,7 +292,7 @@ public class ConfServiceImpl implements ConfService {
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
+                .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_answer_seconds",maxDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
@@ -316,7 +313,7 @@ public class ConfServiceImpl implements ConfService {
                                     .setId(callId)
                                     .setType("sys_conf")
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(lineGateway.getId())
+                                    .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("from",oneTelnumber)
                                         .putIfNotEmpty("to",to)
