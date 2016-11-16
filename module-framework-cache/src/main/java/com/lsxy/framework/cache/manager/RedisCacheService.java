@@ -388,6 +388,10 @@ public class RedisCacheService {
 			return redisTemplate.opsForZSet().score(key,value);
 		}
 
+		public void sremove(final String key,final String... value){
+			redisTemplate.opsForSet().remove(key,value);
+		}
+
 		public void sadd(final String key, final Object ... values) {
 			redisTemplate.opsForSet().add(key, values);
 		}
@@ -395,6 +399,10 @@ public class RedisCacheService {
 		public Set smembers(final String key) {
 			Set set = redisTemplate.opsForSet().members(key);
 			return set;
+		}
+
+		public long ssize(final String key){
+			return redisTemplate.opsForSet().size(key);
 		}
 
 		public Map hgetAll(final String key){

@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -69,6 +70,9 @@ public class DialActionHandler extends ActionHandler{
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
+
     @Override
     public String getAction() {
         return "dial";
@@ -97,24 +101,29 @@ public class DialActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        boolean dialSucc = false;
         try{
-            dialSucc = dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
+            //更新下一步
+            Map<String,Object> businessData = state.getBusinessData();
+            if(businessData == null){
+                businessData = new HashMap<>();
+            }
+            businessData.put("next",next);
+            state.setBusinessData(businessData);
+            businessStateService.save(state);
+            dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         }catch (Throwable t){
             logger.error("ivr拨号失败:",t);
-        }
-
-        //更新下一步
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
-
-        if(!dialSucc){//拨号失败直接进行ivr下一步
-            ivrActionService.doAction(callId);
+            App app = appService.findById(state.getAppId());
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","ivr.connect_end")
+                    .putIfNotEmpty("id",callId)
+                    .putIfNotEmpty("begin_time",System.currentTimeMillis())
+                    .putIfNotEmpty("end_time",System.currentTimeMillis())
+                    .putIfNotEmpty("error","dial error")
+                    .build();
+            if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                ivrActionService.doAction(callId);
+            }
         }
         return true;
     }

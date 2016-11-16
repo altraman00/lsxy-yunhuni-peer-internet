@@ -5,9 +5,11 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
+import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -34,8 +36,10 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.DocumentSource;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +49,14 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.xml.XMLConstants;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Future;
 
@@ -98,12 +109,31 @@ public class IVRActionService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
+    @Autowired
+    private NotifyCallbackUtil notifyCallbackUtil;
+
     private Map<String,ActionHandler> handlers = new HashMap<>();
+
+    private Schema schema = null;
 
     @PostConstruct
     public void init(){
         initClient();
         initHandler();
+        initIVRSchema();
+    }
+    private void initIVRSchema() {
+        try{
+            InputStream input = IVRActionService.class.getResourceAsStream("/ivraction.xsd");
+            if(input == null){
+                input = IVRActionService.class.getClassLoader().getResourceAsStream("/ivraction.xsd");
+            }
+            SchemaFactory factory =
+                    SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            this.schema = factory.newSchema(new StreamSource(input));
+        }catch (Throwable t){
+            throw new RuntimeException("ivraction.xsd读取失败");
+        }
     }
     private void initClient(){
         client = HttpAsyncClients.createDefault();
@@ -133,7 +163,7 @@ public class IVRActionService {
      * @param from
      * @return
      */
-    public boolean getAcceptRequest(final String url, final String from){
+    public boolean getAcceptRequest(final String url,final String call_id, final String from){
         boolean res = false;
         boolean success = false;
         int re_times = 0;
@@ -143,6 +173,7 @@ public class IVRActionService {
                 Map<String,Object> data = new HashMap<>();
                 data.put("action","ivr_incoming");
                 data.put("from",from);
+                data.put("call_id",call_id);
                 post.setConfig(config);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -173,7 +204,7 @@ public class IVRActionService {
      * @param url
      * @return
      */
-    public String getFirstIvr(final String url){
+    public String getFirstIvr(final String call_id,final String url){
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -182,6 +213,7 @@ public class IVRActionService {
                 HttpPost post = new HttpPost(url);
                 Map<String,Object> data = new HashMap<>();
                 data.put("action","ivr_start");
+                data.put("call_id",call_id);
                 post.setConfig(config);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -204,18 +236,43 @@ public class IVRActionService {
         return res;
     }
 
+    private static String inputUrl(String url,String key,String value){
+        URI uri = URI.create(url);
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
+        String port = "";
+        Integer p = uri.getPort();
+        String path = uri.getPath();
+        String query = uri.getQuery();
+        String fragment = uri.getFragment();
+        if(StringUtil.isEmpty(query)){
+            query = key + "=" + value;
+        }else{
+            query = query + "&" + key + "=" + value;
+        }
+        if(p != -1){
+            port = ":"+p;
+        }
+        if(fragment == null){
+            fragment = "";
+        }else{
+            fragment = "#" + fragment;
+        }
+        return scheme + "://"+host+port+path+"?"+query+fragment;
+    }
+
     /**
      * 调用next
      * @param url
      * @return
      */
-    private String getNextRequest(String url){
+    private String getNextRequest(String call_id,String url){
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
             try{
-                HttpGet get = new HttpGet(url);
+                HttpGet get = new HttpGet(inputUrl(url,"call_id",call_id));
                 get.setConfig(config);
                 get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
@@ -260,7 +317,7 @@ public class IVRActionService {
      */
     public boolean doActionIfAccept(App app, Tenant tenant,String res_id, String from, String to){
         String call_id = UUIDGenerator.uuid();
-        boolean accept = getAcceptRequest(app.getUrl(),from);
+        boolean accept = getAcceptRequest(app.getUrl(),call_id,from);
         if(!accept){
             reject(app,res_id,call_id);
         }else{
@@ -359,6 +416,12 @@ public class IVRActionService {
             logger.info("没有找到call_id={}的state",call_id);
             return false;
         }
+
+        if(state.getClosed()){
+            logger.info("IVR呼叫已关闭，call_id={}",call_id);
+            return false;
+        }
+
         Map<String,Object> businessDate = state.getBusinessData();
         if(businessDate == null){
             businessDate = new HashMap<>();
@@ -368,15 +431,20 @@ public class IVRActionService {
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
+            hangup(state.getResId(),call_id,state.getAreaId());
             return  false;
         }
         String resXML = null;
         if(nextUrl == null){//第一次
             String appId = state.getAppId();
             App app = appService.findById(appId);
-            resXML = getFirstIvr(app.getUrl());
+            if(app == null){
+                logger.error("ivr 找不到对应的app");
+                return false;
+            }
+            resXML = getFirstIvr(call_id,app.getUrl());
         }else{
-            resXML = getNextRequest(nextUrl.toString());
+            resXML = getNextRequest(call_id,nextUrl.toString());
         }
         if(StringUtils.isBlank(resXML)){
             return false;
@@ -386,6 +454,9 @@ public class IVRActionService {
         Element actionEle = null;
         try {
             Document doc = DocumentHelper.parseText(resXML);
+            if(validateXMLSchema(doc)){
+
+            }
             root = doc.getRootElement();
             actionEle = getActionEle(root);
             h = handlers.get(actionEle.getName().toLowerCase());
@@ -394,41 +465,57 @@ public class IVRActionService {
                 return false;
             }
             return h.handle(call_id,actionEle,getNextUrl(root));
+        } catch(DocumentException | IllegalArgumentException e){
+            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
+            //发送ivr格式错误通知
+            String appId = state.getAppId();
+            App app = appService.findById(appId);
+            if(app == null){
+                logger.error("ivr 找不到对应的app");
+                return false;
+            }
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","ivr.format_error")
+                    .putIfNotEmpty("id",call_id)
+                    .putIfNotEmpty("user_data",state.getUserdata())
+                    .build();
+            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            hangup(state.getResId(),call_id,state.getAreaId());
+            return false;
         } catch (Throwable e) {
-            logger.error("处理ivr动作指令出错",e);
+            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
             return false;
         }
     }
 
+    private void hangup(String res_id,String call_id,String area_id){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("user_data",call_id)
+                .put("areaId",area_id)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
+        }
+    }
     /**
-     * 校验ivr指令，返回对应的ivr根元素
+     * 返回对应的ivr根元素
      * @param root
      * @return
      */
     private Element getActionEle(Element root) {
         List elements = root.elements();
         Element actionEle = null;
-        if(elements == null || elements.size() == 0){
-            throw new IllegalArgumentException("ivr action xml 格式错误");
-        }
-        if(elements.size()>2){
-            throw new IllegalArgumentException("ivr action xml 格式错误");
-        }
-        int actionElement_count = 0;
         for (Object obj : elements) {
             Element ele = (Element)obj;
             boolean hasHandler = handlers.get(ele.getName().toLowerCase()) != null;
-            boolean isNext = ele.getName().equals("next");
-            if(!hasHandler && !isNext){
-                throw new IllegalArgumentException("ivr action xml 格式错误");
-            }
             if(hasHandler){
                 actionEle = ele;
-                actionElement_count ++;
+                break;
             }
-        }
-        if(actionElement_count>1){
-            throw new IllegalArgumentException("只能包含一个ivr action");
         }
         return actionEle;
     }
@@ -446,4 +533,13 @@ public class IVRActionService {
         return next;
     }
 
+    public boolean validateXMLSchema(Document doc){
+        try {
+            Validator validator = schema.newValidator();
+            validator.validate(new DocumentSource(doc));
+        } catch (Throwable e) {
+            throw new IllegalArgumentException(e);
+        }
+        return true;
+    }
 }

@@ -17,6 +17,8 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +96,28 @@ public class IVRTest {
         int step = 1;
         while(ivrActionService.doAction(lists.get(0).getId())){
             System.out.println("ivr step" + (step++));
+        }
+    }
+
+    @Test
+    public void testParse() throws DocumentException, InterruptedException {
+        Thread.sleep(1000);
+
+        String xml ="<response>\n" +
+                "  <dial from=\"4001546646464\">\n" +
+                "    <number>415-123-4567</number>\n" +
+                "    <play>ringtone.wav</play>\n" +
+                "    <connect play_time=\"1470293585\">\n" +
+                "      <play repeat=\"3\">warning.wav</play>\n" +
+                "    </connect>\n" +
+                "   </dial>\n" +
+                "   <next>http://yourhost/nextstep</next>\n" +
+                "</response>";
+
+        try {
+            System.out.println(ivrActionService.validateXMLSchema(DocumentHelper.parseText(xml)));
+        } catch (DocumentException e) {
+            e.printStackTrace();
         }
     }
 }
