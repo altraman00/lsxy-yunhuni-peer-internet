@@ -3,6 +3,7 @@ package com.lsxy.app.api.gateway.dto.callcenter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lsxy.app.api.gateway.dto.CommonDTO;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -27,7 +28,9 @@ public class ConditionCreateInputDTO extends CommonDTO {
     @Min(value = 0)
     private Integer priority;
 
-    @Min(value = 0)
+    @NotNull
+    @Min(value = 1)
+    @Max(value = 1000)
     private Integer queueTimeout;
 
     @Min(value = 0)

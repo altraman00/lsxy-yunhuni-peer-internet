@@ -125,7 +125,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 //没有找到可用坐席
                 cQs.add(conditionId,queue.getId());
                 mqService.publish(new EnqueueTimeoutEvent(conditionId,queue.getId(),
-                        tenantId,appId,callId,condition.getQueueTimeout()));
+                        tenantId,appId,callId,condition.getQueueTimeout() * 1000));
                 String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,4,
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                         ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
