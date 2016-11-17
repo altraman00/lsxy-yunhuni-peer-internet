@@ -64,10 +64,12 @@ public class StatisticsUtils {
             }
         }
         String type = "";
-        for(int i=0;i<types.length;i++){
-            type += " '"+types[i]+"' ";
-            if(i != types.length-1){
-                type += " , ";
+        if(types!=null) {
+            for (int i = 0; i < types.length; i++) {
+                type += " '" + types[i] + "' ";
+                if (i != types.length - 1) {
+                    type += " , ";
+                }
             }
         }
         if(StringUtils.isEmpty(type)){
