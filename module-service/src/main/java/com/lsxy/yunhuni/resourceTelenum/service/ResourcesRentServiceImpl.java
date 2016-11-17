@@ -69,7 +69,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         if(tenant==null){
             throw new RuntimeException("租户不存在");
         }
-        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 ";
+        String hql = "from ResourcesRent obj where obj.tenant.id=?1 and obj.rentStatus<>3 order by obj.createTime desc";
         Page<ResourcesRent> page =  this.pageList(hql,pageNo,pageSize,tenant.getId());
         return page;
     }
