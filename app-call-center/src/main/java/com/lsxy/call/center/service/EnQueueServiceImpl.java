@@ -99,7 +99,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             if(condition == null){
                 throw new IllegalArgumentException("条件不存在");
             }
-            if(!condition.getChannelId().equals(channel.getAppId())){
+            if(!condition.getChannelId().equals(channel.getId())){
                 throw new IllegalArgumentException("条件-通道不匹配");
             }
             //创建排队记录
