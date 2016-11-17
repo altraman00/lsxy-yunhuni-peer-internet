@@ -85,7 +85,7 @@ public class BillDetailController extends AbstractPortalController {
     public ModelAndView recording(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                                   String time, String appId,String type){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_VOICE);
+        Map<String,String> map = init(request,time,appId);
         map.put("type",type);
         mav.addAllObjects(map);
         String token = getSecurityToken(request);
@@ -318,6 +318,24 @@ public class BillDetailController extends AbstractPortalController {
     public Map init(HttpServletRequest request, String time, String appId,String serviceType){
         Map map = new HashMap();
         List<App> appList = (List<App>)getBillAppList(request,serviceType).getData();
+        map.put("appList",appList);
+        if(StringUtil.isEmpty(appId)){
+            if(StringUtils.isEmpty(appId)){
+                if(appList.size()>0) {
+                    appId = appList.get(0).getId();
+                }
+            }
+        }
+        map.put("appId",appId);
+        if(StringUtils.isEmpty(time)){
+            time = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
+        }
+        map.put("time",time);
+        return map;
+    }
+    public Map init(HttpServletRequest request, String time, String appId){
+        Map map = new HashMap();
+        List<App> appList = (List<App>)getAppList(request).getData();
         map.put("appList",appList);
         if(StringUtil.isEmpty(appId)){
             if(StringUtils.isEmpty(appId)){
