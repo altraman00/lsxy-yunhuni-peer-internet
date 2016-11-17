@@ -122,6 +122,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             //TODO 注册是否过期，过期执行注销过程
             if(lastRegTime == null || (System.currentTimeMillis() - lastRegTime) > 5 * 60 * 1000){
                 //TODO 注销
+                logout(agent.getTenantId(), agent.getAppId(), agent.getName(), false);
             }else{
                 //TODO 注册没有过期
                 throw new AgentHasAlreadyLoggedInException();
