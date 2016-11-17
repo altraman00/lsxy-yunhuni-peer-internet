@@ -460,11 +460,11 @@ public class IVRActionService {
                 Object iscc_obj = businessDate.get("iscc");
                 if(iscc_obj == null || ((Integer)iscc_obj) != 1){
                     logger.info("没有开通呼叫中心服务");
+                    return false;
                 }
-                return false;
             }
             return h.handle(call_id,actionEle,getNextUrl(root));
-        } catch(DocumentException | IllegalArgumentException e){
+        } catch(DocumentException e){
             logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
             //发送ivr格式错误通知
             String appId = state.getAppId();
@@ -532,12 +532,12 @@ public class IVRActionService {
         return next;
     }
 
-    public boolean validateXMLSchema(Document doc){
+    public boolean validateXMLSchema(Document doc) throws DocumentException {
         try {
             Validator validator = schema.newValidator();
             validator.validate(new DocumentSource(doc));
         } catch (Throwable e) {
-            throw new IllegalArgumentException(e);
+            throw new DocumentException(e);
         }
         return true;
     }
