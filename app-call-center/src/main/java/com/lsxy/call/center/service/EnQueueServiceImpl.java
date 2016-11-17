@@ -161,12 +161,14 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
         }catch (Throwable e){
             logger.error("排队找坐席出错",e);
-            try{
-                queue.setResult(CallCenterQueue.RESULT_FAIL);
-                queue.setEndTime(new Date());
-                callCenterQueueService.save(queue);
-            }catch (Throwable t){
-                logger.info("修改排队状态失败",t);
+            if(queue != null && queue.getId()!=null){
+                try{
+                    queue.setResult(CallCenterQueue.RESULT_FAIL);
+                    queue.setEndTime(new Date());
+                    callCenterQueueService.save(queue);
+                }catch (Throwable t){
+                    logger.info("修改排队状态失败",t);
+                }
             }
             deQueueService.fail(tenantId,appId,callId,e.getMessage());
         }
