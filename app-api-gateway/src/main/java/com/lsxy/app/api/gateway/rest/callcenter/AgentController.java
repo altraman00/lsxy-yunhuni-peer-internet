@@ -42,31 +42,31 @@ public class AgentController extends AbstractAPIController {
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}",method = RequestMethod.DELETE)
     public ApiGatewayResponse logout(HttpServletRequest request, @RequestHeader("AppID") String appId,
-                                          @PathVariable("agent_name") String agentName,@RequestParam("channel") String channel,@RequestParam("force") boolean force) throws YunhuniApiException {
+                                          @PathVariable("agent_name") String agentName,@RequestParam("force") boolean force) throws YunhuniApiException {
         App app = appService.findById(appId);
-        callCenterAgentService.logout(app.getTenant().getId(),appId,channel,agentName,force);
+        callCenterAgentService.logout(app.getTenant().getId(),appId,agentName,force);
         return ApiGatewayResponse.success();
     }
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/keepalive",method = RequestMethod.GET)
     public ApiGatewayResponse keepAlive(HttpServletRequest request, @RequestHeader("AppID") String appId,
-                                          @PathVariable("agent_name") String agentName,@RequestParam("channel") String channel) throws YunhuniApiException {
-        callCenterAgentService.keepAlive(appId,channel,agentName);
+                                          @PathVariable("agent_name") String agentName) throws YunhuniApiException {
+        callCenterAgentService.keepAlive(appId,agentName);
         return ApiGatewayResponse.success();
     }
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}",method = RequestMethod.GET)
     public ApiGatewayResponse get(HttpServletRequest request, @RequestHeader("AppID") String appId,
-                                   @PathVariable("agent_name") String agentName,@RequestParam("channel") String channel) throws YunhuniApiException {
-        CallCenterAgent agent = callCenterAgentService.get(appId,channel,agentName);
+                                   @PathVariable("agent_name") String agentName) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentService.get(appId,agentName);
         return ApiGatewayResponse.success(agent);
     }
 
     @RequestMapping(value = "/{account_id}/callcenter/agent",method = RequestMethod.GET)
-    public ApiGatewayResponse page(HttpServletRequest request, @RequestHeader("AppID") String appId,@RequestParam("channel") String channel,
+    public ApiGatewayResponse page(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                    @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                    @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
-        Page page  = callCenterAgentService.getPage(appId,channel,pageNo,pageSize);
+        Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
         return ApiGatewayResponse.success(page);
     }
 
@@ -74,8 +74,7 @@ public class AgentController extends AbstractAPIController {
     public ApiGatewayResponse extension(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                         @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
         String extensionId = (String) map.get("id");
-        String channel = (String) map.get("channel");
-        callCenterAgentService.extension(appId,channel,agentName,extensionId);
+        callCenterAgentService.extension(appId,agentName,extensionId);
         return ApiGatewayResponse.success();
     }
 
@@ -83,12 +82,11 @@ public class AgentController extends AbstractAPIController {
     public ApiGatewayResponse state(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                         @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
         String state = (String) map.get("state");
-        String channel = (String) map.get("channel");
         //TODO 校验数据有效性
         if(StringUtils.isBlank(state)){
             throw new RuntimeException("状态不能为空");
         }
-        callCenterAgentService.state(appId,channel,agentName,state);
+        callCenterAgentService.state(appId,agentName,state);
         return ApiGatewayResponse.success();
     }
 
@@ -96,12 +94,11 @@ public class AgentController extends AbstractAPIController {
     public ApiGatewayResponse skills(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                     @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
         String state = (String) map.get("state");
-        String channel = (String) map.get("channel");
         //TODO 校验数据有效性
         if(StringUtils.isBlank(state)){
             throw new RuntimeException("状态不能为空");
         }
-        callCenterAgentService.state(appId,channel,agentName,state);
+        callCenterAgentService.state(appId,agentName,state);
         return ApiGatewayResponse.success();
     }
 

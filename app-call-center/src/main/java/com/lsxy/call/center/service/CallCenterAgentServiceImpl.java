@@ -81,7 +81,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }catch (IllegalArgumentException e){
             throw new RequestIllegalArgumentException();
         }
-        CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndChannelAndName(agent.getAppId(),agent.getChannel(),agent.getName());
+        CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndName(agent.getAppId(),agent.getName());
         if(oldAgent != null){
             Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
             //TODO 注册是否过期，过期执行注销过程
@@ -173,13 +173,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //注销
     @Override
-    public void logout(String tenantId, String appId, String channel, String agentName, boolean force) throws YunhuniApiException {
-        try{
-            channelService.findOne(tenantId, appId, channel);
-        }catch (IllegalArgumentException e){
-            throw new RequestIllegalArgumentException();
-        }
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
+    public void logout(String tenantId, String appId, String agentName, boolean force) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             //TODO 座席不存在
             throw new RequestIllegalArgumentException();
@@ -230,8 +225,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void keepAlive(String appId, String channel, String agentName) throws YunhuniApiException{
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
+    public void keepAlive(String appId, String agentName) throws YunhuniApiException{
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             //TODO 座席不存在
             throw new RequestIllegalArgumentException();
@@ -268,8 +263,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public CallCenterAgent get(String appId, String channel, String agentName) throws YunhuniApiException {
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel, agentName);
+    public CallCenterAgent get(String appId, String agentName) throws YunhuniApiException {
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
         if(agent == null){
             //TODO 座席不存在
             throw new RequestIllegalArgumentException();
@@ -286,7 +281,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public Page getPage(String appId, String channel, Integer pageNo, Integer pageSize) throws YunhuniApiException{
+    public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
         List<String> agentIds = new ArrayList<>();
         String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.channel=?2";
         Page page = this.pageList(hql, pageNo, pageSize, appId);
@@ -307,8 +302,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void extension(String appId, String channel, String agentName,String extensionId) throws YunhuniApiException{
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
+    public void extension(String appId, String agentName,String extensionId) throws YunhuniApiException{
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             //TODO 座席不存在
             throw new RequestIllegalArgumentException();
@@ -342,8 +337,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void state(String appId, String channel, String agentName, String state) throws YunhuniApiException{
-        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndChannelAndName(appId,channel,agentName);
+    public void state(String appId, String agentName, String state) throws YunhuniApiException{
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             //TODO 座席不存在
             throw new RequestIllegalArgumentException();
