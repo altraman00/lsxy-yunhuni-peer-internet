@@ -97,5 +97,20 @@ public class InitDevData {
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
         condition = conditionService.save(condition);
+
+
+        List<String> agentIds = callCenterAgentService
+                .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+        /**
+         * 模拟坐席空闲
+         */
+        while(true){
+            Thread.sleep(60000 * (1 + new Random().nextInt(3)));
+            for (String agent: agentIds) {
+                if(agentState.getState(agent).equals(AgentState.Model.STATE_FETCHING)){
+                    agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                }
+            }
+        }
     }
 }
