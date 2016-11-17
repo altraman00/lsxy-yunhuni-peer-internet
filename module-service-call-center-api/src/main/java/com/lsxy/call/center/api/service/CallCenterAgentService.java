@@ -29,6 +29,6 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
 
     void state(String appId, String agentName, String state) throws YunhuniApiException;
 
-    void skills(String appId, String agentName, List<AgentSkillOperation> skillOpts) throws YunhuniApiException;
+    void skills(String tenantId, String appId, String agentName, List<AgentSkillOperation> skillOpts) throws YunhuniApiException;
 
 }

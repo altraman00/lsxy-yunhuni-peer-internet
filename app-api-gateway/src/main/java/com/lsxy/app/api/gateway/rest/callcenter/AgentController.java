@@ -95,7 +95,9 @@ public class AgentController extends AbstractAPIController {
     public ApiGatewayResponse skills(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                     @PathVariable("agent_name") String agentName,@RequestBody List<AgentSkillOperation> skillOpts) throws YunhuniApiException {
         //TODO 校验数据有效性
-        callCenterAgentService.skills(appId,agentName,skillOpts);
+
+        App app = appService.findById(appId);
+        callCenterAgentService.skills(app.getTenant().getId(),appId,agentName,skillOpts);
         return ApiGatewayResponse.success();
     }
 

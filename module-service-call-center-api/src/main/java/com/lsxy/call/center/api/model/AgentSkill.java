@@ -23,6 +23,17 @@ public class AgentSkill extends IdEntity {
     private Integer score;
     private Boolean enabled;
 
+    public AgentSkill() {
+    }
+
+    public AgentSkill(String tenantId, String appId, String agent, String name, Integer score, Boolean enabled) {
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.agent = agent;
+        this.name = name;
+        this.score = score;
+        this.enabled = enabled;
+    }
 
     @Column(name = "tenant_id")
     public String getTenantId() {

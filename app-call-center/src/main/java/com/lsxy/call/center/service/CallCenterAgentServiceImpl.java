@@ -24,8 +24,6 @@ import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.framework.AopContext;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -155,8 +153,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             List<Condition> suitedConditions = new ArrayList<>();
             Map<String,Long> conditionScore = new HashMap<>();
             if(agent.getSkills()!=null && agent.getSkills().size()>0){
-                Map<String,Integer> vars = new HashMap<>();
-                for (AgentSkill obj : agent.getSkills()) {
+                Map<String,Integer> skillScore = new HashMap<>();
+                agent.getSkills().stream().forEach(obj -> {
                     //TODO 处理技能，不让技能名称重复
                     if(StringUtils.isBlank(obj.getName())){
                         throw new RequestIllegalArgumentException();
@@ -171,17 +169,10 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     obj.setAppId(agent.getAppId());
                     obj.setAgent(agentId);
                     agentSkillService.save(obj);
-                    vars.put(obj.getName(),obj.getScore());
-                }
+                    skillScore.put(obj.getName(),obj.getScore());
+                });
                 //查询指定通道下所有条件集合，查出匹配的条件
-                List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
-                for(Condition condition:conditions){
-                    if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),vars)){
-                        long score = ExpressionUtils.execSortExpression(condition.getSortExpression(), vars);
-                        conditionScore.put(condition.getId(),score);
-                        suitedConditions.add(condition);
-                    }
-                }
+                setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
             }
             //写入登录日志
             agentActionLogService.agentLogin(agent);
@@ -193,12 +184,12 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             agentState.setLastTime(agentId,System.currentTimeMillis());
             //TODO 设置分机座席
             extensionState.setAgent(extensionId,agentId);
-            for(Condition condition:suitedConditions){
+            suitedConditions.parallelStream().forEach(condition -> {
                 //TODO 设置条件座席
                 cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
                 //TODO 设置座席条件
                 aCs.add(agentId,condition.getId(),condition.getPriority());
-            }
+            });
             //TODO 如果座席是空闲，触发座席找排队
             if(agent.getState().contains("idle")){
 
@@ -207,6 +198,24 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }finally{
             extensionLock.unlock();
         }
+    }
+
+    /**
+     * 查询指定通道下所有条件集合，查出匹配的条件
+     * @param agent 座席
+     * @param suitedConditions 条件集合，请传入一个空的List对象
+     * @param conditionScore 条件的分数，key为条件Id，请传入一个空的Map
+     * @param skillScore 技能分数，key为技能名称，请传入一个空的Map
+     */
+    private void setSuitedConditionsAndConditionScore(CallCenterAgent agent, List<Condition> suitedConditions, Map<String, Long> conditionScore, Map<String, Integer> skillScore) {
+        List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+        conditions.parallelStream().forEach(condition -> {
+            if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),skillScore)){
+                long score = ExpressionUtils.execSortExpression(condition.getSortExpression(), skillScore);
+                conditionScore.put(condition.getId(),score);
+                suitedConditions.add(condition);
+            }
+        });
     }
 
     //注销
@@ -251,9 +260,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             agentState.delete(agentId);
             Set<String> conditionIds = aCs.getAll(agentId);
             if(conditionIds != null){
-                for(String conditionId:conditionIds){
+                conditionIds.parallelStream().forEach(conditionId -> {
                     cAs.remove(conditionId,agentId);
-                }
+                });
             }
             aCs.delete(agentId);
         }finally {
@@ -385,37 +394,78 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void skills(String appId, String agentName, List<AgentSkillOperation> skillOpts) throws YunhuniApiException{
+    public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperation> skillOpts) throws YunhuniApiException{
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             //TODO 座席不存在
             throw new RequestIllegalArgumentException();
         }
+        String agentId = agent.getId();
 
         if(skillOpts != null && skillOpts.size() > 0){
+            //匹配的条件集合
+            List<Condition> suitedConditions = new ArrayList<>();
+            Map<String,Long> conditionScore = new HashMap<>();
+
+            //旧的技能
+            List<AgentSkill> skills = agentSkillService.findAllByAgent(agentId);
+            //将技能放到map,key是技能名
             Map<String,AgentSkill> skillMap = new HashMap<>();
-            List<AgentSkill> skills = agentSkillService.findAllByAgent(agent.getId());
             skills.parallelStream().forEach(skill -> skillMap.put(skill.getName(),skill));
             skillOpts.stream().forEach(opt -> {
                 switch (opt.getOpt()){
                     case 0:{
-//                        agentSkillService.deleteByAgent();
+                        //删除全部
+                        agentSkillService.deleteByAgent(agentId);
+                        skillMap.clear();
                     }
                     case 1:{
-
+                        //修改
+                        if(StringUtils.isNotBlank(opt.getName())){
+                            AgentSkill agentSkill = skillMap.get(opt.getName());
+                            if(agentSkill != null){
+                                agentSkill.setScore(opt.getScore());
+                                agentSkill.setEnabled(opt.getEnabled());
+                                agentSkillService.save(agentSkill);
+                            }else{
+                                AgentSkill newSkill = new AgentSkill(tenantId,appId,agentId,opt.getName(),opt.getScore(),opt.getEnabled());
+                                agentSkillService.save(newSkill);
+                                skillMap.put(newSkill.getName(),newSkill);
+                            }
+                        }
                     }
                     case 2:{
-
-                    }
-                    default:{
-
+                        //删除一个
+                        agentSkillService.deleteByAgentAndName(agentId,opt.getName());
+                        skillMap.remove(opt.getName());
                     }
                 }
+            });
+            Collection<AgentSkill> newSkills = skillMap.values();
+            Map<String,Integer> skillScore = new HashMap<>();
+            newSkills.parallelStream().forEach(skill -> skillScore.put(skill.getName(),skill.getScore()));
+            //查询指定通道下所有条件集合，查出匹配的条件
+            setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
+
+            Set<String> oldConditionIds = aCs.getAll(agentId);
+            Set<String> removeConditionIds = new HashSet<>();
+
+            suitedConditions.parallelStream().forEach(condition -> {
+                if(!oldConditionIds.contains(condition.getId())){
+                    removeConditionIds.add(condition.getId());
+                }
+                //TODO 设置条件座席
+                cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
+                //TODO 设置座席条件
+                aCs.add(agentId,condition.getId(),condition.getPriority());
+            });
+            removeConditionIds.parallelStream().forEach(cId -> {
+                cAs.remove(cId,agentId);
+                aCs.remove(agentId,cId);
             });
         }else{
             return;
         }
     }
-
 
 }

@@ -59,5 +59,10 @@ public class AgentSkillServiceImpl extends AbstractService<AgentSkill> implement
         return agentSkillDao.findByAgentIn(agentIds);
     }
 
+    @Override
+    public void deleteByAgentAndName(String agent, String name) {
+        agentSkillDao.deleteByAgentAndName(agent,name);
+    }
+
 
 }

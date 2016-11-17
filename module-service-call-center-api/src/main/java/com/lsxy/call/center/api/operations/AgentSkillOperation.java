@@ -37,7 +37,7 @@ public class AgentSkillOperation {
         this.score = score;
     }
 
-    public boolean isEnabled() {
+    public boolean getEnabled() {
         return enabled;
     }
 

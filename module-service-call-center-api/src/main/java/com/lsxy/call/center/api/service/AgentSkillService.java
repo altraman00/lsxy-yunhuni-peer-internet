@@ -14,4 +14,6 @@ public interface AgentSkillService extends BaseService<AgentSkill> {
     List<AgentSkill> findAllByAgent(String agentId);
 
     List<AgentSkill> findAllByAgents(List<String> agentIds);
+
+    void deleteByAgentAndName(String agent, String name);
 }

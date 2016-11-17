@@ -28,4 +28,6 @@ public interface AgentSkillDao extends BaseDaoInterface<AgentSkill, Serializable
     List<AgentSkill> findByAgent(String agentId);
 
     List<AgentSkill> findByAgentIn(List<String> agentIds);
+
+    void deleteByAgentAndName(String agent, String name);
 }
