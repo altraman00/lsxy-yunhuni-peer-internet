@@ -25,7 +25,7 @@ public class EnqueueHandler extends ActionHandler{
     @Autowired
     private BusinessStateService businessStateService;
 
-    @Reference()
+    @Reference(lazy = true,check = false,timeout = 3000)
     private EnQueueService enQueueService;
 
     @Override
