@@ -121,6 +121,9 @@ public class EnQueueServiceImpl implements EnQueueService{
                     AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING
 
             );
+            if(logger.isDebugEnabled()){
+                logger.debug("排队结果:agent={}",agent);
+            }
             if(StringUtil.isEmpty(agent)){
                 //没有找到可用坐席
                 cQs.add(conditionId,queue.getId());

@@ -58,7 +58,7 @@ public class InitDevData {
         }
 
         String skill_prefix = UUIDGenerator.uuid();
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 10; i++) {
             CallCenterAgent agent = new CallCenterAgent();
             agent.setTenantId(channel.getTenantId());
             agent.setAppId(channel.getAppId());
@@ -84,7 +84,7 @@ public class InitDevData {
             agentState.setExtension(agent.getId(),exid);
             agentState.setLastRegTime(agent.getId(),new Date().getTime());
             agentState.setLastTime(agent.getId(),new Date().getTime());
-            agentState.setState(agent.getId(),"IDLE");
+            agentState.setState(agent.getId(),AgentState.Model.STATE_IDLE);
         }
         Condition condition = new Condition();
         condition.setTenantId(channel.getTenantId());
