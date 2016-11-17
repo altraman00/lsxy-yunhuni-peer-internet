@@ -4,10 +4,8 @@ import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.model.Condition;
-import com.lsxy.call.center.api.service.AgentSkillService;
-import com.lsxy.call.center.api.service.CallCenterAgentService;
-import com.lsxy.call.center.api.service.ChannelService;
-import com.lsxy.call.center.api.service.ConditionService;
+import com.lsxy.call.center.api.service.*;
+import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -45,6 +43,9 @@ public class InitDevData {
     @Autowired
     private AgentState agentState;
 
+    @Autowired
+    private EnQueueService enQueueService;
+
     @PostConstruct
     public void testDev() throws InterruptedException {
         List<Channel> cs = channelService.pageList(1,1).getResult();
@@ -58,7 +59,7 @@ public class InitDevData {
         }
 
         String skill_prefix = UUIDGenerator.uuid();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 50; i++) {
             CallCenterAgent agent = new CallCenterAgent();
             agent.setTenantId(channel.getTenantId());
             agent.setAppId(channel.getAppId());
@@ -119,6 +120,33 @@ public class InitDevData {
                         }
                     }
                 }
+            }
+        }).start();
+
+        String xml =
+                "<enqueue\n" +
+                "        channel=\""+channel.getId()+"\"\n" +
+                "        wait_voice=\"3.wav\"\n" +
+                "        ring_mode=\"4\"\n" +
+                "        play_num=\"true\"\n" +
+                "        pre_num_voice=\"坐席.wav\"\n" +
+                "        post_num_voice=\"为您服务.wav\"\n" +
+                "        data=\"your data whatever here!\">\n" +
+                "    <route>\n" +
+                "        <condition id=\""+condition.getId()+"\"></condition>\n" +
+                "    </route>\n" +
+                "</enqueue>\n";
+
+        final Condition cc = condition;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(60* 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                enQueueService.lookupAgent(cc.getTenantId(),cc.getAppId(),"13692206627","hahahahaha",EnQueueDecoder.decode(xml));
             }
         }).start();
     }
