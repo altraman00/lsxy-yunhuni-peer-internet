@@ -5,7 +5,6 @@ import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.*;
-import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -122,7 +121,7 @@ public class InitDevData {
                 }
             }
         }).start();
-
+/*
         String xml =
                 "<enqueue\n" +
                 "        channel=\""+channel.getId()+"\"\n" +
@@ -148,6 +147,6 @@ public class InitDevData {
                 }
                 enQueueService.lookupAgent(cc.getTenantId(),cc.getAppId(),"13692206627","hahahahaha",EnQueueDecoder.decode(xml));
             }
-        }).start();
+        }).start();*/
     }
 }
