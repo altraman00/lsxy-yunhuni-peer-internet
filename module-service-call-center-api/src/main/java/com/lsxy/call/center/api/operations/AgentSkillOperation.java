@@ -4,10 +4,14 @@ package com.lsxy.call.center.api.operations;
  * Created by liups on 2016/11/16.
  */
 public class AgentSkillOperation {
+    public static int OPT_SAVE = 1;
+    public static int OPT_DELETE = 2;
+    public static int OPT_DELETE_ALL = 0;
+
     private Integer opt;
     private String name;
-    private Integer score;
-    private Boolean enabled;
+    private int score;
+    private boolean enabled;
 
     public Integer getOpt() {
         return opt;
@@ -25,19 +29,19 @@ public class AgentSkillOperation {
         this.name = name;
     }
 
-    public Integer getScore() {
+    public int getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(int score) {
         this.score = score;
     }
 
-    public Boolean getEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 }

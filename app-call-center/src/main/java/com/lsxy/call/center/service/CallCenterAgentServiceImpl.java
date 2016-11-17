@@ -5,6 +5,7 @@ import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Condition;
+import com.lsxy.call.center.api.operations.AgentSkillOperation;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
 import com.lsxy.call.center.states.lock.AgentLock;
@@ -15,21 +16,24 @@ import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.base.BeanSelfAware;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
-import com.lsxy.framework.core.utils.FileUtil;
 import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.framework.AopContext;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -37,10 +41,16 @@ import java.util.stream.Collectors;
  */
 @Service
 @com.alibaba.dubbo.config.annotation.Service
-public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent> implements CallCenterAgentService {
+public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent> implements CallCenterAgentService,BeanSelfAware {
 
     private static final Logger logger = LoggerFactory.getLogger(CallCenterAgentServiceImpl.class);
 
+    private CallCenterAgentService self;
+    @Override
+    public void setSelf(Object proxyBean) {
+        //设置此对象的代理对象
+        this.self = (CallCenterAgentService) proxyBean;
+    }
     @Autowired
     private CallCenterAgentDao callCenterAgentDao;
     @Autowired
@@ -68,9 +78,36 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Autowired
     private AgentActionLogService agentActionLogService;
 
+
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
         return callCenterAgentDao;
+    }
+
+
+    /**
+     * 座席和技能是临时数据，所以删除采用物理删除
+     * @param id
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    @Override
+    @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
+    public void delete(Serializable id) throws IllegalAccessException, InvocationTargetException {
+        CallCenterAgent one = callCenterAgentDao.findOne(id);
+        callCenterAgentDao.delete(one);
+    }
+
+    /**
+     * 座席和技能是临时数据，所以删除采用物理删除
+     * @param entity
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
+    @Override
+    public void delete(CallCenterAgent entity) throws IllegalAccessException, InvocationTargetException {
+        callCenterAgentDao.delete(entity);
     }
 
     //登陆
@@ -120,6 +157,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             if(agent.getSkills()!=null && agent.getSkills().size()>0){
                 Map<String,Integer> vars = new HashMap<>();
                 for (AgentSkill obj : agent.getSkills()) {
+                    //TODO 处理技能，不让技能名称重复
                     if(StringUtils.isBlank(obj.getName())){
                         throw new RequestIllegalArgumentException();
                     }
@@ -234,26 +272,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         agentState.setLastRegTime(agent.getId(),System.currentTimeMillis());
     }
 
-    //技能迁入迁出
-    @Override
-    public boolean checkInSkill(String agent,String skillName,Boolean enable){
-//        agentSkillDao.updateActiveByAgent(enable,agent,skillName);
-        return true;
-    }
-    //技能追加
-    @Override
-    public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Boolean active){
-        AgentSkill skill = new AgentSkill();
-        skill.setTenantId(tenantId);
-        skill.setAppId(appId);
-        skill.setAgent(agent);
-        skill.setName(name);
-        skill.setScore(level);
-        skill.setEnabled(active);
-        agentSkillService.save(skill);
-        return true;
-    }
-
     @Override
     public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
         String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
@@ -365,5 +383,39 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
 
     }
+
+    @Override
+    public void skills(String appId, String agentName, List<AgentSkillOperation> skillOpts) throws YunhuniApiException{
+        CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
+        if(agent == null){
+            //TODO 座席不存在
+            throw new RequestIllegalArgumentException();
+        }
+
+        if(skillOpts != null && skillOpts.size() > 0){
+            Map<String,AgentSkill> skillMap = new HashMap<>();
+            List<AgentSkill> skills = agentSkillService.findAllByAgent(agent.getId());
+            skills.parallelStream().forEach(skill -> skillMap.put(skill.getName(),skill));
+            skillOpts.stream().forEach(opt -> {
+                switch (opt.getOpt()){
+                    case 0:{
+//                        agentSkillService.deleteByAgent();
+                    }
+                    case 1:{
+
+                    }
+                    case 2:{
+
+                    }
+                    default:{
+
+                    }
+                }
+            });
+        }else{
+            return;
+        }
+    }
+
 
 }

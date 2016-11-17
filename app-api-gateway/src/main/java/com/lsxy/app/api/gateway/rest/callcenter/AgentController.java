@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.call.center.api.model.CallCenterAgent;
+import com.lsxy.call.center.api.operations.AgentSkillOperation;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
@@ -92,13 +93,9 @@ public class AgentController extends AbstractAPIController {
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/skills",method = RequestMethod.POST)
     public ApiGatewayResponse skills(HttpServletRequest request, @RequestHeader("AppID") String appId,
-                                    @PathVariable("agent_name") String agentName,@RequestBody Map map) throws YunhuniApiException {
-        String state = (String) map.get("state");
+                                    @PathVariable("agent_name") String agentName,@RequestBody List<AgentSkillOperation> skillOpts) throws YunhuniApiException {
         //TODO 校验数据有效性
-        if(StringUtils.isBlank(state)){
-            throw new RuntimeException("状态不能为空");
-        }
-        callCenterAgentService.state(appId,agentName,state);
+        callCenterAgentService.skills(appId,agentName,skillOpts);
         return ApiGatewayResponse.success();
     }
 

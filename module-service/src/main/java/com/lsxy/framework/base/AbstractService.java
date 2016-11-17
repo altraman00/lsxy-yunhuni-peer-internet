@@ -78,8 +78,7 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     @CacheEvict(value = "entity", key = "'entity_' + #entity.id", beforeInvocation = true)
     @Override
     public void delete(T entity) throws IllegalAccessException, InvocationTargetException {
-        //设置删除时间
-        entity.setDeleteTime(new Date());
+
         this.logicDelete(entity);
     }
 
@@ -116,7 +115,9 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
     @CacheEvict(value = "entity", key = "'entity_' + #obj.id", beforeInvocation = true)
     public void logicDelete(T obj) throws IllegalAccessException, InvocationTargetException{
         if(obj != null){
-            BeanUtils.setProperty(obj, "deleted", true);
+            //设置删除时间
+            obj.setDeleteTime(new Date());
+            obj.setDeleted(true);
             this.save(obj);
             this.getEm().flush();
 //			this.getEm().detach(obj);
