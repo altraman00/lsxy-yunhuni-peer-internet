@@ -126,7 +126,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 logout(agent.getTenantId(), agent.getAppId(), agent.getName(), false);
             }else{
                 //TODO 注册没有过期
-                throw new AgentHasAlreadyLoggedInException();
+                throw new RuntimeException(new AgentHasAlreadyLoggedInException());
             }
         }
         //分机ID
