@@ -3,10 +3,13 @@ package com.lsxy.app.api.gateway.rest.callcenter;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
+import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentSkillVO;
+import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentVO;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.operations.AgentSkillOperationDTO;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -17,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +66,33 @@ public class AgentController extends AbstractAPIController {
     public ApiGatewayResponse get(HttpServletRequest request, @RequestHeader("AppID") String appId,
                                    @PathVariable("agent_name") String agentName) throws YunhuniApiException {
         CallCenterAgent agent = callCenterAgentService.get(appId,agentName);
-        return ApiGatewayResponse.success(agent);
+        AgentVO agentVO = getAgentVO(agent);
+        return ApiGatewayResponse.success(agentVO);
+    }
+
+    /**
+     * 转成AgentVO字段
+     * @param agent
+     * @return
+     */
+    private AgentVO getAgentVO(CallCenterAgent agent) {
+        AgentVO agentVO = new AgentVO();
+        try {
+            List<AgentSkillVO> skillVOs = new ArrayList<>();
+            BeanUtils.copyProperties(agentVO,agent);
+            List skills = agentVO.getSkills();
+            skills.stream().forEach(skill ->{
+                AgentSkillVO skillVO = new AgentSkillVO();
+                try {
+                    BeanUtils.copyProperties(skillVO,skill);
+                    skillVOs.add(skillVO);
+                } catch (Exception e) {
+                }
+            });
+            agentVO.setSkills(skillVOs);
+        } catch (Exception e) {
+        }
+        return agentVO;
     }
 
     @RequestMapping(value = "/{account_id}/callcenter/agent",method = RequestMethod.GET)
@@ -69,6 +100,10 @@ public class AgentController extends AbstractAPIController {
                                    @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                    @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
         Page page  = callCenterAgentService.getPage(appId,pageNo,pageSize);
+        List<AgentVO> agentVOs = new ArrayList<>();
+        List<CallCenterAgent> result = page.getResult();
+        result.stream().forEach(agent -> agentVOs.add(getAgentVO(agent)));
+        page.setResult(agentVOs);
         return ApiGatewayResponse.success(page);
     }
 
