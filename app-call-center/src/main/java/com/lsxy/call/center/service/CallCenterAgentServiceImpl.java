@@ -226,8 +226,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     public void logout(String tenantId, String appId, String agentName, boolean force) throws YunhuniApiException {
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
-            //TODO 座席不存在
-            throw new RequestIllegalArgumentException();
+            // 座席不存在
+            throw new AgentNotExistException();
         }
         AgentLock agentLock = new AgentLock(redisCacheService, agent.getId());
         boolean lock = agentLock.lock();
@@ -243,8 +243,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 if(force){
                     //TODO 切断平台和座席之间的呼叫
                 }else{
-                    //TODO 座席正忙
-                    throw new RuntimeException("座席正忙");
+                    // 座席正忙
+                    throw new AgentIsBusyException();
                 }
             }
             agentSkillService.deleteByAgent(agentId);
@@ -279,8 +279,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     public void keepAlive(String appId, String agentName) throws YunhuniApiException{
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
-            //TODO 座席不存在
-            throw new RequestIllegalArgumentException();
+            // 座席不存在
+            throw new AgentNotExistException();
         }
         agentState.setLastRegTime(agent.getId(),System.currentTimeMillis());
     }
@@ -297,8 +297,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     public CallCenterAgent get(String appId, String agentName) throws YunhuniApiException {
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
         if(agent == null){
-            //TODO 座席不存在
-            throw new RequestIllegalArgumentException();
+            // 座席不存在
+            throw new AgentNotExistException();
         }
         AgentState.Model model = agentState.get(agent.getId());
         //状态
@@ -336,8 +336,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     public void extension(String appId, String agentName,String extensionId) throws YunhuniApiException{
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
-            //TODO 座席不存在
-            throw new RequestIllegalArgumentException();
+            // 座席不存在
+            throw new AgentNotExistException();
         }
         AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
         if(extension == null){
@@ -371,8 +371,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     public void state(String appId, String agentName, String state) throws YunhuniApiException{
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
-            //TODO 座席不存在
-            throw new RequestIllegalArgumentException();
+            // 座席不存在
+            throw new AgentNotExistException();
         }
 
         AgentLock agentLock = new AgentLock(redisCacheService, agent.getId());
@@ -384,8 +384,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         try{
             String curState = agentState.getState(agent.getId());
             if(curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING)){
-                //TODO 座席正忙
-                throw new RuntimeException("座席正忙");
+                // 座席正忙
+                throw new AgentIsBusyException();
             }
             agentState.setState(agent.getId(),state);
             if(state.contains(AgentState.Model.STATE_IDLE)){
@@ -401,8 +401,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
-            //TODO 座席不存在
-            throw new RequestIllegalArgumentException();
+            //座席不存在
+            throw new AgentNotExistException();
         }
         String agentId = agent.getId();
 
