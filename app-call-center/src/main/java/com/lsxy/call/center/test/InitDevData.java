@@ -23,7 +23,7 @@ import java.util.Random;
  */
 @Component
 @DependsOn("MQEventListener")
-@Profile(value = {"local","development"})
+@Profile(value = {"development"})
 public class InitDevData {
 
     @Autowired

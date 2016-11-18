@@ -118,9 +118,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING
-
-            );
+                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING);
             if(logger.isDebugEnabled()){
                 logger.debug("排队结果:agent={}",agent);
             }
@@ -133,8 +131,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                         ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                         ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                        AgentState.Model.STATE_IDLE
-                );
+                        AgentState.Model.STATE_IDLE);
                 if(StringUtil.isNotEmpty(agent_idle)){
                     lookupQueue(tenantId,appId,conditionId,agent_idle);
                 }
