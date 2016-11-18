@@ -9,6 +9,7 @@ import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,7 @@ import java.util.Random;
  * Created by liuws on 2016/11/17.
  */
 @Component
+@DependsOn("mqEventListener")
 @Profile(value = {"development"})
 public class InitDevData {
 
