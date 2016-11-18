@@ -3,13 +3,16 @@ package com.lsxy.area.server.service.ivr.handler;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +30,9 @@ public class EnqueueHandler extends ActionHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private EnQueueService enQueueService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
 
     @Override
     public String getAction() {
@@ -50,11 +56,37 @@ public class EnqueueHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
+        String xml = root.asXML();
+        EnQueue enQueue = EnQueueDecoder.decode(xml);
+
+        if(enQueue!=null){
+            CallCenter callCenter = new CallCenter();
+            callCenter.setTenantId(state.getTenantId());
+            callCenter.setAppId(state.getAppId());
+            callCenter.setType(""+CallCenter.CALL_IN);
+            callCenter.setAgent(null);
+            callCenter.setStartTime(new Date());
+            callCenter.setFromNum((String)businessData.get("from"));
+            callCenter.setToNum((String)businessData.get("to"));
+            callCenter = callCenterService.save(callCenter);
+            /*businessData.put("conversation_level",enQueue.getConversation_level());
+            businessData.put("conversation_timeout",enQueue.getConversation_level());
+            businessData.put("reserve_state",enQueue.getConversation_level());
+            businessData.put("fail_overflow",enQueue.getConversation_level());
+            businessData.put("wait_voice",enQueue.getConversation_level());
+            businessData.put("ring_mode",enQueue.getConversation_level());
+            businessData.put("ring_voice",enQueue.getConversation_level());
+            businessData.put("hold_voice",enQueue.getConversation_level());
+            businessData.put("play_num",enQueue.getConversation_level());
+            businessData.put("pre_num_voice",enQueue.getConversation_level());
+            businessData.put("post_num_voice",enQueue.getConversation_level());
+            businessData.put("play_num",enQueue.getConversation_level());*/
+            businessData.put("callcenter",callCenter.getId());
+            state.setUserdata(enQueue.getData());
+        }
         businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
-        String xml = root.asXML();
-        EnQueue enQueue = EnQueueDecoder.decode(xml);
         enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),(String)businessData.get("to"),callId,enQueue);
         return true;
     }

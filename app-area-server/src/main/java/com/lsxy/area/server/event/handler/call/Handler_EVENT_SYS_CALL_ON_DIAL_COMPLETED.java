@@ -4,10 +4,12 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -68,6 +70,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Autowired
     private VoiceIvrService voiceIvrService;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Autowired
     private PlayFileUtil playFileUtil;
@@ -204,6 +209,14 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }
                 ivrState.getBusinessData().put("ivr_dial_call_id",call_id);
                 businessStateService.save(ivrState);
+            }
+        }else if("conversation".equals(state.getType())){
+            //加入交谈
+            String conversation = (String)businessData.get("conversation");
+            try {
+                conversationService.join(state.getAppId(),conversation,call_id,null,null,null);
+            } catch (YunhuniApiException e) {
+                e.printStackTrace();
             }
         }
         return res;

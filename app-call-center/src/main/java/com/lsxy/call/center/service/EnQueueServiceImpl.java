@@ -149,6 +149,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     EnQueueResult result = new EnQueueResult();
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
                     result.setAgent(callCenterAgentService.findById(agent));
+                    result.setEnQueue(enQueue);
                     deQueueService.success(tenantId,appId,callId,queue.getId(),result);
                 }catch (Throwable t1){
                     try{

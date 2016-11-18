@@ -1,9 +1,6 @@
 package com.lsxy.call.center.test;
 
-import com.lsxy.call.center.api.model.AgentSkill;
-import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.Channel;
-import com.lsxy.call.center.api.model.Condition;
+import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
@@ -45,6 +42,9 @@ public class InitDevData {
     private AgentState agentState;
 
     @Autowired
+    private AppExtensionService appExtensionService;
+
+    @Autowired
     private EnQueueService enQueueService;
 
     @PostConstruct
@@ -78,7 +78,13 @@ public class InitDevData {
                 skill.setEnabled(true);
                 agentSkillService.save(skill);
             }
-            String exid = UUIDGenerator.uuid();
+            AppExtension appExtension = new AppExtension();
+            appExtension.setType(AppExtension.TYPE_SIP);
+            appExtension.setTenantId(channel.getTenantId());
+            appExtension.setAppId(channel.getAppId());
+            appExtension.setTelenum("13692206627");
+            appExtension=appExtensionService.save(appExtension);
+            String exid = appExtension.getId();
             extensionState.setAgent(exid,agent.getId());
             extensionState.setLastRegisterStatus(exid,200);
             extensionState.setLastRegisterTime(exid,new Date().getTime());
