@@ -22,7 +22,7 @@ import java.util.Random;
  * Created by liuws on 2016/11/17.
  */
 @Component
-@DependsOn("mqEventListener")
+@DependsOn("MQEventListener")
 @Profile(value = {"development"})
 public class InitDevData {
 
