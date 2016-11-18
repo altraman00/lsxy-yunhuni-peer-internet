@@ -22,8 +22,8 @@ import java.util.Random;
  * Created by liuws on 2016/11/17.
  */
 @Component
-@DependsOn("mqEventListener")
-@Profile(value = {"development"})
+@DependsOn("MQEventListener")
+@Profile(value = {"local","development"})
 public class InitDevData {
 
     @Autowired
