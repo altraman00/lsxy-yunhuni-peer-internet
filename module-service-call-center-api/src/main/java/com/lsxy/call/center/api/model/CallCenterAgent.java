@@ -30,12 +30,10 @@ public class CallCenterAgent extends IdEntity {
     private String name;//坐席id
     private String num;//坐席工号
 
-    @Transient
-    private String state;
-    @Transient
-    private List<AgentSkill> skills;
-    @Transient
-    private String extension;
+
+    private String state;   //座席状态，不存入座席表
+    private List<AgentSkill> skills; //座席技能，不存入座席表
+    private String extension;   //座席分机，不存入座席表
 
 
     @Column(name = "tenant_id")

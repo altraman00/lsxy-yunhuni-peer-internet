@@ -5,7 +5,7 @@ import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Condition;
-import com.lsxy.call.center.api.operations.AgentSkillOperation;
+import com.lsxy.call.center.api.operations.AgentSkillOperationDTO;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
 import com.lsxy.call.center.states.lock.AgentLock;
@@ -398,7 +398,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperation> skillOpts) throws YunhuniApiException{
+    public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             //TODO 座席不存在

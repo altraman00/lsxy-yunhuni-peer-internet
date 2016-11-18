@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by liups on 2016/11/16.
  */
-public class AgentSkillOperation implements Serializable {
+public class AgentSkillOperationDTO implements Serializable {
     public static int OPT_SAVE = 1;
     public static int OPT_DELETE = 2;
     public static int OPT_DELETE_ALL = 0;

@@ -28,7 +28,7 @@ public class ExtensionController extends AbstractAPIController {
     @Autowired
     AppService appService;
 
-    @RequestMapping(value = "/{account_id}/callcenter/extensions",method = RequestMethod.POST)
+    @RequestMapping(value = "/{account_id}/callcenter/extension",method = RequestMethod.POST)
     public ApiGatewayResponse createExtension(HttpServletRequest request, @RequestBody AppExtension extension, @RequestHeader("AppID") String appId) throws YunhuniApiException {
         App app = appService.findById(appId);
         extension.setAppId(appId);
@@ -37,13 +37,13 @@ public class ExtensionController extends AbstractAPIController {
         return ApiGatewayResponse.success(extensionId);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/extensions/{extension_id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{account_id}/callcenter/extension/{extension_id}",method = RequestMethod.DELETE)
     public ApiGatewayResponse createExtension(HttpServletRequest request, @PathVariable String extension_id,@RequestHeader("AppID") String appId) throws YunhuniApiException {
         appExtensionService.delete(extension_id,appId);
         return ApiGatewayResponse.success();
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/extensions",method = RequestMethod.GET)
+    @RequestMapping(value = "/{account_id}/callcenter/extension",method = RequestMethod.GET)
     public ApiGatewayResponse listExtensions(HttpServletRequest request,@RequestHeader("AppID") String appId,
                                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
                                              @RequestParam(defaultValue = "20",required = false)  Integer pageSize) throws YunhuniApiException {
