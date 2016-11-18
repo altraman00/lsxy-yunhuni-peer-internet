@@ -1,34 +1,30 @@
 package com.lsxy.call.center.test;
 
-import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.model.AgentSkill;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.model.Condition;
-import com.lsxy.call.center.api.service.AgentSkillService;
-import com.lsxy.call.center.api.service.CallCenterAgentService;
-import com.lsxy.call.center.api.service.ChannelService;
-import com.lsxy.call.center.api.service.ConditionService;
+import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
-import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.UUIDGenerator;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 /**
- * Created by liuws on 2016/11/10.
+ * Created by liuws on 2016/11/17.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(CallCenterMainClass.class)
-public class ConditionTest {
+@Component
+@DependsOn("mqEventListener")
+@Profile(value = {"development"})
+public class InitDevData {
 
     @Autowired
     private ConditionService conditionService;
@@ -48,25 +44,23 @@ public class ConditionTest {
     @Autowired
     private AgentState agentState;
 
-    static {
-        //将 spring boot 的默认配置文件设置为系统配置文件
-        System.setProperty("spring.config.location","classpath:"+ Constants.DEFAULT_CONFIG_FILE);
-    }
+    @Autowired
+    private EnQueueService enQueueService;
 
-    @Test
-    public void test() throws InterruptedException {
+    @PostConstruct
+    public void testDev() throws InterruptedException {
         List<Channel> cs = channelService.pageList(1,1).getResult();
         Channel channel = cs!=null && cs.size()>0 ?cs.get(0):null;
         if(channel == null){
             channel = new Channel();
-            channel.setTenantId("40288aca574060400157406339080002");
-            channel.setAppId("40288aca574060400157406427f20005");
+            channel.setTenantId("8a2bc5f65721aa16015722256ba00007");
+            channel.setAppId("8a2bc5f65721aa160157222c8477000b");
             channel.setRemark("通道1");
             channel = channelService.save(channel);
         }
 
         String skill_prefix = UUIDGenerator.uuid();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 50; i++) {
             CallCenterAgent agent = new CallCenterAgent();
             agent.setTenantId(channel.getTenantId());
             agent.setAppId(channel.getAppId());
@@ -105,6 +99,56 @@ public class ConditionTest {
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
         condition = conditionService.save(condition);
-        Thread.sleep(50000);
+
+
+        List<String> agentIds = callCenterAgentService
+                .getAgentIdsByChannel(condition.getTenantId(),condition.getAppId(),condition.getChannelId());
+        /**
+         * 模拟坐席空闲
+         */
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    try {
+                        Thread.sleep(60000 * (1 + new Random().nextInt(3)));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    for (String agent: agentIds) {
+                        if(agentState.getState(agent).equals(AgentState.Model.STATE_FETCHING)){
+                            agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                        }
+                    }
+                }
+            }
+        }).start();
+/*
+        String xml =
+                "<enqueue\n" +
+                "        channel=\""+channel.getId()+"\"\n" +
+                "        wait_voice=\"3.wav\"\n" +
+                "        ring_mode=\"4\"\n" +
+                "        play_num=\"true\"\n" +
+                "        pre_num_voice=\"坐席.wav\"\n" +
+                "        post_num_voice=\"为您服务.wav\"\n" +
+                "        data=\"your data whatever here!\">\n" +
+                "    <route>\n" +
+                "        <condition id=\""+condition.getId()+"\"></condition>\n" +
+                "    </route>\n" +
+                "</enqueue>\n";
+
+        final Condition cc = condition;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(60* 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                enQueueService.lookupAgent(cc.getTenantId(),cc.getAppId(),"13692206627","hahahahaha",EnQueueDecoder.decode(xml));
+            }
+        }).start();*/
     }
 }

@@ -128,24 +128,30 @@ public class IVRTest {
     public void testParse2() throws DocumentException, InterruptedException {
         Thread.sleep(1000);
 
-        String xml ="<response><enqueue\n" +
-                "        channel=\"channel1\"\n" +
-                "        wait_voice=\"wait.wav\"\n" +
+        String xml ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<response>\n" +
+                "<enqueue\n" +
+                "        channel=\"40288ae2586b014801586b0171520000\"\n" +
+                "        wait_voice=\"3.wav\"\n" +
                 "        ring_mode=\"4\"\n" +
                 "        play_num=\"true\"\n" +
                 "        pre_num_voice=\"坐席.wav\"\n" +
                 "        post_num_voice=\"为您服务.wav\"\n" +
                 "        data=\"your data whatever here!\">\n" +
                 "    <route>\n" +
-                "        <condition id=\"condition1\"/>\n" +
+                "        <condition id=\"40288ae2586b014801586b01f10c157d\"></condition>\n" +
                 "    </route>\n" +
-                "</enqueue></response>";
+                "</enqueue>\n" +
+                "<next>http://101.200.135.23:8085/ivr.php?step=receive</next>\n" +
+                "</response>\n";
 
         try {
             System.out.println(ivrActionService.validateXMLSchema(DocumentHelper.parseText(xml)));
             Document document = DocumentHelper.parseText(xml);
-            System.out.println(JSONUtil.objectToJson(EnQueueDecoder.decode(document.getRootElement().element("enqueue").asXML())));
+            xml = document.getRootElement().element("enqueue").asXML();
+            System.out.println(JSONUtil.objectToJson(EnQueueDecoder.decode(xml)));
         } catch (DocumentException e) {
+            System.out.println("出错鸟");
             e.printStackTrace();
         }
     }
