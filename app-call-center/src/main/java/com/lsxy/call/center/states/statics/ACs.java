@@ -43,7 +43,7 @@ public class ACs {
     }
 
     public Set<String> getAll(String agentId){
-        return redisCacheService.zrang(getKey(agentId), 0L, -1L);
+        return redisCacheService.zRange(getKey(agentId), 0L, -1L);
     }
 
 }

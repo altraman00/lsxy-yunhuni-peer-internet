@@ -3,6 +3,7 @@ package com.lsxy.framework.base;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.api.base.IdEntity;
+import com.lsxy.framework.api.exceptions.PageSizeTooLargeException;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.HqlUtil;
@@ -162,6 +163,9 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
 
     @Override
     public Page pageList(String hql, int pageNo, int pageSize, Object... params) {
+        if(pageSize > 1000){
+            throw new PageSizeTooLargeException("分页数据太大");
+        }
         return this.findByCustom(hql,true, pageNo, pageSize,params);
     }
 

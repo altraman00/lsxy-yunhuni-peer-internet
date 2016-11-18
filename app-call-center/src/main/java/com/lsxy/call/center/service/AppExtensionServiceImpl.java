@@ -11,6 +11,7 @@ import com.lsxy.framework.core.exceptions.api.ExtensionBindingToAgentException;
 import com.lsxy.framework.core.exceptions.api.ExtensionUserExistException;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import org.apache.commons.lang.StringUtils;
@@ -55,24 +56,12 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     //注册
     @Override
     public String register(AppExtension appExtension) throws YunhuniApiException {
-        if(appExtension == null){
-            throw new NullPointerException();
+        if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())
+        || StringUtil.isBlank(appExtension.getUser()) || StringUtil.isBlank(appExtension.getPassword())
+        || StringUtil.isBlank(appExtension.getType())){
+            throw new RequestIllegalArgumentException();
         }
-        if(StringUtil.isBlank(appExtension.getTenantId())){
-            throw new NullPointerException();
-        }
-        if(StringUtil.isBlank(appExtension.getAppId())){
-            throw new NullPointerException();
-        }
-        if(StringUtil.isBlank(appExtension.getUser())){
-            throw new NullPointerException();
-        }
-        if(StringUtil.isBlank(appExtension.getPassword())){
-            throw new NullPointerException();
-        }
-        if(StringUtil.isBlank(appExtension.getType())){
-            throw new NullPointerException();
-        }
+
         if(this.exists(appExtension.getUser())){
             throw new ExtensionUserExistException();
         }
@@ -131,6 +120,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                     throw new ExtensionBindingToAgentException();
                 }
             } catch (Exception e) {
+                logger.error("删除分机失败:{}",extensionId);
                 logger.error("删除分机失败",e);
                 throw new RequestIllegalArgumentException();
             }

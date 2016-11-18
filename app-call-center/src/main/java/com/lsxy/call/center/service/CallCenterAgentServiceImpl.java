@@ -20,6 +20,7 @@ import com.lsxy.framework.api.base.BeanSelfAware;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -155,7 +156,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             Map<String,Long> conditionScore = new HashMap<>();
             if(agent.getSkills()!=null && agent.getSkills().size()>0){
                 Map<String,Integer> skillScore = new HashMap<>();
-                agent.getSkills().stream().forEach(obj -> {
+                for(AgentSkill obj:agent.getSkills()){
                     //TODO 处理技能，不让技能名称重复
                     if(StringUtils.isBlank(obj.getName())){
                         throw new RequestIllegalArgumentException();
@@ -171,7 +172,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     obj.setAgent(agentId);
                     agentSkillService.save(obj);
                     skillScore.put(obj.getName(),obj.getScore());
-                });
+                }
+
                 //查询指定通道下所有条件集合，查出匹配的条件
                 setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
             }
@@ -251,6 +253,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 //写入注销日志
                 agentActionLogService.agentLogout(agent);
             } catch (Exception e) {
+                logger.error("删除座席出错", JSONUtil.objectToJson(agent));
                 logger.error("删除座席出错",e);
             }
             String extension = agentState.getExtension(agentId);
@@ -311,7 +314,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Override
     public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
         List<String> agentIds = new ArrayList<>();
-        String hql = "from CallCenterAgent obj where obj.appId=?1 and obj.channel=?2";
+        String hql = "from CallCenterAgent obj where obj.appId=?1";
         Page page = this.pageList(hql, pageNo, pageSize, appId);
         List<CallCenterAgent> result = page.getResult();
         //将所有座席ID放入集合中
@@ -419,6 +422,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                         //删除全部
                         agentSkillService.deleteByAgent(agentId);
                         skillMap.clear();
+                        break;
                     }
                     case 1:{
                         //修改
@@ -434,11 +438,13 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                                 skillMap.put(newSkill.getName(),newSkill);
                             }
                         }
+                        break;
                     }
                     case 2:{
                         //删除一个
                         agentSkillService.deleteByAgentAndName(agentId,opt.getName());
                         skillMap.remove(opt.getName());
+                        break;
                     }
                 }
             });
@@ -452,9 +458,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             Set<String> removeConditionIds = new HashSet<>();
 
             suitedConditions.parallelStream().forEach(condition -> {
-                if(!oldConditionIds.contains(condition.getId())){
-                    removeConditionIds.add(condition.getId());
-                }
+                oldConditionIds.remove(condition.getId());
                 //TODO 设置条件座席
                 cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
                 //TODO 设置座席条件
@@ -464,9 +468,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 cAs.remove(cId,agentId);
                 aCs.remove(agentId,cId);
             });
-        }else{
-            return;
         }
     }
+
 
 }
