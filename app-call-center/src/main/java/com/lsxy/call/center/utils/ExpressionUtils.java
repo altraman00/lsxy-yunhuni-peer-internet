@@ -101,7 +101,7 @@ public final class ExpressionUtils {
         return value.getNumberValue().longValue();
     }
 
-    public static boolean invalidWhereExpression(String str){
+    public static boolean validWhereExpression(String str){
         if(StringUtil.isBlank(str)){
             return false;
         }
@@ -120,7 +120,7 @@ public final class ExpressionUtils {
         return true;
     }
 
-    public static boolean invalidSortExpression(String str){
+    public static boolean validSortExpression(String str){
         if(StringUtil.isBlank(str)){
             return false;
         }

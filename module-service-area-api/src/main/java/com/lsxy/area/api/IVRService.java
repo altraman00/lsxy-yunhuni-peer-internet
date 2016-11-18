@@ -1,6 +1,6 @@
 package com.lsxy.area.api;
 
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 
 /**
  * Created by liuws on 2016/9/1.

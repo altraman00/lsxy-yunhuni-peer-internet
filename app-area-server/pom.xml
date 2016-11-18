@@ -93,6 +93,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-service-call-center-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-oss</artifactId>
+        </dependency>
 
     </dependencies>
 

@@ -1,23 +1,20 @@
 package com.lsxy.call.center.service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.call.center.api.model.AgentSkill;
-import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.EnQueue;
-import com.lsxy.call.center.api.service.AgentSkillService;
-import com.lsxy.call.center.api.service.AppExtensionService;
-import com.lsxy.call.center.api.service.CallCenterAgentService;
-import com.lsxy.call.center.api.service.DeQueueService;
+import com.lsxy.call.center.api.model.*;
+import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.dao.AgentSkillDao;
-import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.dao.CallCenterAgentDao;
+import com.lsxy.call.center.states.lock.ExtensionLock;
+import com.lsxy.call.center.states.state.ExtensionState;
+import com.lsxy.call.center.states.statics.ACs;
+import com.lsxy.call.center.states.statics.CAs;
+import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.utils.BeanUtils;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.core.exceptions.api.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +22,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -38,30 +38,28 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Autowired
     private CallCenterAgentDao callCenterAgentDao;
-
     @Autowired
     private AgentSkillService agentSkillService;
-
     @Autowired
     private AppExtensionService appExtensionService;
-
-    @Autowired
-    private AppExtensionDao appExtensionDao;
-
     @Autowired
     private AgentSkillDao agentSkillDao;
-
     @Reference(lazy = true,check = false,timeout = 3000)
     private DeQueueService deQueueService;
-
-    @Autowired
-    private RedisCacheService redisCacheService;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     @Autowired
-    private MQService mqService;
+    ChannelService channelService;
+    @Autowired
+    ConditionService conditionService;
+    @Autowired
+    ExtensionState extensionState;
+    @Autowired
+    RedisCacheService redisCacheService;
+    @Autowired
+    private ACs aCs;
+    @Autowired
+    private CAs cAs;
 
     @Override
     public BaseDaoInterface<CallCenterAgent, Serializable> getDao() {
@@ -70,41 +68,76 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     //登陆
     @Override
-    public String login(String tenantId,String appId,CallCenterAgent callCenterAgent,List<AppExtension> extentions,List<AgentSkill> skills){
-        if(StringUtil.isEmpty(tenantId)){
-            throw new NullPointerException();
+    public String login(CallCenterAgent agent) throws YunhuniApiException {
+        Channel channel;
+        try{
+            channel = channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+        }catch (IllegalArgumentException e){
+            throw new RequestIllegalArgumentException();
         }
-        if(StringUtil.isEmpty(appId)){
-            throw new NullPointerException();
+        CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndChannelAndName(agent.getAppId(),agent.getChannel(),agent.getName());
+        if(oldAgent != null){
+            //TODO 注册是否过期，过期执行注销过程
+
+            //TODO 注册没有过期
+            throw new AgentHasAlreadyLoggedInException();
         }
-
-        CallCenterAgent agent = new CallCenterAgent();
-        agent.setTenantId(tenantId);
-        agent.setAppId(appId);
-        agent.setAgentNo(callCenterAgent.getAgentNo());
-        agent.setAgentNum(callCenterAgent.getAgentNum());
-
-        String agentId = this.save(agent).getId();
-        if(extentions!=null && extentions.size()>0){
-            for (AppExtension extension : extentions) {
-                //TODO 设置坐席的分机
+        //分机ID
+        String extensionId = agent.getExtension();
+        if(StringUtils.isBlank(extensionId)){
+           throw new RequestIllegalArgumentException();
+        }
+        AppExtension extension = appExtensionService.findOne(agent.getAppId(),extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
+        //获取分机锁
+        ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
+        boolean lock = extensionLock.lock();
+        try{
+            //获取锁失败 抛异常
+            if(!lock){
+                throw new ExtensionBindingToAgentException();
             }
-        }
-        if(skills!=null && skills.size()>0){
-            for (AgentSkill obj : skills) {
-                AgentSkill skill = new AgentSkill();
-                try {
-                    BeanUtils.copyProperties(skill,obj);
-                } catch (Throwable e) {
-                    throw new IllegalArgumentException(e);
+            String extentionAgent = extensionState.getAgent(extensionId);
+            if(StringUtils.isNotBlank(extentionAgent)){
+                throw new ExtensionBindingToAgentException();
+            }
+            String agentId = this.save(agent).getId();
+            if(agent.getSkills()!=null && agent.getSkills().size()>0){
+                Map<String,Integer> vars = new HashMap<>();
+                for (AgentSkill obj : agent.getSkills()) {
+                    if(StringUtils.isBlank(obj.getName())){
+                        throw new RequestIllegalArgumentException();
+                    }
+                    if(obj.getScore() == null){
+                        throw new RequestIllegalArgumentException();
+                    }
+                    if(obj.getEnabled() == null){
+                        throw new RequestIllegalArgumentException();
+                    }
+                    obj.setTenantId(agent.getTenantId());
+                    obj.setAppId(agent.getAppId());
+                    obj.setAgent(agentId);
+                    agentSkillService.save(obj);
+                    vars.put(obj.getName(),obj.getScore());
                 }
-                skill.setTenantId(tenantId);
-                skill.setAppId(appId);
-                skill.setAgent(agentId);
-                agentSkillService.save(skill);
+                //查询指定通道下所有条件集合，查出匹配的条件
+                List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
+                List<Condition> suitedConditions = new ArrayList<>();
+                for(Condition condition:conditions){
+                    if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),vars)){
+                        suitedConditions.add(condition);
+                    }
+                }
+
             }
+
+            extensionState.setAgent(extensionId,agentId);
+            return agentId;
+        }finally{
+            extensionLock.unlock();
         }
-        return agentId;
     }
 
     //注销
@@ -132,20 +165,20 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
     //技能迁入迁出
     @Override
-    public boolean checkInSkill(String agent,String skillName,Integer active){
-        agentSkillDao.updateActiveByAgent(active,agent,skillName);
+    public boolean checkInSkill(String agent,String skillName,Boolean enable){
+        agentSkillDao.updateActiveByAgent(enable,agent,skillName);
         return true;
     }
     //技能追加
     @Override
-    public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Integer active){
+    public boolean appendSkill(String tenantId,String appId,String agent,String name,Integer level,Boolean active){
         AgentSkill skill = new AgentSkill();
         skill.setTenantId(tenantId);
         skill.setAppId(appId);
         skill.setAgent(agent);
         skill.setName(name);
-        skill.setLevel(level);
-        skill.setActive(active);
+        skill.setScore(level);
+        skill.setEnabled(active);
         agentSkillService.save(skill);
         return true;
     }
@@ -153,88 +186,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     @Override
     public List<String> getAgentIdsByChannel(String tenantId,String appId,String channelId){
         String sql = "select id  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent " +
-                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel_id=\""+channelId+"\" and deleted = 0";
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and channel=\""+channelId+"\" and deleted = 0";
 
         return jdbcTemplate.queryForList(sql, new Object[]{}, String.class);
-    }
-    /**
-     * 排队,通过 dubbo返回结果给  区域管理器
-     * @param tenantId
-     * @param appId
-     * @param callId 参与排队的callId
-     * @param enQueue
-     */
-    @Override
-    public void enqueue(String tenantId, String appId, String callId, EnQueue enQueue){
-        /*if(StringUtil.isEmpty(tenantId)){
-            return;
-        }
-        if(StringUtil.isEmpty(appId)){
-            return;
-        }
-        if(enQueue == null){
-            return;
-        }
-        try{
-            int timeout = 60;
-            String where = "";
-            String sort = "";
-            if(enQueue.getFilter()!=null && enQueue.getFilter().getCondition()!=null){
-                timeout = enQueue.getFilter().getCondition().getTimeout();
-                where = enQueue.getFilter().getCondition().getWhere();
-                sort = enQueue.getFilter().getCondition().getWhere();
-            }
-            String sql = EnqueueSQLUtil.genSQL(tenantId,appId,where,sort);
-            List<EnQueueResult> results = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<EnQueueResult>(EnQueueResult.class));
-            EnQueueResult result = null;
-            if(results != null && results.size()>0){
-                for (EnQueueResult res: results) {
-                    boolean locked = "1".equals(redisTemplate.opsForValue().getAndSet("agent_lock_"+res.getAgent(),"1"));
-                    if(!locked){
-                        result = res;
-                        break;
-                    }
-                }
-            }
-            if(result != null){
-                deQueueService.success(tenantId,appId,callId,result);
-            }else{
-                //将排队放入redis
-                String key = "enqueue_" +tenantId+"_"+appId + UUIDGenerator.uuid();
-                redisTemplate.opsForValue().set(key,"1");
-                //排队队列左进右出
-                redisTemplate.opsForList().leftPush("enqueue_"+tenantId+"_"+appId, JSONUtil.objectToJson(enQueue));
-                mqService.publish(new EnqueueEvent(key,tenantId,appId,callId,timeout));
-            }
-        }catch (Throwable t){
-            logger.error("排队出错",t);
-            deQueueService.fail(tenantId,appId,callId,t.getMessage());
-        }*/
-    }
-
-    /**
-     * 坐席找排队
-     * @param tenantId
-     * @param appId
-     * @param agentId
-     */
-    public void enqueue(String tenantId, String appId, String agentId){
-        /*CallCenterAgent agent = this.findById(agentId);
-        if(agent == null){
-            return;
-        }
-        List<AgentSkill> skills = agentSkillDao.findByTenantIdAndAppIdAndAgentAndActive(tenantId,appId,agentId,1);
-        Map<String,Object> params = new HashMap<>();
-        if(skills!=null && skills.size()>0){
-            for(AgentSkill skill : skills){
-                String varName = "var_" + skill.getName().hashCode();
-                params.put(varName, skill.getLevel() == null ?0 : skill.getLevel());
-            }
-        }
-        String enqueue = redisTemplate.opsForList().rightPop("enqueue_"+tenantId+"_"+appId);
-        if(getWhere(enqueue,params)){
-            getSort(enqueue,params);
-        }*/
     }
 
 }

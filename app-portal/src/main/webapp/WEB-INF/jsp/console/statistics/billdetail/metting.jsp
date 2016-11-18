@@ -49,11 +49,6 @@
                                                 <a href="${ctx}/console/statistics/billdetail/code">语音验证码</a>
                                             </div>
                                         </li>
-                                        <%--<li>--%>
-                                            <%--<div class="aside-li-a">--%>
-                                                <%--<a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>--%>
-                                            <%--</div>--%>
-                                        <%--</li>--%>
                                         <li>
                                             <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/ivr">自定义IVR</a>
@@ -62,6 +57,11 @@
                                         <li>
                                             <div class="aside-li-a">
                                                 <a href="${ctx}/console/statistics/billdetail/callcenter">呼叫中心</a>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="aside-li-a">
+                                                <a href="${ctx}/console/statistics/billdetail/recording">通话录音</a>
                                             </div>
                                         </li>
                                     </ul>
@@ -125,6 +125,7 @@
                                                 <th>参与类型</th>
                                                 <th>时长（秒）</th>
                                                 <th><span style="float:left;width: 80px" ><span style="float:right;" >消费金额</span></span></th>
+                                                <th>操作</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -148,6 +149,7 @@
                                                         ￥<fmt:formatNumber value="${result.cost}" pattern="0.000"></fmt:formatNumber>
                                                         </span></span>
                                                     </td>
+                                                    <td><a id="downVoid${result.id}" onclick="downVoid('${result.id}')" data-statu="1">录音下载</a></td>
                                                 </tr>
                                             </c:forEach>
                                             </tbody>
@@ -180,6 +182,28 @@
         $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/metting/download");
         $('#mainForm').submit();
         $('#mainForm').attr('action',ctx+"/console/statistics/billdetail/metting");
+    }
+    function downVoid(id) {
+        var tag  = $('#downVoid'+id);
+        var ststus = tag.attr('data-statu');
+        if(ststus==1){
+            //查询录音是否下载到oss,是下载到本地，否下载到oss显示 正在下载 ,下载oss失败，显示重试
+            var params = {'${_csrf.parameterName}':'${_csrf.token}'};
+            tag.html('正在下载<span class="download"></span>').attr("data-statu","2");
+            ajaxsync("${ctx}/console/app/file/record/cdr/download/"+id,params,function(result) {
+                if(result.success){
+                    window.open(result.data);
+                    tag.html('录音下载').attr("data-statu","1");
+                }else{
+                    showtoast(result.errorMsg);
+                    tag.html('下载失败,请重试').attr("data-statu","3");
+                }
+            });
+        }else if(ststus==2){
+            tag.html('下载失败,请重试').attr("data-statu","3");
+        }else{
+            tag.html('录音下载').attr("data-statu","1");
+        }
     }
 </script>
 </body>

@@ -17,6 +17,9 @@ public class EnQueue {
     private Integer conversation_timeout;
 
     @XStreamAsAttribute
+    private String choice;
+
+    @XStreamAsAttribute
     private String reserve_state;
 
     @XStreamAsAttribute
@@ -70,6 +73,14 @@ public class EnQueue {
 
     public void setConversation_timeout(Integer conversation_timeout) {
         this.conversation_timeout = conversation_timeout;
+    }
+
+    public String getChoice() {
+        return choice;
+    }
+
+    public void setChoice(String choice) {
+        this.choice = choice;
     }
 
     public String getReserve_state() {
