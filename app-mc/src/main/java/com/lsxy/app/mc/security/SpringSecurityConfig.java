@@ -22,7 +22,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Log logger = LogFactory.getLog(SpringSecurityConfig.class);
 
     @Autowired
-    private MyUserDetailsService myUserDetailsService;
+    private MCUserDetailsService myUserDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

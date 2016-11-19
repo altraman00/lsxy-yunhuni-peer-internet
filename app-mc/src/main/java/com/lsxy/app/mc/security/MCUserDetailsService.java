@@ -18,7 +18,7 @@ import java.util.Set;
  * Created by tandy on 16/11/19.
  */
 @Component
-public class MyUserDetailsService implements UserDetailsService {
+public class MCUserDetailsService implements UserDetailsService {
 
     @Autowired
     private OcUserService ocUserService;
