@@ -49,8 +49,7 @@ public class InitDevData {
 
     @PostConstruct
     public void testDev() throws InterruptedException {
-        List<Channel> cs = channelService.pageList(1,1).getResult();
-        Channel channel = cs!=null && cs.size()>0 ?cs.get(0):null;
+        Channel channel = null;
         if(channel == null){
             channel = new Channel();
             channel.setTenantId("8a2bc5f65721aa16015722256ba00007");
