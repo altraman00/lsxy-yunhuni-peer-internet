@@ -1,5 +1,6 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
@@ -63,7 +64,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     @Autowired
     private ConversationService conversationService;
 
-    @Autowired
+    @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationService callCenterConversationService;
 
 

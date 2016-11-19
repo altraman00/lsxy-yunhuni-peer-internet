@@ -70,7 +70,7 @@ public class ConversationService {
     @Autowired
     private SessionContext sessionContext;
 
-    @Reference()
+    @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationService callCenterConversationService;
 
     /**
