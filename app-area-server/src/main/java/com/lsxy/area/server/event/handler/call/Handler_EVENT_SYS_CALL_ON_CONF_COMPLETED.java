@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -53,6 +54,9 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private IVRActionService ivrActionService;
 
     @Override
     public String getEventName() {
@@ -120,6 +124,9 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
 
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
+        }
+        if(businessData.get("iscc")!=null && (Integer)businessData.get("iscc") ==1){
+            ivrActionService.doAction(call_id);
         }
     }
 

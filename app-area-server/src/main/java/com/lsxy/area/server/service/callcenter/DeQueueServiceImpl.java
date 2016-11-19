@@ -61,7 +61,8 @@ public class DeQueueServiceImpl implements DeQueueService {
     /**
      * 创建交谈，然后呼叫坐席。
      * 交谈创建成功事件邀请排队的客户到交谈
-     * 坐席拨号完成事件中，将坐席加入到交谈
+     * 开始呼叫事件中，将坐席加入交谈
+     * 坐席拨号完成事件中，播放工号
      * 客户和坐席开始交谈
      * @param tenantId
      * @param appId
