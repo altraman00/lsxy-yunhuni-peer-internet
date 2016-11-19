@@ -107,7 +107,7 @@ public class ConversationService {
         bgmFile = playFileUtil.convert(tenantId,appId,bgmFile);
         Map<String, Object> map = new MapBuilder<String,Object>()
                 .putIfNotEmpty("user_data",conversationId)
-                .putIfNotEmpty("max_seconds",maxDuration)
+                .put("max_seconds",maxDuration,EXPIRE)
                 .putIfNotEmpty("bg_file",bgmFile)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
