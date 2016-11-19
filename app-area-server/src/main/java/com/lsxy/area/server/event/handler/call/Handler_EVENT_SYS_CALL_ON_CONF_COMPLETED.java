@@ -84,8 +84,8 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
-
-        if("conversation".equals(state.getType())){
+        Map<String,Object> businessData = state.getBusinessData();
+        if("conversation".equals(state.getType()) || businessData.get("iscc") != null){
             conversation(state,params,call_id);
         }else{
             conf(state,params,call_id);

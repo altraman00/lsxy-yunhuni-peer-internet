@@ -300,7 +300,7 @@ public class ConversationService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",call_state.getResId())
                 .putIfNotEmpty("conf_res_id",conversation_state.getResId())
-                .putIfNotEmpty("max_seconds",max_seconds)
+                .put("max_seconds",max_seconds,EXPIRE)
                 .putIfNotEmpty("voice_mode",voice_mode)
                 .putIfNotEmpty("play_file",play_file)
                 .putIfNotEmpty("user_data",call_id)
