@@ -6,6 +6,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterService;
+import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import org.dom4j.Element;
@@ -33,6 +34,9 @@ public class EnqueueHandler extends ActionHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
+
+    @Autowired
+    private DeQueueService deQueueService;
 
     @Override
     public String getAction() {
@@ -69,25 +73,22 @@ public class EnqueueHandler extends ActionHandler{
             callCenter.setFromNum((String)businessData.get("from"));
             callCenter.setToNum((String)businessData.get("to"));
             callCenter = callCenterService.save(callCenter);
-            /*businessData.put("conversation_level",enQueue.getConversation_level());
-            businessData.put("conversation_timeout",enQueue.getConversation_level());
-            businessData.put("reserve_state",enQueue.getConversation_level());
-            businessData.put("fail_overflow",enQueue.getConversation_level());
-            businessData.put("wait_voice",enQueue.getConversation_level());
-            businessData.put("ring_mode",enQueue.getConversation_level());
-            businessData.put("ring_voice",enQueue.getConversation_level());
-            businessData.put("hold_voice",enQueue.getConversation_level());
-            businessData.put("play_num",enQueue.getConversation_level());
-            businessData.put("pre_num_voice",enQueue.getConversation_level());
-            businessData.put("post_num_voice",enQueue.getConversation_level());
-            businessData.put("play_num",enQueue.getConversation_level());*/
             businessData.put("callcenter",callCenter.getId());
             state.setUserdata(enQueue.getData());
+
+            if(enQueue.getWait_voice()!= null){
+                //TODO 播放排队等待音
+            }
         }
         businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
-        enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),(String)businessData.get("to"),callId,enQueue);
+        try {
+            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), (String) businessData.get("to"), callId, enQueue);
+        }catch (Throwable t){
+            logger.error("调用呼叫中心排队失败",t);
+            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,"调用呼叫中心排队失败");
+        }
         return true;
     }
 }

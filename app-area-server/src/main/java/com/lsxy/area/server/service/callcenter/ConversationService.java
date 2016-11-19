@@ -188,7 +188,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String invite(String appId, String conversationId,
+    public String invite(String appId, String conversationId,String parent_call_res_id,
                          String from, String to, Integer maxDuration, Integer maxDialDuration,
                          String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
@@ -214,6 +214,7 @@ public class ConversationService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
