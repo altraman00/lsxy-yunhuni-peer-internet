@@ -126,7 +126,7 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty("initiator",initiator)//交谈发起者的callid
-                        .putIfNotEmpty("max_seconds",maxDuration)//交谈最大持续时长
+                        .put("max_seconds",maxDuration,EXPIRE)//交谈最大持续时长
                         .put("max_parts",MAX_PARTS)//最大与会数
                         .putIfNotEmpty("auto_hangup",autoHangup)//交谈结束是否自动挂断
                         .putIfNotEmpty("recording",recording)//是否自动启动录音

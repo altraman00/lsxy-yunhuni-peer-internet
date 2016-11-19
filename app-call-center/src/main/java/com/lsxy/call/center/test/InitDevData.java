@@ -121,9 +121,11 @@ public class InitDevData {
                         e.printStackTrace();
                     }
                     for (String agent: agentIds) {
-                        if(agentState.getState(agent).equals(AgentState.Model.STATE_FETCHING)){
-                            agentState.setState(agent,AgentState.Model.STATE_IDLE);
-                        }
+                        try{
+                            if(agentState.getState(agent).equals(AgentState.Model.STATE_FETCHING)){
+                                agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                            }
+                        }catch (Throwable t){}
                     }
                 }
             }
