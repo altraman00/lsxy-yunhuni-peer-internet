@@ -262,6 +262,11 @@ public class ConversationService {
 
 
     private boolean enter(String call_id, String conversation_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("开始呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
+                    call_id,conversation_id,maxDuration,playFile,voiceMode);
+        }
+
         BusinessState call_state = businessStateService.get(call_id);
         BusinessState conversation_state = businessStateService.get(conversation_id);
         if(call_state == null || call_state.getResId() == null){
@@ -318,6 +323,10 @@ public class ConversationService {
                 call_state.setBusinessData(call_business);
                 businessStateService.save(call_state);
             }
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("完成呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
+                    call_id,conversation_id,maxDuration,playFile,voiceMode);
         }
         return true;
     }
