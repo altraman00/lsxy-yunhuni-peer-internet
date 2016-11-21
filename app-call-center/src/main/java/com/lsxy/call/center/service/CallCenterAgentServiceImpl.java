@@ -40,16 +40,10 @@ import java.util.stream.Collectors;
  */
 @Service
 @com.alibaba.dubbo.config.annotation.Service
-public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent> implements CallCenterAgentService,BeanSelfAware {
+public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent> implements CallCenterAgentService {
 
     private static final Logger logger = LoggerFactory.getLogger(CallCenterAgentServiceImpl.class);
 
-    private CallCenterAgentService self;
-    @Override
-    public void setSelf(Object proxyBean) {
-        //设置此对象的代理对象
-        this.self = (CallCenterAgentService) proxyBean;
-    }
     @Autowired
     private CallCenterAgentDao callCenterAgentDao;
     @Autowired
