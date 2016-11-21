@@ -211,7 +211,7 @@ public class ConversationService {
 
 
     /**
-     * 邀请加入交谈
+     * 邀请坐席加入交谈
      * @param appId
      * @param conversationId
      * @param from
@@ -223,7 +223,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String invite(String appId, String conversationId,String parent_call_res_id,
+    public String inviteAgent(String appId, String conversationId,String parent_call_res_id,
                          String from, String to, Integer maxDuration, Integer maxDialDuration,
                          String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
@@ -269,6 +269,82 @@ public class ConversationService {
                 .setAppId(app.getId())
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                .setAreaId(areaId)
+                .setLineGatewayId(lineId)
+                .setBusinessData(new MapBuilder<String,Object>()
+                        .putIfNotEmpty(ConversationService.CONVERSATION_ID,conversationId)
+                        .putIfNotEmpty("from",oneTelnumber)
+                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
+                        .putIfNotEmpty("voice_mode",voiceMode)//加入后的声音模式
+                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .build())
+                .build();
+        businessStateService.save(callstate);
+        return callId;
+    }
+
+
+    /**
+     * 邀请外线
+     * @param appId
+     * @param conversationId
+     * @param parent_call_res_id
+     * @param from
+     * @param to
+     * @param maxDuration
+     * @param maxDialDuration
+     * @param playFile
+     * @param voiceMode
+     * @return
+     * @throws YunhuniApiException
+     */
+    public String inviteOut(String appId, String conversationId,String parent_call_res_id,
+                              String from, String to, Integer maxDuration, Integer maxDialDuration,
+                              String playFile, Integer voiceMode) throws YunhuniApiException{
+        App app = appService.findById(appId);
+        AreaAndTelNumSelector.Selector selector =
+                areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
+
+        String areaId = selector.getAreaId();
+        String oneTelnumber = selector.getOneTelnumber();
+        String lineId = selector.getLineId();
+
+        String callId = UUIDGenerator.uuid();
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setFromNum(oneTelnumber);
+        callSession.setToNum(selector.getToUri());
+        callSession.setApp(app);
+        callSession.setTenant(app.getTenant());
+        callSession.setRelevanceId(callId);
+        callSession.setType(CallSession.TYPE_CALL_CENTER);
+        callSession.setResId(null);
+        callSession = callSessionService.save(callSession);
+
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("to_uri",selector.getToUri())
+                .putIfNotEmpty("from_uri",oneTelnumber)
+                .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
+                .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
+                .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                .putIfNotEmpty("user_data",callId)
+                .put("areaId ",areaId)
+                .build();
+
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            throw new InvokeCallException(e);
+        }
+
+        //保存业务数据，后续事件要用到
+        BusinessState callstate = new BusinessState.Builder()
+                .setTenantId(app.getTenant().getId())
+                .setAppId(app.getId())
+                .setId(callId)
+                .setType(BusinessState.TYPE_CC_OUT_CALL)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
