@@ -37,13 +37,13 @@ public class AbstractAPIController {
             resultEx = ex;
         }
         if(resultEx instanceof YunhuniApiException){
-            failed = ApiGatewayResponse.failed(((YunhuniApiException) cause).getCode(),cause.getMessage());
+            failed = ApiGatewayResponse.failed(((YunhuniApiException) resultEx).getCode(),resultEx.getMessage());
         }else if(resultEx instanceof MethodArgumentNotValidException){
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.IllegalArgument.getCode(), ApiReturnCodeEnum.IllegalArgument.getMsg());
         }else{
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.UnknownFail.getCode(), ApiReturnCodeEnum.UnknownFail.getMsg());
         }
-        logger.info("调用接口出现异常：",cause);
+        logger.info("调用接口出现异常：",resultEx);
         return failed;
     }
 }
