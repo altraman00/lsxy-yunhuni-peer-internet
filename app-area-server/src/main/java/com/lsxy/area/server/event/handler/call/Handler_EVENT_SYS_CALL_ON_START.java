@@ -80,10 +80,10 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
             logger.info("call_id={},state={}",call_id,state);
         }
 
-        if("conversation".equals(state.getType())){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             Map<String,Object> businessData = state.getBusinessData();
             //加入交谈
-            String conversation = (String)businessData.get("conversation");
+            String conversation = (String)businessData.get(ConversationService.CONVERSATION_ID);
             try {
                 conversationService.join(state.getAppId(),conversation,call_id,null,null,null);
             } catch (YunhuniApiException e) {

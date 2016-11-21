@@ -337,7 +337,7 @@ public class IVRActionService {
                 .setAppId(app.getId())
                 .setId(call_id)
                 .setResId(res_id)
-                .setType("ivr_incoming")
+                .setType(BusinessState.TYPE_IVR_INCOMING)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()

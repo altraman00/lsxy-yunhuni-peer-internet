@@ -68,7 +68,7 @@ public class Handler_EVENT_SYS_CONF_ON_FAIL extends EventHandler{
             logger.info("confi_id={},state={}",conf_id,state);
         }
 
-        if("conversation".equals(state.getType())){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             conversation(state,conf_id);
         }else{
             conf(state,conf_id);

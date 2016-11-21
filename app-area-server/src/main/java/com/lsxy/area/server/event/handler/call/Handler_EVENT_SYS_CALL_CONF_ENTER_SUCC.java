@@ -107,7 +107,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             logger.debug("call_id={},state={}",call_id,state);
         }
         Map<String,Object> businessData = state.getBusinessData();
-        if("conversation".equals(state.getType()) || businessData.get("iscc") != null){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) || businessData.get("iscc") != null){
             conversation(state,call_id);
         }else{
             conf(state,call_id);
@@ -121,7 +121,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         Map<String,Object> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
-            conversation_id = (String)businessData.get("conversation");
+            conversation_id = (String)businessData.get(ConversationService.CONVERSATION_ID);
         }
         if(StringUtils.isBlank(conversation_id)){
             throw new InvalidParamException("没有找到对应的交谈信息callid={},conversationid={}",call_id,conversation_id);
@@ -179,7 +179,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             meetingMember.setId(call_id);
             meetingMember.setNumber((String)businessData.get("to"));
             meetingMember.setJoinTime(new Date());
-            if(state.getType().equalsIgnoreCase("ivr_incoming")){
+            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);
             }else{
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);

@@ -80,7 +80,7 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
             callSessionService.save(callSession);
         }
 
-        if("ivr_dial".equals(state.getType())){//ivr拨号失败需要继续ivr
+        if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//ivr拨号失败需要继续ivr
             Map<String,Object> businessData = state.getBusinessData();
             if(businessData != null){
                 String ivr_call_id = (String)businessData.get("ivr_call_id");

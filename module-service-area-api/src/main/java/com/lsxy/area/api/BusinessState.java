@@ -7,6 +7,15 @@ import java.util.Map;
  * Created by liups on 2016/8/25.
  */
 public class BusinessState implements Serializable{
+    public static final String TYPE_IVR_INCOMING = "ivr_incoming";
+    public static final String TYPE_IVR_CALL = "ivr_call";
+    public static final String TYPE_IVR_DIAL = "ivr_dial";
+    public static final String TYPE_NOTIFY_CALL = "notify_call";
+    public static final String TYPE_VERIFY_CALL = "verify_call";
+    public static final String TYPE_SYS_CONF = "sys_conf";
+    public static final String TYPE_CC_AGENT_CALL = "agent_call";
+    public static final String TYPE_CC_OUT_CALL = "out_call";
+
     private String tenantId;
     private String appId;
     private String id;

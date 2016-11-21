@@ -114,7 +114,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             businessData = new HashMap<>();
         }
 
-        if("sys_conf".equals(state.getType())){//该呼叫是通过(会议邀请呼叫)发起需要将呼叫加入会议
+        if(BusinessState.TYPE_SYS_CONF.equals(state.getType())){//该呼叫是通过(会议邀请呼叫)发起需要将呼叫加入会议
             if(StringUtils.isNotBlank(error)){
                 logger.error("将呼叫加入到会议失败{}",error);
             }else{
@@ -128,7 +128,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     logger.error("将呼叫加入到会议失败",e);
                 }
             }
-        }else if("ivr_call".equals(state.getType())){//通过ivr呼出api 发起的呼叫
+        }else if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//通过ivr呼出api 发起的呼叫
             App app = appService.findById(state.getAppId());
             //发送拨号结束通知
             Long begin_time = null;
@@ -155,7 +155,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             if(StringUtils.isNotBlank(error)){
                 logger.error("IVR呼出失败",error);
             }
-        }else if("ivr_dial".equals(state.getType())){//通过ivr拨号动作发起的呼叫
+        }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//通过ivr拨号动作发起的呼叫
             String ivr_call_id = (String)businessData.get("ivr_call_id");
             if(StringUtils.isNotBlank(error)){
                 App app = appService.findById(state.getAppId());
@@ -209,7 +209,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 ivrState.getBusinessData().put("ivr_dial_call_id",call_id);
                 businessStateService.save(ivrState);
             }
-        }else if("conversation".equals(state.getType())){
+        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             //播放工号提示音
 
         }

@@ -48,7 +48,11 @@ public class ConversationService {
 
     private static final String CONVERSATION_PARTS_COUNTER_KEY_PREFIX = "callcenter.conversation_parts_";
 
-    private static final String INITIATOR_FIELD = "CONVERSATION_INITIATOR";
+    /**交谈发起者的call_id的存放属性**/
+    public static final String INITIATOR_FIELD = "CONVERSATION_INITIATOR";
+
+    /**呼叫所属的交谈的id的存放属性**/
+    public static final String CONVERSATION_ID = "CONVERSATION_ID";
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -153,7 +157,7 @@ public class ConversationService {
                 .setTenantId(tenantId)
                 .setAppId(app.getId())
                 .setId(conversationId)
-                .setType("conversation")
+                .setType(BusinessState.TYPE_CC_AGENT_CALL)
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
@@ -264,11 +268,11 @@ public class ConversationService {
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
                 .setId(callId)
-                .setType("conversation")
+                .setType(BusinessState.TYPE_CC_AGENT_CALL)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
-                        .putIfNotEmpty("conversation",conversationId)
+                        .putIfNotEmpty(ConversationService.CONVERSATION_ID,conversationId)
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
@@ -350,8 +354,8 @@ public class ConversationService {
             throw new InvokeCallException(e);
         }
         if(call_business!=null){
-            if(call_business.get("conversation") == null){
-                call_business.put("conversation",conversation_id);
+            if(call_business.get(ConversationService.CONVERSATION_ID) == null){
+                call_business.put(ConversationService.CONVERSATION_ID,conversation_id);
                 call_state.setBusinessData(call_business);
                 businessStateService.save(call_state);
             }
@@ -383,7 +387,7 @@ public class ConversationService {
             //TODO 回到上一次交谈
             return;
         }
-        if("ivr_incoming".equals(state.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
             ivrActionService.doAction(callId);
         }else{
             //TODO 不是ivr 不需要下一步  直接挂断
