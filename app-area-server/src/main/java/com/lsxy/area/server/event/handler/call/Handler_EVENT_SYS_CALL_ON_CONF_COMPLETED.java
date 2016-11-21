@@ -4,6 +4,8 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -46,10 +48,15 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
     private ConfService confService;
 
     @Autowired
+    private ConversationService conversationService;
+    @Autowired
     private RPCCaller rpcCaller;
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Autowired
+    private IVRActionService ivrActionService;
 
     @Override
     public String getEventName() {
@@ -81,7 +88,42 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
+        Map<String,Object> businessData = state.getBusinessData();
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) || businessData.get("iscc") != null){
+            conversation(state,params,call_id);
+        }else{
+            conf(state,params,call_id);
+        }
 
+
+        return res;
+    }
+
+    private void conversation(BusinessState state, Map<String, Object> params, String call_id) {
+        String appId = state.getAppId();
+        String user_data = state.getUserdata();
+        Map<String,Object> businessData = state.getBusinessData();
+        String conversation_id = null;
+        if(businessData!=null){
+            conversation_id = (String)businessData.get(ConversationService.CONVERSATION_ID);
+        }
+        if(StringUtils.isBlank(conversation_id)){
+            throw new InvalidParamException("没有找到对应的交谈信息callid={},conversation_id={}",call_id,conversation_id);
+        }
+        if(StringUtils.isBlank(appId)){
+            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
+        }
+        App app = appService.findById(state.getAppId());
+        if(app == null){
+            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
+        }
+        conversationService.exit(conversation_id,call_id);
+        if(logger.isDebugEnabled()){
+            logger.debug("处理{}事件完成",getEventName());
+        }
+    }
+
+    private void conf(BusinessState state,Map<String,Object> params,String call_id){
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
@@ -135,12 +177,11 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        return res;
     }
 
     private void hungup(BusinessState state){
         //非ivr发起的会议可以直接挂断
-        if("sys_conf".equals(state.getType())){
+        if(BusinessState.TYPE_SYS_CONF.equals(state.getType())){
             Map<String, Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",state.getResId())
                     .putIfNotEmpty("user_data",state.getId())

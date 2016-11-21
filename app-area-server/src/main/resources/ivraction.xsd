@@ -118,6 +118,36 @@
         <xs:attribute name="dial_voice_stop_cond" type="boolnumber"></xs:attribute>
     </xs:complexType>
 
+    <xs:complexType name="condition">
+        <xs:attribute name="id" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="route">
+        <xs:choice minOccurs="1" maxOccurs="1">
+            <xs:element name="condition" type="condition" minOccurs="1" maxOccurs="1"></xs:element>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="enqueue">
+        <xs:choice minOccurs="1" maxOccurs="1">
+            <xs:element name="route" type="route" minOccurs="1" maxOccurs="1"></xs:element>
+        </xs:choice>
+        <xs:attribute name="channel" type="xs:string" use="required"></xs:attribute>
+        <xs:attribute name="conversation_level" type="positivenumber"></xs:attribute>
+        <xs:attribute name="conversation_timeout" type="positivenumber"></xs:attribute>
+        <xs:attribute name="choice" type="xs:string"></xs:attribute>
+        <xs:attribute name="reserve_state" type="xs:string"></xs:attribute>
+        <xs:attribute name="fail_overflow" type="xs:boolean"></xs:attribute>
+        <xs:attribute name="wait_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="ring_mode" type="positivenumber"></xs:attribute>
+        <xs:attribute name="ring_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="hold_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="play_num" type="xs:boolean"></xs:attribute>
+        <xs:attribute name="pre_num_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="post_num_voice" type="xs:string"></xs:attribute>
+        <xs:attribute name="data" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
     <xs:element name="response">
         <xs:complexType>
             <xs:choice minOccurs="1" maxOccurs="2">
@@ -130,6 +160,7 @@
                     <xs:element name="hangup" type="hangup"/>
                     <xs:element name="pause" type="pause"/>
                     <xs:element name="dial" type="dial"/>
+                    <xs:element name="enqueue" type="enqueue"/>
                 </xs:choice>
                 <xs:choice minOccurs="1" maxOccurs="1">
                     <xs:element name="next" type="xs:string"/>

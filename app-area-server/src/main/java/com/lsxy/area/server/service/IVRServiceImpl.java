@@ -4,11 +4,11 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.IVRService;
-import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -16,7 +16,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -168,7 +167,7 @@ public class IVRServiceImpl implements IVRService {
                                     .setTenantId(tenantId)
                                     .setAppId(appId)
                                     .setId(callId)
-                                    .setType("ivr_call")
+                                    .setType(BusinessState.TYPE_IVR_CALL)
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()

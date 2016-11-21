@@ -68,6 +68,20 @@ public class Handler_EVENT_SYS_CONF_ON_FAIL extends EventHandler{
             logger.info("confi_id={},state={}",conf_id,state);
         }
 
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            conversation(state,conf_id);
+        }else{
+            conf(state,conf_id);
+        }
+
+        return res;
+    }
+
+    private void conversation(BusinessState state, String conversation_id) {
+        //TODO
+    }
+
+    private void conf(BusinessState state,String conf_id){
         String appId = state.getAppId();
         String user_data = state.getUserdata();
 
@@ -100,6 +114,5 @@ public class Handler_EVENT_SYS_CONF_ON_FAIL extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        return res;
     }
 }

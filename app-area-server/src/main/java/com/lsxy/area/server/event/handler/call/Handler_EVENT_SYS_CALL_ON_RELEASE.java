@@ -132,7 +132,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         }
 
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
-        if(!state.getType().equalsIgnoreCase("ivr_dial")){
+        if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
             String ivr_dial_call_id = null;
             if(state.getBusinessData() != null){
                 ivr_dial_call_id = (String)state.getBusinessData().get("ivr_dial_call_id");

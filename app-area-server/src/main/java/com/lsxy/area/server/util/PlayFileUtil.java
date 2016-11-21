@@ -1,6 +1,6 @@
 package com.lsxy.area.server.util;
 
-import com.lsxy.area.api.exceptions.PlayFileNotExistsException;
+import com.lsxy.framework.core.exceptions.api.PlayFileNotExistsException;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

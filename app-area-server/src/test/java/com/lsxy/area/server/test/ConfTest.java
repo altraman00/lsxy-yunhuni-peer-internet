@@ -2,7 +2,7 @@ package com.lsxy.area.server.test;
 
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.area.server.AreaServerMainClass;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;

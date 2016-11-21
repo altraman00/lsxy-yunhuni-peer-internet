@@ -90,7 +90,20 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
         }
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            conversation(state,params,conf_id);
+        }else{
+            conf(state,params,conf_id);
+        }
 
+        return res;
+    }
+
+    private void conversation(BusinessState state, Map<String, Object> params, String conversation_id) {
+        //TODO
+    }
+
+    private void conf(BusinessState state,Map<String,Object> params,String conf_id){
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
@@ -147,9 +160,7 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             meeting.setEndTime(new Date());
             meetingService.save(meeting);
         }
-        return res;
     }
-
     private void handupParts(String confId) {
         logger.info("开始处理会议={}解散自动挂断与会方",confId);
         Set<String> parts = confService.popParts(confId);
