@@ -367,7 +367,7 @@
                 trigger: 'axis'
             },
             grid: {
-                left: '1%',
+                left: '2%',
                 right: '3%',
                 bottom: '3%',
                 containLabel: true
@@ -384,7 +384,7 @@
             },
             yAxis: {
                 type: 'value',
-                name:'呼叫次数（次）',
+                name:'     呼叫次数（次）',
                 nameGap:32,
                 axisLabel:{
                     margin:12
@@ -422,7 +422,7 @@
                 trigger: 'axis'
             },
             grid: {
-                left: '1%',
+                left: '2%',
                 right: '3%',
                 bottom: '3%',
                 containLabel: true
@@ -438,7 +438,7 @@
             },
             yAxis: {
                 type: 'value',
-                name:'通话时长（分钟）',
+                name:'      通话时长（分钟）',
                 nameGap:32,
                 nameTextStyle:{
                     color:'#999',
