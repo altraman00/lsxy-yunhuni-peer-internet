@@ -723,6 +723,7 @@
             },
             yAxis: {
                 type: 'value',
+                min: 0,
                 name: '     会话量(次)',
                 boundaryGap: [0.2, 0.2]
             },
@@ -777,6 +778,7 @@
             yAxis: {
                 type: 'value',
                 name: '     次数(次)',
+                min: 0,
                 boundaryGap: [0.2, 0.2]
             },
             series: [

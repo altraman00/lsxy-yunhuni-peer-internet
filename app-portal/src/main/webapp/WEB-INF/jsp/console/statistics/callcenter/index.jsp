@@ -386,6 +386,7 @@
                 type: 'value',
                 name:'     呼叫次数（次）',
                 nameGap:32,
+                min: 0,
                 axisLabel:{
                     margin:12
                 }
@@ -440,6 +441,7 @@
                 type: 'value',
                 name:'      通话时长（分钟）',
                 nameGap:32,
+                min: 0,
                 nameTextStyle:{
                     color:'#999',
                     padding:[10,10,10,50],
