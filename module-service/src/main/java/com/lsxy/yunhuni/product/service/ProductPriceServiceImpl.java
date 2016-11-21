@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.product.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.product.model.ProductPrice;
 import com.lsxy.yunhuni.api.product.service.ProductPriceService;
 import com.lsxy.yunhuni.product.dao.ProductPriceDao;
@@ -33,5 +34,11 @@ public class ProductPriceServiceImpl extends AbstractService<ProductPrice> imple
             throw new RuntimeException("产品资费不存在");
         }
         return productPrice;
+    }
+
+    @Override
+    public Page<ProductPrice> getPageOrderCreate(Integer pageNo,Integer pageSize) {
+        String hql = "FROM ProductPrice obj ORDER BY obj.createTime DESC ";
+        return pageList(hql,pageNo,pageSize);
     }
 }
