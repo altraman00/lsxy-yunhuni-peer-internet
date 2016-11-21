@@ -74,7 +74,7 @@ then
 fi
 
 cd $YUNHUNI_HOME
-
+git remote prune origin
 #更新代码和安装模块组件
 pull_ret=`git pull`
 if [ "$pull_ret"x = "Already up-to-date."x ]; then
