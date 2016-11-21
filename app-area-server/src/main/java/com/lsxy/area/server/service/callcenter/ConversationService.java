@@ -282,7 +282,7 @@ public class ConversationService {
         }
 
         Map<String,Object> call_business=call_state.getBusinessData();
-        Map<String,Object> conf_business=call_state.getBusinessData();
+        Map<String,Object> conversation_business=conversation_state.getBusinessData();
 
         Integer max_seconds = maxDuration == null ? 0 : maxDuration;
         Integer voice_mode = voiceMode == null ? 1 : voiceMode;
@@ -290,8 +290,8 @@ public class ConversationService {
 
         if(call_business != null && call_business.get("max_seconds")!=null){
             max_seconds = (Integer)call_business.get("max_seconds");
-        }else if(conf_business != null && conf_business.get("max_seconds")!=null){
-            max_seconds = (Integer)conf_business.get("max_seconds");
+        }else if(conversation_business != null && conversation_business.get("max_seconds")!=null){
+            max_seconds = (Integer)conversation_business.get("max_seconds");
         }
 
         if(call_business != null && call_business.get("voice_mode")!=null){
@@ -339,43 +339,44 @@ public class ConversationService {
         }
         return CONVERSATION_PARTS_COUNTER_KEY_PREFIX + conversation;
     }
+
     /**
-     * 判断是否达到最大与会数
-     * @param confId
+     * 拍段是否超出最大成员数
+     * @param conversationId
      * @return
      */
-    public boolean outOfParts(String confId){
-        String key = key(confId);
+    public boolean outOfParts(String conversationId){
+        String key = key(conversationId);
         return redisCacheService.ssize(key) >= MAX_PARTS;
     }
 
     /**
      * 增加交谈成员
-     * @param confId
+     * @param conversationId
      */
-    public void incrPart(String confId,String callId){
-        String key = key(confId);
+    public void incrPart(String conversationId,String callId){
+        String key = key(conversationId);
         redisCacheService.sadd(key,callId);
         redisCacheService.expire(key,EXPIRE);
     }
 
     /**
      * 减少交谈成员
-     * @param confId
+     * @param conversationId
      */
-    public void decrPart(String confId,String callId){
-        String key = key(confId);
+    public void decrPart(String conversationId,String callId){
+        String key = key(conversationId);
         redisCacheService.sremove(key,callId);
         redisCacheService.expire(key,EXPIRE);
     }
 
     /**
      * 获取交谈成员的call_id
-     * @param confId
+     * @param conversationId
      * @return
      */
-    public Set<String> getParts(String confId){
-        String key = key(confId);
+    public Set<String> getParts(String conversationId){
+        String key = key(conversationId);
         Set<String> results = null;
         try{
             results = redisCacheService.smembers(key);
@@ -388,8 +389,8 @@ public class ConversationService {
     /**
      * 弹出交谈成员，并清空
      */
-    public Set<String> popParts(String confId){
-        String key = key(confId);
+    public Set<String> popParts(String conversationId){
+        String key = key(conversationId);
         Set<String> results = null;
         try{
             results = redisCacheService.smembers(key);

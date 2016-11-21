@@ -4,12 +4,12 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
-import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -18,7 +18,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -644,7 +643,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         Map<String,Object> call_business=call_state.getBusinessData();
-        Map<String,Object> conf_business=call_state.getBusinessData();
+        Map<String,Object> conf_business=conf_state.getBusinessData();
 
         Integer max_seconds = maxDuration == null ? 0 : maxDuration;
         Integer voice_mode = voiceMode == null ? 1 : voiceMode;
