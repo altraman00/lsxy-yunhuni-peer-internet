@@ -129,8 +129,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }
         conversationService.incrPart(conversation_id,call_id);
 
+        logger.info("加入交谈成功");
         CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
         if(conversation!=null){
+
             //TODO 交谈成员
         }
     }
