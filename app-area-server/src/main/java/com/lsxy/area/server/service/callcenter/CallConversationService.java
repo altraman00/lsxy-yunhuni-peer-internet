@@ -34,20 +34,17 @@ public class CallConversationService {
         return CONVERSATION_PARTS_COUNTER_KEY_PREFIX + conversation;
     }
 
-    /**
-     * 增加交谈成员
-     * @param conversation
-     */
+    public long size(String callId){
+        String key = key(callId);
+        return redisCacheService.ssize(key);
+    }
+
     public void incrConversation(String callId,String conversation){
         String key = key(callId);
         redisCacheService.sadd(key,conversation);
         redisCacheService.expire(key,EXPIRE);
     }
 
-    /**
-     * 减少交谈成员
-     * @param conversation
-     */
     public void decrConversation(String callId,String conversation){
         String key = key(callId);
         redisCacheService.sremove(key,conversation);
@@ -71,7 +68,7 @@ public class CallConversationService {
     }
 
     /**
-     * 弹出交谈成员，并清空
+     * 弹出交谈，并清空
      */
     public Set<String> popConversations(String callId){
         String key = key(callId);
@@ -79,7 +76,7 @@ public class CallConversationService {
         try{
             results = redisCacheService.smembers(key);
         }catch (Throwable t){
-            logger.error("获取交谈成员失败",t);
+            logger.error("获取交谈失败",t);
         }
         clear(callId);
         return results;
@@ -89,7 +86,7 @@ public class CallConversationService {
         try{
             redisCacheService.del(key(callId));
         }catch (Throwable t){
-            logger.info("删除交谈成员缓存失败",t);
+            logger.info("删除交谈缓存失败",t);
         }
     }
 }

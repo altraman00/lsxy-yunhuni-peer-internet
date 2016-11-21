@@ -117,16 +117,9 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        //TODO
-        
-        //交谈成员递减
-        conversationService.decrPart(conversation_id,call_id);
-
+        conversationService.exit(conversation_id,call_id);
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
-        }
-        if("ivr_incoming".equals(state.getType())){
-            ivrActionService.doAction(call_id);
         }
     }
 

@@ -7,6 +7,8 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.CallCenterConversation;
+import com.lsxy.call.center.api.model.CallCenterConversationMember;
+import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
@@ -46,6 +48,8 @@ public class ConversationService {
 
     private static final String CONVERSATION_PARTS_COUNTER_KEY_PREFIX = "callcenter.conversation_parts_";
 
+    private static final String INITIATOR_FIELD = "CONVERSATION_INITIATOR";
+
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -70,9 +74,36 @@ public class ConversationService {
     @Autowired
     private SessionContext sessionContext;
 
+    @Autowired
+    private IVRActionService ivrActionService;
+
+    @Autowired
+    private CallConversationService callConversationService;
+
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationService callCenterConversationService;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationMemberService callCenterConversationMemberService;
+
+
+    /**
+     * 判断callId是否conversation的发起者
+     * @return
+     */
+    public String isInitiator(String conversation,String callId){
+        if(StringUtils.isEmpty(conversation) || StringUtils.isEmpty(callId)){
+            return CallCenterConversationMember.INITIATOR_FALSE;
+        }
+        BusinessState state = businessStateService.get(conversation);
+        if(state != null && state.getBusinessData()!= null){
+            String initiator = (String)state.getBusinessData().get(INITIATOR_FIELD);
+            if(initiator != null && initiator.equals(callId)){
+                return CallCenterConversationMember.INITIATOR_TRUE;
+            }
+        }
+        return CallCenterConversationMember.INITIATOR_FALSE;
+    }
     /**
      * 发起交谈
      * @param initiator
@@ -125,7 +156,7 @@ public class ConversationService {
                 .setType("conversation")
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,Object>()
-                        .putIfNotEmpty("initiator",initiator)//交谈发起者的callid
+                        .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
                         .put("max_seconds",maxDuration,EXPIRE)//交谈最大持续时长
                         .put("max_parts",MAX_PARTS)//最大与会数
                         .putIfNotEmpty("auto_hangup",autoHangup)//交谈结束是否自动挂断
@@ -332,6 +363,33 @@ public class ConversationService {
         return true;
     }
 
+    public void exit(String conversationId,String callId){
+        BusinessState state = businessStateService.get(callId);
+        try{
+            CallCenterConversationMember member = callCenterConversationMemberService.findById(callId);
+            if(member != null){
+                member.setEndTime(new Date());
+                callCenterConversationMemberService.save(member);
+            }
+        }catch (Throwable t){
+            logger.error("设置交谈成员的结束时间失败",t);
+        }
+        //交谈成员递减
+        this.decrPart(conversationId,callId);
+
+        //退出呼叫所在的交谈
+        callConversationService.decrConversation(callId,conversationId);
+        if(callConversationService.size(callId) > 0){
+            //TODO 回到上一次交谈
+            return;
+        }
+        if("ivr_incoming".equals(state.getType())){
+            ivrActionService.doAction(callId);
+        }else{
+            //TODO 不是ivr 不需要下一步  直接挂断
+
+        }
+    }
 
     private String key(String conversation){
         if(StringUtils.isBlank(conversation)){
@@ -341,7 +399,7 @@ public class ConversationService {
     }
 
     /**
-     * 拍段是否超出最大成员数
+     * 判断是否超出最大成员数
      * @param conversationId
      * @return
      */

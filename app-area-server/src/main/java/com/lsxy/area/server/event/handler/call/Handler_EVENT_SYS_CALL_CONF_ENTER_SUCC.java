@@ -5,9 +5,12 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallConversationService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenterConversation;
+import com.lsxy.call.center.api.model.CallCenterConversationMember;
+import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -64,9 +67,14 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     @Autowired
     private ConversationService conversationService;
 
+    @Autowired
+    private CallConversationService callConversationService;
+
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationService callCenterConversationService;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationMemberService callCenterConversationMemberService;
 
     @Override
     public String getEventName() {
@@ -104,7 +112,6 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }else{
             conf(state,call_id);
         }
-
         return res;
     }
 
@@ -129,11 +136,17 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         }
         conversationService.incrPart(conversation_id,call_id);
 
-        logger.info("加入交谈成功");
         CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
         if(conversation!=null){
-
-            //TODO 交谈成员
+            callConversationService.incrConversation(call_id,conversation_id);
+            conversationService.incrPart(conversation_id,call_id);
+            CallCenterConversationMember member = new CallCenterConversationMember();
+            member.setId(call_id);
+            member.setRelevanceId(conversation_id);
+            member.setStartTime(new Date());
+            member.setSessionId((String)businessData.get("sessionid"));
+            member.setIsInitiator(conversationService.isInitiator(conversation_id,call_id));
+            callCenterConversationMemberService.save(member);
         }
     }
 
