@@ -376,7 +376,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
         try{
             String curState = agentState.getState(agent.getId());
-            if(curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING)){
+            if(StringUtils.isNotBlank(curState) && (curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING))){
                 // 座席正忙
                 throw new AgentIsBusyException();
             }
@@ -422,11 +422,17 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                         if(StringUtils.isNotBlank(opt.getName())){
                             AgentSkill agentSkill = skillMap.get(opt.getName());
                             if(agentSkill != null){
-                                agentSkill.setScore(opt.getScore());
-                                agentSkill.setEnabled(opt.getEnabled());
+                                if(opt.getScore() != null){
+                                    agentSkill.setScore(opt.getScore());
+                                }
+                                if(opt.getEnabled() != null){
+                                    agentSkill.setEnabled(opt.getEnabled());
+                                }
                                 agentSkillService.save(agentSkill);
                             }else{
-                                AgentSkill newSkill = new AgentSkill(tenantId,appId,agentId,opt.getName(),opt.getScore(),opt.getEnabled());
+                                AgentSkill newSkill = new AgentSkill(tenantId,appId,agentId,opt.getName(),
+                                        opt.getScore() == null?0:opt.getScore(),
+                                        opt.getEnabled()== null?false:opt.getEnabled());
                                 agentSkillService.save(newSkill);
                                 skillMap.put(newSkill.getName(),newSkill);
                             }

@@ -12,8 +12,8 @@ public class AgentSkillOperationDTO implements Serializable {
 
     private Integer opt;
     private String name;
-    private int score;
-    private boolean enabled;
+    private Integer score;
+    private Boolean enabled;
 
     public Integer getOpt() {
         return opt;
@@ -31,19 +31,19 @@ public class AgentSkillOperationDTO implements Serializable {
         this.name = name;
     }
 
-    public int getScore() {
+    public Integer getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(Integer score) {
         this.score = score;
     }
 
-    public boolean getEnabled() {
+    public Boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 }
