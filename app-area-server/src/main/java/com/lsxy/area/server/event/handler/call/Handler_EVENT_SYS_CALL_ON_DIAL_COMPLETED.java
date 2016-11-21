@@ -214,6 +214,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             if(StringUtils.isNotBlank(error)){
                 //判断交谈是否只有一个人
                 String conversation_id = (String)businessData.get(ConversationService.CONVERSATION_ID);
+                conversationService.exit(conversation_id,call_id);
                 if(conversationService.size(conversation_id) == 1){
                     Set<String> part = conversationService.getParts(conversation_id);
                     if(part.size() == 1 && part.iterator().hasNext()){
