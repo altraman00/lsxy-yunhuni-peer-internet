@@ -106,7 +106,7 @@
                                                 类型
                                             </div>
                                             <div class="col-md-2">
-                                                <select name="type">
+                                                <select name="type" class="form-control">
                                                     <option value=""></option>
                                                     <option value="语音回拔" <c:if test="${type=='语音回拔'}">selected="selected"</c:if> >语音回拔</option>
                                                     <option value="语音会议"<c:if test="${type=='语音会议'}">selected="selected"</c:if> >语音会议</option>
