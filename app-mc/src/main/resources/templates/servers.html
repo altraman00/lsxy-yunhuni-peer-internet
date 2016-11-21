@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        td{
+            padding:5px;
+        }
+    </style>
+</head>
+<body style="font-size: 9pt">
+
+<h1>云呼你运维</h1>
+<h2>服务器列表</h2>
+<table border="1" width="100%">
+    <tr style="font-weight: bolder">
+        <td>服务组件</td>
+        <td>应用名</td>
+        <td>服务器</td>
+        <td>服务端口</td>
+        <td>状态</td>
+    </tr>
+    
+    <tr th:each="server:${servers}">
+        <td th:text="${server.serverName}">用户控制台01</td>
+        <td th:text="${server.appName}">app-portal-01</td>
+        <td th:text="|${server.serverHost} - ${server.serverIp}|">p01 - 192.168.10.2</td>
+        <td th:text="${server.serverPort}">8080</td>
+
+        <td th:style="${server.status eq 'OK'} ? 'background-color: green':'background-color: red'" th:text="${server.status}" style="background-color: green">OK</td>
+    </tr>
+</table>
+
+</body>
+</html>

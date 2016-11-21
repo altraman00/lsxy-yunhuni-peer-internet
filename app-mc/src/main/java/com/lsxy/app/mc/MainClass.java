@@ -22,7 +22,7 @@ public class MainClass extends AbstractSpringBootWebStarter {
         return systemId;
     }
 
-    public static final String systemId = "mc.api";
+    public static final String systemId = "mc.server";
     static {
         System.setProperty("systemId",systemId);
     }

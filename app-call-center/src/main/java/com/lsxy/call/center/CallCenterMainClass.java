@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Import;
 public class CallCenterMainClass extends AbstractSpringBootStarter {
 
 
-    private static final String systemId = "call.center";
+    private static final String systemId = "app.cc";
     static {
         System.setProperty("systemId",systemId);
     }
