@@ -4,7 +4,9 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -43,6 +45,9 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
     private CallSessionService callSessionService;
 
     @Autowired
+    private ConversationService conversationService;
+
+    @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
 
@@ -73,6 +78,17 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
         }
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
+        }
+
+        if("conversation".equals(state.getType())){
+            Map<String,Object> businessData = state.getBusinessData();
+            //加入交谈
+            String conversation = (String)businessData.get("conversation");
+            try {
+                conversationService.join(state.getAppId(),conversation,call_id,null,null,null);
+            } catch (YunhuniApiException e) {
+                e.printStackTrace();
+            }
         }
 
         //更新会话记录状态

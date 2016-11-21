@@ -3,13 +3,17 @@ package com.lsxy.area.server.service.ivr.handler;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
+import com.lsxy.call.center.api.service.CallCenterService;
+import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +31,12 @@ public class EnqueueHandler extends ActionHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private EnQueueService enQueueService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
+
+    @Autowired
+    private DeQueueService deQueueService;
 
     @Override
     public String getAction() {
@@ -50,12 +60,35 @@ public class EnqueueHandler extends ActionHandler{
         if(businessData == null){
             businessData = new HashMap<>();
         }
+        String xml = root.asXML();
+        EnQueue enQueue = EnQueueDecoder.decode(xml);
+
+        if(enQueue!=null){
+            CallCenter callCenter = new CallCenter();
+            callCenter.setTenantId(state.getTenantId());
+            callCenter.setAppId(state.getAppId());
+            callCenter.setType(""+CallCenter.CALL_IN);
+            callCenter.setAgent(null);
+            callCenter.setStartTime(new Date());
+            callCenter.setFromNum((String)businessData.get("from"));
+            callCenter.setToNum((String)businessData.get("to"));
+            callCenter = callCenterService.save(callCenter);
+            businessData.put("callcenter",callCenter.getId());
+            state.setUserdata(enQueue.getData());
+
+            if(enQueue.getWait_voice()!= null){
+                //TODO 播放排队等待音
+            }
+        }
         businessData.put("next",next);
         state.setBusinessData(businessData);
         businessStateService.save(state);
-        String xml = root.asXML();
-        EnQueue enQueue = EnQueueDecoder.decode(xml);
-        enQueueService.lookupAgent(state.getTenantId(),state.getAppId(),(String)businessData.get("to"),callId,enQueue);
+        try {
+            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), (String) businessData.get("to"), callId, enQueue);
+        }catch (Throwable t){
+            logger.error("调用呼叫中心排队失败",t);
+            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,"调用呼叫中心排队失败");
+        }
         return true;
     }
 }

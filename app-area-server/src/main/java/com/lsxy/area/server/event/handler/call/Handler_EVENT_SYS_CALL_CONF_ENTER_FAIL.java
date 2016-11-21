@@ -17,8 +17,6 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.session.model.Meeting;
-import com.lsxy.yunhuni.api.session.model.MeetingMember;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.MeetingMemberService;
 import com.lsxy.yunhuni.api.session.service.MeetingService;
@@ -29,16 +27,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
  * Created by liuws on 2016/8/29.
  */
 @Component
-public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
+public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
 
-    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC.class);
+    private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL.class);
 
     @Autowired
     private AppService appService;
@@ -70,11 +67,11 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     @Override
     public String getEventName() {
-        return Constants.EVENT_SYS_CALL_CONF_ENTER_SUCC;
+        return Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL;
     }
 
     /**
-     * 接收到加入会议成功事件，需要向开发者发送通知
+     * 接收到加入会议失败事件，需要向开发者发送通知
      * @param request
      * @param session
      * @return
@@ -127,13 +124,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        conversationService.incrPart(conversation_id,call_id);
-
-        logger.info("加入交谈成功");
         CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
         if(conversation!=null){
 
-            //TODO 交谈成员
         }
     }
 
@@ -156,46 +149,21 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        //会议成员增加
-        confService.incrPart(conf_id,call_id);
-
-        Meeting meeting = meetingService.findById(conf_id);
-        if(meeting!=null){
-            String callSessionId = (String)businessData.get("sessionid");
-            MeetingMember meetingMember = new MeetingMember();
-            meetingMember.setId(call_id);
-            meetingMember.setNumber((String)businessData.get("to"));
-            meetingMember.setJoinTime(new Date());
-            if(state.getType().equalsIgnoreCase("ivr_incoming")){
-                meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);
-            }else{
-                meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);
-            }
-            meetingMember.setMeeting(meeting);
-            if(callSessionId!=null){
-                meetingMember.setSession(callSessionService.findById(callSessionId));
-            }
-            meetingMember.setResId(state.getResId());
-            meetingMemberService.save(meetingMember);
-        }
-
         //开始通知开发者
         if(logger.isDebugEnabled()){
-            logger.debug("开始发送会议加入通知给开发者");
+            logger.debug("开始发送会议加入失败通知给开发者");
         }
         if(StringUtils.isNotBlank(app.getUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","conf.joined")
+                    .putIfNotEmpty("event","conf.joined.fail")
                     .putIfNotEmpty("id",conf_id)
-                    .putIfNotEmpty("join_time",System.currentTimeMillis())
                     .putIfNotEmpty("call_id",call_id)
-                    .putIfNotEmpty("part_uri",null)
                     .putIfNotEmpty("user_data",user_data)
                     .build();
             notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         }
         if(logger.isDebugEnabled()){
-            logger.debug("会议加入通知发送成功");
+            logger.debug("会议加入失败通知发送成功");
         }
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());

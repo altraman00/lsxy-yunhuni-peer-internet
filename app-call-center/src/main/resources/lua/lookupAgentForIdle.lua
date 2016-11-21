@@ -2,7 +2,6 @@
 local cAs_key = KEYS[1]
 local agent_state_key_prefix = KEYS[2]
 local extension_state_key_prefix = KEYS[3]
-local agent_lock_key_prefix = KEYS[4]
 
 local agent_reg_expire = tonumber(ARGV[1])
 local cur_time = tonumber(ARGV[2])
@@ -12,9 +11,8 @@ local result
 local cas = redis.call('ZREVRANGE',cAs_key,0,-1)
 local cas_size = #cas
 redis.log(redis.LOG_WARNING,cAs_key)
+redis.log(redis.LOG_WARNING,agent_state_key_prefix)
 redis.log(redis.LOG_WARNING,extension_state_key_prefix)
-redis.log(redis.LOG_WARNING,extension_state_key_prefix)
-redis.log(redis.LOG_WARNING,agent_lock_key_prefix)
 redis.log(redis.LOG_WARNING,'cur_time'..cur_time)
 redis.log(redis.LOG_WARNING,'cas_size'..cas_size)
 

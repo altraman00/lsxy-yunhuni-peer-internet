@@ -127,10 +127,11 @@ public class EnQueueServiceImpl implements EnQueueService{
                 cQs.add(conditionId,queue.getId());
                 mqService.publish(new EnqueueTimeoutEvent(conditionId,queue.getId(),
                         tenantId,appId,callId,condition.getQueueTimeout() * 1000));
-                String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,4,
+                String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,3,
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
-                        ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
-                        ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
+                        ExtensionState.getPrefixed(),
+                        ""+AgentState.REG_EXPIRE,
+                        ""+System.currentTimeMillis(),
                         AgentState.Model.STATE_IDLE);
                 if(StringUtil.isNotEmpty(agent_idle)){
                     lookupQueue(tenantId,appId,conditionId,agent_idle);
@@ -149,6 +150,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     EnQueueResult result = new EnQueueResult();
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
                     result.setAgent(callCenterAgentService.findById(agent));
+                    result.setEnQueue(enQueue);
                     deQueueService.success(tenantId,appId,callId,queue.getId(),result);
                 }catch (Throwable t1){
                     try{

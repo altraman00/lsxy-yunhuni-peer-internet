@@ -4,6 +4,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
@@ -68,6 +69,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Autowired
     private VoiceIvrService voiceIvrService;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Autowired
     private PlayFileUtil playFileUtil;
@@ -205,6 +209,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 ivrState.getBusinessData().put("ivr_dial_call_id",call_id);
                 businessStateService.save(ivrState);
             }
+        }else if("conversation".equals(state.getType())){
+            //播放工号提示音
+
         }
         return res;
     }

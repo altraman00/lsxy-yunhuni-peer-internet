@@ -20,8 +20,8 @@ public class AgentState {
 
     private static final String STATE_PREFIXED_KEY = "callcenter.agent.state_";
 
-    //TODO 坐席报道过期时间 方便测试用3600分钟
-    public static final int REG_EXPIRE = 1000 * 60 * 3600;
+    //TODO 坐席报道过期时间 方便测试用24小时
+    public static final int REG_EXPIRE = 1000 * 60 * 60 * 24;
 
     @Autowired
     private RedisCacheService redisCacheService;

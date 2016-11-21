@@ -1,9 +1,6 @@
 package com.lsxy.call.center.test;
 
-import com.lsxy.call.center.api.model.AgentSkill;
-import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.model.Channel;
-import com.lsxy.call.center.api.model.Condition;
+import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
@@ -45,12 +42,14 @@ public class InitDevData {
     private AgentState agentState;
 
     @Autowired
+    private AppExtensionService appExtensionService;
+
+    @Autowired
     private EnQueueService enQueueService;
 
     @PostConstruct
     public void testDev() throws InterruptedException {
-        List<Channel> cs = channelService.pageList(1,1).getResult();
-        Channel channel = cs!=null && cs.size()>0 ?cs.get(0):null;
+        Channel channel = null;
         if(channel == null){
             channel = new Channel();
             channel.setTenantId("8a2bc5f65721aa16015722256ba00007");
@@ -78,7 +77,13 @@ public class InitDevData {
                 skill.setEnabled(true);
                 agentSkillService.save(skill);
             }
-            String exid = UUIDGenerator.uuid();
+            AppExtension appExtension = new AppExtension();
+            appExtension.setType(AppExtension.TYPE_SIP);
+            appExtension.setTenantId(channel.getTenantId());
+            appExtension.setAppId(channel.getAppId());
+            appExtension.setTelenum("13692206627");
+            appExtension=appExtensionService.save(appExtension);
+            String exid = appExtension.getId();
             extensionState.setAgent(exid,agent.getId());
             extensionState.setLastRegisterStatus(exid,200);
             extensionState.setLastRegisterTime(exid,new Date().getTime());
@@ -116,9 +121,11 @@ public class InitDevData {
                         e.printStackTrace();
                     }
                     for (String agent: agentIds) {
-                        if(agentState.getState(agent).equals(AgentState.Model.STATE_FETCHING)){
-                            agentState.setState(agent,AgentState.Model.STATE_IDLE);
-                        }
+                        try{
+                            if(agentState.getState(agent).equals(AgentState.Model.STATE_FETCHING)){
+                                agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                            }
+                        }catch (Throwable t){}
                     }
                 }
             }
@@ -151,4 +158,4 @@ public class InitDevData {
             }
         }).start();*/
     }
-}
+    }
