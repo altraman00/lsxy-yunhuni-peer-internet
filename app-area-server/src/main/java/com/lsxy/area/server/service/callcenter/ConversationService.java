@@ -108,6 +108,14 @@ public class ConversationService {
         }
         return CallCenterConversationMember.INITIATOR_FALSE;
     }
+
+    public String getInitiator(String conversation){
+        BusinessState state = businessStateService.get(conversation);
+        if(state != null && state.getBusinessData()!= null){
+            return  (String)state.getBusinessData().get(INITIATOR_FIELD);
+        }
+        return null;
+    }
     /**
      * 发起交谈
      * @param initiator
@@ -488,6 +496,10 @@ public class ConversationService {
         return redisCacheService.ssize(key) >= MAX_PARTS;
     }
 
+    public long size(String conversationId){
+        String key = key(conversationId);
+        return redisCacheService.ssize(key);
+    }
     /**
      * 增加交谈成员
      * @param conversationId
