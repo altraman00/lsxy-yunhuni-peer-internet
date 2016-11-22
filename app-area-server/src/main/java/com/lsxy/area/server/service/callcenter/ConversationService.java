@@ -458,32 +458,39 @@ public class ConversationService {
      * @param callId
      */
     public void exit(String conversationId,String callId){
+        if(logger.isDebugEnabled()){
+            logger.info("调用退出会议命令conversationId={},callId={}",conversationId,callId);
+        }
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conversation_state = businessStateService.get(conversationId);
         if(call_state == null || call_state.getResId() == null){
+            logger.info("(call_state == null || call_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
         if(conversation_state == null || conversation_state.getResId() == null){
+            logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
         if(!call_state.getAppId().equals(conversation_state.getAppId())){
+            logger.info("(!call_state.getAppId().equals(conversation_state.getAppId()))conversationId={},callId={}",conversationId,callId);
             return;
         }
         App app = appService.findById(call_state.getAppId());
         if(app == null){
+            logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
-        String areaId = areaAndTelNumSelector.getAreaId(app);
-        Map<String,Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("res_id",call_state.getResId())
-                .putIfNotEmpty("conf_res_id",conversation_state.getResId())
-                .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("areaId",areaId)
-                .build();
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
         try {
+            String areaId = areaAndTelNumSelector.getAreaId(app);
+            Map<String,Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("res_id",call_state.getResId())
+                    .putIfNotEmpty("conf_res_id",conversation_state.getResId())
+                    .putIfNotEmpty("user_data",callId)
+                    .putIfNotEmpty("areaId",areaId)
+                    .build();
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("调用将呼叫退出会议失败",e);
         }
     }
@@ -494,7 +501,20 @@ public class ConversationService {
      * @param callId
      */
     public void logicExit(String conversationId,String callId){
-        BusinessState state = businessStateService.get(callId);
+        BusinessState call_state = businessStateService.get(callId);
+        BusinessState conversation_state = businessStateService.get(conversationId);
+        if(call_state == null || call_state.getResId() == null){
+            logger.info("(call_state == null || call_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
+            return;
+        }
+        if(conversation_state == null || conversation_state.getResId() == null){
+            logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
+            return;
+        }
+        if(!call_state.getAppId().equals(conversation_state.getAppId())){
+            logger.info("(!call_state.getAppId().equals(conversation_state.getAppId()))conversationId={},callId={}",conversationId,callId);
+            return;
+        }
         try{
             CallCenterConversationMember member = callCenterConversationMemberService.findById(callId);
             if(member != null){
@@ -511,13 +531,34 @@ public class ConversationService {
         callConversationService.decrConversation(callId,conversationId);
         if(callConversationService.size(callId) > 0){
             //TODO 回到上一次交谈
+            logger.info("回到上一次交谈callid={}",callId);
             return;
         }
-        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType())){
             ivrActionService.doAction(callId);
         }else{
-            //TODO 不是ivr 不需要下一步  直接挂断
+            //不是ivr 不需要下一步  直接挂断
+            App app = appService.findById(call_state.getAppId());
+            if(app == null){
+                logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
+                return;
+            }
+            String areaId = areaAndTelNumSelector.getAreaId(app);
+            hangup(call_state.getResId(),callId,areaId);
+        }
+    }
 
+    private void hangup(String res_id,String call_id,String area_id){
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("user_data",call_id)
+                .put("areaId",area_id)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
         }
     }
 
