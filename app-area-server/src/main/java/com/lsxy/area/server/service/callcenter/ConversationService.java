@@ -56,6 +56,8 @@ public class ConversationService {
 
     public static final String ISCC_FIELD = "ISCC";
 
+    public static final String IS_PLAYWAIT = "IS_PLAYWAIT";
+
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -122,6 +124,19 @@ public class ConversationService {
         }
         return false;
     }
+
+    public boolean isPlayWait(String callId){
+        if(StringUtils.isEmpty(callId)){
+            return false;
+        }
+        BusinessState state = businessStateService.get(callId);
+        if(state != null && state.getBusinessData()!= null){
+            Integer playWait = (Integer)state.getBusinessData().get(IS_PLAYWAIT);
+            return playWait !=null && playWait == 1;
+        }
+        return false;
+    }
+
     public String getInitiator(String conversation){
         BusinessState state = businessStateService.get(conversation);
         if(state != null && state.getBusinessData()!= null){

@@ -74,14 +74,29 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
-        if(BusinessState.TYPE_IVR_CALL.equals(state.getType()) ||
-                (BusinessState.TYPE_IVR_INCOMING.equals(state.getType()) && !conversationService.isCC(call_id))
-                ){
+        if(canDoivr(state.getType(),call_id)){
             ivr(state,params,call_id);
         }
         return res;
     }
 
+    private boolean canDoivr(String type,String call_id){
+        if(BusinessState.TYPE_IVR_CALL.equals(type)){//是ivr呼出
+            return true;
+        }
+        if(BusinessState.TYPE_IVR_INCOMING.equals(type)){//是ivr呼入
+            boolean iscc = conversationService.isCC(call_id);
+            if(!iscc){//不是ivr呼叫中心呼入
+                return true;
+            }
+            boolean isPlaywait = conversationService.isPlayWait(call_id);
+            if(!isPlaywait){//不是ivr呼叫中心排队
+                return true;
+            }
+        }
+
+        return false;
+    }
     private void ivr(BusinessState state,Map<String,Object> params,String call_id){
         if(StringUtils.isBlank(state.getAppId())){
             throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());

@@ -3,6 +3,7 @@ package com.lsxy.area.server.service.ivr.handler;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
@@ -107,6 +108,7 @@ public class EnqueueHandler extends ActionHandler{
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
                     rpcCaller.invoke(sessionContext, rpcrequest);
+                    businessData.put(ConversationService.IS_PLAYWAIT,1);
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }
