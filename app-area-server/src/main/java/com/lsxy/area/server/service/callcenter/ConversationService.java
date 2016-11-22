@@ -52,7 +52,9 @@ public class ConversationService {
     public static final String INITIATOR_FIELD = "CONVERSATION_INITIATOR";
 
     /**呼叫所属的交谈的id的存放属性**/
-    public static final String CONVERSATION_ID = "CONVERSATION_ID";
+    public static final String CONVERSATION_FIELD = "CONVERSATION_ID";
+
+    public static final String ISCC_FIELD = "ISCC";
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -109,6 +111,17 @@ public class ConversationService {
         return CallCenterConversationMember.INITIATOR_FALSE;
     }
 
+    public boolean isCC(String callId){
+        if(StringUtils.isEmpty(callId)){
+            return false;
+        }
+        BusinessState state = businessStateService.get(callId);
+        if(state != null && state.getBusinessData()!= null){
+            Integer iscc = (Integer)state.getBusinessData().get(ISCC_FIELD);
+            return iscc !=null && iscc == 1;
+        }
+        return false;
+    }
     public String getInitiator(String conversation){
         BusinessState state = businessStateService.get(conversation);
         if(state != null && state.getBusinessData()!= null){
@@ -280,7 +293,7 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
-                        .putIfNotEmpty(ConversationService.CONVERSATION_ID,conversationId)
+                        .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
@@ -356,7 +369,7 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
-                        .putIfNotEmpty(ConversationService.CONVERSATION_ID,conversationId)
+                        .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
@@ -438,8 +451,8 @@ public class ConversationService {
             throw new InvokeCallException(e);
         }
         if(call_business!=null){
-            if(call_business.get(ConversationService.CONVERSATION_ID) == null){
-                call_business.put(ConversationService.CONVERSATION_ID,conversation_id);
+            if(call_business.get(ConversationService.CONVERSATION_FIELD) == null){
+                call_business.put(ConversationService.CONVERSATION_FIELD,conversation_id);
                 call_state.setBusinessData(call_business);
                 businessStateService.save(call_state);
             }
