@@ -539,6 +539,7 @@ public class ConversationService {
             ivrActionService.doAction(callId);
         }else{
             //不是ivr 不需要下一步  直接挂断
+            logger.info("开始挂断坐席",callId);
             App app = appService.findById(call_state.getAppId());
             if(app == null){
                 logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
