@@ -548,6 +548,30 @@ public class ConversationService {
         }
     }
 
+    public void join(String conversation_id,String call_id){
+        BusinessState state = businessStateService.get(call_id);
+        if(state == null){
+            return;
+        }
+        CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
+        if(conversation==null){
+            return;
+        }
+        try{
+            Map<String,Object> businessData = state.getBusinessData();
+            callConversationService.incrConversation(call_id,conversation_id);
+            this.incrPart(conversation_id,call_id);
+            CallCenterConversationMember member = new CallCenterConversationMember();
+            member.setId(call_id);
+            member.setRelevanceId(conversation_id);
+            member.setStartTime(new Date());
+            member.setSessionId((String)businessData.get("sessionid"));
+            member.setIsInitiator(this.isInitiator(conversation_id,call_id));
+            callCenterConversationMemberService.save(member);
+        }catch (Throwable t){
+            logger.error("处理加入交谈失败",t);
+        }
+    }
     private void hangup(String res_id,String call_id,String area_id){
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
