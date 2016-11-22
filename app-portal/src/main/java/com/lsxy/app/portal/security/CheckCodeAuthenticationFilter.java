@@ -45,49 +45,34 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res=(HttpServletResponse)response;
         String expect = (String) req.getSession().getAttribute(PortalConstants.VC_KEY);
-        if(logger.isDebugEnabled()){
-            logger.debug("是否需要检验图形验证码[POST]==[{}]&&[{}]==[{}]",req.getMethod(),servletPath,req.getServletPath());
-        }
         if ("POST".equalsIgnoreCase(req.getMethod())&&servletPath.equals(req.getServletPath())){
             if(logger.isDebugEnabled()){
-                logger.debug("开始校验图形验证码：当前验证码[{}],输入验证码[{}],暗码[{}]",req.getParameter(PortalConstants.VC_KEY),expect,hideCode);
+                logger.debug("校验图形验证码：当前验证码[{}],输入验证码[{}],暗码[{}]",req.getParameter(PortalConstants.VC_KEY),expect,hideCode);
             }
+            //是否通过暗码验证
+            boolean flag = false;
             //暗码校验，非生产环境可用start-↓↓↓↓↓↓↓↓--->
             if(StringUtils.isNotBlank(hideCode)){
                 if(req.getParameter(PortalConstants.VC_KEY).equals(hideCode.substring(0,4))){
-                    if(logger.isDebugEnabled()){
-                        logger.debug("通过暗码检验");
-                    }
                     //正确，清空图形验证码
                     req.getSession().removeAttribute(PortalConstants.VC_KEY);
+                    flag = true;
                 }
             }
             //暗码校验，非生产环境可用end-↑↑↑↑↑↑↑↑↑--->
-            else {
+            if(!flag){
                 if (expect == null) {
-                    if(logger.isDebugEnabled()){
-                        logger.debug("验证码失败，验证码为空");
-                    }
                     unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_OVERTIME));
                     return;
                 } else if (!expect.equalsIgnoreCase(req.getParameter(PortalConstants.VC_KEY))) {
                     unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_ERROR));
                     //图形验证码一次验证不过就清空
                     req.getSession().removeAttribute(PortalConstants.VC_KEY);
-                    if(logger.isDebugEnabled()){
-                        logger.debug("验证码失败，验证码不匹配");
-                    }
                     return;
                 } else {
-                    if(logger.isDebugEnabled()){
-                        logger.debug("验证码成功");
-                    }
                     //清空图形验证码
                     req.getSession().removeAttribute(PortalConstants.VC_KEY);
                 }
-            }
-            if(logger.isDebugEnabled()){
-                logger.debug("验证码校验结束");
             }
         }
         chain.doFilter(request,response);
