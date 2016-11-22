@@ -48,6 +48,17 @@ public class ExtensionController extends AbstractAPIController {
         return ApiGatewayResponse.success();
     }
 
+    @RequestMapping(value = "/{account_id}/callcenter/extension/{extension_id}",method = RequestMethod.GET)
+    public ApiGatewayResponse listExtensions(HttpServletRequest request,@RequestHeader("AppID") String appId,@PathVariable("extension_id") String id) throws YunhuniApiException {
+        AppExtension extension = appExtensionService.findOne(appId, id);
+        ExtensionVO vo = new ExtensionVO();
+        try {
+            BeanUtils.copyProperties(vo,extension);
+        } catch (Exception e) {
+        }
+        return ApiGatewayResponse.success(vo);
+    }
+
     @RequestMapping(value = "/{account_id}/callcenter/extension",method = RequestMethod.GET)
     public ApiGatewayResponse listExtensions(HttpServletRequest request,@RequestHeader("AppID") String appId,
                                              @RequestParam(defaultValue = "1",required = false) Integer  pageNo,
