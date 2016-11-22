@@ -81,7 +81,7 @@ public class EnqueueHandler extends ActionHandler{
         EnQueue enQueue = EnQueueDecoder.decode(xml);
 
         if(enQueue!=null){
-            logger.info("排队= {}", JSONUtil.objectToJson(enQueue));
+            logger.info("排队 != {}", JSONUtil.objectToJson(enQueue));
             CallCenter callCenter = new CallCenter();
             callCenter.setTenantId(state.getTenantId());
             callCenter.setAppId(state.getAppId());
