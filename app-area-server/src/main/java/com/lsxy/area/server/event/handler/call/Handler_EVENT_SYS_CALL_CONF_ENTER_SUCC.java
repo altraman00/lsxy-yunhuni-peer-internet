@@ -8,8 +8,6 @@ import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.CallConversationService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.call.center.api.model.CallCenterConversation;
-import com.lsxy.call.center.api.model.CallCenterConversationMember;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -117,7 +115,6 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     public void conversation(BusinessState state,String call_id){
         String appId = state.getAppId();
-        String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
@@ -126,28 +123,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(StringUtils.isBlank(conversation_id)){
             throw new InvalidParamException("没有找到对应的交谈信息callid={},conversationid={}",call_id,conversation_id);
         }
-
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-        conversationService.incrPart(conversation_id,call_id);
-
-        CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
-        if(conversation!=null){
-            callConversationService.incrConversation(call_id,conversation_id);
-            conversationService.incrPart(conversation_id,call_id);
-            CallCenterConversationMember member = new CallCenterConversationMember();
-            member.setId(call_id);
-            member.setRelevanceId(conversation_id);
-            member.setStartTime(new Date());
-            member.setSessionId((String)businessData.get("sessionid"));
-            member.setIsInitiator(conversationService.isInitiator(conversation_id,call_id));
-            callCenterConversationMemberService.save(member);
-        }
+        conversationService.join(conversation_id,call_id);
     }
 
     public void conf(BusinessState state,String call_id){
