@@ -535,6 +535,7 @@ public class ConversationService {
             return;
         }
         if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType())){
+            logger.info("开始重新进入ivr，callid={}",callId);
             ivrActionService.doAction(callId);
         }else{
             //不是ivr 不需要下一步  直接挂断
