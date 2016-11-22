@@ -498,7 +498,11 @@ public class ConversationService {
 
     public long size(String conversationId){
         String key = key(conversationId);
-        return redisCacheService.ssize(key);
+        long size = redisCacheService.ssize(key);
+        if(logger.isDebugEnabled()){
+            logger.debug("{}交谈成员数={}",conversationId,size);
+        }
+        return size;
     }
     /**
      * 增加交谈成员
