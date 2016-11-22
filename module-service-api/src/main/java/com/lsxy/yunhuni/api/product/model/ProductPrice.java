@@ -23,6 +23,33 @@ public class ProductPrice extends IdEntity {
     private Integer priority;   //优先级，数字大的优先
     private Long priceVersion;  //资费版本号，同一套资费版本号一样，创建后不可修改，用时间戳
     private String remark;
+    private Integer calType;    //1、按数量，2、按时长
+    private Integer timeUnit;   //单位时长(单位秒)
+    private String unit;   //单位
+    @Column(name = "cal_type")
+    public Integer getCalType() {
+        return calType;
+    }
+
+    public void setCalType(Integer calType) {
+        this.calType = calType;
+    }
+    @Column(name = "time_unit")
+    public Integer getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(Integer timeUnit) {
+        this.timeUnit = timeUnit;
+    }
+    @Column(name = "unit")
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     @ManyToOne
     @JoinColumn(name = "product_id")
