@@ -10,6 +10,7 @@ import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -80,6 +81,7 @@ public class EnqueueHandler extends ActionHandler{
         EnQueue enQueue = EnQueueDecoder.decode(xml);
 
         if(enQueue!=null){
+            logger.info("排队={}", JSONUtil.objectToJson(enQueue));
             CallCenter callCenter = new CallCenter();
             callCenter.setTenantId(state.getTenantId());
             callCenter.setAppId(state.getAppId());
