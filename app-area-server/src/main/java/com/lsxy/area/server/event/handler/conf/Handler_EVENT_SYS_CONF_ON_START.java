@@ -117,7 +117,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        String initiator = (String)businessData.get("initiator");
+        String initiator = (String)businessData.get(ConversationService.INITIATOR_FIELD);
         if(initiator != null){
             try {
                 conversationService.join(appId,conversationId,initiator,null,null,null);
