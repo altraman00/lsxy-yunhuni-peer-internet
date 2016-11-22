@@ -1,9 +1,6 @@
 package com.lsxy.area.agent.handler.call;
 
-import com.lsxy.app.area.cti.BusAddress;
 import com.lsxy.app.area.cti.Commander;
-import com.lsxy.app.area.cti.RpcError;
-import com.lsxy.app.area.cti.RpcResultListener;
 import com.lsxy.area.agent.cti.CTIClientContext;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -59,7 +56,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
         String call_id = (String)params.get("user_data");
 
         try {
-            cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.conf_enter", params, new RpcResultListener(){
+            /*cticlient.operateResource(new BusAddress((byte)0,(byte)0),res_id, "sys.call.conf_enter", params, new RpcResultListener(){
                 @Override
                 protected void onResult(Object o) {
                     if(logger.isDebugEnabled()){
@@ -106,7 +103,18 @@ public class Handler_MN_CH_SYS_CALL_CONF_ENTER extends RpcRequestHandler{
                         logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL);
                     }
                 }
-            });
+            });*/
+            RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
+                    new MapBuilder<String,Object>()
+                            .put("method",Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL)
+                            .put("user_data",call_id)
+                            .build());
+            try {
+                rpcCaller.invoke(sessionContext,req);
+            } catch (Exception e) {
+                logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_CONF_ENTER_FAIL);
+                throw new IOException();
+            }
             response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
             logger.error("调用资源操作失败",e);
