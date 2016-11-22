@@ -87,7 +87,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         String to = result.getExtension().getTelenum();
         String conversation = conversationService.create(state.getId(),
                 (String)businessData.get("callcenter"),state.getAppId(),null,false,true,null);
-        conversationService.inviteAgent(appId,conversation,state.getResId(),null,to,null,null,null,null);
+        conversationService.inviteAgent(appId,conversation,null,null,to,null,null,null,null);
     }
     @Override
     public void timeout(String tenantId, String appId, String callId) {
