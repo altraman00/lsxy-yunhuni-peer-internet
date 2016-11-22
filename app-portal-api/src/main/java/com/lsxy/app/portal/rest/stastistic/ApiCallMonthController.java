@@ -34,7 +34,7 @@ public class ApiCallMonthController extends AbstractRestController {
     @RequestMapping("/list")
     public RestResponse list(String tenantId, String appId, String type, String startTime, String endTime ){
         Date date1 = DateUtils.parseDate(startTime,"yyyy");
-        if(org.springframework.util.StringUtils.isEmpty(endTime)){
+        if(StringUtils.isEmpty(endTime)){
             endTime = startTime;
         }
         Date date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(endTime)+" 23:59:59","yyyy-MM-dd HH:mm:ss");

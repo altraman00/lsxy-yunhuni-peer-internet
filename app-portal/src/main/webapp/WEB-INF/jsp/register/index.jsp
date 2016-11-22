@@ -33,9 +33,6 @@
             </div>
             <div class="row">
                 <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" acceptCharset="utf-8">
-                <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" acceptCharset="utf-8">
-                <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" acceptCharset="utf-8">
-                <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" acceptCharset="utf-8">
                     <!-- 防止表单重复提交要加这个隐藏变量 -->
                     <input type="hidden" name="submission_token" value="${submission_token}" />
                     <div class="form-group">
@@ -81,6 +78,7 @@
         </div>
     </div>
 </div>
+
 <!-- /container -->
 <!--footer-->
 <div class="register_footer">
