@@ -216,7 +216,7 @@
                                             放音媒体库
                                         </a>
                                     </li>
-                                    <%--<li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>--%>
+                                    <li data-id="voice"><a href="#voice" data-toggle="tab">录音文件</a></li>
                                     <li class="right" id="uploadButton" hidden><a href="#" id="uploadButtonA" class="btn btn-primary defind modalShow" data-id="four" >上传放音文件</a></li>
                                 </ul>
                                 <div id="myTabContent" class="tab-content" style="">
@@ -251,33 +251,55 @@
                                     </div>
                                     <div class="tab-pane fade" id="voice">
                                         <p class="application_info">
-                                            1、默认录音文件免费存储7天，超过7天平台自动删除该文件，如有需要请提前下载保留<br/>
-                                            2、可配置录音文件存储周期，超过7天按相应的存储资费计费，10元/天。
+                                            1.每个账号默认允许免费存储7天内的录音文件，超过7天的录音文件系统自动删除。<br/>
+                                            2.会员可以自行配置存储周期，修改存储周期后，文件存储按1元/G/月收费，每个月底进行扣费。<br/>
+                                            3.录音文件可在详单查询内下载。
                                         </p>
-                                        <div class="form-group">
-                                            <div class="col-md-3 remove-padding line32 font14" id="voiceFileRecord">
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-2 font14 max-width-120">
+                                                配置存储周期
                                             </div>
-                                            <div class="col-md-9 text-right">
-                                                <a class="btn modalShow right" data-id="three">批量删除</a> <a class="btn modalShow right" data-id="two" >批量下载</a>
+                                            <div class="col-md-10 font14">
+                                                <input type="radio" name="cycle" value="0" checked/>7天免费存储
+                                                &nbsp;<input type="radio" name="cycle" value="1" />1个月
+                                                &nbsp;<input type="radio" name="cycle" value="2" />2个月
+                                                &nbsp;<input type="radio" name="cycle" value="3" />3个月
                                             </div>
                                         </div>
+                                        <div class="row margin-bottom-20">
+                                            <div class="col-md-2 font14 max-width-120"></div>
+                                            <div class=" col-md-10">
+                                                <a href="" class="btn btn-primary">保存</a>
+                                            </div>
+                                        </div>
+                                        <%--<p class="application_info">--%>
+                                            <%--1、默认录音文件免费存储7天，超过7天平台自动删除该文件，如有需要请提前下载保留<br/>--%>
+                                            <%--2、可配置录音文件存储周期，超过7天按相应的存储资费计费，10元/天。--%>
+                                        <%--</p>--%>
+                                        <%--<div class="form-group">--%>
+                                            <%--<div class="col-md-3 remove-padding line32 font14" id="voiceFileRecord">--%>
+                                            <%--</div>--%>
+                                            <%--<div class="col-md-9 text-right">--%>
+                                                <%--<a class="btn modalShow right" data-id="three">批量删除</a> <a class="btn modalShow right" data-id="two" >批量下载</a>--%>
+                                            <%--</div>--%>
+                                        <%--</div>--%>
 
-                                        <table class="table table-striped cost-table-history tablelist" id="voicetable">
-                                            <thead>
-                                            <tr>
-                                                <th>标题</th>
-                                                <th>大小</th>
-                                                <th>时长</th>
-                                                <th>操作</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
+                                        <%--<table class="table table-striped cost-table-history tablelist" id="voicetable">--%>
+                                            <%--<thead>--%>
+                                            <%--<tr>--%>
+                                                <%--<th>标题</th>--%>
+                                                <%--<th>大小</th>--%>
+                                                <%--<th>时长</th>--%>
+                                                <%--<th>操作</th>--%>
+                                            <%--</tr>--%>
+                                            <%--</thead>--%>
+                                            <%--<tbody>--%>
 
-                                            </tbody>
-                                        </table>
-                                        <section class="panel panel-default yunhuni-personal">
-                                            <div id="voicepage"></div>
-                                        </section>
+                                            <%--</tbody>--%>
+                                        <%--</table>--%>
+                                        <%--<section class="panel panel-default yunhuni-personal">--%>
+                                            <%--<div id="voicepage"></div>--%>
+                                        <%--</section>--%>
                                     </div>
 
                                 </div>
