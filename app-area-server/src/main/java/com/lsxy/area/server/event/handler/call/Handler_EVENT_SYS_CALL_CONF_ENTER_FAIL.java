@@ -7,7 +7,6 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.call.center.api.model.CallCenterConversation;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -124,10 +123,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
-        if(conversation!=null){
-
-        }
+        conversationService.logicExit(conversation_id,call_id);
     }
 
     public void conf(BusinessState state,String call_id){
