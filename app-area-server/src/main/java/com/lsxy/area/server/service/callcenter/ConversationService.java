@@ -451,7 +451,49 @@ public class ConversationService {
         return true;
     }
 
+
+    /**
+     * 主动退出会议，调用cti命令
+     * @param conversationId
+     * @param callId
+     */
     public void exit(String conversationId,String callId){
+        BusinessState call_state = businessStateService.get(callId);
+        BusinessState conversation_state = businessStateService.get(conversationId);
+        if(call_state == null || call_state.getResId() == null){
+            return;
+        }
+        if(conversation_state == null || conversation_state.getResId() == null){
+            return;
+        }
+        if(!call_state.getAppId().equals(conversation_state.getAppId())){
+            return;
+        }
+        App app = appService.findById(call_state.getAppId());
+        if(app == null){
+            return;
+        }
+        String areaId = areaAndTelNumSelector.getAreaId(app);
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",call_state.getResId())
+                .putIfNotEmpty("conf_res_id",conversation_state.getResId())
+                .putIfNotEmpty("user_data",callId)
+                .putIfNotEmpty("areaId",areaId)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            logger.error("调用将呼叫退出会议失败",e);
+        }
+    }
+
+    /**
+     * 接收到呼叫退出会议事件后，处理成员和呼叫所在的交谈
+     * @param conversationId
+     * @param callId
+     */
+    public void logicExit(String conversationId,String callId){
         BusinessState state = businessStateService.get(callId);
         try{
             CallCenterConversationMember member = callCenterConversationMemberService.findById(callId);
