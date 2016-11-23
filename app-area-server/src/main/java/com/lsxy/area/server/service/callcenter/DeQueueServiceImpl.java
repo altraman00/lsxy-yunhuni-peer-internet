@@ -3,18 +3,14 @@ package com.lsxy.area.server.service.callcenter;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.call.center.api.model.EnQueue;
+import com.lsxy.call.center.api.model.BaseEnQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.rpc.api.RPCCaller;
-import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +77,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
         businessStateService.save(state);
 
-        EnQueue enQueue = conversationService.getEnqueue(queueId);
+        BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
         Integer conversationTimeout = enQueue.getConversation_timeout();
         String reserveState = enQueue.getReserve_state();
         boolean playNum = enQueue.isPlay_num();

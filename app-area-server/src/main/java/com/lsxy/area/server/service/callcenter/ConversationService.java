@@ -125,12 +125,12 @@ public class ConversationService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
-    public EnQueue getEnqueue(String queueId){
-        EnQueue enqueue = null;
+    public BaseEnQueue getEnqueue(String queueId){
+        BaseEnQueue enqueue = null;
         try{
             CallCenterQueue ccQueue = callCenterQueueService.findById(queueId);
             if(ccQueue != null && StringUtil.isNotEmpty(ccQueue.getEnqueue())){
-                enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),EnQueue.class);
+                enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),BaseEnQueue.class);
             }
         }catch (Throwable t){
             logger.error("获取排队信息失败",t);
