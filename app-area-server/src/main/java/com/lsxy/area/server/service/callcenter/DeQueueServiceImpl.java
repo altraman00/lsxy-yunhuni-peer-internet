@@ -86,7 +86,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         String to = result.getExtension().getTelenum();
         String conversation = conversationService.create(state.getId(),
-                (String)businessData.get("callcenter"),state.getAppId(),null,false,true,null);
+                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),null,false,true,null);
         conversationService.inviteAgent(appId,conversation,null,null,to,null,null,null,null);
     }
     @Override

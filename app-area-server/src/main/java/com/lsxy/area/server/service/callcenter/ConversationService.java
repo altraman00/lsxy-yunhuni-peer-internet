@@ -54,9 +54,16 @@ public class ConversationService {
     /**呼叫所属的交谈的id的存放属性**/
     public static final String CONVERSATION_FIELD = "CONVERSATION_ID";
 
+    /**ivr呼叫是否呼叫中心标记存放的字段**/
     public static final String ISCC_FIELD = "ISCC";
 
-    public static final String IS_PLAYWAIT = "IS_PLAYWAIT";
+    /**是否正在播放排队等待音标记存放的字段**/
+    public static final String IS_PLAYWAIT_FIELD = "IS_PLAYWAIT";
+
+    public static final Integer IS_PLAYWAIT_TRUE = 1;
+
+    /**呼叫中心id存放的字段**/
+    public static final String CALLCENTER_ID_FIELD = "CALLCENTER_ID";
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -131,8 +138,8 @@ public class ConversationService {
         }
         BusinessState state = businessStateService.get(callId);
         if(state != null && state.getBusinessData()!= null){
-            Integer playWait = (Integer)state.getBusinessData().get(IS_PLAYWAIT);
-            return playWait !=null && playWait == 1;
+            Integer playWait = (Integer)state.getBusinessData().get(IS_PLAYWAIT_FIELD);
+            return playWait !=null && playWait == IS_PLAYWAIT_TRUE;
         }
         return false;
     }

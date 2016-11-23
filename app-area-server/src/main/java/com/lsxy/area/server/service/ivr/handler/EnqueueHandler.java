@@ -82,7 +82,9 @@ public class EnqueueHandler extends ActionHandler{
         EnQueue enQueue = EnQueueDecoder.decode(xml);
 
         if(enQueue!=null){
-            logger.info("排队={}", JSONUtil.objectToJson(enQueue));
+            if(logger.isDebugEnabled()){
+                logger.debug("排队={}", JSONUtil.objectToJson(enQueue));
+            }
             CallCenter callCenter = new CallCenter();
             callCenter.setTenantId(state.getTenantId());
             callCenter.setAppId(state.getAppId());
@@ -92,14 +94,13 @@ public class EnqueueHandler extends ActionHandler{
             callCenter.setFromNum((String)businessData.get("from"));
             callCenter.setToNum((String)businessData.get("to"));
             callCenter = callCenterService.save(callCenter);
-            businessData.put("callcenter",callCenter.getId());
+            businessData.put(ConversationService.CALLCENTER_ID_FIELD,callCenter.getId());
             state.setUserdata(enQueue.getData());
 
             if(enQueue.getWait_voice()!= null){
                 String playWait = enQueue.getWait_voice();
                 try {
                     playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
-                    logger.info("开始放排队等待音={}",playWait);
                     Map<String, Object> params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
                             .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{playWait,0,""}}))
@@ -108,7 +109,7 @@ public class EnqueueHandler extends ActionHandler{
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
                     rpcCaller.invoke(sessionContext, rpcrequest);
-                    businessData.put(ConversationService.IS_PLAYWAIT,1);
+                    businessData.put(ConversationService.IS_PLAYWAIT_FIELD,ConversationService.IS_PLAYWAIT_TRUE);
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }
@@ -125,5 +126,11 @@ public class EnqueueHandler extends ActionHandler{
             deQueueService.fail(state.getTenantId(),state.getAppId(),callId,"调用呼叫中心排队失败");
         }
         return true;
+    }
+
+    public static void main(String[] args) {
+        Integer a = new Integer(1);
+        Integer b = new Integer(1);
+        System.out.println(a == b);
     }
 }

@@ -70,7 +70,7 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
             logger.info("confi_id={},state={}",conf_id,state);
         }
 
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+        if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
             conversation(state,conf_id);
         }else{
             conf(state,conf_id);
