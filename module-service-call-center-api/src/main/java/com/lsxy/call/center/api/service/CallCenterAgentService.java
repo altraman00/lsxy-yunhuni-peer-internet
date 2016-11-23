@@ -85,6 +85,7 @@ public interface CallCenterAgentService extends BaseService<CallCenterAgent> {
      */
     void state(String appId, String agentName, String state) throws YunhuniApiException;
 
+    void state(String id, String state,boolean force) throws YunhuniApiException;
     /**
      * 修改座席技能
      * @param tenantId
