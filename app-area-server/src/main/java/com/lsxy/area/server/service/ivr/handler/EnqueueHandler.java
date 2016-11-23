@@ -99,7 +99,7 @@ public class EnqueueHandler extends ActionHandler{
                 String playWait = enQueue.getWait_voice();
                 try {
                     playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
-                    logger.info("开始放排队等待音={}",playWait);
+                    logger.info("开始放排队等待音 = {}",playWait);
                     Map<String, Object> params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
                             .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{playWait,0,""}}))
