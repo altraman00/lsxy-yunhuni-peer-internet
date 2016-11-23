@@ -1,9 +1,11 @@
 package com.lsxy.call.center.api.model;
 
+import java.io.Serializable;
+
 /**
  * Created by liuws on 2016/11/23.
  */
-public class BaseEnQueue {
+public class BaseEnQueue implements Serializable{
 
     private String channel;
 
