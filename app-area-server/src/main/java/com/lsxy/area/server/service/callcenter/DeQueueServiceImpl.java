@@ -6,6 +6,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -89,11 +90,35 @@ public class DeQueueServiceImpl implements DeQueueService {
             businessData = new HashMap<>();
             state.setBusinessData(businessData);
         }
-        String to = result.getExtension().getTelenum();
+        businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
+        businessStateService.save(state);
+
+        EnQueue enQueue = conversationService.getEnqueue(queueId);
+        Integer conversationTimeout = enQueue.getConversation_timeout();
+        String reserveState = enQueue.getReserve_state();
+        boolean playNum = enQueue.isPlay_num();
+        String preNumVoice = enQueue.getPre_num_voice();
+        String postNumVoice = enQueue.getPost_num_voice();
         String conversation = conversationService.create(state.getId(),
-                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),null,false,true,null);
-        conversationService.inviteAgent(appId,conversation,null,null,to,null,null,null,null);
+                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+        String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
+                result.getExtension().getTelenum(),result.getExtension().getType(),
+                result.getExtension().getUser(),conversationTimeout,45);
+
+        BusinessState agentState = businessStateService.get(agentCallId);
+        if(reserveState != null){
+            agentState.getBusinessData().put(ConversationService.RESERVE_STATE_FIELD,reserveState);
+        }
+        if(playNum){
+            agentState.getBusinessData().put("agent_num",result.getAgent().getNum());
+            agentState.getBusinessData().put("pre_numvoice",preNumVoice);
+            agentState.getBusinessData().put("post_numvoice",postNumVoice);
+        }
+        if(reserveState != null || playNum){
+            businessStateService.save(agentState);
+        }
     }
+
     @Override
     public void timeout(String tenantId, String appId, String callId) {
         if(logger.isDebugEnabled()){
