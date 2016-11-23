@@ -13,19 +13,24 @@ import javax.validation.constraints.Size;
 public class ConditionModifyInputDTO extends CommonDTO {
 
     @Size(max = 512)
+    @JsonProperty("where")
     private String whereExpression;
 
     @Size(max = 512)
+    @JsonProperty("sort")
     private String sortExpression;
 
     @Min(value = 0)
+    @JsonProperty("priority")
     private Integer priority;
 
     @Min(value = 1)
     @Max(value = 1000)
+    @JsonProperty("queue_timeout")
     private Integer queueTimeout;
 
     @Min(value = 0)
+    @JsonProperty("fetch_timeout")
     private Integer fetchTimeout;
 
     @JsonProperty("remark")

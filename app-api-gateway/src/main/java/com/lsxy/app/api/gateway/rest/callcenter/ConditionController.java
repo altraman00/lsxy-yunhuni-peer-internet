@@ -35,7 +35,7 @@ public class ConditionController extends AbstractAPIController {
     @Autowired
     private AppService appService;
 
-    @RequestMapping(value = "/{account_id}/callcenter/conditions",method = RequestMethod.POST)
+    @RequestMapping(value = "/{account_id}/callcenter/condition",method = RequestMethod.POST)
     public ApiGatewayResponse save(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId,
                                    @Valid @RequestBody ConditionCreateInputDTO dto) throws YunhuniApiException {
@@ -59,7 +59,7 @@ public class ConditionController extends AbstractAPIController {
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/conditions/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{account_id}/callcenter/condition/{id}",method = RequestMethod.PUT)
     public ApiGatewayResponse modify(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId,
                                    @PathVariable String id,
@@ -82,7 +82,7 @@ public class ConditionController extends AbstractAPIController {
         return ApiGatewayResponse.success(true);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/conditions/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{account_id}/callcenter/condition/{id}",method = RequestMethod.DELETE)
     public ApiGatewayResponse delete(HttpServletRequest request, @PathVariable String accountId,
                                      @RequestHeader(value = "AppID") String appId,
                                      @PathVariable String id) throws YunhuniApiException {
@@ -94,7 +94,7 @@ public class ConditionController extends AbstractAPIController {
         return ApiGatewayResponse.success(true);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/conditions",method = RequestMethod.GET)
+    @RequestMapping(value = "/{account_id}/callcenter/condition",method = RequestMethod.GET)
     public ApiGatewayResponse conditions(HttpServletRequest request, @PathVariable String accountId,
                                        @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
@@ -104,7 +104,7 @@ public class ConditionController extends AbstractAPIController {
         return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId()));
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/conditions/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{account_id}/callcenter/condition/{id}",method = RequestMethod.GET)
     public ApiGatewayResponse findOne(HttpServletRequest request, @PathVariable String accountId,
                                       @RequestHeader(value = "AppID") String appId,
                                       @PathVariable String id) throws YunhuniApiException {
