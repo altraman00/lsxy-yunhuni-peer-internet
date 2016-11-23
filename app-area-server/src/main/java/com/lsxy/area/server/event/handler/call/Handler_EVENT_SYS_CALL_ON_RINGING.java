@@ -62,7 +62,9 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             logger.info("call_id={},state={}",call_id,state);
         }
 
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())
+        ){
             Map<String,Object> businessData = state.getBusinessData();
             //加入交谈
             String conversation = (String)businessData.get(ConversationService.CONVERSATION_FIELD);

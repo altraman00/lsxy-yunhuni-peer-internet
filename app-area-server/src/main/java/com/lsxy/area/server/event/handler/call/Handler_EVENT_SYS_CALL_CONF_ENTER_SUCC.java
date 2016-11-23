@@ -105,7 +105,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             logger.debug("call_id={},state={}",call_id,state);
         }
         Map<String,Object> businessData = state.getBusinessData();
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) || conversationService.isCC(call_id)){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
+                conversationService.isCC(call_id)){
             conversation(state,call_id);
         }else{
             conf(state,call_id);

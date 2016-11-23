@@ -13,6 +13,7 @@ public class BusinessState implements Serializable{
     public static final String TYPE_NOTIFY_CALL = "notify_call";
     public static final String TYPE_VERIFY_CALL = "verify_call";
     public static final String TYPE_SYS_CONF = "sys_conf";
+    public static final String TYPE_CC_CONVERSATION = "conversation";
     public static final String TYPE_CC_AGENT_CALL = "agent_call";
     public static final String TYPE_CC_OUT_CALL = "out_call";
 

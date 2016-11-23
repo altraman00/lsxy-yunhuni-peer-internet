@@ -95,7 +95,9 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
             logger.debug("call_id={},state={}",call_id,state);
         }
         Map<String,Object> businessData = state.getBusinessData();
-        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) || conversationService.isCC(call_id)){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+            BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
+            conversationService.isCC(call_id)){
             conversation(state,call_id);
         }else{
             conf(state,call_id);
@@ -106,7 +108,6 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
 
     public void conversation(BusinessState state,String call_id){
         String appId = state.getAppId();
-        String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
@@ -117,10 +118,6 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         }
 
         if(StringUtils.isBlank(appId)){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
         conversationService.logicExit(conversation_id,call_id);

@@ -132,7 +132,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         }
 
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
-        if(!BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
+        if(BusinessState.TYPE_IVR_CALL.equals(state.getType()) ||
+            BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
             String ivr_dial_call_id = null;
             if(state.getBusinessData() != null){
                 ivr_dial_call_id = (String)state.getBusinessData().get("ivr_dial_call_id");
@@ -140,6 +141,8 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             if(StringUtils.isNotBlank(ivr_dial_call_id)){
                 hugup(ivr_dial_call_id,state.getAreaId());
             }
+        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            //TODO 坐席状态更改
         }
         return res;
     }

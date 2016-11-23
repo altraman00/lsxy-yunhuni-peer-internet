@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -47,6 +48,9 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
 
     @Autowired
     private IVRActionService ivrActionService;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Override
     public String getEventName() {
@@ -98,6 +102,11 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
                     }
                 }
             }
+        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())||
+                BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
+            Map<String,Object> businessData = state.getBusinessData();
+            String conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
+            conversationService.logicExit(conversation_id,call_id);
         }
         return res;
     }

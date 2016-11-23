@@ -211,12 +211,13 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             if(StringUtils.isNotBlank(error)){
-                //判断交谈是否只有一个人
                 String conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
                 conversationService.exit(conversation_id,call_id);
-            }else{//播放工号提示音
+            }else{//TODO 播放工号提示音
 
             }
+        }else if(BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
+            //TODO
         }
         return res;
     }
