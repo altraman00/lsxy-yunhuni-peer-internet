@@ -54,6 +54,9 @@ public class EnQueue implements Serializable{
 
     private Route route;
 
+    public EnQueue(){
+        
+    }
     public String getChannel() {
         return channel;
     }
@@ -177,6 +180,9 @@ public class EnQueue implements Serializable{
     public class Route  implements Serializable{
         private Condition condition;
 
+        public Route(){
+
+        }
         public Condition getCondition() {
             return condition;
         }
@@ -189,6 +195,9 @@ public class EnQueue implements Serializable{
         @XStreamAsAttribute
         private String id;
 
+        public Condition(){
+
+        }
         public String getId() {
             return id;
         }
