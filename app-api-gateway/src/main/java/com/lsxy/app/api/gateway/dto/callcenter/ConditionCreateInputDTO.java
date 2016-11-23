@@ -15,25 +15,31 @@ public class ConditionCreateInputDTO extends CommonDTO {
 
     @NotNull
     @Size(max = 32)
+    @JsonProperty("channel")
     private String channelId;
 
     @NotNull
     @Size(max = 512)
+    @JsonProperty("where")
     private String whereExpression;
 
     @NotNull
     @Size(max = 512)
+    @JsonProperty("sort")
     private String sortExpression;
 
     @Min(value = 0)
+    @JsonProperty("priority")
     private Integer priority;
 
     @NotNull
     @Min(value = 1)
     @Max(value = 1000)
+    @JsonProperty("queue_timeout")
     private Integer queueTimeout;
 
     @Min(value = 0)
+    @JsonProperty("fetch_timeout")
     private Integer fetchTimeout;
 
     @JsonProperty("remark")

@@ -68,7 +68,19 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.info("conf_id={},state={}",conf_id,state);
         }
+        if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
+            conversation(state,params,conf_id);
+        }else{
+            conf(state,params,conf_id);
+        }
+        return res;
+    }
 
+    private void conversation(BusinessState state, Map<String, Object> params, String conversation_id) {
+        //TODO
+    }
+
+    private void conf(BusinessState state,Map<String,Object> params,String conf_id){
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
@@ -111,6 +123,5 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        return res;
     }
 }

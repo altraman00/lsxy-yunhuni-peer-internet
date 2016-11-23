@@ -12,6 +12,7 @@ import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
@@ -112,6 +113,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             queue.setRelevanceId("");
             queue.setNum(num);
             queue.setOriginCallId(callId);
+            queue.setEnqueue(JSONUtil.objectToJson(enQueue));
             queue = callCenterQueueService.save(queue);
             //lua脚本找坐席
             String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,4,
@@ -150,7 +152,6 @@ public class EnQueueServiceImpl implements EnQueueService{
                     EnQueueResult result = new EnQueueResult();
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
                     result.setAgent(callCenterAgentService.findById(agent));
-                    result.setEnQueue(enQueue);
                     deQueueService.success(tenantId,appId,callId,queue.getId(),result);
                 }catch (Throwable t1){
                     try{
@@ -191,7 +192,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
             AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
             conditionId);
-        if(StringUtil.isEmpty(queueId)){
+        if(queueId != null){
             //找到排队，修改排队状态
             CallCenterQueue queue = callCenterQueueService.findById(queueId);
             if(queue != null){

@@ -89,13 +89,14 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
             logger.info("call_id={},state={}",call_id,state);
         }
         Map<String,Object> businessData = state.getBusinessData();
-        if("conversation".equals(state.getType()) || businessData.get("iscc") != null){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
+                (BusinessState.TYPE_IVR_INCOMING.equals(state.getType())
+                        &&  conversationService.isCC(call_id))){
             conversation(state,params,call_id);
         }else{
             conf(state,params,call_id);
         }
-
-
         return res;
     }
 
@@ -105,7 +106,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         Map<String,Object> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
-            conversation_id = (String)businessData.get("conversation");
+            conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
         }
         if(StringUtils.isBlank(conversation_id)){
             throw new InvalidParamException("没有找到对应的交谈信息callid={},conversation_id={}",call_id,conversation_id);
@@ -117,16 +118,9 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        //TODO
-        
-        //交谈成员递减
-        conversationService.decrPart(conversation_id,call_id);
-
+        conversationService.logicExit(conversation_id,call_id);
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
-        }
-        if("ivr_incoming".equals(state.getType())){
-            ivrActionService.doAction(call_id);
         }
     }
 
@@ -188,7 +182,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
 
     private void hungup(BusinessState state){
         //非ivr发起的会议可以直接挂断
-        if("sys_conf".equals(state.getType())){
+        if(BusinessState.TYPE_SYS_CONF.equals(state.getType())){
             Map<String, Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",state.getResId())
                     .putIfNotEmpty("user_data",state.getId())

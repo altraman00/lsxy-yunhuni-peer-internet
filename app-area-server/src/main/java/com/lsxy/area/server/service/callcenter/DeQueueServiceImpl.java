@@ -6,6 +6,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -32,12 +33,6 @@ public class DeQueueServiceImpl implements DeQueueService {
     private static final Logger logger = LoggerFactory.getLogger(DeQueueServiceImpl.class);
 
     @Autowired
-    private RPCCaller rpcCaller;
-
-    @Autowired
-    private SessionContext sessionContext;
-
-    @Autowired
     private IVRActionService ivrActionService;
 
     @Autowired
@@ -47,13 +42,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     private BusinessStateService businessStateService;
 
     @Autowired
-    private CallSessionService callSessionService;
-
-    @Autowired
     private ConversationService conversationService;
-
-    @Autowired
-    private AreaAndTelNumSelector areaAndTelNumSelector;
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
@@ -79,22 +68,55 @@ public class DeQueueServiceImpl implements DeQueueService {
                     tenantId,appId,callId,queueId,result);
         }
         BusinessState state = businessStateService.get(callId);
+        if(state == null || state.getClosed()){
+            logger.info("会话已关闭callid={}",callId);
+            //抛异常后呼叫中心微服务会回滚坐席状态
+            throw new IllegalStateException("会话已关闭");
+        }
         Map<String,Object> businessData = state.getBusinessData();
         if(businessData == null){
             businessData = new HashMap<>();
             state.setBusinessData(businessData);
         }
-        String to = result.getExtension().getTelenum();
+        businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
+        businessStateService.save(state);
+
+        EnQueue enQueue = conversationService.getEnqueue(queueId);
+        Integer conversationTimeout = enQueue.getConversation_timeout();
+        String reserveState = enQueue.getReserve_state();
+        boolean playNum = enQueue.isPlay_num();
+        String preNumVoice = enQueue.getPre_num_voice();
+        String postNumVoice = enQueue.getPost_num_voice();
         String conversation = conversationService.create(state.getId(),
-                (String)businessData.get("callcenter"),state.getAppId(),null,false,true,null);
-        conversationService.invite(appId,conversation,state.getResId(),null,to,null,null,null,null);
+                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+        String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
+                result.getExtension().getTelenum(),result.getExtension().getType(),
+                result.getExtension().getUser(),conversationTimeout,45);
+
+        BusinessState agentState = businessStateService.get(agentCallId);
+        if(reserveState != null){
+            agentState.getBusinessData().put(ConversationService.RESERVE_STATE_FIELD,reserveState);
+        }
+        if(playNum){
+            agentState.getBusinessData().put(ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
+            agentState.getBusinessData().put(ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
+            agentState.getBusinessData().put(ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
+        }
+        if(reserveState != null || playNum){
+            businessStateService.save(agentState);
+        }
     }
+
     @Override
     public void timeout(String tenantId, String appId, String callId) {
         if(logger.isDebugEnabled()){
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
+        if(state == null || state.getClosed()){
+            logger.info("会话已关闭callid={}",callId);
+            return;
+        }
         App app = appService.findById(appId);
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.timeout")
@@ -112,6 +134,10 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
+        if(state == null || state.getClosed()){
+            logger.info("会话已关闭callid={}",callId);
+            return;
+        }
         App app = appService.findById(appId);
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.fail")
