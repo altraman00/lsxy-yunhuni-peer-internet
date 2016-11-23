@@ -118,6 +118,16 @@ elif [ $IS_TOMCAT_DEPLOY = true ]; then
   echo "deploy war to tomcat...."
   nohup mvn -U $ENV_PROFILE tomcat7:redeploy 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
 fi
+
+sleep 20;
+PROCESS_NUM=`ps -ef | grep $APP_NAME | grep -v "grep" | wc -l`
+if [ $PROCESS_NUM -eq 1 ];
+    then
+        echo "start sucess"
+    else
+        echo "start fail"
+        exit 1
+fi
 echo "OK";
 
 if [ $TAIL_LOG = true ]; then
