@@ -12,6 +12,7 @@ import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
@@ -113,7 +114,9 @@ public class EnQueueServiceImpl implements EnQueueService{
             queue.setRelevanceId("");
             queue.setNum(num);
             queue.setOriginCallId(callId);
-            queue.setEnqueue(JSONUtil.objectToJson(enQueue));
+            BaseEnQueue baseEnQueue = new BaseEnQueue();
+            BeanUtils.copyProperties(baseEnQueue,enQueue);
+            queue.setEnqueue(JSONUtil.objectToJson(baseEnQueue));
             queue = callCenterQueueService.save(queue);
             //lua脚本找坐席
             String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,4,
