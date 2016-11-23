@@ -1,6 +1,7 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -12,9 +13,9 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.tenant.dao.RealnameCorpDao;
 import com.lsxy.framework.tenant.dao.RealnamePrivateDao;
 import com.lsxy.framework.tenant.dao.TenantDao;
-import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,16 +71,40 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     @Override
     public Tenant createTenant(Account account) {
-        long incTid = cacheManager.incr(INCREASE_TID);
+        long incTid = getTid();
         Tenant tenant = new Tenant();
         tenant.setTenantName(account.getUserName());
         tenant.setRegisterUserId(account.getId());
         tenant.setIsRealAuth(Tenant.AUTH_NO); //设为未实名认证状态
         tenant.setTenantUid(DateUtils.getTime("yyyyMMdd")+ incTid);
-        if(incTid >= 9999){
-            cacheManager.del(INCREASE_TID);
-        }
+
         return this.save(tenant);
+    }
+
+    //获取用户Tid
+    private long getTid(){
+        long incTid = cacheManager.incr(INCREASE_TID);
+        if(incTid == 8999){
+            cacheManager.del(INCREASE_TID);
+            return incTid;
+        }else if(incTid > 8999){
+            int random = RandomUtils.nextInt(10, 20);
+            for(int i=0;i<random;i++){
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                long tid = cacheManager.incr(INCREASE_TID);
+                if(tid < 8999){
+                    return tid;
+                }
+            }
+            cacheManager.del(INCREASE_TID);
+            return cacheManager.incr(INCREASE_TID);
+        }else{
+            return incTid;
+        }
     }
 
     @Override
