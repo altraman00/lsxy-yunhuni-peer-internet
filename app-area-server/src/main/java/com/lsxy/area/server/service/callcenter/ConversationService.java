@@ -586,6 +586,13 @@ public class ConversationService {
         //交谈成员递减
         this.decrPart(conversationId,callId);
 
+        //TODO 成员大于1且，活动成员只剩一个了
+        if(this.size(conversationId) > 1){
+            long activeTotal = 1;//TODO 需要获取活动成员
+            if(activeTotal == 1){
+                //TODO 播放holdvoice
+            }
+        }
         //退出呼叫所在的交谈
         callConversationService.decrConversation(callId,conversationId);
         if(callConversationService.size(callId) > 0){
