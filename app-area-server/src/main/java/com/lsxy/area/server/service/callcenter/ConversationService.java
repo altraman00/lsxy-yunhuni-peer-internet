@@ -6,13 +6,15 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.call.center.api.model.CallCenterConversation;
-import com.lsxy.call.center.api.model.CallCenterConversationMember;
+import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
+import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -65,6 +67,15 @@ public class ConversationService {
     /**呼叫中心id存放的字段**/
     public static final String CALLCENTER_ID_FIELD = "CALLCENTER_ID";
 
+    /**呼叫对应的排队id存放的字段**/
+    public static final String QUEUE_ID_FIELD = "QUEUE_ID";
+
+    /**坐席挂机后的状态存放的字段**/
+    public static final String RESERVE_STATE_FIELD = "RESERVE_STATE";
+
+    /**坐席呼叫对应的坐席id存放的字段**/
+    public static final String AGENT_ID_FIELD = "AGENT_ID";
+
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -101,6 +112,21 @@ public class ConversationService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationMemberService callCenterConversationMemberService;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterQueueService callCenterQueueService;
+
+    public EnQueue getEnqueue(String queueId){
+        EnQueue enqueue = null;
+        try{
+            CallCenterQueue ccQueue = callCenterQueueService.findById(queueId);
+            if(ccQueue != null && StringUtil.isNotEmpty(ccQueue.getEnqueue())){
+                enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),EnQueue.class);
+            }
+        }catch (Throwable t){
+            logger.error("获取排队信息失败",t);
+        }
+        return enqueue;
+    }
 
     /**
      * 判断callId是否conversation的发起者
@@ -157,21 +183,14 @@ public class ConversationService {
      * @param callCenterId
      * @param appId
      * @param maxDuration
-     * @param recording
-     * @param autoHangup
-     * @param bgmFile
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String initiator,String callCenterId, String appId, Integer maxDuration,
-                         Boolean recording, Boolean autoHangup, String bgmFile) throws YunhuniApiException {
+    public String create(String initiator,String callCenterId, String appId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
         }
-        String tenantId = app.getTenant().getId();
-
-        //TODO
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
         CallCenterConversation conversation = new CallCenterConversation();
@@ -182,11 +201,12 @@ public class ConversationService {
         conversation = callCenterConversationService.save(conversation);
         String conversationId = conversation.getId();
 
-        bgmFile = playFileUtil.convert(tenantId,appId,bgmFile);
+        if(maxDuration!=null && maxDuration > EXPIRE){
+            maxDuration = EXPIRE;
+        }
         Map<String, Object> map = new MapBuilder<String,Object>()
                 .putIfNotEmpty("user_data",conversationId)
                 .put("max_seconds",maxDuration,EXPIRE)
-                .putIfNotEmpty("bg_file",bgmFile)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
@@ -197,7 +217,7 @@ public class ConversationService {
         }
         //保存业务数据
         BusinessState state = new BusinessState.Builder()
-                .setTenantId(tenantId)
+                .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
                 .setId(conversationId)
                 .setType(BusinessState.TYPE_CC_AGENT_CALL)
@@ -205,9 +225,6 @@ public class ConversationService {
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
                         .put("max_seconds",maxDuration,EXPIRE)//交谈最大持续时长
-                        .put("max_parts",MAX_PARTS)//最大与会数
-                        .putIfNotEmpty("auto_hangup",autoHangup)//交谈结束是否自动挂断
-                        .putIfNotEmpty("recording",recording)//是否自动启动录音
                         .build())
                 .build();
         businessStateService.save(state);
@@ -257,82 +274,114 @@ public class ConversationService {
      * 邀请坐席加入交谈
      * @param appId
      * @param conversationId
-     * @param from
-     * @param to
      * @param maxDuration
      * @param maxDialDuration
-     * @param playFile
-     * @param voiceMode
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteAgent(String appId, String conversationId,String parent_call_res_id,
-                         String from, String to, Integer maxDuration, Integer maxDialDuration,
-                         String playFile, Integer voiceMode) throws YunhuniApiException{
-        App app = appService.findById(appId);
-        AreaAndTelNumSelector.Selector selector =
-                areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
-
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber();
-        String lineId = selector.getLineId();
-
+    public String inviteAgent(String appId, String conversationId,String agentId,
+                         String telnum,String type,String user,
+                          Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_PREPARING);
-        callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(selector.getToUri());
-        callSession.setApp(app);
-        callSession.setTenant(app.getTenant());
-        callSession.setRelevanceId(callId);
-        callSession.setType(CallSession.TYPE_CALL_CENTER);
-        callSession.setResId(null);
-        callSession = callSessionService.save(callSession);
-
-        Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",selector.getToUri())
-                .putIfNotEmpty("from_uri",oneTelnumber)
-                .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
-                .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
-                .putIfNotEmpty("max_ring_seconds",maxDialDuration)
-                .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
-                .build();
-
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
-        try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
-        } catch (Exception e) {
-            throw new InvokeCallException(e);
+        App app = appService.findById(appId);
+        if(AppExtension.TYPE_TELPHONE.equals(type)){//分机为普通电话或手机
+            AreaAndTelNumSelector.Selector selector =
+                    areaAndTelNumSelector.getTelnumberAndAreaId(app,null,telnum);
+            String areaId = selector.getAreaId();
+            String oneTelnumber = selector.getOneTelnumber();
+            String lineId = selector.getLineId();
+            CallSession callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_PREPARING);
+            callSession.setFromNum(oneTelnumber);
+            callSession.setToNum(selector.getToUri());
+            callSession.setApp(app);
+            callSession.setTenant(app.getTenant());
+            callSession.setRelevanceId(callId);
+            callSession.setType(CallSession.TYPE_CALL_CENTER);
+            callSession.setResId(null);
+            callSession = callSessionService.save(callSession);
+            Map<String, Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("to_uri",selector.getToUri())
+                    .putIfNotEmpty("from_uri",oneTelnumber)
+                    .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
+                    .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                    .putIfNotEmpty("user_data",callId)
+                    .put("areaId ",areaId)
+                    .build();
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            } catch (Exception e) {
+                throw new InvokeCallException(e);
+            }
+            //保存业务数据，后续事件要用到
+            BusinessState callstate = new BusinessState.Builder()
+                    .setTenantId(app.getTenant().getId())
+                    .setAppId(app.getId())
+                    .setId(callId)
+                    .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                    .setAreaId(areaId)
+                    .setLineGatewayId(lineId)
+                    .setBusinessData(new MapBuilder<String,Object>()
+                            .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
+                            .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
+                            .putIfNotEmpty("from",oneTelnumber)
+                            .putIfNotEmpty("to",telnum)
+                            .putIfNotEmpty("sessionid",callSession.getId())
+                            .build())
+                    .build();
+            businessStateService.save(callstate);
+        }else{//sip话机
+            String areaId = areaAndTelNumSelector.getAreaId(app);
+            String from = "callcenter@sip.yunhuni.com";
+            CallSession callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_PREPARING);
+            callSession.setFromNum(from);
+            callSession.setToNum(user);
+            callSession.setApp(app);
+            callSession.setTenant(app.getTenant());
+            callSession.setRelevanceId(callId);
+            callSession.setType(CallSession.TYPE_CALL_CENTER);
+            callSession.setResId(null);
+            callSession = callSessionService.save(callSession);
+            Map<String, Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("to_uri",user)
+                    .putIfNotEmpty("from_uri","callcenter@sip.yunhuni.com")
+                    .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
+                    .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                    .putIfNotEmpty("user_data",callId)
+                    .put("areaId ",areaId)
+                    .build();
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            } catch (Exception e) {
+                throw new InvokeCallException(e);
+            }
+            //保存业务数据，后续事件要用到
+            BusinessState callstate = new BusinessState.Builder()
+                    .setTenantId(app.getTenant().getId())
+                    .setAppId(app.getId())
+                    .setId(callId)
+                    .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                    .setAreaId(areaId)
+                    .setBusinessData(new MapBuilder<String,Object>()
+                            .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
+                            .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
+                            .putIfNotEmpty("from",from)
+                            .putIfNotEmpty("to",user)
+                            .putIfNotEmpty("sessionid",callSession.getId())
+                            .build())
+                    .build();
+            businessStateService.save(callstate);
         }
-
-        //保存业务数据，后续事件要用到
-        BusinessState callstate = new BusinessState.Builder()
-                .setTenantId(app.getTenant().getId())
-                .setAppId(app.getId())
-                .setId(callId)
-                .setType(BusinessState.TYPE_CC_AGENT_CALL)
-                .setAreaId(areaId)
-                .setLineGatewayId(lineId)
-                .setBusinessData(new MapBuilder<String,Object>()
-                        .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
-                        .putIfNotEmpty("from",oneTelnumber)
-                        .putIfNotEmpty("to",to)
-                        .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
-                        .putIfNotEmpty("voice_mode",voiceMode)//加入后的声音模式
-                        .putIfNotEmpty("sessionid",callSession.getId())
-                        .build())
-                .build();
-        businessStateService.save(callstate);
         return callId;
     }
-
 
     /**
      * 邀请外线
      * @param appId
      * @param conversationId
-     * @param parent_call_res_id
      * @param from
      * @param to
      * @param maxDuration
@@ -342,7 +391,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteOut(String appId, String conversationId,String parent_call_res_id,
+    public String inviteOut(String appId, String conversationId,
                               String from, String to, Integer maxDuration, Integer maxDialDuration,
                               String playFile, Integer voiceMode) throws YunhuniApiException{
         App app = appService.findById(appId);
@@ -368,7 +417,6 @@ public class ConversationService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
-                .putIfNotEmpty("parent_call_res_id",parent_call_res_id)
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
