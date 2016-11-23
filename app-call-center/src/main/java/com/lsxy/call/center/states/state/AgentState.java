@@ -44,6 +44,10 @@ public class AgentState {
         return model;
     }
 
+    public void delete(String agentId){
+        redisCacheService.del(getKey(agentId));
+    }
+
     public String getExtension(String agentId) {
         Object obj = redisCacheService.hget(getKey(agentId),"extension");
         if(obj == null){

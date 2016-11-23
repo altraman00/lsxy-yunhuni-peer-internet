@@ -91,7 +91,8 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         Map<String,Object> businessData = state.getBusinessData();
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
                 BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
-                conversationService.isCC(call_id)){
+                (BusinessState.TYPE_IVR_INCOMING.equals(state.getType())
+                        &&  conversationService.isCC(call_id))){
             conversation(state,params,call_id);
         }else{
             conf(state,params,call_id);

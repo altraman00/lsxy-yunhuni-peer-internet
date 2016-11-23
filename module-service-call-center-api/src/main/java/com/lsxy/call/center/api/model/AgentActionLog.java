@@ -8,31 +8,30 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * 坐席
- * Created by zhangxb on 2016/10/21.
+ * Created by liups on 2016/11/15.
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_agent_skill")
-public class AgentSkill extends IdEntity {
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_agent_action_log")
+public class AgentActionLog extends IdEntity {
+    public static int ACTION_LOGIN = 1;
+    public static int ACTION_LOGOUT = 0;
 
     private String tenantId;
     private String appId;
-    private String agent;
+    private String channel;
     private String name;
-    private Integer score;
-    private Boolean enabled;
+    private Integer action; //1登录，0注销
 
-    public AgentSkill() {
+    public AgentActionLog() {
     }
 
-    public AgentSkill(String tenantId, String appId, String agent, String name, Integer score, Boolean enabled) {
+    public AgentActionLog(String tenantId, String appId, String channel, String name, Integer action) {
         this.tenantId = tenantId;
         this.appId = appId;
-        this.agent = agent;
+        this.channel = channel;
         this.name = name;
-        this.score = score;
-        this.enabled = enabled;
+        this.action = action;
     }
 
     @Column(name = "tenant_id")
@@ -53,13 +52,13 @@ public class AgentSkill extends IdEntity {
         this.appId = appId;
     }
 
-    @Column(name = "agent")
-    public String getAgent() {
-        return agent;
+    @Column(name = "channel")
+    public String getChannel() {
+        return channel;
     }
 
-    public void setAgent(String agent) {
-        this.agent = agent;
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     @Column(name = "name")
@@ -71,22 +70,12 @@ public class AgentSkill extends IdEntity {
         this.name = name;
     }
 
-    @Column(name = "score")
-    public Integer getScore() {
-        return score;
+    @Column(name = "action")
+    public Integer getAction() {
+        return action;
     }
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
-
-    @Column(name = "enabled")
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setAction(Integer action) {
+        this.action = action;
     }
 }
-
