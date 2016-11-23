@@ -76,6 +76,16 @@ public class ConversationService {
     /**坐席呼叫对应的坐席id存放的字段**/
     public static final String AGENT_ID_FIELD = "AGENT_ID";
 
+    /**坐席工号存放的字段**/
+    public static final String AGENT_NUM_FIELD = "AGENT_NUM";
+
+    /**坐席播放工号前的音存放的字段**/
+    public static final String AGENT_PRENUMVOICE_FIELD = "AGENT_PRENUMVOICE";
+
+    /**坐席播放工号后的音存放的字段**/
+    public static final String AGENT_POSTNUMVOICE_FIELD = "AGENT_POSTNUMVOICE";
+
+    /****/
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -284,97 +294,63 @@ public class ConversationService {
                           Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
         App app = appService.findById(appId);
-        if(AppExtension.TYPE_TELPHONE.equals(type)){//分机为普通电话或手机
+        String from = null;
+        String to = null;
+        String areaId = null;
+        String lineId = null;
+        if(AppExtension.TYPE_TELPHONE.equals(type)){
             AreaAndTelNumSelector.Selector selector =
                     areaAndTelNumSelector.getTelnumberAndAreaId(app,null,telnum);
-            String areaId = selector.getAreaId();
-            String oneTelnumber = selector.getOneTelnumber();
-            String lineId = selector.getLineId();
-            CallSession callSession = new CallSession();
-            callSession.setStatus(CallSession.STATUS_PREPARING);
-            callSession.setFromNum(oneTelnumber);
-            callSession.setToNum(selector.getToUri());
-            callSession.setApp(app);
-            callSession.setTenant(app.getTenant());
-            callSession.setRelevanceId(callId);
-            callSession.setType(CallSession.TYPE_CALL_CENTER);
-            callSession.setResId(null);
-            callSession = callSessionService.save(callSession);
-            Map<String, Object> params = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("to_uri",selector.getToUri())
-                    .putIfNotEmpty("from_uri",oneTelnumber)
-                    .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
-                    .putIfNotEmpty("max_ring_seconds",maxDialDuration)
-                    .putIfNotEmpty("user_data",callId)
-                    .put("areaId ",areaId)
-                    .build();
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
-            try {
-                rpcCaller.invoke(sessionContext, rpcrequest);
-            } catch (Exception e) {
-                throw new InvokeCallException(e);
-            }
-            //保存业务数据，后续事件要用到
-            BusinessState callstate = new BusinessState.Builder()
-                    .setTenantId(app.getTenant().getId())
-                    .setAppId(app.getId())
-                    .setId(callId)
-                    .setType(BusinessState.TYPE_CC_AGENT_CALL)
-                    .setAreaId(areaId)
-                    .setLineGatewayId(lineId)
-                    .setBusinessData(new MapBuilder<String,Object>()
-                            .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
-                            .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
-                            .putIfNotEmpty("from",oneTelnumber)
-                            .putIfNotEmpty("to",telnum)
-                            .putIfNotEmpty("sessionid",callSession.getId())
-                            .build())
-                    .build();
-            businessStateService.save(callstate);
-        }else{//sip话机
-            String areaId = areaAndTelNumSelector.getAreaId(app);
-            String from = "callcenter@sip.yunhuni.com";
-            CallSession callSession = new CallSession();
-            callSession.setStatus(CallSession.STATUS_PREPARING);
-            callSession.setFromNum(from);
-            callSession.setToNum(user);
-            callSession.setApp(app);
-            callSession.setTenant(app.getTenant());
-            callSession.setRelevanceId(callId);
-            callSession.setType(CallSession.TYPE_CALL_CENTER);
-            callSession.setResId(null);
-            callSession = callSessionService.save(callSession);
-            Map<String, Object> params = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("to_uri",user)
-                    .putIfNotEmpty("from_uri","callcenter@sip.yunhuni.com")
-                    .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
-                    .putIfNotEmpty("max_ring_seconds",maxDialDuration)
-                    .putIfNotEmpty("user_data",callId)
-                    .put("areaId ",areaId)
-                    .build();
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
-            try {
-                rpcCaller.invoke(sessionContext, rpcrequest);
-            } catch (Exception e) {
-                throw new InvokeCallException(e);
-            }
-            //保存业务数据，后续事件要用到
-            BusinessState callstate = new BusinessState.Builder()
-                    .setTenantId(app.getTenant().getId())
-                    .setAppId(app.getId())
-                    .setId(callId)
-                    .setType(BusinessState.TYPE_CC_AGENT_CALL)
-                    .setAreaId(areaId)
-                    .setBusinessData(new MapBuilder<String,Object>()
-                            .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
-                            .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
-                            .putIfNotEmpty("from",from)
-                            .putIfNotEmpty("to",user)
-                            .putIfNotEmpty("sessionid",callSession.getId())
-                            .build())
-                    .build();
-            businessStateService.save(callstate);
+            from = selector.getOneTelnumber();
+            to = selector.getToUri();
+            areaId = selector.getAreaId();
+            lineId = selector.getLineId();
+        }else{
+            from = "callcenter@sip.yunhuni.com";
+            to = user;
+            areaId = areaAndTelNumSelector.getAreaId(app);
         }
+        CallSession callSession = new CallSession();
+        callSession.setStatus(CallSession.STATUS_PREPARING);
+        callSession.setFromNum(from);
+        callSession.setToNum(to);
+        callSession.setApp(app);
+        callSession.setTenant(app.getTenant());
+        callSession.setRelevanceId(callId);
+        callSession.setType(CallSession.TYPE_CALL_CENTER);
+        callSession.setResId(null);
+        callSession = callSessionService.save(callSession);
+        Map<String, Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("to_uri",to)
+                .putIfNotEmpty("from_uri",from)
+                .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
+                .putIfNotEmpty("max_ring_seconds",maxDialDuration)
+                .putIfNotEmpty("user_data",callId)
+                .put("areaId ",areaId)
+                .build();
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            throw new InvokeCallException(e);
+        }
+        //保存业务数据，后续事件要用到
+        BusinessState callstate = new BusinessState.Builder()
+                .setTenantId(app.getTenant().getId())
+                .setAppId(app.getId())
+                .setId(callId)
+                .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                .setAreaId(areaId)
+                .setLineGatewayId(lineId)
+                .setBusinessData(new MapBuilder<String,Object>()
+                        .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
+                        .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
+                        .putIfNotEmpty("from",from)
+                        .putIfNotEmpty("to",to)
+                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .build())
+                .build();
+        businessStateService.save(callstate);
         return callId;
     }
 

@@ -33,12 +33,6 @@ public class DeQueueServiceImpl implements DeQueueService {
     private static final Logger logger = LoggerFactory.getLogger(DeQueueServiceImpl.class);
 
     @Autowired
-    private RPCCaller rpcCaller;
-
-    @Autowired
-    private SessionContext sessionContext;
-
-    @Autowired
     private IVRActionService ivrActionService;
 
     @Autowired
@@ -48,13 +42,7 @@ public class DeQueueServiceImpl implements DeQueueService {
     private BusinessStateService businessStateService;
 
     @Autowired
-    private CallSessionService callSessionService;
-
-    @Autowired
     private ConversationService conversationService;
-
-    @Autowired
-    private AreaAndTelNumSelector areaAndTelNumSelector;
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
@@ -110,9 +98,9 @@ public class DeQueueServiceImpl implements DeQueueService {
             agentState.getBusinessData().put(ConversationService.RESERVE_STATE_FIELD,reserveState);
         }
         if(playNum){
-            agentState.getBusinessData().put("agent_num",result.getAgent().getNum());
-            agentState.getBusinessData().put("pre_numvoice",preNumVoice);
-            agentState.getBusinessData().put("post_numvoice",postNumVoice);
+            agentState.getBusinessData().put(ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
+            agentState.getBusinessData().put(ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
+            agentState.getBusinessData().put(ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
         }
         if(reserveState != null || playNum){
             businessStateService.save(agentState);
