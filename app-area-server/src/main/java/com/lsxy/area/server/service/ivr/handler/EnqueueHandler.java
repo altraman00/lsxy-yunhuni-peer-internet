@@ -101,6 +101,9 @@ public class EnqueueHandler extends ActionHandler{
                 String playWait = enQueue.getWait_voice();
                 try {
                     playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
+                    if(logger.isDebugEnabled()){
+                        logger.debug("开始播放排队等待音={}", playWait);
+                    }
                     Map<String, Object> params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
                             .putIfNotEmpty("content", JSONUtil2.objectToJson(new Object[][]{new Object[]{playWait,0,""}}))
@@ -119,7 +122,6 @@ public class EnqueueHandler extends ActionHandler{
         state.setBusinessData(businessData);
         businessStateService.save(state);
         try {
-            Thread.sleep(10000);
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), (String) businessData.get("to"), callId, enQueue);
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
