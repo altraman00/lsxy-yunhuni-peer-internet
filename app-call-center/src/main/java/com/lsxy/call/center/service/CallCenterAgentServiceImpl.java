@@ -69,6 +69,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     private CAs cAs;
     @Autowired
     private AgentActionLogService agentActionLogService;
+    @Autowired
+    private EnQueueService enQueueService;
 
 
     @Override
@@ -367,11 +369,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             // 座席不存在
             throw new AgentNotExistException();
         }
-        this.state(agent.getId(),state,false);
+        this.state(agent.getTenantId(),agent.getAppId(),agent.getId(),state,false);
     }
 
     @Override
-    public void state(String agentId, String state,boolean force) throws YunhuniApiException{
+    public void state(String tanantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
         AgentLock agentLock = new AgentLock(redisCacheService, agentId);
         boolean lock = agentLock.lock();
         if(!lock){
@@ -391,7 +393,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             agentState.setState(agentId,state);
             if(state.contains(AgentState.Model.STATE_IDLE)){
-                //TODO 找排队事件
+                enQueueService.lookupQueue(tanantId,appId,null,agentId);
             }
         }finally {
             agentLock.unlock();
