@@ -253,7 +253,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
                         rpcCaller.invoke(sessionContext, rpcrequest);
                     } catch (Throwable e) {
-                        logger.error("调用失败",e);
+                        logger.error("调用失败 ",e);
                     }
                 }
             }
