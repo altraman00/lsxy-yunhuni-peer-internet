@@ -1,10 +1,13 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -52,6 +55,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Reference
+    private CallCenterAgentService callCenterAgentService;
 
     @Override
     public String getEventName() {
@@ -139,11 +145,14 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 hugup(ivr_dial_call_id,state.getAreaId());
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
-            //TODO 坐席状态更改
             String agentId = (String)state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
             if(agentId != null){
                 String reserve_state = (String)state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
-                
+                try {
+                    callCenterAgentService.state(app.getTenant().getId(),app.getId(),agentId,reserve_state,true);
+                } catch (YunhuniApiException e) {
+                    logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
+                }
             }
         }
         return res;
