@@ -71,7 +71,8 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
             RestToken codeToken = new RestToken("MASKCODE", null, new Date(), null, null);
             //认证成功，设置认证token
             SecurityContextHolder.getContext().setAuthentication(codeToken);
-            chain.doFilter(new AuthenticationRequestWrapper(req), resp);
+            chain.doFilter(req, resp);
+            return;
         }
 
         long start = System.currentTimeMillis();
