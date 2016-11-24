@@ -8,7 +8,6 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.utils.StatisticsUtils;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -55,7 +54,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         String[] types = {type};
-        if(App.PRODUCT_CALL_CENTER.equals(type)){
+        if(App.SERVICE_TYPE_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
         String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   last_time BETWEEN ? and ?";
@@ -81,7 +80,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         String[] types = {type};
-        if(App.PRODUCT_CALL_CENTER.equals(type)){
+        if(App.SERVICE_TYPE_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
         String sql = "from db_lsxy_bi_yunhuni.tb_bi_voice_cdr where "+ StatisticsUtils.getSqlIsNull2(tenantId,appId,types)+ " deleted=0 and   call_end_dt BETWEEN ? and ?";
@@ -111,7 +110,7 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
         String[] types = {type};
-        if(App.PRODUCT_CALL_CENTER.equals(type)){
+        if(App.SERVICE_TYPE_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
         String costType = " SUM(cost) as cost";

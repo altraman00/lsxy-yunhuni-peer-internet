@@ -70,11 +70,11 @@ public interface AppService extends BaseService<App> {
      */
     List<App> getAppsByTenantId(String tenantId);
 
-
     /**
-     * 获取分机注册信息
-     * @param appId
-     * @return
+     * 创建应用
+     * @param app
      */
-    String findAppSipRegistrar(String appId);
+    App create(App app);
+
+    Long getIncr();
 }

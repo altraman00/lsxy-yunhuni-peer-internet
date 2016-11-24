@@ -21,8 +21,8 @@ import javax.persistence.*;
 public class App extends IdEntity {
     public static int STATUS_ONLINE = 1;//上线
     public static int STATUS_OFFLINE = 2;//没上线
-    public static String PRODUCT_VOICE = "voice";//语言产品
-    public static String PRODUCT_CALL_CENTER = "call_center";//语言产品
+    public static String SERVICE_TYPE_VOICE = "voice";//语言产品
+    public static String SERVICE_TYPE_CALL_CENTER = "call_center";//语言产品
     private Tenant tenant;//所属租户
     private String name;//应用名字
     private Integer status;//应用状态
@@ -42,6 +42,7 @@ public class App extends IdEntity {
     private Integer isCallCenter;//是否启用呼叫中心服务 是否呼叫中心0否，1是',
     private String serviceType;//服务类型
     private AreaSip areaSip; //sip接入点信息
+    private Long callCenterNum;
 
     @Column(name = "is_call_center")
     public Integer getIsCallCenter() {
@@ -206,5 +207,14 @@ public class App extends IdEntity {
 
     public void setAreaSip(AreaSip areaSip) {
         this.areaSip = areaSip;
+    }
+
+    @Column(name = "call_center_num")
+    public Long getCallCenterNum() {
+        return callCenterNum;
+    }
+
+    public void setCallCenterNum(Long callCenterNum) {
+        this.callCenterNum = callCenterNum;
     }
 }
