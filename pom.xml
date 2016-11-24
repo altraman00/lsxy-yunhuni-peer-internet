@@ -17,6 +17,7 @@
         <spring-security-version>3.2.5.RELEASE</spring-security-version>
         <skip_maven_deploy>false</skip_maven_deploy>
     </properties>
+
     <modules>
         <module>app-portal</module>
         <module>app-area-server</module>
