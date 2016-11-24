@@ -43,10 +43,8 @@ public class ChannelController extends AbstractAPIController {
         }
         App app = appService.findById(appId);
         Channel channel = new Channel();
-        channel.setTenantId(app.getTenant().getId());
-        channel.setAppId(app.getId());
         channel.setRemark(dto.getRemark());
-        channel = channelService.save(channel);
+        channel = channelService.save(app.getTenant().getId(),appId,channel);
         Map<String,String> result = new HashMap<>();
         result.put("channelId",channel.getId());
         return ApiGatewayResponse.success(result);
