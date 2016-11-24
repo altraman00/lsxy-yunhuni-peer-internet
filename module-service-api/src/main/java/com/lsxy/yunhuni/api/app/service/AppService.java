@@ -76,5 +76,4 @@ public interface AppService extends BaseService<App> {
      */
     App create(App app);
 
-    Long getIncr();
 }

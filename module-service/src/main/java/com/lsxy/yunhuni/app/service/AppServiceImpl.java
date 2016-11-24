@@ -139,11 +139,6 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         return app;
     }
 
-    @Override
-    public Long getIncr() {
-        return getCallCenterAppNum();
-    }
-
     private Long getCallCenterAppNum(){
         //5位编号
         long incr5 = redisCacheService.incr(APP_CC_NUM_PREFIX5);
