@@ -6,10 +6,12 @@ import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.dao.ConditionDao;
 import com.lsxy.call.center.states.lock.ModifyConditionLock;
+import com.lsxy.call.center.utils.CallCenterEnableUtil;
 import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.mq.api.AbstractMQEvent;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
@@ -19,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -44,50 +46,56 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     @Autowired
     private RedisCacheService redisCacheService;
 
+    @Autowired
+    private CallCenterEnableUtil callCenterEnableUtil;
+
     @Override
     public BaseDaoInterface<Condition, Serializable> getDao() {
         return conditionDao;
     }
 
     @Override
-    public Condition save(Condition condition){
+    public Condition save(String tenantId,String appId,Condition condition) throws YunhuniApiException{
         if(condition == null){
-            throw new NullPointerException();
+            throw new RequestIllegalArgumentException();
         }
-        if(condition.getTenantId() == null){
-            throw new IllegalArgumentException("tenantId 不能为null");
+        if(tenantId == null){
+            throw new RequestIllegalArgumentException();
         }
-        if(condition.getAppId() == null){
-            throw new IllegalArgumentException("appId 不能为null");
+        if(appId == null){
+            throw new RequestIllegalArgumentException();
         }
         if(condition.getChannelId() == null){
-            throw new IllegalArgumentException("channelId 不能为null");
+            throw new RequestIllegalArgumentException();
         }
         if(!ExpressionUtils.validSortExpression(condition.getSortExpression())){
-            throw new IllegalArgumentException("sort expression 错误");
+            throw new ConditionExpressionException();
         }
         if(!ExpressionUtils.validWhereExpression(condition.getWhereExpression())){
-            throw new IllegalArgumentException("where expression 错误");
+            throw new ConditionExpressionException();
+        }
+        if(callCenterEnableUtil.enabled(tenantId, appId)){
+            throw new AppServiceInvalidException();
         }
         //通道是否存在
         Channel channel = channelService.findById(condition.getChannelId());
         if(channel == null){
-            throw new IllegalArgumentException("channel 不存在");
+            throw new ChannelNotExistException();
         }
         if(condition.getId() != null){
             Condition oldCondition = this.findById(condition.getId());
             if(oldCondition == null){
-                throw new IllegalArgumentException("condition 不存在");
+                throw new ChannelNotExistException();
             }
-            if(!oldCondition.getTenantId().equals(condition.getTenantId())){
-                throw new IllegalArgumentException("condition 不存在");
+            if(!oldCondition.getTenantId().equals(tenantId)){
+                throw new ChannelNotExistException();
             }
-            if(!oldCondition.getAppId().equals(condition.getAppId())){
-                throw new IllegalArgumentException("condition 不存在");
+            if(!oldCondition.getAppId().equals(appId)){
+                throw new ChannelNotExistException();
             }
             ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
             if(!lock.lock()){
-                throw new java.lang.IllegalStateException("系统繁忙");
+                throw new SystemBusyException();
             }
             try{
                 boolean modify_where = false;
@@ -129,10 +137,12 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
                 throw t;
             }
         }else{
+            condition.setTenantId(tenantId);
+            condition.setAppId(appId);
             condition = super.save(condition);
             ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
             if(!lock.lock()){
-                throw new java.lang.IllegalStateException("系统繁忙");
+                throw new SystemBusyException();
             }
             try{
                 //创建条件事件
@@ -147,11 +157,14 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     }
 
     @Override
-    public void delete(String tenantId,String appId,String conditionId){
+    public void delete(String tenantId,String appId,String conditionId) throws YunhuniApiException{
+        if(callCenterEnableUtil.enabled(tenantId, appId)){
+            throw new AppServiceInvalidException();
+        }
         Condition condition = this.findOne(tenantId,appId,conditionId);
         ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
         if(!lock.lock()){
-            throw new java.lang.IllegalStateException("系统繁忙");
+            throw new SystemBusyException();
         }
         try {
             this.delete(conditionId);
@@ -165,51 +178,59 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     }
 
     @Override
-    public Condition findOne(String tenantId,String appId,String conditionId){
+    public Condition findOne(String tenantId,String appId,String conditionId) throws YunhuniApiException{
         if(conditionId == null){
-            throw new IllegalArgumentException("conditionId 不能为null");
+            throw new RequestIllegalArgumentException();
         }
         if(tenantId == null){
-            throw new IllegalArgumentException("tenantId 不能为null");
+            throw new RequestIllegalArgumentException();
         }
         if(appId == null){
-            throw new IllegalArgumentException("appId 不能为null");
+            throw new RequestIllegalArgumentException();
+        }
+        if(callCenterEnableUtil.enabled(tenantId, appId)){
+            throw new AppServiceInvalidException();
         }
         Condition condition = this.findById(conditionId);
         if(condition == null){
-            throw new IllegalArgumentException("condition 不存在");
+            throw new ConditionNotExistException();
         }
         if(!tenantId.equals(condition.getTenantId())){
-            throw new IllegalArgumentException("condition 不存在");
+            throw new ConditionNotExistException();
         }
         if(!appId.equals(condition.getAppId())){
-            throw new IllegalArgumentException("condition 不存在");
+            throw new ConditionNotExistException();
         }
         return condition;
     }
 
     @Override
-    public List<Condition> getAll(String tenantId, String appId){
+    public List<Condition> getAll(String tenantId, String appId) throws YunhuniApiException{
         if(tenantId == null){
-            throw new IllegalArgumentException("tenantId 不能为null");
+            throw new RequestIllegalArgumentException();
         }
         if(appId == null){
-            throw new IllegalArgumentException("appId 不能为null");
+            throw new RequestIllegalArgumentException();
         }
-
+        if(callCenterEnableUtil.enabled(tenantId, appId)){
+            throw new AppServiceInvalidException();
+        }
         return this.conditionDao.findByTenantIdAndAppId(tenantId,appId);
     }
 
     @Override
-    public List<Condition> getAll(String tenantId, String appId,String channelId){
+    public List<Condition> getAll(String tenantId, String appId,String channelId) throws YunhuniApiException{
         if(tenantId == null){
-            throw new IllegalArgumentException("tenantId 不能为null");
+            throw new RequestIllegalArgumentException();
         }
         if(appId == null){
-            throw new IllegalArgumentException("appId 不能为null");
+            throw new RequestIllegalArgumentException();
         }
         if(channelId == null){
-            throw new IllegalArgumentException("channelId 不能为null");
+            throw new RequestIllegalArgumentException();
+        }
+        if(callCenterEnableUtil.enabled(tenantId, appId)){
+            throw new AppServiceInvalidException();
         }
         return this.conditionDao.findByTenantIdAndAppIdAndChannelId(tenantId,appId,channelId);
     }

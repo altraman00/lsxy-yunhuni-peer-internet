@@ -44,8 +44,6 @@ public class ConditionController extends AbstractAPIController {
         }
         App app = appService.findById(appId);
         Condition condition = new Condition();
-        condition.setTenantId(app.getTenant().getId());
-        condition.setAppId(app.getId());
         condition.setChannelId(dto.getChannelId());
         condition.setWhereExpression(dto.getWhereExpression());
         condition.setSortExpression(dto.getSortExpression());
@@ -53,7 +51,7 @@ public class ConditionController extends AbstractAPIController {
         condition.setQueueTimeout(dto.getQueueTimeout());
         condition.setFetchTimeout(dto.getFetchTimeout());
         condition.setRemark(dto.getRemark());
-        condition = conditionService.save(condition);
+        condition = conditionService.save(app.getTenant().getId(),appId,condition);
         Map<String,String> result = new HashMap<>();
         result.put("conditionId",condition.getId());
         return ApiGatewayResponse.success(result);
@@ -70,15 +68,13 @@ public class ConditionController extends AbstractAPIController {
         App app = appService.findById(appId);
         Condition condition = new Condition();
         condition.setId(id);
-        condition.setTenantId(app.getTenant().getId());
-        condition.setAppId(app.getId());
         condition.setWhereExpression(dto.getWhereExpression());
         condition.setSortExpression(dto.getSortExpression());
         condition.setPriority(dto.getPriority());
         condition.setQueueTimeout(dto.getQueueTimeout());
         condition.setFetchTimeout(dto.getFetchTimeout());
         condition.setRemark(dto.getRemark());
-        conditionService.save(condition);
+        conditionService.save(app.getTenant().getId(),appId,condition);
         return ApiGatewayResponse.success(true);
     }
 
