@@ -133,14 +133,14 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.error("找不到对应的APP:{}", params);
             return res;
         }
-        if(app.getType().equals(App.PRODUCT_CALL_CENTER)){
+        if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(app.getIsCallCenter() == null || app.getIsCallCenter() != 1){
-                logger.info("没有呼叫中心");
+                logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
                 return res;
             }
         }else{
             if(!isEnableIVRService(tenant.getId(),app.getId())){
-                logger.info("没有开通ivr");
+                logger.info("[{}][{}]没有开通ivr",tenant.getId(),app.getId());
                 return res;
             }
         }
