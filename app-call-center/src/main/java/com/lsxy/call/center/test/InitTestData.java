@@ -19,8 +19,8 @@ import java.util.Random;
  */
 @Component
 @DependsOn("MQEventListener")
-@Profile(value = {"development"})
-public class InitDevData {
+@Profile(value = {"test"})
+public class InitTestData {
 
     @Autowired
     private ConditionService conditionService;
@@ -47,12 +47,12 @@ public class InitDevData {
     private EnQueueService enQueueService;
 
     @PostConstruct
-    public void dev() throws InterruptedException {
+    public void test() throws InterruptedException {
         Channel channel = null;
         if(channel == null){
             channel = new Channel();
-            channel.setTenantId("8a2bc5f65721aa16015722256ba00007");
-            channel.setAppId("8a2bc5f65721aa160157222c8477000b");
+            channel.setTenantId("8a2bc672576fb93d01576fbf04180000");
+            channel.setAppId("8a2bc672576fb93d01576fc0fbd70003");
             channel.setRemark("通道1");
             channel = channelService.save(channel);
         }
@@ -103,6 +103,7 @@ public class InitDevData {
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
         condition = conditionService.save(condition);
+
     }
 }
 
