@@ -55,7 +55,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     //注册
     @Override
-    public String register(AppExtension appExtension) throws YunhuniApiException {
+    public AppExtension register(AppExtension appExtension) throws YunhuniApiException {
         if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())
         || StringUtil.isBlank(appExtension.getUser()) || StringUtil.isBlank(appExtension.getPassword())
         || StringUtil.isBlank(appExtension.getType())){
@@ -69,7 +69,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         //TODO 初始化状态状态
         extensionState.setLastRegisterStatus(appExtension.getId(),200);
 
-        return appExtension.getId();
+        return appExtension;
     }
 
     //鉴权
