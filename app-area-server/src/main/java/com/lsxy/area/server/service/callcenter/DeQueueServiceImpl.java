@@ -130,7 +130,9 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-            ivrActionService.doAction(callId);
+            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+                ivrActionService.doAction(callId);
+            }
         }
     }
 
@@ -151,7 +153,9 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-            ivrActionService.doAction(callId);
+            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+                ivrActionService.doAction(callId);
+            }
         }
     }
 
