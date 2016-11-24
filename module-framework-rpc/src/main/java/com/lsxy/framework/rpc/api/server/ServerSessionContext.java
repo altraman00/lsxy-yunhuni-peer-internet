@@ -126,7 +126,7 @@ public class ServerSessionContext extends SessionContext{
 		sb.append("[");
 		for (Object key:areaSessionMap.keySet()) {
 			Session session = (Session) areaSessionMap.get(key);
-			sb.append("{\"nodeId\":\""+key + "\",\"host\":\"" + session.getRemoteAddress().getHostName() + "},");
+			sb.append("{\"nodeId\":\""+key + "\",\"host\":\"" + session.getRemoteAddress().getHostName() + "\"},");
 		}
 		if(sb.length() > 1){
 			sb.deleteCharAt(sb.length()-1);
