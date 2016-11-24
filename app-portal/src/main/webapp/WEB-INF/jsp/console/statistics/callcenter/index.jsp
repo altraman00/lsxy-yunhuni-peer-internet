@@ -77,7 +77,7 @@
                                     <div class="col-md-2 padder-v fix-padding" >
                                         <div class="warpbox">
                                             <div class="">
-                                                <i class="icon iconfont icon-oc-wallet bigicon"></i>
+                                                <i class="icon iconfont icon-oc-incoming bigicon"></i>
                                                 <span class="green money datatoday" id="callIn"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
@@ -88,7 +88,7 @@
                                     <div class="col-md-2 padder-v fix-padding">
                                         <div class="warpbox">
                                             <div class="">
-                                                <i class="icon iconfont icon-oc-msg1 bigicon"></i>
+                                                <i class="icon iconfont icon-oc-exhale bigicon"></i>
                                                 <span class="green money datatoday" id="callOut"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
@@ -99,7 +99,7 @@
                                     <div class="col-md-2 padder-v fix-padding" >
                                         <div class="warpbox">
                                             <div class="">
-                                                <i class="icon iconfont icon-oc-mobile bigicon"></i>
+                                                <i class="icon iconfont icon-oc-transfer bigicon"></i>
                                                 <span class="green money datatoday" id="transferSuccess"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
@@ -110,7 +110,7 @@
                                     <div class="col-md-2 padder-v fix-padding">
                                         <div class="warpbox">
                                             <div class="">
-                                                <i class="icon iconfont icon-oc-talktime bigicon"></i>
+                                                <i class="icon iconfont icon-oc-lineup bigicon"></i>
                                                 <span class="green money datatoday" id="formTime"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
@@ -121,7 +121,7 @@
                                     <div class="col-md-2 padder-v fix-padding">
                                         <div class="warpbox">
                                             <div class="">
-                                                <i class="icon iconfont icon-oc-recharge bigicon"></i>
+                                                <i class="icon iconfont icon-oc-talktime bigicon"></i>
                                                 <span class="green money datatoday" id="callTime"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
@@ -132,7 +132,7 @@
                                     <div class="col-md-2 padder-v fix-padding" >
                                         <div class="warpbox remove-border">
                                             <div class="">
-                                                <i class="icon iconfont icon-oc-callrate bigicon"></i>
+                                                <i class="icon iconfont icon-oc-wastage bigicon"></i>
                                                 <span class="green money datatoday" id="callFail"></span>
                                             </div>
                                             <div class="middle-font-size middle-font-color" >
