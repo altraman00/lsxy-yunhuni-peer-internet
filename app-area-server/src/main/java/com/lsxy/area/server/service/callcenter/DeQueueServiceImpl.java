@@ -9,6 +9,10 @@ import com.lsxy.call.center.api.model.BaseEnQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.rpc.api.RPCCaller;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.ServiceConstants;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.slf4j.Logger;
@@ -43,6 +47,12 @@ public class DeQueueServiceImpl implements DeQueueService {
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
+
     /**
      * 创建交谈，然后呼叫坐席。
      * 交谈创建成功事件邀请排队的客户到交谈
@@ -69,6 +79,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
+        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         Map<String,Object> businessData = state.getBusinessData();
         if(businessData == null){
             businessData = new HashMap<>();
@@ -113,6 +124,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
+        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         App app = appService.findById(appId);
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.timeout")
@@ -134,6 +146,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
+        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         App app = appService.findById(appId);
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.fail")
@@ -142,6 +155,23 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .build();
         if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
             ivrActionService.doAction(callId);
+        }
+    }
+
+    private void stopPlayWait(String area_id,String call_id,String res_id){
+        try {
+            if(conversationService.isPlayWait(call_id)){
+
+                    Map<String, Object> params = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("res_id",res_id)
+                            .putIfNotEmpty("user_data",call_id)
+                            .put("areaId",area_id)
+                            .build();
+                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+                    rpcCaller.invoke(sessionContext, rpcrequest);
+            }
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
         }
     }
 }

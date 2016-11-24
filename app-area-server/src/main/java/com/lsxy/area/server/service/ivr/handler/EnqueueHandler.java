@@ -122,7 +122,6 @@ public class EnqueueHandler extends ActionHandler{
         state.setBusinessData(businessData);
         businessStateService.save(state);
         try {
-            Thread.sleep(6000);
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), (String) businessData.get("to"), callId, enQueue);
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
