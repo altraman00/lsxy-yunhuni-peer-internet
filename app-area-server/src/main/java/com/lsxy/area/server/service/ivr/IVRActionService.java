@@ -342,6 +342,7 @@ public class IVRActionService {
                 .setId(call_id)
                 .setResId(res_id)
                 .setType(BusinessState.TYPE_IVR_INCOMING)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
@@ -470,18 +471,12 @@ public class IVRActionService {
         } catch(DocumentException e){
             logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
             //发送ivr格式错误通知
-            String appId = state.getAppId();
-            App app = appService.findById(appId);
-            if(app == null){
-                logger.error("ivr 找不到对应的app");
-                return false;
-            }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
                     .putIfNotEmpty("id",call_id)
                     .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {

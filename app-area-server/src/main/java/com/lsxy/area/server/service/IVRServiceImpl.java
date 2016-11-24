@@ -168,6 +168,7 @@ public class IVRServiceImpl implements IVRService {
                                     .setAppId(appId)
                                     .setId(callId)
                                     .setType(BusinessState.TYPE_IVR_CALL)
+                                    .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()

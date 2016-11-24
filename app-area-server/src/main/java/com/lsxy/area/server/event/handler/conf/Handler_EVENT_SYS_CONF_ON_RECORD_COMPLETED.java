@@ -10,7 +10,6 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -81,17 +80,7 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
     }
 
     private void conf(BusinessState state,Map<String,Object> params,String conf_id){
-        String appId = state.getAppId();
         String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
-
-        if(StringUtils.isBlank(appId)){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
 
         //开始通知开发者
         if(logger.isDebugEnabled()){
@@ -105,7 +94,7 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         if(params.get("end_time") != null){
             end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
-        if(StringUtils.isNotBlank(app.getUrl())){
+        if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.record_end")
                     .putIfNotEmpty("id",conf_id)
@@ -115,7 +104,7 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
                     .putIfNotEmpty("user_data",user_data)
                     .build();
 
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }
         if(logger.isDebugEnabled()){
             logger.debug("会议录音结束通知发送成功");

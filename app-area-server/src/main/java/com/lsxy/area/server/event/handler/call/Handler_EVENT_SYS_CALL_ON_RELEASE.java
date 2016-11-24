@@ -17,7 +17,6 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -88,13 +87,6 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
         businessStateService.delete(call_id);
-        if(StringUtils.isBlank(state.getAppId())){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());
-        }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());
-        }
 
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
@@ -123,7 +115,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 answer_time = (Long.parseLong(params.get("answer_time").toString())) * 1000;
             }
             //发送呼叫结束通知
-            if(StringUtils.isNotBlank(app.getUrl())){
+            if(StringUtils.isNotBlank(state.getCallBackUrl())){
                 Map<String,Object> notify_data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("event","ivr.call_end")
                         .putIfNotEmpty("id",call_id)
@@ -134,7 +126,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                         .putIfNotEmpty("cause",params.get("cause"))
                         .putIfNotEmpty("user_data",state.getUserdata())
                         .build();
-                notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
             }
 
             String ivr_dial_call_id = null;
@@ -149,7 +141,7 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             if(agentId != null){
                 String reserve_state = (String)state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
                 try {
-                    callCenterAgentService.state(app.getTenant().getId(),app.getId(),agentId,reserve_state,true);
+                    callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (YunhuniApiException e) {
                     logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
                 }
