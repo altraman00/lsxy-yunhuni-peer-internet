@@ -120,7 +120,7 @@ elif [ $IS_TOMCAT_DEPLOY = true ]; then
 fi
 
 sleep 20;
-PROCESS_NUM=`ps -ef | grep $APP_NAME | grep -v "grep" | wc -l`
+PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
 if [ $PROCESS_NUM -eq 1 ];
     then
         echo "start sucess"
