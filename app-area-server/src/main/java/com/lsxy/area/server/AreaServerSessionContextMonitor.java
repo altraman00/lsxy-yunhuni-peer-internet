@@ -21,6 +21,6 @@ public class AreaServerSessionContextMonitor extends AbstractMonitor {
 
     @Override
     public String fetch() {
-        return JSONUtil2.objectToJson(sessionContext.sessions());
+        return sessionContext.toString();
     }
 }
