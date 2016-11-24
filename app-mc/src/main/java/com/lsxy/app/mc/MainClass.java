@@ -24,7 +24,7 @@ public class MainClass extends AbstractSpringBootWebStarter {
         return systemId;
     }
 
-    public static final String systemId = "mc.server";
+    public static final String systemId = "app.mc";
     static {
         System.setProperty("systemId",systemId);
     }
