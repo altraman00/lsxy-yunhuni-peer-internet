@@ -59,7 +59,7 @@ if(agent_locked == false) then
 end
 
 --指定了条件
-if(target_condition) then
+if(string.len(target_condition)>0) then
     aCs[0] = target_condition
 else
     aCs = redis.call('ZREVRANGE',aCs_key,0,-1)
@@ -78,10 +78,10 @@ for i = 1, aCs_size do
         local ok = redis.call('setnx',q_lock_key, '1')
         redis.log(redis.LOG_WARNING,ok)
         if ok == 1 then
-            redis.call('EXPIRE', q_lock_key, '60')
             redis.call('HSET',agent_state_key,'state',fetching)
             result = cQs[j]
             redis.call('ZREM',cQs_key,result)
+            redis.call('DEL', q_lock_key)
             return result
         end
     end
