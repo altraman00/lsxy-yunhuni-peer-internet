@@ -97,7 +97,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
         }
-        if("conversation".equals(state.getType())){
+        if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
             conversation(state,conf_id);
         }else{
             conf(state,conf_id,res_id);
@@ -117,7 +117,8 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(app == null){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        String initiator = (String)businessData.get("initiator");
+
+        String initiator = conversationService.getInitiator(conversationId);
         if(initiator != null){
             try {
                 conversationService.join(appId,conversationId,initiator,null,null,null);

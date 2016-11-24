@@ -67,11 +67,11 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
         //释放资源
         businessStateService.delete(callId);
 
-        if(state.getType().equalsIgnoreCase("notify_call")){
+        if(BusinessState.TYPE_NOTIFY_CALL.equals(state.getType())){
             return notifyCall(callId,paramMap,state);
         }
 
-        if(state.getType().equalsIgnoreCase("verify_call")){
+        if(BusinessState.TYPE_VERIFY_CALL.equals(state.getType())){
             return verifyCall(callId,paramMap,state);
         }
         return res;

@@ -7,7 +7,6 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.call.center.api.model.CallCenterConversation;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -96,7 +95,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
             logger.debug("call_id={},state={}",call_id,state);
         }
         Map<String,Object> businessData = state.getBusinessData();
-        if("conversation".equals(state.getType()) || businessData.get("iscc") != null){
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+            BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
+            (BusinessState.TYPE_IVR_INCOMING.equals(state.getType())
+                    &&  conversationService.isCC(call_id))){
             conversation(state,call_id);
         }else{
             conf(state,call_id);
@@ -107,11 +109,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
 
     public void conversation(BusinessState state,String call_id){
         String appId = state.getAppId();
-        String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
-            conversation_id = (String)businessData.get("conversation");
+            conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
         }
         if(StringUtils.isBlank(conversation_id)){
             throw new InvalidParamException("没有找到对应的交谈信息callid={},conversationid={}",call_id,conversation_id);
@@ -120,14 +121,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_FAIL extends EventHandler{
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-        CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
-        if(conversation!=null){
-
-        }
+        conversationService.logicExit(conversation_id,call_id);
     }
 
     public void conf(BusinessState state,String call_id){

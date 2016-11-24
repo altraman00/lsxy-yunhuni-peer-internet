@@ -78,7 +78,7 @@ public class InitDevData {
                 agentSkillService.save(skill);
             }
             AppExtension appExtension = new AppExtension();
-            appExtension.setType(AppExtension.TYPE_SIP);
+            appExtension.setType(AppExtension.TYPE_TELPHONE);
             appExtension.setTenantId(channel.getTenantId());
             appExtension.setAppId(channel.getAppId());
             appExtension.setTelenum("13692206627");

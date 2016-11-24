@@ -69,6 +69,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     private CAs cAs;
     @Autowired
     private AgentActionLogService agentActionLogService;
+    @Autowired
+    private EnQueueService enQueueService;
 
 
     @Override
@@ -367,29 +369,37 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             // 座席不存在
             throw new AgentNotExistException();
         }
+        this.state(agent.getTenantId(),agent.getAppId(),agent.getId(),state,false);
+    }
 
-        AgentLock agentLock = new AgentLock(redisCacheService, agent.getId());
+    @Override
+    public void state(String tanantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
+        AgentLock agentLock = new AgentLock(redisCacheService, agentId);
         boolean lock = agentLock.lock();
         if(!lock){
             //获取锁失败
             throw new ExtensionBindingToAgentException();
         }
         try{
-            String curState = agentState.getState(agent.getId());
-            if(StringUtils.isNotBlank(curState) && (curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING))){
-                // 座席正忙
-                throw new AgentIsBusyException();
+            if(!force){
+                String curState = agentState.getState(agentId);
+                if(StringUtils.isNotBlank(curState) && (curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING))){
+                    // 座席正忙
+                    throw new AgentIsBusyException();
+                }
             }
-            agentState.setState(agent.getId(),state);
+            if(state == null){
+                state = AgentState.Model.STATE_IDLE;
+            }
+            agentState.setState(agentId,state);
             if(state.contains(AgentState.Model.STATE_IDLE)){
-                //TODO 找排队事件
+                enQueueService.lookupQueue(tanantId,appId,null,agentId);
             }
         }finally {
             agentLock.unlock();
         }
 
     }
-
     @Override
     public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
