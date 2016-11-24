@@ -45,6 +45,10 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-monitor</artifactId>
+        </dependency>
 
     </dependencies>
 </project>
