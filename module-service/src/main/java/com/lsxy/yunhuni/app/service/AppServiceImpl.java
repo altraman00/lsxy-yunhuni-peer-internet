@@ -12,13 +12,9 @@ import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.config.service.AreaSipService;
-import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
-import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -124,7 +120,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
     @Override
     public App create(App app) {
-        if(App.SERVICE_TYPE_CALL_CENTER.equals(app.getServiceType())){
+        if(App.PRODUCT_CALL_CENTER.equals(app.getServiceType())){
             app.setCallCenterNum(getCallCenterAppNum());
         }
 

@@ -30,7 +30,7 @@ public class CallCenterController extends AbstractPortalController {
     @RequestMapping("/index")
     public ModelAndView index(HttpServletRequest request){
         ModelAndView mav = new ModelAndView();
-        List<App> appList = (List)getBillAppList(request, App.SERVICE_TYPE_CALL_CENTER).getData();
+        List<App> appList = (List)getBillAppList(request, App.PRODUCT_CALL_CENTER).getData();
         mav.addObject("appList",appList);
         Date date = new Date();
         String day = DateUtils.formatDate(date,"yyyy-MM");
@@ -52,7 +52,7 @@ public class CallCenterController extends AbstractPortalController {
     public ModelAndView detail(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                                String appId, String startTime, String endTime, String type, String callnum, String agent){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,startTime,appId,App.SERVICE_TYPE_CALL_CENTER);
+        Map<String,String> map = init(request,startTime,appId,App.PRODUCT_CALL_CENTER);
         if(StringUtils.isEmpty(startTime)){
             startTime = map.get("time");
         }
@@ -88,9 +88,9 @@ public class CallCenterController extends AbstractPortalController {
         String one = "";
         String[] headers = new String[]{"呼叫时间","呼叫类型","主叫","被叫","坐席","转接结果","通话结束原因","转人工时间","接听时间","通话结束时间","消费金额"};
         String[] values = new String[]{"startTime","type:1=呼入;2=呼出","fromNum","toNum","agent","toManualResult:1=接听;2=呼叫坐席失败;3=主动放弃;4=超时","overReason","toManualTime","answerTime","endTime","cost"};
-        String serviceType = App.SERVICE_TYPE_CALL_CENTER;
+        String serviceType = App.PRODUCT_CALL_CENTER;
         List list = null;
-        if(App.SERVICE_TYPE_CALL_CENTER.equals(serviceType)){
+        if(App.PRODUCT_CALL_CENTER.equals(serviceType)){
             String startTime = request.getParameter("startTime");
             String endTime = request.getParameter("endTime");
             String type = request.getParameter("type");

@@ -51,7 +51,7 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
     @Override
     public List<VoiceCdrDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
         String[] types = {type};
-        if(App.SERVICE_TYPE_CALL_CENTER.equals(type)){
+        if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
         String hql = "from VoiceCdrDay obj where "+StatisticsUtils.getSqlIsNull2(tenantId,appId, types)+"  obj.dt>=?1 and obj.dt<=?2 ORDER BY obj.day";

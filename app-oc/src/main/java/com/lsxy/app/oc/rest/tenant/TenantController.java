@@ -1100,7 +1100,7 @@ public class TenantController {
             try{
                 date1 = DateUtils.parseDate(time,"yyyy");
                 date2  = DateUtils.parseDate(DateUtils.getLastYearByDate(time)+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-                tempVoiceCdrList =  voiceCdrMonthService.list(id,  appId,  App.SERVICE_TYPE_CALL_CENTER,  date1,  date2 );
+                tempVoiceCdrList =  voiceCdrMonthService.list(id,  appId,  App.PRODUCT_CALL_CENTER,  date1,  date2 );
             }catch (Exception e){
                 return RestResponse.failed("0000","日期格式错误");
             }
@@ -1108,7 +1108,7 @@ public class TenantController {
             try{
                 date1 = DateUtils.parseDate(time,"yyyy-MM");
                 date2 =  DateUtils.parseDate(DateUtils.getMonthLastTime(DateUtils.parseDate(time,"yyyy-MM")),"yyyy-MM-dd HH:mm:ss");
-                tempVoiceCdrList =  voiceCdrDayService.list(id,  appId,  App.SERVICE_TYPE_CALL_CENTER,  date1,  date2 );
+                tempVoiceCdrList =  voiceCdrDayService.list(id,  appId,  App.PRODUCT_CALL_CENTER,  date1,  date2 );
                 date = date1;
             }catch (Exception e){
                 return RestResponse.failed("0000","日期格式错误");
