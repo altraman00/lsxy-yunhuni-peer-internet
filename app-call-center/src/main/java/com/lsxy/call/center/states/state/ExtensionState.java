@@ -2,12 +2,15 @@ package com.lsxy.call.center.states.state;
 
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.BeanUtils;
+import com.lsxy.framework.core.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -117,6 +120,27 @@ public class ExtensionState {
         redisCacheService.hput(getKey(extensionId),"registerExpires",registerExpires.toString());
     }
 
+    public void setAll(Model model){
+        Map<String,String> map = new HashMap();
+        if(StringUtil.isNotBlank(model.getAgent())){
+            map.put("agent", model.getAgent());
+        }
+        if(model.getLastAction() != null){
+            map.put("lastAction",model.getLastAction().toString());
+        }
+        if(model.getLastActionTime() != null){
+            map.put("lastActionTime",model.getLastActionTime().toString());
+        }
+        if(model.getLastRegisterTime() != null){
+            map.put("lastRegisterTime",model.getLastRegisterTime().toString());
+        }
+        if(model.getLastRegisterStatus() != null){
+            map.put("lastRegisterStatus",model.getLastRegisterStatus().toString());
+        }
+        if(model.getRegisterExpires() != null){
+            map.put("registerExpires",model.getRegisterExpires().toString());
+        }
+    }
 
     public class Model implements Serializable {
 
