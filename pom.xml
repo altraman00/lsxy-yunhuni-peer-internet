@@ -41,7 +41,7 @@
         <module>module-service</module>
         <module>module-framework-oss</module>
         <module>module-framework-rpc</module>
-        <module>app-user-app-demo</module>
+        <module>app-user-demo</module>
         <module>module-service-area-api</module>
         <module>module-framework-jmx</module>
         <module>module-framework-monitor</module>
