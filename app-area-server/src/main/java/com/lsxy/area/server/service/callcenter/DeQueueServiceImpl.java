@@ -161,13 +161,12 @@ public class DeQueueServiceImpl implements DeQueueService {
     private void stopPlayWait(String area_id,String call_id,String res_id){
         try {
             if(conversationService.isPlayWait(call_id)){
-
                     Map<String, Object> params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",res_id)
                             .putIfNotEmpty("user_data",call_id)
                             .put("areaId",area_id)
                             .build();
-                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
                     rpcCaller.invoke(sessionContext, rpcrequest);
             }
         } catch (Throwable e) {
