@@ -23,6 +23,7 @@ public enum ApiReturnCodeEnum {
     IllegalArgument("000001","参数错误"),
     UnknownFail("000002","未知错误"),
     InvokeCall("000003","内部错误"),
+    SystemBusy("000004","系统繁忙"),
     AppNotFound("010000","应用不存在"),
     AppOffLine("010001","应用没上线"),
     AppServiceInvalid("010002","app没开通该服务"),
@@ -39,8 +40,10 @@ public enum ApiReturnCodeEnum {
     ExtensionNotExist("080103","分机不存在"),
     AgentHasAlreadyLoggedIn("080201","座席已经登录"),
     AgentNotExist("080202","座席不存在"),
-    AgentIsBusy("080203","座席正忙");
-
+    AgentIsBusy("080203","座席正忙"),
+    ChannelNotExist("080301","通道不存在"),
+    ConditionNotExist("080401","条件不存在"),
+    ConditionExpression("080402","条件表达式错误");
 
     private String code;
     private String msg;
