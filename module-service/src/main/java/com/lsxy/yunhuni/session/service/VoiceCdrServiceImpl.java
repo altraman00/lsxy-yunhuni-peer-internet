@@ -53,7 +53,10 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     public List<VoiceCdr> listCdr(String type, String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String[] types = {type};
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
@@ -79,7 +82,10 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     public Page<VoiceCdr> pageList(Integer pageNo,Integer pageSize, String type,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String[] types = {type};
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }
@@ -109,7 +115,10 @@ public class VoiceCdrServiceImpl extends AbstractService<VoiceCdr> implements  V
     public Map sumCost( String type ,String tenantId, String time, String appId) {
         Date date1 = DateUtils.parseDate(time,"yyyy-MM-dd");
         Date date2 = DateUtils.parseDate(time+" 23:59:59","yyyy-MM-dd HH:mm:ss");
-        String[] types = {type};
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }

@@ -6,6 +6,7 @@ import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -104,6 +105,19 @@ public class VoiceFileRecordContrller extends AbstractPortalController {
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/batch/download?appId={1}&startTime={2}&endTime={3}";
         return RestRequest.buildSecurityRequest(token).get(uri, String.class,appId,startTime,endTime);
     }
-
+    @RequestMapping("/cdr/download/{id}")
+    @ResponseBody
+    public RestResponse cdrDownload(HttpServletRequest request, @PathVariable String id){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/cdr/download?id={1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
+    }
+    @RequestMapping("/file/download/{id}")
+    @ResponseBody
+    public RestResponse fileDownload(HttpServletRequest request, @PathVariable String id){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/file/download?id={1}";
+        return RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
+    }
 
 }

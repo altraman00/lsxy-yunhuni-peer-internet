@@ -5,7 +5,7 @@ package com.lsxy.yunhuni.api.product.enums;
  * Created by liups on 2016/8/30.
  */
 public enum ProductCode {
-    duo_call("duo_call1","语音回拔"),
+    duo_call("duo_call","语音回拔"),
     sys_conf("sys_conf","语音会议"),
     ivr_call("ivr_call,ivr_incoming,ivr_dial","自定义IVR"),
     captcha_call("captcha_call,verify_call","语音验证码"),
@@ -30,6 +30,15 @@ public enum ProductCode {
         for(ProductCode value:values){
             if(value.getApiCmd().contains(apiCmd)){
                 return value;
+            }
+        }
+        return null;
+    }
+    public static String getApiCmdByRemark(String remark){
+        ProductCode[] values = ProductCode.values();
+        for(ProductCode value:values){
+            if(value.getRemark().equals(remark)){
+                return value.getApiCmd();
             }
         }
         return null;

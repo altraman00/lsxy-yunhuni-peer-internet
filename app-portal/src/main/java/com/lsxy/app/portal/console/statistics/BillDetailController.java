@@ -8,6 +8,7 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import org.apache.commons.lang.StringUtils;
@@ -80,12 +81,17 @@ public class BillDetailController extends AbstractPortalController {
      * @return
      */
     @RequestMapping("/recording")
-    public ModelAndView recording(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize, String time, String appId){
+    public ModelAndView recording(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
+                                  String time, String appId,String type){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId,App.PRODUCT_VOICE);
+        Map<String,String> map = init(request,time,appId);
+        map.put("type",type);
         mav.addAllObjects(map);
-        mav.addObject("sum",sum(request,CallSession.TYPE_VOICE_RECORDING,map.get("time"),map.get("appId")).getData());
-        mav.addObject("pageObj",getPageList(request,pageNo,pageSize, CallSession.TYPE_VOICE_RECORDING,map.get("time"),map.get("appId")).getData());
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&type={2}&startTime={3}&endTime={4}";
+        mav.addObject("sum",RestRequest.buildSecurityRequest(token).get(uri, Map.class,appId,type,map.get("time"),map.get("time")).getData());
+        String uri1 = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/plist/time?pageNo={1}&pageSize={2}&appId={3}&type={4}&startTime={5}&endTime={6}";
+        mav.addObject("pageObj",RestRequest.buildSecurityRequest(token).getPage(uri1,Map.class,pageNo,pageSize,appId,type,map.get("time"),map.get("time")).getData());
         mav.setViewName("/console/statistics/billdetail/recording");
         return mav;
     }
@@ -311,6 +317,24 @@ public class BillDetailController extends AbstractPortalController {
     public Map init(HttpServletRequest request, String time, String appId,String serviceType){
         Map map = new HashMap();
         List<App> appList = (List<App>)getBillAppList(request,serviceType).getData();
+        map.put("appList",appList);
+        if(StringUtil.isEmpty(appId)){
+            if(StringUtils.isEmpty(appId)){
+                if(appList.size()>0) {
+                    appId = appList.get(0).getId();
+                }
+            }
+        }
+        map.put("appId",appId);
+        if(StringUtils.isEmpty(time)){
+            time = DateUtils.formatDate(new Date(),"yyyy-MM-dd");
+        }
+        map.put("time",time);
+        return map;
+    }
+    public Map init(HttpServletRequest request, String time, String appId){
+        Map map = new HashMap();
+        List<App> appList = (List<App>)getAppList(request).getData();
         map.put("appList",appList);
         if(StringUtil.isEmpty(appId)){
             if(StringUtils.isEmpty(appId)){
