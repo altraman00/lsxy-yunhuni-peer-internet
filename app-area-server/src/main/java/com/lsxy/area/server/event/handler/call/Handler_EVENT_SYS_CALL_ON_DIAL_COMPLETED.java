@@ -9,7 +9,6 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.exceptions.api.PlayFileNotExistsException;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -31,10 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import java.util.List;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -224,37 +223,28 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 String prevoice = (String)businessData.get(ConversationService.AGENT_PRENUMVOICE_FIELD);
                 String postvoice = (String)businessData.get(ConversationService.AGENT_POSTNUMVOICE_FIELD);
                 List<Object[]> plays = new ArrayList<>();
-                if(StringUtil.isNotEmpty(prevoice)){
-                    try {
+                try {
+                    if(StringUtil.isNotEmpty(prevoice)){
                         plays.add(new Object[]{playFileUtil.convert(app.getTenant().getId(),app.getId(),prevoice),0,""});
-                    } catch (PlayFileNotExistsException e) {
-                        e.printStackTrace();
                     }
-                }
-                if(StringUtil.isNotEmpty(agent_num)){
-                    plays.add(new Object[]{agent_num,1,""});
-                }
-                if(StringUtil.isNotEmpty(postvoice)){
-                    try {
+                    if(StringUtil.isNotEmpty(agent_num)){
+                        plays.add(new Object[]{agent_num,1,""});
+                    }
+                    if(StringUtil.isNotEmpty(postvoice)){
                         plays.add(new Object[]{playFileUtil.convert(app.getTenant().getId(),app.getId(),postvoice),0,""});
-                    } catch (PlayFileNotExistsException e) {
-                        e.printStackTrace();
                     }
-                }
-                if(plays!=null && plays.size()>0){
-                    try {
+                    if(plays!=null && plays.size()>0){
                         Map<String, Object> _params = new MapBuilder<String,Object>()
                                 .putIfNotEmpty("res_id",state.getResId())
                                 .putIfNotEmpty("content", JSONUtil2.objectToJson(plays))
                                 .putIfNotEmpty("user_data",conversation_id)
                                 .put("areaId",state.getAreaId())
                                 .build();
-
                         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_PLAY, _params);
                         rpcCaller.invoke(sessionContext, rpcrequest);
-                    } catch (Throwable e) {
-                        logger.error("调用失败 ",e);
                     }
+                } catch (Throwable e) {
+                    logger.error("调用失败 ",e);
                 }
             }
         }else if(BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
