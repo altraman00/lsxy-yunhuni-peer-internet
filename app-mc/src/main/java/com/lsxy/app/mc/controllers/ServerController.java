@@ -1,5 +1,6 @@
 package com.lsxy.app.mc.controllers;
 
+import com.lsxy.app.mc.vo.AreaServerVO;
 import com.lsxy.app.mc.vo.ServerVO;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
@@ -55,6 +56,13 @@ public class ServerController extends AdminController{
         }
         return result;
     }
+
+
+    private List<AreaServerVO> getAllAreaServers(){
+
+    }
+
+
 
 
 }
