@@ -1,5 +1,7 @@
 package com.lsxy.area.api;
 
+import com.lsxy.framework.core.utils.JSONUtil;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -134,6 +136,11 @@ public class BusinessState implements Serializable{
         this.closed = closed;
     }
 
+    @Override
+    public String toString(){
+        return JSONUtil.objectToJson(this);
+    }
+    
     public static class Builder{
 
         private String tenantId;
