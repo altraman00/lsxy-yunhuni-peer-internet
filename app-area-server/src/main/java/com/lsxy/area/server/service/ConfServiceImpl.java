@@ -167,6 +167,7 @@ public class ConfServiceImpl implements ConfService {
                                 .setType(BusinessState.TYPE_SYS_CONF)
                                 .setUserdata(userData)
                                 .setAreaId(areaId)
+                                .setCallBackUrl(app.getUrl())
                                 .setLineGatewayId(null)
                                 .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
@@ -311,6 +312,7 @@ public class ConfServiceImpl implements ConfService {
                                     .setAppId(app.getId())
                                     .setId(callId)
                                     .setType(BusinessState.TYPE_SYS_CONF)
+                                    .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()

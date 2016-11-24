@@ -112,7 +112,6 @@ public class DialActionHandler extends ActionHandler{
             dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         }catch (Throwable t){
             logger.error("ivr拨号失败:",t);
-            App app = appService.findById(state.getAppId());
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.connect_end")
                     .putIfNotEmpty("id",callId)
@@ -120,7 +119,7 @@ public class DialActionHandler extends ActionHandler{
                     .putIfNotEmpty("end_time",System.currentTimeMillis())
                     .putIfNotEmpty("error","dial error")
                     .build();
-            if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
                 ivrActionService.doAction(callId);
             }
         }
@@ -235,6 +234,7 @@ public class DialActionHandler extends ActionHandler{
                 .setAppId(appId)
                 .setId(callId)
                 .setType(BusinessState.TYPE_IVR_DIAL)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()

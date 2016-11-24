@@ -231,6 +231,7 @@ public class ConversationService {
                 .setAppId(app.getId())
                 .setId(conversationId)
                 .setType(BusinessState.TYPE_CC_CONVERSATION)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
@@ -340,6 +341,7 @@ public class ConversationService {
                 .setAppId(app.getId())
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
@@ -412,6 +414,7 @@ public class ConversationService {
                 .setAppId(app.getId())
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_OUT_CALL)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()

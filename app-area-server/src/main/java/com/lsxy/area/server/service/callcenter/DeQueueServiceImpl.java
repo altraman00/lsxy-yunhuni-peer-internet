@@ -13,7 +13,6 @@ import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,13 +124,12 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        App app = appService.findById(appId);
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.timeout")
                 .putIfNotEmpty("id",callId)
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
-        if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+        if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             ivrActionService.doAction(callId);
         }
     }
@@ -147,13 +145,12 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        App app = appService.findById(appId);
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.fail")
                 .putIfNotEmpty("id",callId)
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
-        if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+        if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             ivrActionService.doAction(callId);
         }
     }

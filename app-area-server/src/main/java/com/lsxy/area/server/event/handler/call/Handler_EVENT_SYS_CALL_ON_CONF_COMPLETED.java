@@ -101,7 +101,6 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
 
     private void conversation(BusinessState state, Map<String, Object> params, String call_id) {
         String appId = state.getAppId();
-        String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
@@ -124,7 +123,6 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
     }
 
     private void conf(BusinessState state,Map<String,Object> params,String call_id){
-        String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
         String conf_id = null;
@@ -133,13 +131,6 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         }
         if(StringUtils.isBlank(conf_id)){
             throw new InvalidParamException("没有找到对应的会议信息callid={},confid={}",call_id,conf_id);
-        }
-        if(StringUtils.isBlank(appId)){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
         hungup(state);
         //会议成员递减
@@ -158,7 +149,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
             end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
 
-        if(StringUtils.isNotBlank(app.getUrl())){
+        if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.quit")
                     .putIfNotEmpty("id",conf_id)
@@ -168,7 +159,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
                     .putIfNotEmpty("part_uri",null)
                     .putIfNotEmpty("user_data",user_data)
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }
 
         if(logger.isDebugEnabled()){
