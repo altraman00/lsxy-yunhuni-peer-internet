@@ -76,7 +76,7 @@
     <logger name="com.lsxy.framework.monitor" level="INFO" additivity="true" />
     <logger name="org.springframework" level="ERROR" additivity="true" />
     <logger name="org.hibernate" level="ERROR" additivity="true" />
-    <logger name="org.springframework.web.servlet.mvc" level="ERROR" additivity="true" />
+    <logger name="org.springframework.web.servlet.mvc" level="INFO" additivity="true" />
 
 
 </included>

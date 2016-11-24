@@ -46,6 +46,7 @@
         <module>module-framework-monitor</module>
         <module>module-service-call-center-api</module>
         <module>app-opensips</module>
+        <module>app-mc</module>
 
     </modules>
     <packaging>pom</packaging>

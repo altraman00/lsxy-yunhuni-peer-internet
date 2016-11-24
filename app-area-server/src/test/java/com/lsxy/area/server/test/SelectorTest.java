@@ -1,9 +1,11 @@
 package com.lsxy.area.server.test;
 
+import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.AreaServerMainClass;
 import com.lsxy.framework.config.Constants;
-import com.lsxy.framework.core.exceptions.api.AppOffLineException;
+import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +14,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by liups on 2016/10/29.
