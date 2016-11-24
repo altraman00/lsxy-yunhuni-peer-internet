@@ -140,7 +140,7 @@ public class BusinessState implements Serializable{
     public String toString(){
         return JSONUtil.objectToJson(this);
     }
-    
+
     public static class Builder{
 
         private String tenantId;

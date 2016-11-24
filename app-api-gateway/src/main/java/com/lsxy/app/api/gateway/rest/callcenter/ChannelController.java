@@ -34,7 +34,7 @@ public class ChannelController extends AbstractAPIController {
     @Autowired
     private AppService appService;
 
-    @RequestMapping(value = "/{account_id}/callcenter/channel",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/callcenter/channel",method = RequestMethod.POST)
     public ApiGatewayResponse save(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId,
                                    @Valid @RequestBody ChannelCreateInputDTO dto) throws YunhuniApiException {
@@ -52,7 +52,7 @@ public class ChannelController extends AbstractAPIController {
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/channel/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{accountId}/callcenter/channel/{id}",method = RequestMethod.DELETE)
     public ApiGatewayResponse delete(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId,
                                    @PathVariable String id) throws YunhuniApiException {
@@ -64,7 +64,7 @@ public class ChannelController extends AbstractAPIController {
         return ApiGatewayResponse.success(true);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/channel",method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountId}/callcenter/channel",method = RequestMethod.GET)
     public ApiGatewayResponse channels(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
@@ -74,7 +74,7 @@ public class ChannelController extends AbstractAPIController {
         return ApiGatewayResponse.success(channelService.getAll(app.getTenant().getId(),app.getId()));
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/channel/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountId}/callcenter/channel/{id}",method = RequestMethod.GET)
     public ApiGatewayResponse findOne(HttpServletRequest request, @PathVariable String accountId,
                                      @RequestHeader(value = "AppID") String appId,
                                      @PathVariable String id) throws YunhuniApiException {
