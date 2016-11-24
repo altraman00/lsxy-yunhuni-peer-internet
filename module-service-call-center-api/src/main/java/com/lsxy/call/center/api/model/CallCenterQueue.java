@@ -30,6 +30,7 @@ public class CallCenterQueue extends IdEntity {
     private String originCallId;
     private String agentCallId;
     private String conversation;
+    private String enqueue;//存放排队的json
 
     @Column(name = "tenant_id")
     public String getTenantId() {
@@ -147,5 +148,14 @@ public class CallCenterQueue extends IdEntity {
 
     public void setConversation(String conversation) {
         this.conversation = conversation;
+    }
+
+    @Column(name = "enqueue")
+    public String getEnqueue() {
+        return enqueue;
+    }
+
+    public void setEnqueue(String enqueue) {
+        this.enqueue = enqueue;
     }
 }

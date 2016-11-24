@@ -6,6 +6,8 @@ import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BusinessStateServiceImpl implements BusinessStateService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BusinessStateServiceImpl.class);
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -30,16 +34,31 @@ public class BusinessStateServiceImpl implements BusinessStateService {
 
     @Override
     public void save(BusinessState state) {
-        redisCacheService.set(getKey(state.getId()), JSONUtil.objectToJson(state),EXPIRE_START);
+        if(state == null){
+            return;
+        }
+        if(state.getId() == null){
+            return;
+        }
+        try{
+            redisCacheService.set(getKey(state.getId()), JSONUtil.objectToJson(state),EXPIRE_START);
+        }catch (Throwable t){
+            logger.error("保存state失败",t);
+        }
     }
 
     @Override
     public BusinessState get(String id) {
-        String str = redisCacheService.get(getKey(id));
-        if(StringUtils.isBlank(str)){
-            return null;
+        BusinessState state = null;
+        try{
+            String str = redisCacheService.get(getKey(id));
+            if(!StringUtils.isBlank(str)){
+                state = JSONUtil2.fromJson(str,BusinessState.class);
+            }
+        }catch (Throwable t){
+            logger.error("获取state失败",t);
         }
-        return JSONUtil2.fromJson(str,BusinessState.class);
+        return state;
     }
 
     @Override
@@ -51,6 +70,7 @@ public class BusinessStateServiceImpl implements BusinessStateService {
                 redisCacheService.set(getKey(id), JSONUtil.objectToJson(state),EXPIRE_RELEASE);
             }
         }catch (Throwable t){
+            logger.error("删除state失败",t);
         }
     }
 }

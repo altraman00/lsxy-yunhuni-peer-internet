@@ -64,7 +64,7 @@ public class LuaTest {
         List<Condition> conditions = conditionService.pageList(1,10000).getResult();
         Condition condition = conditions.get(conditions.size()-1);
         long start1 = System.currentTimeMillis();
-        int size = 500;
+        int size = 1;
         CountDownLatch latch = new CountDownLatch(size);
         for (int i = 0; i < size; i++) {
             new Thread(new Runnable() {
@@ -72,13 +72,10 @@ public class LuaTest {
                 public void run() {
                     long start = System.currentTimeMillis();
                     System.out.println(redisCacheService.eval(Lua.LOOKUPAGENT,4,
-                            CAs.getKey(condition.getId()),
-                            AgentState.getPrefixed(),
-                            ExtensionState.getPrefixed(),
-                            AgentLock.getPrefixed(),
-                            ""+AgentState.REG_EXPIRE,
-                            ""+System.currentTimeMillis())
-                    );
+                            CAs.getKey(condition.getId()),AgentState.getPrefixed(),
+                            ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
+                            ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
+                            AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING));
                     System.out.println(System.currentTimeMillis() -start);
                     latch.countDown();
                 }

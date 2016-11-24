@@ -3,6 +3,8 @@ package com.lsxy.call.center.api.utils;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class EnQueueDecoder {
 
     private static final Logger logger = LoggerFactory.getLogger(EnQueueDecoder.class);
-    private final static XStream xStream = new XStream();
+    private final static XStream xStream = new XStream(new DomDriver("UTF-8", new XmlFriendlyNameCoder("-_", "_")));
 
     static {
         xStream.processAnnotations(EnQueue.class);

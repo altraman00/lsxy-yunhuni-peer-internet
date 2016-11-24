@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
+
 /**
  * 管理坐席的条件，按优先级排序
  * key callcenter.acs_agentid
@@ -39,4 +41,9 @@ public class ACs {
     public void remove(String agentId,String... conditionIds){
         redisCacheService.zrem(getKey(agentId),conditionIds);
     }
+
+    public Set<String> getAll(String agentId){
+        return redisCacheService.zRange(getKey(agentId), 0L, -1L);
+    }
+
 }

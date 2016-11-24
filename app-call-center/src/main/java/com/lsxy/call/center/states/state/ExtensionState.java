@@ -53,6 +53,10 @@ public class ExtensionState {
         redisCacheService.hput(getKey(extensionId),"agent",agent);
     }
 
+    public void deleteAgent(String extensionId) {
+        redisCacheService.hdel(getKey(extensionId),"agent");
+    }
+
     public Integer getLastAction(String extensionId) {
         Object obj = redisCacheService.hget(getKey(extensionId),"lastAction");
         if(obj == null){

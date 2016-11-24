@@ -37,7 +37,9 @@ public enum ApiReturnCodeEnum {
     ExtensionUserExist("080101","分机账号已存在"),
     ExtensionBindingToAgent("080102","分机已绑定座席"),
     ExtensionNotExist("080103","分机不存在"),
-    AgentHasAlreadyLoggedIn("080201","座席已经登录");
+    AgentHasAlreadyLoggedIn("080201","座席已经登录"),
+    AgentNotExist("080202","座席不存在"),
+    AgentIsBusy("080203","座席正忙");
 
 
     private String code;

@@ -43,4 +43,26 @@ public class AgentSkillServiceImpl extends AbstractService<AgentSkill> implement
 
         return jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<AgentSkill>(AgentSkill.class));
     }
+
+    @Override
+    public void deleteByAgent(String agentId) {
+        agentSkillDao.deleteByAgent(agentId);
+    }
+
+    @Override
+    public List<AgentSkill> findAllByAgent(String agentId) {
+        return agentSkillDao.findByAgent(agentId);
+    }
+
+    @Override
+    public List<AgentSkill> findAllByAgents(List<String> agentIds) {
+        return agentSkillDao.findByAgentIn(agentIds);
+    }
+
+    @Override
+    public void deleteByAgentAndName(String agent, String name) {
+        agentSkillDao.deleteByAgentAndName(agent,name);
+    }
+
+
 }

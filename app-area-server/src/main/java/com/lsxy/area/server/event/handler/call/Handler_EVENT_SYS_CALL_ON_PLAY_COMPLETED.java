@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -42,6 +43,9 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
     @Autowired
     private IVRActionService ivrActionService;
 
+    @Autowired
+    private ConversationService conversationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_PLAY_COMPLETED;
@@ -70,7 +74,34 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
+        if(canDoivr(state,call_id)){
+            ivr(state,params,call_id);
+        }
+        return res;
+    }
 
+    private boolean canDoivr(BusinessState state,String call_id){
+        if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){//是ivr呼出
+            return true;
+        }
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){//是ivr呼入
+            boolean iscc = conversationService.isCC(call_id);
+            if(!iscc){//不是ivr呼叫中心呼入
+                return true;
+            }
+            boolean isPlaywait = conversationService.isPlayWait(call_id);
+            if(isPlaywait){
+                //等待音播放完成需要移除等待音标记
+                state.getBusinessData().remove(ConversationService.IS_PLAYWAIT_FIELD);
+                businessStateService.save(state);
+            }
+            if(!isPlaywait){//不是ivr呼叫中心排队
+                return true;
+            }
+        }
+        return false;
+    }
+    private void ivr(BusinessState state,Map<String,Object> params,String call_id){
         if(StringUtils.isBlank(state.getAppId())){
             throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());
         }
@@ -105,6 +136,5 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
                 ivrActionService.doAction(call_id);
             }
         }
-        return res;
     }
 }

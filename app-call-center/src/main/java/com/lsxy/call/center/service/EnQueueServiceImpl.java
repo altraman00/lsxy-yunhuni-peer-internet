@@ -12,6 +12,7 @@ import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
@@ -99,7 +100,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             if(condition == null){
                 throw new IllegalArgumentException("条件不存在");
             }
-            if(!condition.getChannelId().equals(channel.getAppId())){
+            if(!condition.getChannelId().equals(channel.getId())){
                 throw new IllegalArgumentException("条件-通道不匹配");
             }
             //创建排队记录
@@ -112,26 +113,28 @@ public class EnQueueServiceImpl implements EnQueueService{
             queue.setRelevanceId("");
             queue.setNum(num);
             queue.setOriginCallId(callId);
+            queue.setEnqueue(JSONUtil.objectToJson(enQueue));
             queue = callCenterQueueService.save(queue);
             //lua脚本找坐席
             String agent = (String)redisCacheService.eval(Lua.LOOKUPAGENT,4,
                     CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING
-
-            );
+                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING);
+            if(logger.isDebugEnabled()){
+                logger.debug("排队结果:agent={}",agent);
+            }
             if(StringUtil.isEmpty(agent)){
                 //没有找到可用坐席
                 cQs.add(conditionId,queue.getId());
                 mqService.publish(new EnqueueTimeoutEvent(conditionId,queue.getId(),
-                        tenantId,appId,callId,condition.getQueueTimeout()));
-                String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,4,
+                        tenantId,appId,callId,condition.getQueueTimeout() * 1000));
+                String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,3,
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
-                        ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
-                        ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                        AgentState.Model.STATE_IDLE
-                );
+                        ExtensionState.getPrefixed(),
+                        ""+AgentState.REG_EXPIRE,
+                        ""+System.currentTimeMillis(),
+                        AgentState.Model.STATE_IDLE);
                 if(StringUtil.isNotEmpty(agent_idle)){
                     lookupQueue(tenantId,appId,conditionId,agent_idle);
                 }
@@ -161,12 +164,14 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
         }catch (Throwable e){
             logger.error("排队找坐席出错",e);
-            try{
-                queue.setResult(CallCenterQueue.RESULT_FAIL);
-                queue.setEndTime(new Date());
-                callCenterQueueService.save(queue);
-            }catch (Throwable t){
-                logger.info("修改排队状态失败",t);
+            if(queue != null && queue.getId()!=null){
+                try{
+                    queue.setResult(CallCenterQueue.RESULT_FAIL);
+                    queue.setEndTime(new Date());
+                    callCenterQueueService.save(queue);
+                }catch (Throwable t){
+                    logger.info("修改排队状态失败",t);
+                }
             }
             deQueueService.fail(tenantId,appId,callId,e.getMessage());
         }
@@ -187,7 +192,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
             AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
             conditionId);
-        if(StringUtil.isEmpty(queueId)){
+        if(queueId != null){
             //找到排队，修改排队状态
             CallCenterQueue queue = callCenterQueueService.findById(queueId);
             if(queue != null){

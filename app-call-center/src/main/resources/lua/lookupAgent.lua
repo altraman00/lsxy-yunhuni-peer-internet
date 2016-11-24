@@ -35,7 +35,7 @@ for i=1,cas_size do
     local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
 	redis.log(redis.LOG_WARNING,agent['state'])
 	redis.log(redis.LOG_WARNING,agent['extension'])
-	redis.log(redis.LOG_WARNING,agent['lastRegTime'])
+	redis.log(redis.LOG_WARNING,agent['lastRegTime'] + agent_reg_expire)
 	if(agent and agent['state'] == idle
 		and agent['extension'] and agent['lastRegTime']
 			and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)

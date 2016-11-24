@@ -4,13 +4,13 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.CallService;
-import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -21,7 +21,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -322,7 +321,7 @@ public class CallServiceImpl implements CallService {
     @Override
     public String notifyCall(String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
                              Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException{
-        String apiCmd = "notify_call";
+        String apiCmd = BusinessState.TYPE_NOTIFY_CALL;
         String callId;
         if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
@@ -564,7 +563,7 @@ public class CallServiceImpl implements CallService {
                     .setTenantId(app.getTenant().getId())
                     .setAppId(app.getId())
                     .setId(callId)
-                    .setType("verify_call")
+                    .setType(BusinessState.TYPE_VERIFY_CALL)
                     .setCallBackUrl(app.getUrl())
                     .setUserdata(userData)
                     .setAreaId(areaId)

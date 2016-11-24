@@ -1,10 +1,15 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallConversationService;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
+import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -57,6 +62,18 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     @Autowired
     private ConfService confService;
 
+    @Autowired
+    private ConversationService conversationService;
+
+    @Autowired
+    private CallConversationService callConversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationService callCenterConversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationMemberService callCenterConversationMemberService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_CONF_ENTER_SUCC;
@@ -87,7 +104,35 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
         }
+        Map<String,Object> businessData = state.getBusinessData();
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
+                (BusinessState.TYPE_IVR_INCOMING.equals(state.getType())
+                        &&  conversationService.isCC(call_id))){
+            conversation(state,call_id);
+        }else{
+            conf(state,call_id);
+        }
+        return res;
+    }
 
+    public void conversation(BusinessState state,String call_id){
+        String appId = state.getAppId();
+        Map<String,Object> businessData = state.getBusinessData();
+        String conversation_id = null;
+        if(businessData!=null){
+            conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
+        }
+        if(StringUtils.isBlank(conversation_id)){
+            throw new InvalidParamException("没有找到对应的交谈信息callid={},conversationid={}",call_id,conversation_id);
+        }
+        if(StringUtils.isBlank(appId)){
+            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
+        }
+        conversationService.join(conversation_id,call_id);
+    }
+
+    public void conf(BusinessState state,String call_id){
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
@@ -116,7 +161,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
             meetingMember.setId(call_id);
             meetingMember.setNumber((String)businessData.get("to"));
             meetingMember.setJoinTime(new Date());
-            if(state.getType().equalsIgnoreCase("ivr_incoming")){
+            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);
             }else{
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);
@@ -150,8 +195,5 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        return res;
     }
-
-
 }

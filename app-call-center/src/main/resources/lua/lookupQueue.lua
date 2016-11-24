@@ -81,6 +81,7 @@ for i = 1, aCs_size do
             redis.call('EXPIRE', q_lock_key, '60')
             redis.call('HSET',agent_state_key,'state',fetching)
             result = cQs[j]
+            redis.call('ZREM',cQs_key,result)
             return result
         end
     end

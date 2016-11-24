@@ -20,7 +20,8 @@ public class AgentState {
 
     private static final String STATE_PREFIXED_KEY = "callcenter.agent.state_";
 
-    public static final int REG_EXPIRE = 1000 * 60 * 5;
+    //TODO 坐席报道过期时间 方便测试用24小时
+    public static final int REG_EXPIRE = 1000 * 60 * 60 * 24;
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -41,6 +42,10 @@ public class AgentState {
         Model model = new Model();
         BeanUtils.setPropertys(model,map);
         return model;
+    }
+
+    public void delete(String agentId){
+        redisCacheService.del(getKey(agentId));
     }
 
     public String getExtension(String agentId) {

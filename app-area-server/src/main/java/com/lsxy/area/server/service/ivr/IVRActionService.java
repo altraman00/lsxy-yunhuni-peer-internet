@@ -3,6 +3,7 @@ package com.lsxy.area.server.service.ivr;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -110,6 +111,9 @@ public class IVRActionService {
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private ConversationService conversationService;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -337,14 +341,14 @@ public class IVRActionService {
                 .setAppId(app.getId())
                 .setId(call_id)
                 .setResId(res_id)
-                .setType("ivr_incoming")
+                .setType(BusinessState.TYPE_IVR_INCOMING)
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         //incoming事件from 和 to是相反的
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
-                        .putIfNotEmpty("iscc",iscc)
+                        .putIfNotEmpty(ConversationService.ISCC_FIELD,iscc)
                         .build())
                 .build();
         CallSession callSession = new CallSession();
@@ -457,14 +461,13 @@ public class IVRActionService {
                 return false;
             }
             if(h.getAction().equals(EnqueueHandler.action)){
-                Object iscc_obj = businessDate.get("iscc");
-                if(iscc_obj == null || ((Integer)iscc_obj) != 1){
+                if(!conversationService.isCC(call_id)){
                     logger.info("没有开通呼叫中心服务");
+                    return false;
                 }
-                return false;
             }
             return h.handle(call_id,actionEle,getNextUrl(root));
-        } catch(DocumentException | IllegalArgumentException e){
+        } catch(DocumentException e){
             logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
             //发送ivr格式错误通知
             String appId = state.getAppId();
@@ -532,12 +535,12 @@ public class IVRActionService {
         return next;
     }
 
-    public boolean validateXMLSchema(Document doc){
+    public boolean validateXMLSchema(Document doc) throws DocumentException {
         try {
             Validator validator = schema.newValidator();
             validator.validate(new DocumentSource(doc));
         } catch (Throwable e) {
-            throw new IllegalArgumentException(e);
+            throw new DocumentException(e);
         }
         return true;
     }

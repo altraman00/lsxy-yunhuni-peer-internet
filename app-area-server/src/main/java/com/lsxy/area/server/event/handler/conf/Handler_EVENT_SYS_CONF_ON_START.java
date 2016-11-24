@@ -4,7 +4,9 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -58,6 +60,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
     @Autowired
     private MeetingService meetingService;
 
+    @Autowired
+    private ConversationService conversationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_START;
@@ -92,6 +97,37 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
         }
+        if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
+            conversation(state,conf_id);
+        }else{
+            conf(state,conf_id,res_id);
+        }
+        return res;
+    }
+
+    public void conversation(BusinessState state,String conversationId){
+        String appId = state.getAppId();
+        String user_data = state.getUserdata();
+        Map<String,Object> businessData = state.getBusinessData();
+
+        if(StringUtils.isBlank(appId)){
+            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
+        }
+        App app = appService.findById(state.getAppId());
+        if(app == null){
+            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
+        }
+
+        String initiator = conversationService.getInitiator(conversationId);
+        if(initiator != null){
+            try {
+                conversationService.join(appId,conversationId,initiator,null,null,null);
+            } catch (YunhuniApiException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void conf(BusinessState state,String conf_id,String res_id){
         String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
@@ -131,9 +167,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             meeting.setStartTime(new Date());
             meetingService.save(meeting);
         }
-        return res;
     }
-
     /**
      * 创建会议是否自动录音
      * @param businessData

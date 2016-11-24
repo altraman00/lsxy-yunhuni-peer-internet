@@ -372,11 +372,11 @@ public class RedisCacheService {
 			
 		}
 
-		public Set zrang(final String key, final long start,final long end) {
+		public Set zRange(final String key, final long start, final long end) {
 			return redisTemplate.opsForZSet().range(key, start, end);
 		}
 
-		public Set zrang_score(final String key, final long min,final long max) {
+		public Set zRangeScore(final String key, final long min, final long max) {
 			return redisTemplate.opsForZSet().rangeByScore(key, min, max);
 		}
 
