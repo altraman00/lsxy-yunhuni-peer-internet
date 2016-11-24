@@ -237,6 +237,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         Map<String, Object> _params = new MapBuilder<String,Object>()
                                 .putIfNotEmpty("res_id",state.getResId())
                                 .putIfNotEmpty("content", JSONUtil2.objectToJson(plays))
+                                .put("finish_keys","")
                                 .putIfNotEmpty("user_data",conversation_id)
                                 .put("areaId",state.getAreaId())
                                 .build();
