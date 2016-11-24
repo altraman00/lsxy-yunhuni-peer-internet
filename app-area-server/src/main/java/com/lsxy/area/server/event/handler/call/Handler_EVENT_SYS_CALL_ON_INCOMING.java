@@ -135,12 +135,12 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         }
         if(app.getType().equals(App.PRODUCT_CALL_CENTER)){
             if(app.getIsCallCenter() == null || app.getIsCallCenter() != 1){
-                logger.info("没有呼叫中心");
+                logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
                 return res;
             }
         }else{
             if(!isEnableIVRService(tenant.getId(),app.getId())){
-                logger.info("没有开通ivr");
+                logger.info("[{}][{}]没有开通ivr",tenant.getId(),app.getId());
                 return res;
             }
         }
