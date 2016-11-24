@@ -230,7 +230,7 @@ public class ConversationService {
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
                 .setId(conversationId)
-                .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                .setType(BusinessState.TYPE_CC_CONVERSATION)
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
