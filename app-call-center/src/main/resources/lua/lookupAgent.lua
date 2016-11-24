@@ -50,9 +50,9 @@ for i=1,cas_size do
 			local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, '1')
 			redis.log(redis.LOG_WARNING,ok)
 			if ok == 1 then
-				redis.call('EXPIRE', agent_lock_key_prefix..agent_id, '60')
 				redis.call('HSET',agent_state_key_prefix..agent_id,'state',fetching)
 				result = agent_id
+				redis.call('DEL', agent_lock_key_prefix..agent_id)
 				return result
 			end
 		end

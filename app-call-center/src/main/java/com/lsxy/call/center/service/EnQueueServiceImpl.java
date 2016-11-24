@@ -194,7 +194,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             QueueLock.getPrefixed(),CQs.getPrefixed(),
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
             AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
-            conditionId);
+            conditionId==null?"":conditionId);
         if(queueId != null){
             //找到排队，修改排队状态
             CallCenterQueue queue = callCenterQueueService.findById(queueId);
