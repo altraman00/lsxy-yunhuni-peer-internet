@@ -3,7 +3,6 @@ package com.lsxy.yunhuni.api.app.service;
 import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
-import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
 import java.util.Date;
 import java.util.List;
@@ -76,4 +75,12 @@ public interface AppService extends BaseService<App> {
      */
     App create(App app);
 
+    /**
+     * 获取分机注册信息
+     * @param appId
+     * @return
+     */
+    String findAppSipRegistrar(String appId);
+
+    boolean enabledService(String tenantId,String appId,ServiceType service);
 }

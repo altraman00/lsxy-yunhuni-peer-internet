@@ -35,7 +35,7 @@ public class ConditionController extends AbstractAPIController {
     @Autowired
     private AppService appService;
 
-    @RequestMapping(value = "/{account_id}/callcenter/condition",method = RequestMethod.POST)
+    @RequestMapping(value = "/{accountId}/callcenter/condition",method = RequestMethod.POST)
     public ApiGatewayResponse save(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId,
                                    @Valid @RequestBody ConditionCreateInputDTO dto) throws YunhuniApiException {
@@ -44,8 +44,6 @@ public class ConditionController extends AbstractAPIController {
         }
         App app = appService.findById(appId);
         Condition condition = new Condition();
-        condition.setTenantId(app.getTenant().getId());
-        condition.setAppId(app.getId());
         condition.setChannelId(dto.getChannelId());
         condition.setWhereExpression(dto.getWhereExpression());
         condition.setSortExpression(dto.getSortExpression());
@@ -53,13 +51,13 @@ public class ConditionController extends AbstractAPIController {
         condition.setQueueTimeout(dto.getQueueTimeout());
         condition.setFetchTimeout(dto.getFetchTimeout());
         condition.setRemark(dto.getRemark());
-        condition = conditionService.save(condition);
+        condition = conditionService.save(app.getTenant().getId(),appId,condition);
         Map<String,String> result = new HashMap<>();
         result.put("conditionId",condition.getId());
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/condition/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{accountId}/callcenter/condition/{id}",method = RequestMethod.PUT)
     public ApiGatewayResponse modify(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId,
                                    @PathVariable String id,
@@ -70,19 +68,17 @@ public class ConditionController extends AbstractAPIController {
         App app = appService.findById(appId);
         Condition condition = new Condition();
         condition.setId(id);
-        condition.setTenantId(app.getTenant().getId());
-        condition.setAppId(app.getId());
         condition.setWhereExpression(dto.getWhereExpression());
         condition.setSortExpression(dto.getSortExpression());
         condition.setPriority(dto.getPriority());
         condition.setQueueTimeout(dto.getQueueTimeout());
         condition.setFetchTimeout(dto.getFetchTimeout());
         condition.setRemark(dto.getRemark());
-        conditionService.save(condition);
+        conditionService.save(app.getTenant().getId(),appId,condition);
         return ApiGatewayResponse.success(true);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/condition/{id}",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{accountId}/callcenter/condition/{id}",method = RequestMethod.DELETE)
     public ApiGatewayResponse delete(HttpServletRequest request, @PathVariable String accountId,
                                      @RequestHeader(value = "AppID") String appId,
                                      @PathVariable String id) throws YunhuniApiException {
@@ -94,7 +90,7 @@ public class ConditionController extends AbstractAPIController {
         return ApiGatewayResponse.success(true);
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/condition",method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountId}/callcenter/condition",method = RequestMethod.GET)
     public ApiGatewayResponse conditions(HttpServletRequest request, @PathVariable String accountId,
                                        @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
         if(logger.isDebugEnabled()){
@@ -104,7 +100,7 @@ public class ConditionController extends AbstractAPIController {
         return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId()));
     }
 
-    @RequestMapping(value = "/{account_id}/callcenter/condition/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountId}/callcenter/condition/{id}",method = RequestMethod.GET)
     public ApiGatewayResponse findOne(HttpServletRequest request, @PathVariable String accountId,
                                       @RequestHeader(value = "AppID") String appId,
                                       @PathVariable String id) throws YunhuniApiException {

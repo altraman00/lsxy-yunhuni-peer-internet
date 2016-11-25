@@ -205,7 +205,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
      * @param conditionScore 条件的分数，key为条件Id，请传入一个空的Map
      * @param skillScore 技能分数，key为技能名称，请传入一个空的Map
      */
-    private void setSuitedConditionsAndConditionScore(CallCenterAgent agent, List<Condition> suitedConditions, Map<String, Long> conditionScore, Map<String, Integer> skillScore) {
+    private void setSuitedConditionsAndConditionScore(CallCenterAgent agent, List<Condition> suitedConditions, Map<String, Long> conditionScore, Map<String, Integer> skillScore) throws YunhuniApiException {
         List<Condition> conditions = conditionService.getAll(agent.getTenantId(), agent.getAppId(), agent.getChannel());
         conditions.parallelStream().forEach(condition -> {
             if(ExpressionUtils.execWhereExpression(condition.getWhereExpression(),skillScore)){

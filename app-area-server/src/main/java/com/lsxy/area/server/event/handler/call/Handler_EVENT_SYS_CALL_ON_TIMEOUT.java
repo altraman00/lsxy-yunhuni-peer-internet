@@ -13,7 +13,6 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -89,7 +88,6 @@ public class Handler_EVENT_SYS_CALL_ON_TIMEOUT extends EventHandler{
             if(businessData != null){
                 String ivr_call_id = (String)businessData.get("ivr_call_id");
                 if(StringUtil.isNotEmpty(ivr_call_id)){
-                    App app = appService.findById(state.getAppId());
                     Map<String,Object> notify_data = new MapBuilder<String,Object>()
                             .putIfNotEmpty("event","ivr.connect_end")
                             .putIfNotEmpty("id",ivr_call_id)
@@ -97,7 +95,7 @@ public class Handler_EVENT_SYS_CALL_ON_TIMEOUT extends EventHandler{
                             .putIfNotEmpty("end_time",System.currentTimeMillis())
                             .putIfNotEmpty("error","dial error")
                             .build();
-                    if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+                    if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
                         ivrActionService.doAction(ivr_call_id);
                     }
                 }

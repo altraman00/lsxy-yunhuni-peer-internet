@@ -1,62 +1,40 @@
 package com.lsxy.call.center.api.model;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import java.io.Serializable;
 
 /**
- * Created by liuws on 2016/10/29.
+ * Created by liuws on 2016/11/23.
  */
-@XStreamAlias("enqueue")
-public class EnQueue implements Serializable{
-    @XStreamAsAttribute
+public class BaseEnQueue implements Serializable{
+
     private String channel;
 
-    @XStreamAsAttribute
     private Integer conversation_level;
 
-    @XStreamAsAttribute
     private Integer conversation_timeout;
 
-    @XStreamAsAttribute
     private String choice;
 
-    @XStreamAsAttribute
     private String reserve_state;
 
-    @XStreamAsAttribute
     private boolean fail_overflow;
 
-    @XStreamAsAttribute
     private String wait_voice;
 
-    @XStreamAsAttribute
     private Integer ring_mode;
 
-    @XStreamAsAttribute
     private String ring_voice;
 
-    @XStreamAsAttribute
     private String hold_voice;
 
-    @XStreamAsAttribute
     private boolean play_num;
 
-    @XStreamAsAttribute
     private String pre_num_voice;
 
-    @XStreamAsAttribute
     private String post_num_voice;
 
-    @XStreamAsAttribute
     private String data;
 
-    private Route route;
-
-    public EnQueue(){
-        
-    }
     public String getChannel() {
         return channel;
     }
@@ -168,44 +146,4 @@ public class EnQueue implements Serializable{
     public void setData(String data) {
         this.data = data;
     }
-
-    public Route getRoute() {
-        return route;
-    }
-
-    public void setRoute(Route route) {
-        this.route = route;
-    }
-
-    public class Route  implements Serializable{
-        private Condition condition;
-
-        public Route(){
-
-        }
-        public Condition getCondition() {
-            return condition;
-        }
-
-        public void setCondition(Condition condition) {
-            this.condition = condition;
-        }
-    }
-    public class Condition  implements Serializable{
-        @XStreamAsAttribute
-        private String id;
-
-        public Condition(){
-
-        }
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-    }
 }
-
-

@@ -3,18 +3,17 @@ package com.lsxy.area.server.service.callcenter;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
-import com.lsxy.call.center.api.model.EnQueue;
+import com.lsxy.call.center.api.model.BaseEnQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +46,12 @@ public class DeQueueServiceImpl implements DeQueueService {
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
+    @Autowired
+    private RPCCaller rpcCaller;
+
+    @Autowired
+    private SessionContext sessionContext;
+
     /**
      * 创建交谈，然后呼叫坐席。
      * 交谈创建成功事件邀请排队的客户到交谈
@@ -73,6 +78,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
+        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         Map<String,Object> businessData = state.getBusinessData();
         if(businessData == null){
             businessData = new HashMap<>();
@@ -81,7 +87,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
         businessStateService.save(state);
 
-        EnQueue enQueue = conversationService.getEnqueue(queueId);
+        BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
         Integer conversationTimeout = enQueue.getConversation_timeout();
         String reserveState = enQueue.getReserve_state();
         boolean playNum = enQueue.isPlay_num();
@@ -117,14 +123,16 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        App app = appService.findById(appId);
+        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.timeout")
                 .putIfNotEmpty("id",callId)
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
-        if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
-            ivrActionService.doAction(callId);
+        if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
+            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+                ivrActionService.doAction(callId);
+            }
         }
     }
 
@@ -138,14 +146,32 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.info("会话已关闭callid={}",callId);
             return;
         }
-        App app = appService.findById(appId);
+        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         Map<String,Object> notify_data = new MapBuilder<String,Object>()
                 .putIfNotEmpty("event","callcenter.enqueue.fail")
                 .putIfNotEmpty("id",callId)
                 .putIfNotEmpty("user_data",state.getUserdata())
                 .build();
-        if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
-            ivrActionService.doAction(callId);
+        if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
+            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+                ivrActionService.doAction(callId);
+            }
+        }
+    }
+
+    private void stopPlayWait(String area_id,String call_id,String res_id){
+        try {
+            if(conversationService.isPlayWait(call_id)){
+                    Map<String, Object> params = new MapBuilder<String,Object>()
+                            .putIfNotEmpty("res_id",res_id)
+                            .putIfNotEmpty("user_data",call_id)
+                            .put("areaId",area_id)
+                            .build();
+                    RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_STOP, params);
+                    rpcCaller.invoke(sessionContext, rpcrequest);
+            }
+        } catch (Throwable e) {
+            logger.error("调用失败",e);
         }
     }
 }
