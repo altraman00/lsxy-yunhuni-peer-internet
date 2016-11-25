@@ -3,7 +3,6 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.NumberNotAllowToCallException;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -13,6 +12,7 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
@@ -133,36 +133,24 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.error("找不到对应的APP:{}", params);
             return res;
         }
-        if(app.getType().equals(App.PRODUCT_CALL_CENTER)){
+        Integer isCallCenter = null;
+        if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(app.getIsCallCenter() == null || app.getIsCallCenter() != 1){
-                logger.info("没有呼叫中心");
+                logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
                 return res;
             }
+            isCallCenter = 1;
         }else{
-            if(!isEnableIVRService(tenant.getId(),app.getId())){
-                logger.info("没有开通ivr");
+            if(!appService.enabledService(tenant.getId(),app.getId(), ServiceType.IvrService)){
+                logger.info("[{}][{}]没有开通ivr",tenant.getId(),app.getId());
                 return res;
             }
         }
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),app.getIsCallCenter());
-        return res;
-    }
-
-    private boolean isEnableIVRService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsIvrService() == null || serviceSwitch.getIsIvrService() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsIvrService() == null || app.getIsIvrService() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
+        if(logger.isDebugEnabled()){
+            logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
-        return true;
+        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),isCallCenter);
+        return res;
     }
 
     private String resolveFromTelNum(String from,LineGateway lineGateway){

@@ -2,13 +2,17 @@ package com.lsxy.yunhuni.app.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.config.service.AreaSipService;
@@ -16,10 +20,12 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by liups on 2016/6/29.
@@ -32,8 +38,10 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
     @Autowired
     private AppDao appDao;
+
     @Autowired
     private TenantService tenantService;
+
     @Autowired
     private ResourcesRentService resourcesRentService;
     @Autowired
@@ -42,6 +50,9 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     private AreaSipService areaSipService;
     @Autowired
     private RedisCacheService redisCacheService;
+
+    @Autowired
+    private TenantServiceSwitchService tenantServiceSwitchService;
 
     @Override
     public BaseDaoInterface<App, Serializable> getDao() {
@@ -162,5 +173,48 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         }
         //TODO 8位9位
         throw new RuntimeException("编号已满，请联系管理员");
+    }
+
+    @Override
+    public String findAppSipRegistrar(String appId) {
+        //TODO 分机注册信息
+        return "待实现";
+    }
+
+    @Override
+    @CacheEvict(value = "entity", key = "'entity_' + #tenantId + #appId + #service.code")
+    public boolean enabledService(String tenantId, String appId, ServiceType service) {
+        if(tenantId == null){
+            return false;
+        }
+        if(tenantId == null){
+            return false;
+        }
+        if(service == null){
+            return false;
+        }
+        String field = service.getCode();
+        try {
+            if(service != ServiceType.CallCenter){//租户功能开关 暂时没有呼叫中心功能
+                TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
+                if(serviceSwitch != null){
+                    Integer enabled =  (Integer) BeanUtils.getProperty2(serviceSwitch,field);
+                    if(enabled == null || enabled != 1){
+                        return false;
+                    }
+                }
+            }
+            App app = this.findById(appId);
+            if(app == null){
+                return false;
+            }
+            Integer enabled =  (Integer) BeanUtils.getProperty2(app,field);
+            if(enabled == null || enabled != 1){
+                return false;
+            }
+        } catch (Throwable e) {
+            return false;
+        }
+        return true;
     }
 }
