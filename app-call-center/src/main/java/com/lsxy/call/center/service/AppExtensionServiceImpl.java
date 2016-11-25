@@ -1,6 +1,8 @@
 package com.lsxy.call.center.service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.opensips.service.OpensipsService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.states.state.ExtensionState;
@@ -44,6 +46,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     ExtensionState extensionState;
     @Autowired
     AppService appService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private OpensipsService opensipsService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -96,6 +100,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         }
 
         this.save(appExtension);
+        if(AppExtension.TYPE_SIP.equals(appExtension.getType())){
+            opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
+        }
         //TODO 初始化状态状态
         extensionState.setLastRegisterStatus(appExtension.getId(),200);
 
@@ -145,6 +152,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                 String agent = extensionState.getAgent(extensionId);
                 if(StringUtils.isBlank(agent)){
                     this.delete(extension);
+                    if(AppExtension.TYPE_SIP.equals(extension.getType())){
+                        opensipsService.deleteExtension(extension.getUser());
+                    }
                     redisCacheService.del(extensionId);
                 }else{
                     throw new ExtensionBindingToAgentException();
