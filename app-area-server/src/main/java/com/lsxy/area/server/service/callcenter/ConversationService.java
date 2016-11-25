@@ -45,6 +45,9 @@ public class ConversationService {
     /**最大成员数**/
     public static final int MAX_PARTS = 8;
 
+    /**交谈最大时长**/
+    public static final int MAX_DURATION = 60 * 60 * 6;
+
     /**key的过期时间 秒**/
     public static final int EXPIRE = 60 * 60 * 12;
 
@@ -196,7 +199,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String initiator,String callCenterId, String appId, Integer maxDuration) throws YunhuniApiException {
+    public String create(String id,String initiator,String callCenterId, String appId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -204,6 +207,7 @@ public class ConversationService {
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
         CallCenterConversation conversation = new CallCenterConversation();
+        conversation.setId(id);
         conversation.setAppId(appId);
         conversation.setTenantId(app.getTenant().getId());
         conversation.setRelevanceId(callCenterId);
@@ -211,12 +215,12 @@ public class ConversationService {
         conversation = callCenterConversationService.save(conversation);
         String conversationId = conversation.getId();
 
-        if(maxDuration!=null && maxDuration > EXPIRE){
-            maxDuration = EXPIRE;
+        if(maxDuration!=null && maxDuration > MAX_DURATION){
+            maxDuration = MAX_DURATION;
         }
         Map<String, Object> map = new MapBuilder<String,Object>()
                 .putIfNotEmpty("user_data",conversationId)
-                .put("max_seconds",maxDuration,EXPIRE)
+                .put("max_seconds",maxDuration,MAX_DURATION)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF, map);
@@ -235,7 +239,7 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
-                        .put("max_seconds",maxDuration,EXPIRE)//交谈最大持续时长
+                        .put("max_seconds",maxDuration,MAX_DURATION)//交谈最大持续时长
                         .build())
                 .build();
         businessStateService.save(state);
@@ -487,7 +491,7 @@ public class ConversationService {
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",call_state.getResId())
                 .putIfNotEmpty("conf_res_id",conversation_state.getResId())
-                .put("max_seconds",max_seconds,EXPIRE)
+                .put("max_seconds",max_seconds,MAX_DURATION)
                 .putIfNotEmpty("voice_mode",voice_mode)
                 .putIfNotEmpty("play_file",play_file)
                 .putIfNotEmpty("user_data",call_id)
@@ -578,7 +582,7 @@ public class ConversationService {
             return;
         }
         try{
-            CallCenterConversationMember member = callCenterConversationMemberService.findById(callId);
+            CallCenterConversationMember member = callCenterConversationMemberService.findOne(conversationId,callId);
             if(member != null){
                 member.setEndTime(new Date());
                 callCenterConversationMemberService.save(member);
@@ -633,7 +637,7 @@ public class ConversationService {
             callConversationService.incrConversation(call_id,conversation_id);
             this.incrPart(conversation_id,call_id);
             CallCenterConversationMember member = new CallCenterConversationMember();
-            member.setId(call_id);
+            member.setCallId(call_id);
             member.setRelevanceId(conversation_id);
             member.setStartTime(new Date());
             member.setSessionId((String)businessData.get("sessionid"));

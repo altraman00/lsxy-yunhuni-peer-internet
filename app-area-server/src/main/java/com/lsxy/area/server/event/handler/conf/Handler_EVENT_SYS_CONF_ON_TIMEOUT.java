@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.conf;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -37,6 +38,9 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
+    @Autowired
+    private ConversationService conversationService;
+
 
     @Override
     public String getEventName() {
@@ -69,6 +73,8 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
             logger.info("confi_id={},state={}",conf_id,state);
         }
 
+        businessStateService.delete(conf_id);
+
         if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
             conversation(state,conf_id);
         }else{
@@ -80,7 +86,10 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
     }
 
     private void conversation(BusinessState state, String conversation_id) {
-        //TODO
+        String initiator = conversationService.getInitiator(conversation_id);
+        if(initiator != null){
+            conversationService.logicExit(conversation_id,initiator);
+        }
     }
 
     private void conf(BusinessState state, String conf_id) {

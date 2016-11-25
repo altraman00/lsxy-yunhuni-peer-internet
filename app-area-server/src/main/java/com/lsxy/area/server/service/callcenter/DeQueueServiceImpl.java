@@ -9,6 +9,7 @@ import com.lsxy.call.center.api.model.BaseEnQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -93,11 +94,14 @@ public class DeQueueServiceImpl implements DeQueueService {
         boolean playNum = enQueue.isPlay_num();
         String preNumVoice = enQueue.getPre_num_voice();
         String postNumVoice = enQueue.getPost_num_voice();
-        String conversation = conversationService.create(state.getId(),
-                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+        String conversation = UUIDGenerator.uuid();
         String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
                 result.getExtension().getTelenum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
+
+        conversationService.create(conversation,state.getId(),
+                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+
 
         BusinessState agentState = businessStateService.get(agentCallId);
         if(reserveState != null){
