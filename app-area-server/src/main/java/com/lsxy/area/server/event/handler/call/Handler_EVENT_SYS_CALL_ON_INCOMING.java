@@ -136,7 +136,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         Integer isCallCenter = null;
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(app.getIsCallCenter() == null || app.getIsCallCenter() != 1){
-                logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
+                logger.info("[{}][{}]没有开通呼叫中心 ",tenant.getId(),app.getId());
                 return res;
             }
             isCallCenter = 1;
