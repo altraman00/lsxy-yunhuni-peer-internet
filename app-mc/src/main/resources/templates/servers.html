@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>云呼你运维</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        td{
+            padding:5px;
+        }
+    </style>
+</head>
+<body style="font-size: 9pt">
+
+<h1>云呼你运维</h1>
+<h2>服务器列表</h2>
+<table border="1" width="100%">
+    <tr style="font-weight: bolder;background-color: bisque">
+        <td>服务组件</td>
+        <td>应用名</td>
+        <td>服务器</td>
+        <td>服务端口</td>
+        <td>状态</td>
+    </tr>
+    
+    <tr th:each="server:${servers}">
+        <td th:text="${server.serverName}">用户控制台01</td>
+        <td th:text="${server.appName}">app-portal-01</td>
+        <td th:text="|${server.serverHost} - ${server.serverIp}|">p01 - 192.168.10.2</td>
+        <td th:text="${server.serverPort}">8080</td>
+
+        <td th:style="${server.status eq 'OK'} ? 'background-color: green':'background-color: red'" th:text="${server.status}" style="background-color: green">OK</td>
+    </tr>
+</table>
+
+<h2>区域节点连接状态</h2>
+<div th:each="areaServer:${areaServers}">
+    <div>区域 <span th:text="${areaServer.areaName}"></span></div>
+    <hr/>
+    <div th:each="areaServerHost:${areaServer.hosts}" style="padding-bottom: 20px;">
+        <b>主机 <span th:text="${areaServer.areaName}">area001</span>-<span th:text="${areaServerHost.hostName}">p01</span> 节点连接情况</b>
+        <table border="1" >
+            <tr style="background-color: bisque">
+                <td>节点标识</td>
+                <td>节点主机</td>
+                <td>连接状态</td>
+            </tr>
+            <tr th:each="areaNode:${areaServerHost.nodes}">
+                <td th:text="${areaNode.nodeId}">area001-1</td>
+                <td th:text="${areaNode.host}">ap01</td>
+                <td th:style="${areaNode.status eq 'OK'} ? 'background-color: green':'background-color: red'"
+                    th:text="${areaNode.status}" style="background-color: green">OK</td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+</body>
+</html>

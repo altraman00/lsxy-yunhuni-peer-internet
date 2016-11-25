@@ -19,7 +19,7 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @return
      * @throws YunhuniApiException
      */
-    AppExtension create(AppExtension appExtension) throws YunhuniApiException;
+    AppExtension create(String appId,AppExtension appExtension) throws YunhuniApiException;
 
     /**
      * 分机登录

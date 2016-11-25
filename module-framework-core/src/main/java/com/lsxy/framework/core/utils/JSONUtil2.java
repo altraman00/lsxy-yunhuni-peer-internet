@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -15,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 
@@ -57,7 +55,26 @@ public class JSONUtil2 {
 		}
 		return result;
 	}
-	
+
+	/**
+	 * 将json 转换为指定类型对象集合
+	 * @param json
+	 * @param clazz
+	 * @return
+	 */
+	public  static <T> List<T> jsonToList(String json, Class<T> clazz){
+		ObjectMapper om = new ObjectMapper();
+		JavaType javaType = om.getTypeFactory().constructParametricType(List.class, clazz);
+
+		List<T> result = null;
+		try {
+			result = om.readValue(json,javaType);
+		} catch (IOException e) {
+			logger.error("jsonToList 处理异常",e);
+		}
+		return result;
+	}
+
 	/**
 	 * 串行化指定对象的指定字段
 	 * 指定对象必须实现JSONUtil2Serialization接口

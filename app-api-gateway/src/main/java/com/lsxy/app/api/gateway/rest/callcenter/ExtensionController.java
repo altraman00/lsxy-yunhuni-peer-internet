@@ -35,13 +35,8 @@ public class ExtensionController extends AbstractAPIController {
 
     @RequestMapping(value = "/{account_id}/callcenter/extension",method = RequestMethod.POST)
     public ApiGatewayResponse createExtension(HttpServletRequest request, @RequestBody AppExtension extension, @RequestHeader("AppID") String appId) throws YunhuniApiException {
-        App app = appService.findById(appId);
-        Long ccn = app.getCallCenterNum();
-        //创建分机的用户名要加上应用编号，以区分唯一性
-        extension.setUser(ccn + extension.getUser());
-        extension.setAppId(appId);
-        extension.setTenantId(app.getTenant().getId());
-        AppExtension rExtension = appExtensionService.create(extension);
+
+        AppExtension rExtension = appExtensionService.create(appId,extension);
         ExtensionVO vo = new ExtensionVO();
         try {
             BeanUtils.copyProperties(vo,rExtension);
