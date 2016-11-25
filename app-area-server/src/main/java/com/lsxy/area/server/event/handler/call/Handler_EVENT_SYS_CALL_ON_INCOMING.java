@@ -144,6 +144,9 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }
+        if(logger.isDebugEnabled()){
+            logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
+        }
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),app.getIsCallCenter());
         return res;
     }
