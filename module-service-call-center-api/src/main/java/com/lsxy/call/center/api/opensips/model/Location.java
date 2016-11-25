@@ -3,6 +3,7 @@ package com.lsxy.call.center.api.opensips.model;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Date;
  */
 @Entity
 @Table(schema="opensips",name = "location")
-public class Location {
+public class Location implements Serializable {
     private Long contactId;
     private String username;
     private String domain;
@@ -32,7 +33,8 @@ public class Location {
 
     @Id
     @Column(name="contact_id")
-    @GeneratedValue(generator = "native")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GenericGenerator(name = "paymentableGenerator", strategy = "native")
     public Long getContactId() {
         return contactId;
     }

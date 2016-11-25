@@ -1,13 +1,16 @@
 package com.lsxy.call.center.api.opensips.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Created by liups on 2016/11/24.
  */
 @Entity
 @Table(schema="opensips",name = "subscriber")
-public class Subscriber {
+public class Subscriber implements Serializable {
     private Integer id;
     private String username;
     private String domain;
@@ -20,17 +23,19 @@ public class Subscriber {
     public Subscriber() {
     }
 
-    public Subscriber(String username, String domain, String password, String ha1, String ha1b) {
+    public Subscriber(String username, String domain, String password, String emailAddress, String ha1, String ha1b) {
         this.username = username;
         this.domain = domain;
         this.password = password;
+        this .emailAddress = emailAddress;
         this.ha1 = ha1;
         this.ha1b = ha1b;
     }
 
     @Id
     @Column(name="id")
-    @GeneratedValue(generator = "native")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GenericGenerator(name = "paymentableGenerator", strategy = "native")
     public Integer getId() {
         return id;
     }

@@ -1,6 +1,9 @@
 import com.lsxy.app.opensips.OpensipsMain;
+import com.lsxy.call.center.api.opensips.service.OpensipsService;
 import com.lsxy.framework.config.Constants;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -14,4 +17,11 @@ public class OpensipsProxyTest {
         //将 spring boot 的默认配置文件设置为系统配置文件
         System.setProperty("spring.config.location","classpath:"+ Constants.DEFAULT_CONFIG_FILE);
     }
+    @Autowired
+    OpensipsService opensipsService;
+    @Test
+    public void testOpensipsProxy(){
+        opensipsService.createExtension("456791132","123456");
+    }
+
 }

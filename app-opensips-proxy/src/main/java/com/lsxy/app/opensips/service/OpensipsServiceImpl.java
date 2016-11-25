@@ -31,7 +31,7 @@ public class OpensipsServiceImpl implements OpensipsService {
     public void createExtension(String username, String password) {
         String ha1 = DigestUtils.md5DigestAsHex((username + ":" + domain + ":" + password).getBytes());
         String ha1b = DigestUtils.md5DigestAsHex((username + "@" + domain + ":" + domain + ":" + password).getBytes());
-        Subscriber subscriber = new Subscriber(username,domain,password,ha1,ha1b);
+        Subscriber subscriber = new Subscriber(username,domain,password,"",ha1,ha1b);
         subscriberDao.save(subscriber);
     }
 
