@@ -75,6 +75,9 @@ fi
 
 export MAVEN_OPTS="-Xms256m -Xmx512m"
 
+
+echo $MAVEN_OPTS
+
 cd $YUNHUNI_HOME
 git remote prune origin
 #更新代码和安装模块组件
