@@ -17,6 +17,7 @@
         <spring-security-version>3.2.5.RELEASE</spring-security-version>
         <skip_maven_deploy>false</skip_maven_deploy>
     </properties>
+
     <modules>
         <module>app-portal</module>
         <module>app-area-server</module>
@@ -40,12 +41,13 @@
         <module>module-service</module>
         <module>module-framework-oss</module>
         <module>module-framework-rpc</module>
-        <module>app-user-app-demo</module>
+        <module>app-user-demo</module>
         <module>module-service-area-api</module>
         <module>module-framework-jmx</module>
         <module>module-framework-monitor</module>
         <module>module-service-call-center-api</module>
         <module>app-opensips-proxy</module>
+        <module>app-mc</module>
 
     </modules>
     <packaging>pom</packaging>

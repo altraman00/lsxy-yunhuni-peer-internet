@@ -1221,6 +1221,15 @@ public class StringUtil extends StringUtils{
 		}
 		return "";
 	}
+	public static String getHostIp(){
+		try {
+			String host = InetAddress.getLocalHost().getHostAddress();
+			return host;
+		} catch (UnknownHostException e) {
+			logger.error("",e);
+		}
+		return "";
+	}
 	public static String getDecimal(String o,int num){
 		String[] temp = o.split("\\.");
 		String result = temp[0];
@@ -1243,4 +1252,5 @@ public class StringUtil extends StringUtils{
 		}
 		return result;
 	}
+
 }
