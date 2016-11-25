@@ -5,6 +5,7 @@ import com.lsxy.app.api.gateway.dto.callcenter.ChannelCreateInputDTO;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.ConfController;
+import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.service.ChannelService;
@@ -33,6 +34,9 @@ public class ChannelController extends AbstractAPIController {
 
     @Autowired
     private AppService appService;
+
+    @Autowired
+    private ConditionService conditionService;
 
     @RequestMapping(value = "/{accountId}/callcenter/channel",method = RequestMethod.POST)
     public ApiGatewayResponse save(HttpServletRequest request, @PathVariable String accountId,
@@ -81,5 +85,16 @@ public class ChannelController extends AbstractAPIController {
         }
         App app = appService.findById(appId);
         return ApiGatewayResponse.success(channelService.findOne(app.getTenant().getId(),app.getId(),id));
+    }
+
+    @RequestMapping(value = "/{accountId}/callcenter/channel/{channel_id}/condition",method = RequestMethod.GET)
+    public ApiGatewayResponse conditions(HttpServletRequest request, @PathVariable String accountId,
+                                         @PathVariable String channel_id,
+                                         @RequestHeader(value = "AppID") String appId) throws YunhuniApiException {
+        if(logger.isDebugEnabled()){
+            logger.debug("条件列表API参数,accountId={},appId={},channelId={}",accountId,appId,channel_id);
+        }
+        App app = appService.findById(appId);
+        return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId(),channel_id));
     }
 }
