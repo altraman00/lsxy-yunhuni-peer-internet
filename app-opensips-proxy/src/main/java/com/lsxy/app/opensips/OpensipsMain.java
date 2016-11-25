@@ -20,17 +20,16 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 /**
  * Created by liups on 2016/11/23.
  */
-@SpringBootApplication(exclude = {EmbeddedServletContainerAutoConfiguration.class})
+@SpringBootApplication()
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class,
         FrameworkCacheConfig.class, YunhuniApiConfig.class,
         YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class})
 @EnableDubboConfiguration
 @EnableJpaRepositories
-@ComponentScan
 public class OpensipsMain extends AbstractSpringBootStarter {
 
 
-    private static final String systemId = "app.opensips";
+    private static final String systemId = "app.opensips.proxy";
     static {
         System.setProperty("systemId",systemId);
     }

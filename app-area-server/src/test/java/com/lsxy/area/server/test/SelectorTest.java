@@ -3,15 +3,11 @@ package com.lsxy.area.server.test;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.AreaServerMainClass;
 import com.lsxy.framework.config.Constants;
-import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created by liups on 2016/10/29.
@@ -29,14 +25,14 @@ public class SelectorTest {
     @Autowired
     AppService appService;
 
-    @Test
-    public void ttttt() throws AppOffLineException, UnsupportedEncodingException {
+//    @Test
+//    public void ttttt() throws AppOffLineException, UnsupportedEncodingException {
 //        App app = appService.findById("40288ac95778fd6f01577909260d0000");
 //        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, null, "02082241195");
 //        System.out.println(selector.getOneTelnumber().getTelNumber());
 //        String s = JSONUtil.objectToJson(selector.getToNum());
 //        List<Map<String, String>> maps = JSONUtil.parseList(s);
 //        System.out.println(JSONUtil.objectToJson(maps));
-    }
+//    }
 
 }

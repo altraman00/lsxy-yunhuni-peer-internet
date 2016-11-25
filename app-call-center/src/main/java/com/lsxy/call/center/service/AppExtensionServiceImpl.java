@@ -14,6 +14,8 @@ import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     @Autowired
     ExtensionState extensionState;
+    @Autowired
+    AppService appService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -55,16 +59,42 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     //注册
     @Override
-    public AppExtension create(AppExtension appExtension) throws YunhuniApiException {
-        if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())
-        || StringUtil.isBlank(appExtension.getUser()) || StringUtil.isBlank(appExtension.getPassword())
-        || StringUtil.isBlank(appExtension.getType())){
+    public AppExtension create(String appId,AppExtension appExtension) throws YunhuniApiException {
+        App app = appService.findById(appId);
+
+        appExtension.setAppId(appId);
+        appExtension.setTenantId(app.getTenant().getId());
+
+        if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())){
             throw new RequestIllegalArgumentException();
         }
 
-        if(this.exists(appExtension.getUser())){
-            throw new ExtensionUserExistException();
+        switch (appExtension.getType()){
+            case AppExtension.TYPE_SIP:
+                if(StringUtil.isBlank(appExtension.getUser()) || StringUtil.isBlank(appExtension.getPassword())){
+                    throw new RequestIllegalArgumentException();
+                }
+                Long ccn = app.getCallCenterNum();
+                //创建分机的用户名要加上应用编号，以区分唯一性
+                appExtension.setUser(ccn + appExtension.getUser());
+                //用户名是否已存在
+                if(this.exists(appExtension.getUser())){
+                    throw new ExtensionUserExistException();
+                }
+                break;
+            case AppExtension.TYPE_THIRD_SIP:
+                throw new RequestIllegalArgumentException();
+            case AppExtension.TYPE_TELPHONE:
+                appExtension.setUser(null);
+                appExtension.setPassword(null);
+                if(StringUtil.isBlank(appExtension.getTelenum()) ){
+                    throw new RequestIllegalArgumentException();
+                }
+                break;
+            default:
+                throw new RequestIllegalArgumentException();
         }
+
         this.save(appExtension);
         //TODO 初始化状态状态
         extensionState.setLastRegisterStatus(appExtension.getId(),200);
