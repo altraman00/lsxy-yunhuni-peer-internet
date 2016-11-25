@@ -41,7 +41,7 @@ public class ExtensionController extends AbstractAPIController {
         extension.setUser(ccn + extension.getUser());
         extension.setAppId(appId);
         extension.setTenantId(app.getTenant().getId());
-        AppExtension rExtension = appExtensionService.register(extension);
+        AppExtension rExtension = appExtensionService.create(extension);
         ExtensionVO vo = new ExtensionVO();
         try {
             BeanUtils.copyProperties(vo,rExtension);

@@ -55,7 +55,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
     //注册
     @Override
-    public AppExtension register(AppExtension appExtension) throws YunhuniApiException {
+    public AppExtension create(AppExtension appExtension) throws YunhuniApiException {
         if(appExtension == null || StringUtil.isBlank(appExtension.getTenantId()) || StringUtil.isBlank(appExtension.getAppId())
         || StringUtil.isBlank(appExtension.getUser()) || StringUtil.isBlank(appExtension.getPassword())
         || StringUtil.isBlank(appExtension.getType())){
@@ -150,6 +150,16 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new IllegalArgumentException("extension不属于该App");
         }
         return extension;
+    }
+
+    @Override
+    public void register(String extensionId) {
+        Integer expire = 10 * 60 * 1000;
+        ExtensionState.Model model = extensionState.new Model();
+        model.setLastRegisterStatus(200);
+        model.setLastRegisterTime(System.currentTimeMillis());
+        model.setRegisterExpires(expire);
+        extensionState.setAll(model);
     }
 
 

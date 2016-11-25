@@ -6,7 +6,6 @@ import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.dao.ConditionDao;
 import com.lsxy.call.center.states.lock.ModifyConditionLock;
-import com.lsxy.call.center.utils.CallCenterEnableUtil;
 import com.lsxy.call.center.utils.ExpressionUtils;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
@@ -17,6 +16,8 @@ import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.callcenter.CreateConditionEvent;
 import com.lsxy.framework.mq.events.callcenter.DeleteConditionEvent;
 import com.lsxy.framework.mq.events.callcenter.ModifyConditionEvent;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
     private RedisCacheService redisCacheService;
 
     @Autowired
-    private CallCenterEnableUtil callCenterEnableUtil;
+    private AppService appService;
 
     @Override
     public BaseDaoInterface<Condition, Serializable> getDao() {
@@ -74,7 +75,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(!ExpressionUtils.validWhereExpression(condition.getWhereExpression())){
             throw new ConditionExpressionException();
         }
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         //通道是否存在
@@ -158,7 +159,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
 
     @Override
     public void delete(String tenantId,String appId,String conditionId) throws YunhuniApiException{
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         Condition condition = this.findOne(tenantId,appId,conditionId);
@@ -188,7 +189,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         Condition condition = this.findById(conditionId);
@@ -212,7 +213,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         return this.conditionDao.findByTenantIdAndAppId(tenantId,appId);
@@ -229,7 +230,7 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(channelId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         return this.conditionDao.findByTenantIdAndAppIdAndChannelId(tenantId,appId,channelId);
