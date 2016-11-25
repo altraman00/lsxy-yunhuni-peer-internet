@@ -578,7 +578,7 @@ public class ConversationService {
             return;
         }
         try{
-            CallCenterConversationMember member = callCenterConversationMemberService.findById(callId);
+            CallCenterConversationMember member = callCenterConversationMemberService.findOne(conversationId,callId);
             if(member != null){
                 member.setEndTime(new Date());
                 callCenterConversationMemberService.save(member);
@@ -633,7 +633,7 @@ public class ConversationService {
             callConversationService.incrConversation(call_id,conversation_id);
             this.incrPart(conversation_id,call_id);
             CallCenterConversationMember member = new CallCenterConversationMember();
-            member.setId(call_id);
+            member.setCallId(call_id);
             member.setRelevanceId(conversation_id);
             member.setStartTime(new Date());
             member.setSessionId((String)businessData.get("sessionid"));
