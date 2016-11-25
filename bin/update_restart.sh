@@ -96,7 +96,10 @@ else
         echo "已经是最新代码了 不用CLEAN INSTALL了";
     fi
 fi
-
+if [ $? -ne 0 ];then
+        echo "mvn compile failed"
+        exit 1
+fi
 
 #先停止制定的APP服务
 echo "停止现有服务...."
