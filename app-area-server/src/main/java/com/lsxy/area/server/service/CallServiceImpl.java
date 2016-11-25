@@ -8,7 +8,6 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil;
@@ -21,6 +20,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -101,58 +101,6 @@ public class CallServiceImpl implements CallService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
-    private boolean isEnableDuoCallService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsVoiceCallback() == null || app.getIsVoiceCallback() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isEnableVoiceDirectlyService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch !=null && (serviceSwitch.getIsVoiceDirectly() == null || serviceSwitch.getIsVoiceDirectly() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsVoiceDirectly() == null || app.getIsVoiceDirectly() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
-
-    private boolean isEnableVoiceValidateService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsVoiceValidate() == null || serviceSwitch.getIsVoiceValidate() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsVoiceValidate() == null || app.getIsVoiceValidate() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
 
@@ -190,7 +138,7 @@ public class CallServiceImpl implements CallService {
     @Override
     public String duoCallback(String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
                               Integer max_dial_duration,Integer max_call_duration ,Boolean recording,Integer record_mode,String user_data) throws YunhuniApiException {
-        String apiCmd = "duo_call";
+        String apiCmd = BusinessState.TYPE_DUO_CALL;
         String duocCallId;
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
             throw new NumberNotAllowToCallException();
@@ -205,7 +153,7 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(!isEnableDuoCallService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceCallback)){
             throw new AppServiceInvalidException();
         }
 
@@ -337,7 +285,7 @@ public class CallServiceImpl implements CallService {
             }
         }
 
-        if(!isEnableVoiceDirectlyService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceDirectly)){
             throw new AppServiceInvalidException();
         }
 
@@ -419,7 +367,7 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(!isEnableVoiceValidateService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceValidate)){
             throw new AppServiceInvalidException();
         }
 
@@ -497,7 +445,7 @@ public class CallServiceImpl implements CallService {
             }
         }
 
-        if(!isEnableVoiceValidateService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceValidate)){
             throw new AppServiceInvalidException();
         }
 

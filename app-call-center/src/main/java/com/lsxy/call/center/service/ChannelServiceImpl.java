@@ -3,13 +3,14 @@ package com.lsxy.call.center.service;
 import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.call.center.dao.ChannelDao;
-import com.lsxy.call.center.utils.CallCenterEnableUtil;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.ChannelNotExistException;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
     private ChannelDao channelDao;
 
     @Autowired
-    private CallCenterEnableUtil callCenterEnableUtil;
+    private AppService appService;
 
     @Override
     public BaseDaoInterface<Channel, Serializable> getDao() {
@@ -49,7 +50,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         return super.save(channel);
@@ -57,7 +58,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
 
     @Override
     public void delete(String tenantId, String appId, String channelId) throws YunhuniApiException{
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         Channel channel = this.findOne(tenantId,appId,channelId);
@@ -81,7 +82,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         Channel channel = this.findById(channelId);
@@ -105,7 +106,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(!callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
         return this.channelDao.findByTenantIdAndAppId(tenantId,appId);
