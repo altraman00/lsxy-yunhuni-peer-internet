@@ -49,7 +49,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!callCenterEnableUtil.enabled(tenantId, appId)){
             throw new AppServiceInvalidException();
         }
         return super.save(channel);
@@ -57,7 +57,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
 
     @Override
     public void delete(String tenantId, String appId, String channelId) throws YunhuniApiException{
-        if(callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!callCenterEnableUtil.enabled(tenantId, appId)){
             throw new AppServiceInvalidException();
         }
         Channel channel = this.findOne(tenantId,appId,channelId);
@@ -81,7 +81,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!callCenterEnableUtil.enabled(tenantId, appId)){
             throw new AppServiceInvalidException();
         }
         Channel channel = this.findById(channelId);
@@ -105,7 +105,7 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(callCenterEnableUtil.enabled(tenantId, appId)){
+        if(!callCenterEnableUtil.enabled(tenantId, appId)){
             throw new AppServiceInvalidException();
         }
         return this.channelDao.findByTenantIdAndAppId(tenantId,appId);
