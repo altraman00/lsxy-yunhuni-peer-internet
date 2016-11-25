@@ -1,5 +1,6 @@
 package com.lsxy.app.backend;
 
+import com.alibaba.dubbo.common.Constants;
 import com.lsxy.call.center.api.CallCenterApiConfig;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
@@ -31,9 +32,8 @@ public class MainClass extends AbstractSpringBootStarter {
 
 
     public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(MainClass.class);
-        app.setWebEnvironment(false);
-        app.run(args);
+        System.setProperty(Constants.DUBBO_PROPERTIES_KEY,"config.properties");
+        SpringApplication.run(MainClass.class);
     }
 
     @Override
