@@ -196,7 +196,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String initiator,String callCenterId, String appId, Integer maxDuration) throws YunhuniApiException {
+    public String create(String id,String initiator,String callCenterId, String appId, Integer maxDuration) throws YunhuniApiException {
         App app = appService.findById(appId);
         if(app == null){
             throw new AppNotFoundException();
@@ -204,6 +204,7 @@ public class ConversationService {
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
         CallCenterConversation conversation = new CallCenterConversation();
+        conversation.setId(id);
         conversation.setAppId(appId);
         conversation.setTenantId(app.getTenant().getId());
         conversation.setRelevanceId(callCenterId);
