@@ -1,9 +1,8 @@
 package com.lsxy.call.center.api.opensips.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -33,6 +32,8 @@ public class Location {
 
     @Id
     @Column(name="contact_id")
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "com.lsxy.framework.api.base.CustomUUIDGenerator")
     public Long getContactId() {
         return contactId;
     }

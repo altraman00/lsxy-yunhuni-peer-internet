@@ -26,7 +26,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
         YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class})
 @EnableDubboConfiguration
 @EnableJpaRepositories
-@ComponentScan
 public class OpensipsMain extends AbstractSpringBootStarter {
 
 
@@ -37,7 +36,9 @@ public class OpensipsMain extends AbstractSpringBootStarter {
 
     public static void main(String[] args) {
         System.setProperty(Constants.DUBBO_PROPERTIES_KEY,"config.properties");
-        SpringApplication.run(OpensipsMain.class);
+        SpringApplication app = new SpringApplication(OpensipsMain.class);
+        app.setWebEnvironment(false);
+        app.run(args);
     }
 
     @Override
