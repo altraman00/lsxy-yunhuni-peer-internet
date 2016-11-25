@@ -73,7 +73,7 @@ then
    exit 1;
 fi
 
-echo $MAVEN_OPTS
+export MAVEN_OPTS="-Xms256m -Xmx512m"
 
 cd $YUNHUNI_HOME
 git remote prune origin
