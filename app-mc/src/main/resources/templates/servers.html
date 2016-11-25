@@ -14,7 +14,7 @@
 <h1>云呼你运维</h1>
 <h2>服务器列表</h2>
 <table border="1" width="100%">
-    <tr style="font-weight: bolder">
+    <tr style="font-weight: bolder;background-color: bisque">
         <td>服务组件</td>
         <td>应用名</td>
         <td>服务器</td>
@@ -39,7 +39,7 @@
     <div th:each="areaServerHost:${areaServer.hosts}" style="padding-bottom: 20px;">
         <b>主机 <span th:text="${areaServer.areaName}">area001</span>-<span th:text="${areaServerHost.hostName}">p01</span> 节点连接情况</b>
         <table border="1" >
-            <tr>
+            <tr style="background-color: bisque">
                 <td>节点标识</td>
                 <td>节点主机</td>
                 <td>连接状态</td>
