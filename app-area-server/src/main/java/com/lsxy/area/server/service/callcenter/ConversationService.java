@@ -125,12 +125,12 @@ public class ConversationService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
-    public EnQueue getEnqueue(String queueId){
-        EnQueue enqueue = null;
+    public BaseEnQueue getEnqueue(String queueId){
+        BaseEnQueue enqueue = null;
         try{
             CallCenterQueue ccQueue = callCenterQueueService.findById(queueId);
             if(ccQueue != null && StringUtil.isNotEmpty(ccQueue.getEnqueue())){
-                enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),EnQueue.class);
+                enqueue = JSONUtil2.fromJson(ccQueue.getEnqueue(),BaseEnQueue.class);
             }
         }catch (Throwable t){
             logger.error("获取排队信息失败",t);
@@ -230,7 +230,8 @@ public class ConversationService {
                 .setTenantId(app.getTenant().getId())
                 .setAppId(app.getId())
                 .setId(conversationId)
-                .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                .setType(BusinessState.TYPE_CC_CONVERSATION)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
@@ -340,6 +341,7 @@ public class ConversationService {
                 .setAppId(app.getId())
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_AGENT_CALL)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
@@ -412,6 +414,7 @@ public class ConversationService {
                 .setAppId(app.getId())
                 .setId(callId)
                 .setType(BusinessState.TYPE_CC_OUT_CALL)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()

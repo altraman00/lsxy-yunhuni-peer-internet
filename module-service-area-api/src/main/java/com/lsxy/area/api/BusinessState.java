@@ -1,5 +1,7 @@
 package com.lsxy.area.api;
 
+import com.lsxy.framework.core.utils.JSONUtil;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ public class BusinessState implements Serializable{
     public static final String TYPE_IVR_DIAL = "ivr_dial";
     public static final String TYPE_NOTIFY_CALL = "notify_call";
     public static final String TYPE_VERIFY_CALL = "verify_call";
+    public static final String TYPE_DUO_CALL = "duo_call";
     public static final String TYPE_SYS_CONF = "sys_conf";
     public static final String TYPE_CC_CONVERSATION = "conversation";
     public static final String TYPE_CC_AGENT_CALL = "agent_call";
@@ -132,6 +135,11 @@ public class BusinessState implements Serializable{
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    @Override
+    public String toString(){
+        return JSONUtil.objectToJson(this);
     }
 
     public static class Builder{

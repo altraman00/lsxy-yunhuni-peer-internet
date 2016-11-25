@@ -128,30 +128,21 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         }
     }
     public void conf(BusinessState state,String conf_id,String res_id){
-        String appId = state.getAppId();
         String user_data = state.getUserdata();
         Map<String,Object> businessData = state.getBusinessData();
-
-        if(StringUtils.isBlank(appId)){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
-        }
 
         //开始通知开发者
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议创建成功通知给开发者");
         }
-        if(StringUtils.isNotBlank(app.getUrl())){
+        if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.create.succ")
                     .putIfNotEmpty("id",conf_id)
                     .putIfNotEmpty("begin_time",System.currentTimeMillis())
                     .putIfNotEmpty("user_data",user_data)
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }
 
         if(logger.isDebugEnabled()){

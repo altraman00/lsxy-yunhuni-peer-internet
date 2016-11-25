@@ -2,6 +2,8 @@ package com.lsxy.call.center.api.service;
 
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.framework.api.base.BaseService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+
 import java.util.List;
 
 /**
@@ -9,11 +11,13 @@ import java.util.List;
  */
 public interface ConditionService extends BaseService<Condition> {
 
-    public void delete(String tenantId,String appId,String conditionId);
+    public Condition save(String tenantId,String appId,Condition condition) throws YunhuniApiException;
 
-    public Condition findOne(String tenantId,String appId,String conditionId);
+    public void delete(String tenantId,String appId,String conditionId) throws YunhuniApiException;
 
-    public List<Condition> getAll(String tenantId, String appId);
+    public Condition findOne(String tenantId,String appId,String conditionId) throws YunhuniApiException;
 
-    public List<Condition> getAll(String tenantId, String appId,String channelId);
+    public List<Condition> getAll(String tenantId, String appId) throws YunhuniApiException;
+
+    public List<Condition> getAll(String tenantId, String appId,String channelId) throws YunhuniApiException;
 }
