@@ -56,10 +56,6 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-service-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.lsxy</groupId>
-            <artifactId>module-service</artifactId>
-        </dependency>
 
     </dependencies>
 
