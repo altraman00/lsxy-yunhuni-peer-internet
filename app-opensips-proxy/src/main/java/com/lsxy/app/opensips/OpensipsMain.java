@@ -20,7 +20,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 /**
  * Created by liups on 2016/11/23.
  */
-@SpringBootApplication(exclude = {EmbeddedServletContainerAutoConfiguration.class})
+@SpringBootApplication()
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class,
         FrameworkCacheConfig.class, YunhuniApiConfig.class,
         YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class})
@@ -29,16 +29,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class OpensipsMain extends AbstractSpringBootStarter {
 
 
-    private static final String systemId = "app.opensips";
+    private static final String systemId = "app.opensips.proxy";
     static {
         System.setProperty("systemId",systemId);
     }
 
     public static void main(String[] args) {
         System.setProperty(Constants.DUBBO_PROPERTIES_KEY,"config.properties");
-        SpringApplication app = new SpringApplication(OpensipsMain.class);
-        app.setWebEnvironment(false);
-        app.run(args);
+        SpringApplication.run(OpensipsMain.class);
     }
 
     @Override

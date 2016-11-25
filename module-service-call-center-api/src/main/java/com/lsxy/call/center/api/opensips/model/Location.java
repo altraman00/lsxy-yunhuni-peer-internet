@@ -32,8 +32,7 @@ public class Location {
 
     @Id
     @Column(name="contact_id")
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "com.lsxy.framework.api.base.CustomUUIDGenerator")
+    @GeneratedValue(generator = "native")
     public Long getContactId() {
         return contactId;
     }

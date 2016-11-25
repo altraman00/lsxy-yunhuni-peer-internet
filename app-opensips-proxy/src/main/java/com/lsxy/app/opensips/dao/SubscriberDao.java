@@ -9,4 +9,5 @@ import java.io.Serializable;
  * Created by liups on 2016/11/25.
  */
 public interface SubscriberDao extends BaseDaoInterface<Subscriber, Serializable> {
+    Subscriber findByUsername(String username);
 }

@@ -1,9 +1,6 @@
 package com.lsxy.call.center.api.opensips.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by liups on 2016/11/24.
@@ -20,8 +17,20 @@ public class Subscriber {
     private String ha1b;
     private String rpid;
 
+    public Subscriber() {
+    }
+
+    public Subscriber(String username, String domain, String password, String ha1, String ha1b) {
+        this.username = username;
+        this.domain = domain;
+        this.password = password;
+        this.ha1 = ha1;
+        this.ha1b = ha1b;
+    }
+
     @Id
     @Column(name="id")
+    @GeneratedValue(generator = "native")
     public Integer getId() {
         return id;
     }
