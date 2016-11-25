@@ -4,6 +4,7 @@ import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.*;
 import com.lsxy.call.center.states.state.AgentState;
 import com.lsxy.call.center.states.state.ExtensionState;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
@@ -54,7 +55,11 @@ public class InitDevData {
             channel.setTenantId("8a2bc5f65721aa16015722256ba00007");
             channel.setAppId("8a2bc5f65721aa160157222c8477000b");
             channel.setRemark("通道1");
-            channel = channelService.save(channel);
+            try {
+                channel = channelService.save("8a2bc5f65721aa16015722256ba00007","8a2bc5f65721aa160157222c8477000b",channel);
+            } catch (YunhuniApiException e) {
+                e.printStackTrace();
+            }
         }
 
         String skill_prefix = UUIDGenerator.uuid();
@@ -102,7 +107,11 @@ public class InitDevData {
         condition.setQueueTimeout(33);
         condition.setFetchTimeout(45);
         condition.setRemark("条件1");
-        condition = conditionService.save(condition);
+        try {
+            condition = conditionService.save(channel.getTenantId(),channel.getAppId(),condition);
+        } catch (YunhuniApiException e) {
+            e.printStackTrace();
+        }
     }
 }
 
