@@ -1,8 +1,10 @@
 package com.lsxy.app.backend;
 
+import com.lsxy.call.center.api.CallCenterApiConfig;
 import com.lsxy.framework.FrameworkServiceConfig;
 import com.lsxy.framework.api.FrameworkApiConfig;
 import com.lsxy.framework.cache.FrameworkCacheConfig;
+import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
@@ -19,7 +21,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  */
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
 @EnableScheduling
-@Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class})
+@Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class,
+        FrameworkMonitorConfig.class,CallCenterApiConfig.class})
+@EnableDubboConfiguration
 public class MainClass extends AbstractSpringBootWebStarter {
     private static final String systemId = "app.backend";
     static {
