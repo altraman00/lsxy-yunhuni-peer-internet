@@ -52,10 +52,10 @@
             <groupId>com.lsxy</groupId>
             <artifactId>module-service-api</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.lsxy</groupId>-->
-            <!--<artifactId>module-framework-sms</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-sms</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-mail</artifactId>

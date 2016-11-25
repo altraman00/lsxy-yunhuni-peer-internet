@@ -29,7 +29,7 @@ public class ExtensionRegisterImitator {
     @Autowired
     RedisCacheService redisCacheService;
 
-    @Scheduled(cron="0 0 2 1 * ? ")
+    @Scheduled(cron="0 0/5 * * * ? ")
     public void month(){
         Date date=new Date();
         String month = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm");

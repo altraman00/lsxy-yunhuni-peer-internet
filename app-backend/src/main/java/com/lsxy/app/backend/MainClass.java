@@ -12,14 +12,13 @@ import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Created by Tandy on 2016/6/13.
  */
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@SpringBootApplication()
 @EnableScheduling
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class,
         FrameworkMonitorConfig.class,CallCenterApiConfig.class})
@@ -32,7 +31,9 @@ public class MainClass extends AbstractSpringBootStarter {
 
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(MainClass.class, args);
+        SpringApplication app = new SpringApplication(MainClass.class);
+        app.setWebEnvironment(false);
+        app.run(args);
     }
 
     @Override
