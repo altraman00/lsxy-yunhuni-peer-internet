@@ -73,6 +73,9 @@ then
    exit 1;
 fi
 
+echo $MAVEN_OPTS
+
+
 cd $YUNHUNI_HOME
 git remote prune origin
 #更新代码和安装模块组件
