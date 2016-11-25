@@ -78,7 +78,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
-        stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+        //stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         Map<String,Object> businessData = state.getBusinessData();
         if(businessData == null){
             businessData = new HashMap<>();
