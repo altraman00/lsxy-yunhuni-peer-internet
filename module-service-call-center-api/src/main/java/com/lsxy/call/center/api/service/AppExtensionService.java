@@ -19,7 +19,7 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @return
      * @throws YunhuniApiException
      */
-    String register(AppExtension appExtension) throws YunhuniApiException;
+    AppExtension create(AppExtension appExtension) throws YunhuniApiException;
 
     /**
      * 分机登录
@@ -63,4 +63,10 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @return
      */
     AppExtension findOne(String appId, String extensionId);
+
+    /**
+     * 分机注册
+     * @param extensionId
+     */
+    void register(String extensionId);
 }

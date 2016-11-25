@@ -69,6 +69,11 @@ public interface AppService extends BaseService<App> {
      */
     List<App> getAppsByTenantId(String tenantId);
 
+    /**
+     * 创建应用
+     * @param app
+     */
+    App create(App app);
 
     /**
      * 获取分机注册信息

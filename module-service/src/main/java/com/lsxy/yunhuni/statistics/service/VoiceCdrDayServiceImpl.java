@@ -50,7 +50,10 @@ public class VoiceCdrDayServiceImpl extends AbstractService<VoiceCdrDay> impleme
 
     @Override
     public List<VoiceCdrDay> list(String tenantId, String appId,String type,Date startTime, Date endTime) {
-        String[] types = {type};
+        String[] types = null;
+        if(type!=null){
+            types = new String[]{type};
+        }
         if(App.PRODUCT_CALL_CENTER.equals(type)){
             types = CallSession.PRODUCT_CODE;
         }

@@ -6,21 +6,32 @@ import com.lsxy.call.center.dao.CallCenterConversationMemberDao;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
- * Created by liuws on 2016/11/18.
+ * Created by zhangxb on 2016/11/11.
  */
 @Service
 @com.alibaba.dubbo.config.annotation.Service
 public class CallCenterConversationMemberServiceImpl extends AbstractService<CallCenterConversationMember> implements CallCenterConversationMemberService {
-
     @Autowired
-    private CallCenterConversationMemberDao callCenterConversationMemberDao;
+    CallCenterConversationMemberDao callCenterConversationMemberDao;
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     @Override
     public BaseDaoInterface<CallCenterConversationMember, Serializable> getDao() {
-        return callCenterConversationMemberDao;
+        return this.callCenterConversationMemberDao;
     }
+
+    @Override
+    public List<String> getListBySessionId(String sessionId) {
+        String sql = "SELECT DISTINCT relevance_id FROM db_lsxy_bi_yunhuni.tb_bi_call_center_conversation_member  WHERE deleted=0 AND session_id=? ";
+        return jdbcTemplate.queryForList(sql,String.class,sessionId);
+    }
+
+
 }

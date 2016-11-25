@@ -125,4 +125,6 @@ public interface TenantService extends BaseService<Tenant> {
      * @return
      */
     Map getAwaitNum();
+
+    List<Tenant> getListByPage();
 }

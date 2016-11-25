@@ -49,6 +49,10 @@ public class ServiceConstants {
 
 	public static final String MN_CH_VF_SYNC = "MN_CH_VF_SYNC";		//放音文件同步指令
 	public static final String MN_CH_VF_SYNC_OK = "MN_CH_VF_SYNC_OK";		//放音文件同步成功指令
-	public static final String MN_CH_VF_DELETED = "MN_CH_VF_DELETED";		//放音文件同步指令
-	public static final String MN_CH_VF_DELETED_OK = "MN_CH_VF_DELETED_OK";		//放音文件同步成功指令
+	public static final String MN_CH_VF_DELETED = "MN_CH_VF_DELETED";		//放音文件删除指令
+	public static final String MN_CH_VF_DELETED_OK = "MN_CH_VF_DELETED_OK";		//放音文件删除成功指令
+	public static final String MN_CH_RF_SYNC = "MN_CH_RF_SYNC";//录音文件同步指令
+	public static final String MN_CH_RF_SYNC_OK = "MN_CH_RF_SYNC_OK";		//录音文件同步成功指令
+	public static final String MN_CH_RF_DELETED = "MN_CH_RF_DELETED";		//录音文件删除指令
+	public static final String MN_CH_RF_DELETED_OK = "MN_CH_RF_DELETED_OK";		//录音文件删除成功指令
 }
