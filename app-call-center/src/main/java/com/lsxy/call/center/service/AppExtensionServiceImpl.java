@@ -1,6 +1,8 @@
 package com.lsxy.call.center.service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.call.center.api.opensips.service.OpensipsService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.states.state.ExtensionState;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -44,6 +47,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     ExtensionState extensionState;
     @Autowired
     AppService appService;
+    @Reference(timeout=3000,check = false,lazy = true)
+    private OpensipsService opensipsService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -96,6 +101,10 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         }
 
         this.save(appExtension);
+        if(AppExtension.TYPE_SIP.equals(appExtension.getType())){
+            //TODO 分机opensips注册
+//            opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
+        }
         //TODO 初始化状态状态
         extensionState.setLastRegisterStatus(appExtension.getId(),200);
 
@@ -141,18 +150,22 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     public void delete(String extensionId, String appId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
-            try {
-                String agent = extensionState.getAgent(extensionId);
-                if(StringUtils.isBlank(agent)){
+            String agent = extensionState.getAgent(extensionId);
+            if(StringUtils.isBlank(agent)){
+                try {
                     this.delete(extension);
-                    redisCacheService.del(extensionId);
-                }else{
-                    throw new ExtensionBindingToAgentException();
+                } catch (Exception e) {
+                    logger.error("删除分机失败:{}",extensionId);
+                    logger.error("删除分机失败",e);
+                    throw new RequestIllegalArgumentException();
                 }
-            } catch (Exception e) {
-                logger.error("删除分机失败:{}",extensionId);
-                logger.error("删除分机失败",e);
-                throw new RequestIllegalArgumentException();
+                if(AppExtension.TYPE_SIP.equals(extension.getType())){
+                    //TODO 分机opensips删除
+//                        opensipsService.deleteExtension(extension.getUser());
+                }
+                redisCacheService.del(extensionId);
+            }else{
+                throw new ExtensionBindingToAgentException();
             }
         }else{
             throw new RequestIllegalArgumentException();
