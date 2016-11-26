@@ -42,6 +42,7 @@ for i=1,cas_size do
         redis.log(redis.LOG_WARNING,extension['lastRegisterTime'])
         redis.log(redis.LOG_WARNING,extension['registerExpires'])
         if(extension and extension['lastRegisterStatus']
+                and extension['lastRegisterTime'] and extension['registerExpires']
                 and (extension['lastRegisterTime'] + extension['registerExpires']) >= cur_time)
         then
             result = agent_id
