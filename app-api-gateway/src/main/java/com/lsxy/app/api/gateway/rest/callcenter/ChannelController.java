@@ -35,7 +35,7 @@ public class ChannelController extends AbstractAPIController {
     @Autowired
     private AppService appService;
 
-    @Autowired
+    @Reference(timeout=3000,check = false,lazy = true)
     private ConditionService conditionService;
 
     @RequestMapping(value = "/{accountId}/callcenter/channel",method = RequestMethod.POST)
