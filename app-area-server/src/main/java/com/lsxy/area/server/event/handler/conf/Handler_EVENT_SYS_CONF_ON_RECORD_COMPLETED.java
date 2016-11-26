@@ -5,6 +5,8 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.agentserver.RecordCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -37,6 +39,9 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
+    @Autowired
+    private MQService mqService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_RECORD_COMPLETED;
@@ -67,6 +72,17 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
         if(logger.isDebugEnabled()){
             logger.info("conf_id={},state={}",conf_id,state);
         }
+
+        try{
+            mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
+                    state.getType(),(String)params.get("record_file"),
+                    Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
+            ));
+        }catch (Throwable t){
+            logger.info("发布RecordCompletedEvent失败,state={},params={}",state,params);
+            logger.error("发布RecordCompletedEvent失败",t);
+        }
+
         if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
             conversation(state,params,conf_id);
         }else{
@@ -100,7 +116,6 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
                     .putIfNotEmpty("id",conf_id)
                     .putIfNotEmpty("begin_time",begin_time)
                     .putIfNotEmpty("end_time",end_time)
-                    .putIfNotEmpty("record_file",null)
                     .putIfNotEmpty("user_data",user_data)
                     .build();
 

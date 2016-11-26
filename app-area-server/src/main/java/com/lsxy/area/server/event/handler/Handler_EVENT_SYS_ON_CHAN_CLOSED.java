@@ -101,9 +101,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setType(productCode.name());
 
         voiceCdr.setRelevanceId(businessState.getId());
-        //TODO 录音文件路径跟大小
-        voiceCdr.setRecordUrl(null);
-        voiceCdr.setRecordSize(null);
+
         voiceCdr.setFromNum(cdrSplit[7].trim());
         voiceCdr.setToNum(cdrSplit[8].trim());
         voiceCdr.setCallStartDt(getCallDate(cdrSplit[18].trim()));

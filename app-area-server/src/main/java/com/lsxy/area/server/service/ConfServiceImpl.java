@@ -6,6 +6,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
@@ -508,8 +509,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
-                //TODO 文件名如何定
-                .putIfNotEmpty("record_file",UUIDGenerator.uuid())
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(app.getTenant().getId(),appId))
                 .putIfNotEmpty("user_data",confId)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
