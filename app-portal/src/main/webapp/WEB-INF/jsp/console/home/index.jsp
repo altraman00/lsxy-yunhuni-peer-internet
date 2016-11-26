@@ -35,10 +35,10 @@
                                     }
                                 });
                             }
-                            //                        marqueeContent[0]="<span >壹云有新的讯息1</span>";
-                            //                        marqueeContent[1]="<span >壹云有新的讯息2</span>";
-                            //                        marqueeContent[2]="<span >壹云有新的讯息3壹云有新的讯息3</span>";
-                            //                        marqueeContent[3]="<span >壹云有新的讯息4</span>";
+                            //                        marqueeContent[0]="<span >壹耘有新的讯息1</span>";
+                            //                        marqueeContent[1]="<span >壹耘有新的讯息2</span>";
+                            //                        marqueeContent[2]="<span >壹耘有新的讯息3壹耘有新的讯息3</span>";
+                            //                        marqueeContent[3]="<span >壹耘有新的讯息4</span>";
                             var marqueeInterval=new Array();
                             var marqueeId=0;
                             var marqueeDelay=2000;
@@ -614,8 +614,8 @@
                 data:['话务量', '消费额']
             },
             grid: {
-                left: '0%',
-                right: '0%',
+                left: '15px',
+                right: '15px',
                 bottom: '3%',
                 containLabel: true
             },
@@ -702,10 +702,15 @@
                 data:['会话量']
             },
             grid: {
-                left: '0%',
+                left: '15px',
                 right: '3%',
                 bottom: '3%',
                 containLabel: true
+            },
+            dataZoom: {
+                show: false,
+                start: 0,
+                end: 100
             },
             toolbox: {
                 feature: {
@@ -713,12 +718,14 @@
             },
             xAxis: {
                 type: 'category',
-                boundaryGap: false,
+                boundaryGap: [0.2, 0.2],
                 data : Xdata
             },
             yAxis: {
                 type: 'value',
-                name: '  会话量(次)',
+                min: 0,
+                name: '     会话量(次)',
+                boundaryGap: [0.2, 0.2]
             },
             series: [
                 {
@@ -753,7 +760,7 @@
                 data:['api调用次数']
             },
             grid: {
-                left: '0%',
+                left: '15px',
                 right: '3%',
                 bottom: '3%',
                 containLabel: true
@@ -766,10 +773,13 @@
                 type: 'category',
                 boundaryGap: false,
                 data : Xdata,
+                boundaryGap: [0.2, 0.2]
             },
             yAxis: {
                 type: 'value',
-                name: '次数(次)'
+                name: '     次数(次)',
+                min: 0,
+                boundaryGap: [0.2, 0.2]
             },
             series: [
                 {

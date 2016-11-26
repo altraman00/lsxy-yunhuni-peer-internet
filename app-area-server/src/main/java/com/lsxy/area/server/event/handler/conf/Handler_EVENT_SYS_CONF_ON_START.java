@@ -6,9 +6,9 @@ import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -151,7 +151,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        ifAutoRecording(state.getAreaId(),businessData,res_id,conf_id);
+        ifAutoRecording(state,state.getAreaId(),businessData,res_id,conf_id);
         Meeting meeting = meetingService.findById(conf_id);
         if(meeting != null){
             meeting.setResId(res_id);
@@ -161,11 +161,12 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
     }
     /**
      * 创建会议是否自动录音
+     * @param state
      * @param businessData
      * @param res_id
      * @param conf_id
      */
-    private void ifAutoRecording(String areaId,Map<String,Object> businessData,String res_id,String conf_id){
+    private void ifAutoRecording(BusinessState state, String areaId, Map<String, Object> businessData, String res_id, String conf_id){
         if(businessData == null){
             return;
         }
@@ -176,8 +177,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
                 .putIfNotEmpty("max_seconds",businessData.get("max_seconds"))
-                //TODO 文件名如何定
-                .putIfNotEmpty("record_file", UUIDGenerator.uuid())
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
                 .putIfNotEmpty("user_data",conf_id)
                 .put("areaId",areaId)
                 .build();

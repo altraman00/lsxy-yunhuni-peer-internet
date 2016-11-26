@@ -26,7 +26,7 @@
         <a a href="#" onclick="window.open('${globalOfficialWebsiteUrl}')">
         <img class="logo" src="${resPrefixUrl}/images/index/logo_top.png"/></a>
         <div class="text">
-            如果有壹云账号，<a href="${host}/login">立即登录</a>
+            如果有壹耘账号，<a href="${host}/login">立即登录</a>
         </div>
     </div>
 </div>
@@ -37,7 +37,7 @@
             <br/>
             <p>你好！</p>
             </br>
-            <p>您于${date}变更了壹云账号绑定邮箱，点击以下链接，即可激活该邮箱：</p>
+            <p>您于${date}变更了壹耘账号绑定邮箱，点击以下链接，即可激活该邮箱：</p>
             <br/>
             <a href="${host}/modify/email?id=${id}&code=${code}" target="_blank">${host}/modify/email?id=${id}&code=${code}</a>
             <br/>
@@ -50,7 +50,7 @@
             <br/>
             <br/>
             <br/>
-            <p>壹云团队</p>
+            <p>壹耘团队</p>
             <p>${date}</p>
         </div>
     </div>
@@ -58,7 +58,7 @@
 <!--/container -->
 <!--footer-->
 <div class="register_footer">
-    <p>Copyright 2016 壹云 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
+    <p>Copyright 2016 壹耘 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
 </div>
 <!--/footer-->
 

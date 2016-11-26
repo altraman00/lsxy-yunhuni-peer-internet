@@ -8,6 +8,7 @@ import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil;
@@ -201,8 +202,7 @@ public class CallServiceImpl implements CallService {
         }
         //录音
         if(recording != null && recording){
-            //TODO 录音文件名称
-            params.put("record_file ",duocCallId);
+            params.put("record_file ", RecordFileUtil.getRecordFileUrl(app.getTenant().getId(),appId));
             params.put("record_mode",record_mode);
             params.put("record_format ",1);
         }
