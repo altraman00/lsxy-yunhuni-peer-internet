@@ -298,4 +298,19 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
         map.put("voiceFilePlay",voiceFilePlay);
         return map;
     }
+
+    @Override
+    public List<Tenant> getListByPage() {
+        List<Tenant> list = new ArrayList();
+        Page page = this.pageList(1,20);
+        if(page!=null){
+            list.addAll(page.getResult());
+            if(page.getCurrentPageNo()<page.getTotalPageCount()){
+                int index = Integer.valueOf(page.getCurrentPageNo()+"");
+                page = this.pageList(index,20);
+                list.addAll(page.getResult());
+            }
+        }
+        return list;
+    }
 }

@@ -72,6 +72,26 @@ public class OSSServiceImpl implements OSSService{
     }
 
     @Override
+    public boolean uploadFileLocal(File file, String repository, String fileKey, String contentType, String contentDisposition) throws Exception {
+        try {
+            OSSClient client = afb.getObject();
+            InputStream inputStream = new FileInputStream(file);
+            // 创建上传Object的Metadata
+            ObjectMetadata meta = new ObjectMetadata();
+            // 设置上传文件长度
+            meta.setContentLength(file.length());
+            // 设置上传内容类型
+            meta.setContentType(contentType);
+            meta.setContentDisposition(contentDisposition);
+            client.putObject(repository, fileKey, inputStream,meta);
+        }catch(Exception ex){
+            logger.error("上传文件异常",ex);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public InputStream getFileStream(String repository, String fileKey) throws Exception {
         OSSClient client = afb.getObject();
         // 获取Object，返回结果为OSSObject对象

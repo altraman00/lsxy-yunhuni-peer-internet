@@ -7,6 +7,7 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * 录音文件
@@ -29,6 +30,33 @@ public class VoiceFileRecord extends IdEntity {
     private Integer status; //文件是否已同步:1已同步0未同步-1同步失败
     private Integer ossDeleted;//oss文件删除状态 1 已删除，-1删除失败
     private Integer aaDeleted;//区域文件删除状态 1 已删除，-1删除失败
+    private BigDecimal cost;//消费金额
+    private Long callTimeLong;//'呼叫时长'
+    private Long costTimeLong;//'计费时长'
+    @Column(name="cost")
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
+    }
+    @Column(name="call_time_long")
+    public Long getCallTimeLong() {
+        return callTimeLong;
+    }
+    public void setCallTimeLong(Long callTimeLong) {
+        this.callTimeLong = callTimeLong;
+    }
+    @Column(name="cost_time_long")
+    public Long getCostTimeLong() {
+        return costTimeLong;
+    }
+
+    public void setCostTimeLong(Long costTimeLong) {
+        this.costTimeLong = costTimeLong;
+    }
+
     @Column(name="oss_deleted")
     public Integer getOssDeleted() {
         return ossDeleted;
@@ -106,15 +134,6 @@ public class VoiceFileRecord extends IdEntity {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
-    }
-
-    @Column(name="duration")
-    public Long getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Long duration) {
-        this.duration = duration;
     }
 
     @Column(name="oss_url")

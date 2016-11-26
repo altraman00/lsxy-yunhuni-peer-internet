@@ -80,8 +80,7 @@ public class OssTempUriUtils {
             }
         }
         System.out.println(sign);
-        String url = "";
-        url =  bucket + "." + host + "/" + object_name + "?OSSAccessKeyId=" + accessId + "&Expires=" + expireTime + "&Signature=" + OSSEncodeURI.encodeURIComponent(sign);
+        String url =  "http://"+bucket + "." + host + "/" + object_name + "?OSSAccessKeyId=" + accessId + "&Expires=" + expireTime + "&Signature=" + OSSEncodeURI.encodeURIComponent(sign);
         return url;
     }
     public static void main(String[] args){
@@ -89,7 +88,7 @@ public class OssTempUriUtils {
         String accessKey = "HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW";
         String host = "oss-cn-beijing.aliyuncs.com";
         String verb = "GET";
-        String resource = "/yunhuni-development/20150110_105112.jpg";
+        String resource = "/yunhuni-development/tenant_res/40288aca574060400157406339080002/realname_auth/20160919/f4d2f47874cc9af7e123ebca7810bf89.jpg";
         long expire = 20;
         String re = getOssTempUri(accessId,accessKey,host,verb,resource,expire);
         System.out.println(re);
