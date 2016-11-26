@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
@@ -149,22 +150,22 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     public void delete(String extensionId, String appId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
-            try {
-                String agent = extensionState.getAgent(extensionId);
-                if(StringUtils.isBlank(agent)){
+            String agent = extensionState.getAgent(extensionId);
+            if(StringUtils.isBlank(agent)){
+                try {
                     this.delete(extension);
-                    if(AppExtension.TYPE_SIP.equals(extension.getType())){
-                        //TODO 分机opensips删除
-//                        opensipsService.deleteExtension(extension.getUser());
-                    }
-                    redisCacheService.del(extensionId);
-                }else{
-                    throw new ExtensionBindingToAgentException();
+                } catch (Exception e) {
+                    logger.error("删除分机失败:{}",extensionId);
+                    logger.error("删除分机失败",e);
+                    throw new RequestIllegalArgumentException();
                 }
-            } catch (Exception e) {
-                logger.error("删除分机失败:{}",extensionId);
-                logger.error("删除分机失败",e);
-                throw new RequestIllegalArgumentException();
+                if(AppExtension.TYPE_SIP.equals(extension.getType())){
+                    //TODO 分机opensips删除
+//                        opensipsService.deleteExtension(extension.getUser());
+                }
+                redisCacheService.del(extensionId);
+            }else{
+                throw new ExtensionBindingToAgentException();
             }
         }else{
             throw new RequestIllegalArgumentException();
