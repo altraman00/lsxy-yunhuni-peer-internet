@@ -11,7 +11,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Random;
 
@@ -47,7 +46,7 @@ public class InitTestData {
     @Autowired
     private EnQueueService enQueueService;
 
-    @PostConstruct
+    //@PostConstruct
     public void test() throws InterruptedException {
         Channel channel = null;
         if(channel == null){
