@@ -202,7 +202,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         model.setLastRegisterStatus(200);
         model.setLastRegisterTime(System.currentTimeMillis());
         model.setRegisterExpires(expire);
-        extensionState.setAll(model);
+        extensionState.setAll(extensionId,model);
     }
 
 
