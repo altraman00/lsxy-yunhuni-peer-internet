@@ -24,7 +24,7 @@ import java.util.Date;
  * 用于测试环境前期模拟分机座席自动注册，可修改Profile,将其作用的环境修改
  * Created by liups on 2016/11/25.
  */
-@Profile("local")
+@Profile("test")
 @Component
 public class CallCenterRegisterImitator {
     private static final Logger logger = LoggerFactory.getLogger(CallCenterRegisterImitator.class);
@@ -37,7 +37,7 @@ public class CallCenterRegisterImitator {
     @Autowired
     RedisCacheService redisCacheService;
 
-    @Scheduled(cron="0 0/1 * * * ? ")
+    @Scheduled(cron="0 0/3 * * * ? ")
     public void extensionRegister(){
         Date date=new Date();
         String month = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm");
@@ -88,7 +88,7 @@ public class CallCenterRegisterImitator {
         });
     }
 
-    @Scheduled(cron="0 0/1 * * * ? ")
+    @Scheduled(cron="0 0/3 * * * ? ")
     public void agentRegister(){
         Date date=new Date();
         String month = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm");
