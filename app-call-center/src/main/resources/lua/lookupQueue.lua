@@ -42,6 +42,7 @@ then
     redis.log(redis.LOG_WARNING,extension['lastRegisterTime'])
     redis.log(redis.LOG_WARNING,extension['registerExpires'])
     if(extension and extension['lastRegisterStatus']
+            and extension['lastRegisterTime'] and extension['registerExpires']
             and (extension['lastRegisterTime'] + extension['registerExpires']) >= cur_time)
     then
         local ok = redis.call('setnx',agent_lock_key, '1')
