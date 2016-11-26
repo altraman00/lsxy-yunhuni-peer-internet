@@ -80,6 +80,7 @@ echo "停止现有服务...."
 ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 
+
 cd $YUNHUNI_HOME
 git remote prune origin
 #更新代码和安装模块组件
