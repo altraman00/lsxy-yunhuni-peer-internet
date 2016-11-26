@@ -9,28 +9,29 @@ import java.util.Map;
  * Created by zhangxb on 2016/11/22.
  */
 public enum PriceType {
-    type1(2,6,"6秒"),
-    type2(2,60,"60秒"),
-    type3(1,1,"条"),
-    type4(1,1,"个"),
-    type5(3,1,"月");
+    type1(2,6,"6秒","6秒"),
+    type2(2,60,"60秒","60秒"),
+    type3(1,1,"条","条"),
+    type4(1,1,"个","个"),
+    type5(3,1,"月","月");
 
     private Integer calType;    //1、按数量，2、按时长3、按月
     private Integer timeUnit;   //单位时长(单位秒)
     private String unit;   //单位
-
-    PriceType(Integer calType, Integer timeUnit, String unit) {
+    private String key;//
+    PriceType(Integer calType, Integer timeUnit, String unit,String key) {
         this.calType = calType;
         this.timeUnit = timeUnit;
         this.unit = unit;
+        this.key = key;
     }
     public static List getPriceTypeAll(){
         List list = new ArrayList<>();
         PriceType[] values = PriceType.values();
         for(PriceType value:values){
             Map map = new HashMap<>();
-            map.put("id",value.getUnit());
-            map.put("name",value.getUnit());
+            map.put("id",value.getKey());
+            map.put("name",value.getKey());
             list.add(map);
         }
         return list;
@@ -43,6 +44,10 @@ public enum PriceType {
             }
         }
         return null;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public Integer getCalType() {

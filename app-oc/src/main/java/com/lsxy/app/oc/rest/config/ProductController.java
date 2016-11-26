@@ -1,8 +1,11 @@
 package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
+import com.lsxy.app.oc.rest.config.vo.ProductEditVo;
+import com.lsxy.app.oc.rest.config.vo.ProductVo;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.product.enums.PriceType;
 import com.lsxy.yunhuni.api.product.model.Product;
 import com.lsxy.yunhuni.api.product.model.ProductPrice;
 import com.lsxy.yunhuni.api.product.model.ProductType;
@@ -18,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +38,12 @@ public class ProductController  extends AbstractRestController {
     ProductTypeService productTypeService;
     @Autowired
     ProductPriceService productPriceService;
-
+    @RequestMapping(value = "/price/type/list",method = RequestMethod.GET)
+    @ApiOperation(value = "获取计价单位")
+    public RestResponse priceTypeList(){
+        List list= PriceType.getPriceTypeAll();
+        return RestResponse.success(list);
+    }
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品数据")
     public RestResponse list(){
@@ -83,8 +92,13 @@ public class ProductController  extends AbstractRestController {
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
             @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize
     ){
-        Page page= productPriceService.getPageOrderCreate(pageNo,pageSize);
-        return RestResponse.success(page);
+        Page<ProductPrice> page= productPriceService.getPageOrderCreate(pageNo,pageSize);
+        List<ProductVo> tempList = new ArrayList<>();
+        for(int i=0;i<page.getResult().size();i++){
+            tempList.add(new ProductVo(page.getResult().get(i)));
+        }
+        Page page1 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),tempList);
+        return RestResponse.success(page1);
     }
     @RequestMapping(value = "price/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品费用单调记录")
@@ -95,18 +109,41 @@ public class ProductController  extends AbstractRestController {
         if(price==null){
             return RestResponse.failed("0000","id无对应记录");
         }
-        return RestResponse.success(price);
+        ProductVo productVo = new ProductVo(price);
+        return RestResponse.success(productVo);
     }
     @RequestMapping(value = "price/edit/{id}",method = RequestMethod.PUT)
     @ApiOperation(value = "修改产品费用")
     public RestResponse priceEdit(
-            @ApiParam(name = "id",value = "费用记录id")  @PathVariable String  id
+            @ApiParam(name = "id",value = "费用记录id")  @PathVariable String  id,@RequestBody ProductEditVo productEditVo
     ){
         ProductPrice price= productPriceService.findById(id);
         if(price==null){
             return RestResponse.failed("0000","id无对应记录");
         }
-        return RestResponse.success(price);
+        Product product = price.getProduct();
+        if(StringUtils.isNotEmpty(productEditVo.getProductTypeId())&&!product.getProductType().getId().equals(productEditVo.getProductTypeId())){
+            ProductType productType = productTypeService.findById(productEditVo.getProductTypeId());
+            if(productType != null){
+                product.setProductType(productType);
+            }
+        }
+        if(StringUtils.isNotEmpty(productEditVo.getPriceItem())){
+            product.setName(productEditVo.getPriceItem());
+
+        }
+        PriceType priceType = PriceType.getPriceTypeById(productEditVo.getUnit());
+        if(priceType==null){
+            return RestResponse.failed("0000","计价单位错误");
+        }
+        product =  productService.save(product);
+        price.setProduct(product);
+        price.setPrice(productEditVo.getPrice());
+        price.setTimeUnit(priceType.getTimeUnit());
+        price.setUnit(priceType.getUnit());
+        price.setCalType(priceType.getCalType());
+        productPriceService.save(price);
+        return RestResponse.success("修改成功");
     }
 
 }
