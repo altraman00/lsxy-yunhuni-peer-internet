@@ -107,6 +107,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     //登陆
     @Override
     public String login(CallCenterAgent agent) throws YunhuniApiException {
+        if(StringUtils.isBlank(agent.getState())){
+            agent.setState("online");
+        }
         try{
             channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
         }catch (IllegalArgumentException e){
