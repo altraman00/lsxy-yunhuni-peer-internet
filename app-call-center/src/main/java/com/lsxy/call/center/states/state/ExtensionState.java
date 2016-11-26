@@ -120,7 +120,7 @@ public class ExtensionState {
         redisCacheService.hput(getKey(extensionId),"registerExpires",registerExpires.toString());
     }
 
-    public void setAll(Model model){
+    public void setAll(String extensionId,Model model){
         Map<String,String> map = new HashMap();
         if(StringUtil.isNotBlank(model.getAgent())){
             map.put("agent", model.getAgent());
@@ -140,6 +140,7 @@ public class ExtensionState {
         if(model.getRegisterExpires() != null){
             map.put("registerExpires",model.getRegisterExpires().toString());
         }
+        redisCacheService.hputAll(extensionId,map);
     }
 
     public class Model implements Serializable {
