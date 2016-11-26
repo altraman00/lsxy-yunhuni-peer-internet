@@ -75,6 +75,10 @@ fi
 
 export MAVEN_OPTS="-Xms256m -Xmx512m"
 echo "MAVEN 构建参数：$MAVEN_OPTS"
+#先停止制定的APP服务
+echo "停止现有服务...."
+ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
+ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 
 cd $YUNHUNI_HOME
 git remote prune origin
@@ -104,10 +108,6 @@ if [ $? -ne 0 ];then
         exit 1
 fi
 
-#先停止制定的APP服务
-echo "停止现有服务...."
-ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
-ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 
 #启动服务脚本
 
