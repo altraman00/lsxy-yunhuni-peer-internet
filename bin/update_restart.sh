@@ -73,6 +73,14 @@ then
    exit 1;
 fi
 
+export MAVEN_OPTS="-Xms256m -Xmx512m"
+echo "MAVEN 构建参数：$MAVEN_OPTS"
+#先停止制定的APP服务
+echo "停止现有服务...."
+ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
+ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
+
+
 cd $YUNHUNI_HOME
 git remote prune origin
 #更新代码和安装模块组件
@@ -101,10 +109,6 @@ if [ $? -ne 0 ];then
         exit 1
 fi
 
-#先停止制定的APP服务
-echo "停止现有服务...."
-ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
-ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 
 #启动服务脚本
 
@@ -124,12 +128,14 @@ fi
 
 sleep 20;
 PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
-if [ $PROCESS_NUM -eq 1 ];
-    then
-        echo "start sucess"
-    else
-        echo "start fail"
-        exit 1
+if [ $IS_TOMCAT_DEPLOY = false ]; then
+    if [ $PROCESS_NUM -eq 1 ];
+        then
+            echo "start sucess"
+        else
+            echo "start fail"
+            exit 1
+    fi
 fi
 echo "OK";
 
