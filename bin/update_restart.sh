@@ -127,12 +127,14 @@ fi
 
 sleep 20;
 PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
-if [ $PROCESS_NUM -eq 1 ];
-    then
-        echo "start sucess"
-    else
-        echo "start fail"
-        exit 1
+if [ $IS_TOMCAT_DEPLOY = false ]; then
+    if [ $PROCESS_NUM -eq 1 ];
+        then
+            echo "start sucess"
+        else
+            echo "start fail"
+            exit 1
+    fi
 fi
 echo "OK";
 
