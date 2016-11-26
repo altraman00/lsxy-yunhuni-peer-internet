@@ -26,7 +26,7 @@ public class AppExtension extends IdEntity {
     private String user;//    user                 varchar(50) comment 'SIP注册用户名，全局唯一。格式是6到12位数字',
     private String password;//    password             varchar(50) comment 'SIP注册密码',
     private String secret;//    secret               varchar(100) comment '全局唯一的内部SIP登录地址获取密钥',
-    private String telenum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
+    private String telnum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
     private String ext;//    ext                  varchar(32) comment '分机短号（保留，不用）',
     private String did;//    did                  varchar(32) comment '分机直通号（保留，不用）',
     private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
@@ -81,13 +81,13 @@ public class AppExtension extends IdEntity {
         this.secret = secret;
     }
 
-    @Column(name = "telenum")
-    public String getTelenum() {
-        return telenum;
+    @Column(name = "telnum")
+    public String getTelnum() {
+        return telnum;
     }
 
-    public void setTelenum(String telenum) {
-        this.telenum = telenum;
+    public void setTelnum(String telnum) {
+        this.telnum = telnum;
     }
 
     @Column(name = "ext")

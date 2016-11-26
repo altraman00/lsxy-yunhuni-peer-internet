@@ -92,7 +92,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             case AppExtension.TYPE_TELPHONE:
                 appExtension.setUser(null);
                 appExtension.setPassword(null);
-                if(StringUtil.isBlank(appExtension.getTelenum()) ){
+                if(StringUtil.isBlank(appExtension.getTelnum()) ){
                     throw new RequestIllegalArgumentException();
                 }
                 break;
