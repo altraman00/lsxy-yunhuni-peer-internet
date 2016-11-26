@@ -1,18 +1,16 @@
-package com.lsxy.app.opensips.service;
+package com.lsxy.call.center.opensips.service;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.lsxy.app.opensips.dao.LocationDao;
-import com.lsxy.app.opensips.dao.SubscriberDao;
 import com.lsxy.call.center.api.opensips.model.Location;
 import com.lsxy.call.center.api.opensips.model.Subscriber;
 import com.lsxy.call.center.api.opensips.service.OpensipsService;
+import com.lsxy.call.center.opensips.dao.LocationDao;
+import com.lsxy.call.center.opensips.dao.SubscriberDao;
 import com.lsxy.framework.config.SystemConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.List;
 
 /**
@@ -31,7 +29,7 @@ public class OpensipsServiceImpl implements OpensipsService {
     public void createExtension(String username, String password) {
         String ha1 = DigestUtils.md5DigestAsHex((username + ":" + domain + ":" + password).getBytes());
         String ha1b = DigestUtils.md5DigestAsHex((username + "@" + domain + ":" + domain + ":" + password).getBytes());
-        Subscriber subscriber = new Subscriber(username,domain,password,ha1,ha1b);
+        Subscriber subscriber = new Subscriber(username,domain,password,"",ha1,ha1b);
         subscriberDao.save(subscriber);
     }
 
