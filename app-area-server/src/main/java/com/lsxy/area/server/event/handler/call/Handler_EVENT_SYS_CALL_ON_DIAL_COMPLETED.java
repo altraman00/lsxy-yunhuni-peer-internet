@@ -8,6 +8,7 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -184,8 +185,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 String schedule_play_file = (String) businessData.get("play_file");
                 Integer schedule_play_loop = (Integer) businessData.get("play_repeat");
                 if(recording!=null && recording){
-                    //TODO 录音文件名如何定
-                    record_file = "";
+                    record_file = RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId());
                 }
                 try {
                     schedule_play_file = playFileUtil.convert(state.getTenantId(),state.getAppId(),schedule_play_file);

@@ -7,6 +7,8 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.mq.api.MQService;
+import com.lsxy.framework.mq.events.agentserver.RecordCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -45,6 +47,8 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
     @Autowired
     private ConversationService conversationService;
 
+    @Autowired
+    private MQService mqService;
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_RECORD_COMPLETED;
@@ -73,6 +77,17 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
+
+        try{
+            mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
+                    state.getType(),(String)params.get("record_file"),
+                    Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
+            ));
+        }catch (Throwable t){
+            logger.info("发布RecordCompletedEvent失败,state={},params={}",state,params);
+            logger.error("发布RecordCompletedEvent失败",t);
+        }
+
         if(canDoivr(state,call_id)){
             ivr(state,params,call_id);
         }
