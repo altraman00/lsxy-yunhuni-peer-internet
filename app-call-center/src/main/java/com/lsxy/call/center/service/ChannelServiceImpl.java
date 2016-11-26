@@ -53,6 +53,8 @@ public class ChannelServiceImpl extends AbstractService<Channel> implements Chan
         if(!appService.enabledService(tenantId,appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
+        channel.setTenantId(tenantId);
+        channel.setAppId(appId);
         return super.save(channel);
     }
 
