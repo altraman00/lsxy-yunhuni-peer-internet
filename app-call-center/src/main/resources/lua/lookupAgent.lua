@@ -35,7 +35,7 @@ for i=1,cas_size do
     local agent = array_to_map(redis.call('HGETALL',agent_state_key_prefix..agent_id))
 	redis.log(redis.LOG_WARNING,agent['state'])
 	redis.log(redis.LOG_WARNING,agent['extension'])
-	redis.log(redis.LOG_WARNING,agent['lastRegTime'] + agent_reg_expire)
+	redis.log(redis.LOG_WARNING,agent['lastRegTime'])
 	if(agent and agent['state'] == idle
 		and agent['extension'] and agent['lastRegTime']
 			and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
@@ -44,7 +44,8 @@ for i=1,cas_size do
 		redis.log(redis.LOG_WARNING,extension['lastRegisterStatus'])
 		redis.log(redis.LOG_WARNING,extension['lastRegisterTime'])
 		redis.log(redis.LOG_WARNING,extension['registerExpires'])
-		if(extension and extension['lastRegisterStatus']
+		if(extension and extension['lastRegisterStatus'] and extension['lastRegisterTime']
+				and extension['registerExpires']
 				and (extension['lastRegisterTime'] + extension['registerExpires']) >= cur_time)
 		then
 			local ok = redis.call('setnx',agent_lock_key_prefix..agent_id, '1')
