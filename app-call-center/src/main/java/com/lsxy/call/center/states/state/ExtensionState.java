@@ -140,7 +140,7 @@ public class ExtensionState {
         if(model.getRegisterExpires() != null){
             map.put("registerExpires",model.getRegisterExpires().toString());
         }
-        redisCacheService.hputAll(extensionId,map);
+        redisCacheService.hputAll(getKey(extensionId),map);
     }
 
     public class Model implements Serializable {
