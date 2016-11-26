@@ -85,6 +85,12 @@
         <dependency>
             <groupId>com.lsxy</groupId>
             <artifactId>module-framework-dubbo</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
