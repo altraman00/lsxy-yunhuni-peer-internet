@@ -83,7 +83,7 @@ public class CallCenterRegisterImitator {
             try{
                 appExtensionService.register(ex.getId());
             }catch (Exception e){
-
+                logger.error("注册分机失败",e);
             }
         });
     }
@@ -134,7 +134,7 @@ public class CallCenterRegisterImitator {
             try {
                 callCenterAgentService.keepAlive(agent.getAppId(), agent.getName());
             } catch (Exception e) {
-
+                logger.error("座席保持失败",e);
             }
         });
     }

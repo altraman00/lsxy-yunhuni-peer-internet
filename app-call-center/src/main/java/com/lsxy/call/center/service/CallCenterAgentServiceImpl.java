@@ -107,6 +107,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     //登陆
     @Override
     public String login(CallCenterAgent agent) throws YunhuniApiException {
+        if(StringUtils.isBlank(agent.getState())){
+            agent.setState(AgentState.Model.STATE_ONLINE);
+        }
         try{
             channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
         }catch (IllegalArgumentException e){
@@ -188,9 +191,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 //TODO 设置座席条件
                 aCs.add(agentId,condition.getId(),condition.getPriority());
             });
-            //TODO 如果座席是空闲，触发座席找排队
-            if(agent.getState().contains("idle")){
-
+            //如果座席是空闲，触发座席找排队
+            if(agent.getState().contains(AgentState.Model.STATE_IDLE)){
+                enQueueService.lookupQueue(agent.getTenantId(),agent.getAppId(),null,agentId);
             }
             return agentId;
         }finally{
@@ -236,7 +239,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
             if(StringUtils.isNotBlank(state) && (state.contains(AgentState.Model.STATE_FETCHING)||state.contains(AgentState.Model.STATE_TALKING))){
                 if(force){
-                    //TODO 切断平台和座席之间的呼叫
+                    //TODO
                 }else{
                     // 座席正忙
                     throw new AgentIsBusyException();
@@ -374,6 +377,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public void state(String tanantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
+        if(logger.isDebugEnabled()){
+            logger.info("[{}][{}]agent={},state={}",tanantId,appId,agentId,state);
+        }
         AgentLock agentLock = new AgentLock(redisCacheService, agentId);
         boolean lock = agentLock.lock();
         if(!lock){
