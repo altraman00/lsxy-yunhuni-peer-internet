@@ -58,6 +58,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     @Reference
     private CallCenterAgentService callCenterAgentService;
 
+    @Autowired
+    private ConversationService conversationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_RELEASE;
@@ -135,6 +138,13 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
             if(StringUtils.isNotBlank(ivr_dial_call_id)){
                 hugup(ivr_dial_call_id,state.getAreaId());
+            }
+
+            if(conversationService.isCC(call_id)){
+                String conversation_id = (String)state.getBusinessData().get(ConversationService.CONVERSATION_FIELD);
+                if(conversation_id != null){
+                    conversationService.logicExit(conversation_id,call_id);
+                }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             String agentId = (String)state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
