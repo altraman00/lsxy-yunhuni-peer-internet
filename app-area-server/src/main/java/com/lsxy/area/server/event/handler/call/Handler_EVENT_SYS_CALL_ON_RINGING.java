@@ -77,6 +77,9 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
             Map<String,Object> businessData = state.getBusinessData();
             String conversation = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
             BusinessState conversationState = businessStateService.get(conversation);
+            if(logger.isDebugEnabled()){
+                logger.info("开始判断振铃前是否客户挂断了呼叫1:{}",conversationState);
+            }
             if(conversationState == null || conversationState.getClosed()){
                 conversationService.logicExit(conversation,state.getId());
                 return res;
@@ -85,6 +88,9 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                 String initiator = (String)conversationState.getBusinessData().get(ConversationService.INITIATOR_FIELD);
                 if(initiator != null){
                     BusinessState initiatorState = businessStateService.get(initiator);
+                    if(logger.isDebugEnabled()){
+                        logger.info("开始判断振铃前是否客户挂断了呼叫2:{}",initiatorState);
+                    }
                     if(initiatorState!=null && initiatorState.getClosed()){
                         conversationService.logicExit(conversation,state.getId());
                         return res;
