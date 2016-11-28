@@ -2,16 +2,22 @@ package com.lsxy.app.oc.rest.config;
 
 import com.lsxy.app.oc.base.AbstractRestController;
 import com.lsxy.app.oc.rest.config.vo.ProductEditVo;
+import com.lsxy.app.oc.rest.config.vo.ProductTenantDiscountEditVo;
+import com.lsxy.app.oc.rest.config.vo.ProductTenantDiscountVo;
 import com.lsxy.app.oc.rest.config.vo.ProductVo;
+import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.product.enums.PriceType;
 import com.lsxy.yunhuni.api.product.model.Product;
 import com.lsxy.yunhuni.api.product.model.ProductPrice;
 import com.lsxy.yunhuni.api.product.model.ProductItem;
+import com.lsxy.yunhuni.api.product.model.ProductTenantDiscount;
 import com.lsxy.yunhuni.api.product.service.ProductPriceService;
 import com.lsxy.yunhuni.api.product.service.ProductService;
 import com.lsxy.yunhuni.api.product.service.ProductItemService;
+import com.lsxy.yunhuni.api.product.service.ProductTenantDiscountService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,6 +44,10 @@ public class ProductController  extends AbstractRestController {
     ProductItemService productItemService;
     @Autowired
     ProductPriceService productPriceService;
+    @Autowired
+    TenantService tenantService;
+    @Autowired
+    ProductTenantDiscountService productTenantDiscountService;
     @RequestMapping(value = "/price/type/list/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取计价单位")
     public RestResponse priceTypeList(@ApiParam(name = "id",value = "产品计费项id")@PathVariable String id){
@@ -148,6 +158,69 @@ public class ProductController  extends AbstractRestController {
             productPriceService.save(price);
         }
         return RestResponse.success("修改成功");
+    }
+    @RequestMapping(value = "/discount/plist/{id}",method = RequestMethod.GET)
+    @ApiOperation(value = "获取租户价格配置分页数据")
+    public RestResponse discountPlist(
+            @ApiParam(name = "id",value = "租户id")  @PathVariable String  id,
+            @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
+            @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize
+    ){
+        Tenant tenant = tenantService.findById(id);
+        if(tenant==null){
+            return RestResponse.failed("0000","id无对应租户");
+        }
+        Page<ProductPrice> page= productPriceService.getPageOrderCreate(pageNo,pageSize);
+        List<ProductTenantDiscountVo> tempList = new ArrayList<>();
+        for(int i=0;i<page.getResult().size();i++){
+            ProductPrice price = page.getResult().get(i);
+            ProductTenantDiscount productTenantDiscount = productTenantDiscountService.findByProductIdAndTenantId(price.getProductItem().getId(),tenant.getId());
+            String discount = "";
+            if(productTenantDiscount != null){
+                discount = productTenantDiscount.getDiscount()+"";
+            }
+            String tempTimeUnit = "";
+            if(price.getTimeUnit()!=1){
+                tempTimeUnit = price.getTimeUnit()+"";
+            }
+            tempTimeUnit+=price.getUnit();
+            if("60秒".equals(tempTimeUnit)){
+                tempTimeUnit = "分钟";
+            }
+            tempList.add(new ProductTenantDiscountVo(price.getProductItem().getId(),price.getProductItem().getName()
+                    ,price.getPrice()+"元/"+tempTimeUnit,
+                    discount));
+        }
+        Page page1 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),tempList);
+        return RestResponse.success(page1);
+    }
+    @RequestMapping(value = "/discount/edit/{id}",method = RequestMethod.PUT)
+    @ApiOperation(value = "修改租户价格配置折扣")
+    public RestResponse discountEdit(
+            @ApiParam(name = "id",value = "租户id")  @PathVariable String  id,@RequestBody ProductTenantDiscountEditVo productTenantDiscountEditVo
+    ){
+        Tenant tenant = tenantService.findById(id);
+        if(tenant==null){
+            return RestResponse.failed("0000","id无对应租户");
+        }
+        if(productTenantDiscountEditVo!=null&&StringUtils.isNotEmpty(productTenantDiscountEditVo.getProductItemId())&&
+                productTenantDiscountEditVo.getDiscount()>=1&&productTenantDiscountEditVo.getDiscount()<=100){
+            ProductItem productItem= productItemService.findById(productTenantDiscountEditVo.getProductItemId());
+            if(productItem==null){
+                return RestResponse.failed("0000","计费项id无对应记录");
+            }
+            ProductTenantDiscount productTenantDiscount = productTenantDiscountService.findByProductIdAndTenantId(productItem.getId(),tenant.getId());
+            double discount = productTenantDiscountEditVo.getDiscount()/100.00;
+            if(productTenantDiscount==null){
+                productTenantDiscount = new ProductTenantDiscount(tenant.getId(),productItem.getId(),discount);
+            }else{
+                productTenantDiscount.setDiscount(discount);
+            }
+            productTenantDiscountService.save(productTenantDiscount);
+            return RestResponse.success("修改成功");
+        }else{
+            return RestResponse.failed("0000","参数错误");
+        }
     }
 
 }
