@@ -159,6 +159,10 @@ public class ConversationService {
         return CallCenterConversationMember.INITIATOR_FALSE;
     }
 
+    public boolean isInitiatorBool(String conversation,String callId){
+        return CallCenterConversationMember.INITIATOR_TRUE.equals(isInitiator(conversation, callId));
+    }
+
     public boolean isCC(String callId){
         if(StringUtils.isEmpty(callId)){
             return false;
