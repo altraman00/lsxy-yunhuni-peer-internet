@@ -188,6 +188,9 @@ public class EnQueueServiceImpl implements EnQueueService{
      */
     @Override
     public void lookupQueue(String tenantId, String appId,String conditionId, String agent){
+        if(logger.isDebugEnabled()){
+            logger.info("[{}][{}]开始坐席找排队agent={}",tenantId,appId,agent);
+        }
         String queueId = (String)redisCacheService.eval(Lua.LOKUPQUEUE,6,
             ACs.getKey(agent),AgentState.getKey(agent),
             ExtensionState.getPrefixed(),AgentLock.getKey(agent),
@@ -195,9 +198,15 @@ public class EnQueueServiceImpl implements EnQueueService{
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
             AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
             conditionId==null?"":conditionId);
+        if(logger.isDebugEnabled()){
+            logger.info("[{}][{}]坐席找排队结果agent={},queueId={}",tenantId,appId,queueId);
+        }
         if(queueId != null){
             //找到排队，修改排队状态
             CallCenterQueue queue = callCenterQueueService.findById(queueId);
+            if(logger.isDebugEnabled()){
+                logger.info("[{}][{}]坐席找排队结果agent={},queue={}",tenantId,appId,queue);
+            }
             if(queue != null){
                 try{
                     queue.setResult(CallCenterQueue.RESULT_SELETEED);

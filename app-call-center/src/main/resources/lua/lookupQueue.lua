@@ -80,12 +80,16 @@ for i = 1, aCs_size do
         redis.log(redis.LOG_WARNING,ok)
         if ok == 1 then
             redis.call('HSET',agent_state_key,'state',fetching)
-            result = cQs[j]
             redis.call('ZREM',cQs_key,result)
             redis.call('DEL', q_lock_key)
+            redis.call('DEL',agent_lock_key)
+            result = cQs[j]
             return result
         end
     end
+end
+if result == nil then
+    redis.call('DEL',agent_lock_key)
 end
 
 return result
