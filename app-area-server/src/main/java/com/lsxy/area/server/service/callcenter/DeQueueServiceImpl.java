@@ -79,12 +79,15 @@ public class DeQueueServiceImpl implements DeQueueService {
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
+        String conversation = UUIDGenerator.uuid();
+
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
         Map<String,Object> businessData = state.getBusinessData();
         if(businessData == null){
             businessData = new HashMap<>();
             state.setBusinessData(businessData);
         }
+        businessData.put(ConversationService.CONVERSATION_FIELD,conversation);
         businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
         businessStateService.save(state);
 
@@ -94,7 +97,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         boolean playNum = enQueue.isPlay_num();
         String preNumVoice = enQueue.getPre_num_voice();
         String postNumVoice = enQueue.getPost_num_voice();
-        String conversation = UUIDGenerator.uuid();
+
         String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
