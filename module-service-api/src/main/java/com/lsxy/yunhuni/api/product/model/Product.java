@@ -15,7 +15,6 @@ import javax.persistence.*;
 public class Product extends IdEntity {
     public static int CAL_TYPE_NUM = 1;
     public static int CAL_TYPE_TIME = 2;
-    private ProductType productType;//所属产品类别
     private String name;    //产品名称
     private String code;    //一次写入，不可修改，涉及到编程
     private Integer calType;    //1、按数量，2、按时长
@@ -23,15 +22,6 @@ public class Product extends IdEntity {
     private String unit;   //单位
     private String remark;
     private Integer status;//是否可用1是0否
-    @OneToOne
-    @JoinColumn(name = "product_type_id")
-    public ProductType getProductType() {
-        return productType;
-    }
-
-    public void setProductType(ProductType productType) {
-        this.productType = productType;
-    }
     @Column(name = "status")
     public Integer getStatus() {
         return status;

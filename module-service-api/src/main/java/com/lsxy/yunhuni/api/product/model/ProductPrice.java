@@ -17,7 +17,7 @@ public class ProductPrice extends IdEntity {
     public static int STATUS_VALID = 1;
     public static int STATUS_INVALID = 0;
 
-    private Product product;    //产品
+    private ProductItem productItem;    //产品
     private BigDecimal price;   //单价
     private Integer status;     //1启用，0未启用
     private Integer priority;   //优先级，数字大的优先
@@ -50,17 +50,15 @@ public class ProductPrice extends IdEntity {
     public void setUnit(String unit) {
         this.unit = unit;
     }
-
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    public Product getProduct() {
-        return product;
+    @JoinColumn(name = "product_item_id")
+    public ProductItem getProductItem() {
+        return productItem;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductItem(ProductItem productItem) {
+        this.productItem = productItem;
     }
-
     @Column(name = "price")
     public BigDecimal getPrice() {
         return price;

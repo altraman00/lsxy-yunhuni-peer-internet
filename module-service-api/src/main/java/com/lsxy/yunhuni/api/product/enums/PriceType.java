@@ -25,6 +25,19 @@ public enum PriceType {
         this.unit = unit;
         this.key = key;
     }
+    public static List getPriceTypeAllByCalType(Integer calType){
+        List list = new ArrayList<>();
+        PriceType[] values = PriceType.values();
+        for(PriceType value:values){
+            if(calType==value.getCalType()) {
+                Map map = new HashMap<>();
+                map.put("id", value.getKey());
+                map.put("name", value.getKey());
+                list.add(map);
+            }
+        }
+        return list;
+    }
     public static List getPriceTypeAll(){
         List list = new ArrayList<>();
         PriceType[] values = PriceType.values();

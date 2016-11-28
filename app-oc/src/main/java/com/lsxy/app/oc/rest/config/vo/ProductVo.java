@@ -20,9 +20,9 @@ public class ProductVo {
     public ProductVo(ProductPrice productPrice) {
         this.id = productPrice.getId();
         this.createTime = productPrice.getCreateTime();
-        this.priceItem = productPrice.getProduct().getName();
-        this.priceKey = productPrice.getProduct().getCode();
-        this.productType = productPrice.getProduct().getProductType().getName();
+        this.priceItem = productPrice.getProductItem().getName();
+        this.priceKey = productPrice.getProductItem().getCode();
+        this.productType = productPrice.getProductItem().getProduct().getName();
         this.price = productPrice.getPrice();
         this.unit = productPrice.getTimeUnit()+productPrice.getUnit();
     }

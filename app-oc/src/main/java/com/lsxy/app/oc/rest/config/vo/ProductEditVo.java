@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 public class ProductEditVo {
     @ApiModelProperty(name="priceItem",value = "计费项")
     private String priceItem;//计费项
-    @ApiModelProperty(name="productTypeId",value = "归属产品标志")
-    private String productTypeId;//
+    @ApiModelProperty(name="productId",value = "归属产品标志")
+    private String productId;//
     @ApiModelProperty(name="price",value = "价格")
     private BigDecimal price;//
     @ApiModelProperty(name="unit",value = "计价单位")
@@ -27,12 +27,12 @@ public class ProductEditVo {
         this.priceItem = priceItem;
     }
 
-    public String getProductTypeId() {
-        return productTypeId;
+    public String getProductId() {
+        return productId;
     }
 
-    public void setProductTypeId(String productTypeId) {
-        this.productTypeId = productTypeId;
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 
     public BigDecimal getPrice() {

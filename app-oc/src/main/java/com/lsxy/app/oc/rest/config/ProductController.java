@@ -8,10 +8,10 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.product.enums.PriceType;
 import com.lsxy.yunhuni.api.product.model.Product;
 import com.lsxy.yunhuni.api.product.model.ProductPrice;
-import com.lsxy.yunhuni.api.product.model.ProductType;
+import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.product.service.ProductPriceService;
 import com.lsxy.yunhuni.api.product.service.ProductService;
-import com.lsxy.yunhuni.api.product.service.ProductTypeService;
+import com.lsxy.yunhuni.api.product.service.ProductItemService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -35,19 +35,23 @@ public class ProductController  extends AbstractRestController {
     @Autowired
     ProductService productService;
     @Autowired
-    ProductTypeService productTypeService;
+    ProductItemService productItemService;
     @Autowired
     ProductPriceService productPriceService;
-    @RequestMapping(value = "/price/type/list",method = RequestMethod.GET)
+    @RequestMapping(value = "/price/type/list/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取计价单位")
-    public RestResponse priceTypeList(){
-        List list= PriceType.getPriceTypeAll();
+    public RestResponse priceTypeList(@ApiParam(name = "id",value = "产品计费项id")@PathVariable String id){
+        ProductPrice price= productPriceService.findById(id);
+        if(price==null){
+            return RestResponse.failed("0000","id无对应记录");
+        }
+        List list= PriceType.getPriceTypeAllByCalType(price.getCalType());
         return RestResponse.success(list);
     }
     @RequestMapping(value = "/list",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品数据")
     public RestResponse list(){
-        List list= (List)productTypeService.list();
+        List list= (List)productService.list();
         return RestResponse.success(list);
     }
     @RequestMapping(value = "/plist",method = RequestMethod.GET)
@@ -56,7 +60,7 @@ public class ProductController  extends AbstractRestController {
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
             @ApiParam(name = "pageSize",value = "每页记录数")  @RequestParam(defaultValue = "20")Integer pageSize
     ){
-        Page page= productTypeService.pageList(pageNo,pageSize);
+        Page page= productService.pageList(pageNo,pageSize);
         return RestResponse.success(page);
     }
     @ApiOperation(value = "启用产品")
@@ -64,12 +68,12 @@ public class ProductController  extends AbstractRestController {
     public RestResponse enabled(
             @ApiParam(name = "id",value = "产品id")
             @PathVariable String id){
-        ProductType product = productTypeService.findById(id);
+        Product product = productService.findById(id);
         if(product==null|| StringUtils.isEmpty(product.getId())){
             return RestResponse.failed("0000","产品不存在");
         }
         product.setStatus(1);
-        productTypeService.save(product);
+        productService.save(product);
         return RestResponse.success("启用产品成功");
     }
     @ApiOperation(value = "禁用产品")
@@ -77,12 +81,12 @@ public class ProductController  extends AbstractRestController {
     public RestResponse disabled(
             @ApiParam(name = "id",value = "产品id")
             @PathVariable String id) {
-        ProductType product = productTypeService.findById(id);
+        Product product = productService.findById(id);
         if (product == null || StringUtils.isEmpty(product.getId())) {
             return RestResponse.failed("0000", "产品不存在");
         }
         product.setStatus(0);
-        productTypeService.save(product);
+        productService.save(product);
         return RestResponse.success("禁用产品成功");
     }
 
@@ -121,23 +125,25 @@ public class ProductController  extends AbstractRestController {
         if(price==null){
             return RestResponse.failed("0000","id无对应记录");
         }
-        Product product = price.getProduct();
-        if(StringUtils.isNotEmpty(productEditVo.getProductTypeId())&&!product.getProductType().getId().equals(productEditVo.getProductTypeId())){
-            ProductType productType = productTypeService.findById(productEditVo.getProductTypeId());
-            if(productType != null){
-                product.setProductType(productType);
+        ProductItem productItem = price.getProductItem();
+        if(StringUtils.isNotEmpty(productEditVo.getProductId())&&!productItem.getProduct().getId().equals(productEditVo.getProductId())){
+            Product product = productService.findById(productEditVo.getProductId());
+            if(product != null){
+                productItem.setProduct(product);
+            }else{
+                return RestResponse.failed("0000","无对应产品");
             }
         }
         if(StringUtils.isNotEmpty(productEditVo.getPriceItem())){
-            product.setName(productEditVo.getPriceItem());
+            productItem.setName(productEditVo.getPriceItem());
 
         }
         PriceType priceType = PriceType.getPriceTypeById(productEditVo.getUnit());
         if(priceType==null){
             return RestResponse.failed("0000","计价单位错误");
         }
-        product =  productService.save(product);
-        price.setProduct(product);
+        productItem =  productItemService.save(productItem);
+        price.setProductItem(productItem);
         price.setPrice(productEditVo.getPrice());
         price.setTimeUnit(priceType.getTimeUnit());
         price.setUnit(priceType.getUnit());
