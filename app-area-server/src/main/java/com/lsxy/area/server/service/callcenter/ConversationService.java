@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -127,6 +128,9 @@ public class ConversationService {
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
+
+    @Value(value = "${app.cc.opensips.domain}")
+    private String sip_address;
 
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
@@ -315,9 +319,9 @@ public class ConversationService {
             areaId = selector.getAreaId();
             lineId = selector.getLineId();
         }else{
-            from = "callcenter@sip.yunhuni.com";
-            to = user;
             areaId = areaAndTelNumSelector.getAreaId(app);
+            from = "system@"+areaId+".area.oneyun.com";
+            to = user + "@" + sip_address;
         }
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);

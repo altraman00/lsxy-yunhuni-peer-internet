@@ -20,6 +20,7 @@ import com.lsxy.framework.mq.events.callcenter.EnqueueTimeoutEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -187,6 +188,7 @@ public class EnQueueServiceImpl implements EnQueueService{
      * @param agent
      */
     @Override
+    @Async
     public void lookupQueue(String tenantId, String appId,String conditionId, String agent){
         if(logger.isDebugEnabled()){
             logger.info("[{}][{}]开始坐席找排队agent={}",tenantId,appId,agent);
