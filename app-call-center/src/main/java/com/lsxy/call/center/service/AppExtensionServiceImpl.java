@@ -101,7 +101,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
         this.save(appExtension);
         if(AppExtension.TYPE_SIP.equals(appExtension.getType())){
-            opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
+            //opensips 创建分机
+//            opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
         }
         //TODO 初始化状态状态
         extensionState.setLastRegisterStatus(appExtension.getId(),200);
@@ -153,6 +154,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                 if(StringUtils.isBlank(agent)){
                     this.delete(extension);
                     if(AppExtension.TYPE_SIP.equals(extension.getType())){
+                        //opensips 删除分机
                         opensipsService.deleteExtension(extension.getUser());
                     }
                     redisCacheService.del(extensionId);
