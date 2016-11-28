@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -107,24 +108,30 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     //登陆
     @Override
     public String login(CallCenterAgent agent) throws YunhuniApiException {
+        //座席不能为空
+        if(StringUtils.isBlank(agent.getName())){
+            throw new RequestIllegalArgumentException();
+        }
+        //通道不能为空
+        if(StringUtils.isBlank(agent.getChannel())){
+            throw new RequestIllegalArgumentException();
+        }
+        //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
             agent.setState(AgentState.Model.STATE_ONLINE);
         }
-        try{
-            channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
-        }catch (IllegalArgumentException e){
-            throw new RequestIllegalArgumentException();
-        }
+        //校验通道
+        channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
         CallCenterAgent oldAgent = callCenterAgentDao.findByAppIdAndName(agent.getAppId(),agent.getName());
         if(oldAgent != null){
             Long lastRegTime = agentState.getLastRegTime(oldAgent.getId());
             //TODO 注册是否过期，过期执行注销过程
             if(lastRegTime == null || (System.currentTimeMillis() - lastRegTime) > 10 * 60 * 1000){
                 //TODO 注销
-                logout(agent.getTenantId(), agent.getAppId(), agent.getName(), false);
+                logout(agent.getTenantId(), agent.getAppId(), agent.getName(), true);
             }else{
                 //TODO 注册没有过期
-                throw new RuntimeException(new AgentHasAlreadyLoggedInException());
+                throw new AgentHasAlreadyLoggedInException();
             }
         }
         //分机ID
@@ -152,18 +159,18 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             //匹配的条件集合
             List<Condition> suitedConditions = new ArrayList<>();
             Map<String,Long> conditionScore = new HashMap<>();
-            if(agent.getSkills()!=null && agent.getSkills().size()>0){
                 Map<String,Integer> skillScore = new HashMap<>();
+                if(agent.getSkills()!=null && agent.getSkills().size()>0){
                 for(AgentSkill obj:agent.getSkills()){
                     //TODO 处理技能，不让技能名称重复
                     if(StringUtils.isBlank(obj.getName())){
                         throw new RequestIllegalArgumentException();
                     }
                     if(obj.getScore() == null){
-                        throw new RequestIllegalArgumentException();
+                        obj.setScore(0);
                     }
                     if(obj.getEnabled() == null){
-                        throw new RequestIllegalArgumentException();
+                        obj.setEnabled(false);
                     }
                     obj.setTenantId(agent.getTenantId());
                     obj.setAppId(agent.getAppId());
@@ -191,9 +198,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 //TODO 设置座席条件
                 aCs.add(agentId,condition.getId(),condition.getPriority());
             });
-            //如果座席是空闲，触发座席找排队
-            if(agent.getState().contains(AgentState.Model.STATE_IDLE)){
-                enQueueService.lookupQueue(agent.getTenantId(),agent.getAppId(),null,agentId);
+            try{
+                //TODO 异步
+                //如果座席是空闲，触发座席找排队,此处与以上处理无关，所以不管成不成功，都返回
+                if(agent.getState().contains(AgentState.Model.STATE_IDLE)){
+                    this.changeStateToIdel(agent.getTenantId(), agent.getAppId(), agentId);
+                }
+            }catch(Exception e){
+
             }
             return agentId;
         }finally{
@@ -222,6 +234,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     //注销
     @Override
     public void logout(String tenantId, String appId, String agentName, boolean force) throws YunhuniApiException {
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             // 座席不存在
@@ -275,6 +290,12 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public void keepAlive(String appId, String agentName) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             // 座席不存在
@@ -293,6 +314,12 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public CallCenterAgent get(String appId, String agentName) throws YunhuniApiException {
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId, agentName);
         if(agent == null){
             // 座席不存在
@@ -311,6 +338,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public Page getPage(String appId, Integer pageNo, Integer pageSize) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
         List<String> agentIds = new ArrayList<>();
         String hql = "from CallCenterAgent obj where obj.appId=?1";
         Page page = this.pageList(hql, pageNo, pageSize, appId);
@@ -332,6 +362,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public void extension(String appId, String agentName,String extensionId) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(extensionId)){
+            throw new RequestIllegalArgumentException();
+        }
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             // 座席不存在
@@ -367,6 +406,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public void state(String appId, String agentName, String state) throws YunhuniApiException{
+        if(StringUtils.isBlank(appId)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
+        if(StringUtils.isBlank(state)){
+            throw new RequestIllegalArgumentException();
+        }
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             // 座席不存在
@@ -376,7 +424,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void state(String tanantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
+    public void state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
         AgentLock agentLock = new AgentLock(redisCacheService, agentId);
         boolean lock = agentLock.lock();
         if(!lock){
@@ -396,15 +444,29 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             agentState.setState(agentId,state);
             if(state.contains(AgentState.Model.STATE_IDLE)){
-                enQueueService.lookupQueue(tanantId,appId,null,agentId);
+                this.changeStateToIdel(tenantId, appId, agentId);
             }
         }finally {
             agentLock.unlock();
         }
-
     }
+
+    /**
+     * 异步调用座席找排队
+     * @param tenantId
+     * @param appId
+     * @param agentId
+     */
+    @Async
+    private void changeStateToIdel(String tenantId,String appId,String agentId){
+        enQueueService.lookupQueue(tenantId,appId,null,agentId);
+    }
+
     @Override
     public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
+        if(StringUtils.isBlank(agentName)){
+            throw new RequestIllegalArgumentException();
+        }
         CallCenterAgent agent = callCenterAgentDao.findByAppIdAndName(appId,agentName);
         if(agent == null){
             //座席不存在
@@ -454,8 +516,10 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     }
                     case 2:{
                         //删除一个
-                        agentSkillService.deleteByAgentAndName(agentId,opt.getName());
-                        skillMap.remove(opt.getName());
+                        if(StringUtils.isNotBlank(opt.getName())){
+                            agentSkillService.deleteByAgentAndName(agentId,opt.getName());
+                            skillMap.remove(opt.getName());
+                        }
                         break;
                     }
                 }
