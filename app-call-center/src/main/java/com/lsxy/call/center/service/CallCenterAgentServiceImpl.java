@@ -377,6 +377,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
     @Override
     public void state(String tanantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
+        if(logger.isDebugEnabled()){
+            logger.info("[{}][{}]agent={},state={}",tanantId,appId,agentId,state);
+        }
         AgentLock agentLock = new AgentLock(redisCacheService, agentId);
         boolean lock = agentLock.lock();
         if(!lock){

@@ -34,7 +34,7 @@ public class CallCenterConversationMemberServiceImpl extends AbstractService<Cal
 
     @Override
     public CallCenterConversationMember findOne(String relevanceId,String callId){
-        String hql = "FROM CallCenterConversationMember WHERE relevanceId=?1 AND callId=?2 ";
+        String hql = "FROM CallCenterConversationMember obj WHERE obj.relevanceId=?1 AND obj.callId=?2 ";
         try {
             return this.findUnique(hql,relevanceId,callId);
         } catch (MatchMutiEntitiesException e) {
