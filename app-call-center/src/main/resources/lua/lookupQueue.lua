@@ -61,7 +61,7 @@ end
 
 --指定了条件
 if(string.len(target_condition)>0) then
-    aCs[0] = target_condition
+    aCs[1] = target_condition
 else
     aCs = redis.call('ZREVRANGE',aCs_key,0,-1)
 end
