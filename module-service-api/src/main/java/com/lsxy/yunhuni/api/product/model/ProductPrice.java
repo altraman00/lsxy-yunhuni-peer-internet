@@ -16,24 +16,14 @@ import java.math.BigDecimal;
 public class ProductPrice extends IdEntity {
     public static int STATUS_VALID = 1;
     public static int STATUS_INVALID = 0;
-
     private ProductItem productItem;    //产品
     private BigDecimal price;   //单价
     private Integer status;     //1启用，0未启用
     private Integer priority;   //优先级，数字大的优先
     private Long priceVersion;  //资费版本号，同一套资费版本号一样，创建后不可修改，用时间戳
     private String remark;
-    private Integer calType;    //1、按数量，2、按时长
     private Integer timeUnit;   //单位时长(单位秒)
     private String unit;   //单位
-    @Column(name = "cal_type")
-    public Integer getCalType() {
-        return calType;
-    }
-
-    public void setCalType(Integer calType) {
-        this.calType = calType;
-    }
     @Column(name = "time_unit")
     public Integer getTimeUnit() {
         return timeUnit;

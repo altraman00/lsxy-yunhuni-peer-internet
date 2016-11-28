@@ -11,7 +11,7 @@ import java.util.Map;
 public enum PriceType {
     type1(2,6,"6秒","6秒"),
     type2(2,60,"60秒","60秒"),
-    type3(1,1,"条","条"),
+    type3(4,1,"G/每月","G/每月"),
     type4(1,1,"个","个"),
     type5(3,1,"月","月");
 

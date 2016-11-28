@@ -16,8 +16,17 @@ public class ProductItem extends IdEntity {
     private Product product;//所属产品类别
     private String name;    //产品名称
     private String code;    //一次写入，不可修改，涉及到编程
+    private Integer calType;    //1、按数量，2、按时长
     private String remark;
     private Integer status;//是否可用1是0否
+    @Column(name = "cal_type")
+    public Integer getCalType() {
+        return calType;
+    }
+
+    public void setCalType(Integer calType) {
+        this.calType = calType;
+    }
     @OneToOne
     @JoinColumn(name = "product_id")
     public Product getProduct() {

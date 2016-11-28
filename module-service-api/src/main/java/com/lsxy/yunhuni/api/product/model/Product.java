@@ -17,9 +17,6 @@ public class Product extends IdEntity {
     public static int CAL_TYPE_TIME = 2;
     private String name;    //产品名称
     private String code;    //一次写入，不可修改，涉及到编程
-    private Integer calType;    //1、按数量，2、按时长
-    private Integer timeUnit;   //单位时长(单位秒)
-    private String unit;   //单位
     private String remark;
     private Integer status;//是否可用1是0否
     @Column(name = "status")
@@ -47,33 +44,6 @@ public class Product extends IdEntity {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    @Column(name = "cal_type")
-    public Integer getCalType() {
-        return calType;
-    }
-
-    public void setCalType(Integer calType) {
-        this.calType = calType;
-    }
-
-    @Column(name = "time_unit")
-    public Integer getTimeUnit() {
-        return timeUnit;
-    }
-
-    public void setTimeUnit(Integer timeUnit) {
-        this.timeUnit = timeUnit;
-    }
-
-    @Column(name = "unit")
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
     }
 
     @Column(name = "remark")

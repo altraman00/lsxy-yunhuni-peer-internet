@@ -45,7 +45,7 @@ public class ProductController  extends AbstractRestController {
         if(price==null){
             return RestResponse.failed("0000","id无对应记录");
         }
-        List list= PriceType.getPriceTypeAllByCalType(price.getCalType());
+        List list= PriceType.getPriceTypeAllByCalType(price.getProductItem().getCalType());
         return RestResponse.success(list);
     }
     @RequestMapping(value = "/list",method = RequestMethod.GET)
@@ -126,29 +126,27 @@ public class ProductController  extends AbstractRestController {
             return RestResponse.failed("0000","id无对应记录");
         }
         ProductItem productItem = price.getProductItem();
-        if(StringUtils.isNotEmpty(productEditVo.getProductId())&&!productItem.getProduct().getId().equals(productEditVo.getProductId())){
-            Product product = productService.findById(productEditVo.getProductId());
-            if(product != null){
-                productItem.setProduct(product);
-            }else{
-                return RestResponse.failed("0000","无对应产品");
-            }
-        }
         if(StringUtils.isNotEmpty(productEditVo.getPriceItem())){
             productItem.setName(productEditVo.getPriceItem());
-
         }
         PriceType priceType = PriceType.getPriceTypeById(productEditVo.getUnit());
         if(priceType==null){
+
+        }else if(priceType.getCalType()!=productItem.getCalType()){
             return RestResponse.failed("0000","计价单位错误");
+        }else {
+            if (productEditVo.getPrice() != null) {
+                price.setPrice(productEditVo.getPrice());
+            }
+            if (priceType.getTimeUnit() != null) {
+                price.setTimeUnit(priceType.getTimeUnit());
+            }
+            if (StringUtils.isNotEmpty(priceType.getUnit())) {
+                price.setUnit(priceType.getUnit());
+            }
+            productItemService.save(productItem);
+            productPriceService.save(price);
         }
-        productItem =  productItemService.save(productItem);
-        price.setProductItem(productItem);
-        price.setPrice(productEditVo.getPrice());
-        price.setTimeUnit(priceType.getTimeUnit());
-        price.setUnit(priceType.getUnit());
-        price.setCalType(priceType.getCalType());
-        productPriceService.save(price);
         return RestResponse.success("修改成功");
     }
 
