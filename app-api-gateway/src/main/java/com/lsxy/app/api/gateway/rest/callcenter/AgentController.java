@@ -8,6 +8,7 @@ import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentVO;
 import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.operations.AgentSkillOperationDTO;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
@@ -39,13 +40,12 @@ public class AgentController extends AbstractAPIController {
 
     @RequestMapping(value = "/{account_id}/callcenter/agent",method = RequestMethod.POST)
     public ApiGatewayResponse login(HttpServletRequest request, @RequestBody CallCenterAgent agent, @RequestHeader("AppID") String appId) throws YunhuniApiException {
-        agent.setAppId(appId);
         App app = appService.findById(appId);
+        agent.setAppId(appId);
         agent.setTenantId(app.getTenant().getId());
         callCenterAgentService.login(agent);
         return ApiGatewayResponse.success();
     }
-
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}",method = RequestMethod.DELETE)
     public ApiGatewayResponse logout(HttpServletRequest request, @RequestHeader("AppID") String appId,
