@@ -1,6 +1,6 @@
 package com.lsxy.yunhuni.api.product.service;
 
-import com.lsxy.yunhuni.api.product.model.Product;
+import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 
 import java.math.BigDecimal;
@@ -16,7 +16,7 @@ public interface CalCostService {
      * @param time
      * @return
      */
-    BigDecimal calCost(Product product, String tenantId, Long time);
+    BigDecimal calCost(ProductItem product, String tenantId, Long time);
 
     /**
      * 消费计算金额及插入消费表，或插入扣量表
