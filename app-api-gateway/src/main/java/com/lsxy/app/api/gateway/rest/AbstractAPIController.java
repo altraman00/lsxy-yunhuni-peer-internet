@@ -43,7 +43,7 @@ public class AbstractAPIController {
         }else{
             failed = ApiGatewayResponse.failed(ApiReturnCodeEnum.UnknownFail.getCode(), ApiReturnCodeEnum.UnknownFail.getMsg());
         }
-        logger.info("调用接口出现异常：",resultEx);
+        logger.error("调用接口出现异常：",resultEx);
         return failed;
     }
 }

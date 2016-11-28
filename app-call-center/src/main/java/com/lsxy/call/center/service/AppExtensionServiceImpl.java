@@ -5,6 +5,7 @@ import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.opensips.service.OpensipsService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
+import com.lsxy.call.center.states.lock.ExtensionLock;
 import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
@@ -76,6 +77,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 
         switch (appExtension.getType()){
             case AppExtension.TYPE_SIP:
+                appExtension.setTelnum(null);
+                appExtension.setIpaddr(null);
                 if(StringUtil.isBlank(appExtension.getUser()) || StringUtil.isBlank(appExtension.getPassword())){
                     throw new RequestIllegalArgumentException();
                 }
@@ -88,10 +91,16 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                 }
                 break;
             case AppExtension.TYPE_THIRD_SIP:
-                throw new RequestIllegalArgumentException();
+                appExtension.setUser(null);
+                appExtension.setPassword(null);
+                appExtension.setTelnum(null);
+                if(StringUtils.isBlank(appExtension.getIpaddr())){
+                    throw new RequestIllegalArgumentException();
+                }
             case AppExtension.TYPE_TELPHONE:
                 appExtension.setUser(null);
                 appExtension.setPassword(null);
+                appExtension.setIpaddr(null);
                 if(StringUtil.isBlank(appExtension.getTelnum()) ){
                     throw new RequestIllegalArgumentException();
                 }
@@ -150,22 +159,33 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     public void delete(String extensionId, String appId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
-            String agent = extensionState.getAgent(extensionId);
-            if(StringUtils.isBlank(agent)){
-                try {
-                    this.delete(extension);
-                } catch (Exception e) {
-                    logger.error("删除分机失败:{}",extensionId);
-                    logger.error("删除分机失败",e);
-                    throw new RequestIllegalArgumentException();
-                }
-                if(AppExtension.TYPE_SIP.equals(extension.getType())){
-                    //TODO 分机opensips删除
-//                        opensipsService.deleteExtension(extension.getUser());
-                }
-                redisCacheService.del(extensionId);
-            }else{
+            //获取分机锁
+            ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
+            boolean lock = extensionLock.lock();
+            //获取锁失败 抛异常
+            if(!lock){
                 throw new ExtensionBindingToAgentException();
+            }
+            try{
+                String agent = extensionState.getAgent(extensionId);
+                if(StringUtils.isBlank(agent)){
+                    try {
+                        this.delete(extension);
+                    } catch (Exception e) {
+                        logger.error("删除分机失败:{}",extensionId);
+                        logger.error("删除分机失败",e);
+                        throw new RequestIllegalArgumentException();
+                    }
+                    if(AppExtension.TYPE_SIP.equals(extension.getType())){
+                        //TODO 分机opensips删除
+//                        opensipsService.deleteExtension(extension.getUser());
+                    }
+                    redisCacheService.del(extensionId);
+                }else{
+                    throw new ExtensionBindingToAgentException();
+                }
+            }finally {
+                extensionLock.unlock();
             }
         }else{
             throw new RequestIllegalArgumentException();
@@ -179,18 +199,18 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
-    public AppExtension findOne(String appId, String extensionId) {
+    public AppExtension findOne(String appId, String extensionId) throws YunhuniApiException{
         if(StringUtils.isBlank(appId)){
             logger.error("appId 不能为空");
-            throw new IllegalArgumentException("appId 不能为空");
+            throw new RequestIllegalArgumentException();
         }
         if(StringUtils.isBlank(extensionId)){
             logger.error("extension 不能为空");
-            throw new IllegalArgumentException("extension 不能为空");
+            throw new RequestIllegalArgumentException();
         }
         AppExtension extension = this.findById(extensionId);
         if(!appId.equals(extension.getAppId())){
-            throw new IllegalArgumentException("extension不属于该App");
+            throw new RequestIllegalArgumentException();
         }
         return extension;
     }
