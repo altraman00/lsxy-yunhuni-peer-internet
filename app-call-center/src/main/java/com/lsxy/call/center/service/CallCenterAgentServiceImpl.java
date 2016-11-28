@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -197,9 +198,14 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 //TODO 设置座席条件
                 aCs.add(agentId,condition.getId(),condition.getPriority());
             });
-            //如果座席是空闲，触发座席找排队
-            if(agent.getState().contains(AgentState.Model.STATE_IDLE)){
-                enQueueService.lookupQueue(agent.getTenantId(),agent.getAppId(),null,agentId);
+            try{
+                //TODO 异步
+                //如果座席是空闲，触发座席找排队,此处与以上处理无关，所以不管成不成功，都返回
+                if(agent.getState().contains(AgentState.Model.STATE_IDLE)){
+                    this.changeStateToIdel(agent.getTenantId(), agent.getAppId(), agentId);
+                }
+            }catch(Exception e){
+
             }
             return agentId;
         }finally{
@@ -418,7 +424,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
-    public void state(String tanantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
+    public void state(String tenantId,String appId,String agentId, String state,boolean force) throws YunhuniApiException{
         AgentLock agentLock = new AgentLock(redisCacheService, agentId);
         boolean lock = agentLock.lock();
         if(!lock){
@@ -438,13 +444,24 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             agentState.setState(agentId,state);
             if(state.contains(AgentState.Model.STATE_IDLE)){
-                enQueueService.lookupQueue(tanantId,appId,null,agentId);
+                this.changeStateToIdel(tenantId, appId, agentId);
             }
         }finally {
             agentLock.unlock();
         }
-
     }
+
+    /**
+     * 异步调用座席找排队
+     * @param tenantId
+     * @param appId
+     * @param agentId
+     */
+    @Async
+    private void changeStateToIdel(String tenantId,String appId,String agentId){
+        enQueueService.lookupQueue(tenantId,appId,null,agentId);
+    }
+
     @Override
     public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
         if(StringUtils.isBlank(agentName)){
