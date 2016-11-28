@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 @Service
 public class OpensipsServiceImpl implements OpensipsService {
-    private static final String domain = SystemConfig.getProperty("global.opensips.domain");
+    private static final String domain = SystemConfig.getProperty("app.cc.opensips.domain");
     @Autowired
     LocationDao locationDao;
     @Autowired
