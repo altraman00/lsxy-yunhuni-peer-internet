@@ -608,15 +608,32 @@ public class ConversationService {
         callConversationService.decrConversation(callId,conversationId);
         if(callConversationService.size(callId) > 0){
             //TODO 回到上一次交谈
-            logger.info("回到上一次交谈callid={}",callId);
+            if(logger.isDebugEnabled()) {
+                logger.debug("回到上一次交谈callid={}", callId);
+            }
             return;
         }
         if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType())){
-            logger.info("开始重新进入ivr，callid={}",callId);
-            ivrActionService.doAction(callId);
+            if(!call_state.getClosed()){
+                if(logger.isDebugEnabled()){
+                    logger.debug("开始重新进入ivr，callid={}",callId);
+                }
+                ivrActionService.doAction(callId);
+            }else if(this.size(conversationId) <= 1){
+                if(logger.isDebugEnabled()){
+                    logger.debug("开始呼入ivr挂断后，解散会议，callid={}",callId);
+                }
+                try {
+                    this.dismiss(call_state.getAppId(),conversationId);
+                } catch (Throwable e) {
+                    logger.error("呼入ivr挂断后，解散会议",e);
+                }
+            }
         }else{
             //不是ivr 不需要下一步  直接挂断
-            logger.info("开始挂断坐席",callId);
+            if(logger.isDebugEnabled()) {
+                logger.debug("开始挂断坐席callid={}", callId);
+            }
             App app = appService.findById(call_state.getAppId());
             if(app == null){
                 logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
