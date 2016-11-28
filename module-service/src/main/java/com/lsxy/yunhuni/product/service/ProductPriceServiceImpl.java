@@ -29,7 +29,7 @@ public class ProductPriceServiceImpl extends AbstractService<ProductPrice> imple
     @Override
     @Cacheable(value="product",key = "'product_price_'+#productId" ,unless="#result == null")
     public ProductPrice getAvailableProductPrice(String productId) {
-        ProductPrice productPrice = productPriceDao.findFirstByProductIdAndStatusOrderByPriorityDesc(productId,ProductPrice.STATUS_VALID);
+        ProductPrice productPrice = productPriceDao.findFirstByProductItemIdAndStatusOrderByPriorityDesc(productId,ProductPrice.STATUS_VALID);
         if(productPrice == null){
             throw new RuntimeException("产品资费不存在");
         }

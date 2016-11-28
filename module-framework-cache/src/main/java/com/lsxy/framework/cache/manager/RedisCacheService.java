@@ -413,7 +413,7 @@ public class RedisCacheService {
 			return redisTemplate.opsForHash().get(key,field);
 		}
 
-		public void hputAll(final String key,final Map map){
+		public void hputAll(final String key,final Map<String,String> map){
 			redisTemplate.opsForHash().putAll(key,map);
 		}
 

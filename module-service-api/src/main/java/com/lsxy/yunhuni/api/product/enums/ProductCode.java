@@ -5,12 +5,14 @@ package com.lsxy.yunhuni.api.product.enums;
  * Created by liups on 2016/8/30.
  */
 public enum ProductCode {
-    duo_call("duo_call","语音回拔"),
-    sys_conf("sys_conf","语音会议"),
-    ivr_call("ivr_call,ivr_incoming,ivr_dial","自定义IVR"),
+    notify_call("notify_call","语音通知"),
     captcha_call("captcha_call,verify_call","语音验证码"),
-    call_center("call_center,conversation,agent_call,out_call","呼叫中心"),
-    notify_call("notify_call","语音通知");
+    duo_call("duo_call","语音回拔"),
+    ivr_call("ivr_call,ivr_incoming,ivr_dial","自定义IVR"),
+    sys_conf("sys_conf","语音会议"),
+    recording("recording","录音服务"),
+    number_resource("rent_number,rent_number_month","号码资源"),
+    call_center("call_center","呼叫中心");
 
     private String apiCmd;  //产品和api的对应关系，一个产品可以对应多个apiCmd，多个apiCmd用“,”号隔开，如 sys_conf("sys_conf,sys_conf,conf_XXXX","语音会议"),
     private String remark;  //产品备注

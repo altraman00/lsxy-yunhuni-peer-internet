@@ -1,4 +1,4 @@
-package com.lsxy.call.center.opensips.dao;
+package com.lsxy.app.opensips.dao;
 
 import com.lsxy.call.center.api.opensips.model.Subscriber;
 import com.lsxy.framework.api.base.BaseDaoInterface;
