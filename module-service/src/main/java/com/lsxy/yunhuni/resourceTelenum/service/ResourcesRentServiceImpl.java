@@ -11,6 +11,9 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.GlobalConfig;
+import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
+import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -63,6 +66,10 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     TelenumOrderItemService telenumOrderItemService;
     @Autowired
     CalCostService calCostService;
+    @Autowired
+    GlobalConfigService globalConfigService;
+    @Autowired
+    TenantConfigService tenantConfigService;
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
         Tenant tenant = null;
@@ -127,6 +134,12 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
+    public void monthlyRentTask() {
+        resourcesRentTask();
+        recordingVoiceFileTask();
+    }
+
+    @Override
     public void resourcesRentTask(){
         Date curTime = new Date();
         List<ResourcesRent> resourcesRents = resourcesRentDao.findByRentStatusNotAndResTypeAndRentExpireLessThan(ResourcesRent.RENT_STATUS_RELEASE,ResourcesRent.RESTYPE_TELENUM,curTime);
@@ -160,6 +173,10 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                 }
             }
         }
+    }
+
+    @Override
+    public void recordingVoiceFileTask() {
     }
 
     @Override
