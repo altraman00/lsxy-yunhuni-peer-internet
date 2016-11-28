@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 全局配置类impl
@@ -29,5 +30,15 @@ public class TenantConfigServiceImpl extends AbstractService<TenantConfig> imple
     @Override
     public TenantConfig findByTypeAndNameAndTenantId(String type, String name,String tenantId) {
         return tenantConfigDao.findByTypeAndNameAndTenantId(type,name,tenantId);
+    }
+
+    @Override
+    public TenantConfig findByTypeAndKeyNameAndTenantId(String type, String keyName, String tenantId) {
+        return null;
+    }
+
+    @Override
+    public List<TenantConfig> getPageByTypeAndKeyName(String type, String keyName) {
+        return null;
     }
 }
