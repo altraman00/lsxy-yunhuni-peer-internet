@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <contextName>app-third-join-gateway</contextName>
+    <property name="APP_NAME" value="app-opensips-proxy" />
+    <property name="systemId" value="app.opensips.proxy" />
+    <include resource="logback-yunhuni.xml"/>
+
+</configuration>

@@ -62,7 +62,7 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @param extensionId
      * @return
      */
-    AppExtension findOne(String appId, String extensionId);
+    AppExtension findOne(String appId, String extensionId) throws YunhuniApiException;
 
     /**
      * 分机注册

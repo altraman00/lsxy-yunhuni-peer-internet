@@ -17,13 +17,7 @@ import java.util.List;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_agent")
 public class CallCenterAgent extends IdEntity {
-    public final static String STATE_NONE = "none";
-    public final static String STATE_OFFLINE = "offline";
-    public final static String STATE_ONLINE = "online";
-    public final static String STATE_IDLE = "idle";
-    public final static String STATE_TALKING = "talking";
-    public final static String STATE_AWAY = "away";
-    public final static String STATE_DEFAULT = STATE_ONLINE;
+
     private String tenantId;
     private String appId;
     private String channel;

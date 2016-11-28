@@ -47,6 +47,7 @@
         <module>module-framework-monitor</module>
         <module>module-service-call-center-api</module>
         <module>app-mc</module>
+        <module>app-opensips-proxy</module>
 
     </modules>
     <packaging>pom</packaging>
@@ -317,16 +318,7 @@
 
         </dependencies>
     </dependencyManagement>
-    <distributionManagement>
-        <repository>
-            <id>nexus-lsxy-release</id>
-            <url>http://nexus.liushuixingyun.com/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-lsxy-snapshot</id>
-            <url>http://nexus.liushuixingyun.com/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+
 
 
     <dependencies>
@@ -376,6 +368,16 @@
             <properties>
                 <profiles.active>production</profiles.active>
             </properties>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
         <profile>
             <!-- 本地开发，连接局域网数据库 -->
@@ -386,6 +388,16 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://nexus.liushuixingyun.com/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://nexus.liushuixingyun.com/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
         <profile>
             <!-- 开发环境 -->
@@ -393,6 +405,16 @@
             <properties>
                 <profiles.active>development</profiles.active>
             </properties>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
         <profile>
             <!-- 开发环境 -->
@@ -407,6 +429,16 @@
             <properties>
                 <profiles.active>test</profiles.active>
             </properties>
+            <distributionManagement>
+                <repository>
+                    <id>nexus-lsxy-release</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-lsxy-snapshot</id>
+                    <url>http://10.44.185.24:8081/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
     </profiles>
 </project>
