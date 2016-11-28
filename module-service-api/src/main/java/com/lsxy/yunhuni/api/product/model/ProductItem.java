@@ -11,7 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_type")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_item")
 public class ProductItem extends IdEntity {
     private Product product;//所属产品类别
     private String name;    //产品名称
