@@ -99,7 +99,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         String postNumVoice = enQueue.getPost_num_voice();
 
         String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
-                result.getExtension().getTelenum(),result.getExtension().getType(),
+                result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
         conversationService.create(conversation,state.getId(),

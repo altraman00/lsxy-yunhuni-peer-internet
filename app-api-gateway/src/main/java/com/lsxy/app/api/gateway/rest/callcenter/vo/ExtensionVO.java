@@ -9,7 +9,7 @@ public class ExtensionVO {
     private String user;//    user                 varchar(50) comment 'SIP注册用户名，全局唯一。格式是6到12位数字',
     private String password;//    password             varchar(50) comment 'SIP注册密码',
     private String ipaddr;  //SIP 网关IP地址与端口，默认5060，仅用于 type==2的情况
-    private String telenum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
+    private String telnum;//    telenum              varchar(32) comment '如果是电话分机，该属性记录电话号码（保留，不用）',
 
     public String getId() {
         return id;
@@ -51,11 +51,11 @@ public class ExtensionVO {
         this.ipaddr = ipaddr;
     }
 
-    public String getTelenum() {
-        return telenum;
+    public String getTelnum() {
+        return telnum;
     }
 
-    public void setTelenum(String telenum) {
-        this.telenum = telenum;
+    public void setTelnum(String telnum) {
+        this.telnum = telnum;
     }
 }

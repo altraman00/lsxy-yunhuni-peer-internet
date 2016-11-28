@@ -79,7 +79,13 @@ public class CallCenterRegisterImitator {
 
     private void registerExtensionAll(){
         Iterable<AppExtension> list = appExtensionService.list();
-        list.forEach(ex -> appExtensionService.register(ex.getId()));
+        list.forEach(ex -> {
+            try{
+                appExtensionService.register(ex.getId());
+            }catch (Exception e){
+                logger.error("注册分机失败",e);
+            }
+        });
     }
 
     @Scheduled(cron="0 0/3 * * * ? ")
@@ -127,8 +133,8 @@ public class CallCenterRegisterImitator {
         list.forEach(agent -> {
             try {
                 callCenterAgentService.keepAlive(agent.getAppId(), agent.getName());
-            } catch (YunhuniApiException e) {
-
+            } catch (Exception e) {
+                logger.error("座席保持失败",e);
             }
         });
     }

@@ -84,7 +84,7 @@ public class InitDevData {
             appExtension.setType(AppExtension.TYPE_TELPHONE);
             appExtension.setTenantId(channel.getTenantId());
             appExtension.setAppId(channel.getAppId());
-            appExtension.setTelenum("13692206627");
+            appExtension.setTelnum("13692206627");
             appExtension=appExtensionService.save(appExtension);
             String exid = appExtension.getId();
             extensionState.setAgent(exid,agent.getId());
