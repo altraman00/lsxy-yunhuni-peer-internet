@@ -109,7 +109,9 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setCallEndDt(getCallDate(cdrSplit[20].trim()));
         voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
         //扣费
-        calCostService.callConsume(voiceCdr);
+        if(voiceCdr.getCallAckDt() != null){
+            calCostService.callConsume(voiceCdr);
+        }
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
         Map<String, Object> data = businessState.getBusinessData();
         if(data != null){

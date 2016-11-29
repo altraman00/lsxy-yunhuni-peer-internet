@@ -7,6 +7,7 @@ import com.lsxy.yunhuni.api.consume.model.VoiceTimeUse;
 import com.lsxy.yunhuni.api.consume.service.CaptchaUseService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.consume.service.VoiceTimeUseService;
+import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.Product;
 import com.lsxy.yunhuni.api.product.model.ProductItem;
@@ -54,8 +55,8 @@ public class CalCostServiceImpl implements CalCostService{
             cost = productPrice.getPrice().multiply(new BigDecimal(Double.toString(discount)));
         }else{
             //如果是计时，则只需 时长单位数量*单价*折扣
-            BigDecimal calNum = new BigDecimal(time).divide(new BigDecimal(productPrice.getTimeUnit()), 0, BigDecimal.ROUND_UP);
-            cost = calNum.multiply(productPrice.getPrice()).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
+            Long calNum = this.calUnitNum(time, productPrice.getTimeUnit());
+            cost = new BigDecimal(calNum).multiply(productPrice.getPrice()).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
         }
         return cost;
     }
@@ -70,7 +71,8 @@ public class CalCostServiceImpl implements CalCostService{
 
     @Override
     public VoiceCdr callConsume(VoiceCdr cdr) {
-        Long time = cdr.getCallTimeLong();
+        //因为就算时长是0秒也要算一个计费单位，所要加上1会更好处理一点
+        Long time = cdr.getCallTimeLong() + 1;
         //扣费时长
         Long costTimeLong;
         //消费金额
@@ -268,4 +270,15 @@ public class CalCostServiceImpl implements CalCostService{
         return new BigDecimal(time).divide(new BigDecimal(timeUnit),0,BigDecimal.ROUND_UP).longValue();
     }
 
+    @Override
+    public void recordConsume(VoiceFileRecord record){
+        //因为就算时长是0秒也要算一个计费单位，所要加上1会更好处理一点
+        Long time = record.getCallTimeLong() +1;
+        ProductItem productItem = productItemService.getProductItemByCode(ProductCode.recording.name());
+        ProductPrice productPrice = productPriceService.getAvailableProductPrice(productItem.getId());
+        Long useTime = calUnitNum(time, productPrice.getTimeUnit()) * productPrice.getTimeUnit();
+        record.setCostTimeLong(useTime);
+        BigDecimal cost = insertConsume(record.getTenantId(), record.getAppId(), useTime, record.getCreateTime(), ProductCode.recording.name(), ProductCode.recording.getRemark(), productItem);
+        record.setCost(cost);
+    }
 }

@@ -177,9 +177,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     //TODO 支付
                     //插入消费记录
                     Consume consume = new Consume(curTime, ConsumeCode.rent_number_month.name(),cost,ConsumeCode.rent_number_month.getName(),appId,tenant);
-                    consumeService.save(consume);
-                    //Redis中消费增加
-                    calBillingService.incConsume(tenant.getId(),curTime,cost);
+                    consumeService.consume(consume);
                 }
             }
         }

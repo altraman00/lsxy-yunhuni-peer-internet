@@ -1,9 +1,12 @@
 package com.lsxy.yunhuni.api.product.service;
 
+import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Created by liups on 2016/8/27.
@@ -31,4 +34,6 @@ public interface CalCostService {
      * @return
      */
     boolean isCallTimeRemainOrBalanceEnough(String apiCmd, String tenantId);
+
+    void recordConsume(VoiceFileRecord record);
 }
