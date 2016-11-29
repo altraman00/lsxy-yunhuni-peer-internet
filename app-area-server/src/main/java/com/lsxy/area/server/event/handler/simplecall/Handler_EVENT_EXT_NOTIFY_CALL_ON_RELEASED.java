@@ -170,7 +170,7 @@ public class Handler_EVENT_EXT_NOTIFY_CALL_ON_RELEASED extends EventHandler {
             notifyCallService.save(notifyCall);
         }
         //处理会话表数据
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        CallSession callSession = callSessionService.findById(state.getBusinessData().get("sessionid"));
         if(callSession != null){
             callSession.setStatus(CallSession.STATUS_OVER);
             callSessionService.save(callSession);

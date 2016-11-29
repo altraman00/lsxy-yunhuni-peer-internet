@@ -154,7 +154,7 @@ public class IVRServiceImpl implements IVRService {
                                     .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
-                                    .setBusinessData(new MapBuilder<String,Object>()
+                                    .setBusinessData(new MapBuilder<String,String>()
                                             .putIfNotEmpty("from",from)
                                             .putIfNotEmpty("to",to)
                                             .putIfNotEmpty("sessionid",callSession.getId())

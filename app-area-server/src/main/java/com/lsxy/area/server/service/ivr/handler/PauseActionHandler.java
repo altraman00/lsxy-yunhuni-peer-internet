@@ -12,9 +12,6 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * pause指令处理器
  * Created by liuws on 2016/9/2.
@@ -62,13 +59,7 @@ public class PauseActionHandler extends ActionHandler{
             }
         }
         mqService.publish(new IVRPauseActionEvent(callId,duration));
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId,"next",next);
         return true;
     }
 }

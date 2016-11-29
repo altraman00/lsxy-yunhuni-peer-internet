@@ -11,10 +11,7 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import static org.reflections.util.ConfigurationBuilder.build;
 
 /**
  * record指令处理器
@@ -57,8 +54,6 @@ public class RecordActionHandler extends ActionHandler{
             logger.debug("开始处理ivr[{}]动作，max_duration={},beeping={},finish_keys={}",
                     getAction(),max_duration,beeping,finish_keys);
         }
-
-        Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
@@ -75,12 +70,7 @@ public class RecordActionHandler extends ActionHandler{
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId,"next",next);
         return true;
     }
 }
