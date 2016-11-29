@@ -24,7 +24,7 @@ import java.util.Date;
  * 用于测试环境前期模拟分机座席自动注册，可修改Profile,将其作用的环境修改
  * Created by liups on 2016/11/25.
  */
-@Profile("test")
+@Profile({"development","test"})
 @Component
 public class CallCenterRegisterImitator {
     private static final Logger logger = LoggerFactory.getLogger(CallCenterRegisterImitator.class);
