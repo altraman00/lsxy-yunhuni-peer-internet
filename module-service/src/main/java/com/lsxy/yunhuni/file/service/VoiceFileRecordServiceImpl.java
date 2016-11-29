@@ -34,6 +34,13 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public long getSumSize(String tenant, String app) {
+        String sql = "select IFNULL(sum(size),0) from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and is_deleted<>1 and tenant_id=? and app_id=?";
+        return jdbcTemplate.queryForObject(sql,Long.class,tenant,app);
+    }
+
     @Override
     public Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize,String appId,String tenantId) {
         String hql = " from VoiceFileRecord obj where obj.appId=?1 and obj.tenantId=?2 ";
@@ -144,7 +151,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime, Date endTime) {
-        String hql = " from VoiceFileRecord obj where obj.app_id=?1 and obj.tenant_id=?2 and obj.createTime<=?3 and obj.createTime>=?4";
+        String hql = " from VoiceFileRecord obj where obj.appId=?1 and obj.tenantId=?2 and obj.createTime<=?3 and obj.createTime>=?4";
         List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
         return list;
     }
@@ -154,19 +161,6 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?1)";
         List list = this.list(hql, sessionId);
         return list;
-    }
-
-    @Override
-    public void batchUpdateOssDelete(List<String> id, int status) {
-        String ids = "";
-        for(int i=0;i<id.size();i++){
-            ids += "'"+id.get(i)+"'";
-            if(i!=id.size()-1){
-                ids+=",";
-            }
-        }
-        String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set oss_deleted=? where id in (?)";
-        jdbcTemplate.update(sql,status,ids);
     }
 
     @Override
@@ -183,29 +177,9 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
 
     @Override
-    public void batchDelete(Date createTime, String tenantId) {
-        String sql = " update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set deleted=1 WHERE deleted=0 AND tenant_id= ? AND create_time <=? ";
-        jdbcTemplate.update(sql,createTime,tenantId);
-    }
-
-    @Override
-    public List<Map> getOSSListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId, String areaId) {
-        String sql = " SELECT id,oss_url AS ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND area_id=? AND create_time <=? AND status=1 AND oss_deleted<>1 ";
-        List<Map> list = jdbcTemplate.queryForList(sql,Map.class,tenantId,areaId,createTime);
-        return list;
-    }
-
-    @Override
     public List<Map> getAAListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId, String areaId) {
         String sql = " SELECT id,url FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND area_id=? AND create_time <=? AND aa_deleted<>1 ";
         List<Map> list = jdbcTemplate.queryForList(sql,Map.class,tenantId,areaId,createTime);
-        return list;
-    }
-
-    @Override
-    public List<String> getOssAreaByCreateTimeAndTenantId(Date createTime, String tenantId) {
-        String sql = " SELECT DISTINCT area_id FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND create_time <=? AND status=1 AND oss_deleted<>1";
-        List<String> list = jdbcTemplate.queryForList(sql,String.class,tenantId,createTime);
         return list;
     }
 
@@ -215,19 +189,4 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         List<String> list = jdbcTemplate.queryForList(sql,String.class,tenantId,createTime);
         return list;
     }
-
-    @Override
-    public List<VoiceFileRecord> getListByCreateTimeAndTenantId(Date createTime, String tenantId) {
-        String hql = " from  VoiceFileRecord obj where obj.createTime<=?1 and obj.tenant.id=?2 ";
-        Page page = this.pageList(hql,1,20,createTime,tenantId);
-        List<VoiceFileRecord> list = new ArrayList<>();
-        while(page.getCurrentPageNo()<page.getTotalPageCount()){
-            list.addAll(page.getResult());
-            int index = Integer.valueOf(page.getCurrentPageNo()+"");
-            page = this.pageList(hql,index+1,20,createTime,tenantId);
-        }
-        return list;
-    }
-
-
 }

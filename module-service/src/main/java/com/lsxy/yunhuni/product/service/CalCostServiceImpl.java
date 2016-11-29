@@ -1,21 +1,17 @@
 package com.lsxy.yunhuni.product.service;
 
-import com.lsxy.yunhuni.api.consume.model.CaptchaUse;
+import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.model.VoiceTimeUse;
 import com.lsxy.yunhuni.api.consume.service.CaptchaUseService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.consume.service.VoiceTimeUseService;
-import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.Product;
+import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.product.model.ProductPrice;
-import com.lsxy.yunhuni.api.product.service.CalCostService;
-import com.lsxy.yunhuni.api.product.service.ProductPriceService;
-import com.lsxy.yunhuni.api.product.service.ProductService;
-import com.lsxy.yunhuni.api.product.service.ProductTenantDiscountService;
+import com.lsxy.yunhuni.api.product.service.*;
 import com.lsxy.yunhuni.api.session.model.VoiceCdr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +41,11 @@ public class CalCostServiceImpl implements CalCostService{
     CaptchaUseService captchaUseService;
     @Autowired
     VoiceTimeUseService voiceTimeUseService;
+    @Autowired
+    ProductItemService productItemService;
 
     @Override
-    public BigDecimal calCost(Product product, String tenantId, Long time) {
+    public BigDecimal calCost(ProductItem product, String tenantId, Long time) {
         BigDecimal cost;
         ProductPrice productPrice = productPriceService.getAvailableProductPrice(product.getId());
         Double discount = productTenantDiscountService.getDiscountByProductIdAndTenantId(product.getId(), tenantId);
@@ -56,10 +54,18 @@ public class CalCostServiceImpl implements CalCostService{
             cost = productPrice.getPrice().multiply(new BigDecimal(Double.toString(discount)));
         }else{
             //如果是计时，则只需 时长单位数量*单价*折扣
-            BigDecimal calNum = new BigDecimal(time).divide(new BigDecimal(product.getTimeUnit()), 0, BigDecimal.ROUND_UP);
+            BigDecimal calNum = new BigDecimal(time).divide(new BigDecimal(productPrice.getTimeUnit()), 0, BigDecimal.ROUND_UP);
             cost = calNum.multiply(productPrice.getPrice()).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
         }
         return cost;
+    }
+
+    @Override
+    public BigDecimal calCost(String code, String tenantId) {
+        ProductItem productItem = productItemService.getProductItemByCode(code);
+        ProductPrice productPrice = productPriceService.getAvailableProductPrice(productItem.getId());
+        BigDecimal discount = new BigDecimal(productTenantDiscountService.getDiscountByProductIdAndTenantId(productItem.getId(), tenantId));
+        return productPrice.getPrice().multiply(discount);
     }
 
     @Override
@@ -78,9 +84,10 @@ public class CalCostServiceImpl implements CalCostService{
             String tenantId = cdr.getTenantId();
             String appId = cdr.getAppId();
             Date dt = cdr.getCallEndDt();
-            Product product = productService.getProductByCode(productCode.name());
+            ProductItem product = productItemService.getProductItemByCode(productCode.name());
+            ProductPrice productPrice = productPriceService.getAvailableProductPrice(product.getId());
             //计量单位
-            String unit = product.getUnit();
+            String unit = productPrice.getUnit();
             switch (productCode){
     //            case captcha_call:{
     //                //短信
@@ -104,11 +111,11 @@ public class CalCostServiceImpl implements CalCostService{
     //            }
                 case sys_conf:{
                     //会议
-                    Long useTime = calUnitNum(time, product) * product.getTimeUnit();
+                    Long useTime = calUnitNum(time, productPrice.getTimeUnit()) * productPrice.getTimeUnit();
                     Long conference = calBillingService.getConference(tenantId);
                     if(useTime <= conference){
                         calBillingService.incUseConference(tenantId,dt,useTime);
-                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,productPrice.getTimeUnit(),productPrice.getUnit(),appId,tenantId);
                         voiceTimeUseService.save(use);
                         costTimeLong = useTime;
                         cost = new BigDecimal(0);
@@ -117,7 +124,7 @@ public class CalCostServiceImpl implements CalCostService{
                     }else if(conference > 0){
                         //先扣量
                         calBillingService.incUseConference(tenantId,dt,conference);
-                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,conference,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,conference,productPrice.getTimeUnit(),productPrice.getUnit(),appId,tenantId);
                         voiceTimeUseService.save(use);
                         //再扣费
                         BigDecimal consume = insertConsume(tenantId, appId, useTime - conference, dt, productCode.name(), productCode.getRemark(), product);
@@ -135,7 +142,7 @@ public class CalCostServiceImpl implements CalCostService{
                     break;
                 }
                 default:{
-                    Long useTime = calUnitNum(time, product) * product.getTimeUnit();
+                    Long useTime = calUnitNum(time, productPrice.getTimeUnit()) * productPrice.getTimeUnit();
                     if(logger.isDebugEnabled()){
                         logger.info("扣费通话时长：{}",useTime);
                     }
@@ -146,7 +153,7 @@ public class CalCostServiceImpl implements CalCostService{
                     }
                     if(useTime <= voice){
                         calBillingService.incUseVoice(tenantId,dt,useTime);
-                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,useTime,productPrice.getTimeUnit(),productPrice.getUnit(),appId,tenantId);
                         voiceTimeUseService.save(use);
                         costTimeLong = useTime;
                         cost = new BigDecimal(0);
@@ -155,7 +162,7 @@ public class CalCostServiceImpl implements CalCostService{
                     }else if(voice > 0){
                         //先扣量
                         calBillingService.incUseVoice(tenantId,dt,voice);
-                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,voice,product.getTimeUnit(),product.getUnit(),appId,tenantId);
+                        VoiceTimeUse use = new VoiceTimeUse(dt,productCode.name(),time,voice,productPrice.getTimeUnit(),productPrice.getUnit(),appId,tenantId);
                         voiceTimeUseService.save(use);
                         //再扣费
                         BigDecimal consume = insertConsume(tenantId, appId, useTime - voice, dt, productCode.name(), productCode.getRemark(), product);
@@ -242,7 +249,7 @@ public class CalCostServiceImpl implements CalCostService{
      * @param remark
      * @param product
      */
-    private BigDecimal insertConsume(String tenantId, String appId, Long time, Date dt, String code, String remark,Product product) {
+    private BigDecimal insertConsume(String tenantId, String appId, Long time, Date dt, String code, String remark,ProductItem product) {
         Tenant tenant = new Tenant();
         tenant.setId(tenantId);
         BigDecimal cost = this.calCost(product, tenantId, time);
@@ -254,11 +261,11 @@ public class CalCostServiceImpl implements CalCostService{
     /**
      * 多少个时长单位，时长/时长单位（不满一个时长单位按一个时长单位算)
      * @param time
-     * @param product
+     * @param timeUnit
      * @return
      */
-    private Long calUnitNum(Long time, Product product) {
-        return new BigDecimal(time).divide(new BigDecimal(product.getTimeUnit()),0,BigDecimal.ROUND_UP).longValue();
+    private Long calUnitNum(Long time, Integer timeUnit) {
+        return new BigDecimal(time).divide(new BigDecimal(timeUnit),0,BigDecimal.ROUND_UP).longValue();
     }
 
 }

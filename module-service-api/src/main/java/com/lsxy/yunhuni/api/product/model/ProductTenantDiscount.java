@@ -20,6 +20,15 @@ public class ProductTenantDiscount  extends IdEntity {
     private Double discount;    //小数点后两位数字
     private String remark;
 
+    public ProductTenantDiscount() {
+    }
+
+    public ProductTenantDiscount(String tenantId, String productId, Double discount) {
+        this.tenantId = tenantId;
+        this.productId = productId;
+        this.discount = discount;
+    }
+
     @Column(name = "tenant_id")
     public String getTenantId() {
         return tenantId;
