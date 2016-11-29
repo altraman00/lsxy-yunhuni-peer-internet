@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lsxy.app.portal.base.AbstractPortalController;
 import com.lsxy.app.portal.comm.PortalConstants;
 import com.lsxy.call.center.api.model.AppExtension;
+import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -98,12 +99,13 @@ public class AppController extends AbstractPortalController {
         List<TestNumBind> testNumBindList = (List<TestNumBind>)getTestNumBindList(request).getData();
 //        List<AppExtension> appExtensionList = (List<AppExtension>)getAppExtensionList(request,id).getData();
         mav.addObject("testNumBindList",testNumBindList);
-        AreaSip areaSip = app.getAreaSip();
-        if(areaSip!=null){
-            mav.addObject("sipRegistrar",app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
-        }else{
-            mav.addObject("sipRegistrar","");
-        }
+//        AreaSip areaSip = app.getAreaSip();
+//        if(areaSip!=null){
+//            mav.addObject("sipRegistrar",app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
+//        }else{
+//            mav.addObject("sipRegistrar","");
+//        }
+        mav.addObject("sipRegistrar", SystemConfig.getProperty("app.cc.opensips.domain"));
         mav.setViewName("/console/app/detail");
         return mav;
     }
