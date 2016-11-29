@@ -144,13 +144,6 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
 
     @Override
-    public List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime, Date endTime) {
-        String hql = " from VoiceFileRecord obj where obj.appId=?1 and obj.tenantId=?2 and obj.createTime<=?3 and obj.createTime>=?4";
-        List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
-        return list;
-    }
-
-    @Override
     public List<VoiceFileRecord> getListBySessionId(String sessionId) {
         String hql = "  FROM VoiceFileRecord obj WHERE obj.sessionId in ( ?1)";
         List list = this.list(hql, sessionId);
