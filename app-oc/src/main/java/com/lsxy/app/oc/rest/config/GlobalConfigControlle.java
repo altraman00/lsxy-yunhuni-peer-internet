@@ -46,7 +46,7 @@ public class GlobalConfigControlle extends AbstractRestController {
         if(StringUtils.isEmpty(globalEditVo.getValue())) {
             return RestResponse.failed("0000","修改内容为空");
         }
-        globalConfig.setValue(globalConfig.getValue());
+        globalConfig.setValue(globalEditVo.getValue());
         globalConfigService.save(globalConfig);
         return RestResponse.success("修改成功");
     }
