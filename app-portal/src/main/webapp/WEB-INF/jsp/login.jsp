@@ -23,7 +23,7 @@
 	<div class="login-box">
 		<div class="row">
 			<div class="col-sm-12 text-center">
-				<h3 class="login-text">登录壹云</h3>
+				<h3 class="login-text">登录壹耘</h3>
 			</div>
 		</div>
 		<div class="row">
@@ -75,7 +75,7 @@
 	<footer>
 		<div class="row">
 			<div class="col-sm-12 text-center login-footer">
-				Copyright 2016 壹云 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司
+				Copyright 2016 壹耘 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司
 			</div>
 		</div>
 	</footer>

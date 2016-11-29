@@ -16,7 +16,7 @@
         <a a href="#" onclick="window.location.href='<%=SystemConfig.getProperty("global.official.website.url")%>'">
         <img class="logo" src="${resPrefixUrl }/images/index/logo_top.png" /></a>
         <div class="text">
-            如果有壹云账号，<a href="${ctx }/login">立即登录</a>
+            如果有壹耘账号，<a href="${ctx }/login">立即登录</a>
         </div>
     </div>
 </div>
@@ -29,7 +29,7 @@
         </div>
         <div class="col-md-7 register-box">
             <div class="row">
-                <P class="col-md-3 text-right">壹云会员注册</P>
+                <P class="col-md-3 text-right">壹耘会员注册</P>
             </div>
             <div class="row">
                 <form:form role="form" action="${ctx }/reg/register" method="post" class="register-form" id="defaultForm" acceptCharset="utf-8">
@@ -82,7 +82,7 @@
 <!-- /container -->
 <!--footer-->
 <div class="register_footer">
-    <p>Copyright 2016 壹云 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
+    <p>Copyright 2016 壹耘 粤ICP备16048993号 All Rights Reserved 广州流水行云科技有限公司</p>
 </div>
 <!--/footer-->
 <!--modal-->
