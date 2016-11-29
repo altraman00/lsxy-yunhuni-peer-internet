@@ -413,7 +413,7 @@ public class IVRActionService {
             return false;
         }
 
-        if(state.getClosed()){
+        if(state.getClosed() != null && state.getClosed()){
             logger.info("IVR呼叫已关闭，call_id={}",call_id);
             return false;
         }

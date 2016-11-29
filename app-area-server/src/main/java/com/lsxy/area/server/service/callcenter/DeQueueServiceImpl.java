@@ -73,7 +73,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                     tenantId,appId,callId,queueId,result);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
@@ -120,7 +120,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             return;
         }
@@ -143,7 +143,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             return;
         }
