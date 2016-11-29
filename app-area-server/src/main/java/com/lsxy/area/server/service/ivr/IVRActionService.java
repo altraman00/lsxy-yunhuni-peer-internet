@@ -332,9 +332,7 @@ public class IVRActionService {
     }
 
     private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, Integer iscc){
-
         String areaId = areaAndTelNumSelector.getAreaId(app);
-
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenant.getId())
@@ -345,37 +343,36 @@ public class IVRActionService {
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
-                .setBusinessData(new MapBuilder<String,Object>()
+                .setBusinessData(new MapBuilder<String,String>()
                         //incoming事件from 和 to是相反的
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
-                        .putIfNotEmpty(ConversationService.ISCC_FIELD,iscc)
+                        .putIfNotEmpty(ConversationService.ISCC_FIELD,iscc !=null ? iscc.toString():null)
                         .build())
                 .build();
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_CALLING);
-        callSession.setFromNum(to);
-        callSession.setToNum(from);
-        callSession.setApp(app);
-        callSession.setTenant(tenant);
-        callSession.setRelevanceId(call_id);
-        callSession.setType(CallSession.TYPE_VOICE_IVR);
-        callSession.setResId(state.getResId());
-        callSession = callSessionService.save(callSession);
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-            state.setBusinessData(businessData);
-        }
-        businessData.put("sessionid",callSession.getId());
         businessStateService.save(state);
-        VoiceIvr voiceIvr = new VoiceIvr();
-        voiceIvr.setId(call_id);
-        voiceIvr.setFromNum(from);
-        voiceIvr.setToNum(to);
-        voiceIvr.setStartTime(new Date());
-        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
-        voiceIvrService.save(voiceIvr);
+        try{
+            CallSession callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSession.setFromNum(to);
+            callSession.setToNum(from);
+            callSession.setApp(app);
+            callSession.setTenant(tenant);
+            callSession.setRelevanceId(call_id);
+            callSession.setType(CallSession.TYPE_VOICE_IVR);
+            callSession.setResId(state.getResId());
+            callSession = callSessionService.save(callSession);
+            businessStateService.updateInnerField(call_id,"sessionid",callSession.getId());
+            VoiceIvr voiceIvr = new VoiceIvr();
+            voiceIvr.setId(call_id);
+            voiceIvr.setFromNum(from);
+            voiceIvr.setToNum(to);
+            voiceIvr.setStartTime(new Date());
+            voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+            voiceIvrService.save(voiceIvr);
+        }catch (Throwable t){
+            logger.error("保存callsession失败",t);
+        }
     }
 
     private void reject(App app,String res_id,String call_id){
@@ -421,14 +418,12 @@ public class IVRActionService {
             return false;
         }
 
-        Map<String,Object> businessDate = state.getBusinessData();
-        if(businessDate == null){
-            businessDate = new HashMap<>();
-        }
-        Object nextUrl = businessDate.get("next");
+        Map<String,String> businessDate = state.getBusinessData();
+
+        String nextUrl = businessDate.get("next");
 
         // is "" 代表没有next，null代表第一次
-        if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
+        if(nextUrl!=null && StringUtils.isBlank(nextUrl)){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
             hangup(state.getResId(),call_id,state.getAreaId());
             return  false;
@@ -443,7 +438,7 @@ public class IVRActionService {
             }
             resXML = getFirstIvr(call_id,app.getUrl());
         }else{
-            resXML = getNextRequest(call_id,nextUrl.toString());
+            resXML = getNextRequest(call_id,nextUrl);
         }
         if(StringUtils.isBlank(resXML)){
             return false;

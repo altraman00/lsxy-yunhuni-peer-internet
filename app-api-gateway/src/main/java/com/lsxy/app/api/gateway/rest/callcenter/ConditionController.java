@@ -57,7 +57,7 @@ public class ConditionController extends AbstractAPIController {
         return ApiGatewayResponse.success(result);
     }
 
-    @RequestMapping(value = "/{accountId}/callcenter/condition/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/{accountId}/callcenter/condition/{id}",method = RequestMethod.POST)
     public ApiGatewayResponse modify(HttpServletRequest request, @PathVariable String accountId,
                                    @RequestHeader(value = "AppID") String appId,
                                    @PathVariable String id,
