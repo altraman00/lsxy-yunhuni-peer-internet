@@ -17,6 +17,7 @@ import java.util.Date;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_oc_config_tenant")
 public class TenantConfig extends IdEntity {
     private String tenantId;//所属租户
+    private String appId;//所属租户
     private String type;//配置类型
     private String keyName;//标识名
     private String name;//配置名
@@ -32,6 +33,16 @@ public class TenantConfig extends IdEntity {
     public void setKeyName(String keyName) {
         this.keyName = keyName;
     }
+    @Column(name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+
 
     @Column(name = "tenant_id")
     public String getTenantId() {
