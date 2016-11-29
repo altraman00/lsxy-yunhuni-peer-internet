@@ -606,7 +606,7 @@ public class ConversationService {
             return;
         }
         if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType())){
-            if(!call_state.getClosed()){
+            if(call_state.getClosed() == null || !call_state.getClosed()){
                 if(logger.isDebugEnabled()){
                     logger.debug("开始重新进入ivr，callid={}",callId);
                 }

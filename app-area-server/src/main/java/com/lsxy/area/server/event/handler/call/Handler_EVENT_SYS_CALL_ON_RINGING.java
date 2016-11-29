@@ -90,7 +90,7 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                     if(logger.isDebugEnabled()){
                         logger.info("开始判断振铃前是否客户挂断了呼叫2:{}",initiatorState);
                     }
-                    if(initiatorState!=null && initiatorState.getClosed()){
+                    if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
                         conversationService.logicExit(conversation,state.getId());
                         return res;
                     }
