@@ -11,12 +11,15 @@ import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.GlobalConfig;
+import com.lsxy.yunhuni.api.config.model.TenantConfig;
 import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
+import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
@@ -38,6 +41,8 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 租户号码租用service
@@ -70,6 +75,10 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     GlobalConfigService globalConfigService;
     @Autowired
     TenantConfigService tenantConfigService;
+    @Autowired
+    AppService appService;
+    @Autowired
+    VoiceFileRecordService voiceFileRecordService;
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
         Tenant tenant = null;
@@ -177,6 +186,44 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public void recordingVoiceFileTask() {
+        GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
+        if(globalConfig!=null&&StringUtils.isNotEmpty(globalConfig.getValue())){
+            //全局录音文件存储时长时间
+            Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
+    	    Matcher matcher = pattern.matcher(globalConfig.getValue());
+            if(!matcher.matches()){
+                //配置不是正整数则结束
+                return;
+            }
+            int globalRecording = Integer.valueOf(globalConfig.getValue());
+            List<TenantConfig> list = tenantConfigService.getPageByTypeAndKeyName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
+            for(int i=0;i<list.size();i++){
+                TenantConfig tenantConfig = list.get(i);
+                if(StringUtils.isNotEmpty(tenantConfig.getValue())&&StringUtils.isNotEmpty(tenantConfig.getTenantId())&&StringUtils.isNotEmpty(tenantConfig.getAppId())){
+                    int tenantRecording = 0;
+                    Matcher matcher1 = pattern.matcher(globalConfig.getValue());
+                    if(matcher1.matches()){
+                        tenantRecording = Integer.valueOf(tenantConfig.getValue());
+                    }
+                    //全局配置的录音文件存储时间不收费，租户的应用下的配置如果大于全局配置的话需要收费
+                    if(tenantRecording>globalRecording){
+                        Tenant tenant = tenantService.findById(tenantConfig.getTenantId());
+                        BigDecimal cost = calCostService.calCost(ProductItem.RECORDING_MEMORY,tenant.getId());
+                        App app = appService.findById(tenantConfig.getAppId());
+                        if(tenant!=null&&app!=null){
+                            //获取租户应用下的录音文件 isDeleted
+                            long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
+                            long g = 1024*1024*1024;
+                            if(size>0) {
+                                long s1 = size / g + g % g > 0 ? 1 : 0;
+                                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),cost.multiply(new BigDecimal(s1)),ConsumeCode.recording_memory.getName(),app.getId(),tenant);
+                                consumeService.consume(consume);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
