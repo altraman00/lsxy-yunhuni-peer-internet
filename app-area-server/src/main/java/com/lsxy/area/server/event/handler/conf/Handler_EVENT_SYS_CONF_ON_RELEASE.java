@@ -104,10 +104,10 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
 
     private void conf(BusinessState state,Map<String,Object> params,String conf_id){
         String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
+        Map<String,String> businessData = state.getBusinessData();
         Boolean auto_hangup = Boolean.FALSE;
         if(businessData!=null){
-            auto_hangup = (Boolean)businessData.get("auto_hangup");
+            auto_hangup = Boolean.parseBoolean(businessData.get("auto_hangup"));
         }
         if(auto_hangup != null && auto_hangup){
             handupParts(conf_id);

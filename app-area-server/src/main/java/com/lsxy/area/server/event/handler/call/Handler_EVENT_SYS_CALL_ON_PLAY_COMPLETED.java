@@ -91,8 +91,7 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
             boolean isPlaywait = conversationService.isPlayWait(call_id);
             if(isPlaywait){
                 //等待音播放完成需要移除等待音标记
-                state.getBusinessData().remove(ConversationService.IS_PLAYWAIT_FIELD);
-                businessStateService.save(state);
+                businessStateService.deleteInnerField(call_id,ConversationService.IS_PLAYWAIT_FIELD);
             }
             if(!isPlaywait){//不是ivr呼叫中心排队
                 return true;

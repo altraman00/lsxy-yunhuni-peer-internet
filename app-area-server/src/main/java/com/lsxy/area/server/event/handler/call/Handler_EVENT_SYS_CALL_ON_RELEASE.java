@@ -58,6 +58,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     @Reference
     private CallCenterAgentService callCenterAgentService;
 
+    @Autowired
+    private ConversationService conversationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_RELEASE;
@@ -93,10 +96,14 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         }
 
         //更新会话记录状态
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
-        if(callSession != null){
-            callSession.setStatus(CallSession.STATUS_OVER);
-            callSessionService.save(callSession);
+        try{
+            CallSession callSession = callSessionService.findById(state.getBusinessData().get("sessionid"));
+            if(callSession != null){
+                callSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.save(callSession);
+            }
+        }catch (Throwable t){
+            logger.error("更新会话记录失败",t);
         }
 
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
@@ -131,15 +138,22 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
             String ivr_dial_call_id = null;
             if(state.getBusinessData() != null){
-                ivr_dial_call_id = (String)state.getBusinessData().get("ivr_dial_call_id");
+                ivr_dial_call_id = state.getBusinessData().get("ivr_dial_call_id");
             }
             if(StringUtils.isNotBlank(ivr_dial_call_id)){
                 hugup(ivr_dial_call_id,state.getAreaId());
             }
+
+            if(conversationService.isCC(call_id)){
+                String conversation_id = state.getBusinessData().get(ConversationService.CONVERSATION_FIELD);
+                if(conversation_id != null){
+                    conversationService.logicExit(conversation_id,call_id);
+                }
+            }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
-            String agentId = (String)state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
+            String agentId = state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
             if(agentId != null){
-                String reserve_state = (String)state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
+                String reserve_state = state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
                 try {
                     callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (YunhuniApiException e) {

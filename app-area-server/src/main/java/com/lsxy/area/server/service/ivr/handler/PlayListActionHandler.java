@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +67,6 @@ public class PlayListActionHandler extends ActionHandler{
             logger.debug("开始处理ivr[{}]动作，finish_keys={},plays={}",
                     getAction(),finish_keys,plays);
         }
-
-        Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         if(plays!=null && plays.size()>0){
             try {
@@ -88,12 +85,7 @@ public class PlayListActionHandler extends ActionHandler{
                 logger.error("调用失败",e);
             }
         }
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId,"next",next);
         return true;
     }
 }

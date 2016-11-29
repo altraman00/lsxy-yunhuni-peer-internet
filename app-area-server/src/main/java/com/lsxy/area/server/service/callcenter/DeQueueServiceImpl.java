@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -79,14 +78,10 @@ public class DeQueueServiceImpl implements DeQueueService {
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
+        String conversation = UUIDGenerator.uuid();
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-            state.setBusinessData(businessData);
-        }
-        businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId,ConversationService.CONVERSATION_FIELD,conversation);
+        businessStateService.updateInnerField(callId,ConversationService.QUEUE_ID_FIELD,queueId);
 
         BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
         Integer conversationTimeout = enQueue.getConversation_timeout();
@@ -94,26 +89,28 @@ public class DeQueueServiceImpl implements DeQueueService {
         boolean playNum = enQueue.isPlay_num();
         String preNumVoice = enQueue.getPre_num_voice();
         String postNumVoice = enQueue.getPost_num_voice();
-        String conversation = UUIDGenerator.uuid();
+
         String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
         conversationService.create(conversation,state.getId(),
-                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+                state.getBusinessData().get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
 
 
-        BusinessState agentState = businessStateService.get(agentCallId);
         if(reserveState != null){
-            agentState.getBusinessData().put(ConversationService.RESERVE_STATE_FIELD,reserveState);
+            businessStateService.updateInnerField(agentCallId,ConversationService.RESERVE_STATE_FIELD,reserveState);
         }
         if(playNum){
-            agentState.getBusinessData().put(ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
-            agentState.getBusinessData().put(ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
-            agentState.getBusinessData().put(ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
-        }
-        if(reserveState != null || playNum){
-            businessStateService.save(agentState);
+            if(result.getAgent().getNum() != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
+            }
+            if(preNumVoice != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
+            }
+            if(postNumVoice != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
+            }
         }
     }
 

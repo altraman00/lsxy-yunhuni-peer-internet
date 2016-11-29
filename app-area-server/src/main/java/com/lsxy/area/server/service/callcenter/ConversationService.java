@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -128,6 +129,9 @@ public class ConversationService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
+    @Value(value = "${app.cc.opensips.ip}")
+    private String sip_address;
+
     public BaseEnQueue getEnqueue(String queueId){
         BaseEnQueue enqueue = null;
         try{
@@ -151,12 +155,16 @@ public class ConversationService {
         }
         BusinessState state = businessStateService.get(conversation);
         if(state != null && state.getBusinessData()!= null){
-            String initiator = (String)state.getBusinessData().get(INITIATOR_FIELD);
+            String initiator = state.getBusinessData().get(INITIATOR_FIELD);
             if(initiator != null && initiator.equals(callId)){
                 return CallCenterConversationMember.INITIATOR_TRUE;
             }
         }
         return CallCenterConversationMember.INITIATOR_FALSE;
+    }
+
+    public boolean isInitiatorBool(String conversation,String callId){
+        return CallCenterConversationMember.INITIATOR_TRUE.equals(isInitiator(conversation, callId));
     }
 
     public boolean isCC(String callId){
@@ -165,8 +173,8 @@ public class ConversationService {
         }
         BusinessState state = businessStateService.get(callId);
         if(state != null && state.getBusinessData()!= null){
-            Integer iscc = (Integer)state.getBusinessData().get(ISCC_FIELD);
-            return iscc !=null && iscc == 1;
+            String iscc = state.getBusinessData().get(ISCC_FIELD);
+            return iscc !=null && Integer.parseInt(iscc) == 1;
         }
         return false;
     }
@@ -177,8 +185,8 @@ public class ConversationService {
         }
         BusinessState state = businessStateService.get(callId);
         if(state != null && state.getBusinessData()!= null){
-            Integer playWait = (Integer)state.getBusinessData().get(IS_PLAYWAIT_FIELD);
-            return playWait !=null && playWait == IS_PLAYWAIT_TRUE;
+            String playWait = state.getBusinessData().get(IS_PLAYWAIT_FIELD);
+            return playWait !=null && Integer.parseInt(playWait) == IS_PLAYWAIT_TRUE;
         }
         return false;
     }
@@ -186,7 +194,7 @@ public class ConversationService {
     public String getInitiator(String conversation){
         BusinessState state = businessStateService.get(conversation);
         if(state != null && state.getBusinessData()!= null){
-            return  (String)state.getBusinessData().get(INITIATOR_FIELD);
+            return state.getBusinessData().get(INITIATOR_FIELD);
         }
         return null;
     }
@@ -237,9 +245,9 @@ public class ConversationService {
                 .setType(BusinessState.TYPE_CC_CONVERSATION)
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
-                .setBusinessData(new MapBuilder<String,Object>()
+                .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
-                        .put("max_seconds",maxDuration,MAX_DURATION)//交谈最大持续时长
+                        .put("max_seconds",maxDuration!=null?maxDuration.toString():null,""+MAX_DURATION)//交谈最大持续时长
                         .build())
                 .build();
         businessStateService.save(state);
@@ -267,12 +275,10 @@ public class ConversationService {
             //不能跨app操作
             throw new ConfNotExistsException();
         }
-        String areaId = areaAndTelNumSelector.getAreaId(app);
-
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",state.getResId())
                 .putIfNotEmpty("user_data",conversationId)
-                .putIfNotEmpty("areaId",areaId)
+                .putIfNotEmpty("areaId",state.getAreaId())
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RELEASE, params);
@@ -311,9 +317,9 @@ public class ConversationService {
             areaId = selector.getAreaId();
             lineId = selector.getLineId();
         }else{
-            from = "callcenter@sip.yunhuni.com";
-            to = user;
             areaId = areaAndTelNumSelector.getAreaId(app);
+            from = "system@"+areaId+".area.oneyun.com";
+            to = user + "@" + sip_address;
         }
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
@@ -348,7 +354,7 @@ public class ConversationService {
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
-                .setBusinessData(new MapBuilder<String,Object>()
+                .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty("from",from)
@@ -421,12 +427,12 @@ public class ConversationService {
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
-                .setBusinessData(new MapBuilder<String,Object>()
+                .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
-                        .putIfNotEmpty("voice_mode",voiceMode)//加入后的声音模式
+                        .putIfNotEmpty("voice_mode",voiceMode!=null?voiceMode.toString():null)//加入后的声音模式
                         .putIfNotEmpty("sessionid",callSession.getId())
                         .build())
                 .build();
@@ -466,25 +472,25 @@ public class ConversationService {
             throw new IllegalArgumentException();
         }
 
-        Map<String,Object> call_business=call_state.getBusinessData();
-        Map<String,Object> conversation_business=conversation_state.getBusinessData();
+        Map<String,String> call_business=call_state.getBusinessData();
+        Map<String,String> conversation_business=conversation_state.getBusinessData();
 
         Integer max_seconds = maxDuration == null ? 0 : maxDuration;
         Integer voice_mode = voiceMode == null ? 1 : voiceMode;
         String play_file = playFile == null ? "" : playFile;
 
         if(call_business != null && call_business.get("max_seconds")!=null){
-            max_seconds = (Integer)call_business.get("max_seconds");
+            max_seconds = Integer.parseInt(call_business.get("max_seconds"));
         }else if(conversation_business != null && conversation_business.get("max_seconds")!=null){
-            max_seconds = (Integer)conversation_business.get("max_seconds");
+            max_seconds = Integer.parseInt(conversation_business.get("max_seconds"));
         }
 
         if(call_business != null && call_business.get("voice_mode")!=null){
-            voice_mode = (Integer) call_business.get("voice_mode");
+            voice_mode = Integer.parseInt(call_business.get("voice_mode"));
         }
 
         if(call_business != null && call_business.get("play_file")!=null){
-            play_file = (String) call_business.get("play_file");
+            play_file = call_business.get("play_file");
         }
 
         play_file = playFileUtil.convert(conversation_state.getTenantId(),conversation_state.getAppId(),play_file);
@@ -503,12 +509,8 @@ public class ConversationService {
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
-        if(call_business!=null){
-            if(call_business.get(ConversationService.CONVERSATION_FIELD) == null){
-                call_business.put(ConversationService.CONVERSATION_FIELD,conversation_id);
-                call_state.setBusinessData(call_business);
-                businessStateService.save(call_state);
-            }
+        if(call_business.get(ConversationService.CONVERSATION_FIELD) == null){
+            businessStateService.updateInnerField(call_id,ConversationService.CONVERSATION_FIELD,conversation_id);
         }
         if(logger.isDebugEnabled()){
             logger.debug("完成呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
@@ -541,18 +543,12 @@ public class ConversationService {
             logger.info("(!call_state.getAppId().equals(conversation_state.getAppId()))conversationId={},callId={}",conversationId,callId);
             return;
         }
-        App app = appService.findById(call_state.getAppId());
-        if(app == null){
-            logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
-            return;
-        }
         try {
-            String areaId = areaAndTelNumSelector.getAreaId(app);
             Map<String,Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",call_state.getResId())
                     .putIfNotEmpty("conf_res_id",conversation_state.getResId())
                     .putIfNotEmpty("user_data",callId)
-                    .putIfNotEmpty("areaId",areaId)
+                    .putIfNotEmpty("areaId",call_state.getAreaId())
                     .build();
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_CONF_EXIT, params);
             rpcCaller.invoke(sessionContext, rpcrequest);
@@ -604,22 +600,38 @@ public class ConversationService {
         callConversationService.decrConversation(callId,conversationId);
         if(callConversationService.size(callId) > 0){
             //TODO 回到上一次交谈
-            logger.info("回到上一次交谈callid={}",callId);
+            if(logger.isDebugEnabled()) {
+                logger.debug("回到上一次交谈callid={}", callId);
+            }
             return;
         }
         if(BusinessState.TYPE_IVR_INCOMING.equals(call_state.getType())){
-            logger.info("开始重新进入ivr，callid={}",callId);
-            ivrActionService.doAction(callId);
+            if(!call_state.getClosed()){
+                if(logger.isDebugEnabled()){
+                    logger.debug("开始重新进入ivr，callid={}",callId);
+                }
+                ivrActionService.doAction(callId);
+            }else if(this.size(conversationId) <= 1){
+                if(logger.isDebugEnabled()){
+                    logger.debug("开始呼入ivr挂断后，解散会议，callid={}",callId);
+                }
+                try {
+                    this.dismiss(call_state.getAppId(),conversationId);
+                } catch (Throwable e) {
+                    logger.error("呼入ivr挂断后，解散会议",e);
+                }
+            }
         }else{
             //不是ivr 不需要下一步  直接挂断
-            logger.info("开始挂断坐席",callId);
+            if(logger.isDebugEnabled()) {
+                logger.debug("开始挂断坐席callid={}", callId);
+            }
             App app = appService.findById(call_state.getAppId());
             if(app == null){
                 logger.info("(app == null)conversationId={},callId={}",conversationId,callId);
                 return;
             }
-            String areaId = areaAndTelNumSelector.getAreaId(app);
-            hangup(call_state.getResId(),callId,areaId);
+            hangup(call_state.getResId(),callId,call_state.getAreaId());
         }
     }
 
@@ -633,14 +645,14 @@ public class ConversationService {
             return;
         }
         try{
-            Map<String,Object> businessData = state.getBusinessData();
+            Map<String,String> businessData = state.getBusinessData();
             callConversationService.incrConversation(call_id,conversation_id);
             this.incrPart(conversation_id,call_id);
             CallCenterConversationMember member = new CallCenterConversationMember();
             member.setCallId(call_id);
             member.setRelevanceId(conversation_id);
             member.setStartTime(new Date());
-            member.setSessionId((String)businessData.get("sessionid"));
+            member.setSessionId(businessData.get("sessionid"));
             member.setIsInitiator(this.isInitiator(conversation_id,call_id));
             callCenterConversationMemberService.save(member);
         }catch (Throwable t){
