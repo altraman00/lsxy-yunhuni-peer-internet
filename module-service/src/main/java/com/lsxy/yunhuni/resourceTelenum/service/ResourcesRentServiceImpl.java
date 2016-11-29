@@ -208,8 +208,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     //全局配置的录音文件存储时间不收费，租户的应用下的配置如果大于全局配置的话需要收费
                     if(tenantRecording>globalRecording){
                         Tenant tenant = tenantService.findById(tenantConfig.getTenantId());
-                        BigDecimal cost = calCostService.calCost(ProductItem.RECORDING_MEMORY,tenant.getId());
                         App app = appService.findById(tenantConfig.getAppId());
+                        BigDecimal cost = calCostService.calCost(ProductItem.RECORDING_MEMORY,tenant.getId());
                         if(tenant!=null&&app!=null){
                             //获取租户应用下的录音文件 isDeleted
                             long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
