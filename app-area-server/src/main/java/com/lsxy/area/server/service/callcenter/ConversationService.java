@@ -129,7 +129,7 @@ public class ConversationService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
-    @Value(value = "${app.cc.opensips.domain}")
+    @Value(value = "${app.cc.opensips.ip}")
     private String sip_address;
 
     public BaseEnQueue getEnqueue(String queueId){
