@@ -72,7 +72,7 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
         globalTime --;
         for(int i=0;i<tenants.size();i++) {
             //获取租户过期的时间
-            TenantConfig tenantConfig = tenantConfigService.findByTypeAndNameAndTenantId(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING,tenants.get(i).getId());
+            TenantConfig tenantConfig = tenantConfigService.findByTypeAndKeyNameAndTenantId(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING,tenants.get(i).getId());
             int tenantTime = 0;
             if(tenantConfig!=null&&StringUtil.isNotEmpty(tenantConfig.getValue())){
                 try {

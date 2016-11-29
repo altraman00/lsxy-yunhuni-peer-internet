@@ -11,11 +11,7 @@ import java.util.List;
 public interface TenantConfigService extends BaseService<TenantConfig> {
     /**
      * 获取配置对象
-     * @param type 类型
-     * @param name 名字
-     * @return
      */
-    TenantConfig findByTypeAndNameAndTenantId(String type, String name,String tenantId);
     TenantConfig findByTypeAndKeyNameAndTenantId(String type, String keyName,String tenantId);
     List<TenantConfig> getPageByTypeAndKeyName(String type, String keyName);
 }

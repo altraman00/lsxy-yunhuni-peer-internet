@@ -25,11 +25,6 @@ public class TenantConfigServiceImpl extends AbstractService<TenantConfig> imple
     }
 
     @Override
-    public TenantConfig findByTypeAndNameAndTenantId(String type, String name,String tenantId) {
-        return tenantConfigDao.findByTypeAndNameAndTenantId(type,name,tenantId);
-    }
-
-    @Override
     public TenantConfig findByTypeAndKeyNameAndTenantId(String type, String keyName, String tenantId) {
         return null;
     }
