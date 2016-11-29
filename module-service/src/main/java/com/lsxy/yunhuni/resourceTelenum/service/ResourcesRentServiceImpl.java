@@ -215,7 +215,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                             long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
                             long g = 1024*1024*1024;
                             if(size>0) {
-                                long s1 = size / g + g % g > 0 ? 1 : 0;
+                                long s1 = (size / g) + (g % g > 0 ? 1 : 0);
                                 Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),cost.multiply(new BigDecimal(s1)),ConsumeCode.recording_memory.getName(),app.getId(),tenant);
                                 consumeService.consume(consume);
                             }
