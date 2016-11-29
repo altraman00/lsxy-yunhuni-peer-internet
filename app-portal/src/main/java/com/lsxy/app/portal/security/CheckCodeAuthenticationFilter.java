@@ -2,6 +2,8 @@ package com.lsxy.app.portal.security;
 
 import com.lsxy.app.portal.comm.PortalConstants;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -20,6 +22,7 @@ import java.io.IOException;
  * Created by liups on 2016/6/17.
  */
 class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+    private static final Logger logger = LoggerFactory.getLogger(CheckCodeAuthenticationFilter.class);
     //验证码超时
     public static final String VC_OVERTIME = "验证码超时";
 
@@ -41,18 +44,23 @@ class CheckCodeAuthenticationFilter extends AbstractAuthenticationProcessingFilt
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res=(HttpServletResponse)response;
-
+        String expect = (String) req.getSession().getAttribute(PortalConstants.VC_KEY);
         if ("POST".equalsIgnoreCase(req.getMethod())&&servletPath.equals(req.getServletPath())){
+            if(logger.isDebugEnabled()){
+                logger.debug("校验图形验证码：当前验证码[{}],输入验证码[{}],暗码[{}]",req.getParameter(PortalConstants.VC_KEY),expect,hideCode);
+            }
+            //是否通过暗码验证
+            boolean flag = false;
             //暗码校验，非生产环境可用start-↓↓↓↓↓↓↓↓--->
             if(StringUtils.isNotBlank(hideCode)){
                 if(req.getParameter(PortalConstants.VC_KEY).equals(hideCode.substring(0,4))){
                     //正确，清空图形验证码
                     req.getSession().removeAttribute(PortalConstants.VC_KEY);
+                    flag = true;
                 }
             }
             //暗码校验，非生产环境可用end-↑↑↑↑↑↑↑↑↑--->
-            else {
-                String expect = (String) req.getSession().getAttribute(PortalConstants.VC_KEY);
+            if(!flag){
                 if (expect == null) {
                     unsuccessfulAuthentication(req, res, new InsufficientAuthenticationException(VC_OVERTIME));
                     return;

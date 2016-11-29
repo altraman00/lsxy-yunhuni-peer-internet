@@ -73,8 +73,16 @@ then
    exit 1;
 fi
 
-cd $YUNHUNI_HOME
+export MAVEN_OPTS="$MAVEN_OPTS -Xms256m -Xmx512m"
+echo "MAVEN 构建参数：$MAVEN_OPTS"
+#先停止制定的APP服务
+echo "停止现有服务...."
+ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
+ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 
+
+cd $YUNHUNI_HOME
+git remote prune origin
 #更新代码和安装模块组件
 pull_ret=`git pull`
 if [ "$pull_ret"x = "Already up-to-date."x ]; then
@@ -96,12 +104,11 @@ else
         echo "已经是最新代码了 不用CLEAN INSTALL了";
     fi
 fi
+if [ $? -ne 0 ];then
+        echo "mvn compile failed"
+        exit 1
+fi
 
-
-#先停止制定的APP服务
-echo "停止现有服务...."
-ps -ef | grep "$APP_NAME.*tomcat7:run" | grep -v grep |awk '{print $2}' | xargs kill -9
-ps -ef | grep "$APP_NAME.*spring-boot:run" | grep -v grep |awk '{print $2}' | xargs kill -9
 
 #启动服务脚本
 
@@ -117,6 +124,18 @@ elif [ $IS_SPRINGBOOT = true ]; then
 elif [ $IS_TOMCAT_DEPLOY = true ]; then
   echo "deploy war to tomcat...."
   nohup mvn -U $ENV_PROFILE tomcat7:redeploy 1>> /opt/yunhuni/logs/$APP_NAME.out 2>> /opt/yunhuni/logs/$APP_NAME.out &
+fi
+
+sleep 20;
+PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
+if [ $IS_TOMCAT_DEPLOY = false ]; then
+    if [ $PROCESS_NUM -eq 1 ];
+        then
+            echo "start sucess"
+        else
+            echo "start fail"
+            exit 1
+    fi
 fi
 echo "OK";
 
