@@ -431,7 +431,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         boolean lock = agentLock.lock();
         if(!lock){
             //获取锁失败
-            throw new ExtensionBindingToAgentException();
+            throw new SystemBusyException();
         }
         try{
             if(!force){
@@ -445,11 +445,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 state = AgentState.Model.STATE_IDLE;
             }
             agentState.setState(agentId,state);
-            if(state.contains(AgentState.Model.STATE_IDLE)){
-                enQueueService.lookupQueue(tenantId,appId,null,agentId);
-            }
         }finally {
             agentLock.unlock();
+        }
+        if(state.contains(AgentState.Model.STATE_IDLE)){
+            enQueueService.lookupQueue(tenantId,appId,null,agentId);
         }
     }
 
