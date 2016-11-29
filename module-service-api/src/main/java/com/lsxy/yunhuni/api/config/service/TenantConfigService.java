@@ -12,6 +12,6 @@ public interface TenantConfigService extends BaseService<TenantConfig> {
     /**
      * 获取配置对象
      */
-    TenantConfig findByTypeAndKeyNameAndTenantId(String type, String keyName,String tenantId);
+    TenantConfig findByTypeAndKeyNameAndTenantIdAndAppId(String type, String keyName,String tenantId,String appId);
     List<TenantConfig> getPageByTypeAndKeyName(String type, String keyName);
 }
