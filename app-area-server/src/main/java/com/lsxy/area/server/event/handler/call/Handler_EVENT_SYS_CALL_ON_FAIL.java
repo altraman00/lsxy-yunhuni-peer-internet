@@ -77,16 +77,16 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
         }
 
         //更新会话记录状态
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        CallSession callSession = callSessionService.findById(state.getBusinessData().get("sessionid"));
         if(callSession != null){
             callSession.setStatus(CallSession.STATUS_EXCEPTION);
             callSessionService.save(callSession);
         }
 
         if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//ivr拨号失败需要继续ivr
-            Map<String,Object> businessData = state.getBusinessData();
+            Map<String,String> businessData = state.getBusinessData();
             if(businessData != null){
-                String ivr_call_id = (String)businessData.get("ivr_call_id");
+                String ivr_call_id = businessData.get("ivr_call_id");
                 if(StringUtil.isNotEmpty(ivr_call_id)){
                     Map<String,Object> notify_data = new MapBuilder<String,Object>()
                             .putIfNotEmpty("event","ivr.connect_end")
@@ -102,8 +102,8 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())||
                 BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
-            Map<String,Object> businessData = state.getBusinessData();
-            String conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
+            Map<String,String> businessData = state.getBusinessData();
+            String conversation_id = businessData.get(ConversationService.CONVERSATION_FIELD);
             conversationService.logicExit(conversation_id,call_id);
         }
         return res;

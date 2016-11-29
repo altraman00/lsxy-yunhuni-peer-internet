@@ -209,7 +209,7 @@ public class CallServiceImpl implements CallService {
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
         try {
-            Map<String,Object> data = new MapBuilder<String,Object>()
+            Map<String,String> data = new MapBuilder<String,String>()
                     .put(to1_uri,callSession.getId())
                     .put(to2_uri,callSession2.getId())
                     .build();
@@ -324,7 +324,7 @@ public class CallServiceImpl implements CallService {
 
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
-            Map<String,Object> data = new MapBuilder<String,Object>()
+            Map<String,String> data = new MapBuilder<String,String>()
                     .put("sessionid",callSession.getId())
                     .build();
             //将数据存到redis
@@ -343,84 +343,6 @@ public class CallServiceImpl implements CallService {
 
 
             rpcCaller.invoke(sessionContext, rpcrequest);
-            return callId;
-        }catch(Exception ex){
-            throw new InvokeCallException(ex);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public String captchaCall(String ip, String appId, String from,String to,String verify_code,
-                              String max_dial_duration,String max_keys,List<String> files,String user_data) throws YunhuniApiException{
-        if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
-        }
-        App app = appService.findById(appId);
-        if(app == null){
-            throw new AppNotFoundException();
-        }
-
-        String whiteList = app.getWhiteList();
-        if(StringUtils.isNotBlank(whiteList.trim())){
-            if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
-            }
-        }
-        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceValidate)){
-            throw new AppServiceInvalidException();
-        }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
-
-        //TODO 获取线路IP和端口
-        //TODO 待定
-        String callId = UUIDGenerator.uuid();
-        //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber();
-        String lineId = selector.getLineId();
-
-        Map<String, Object> params = new MapBuilder<String, Object>()
-                .putIfNotEmpty("to_uri",selector.getToUri())
-                .putIfNotEmpty("from_uri",oneTelnumber)
-                .putIfNotEmpty("max_ring_seconds",max_dial_duration)
-                .putIfNotEmpty("valid_keys",verify_code)
-                .putIfNotEmpty("max_keys",max_keys)
-                .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("areaId",areaId)
-                .build();
-
-        files = playFileUtil.convertArray(app.getTenant().getId(),appId,files);
-
-        if(files!= null && files .size()>0){
-            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(files,"|"),7,""}};
-            params.put("play_content", JSONUtil2.objectToJson(plays));
-        }
-        try {
-            //找到合适的区域代理
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
-            //将数据存到redis
-            BusinessState cache = new BusinessState.Builder()
-                    .setTenantId(app.getTenant().getId())
-                    .setAppId(app.getId())
-                    .setId(callId)
-                    .setType("captcha_call")
-                    .setCallBackUrl(app.getUrl())
-                    .setUserdata(user_data)
-                    .setAreaId(areaId)
-                    .setLineGatewayId(lineId)
-                    .setBusinessData(new MapBuilder<String,Object>()
-                            .put("from",oneTelnumber)
-                            .put("to",to)
-                            .build())
-                    .build();
-            businessStateService.save(cache);
             return callId;
         }catch(Exception ex){
             throw new InvokeCallException(ex);
@@ -516,7 +438,7 @@ public class CallServiceImpl implements CallService {
                     .setUserdata(userData)
                     .setAreaId(areaId)
                     .setLineGatewayId(lineId)
-                    .setBusinessData(new MapBuilder<String,Object>()
+                    .setBusinessData(new MapBuilder<String,String>()
                             .putIfNotEmpty("from",oneTelnumber)
                             .putIfNotEmpty("to",to)
                             .putIfNotEmpty("sessionid",callSession.getId())
