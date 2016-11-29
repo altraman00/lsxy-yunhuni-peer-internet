@@ -11,8 +11,10 @@ public enum ProductCode {
     ivr_call("ivr_call,ivr_incoming,ivr_dial","自定义IVR"),
     sys_conf("sys_conf","语音会议"),
     recording("recording","录音服务"),
-    number_resource("rent_number,rent_number_month","号码资源"),
-    call_center("call_center","呼叫中心");
+    recording_memory("recording_memory","录音文件存储策略"),
+    rent_number("rent_number","号码资源"),
+    rent_number_month("rent_number_month","号码占用费"),
+    call_center("call_center","号码月租费");
 
     private String apiCmd;  //产品和api的对应关系，一个产品可以对应多个apiCmd，多个apiCmd用“,”号隔开，如 sys_conf("sys_conf,sys_conf,conf_XXXX","语音会议"),
     private String remark;  //产品备注

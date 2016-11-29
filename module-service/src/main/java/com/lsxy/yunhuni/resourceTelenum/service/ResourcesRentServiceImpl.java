@@ -20,6 +20,7 @@ import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.ProductItem;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
@@ -166,7 +167,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
             if(StringUtils.isNotBlank(tenantId)){
                 BigDecimal balance = calBillingService.getBalance(tenantId);
                 //获取每月号码扣费金额
-                BigDecimal cost = calCostService.calCost(ProductItem.RENT_NUMBER_MONTH,tenantId);
+                BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.getApiCmd(),tenantId);
                 if(balance.compareTo(cost) == 1 || balance.compareTo(cost) == 0){
                     Date expireDate = DateUtils.getLastTimeOfMonth(curTime);
                     if(logger.isDebugEnabled()){
@@ -209,7 +210,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
                     if(tenantRecording>globalRecording){
                         Tenant tenant = tenantService.findById(tenantConfig.getTenantId());
                         App app = appService.findById(tenantConfig.getAppId());
-                        BigDecimal cost = calCostService.calCost(ProductItem.RECORDING_MEMORY,tenant.getId());
+                        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.getApiCmd(),tenant.getId());
                         if(tenant!=null&&app!=null){
                             //获取租户应用下的录音文件 isDeleted
                             long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
@@ -271,7 +272,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         Consume consume = new Consume(new Date(), ConsumeCode.rent_number.name(), temp.getAmount(), ConsumeCode.rent_number.getName(), "0", tenant);
         consumeService.consume(consume);
         //号码月租费
-        BigDecimal cost = calCostService.calCost(ProductItem.RENT_NUMBER_MONTH,tenant.getId());
+        BigDecimal cost = calCostService.calCost(ProductCode.rent_number_month.getApiCmd(),tenant.getId());
         BigDecimal bigDecimal = cost.multiply(new BigDecimal(list.size()));
         Consume consume1 = new Consume(new Date(), ConsumeCode.rent_number_month.name(), bigDecimal, ConsumeCode.rent_number_month.getName(), "0", tenant);
         consumeService.consume(consume1);

@@ -13,8 +13,6 @@ import javax.persistence.*;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_item")
 public class ProductItem extends IdEntity {
-    public static final String RECORDING_MEMORY = "recording_memory";//录音文件存储费
-    public static final String RENT_NUMBER_MONTH = "rent_number_month";//号码月租费
     private Product product;//所属产品类别
     private String name;    //产品名称
     private String code;    //一次写入，不可修改，涉及到编程
