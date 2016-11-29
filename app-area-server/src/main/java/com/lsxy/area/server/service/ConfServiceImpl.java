@@ -4,12 +4,12 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
-import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -18,7 +18,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -93,23 +93,6 @@ public class ConfServiceImpl implements ConfService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
-    private boolean isEnableConfService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsSessionService() == null || serviceSwitch.getIsSessionService() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsSessionService() == null || app.getIsSessionService() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public String create(String ip, String appId, Integer maxDuration, Integer maxParts,
                          Boolean recording, Boolean autoHangup, String bgmFile, String userData) throws YunhuniApiException {
@@ -127,7 +110,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(tenantId,appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -165,9 +148,10 @@ public class ConfServiceImpl implements ConfService {
                                 .setTenantId(tenantId)
                                 .setAppId(app.getId())
                                 .setId(confId)
-                                .setType("sys_conf")
+                                .setType(BusinessState.TYPE_SYS_CONF)
                                 .setUserdata(userData)
                                 .setAreaId(areaId)
+                                .setCallBackUrl(app.getUrl())
                                 .setLineGatewayId(null)
                                 .setBusinessData(new MapBuilder<String,Object>()
                                         .putIfNotEmpty("max_seconds",maxDuration)//会议最大持续时长
@@ -193,7 +177,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -249,7 +233,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(tenantId,appId)){
+        if(!appService.enabledService(tenantId,appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -311,7 +295,8 @@ public class ConfServiceImpl implements ConfService {
                                     .setTenantId(tenantId)
                                     .setAppId(app.getId())
                                     .setId(callId)
-                                    .setType("sys_conf")
+                                    .setType(BusinessState.TYPE_SYS_CONF)
+                                    .setCallBackUrl(app.getUrl())
                                     .setAreaId(areaId)
                                     .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()
@@ -343,7 +328,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -372,7 +357,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
         BusinessState call_state = businessStateService.get(callId);
@@ -416,7 +401,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -461,7 +446,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -499,7 +484,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -524,8 +509,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
-                //TODO 文件名如何定
-                .putIfNotEmpty("record_file",UUIDGenerator.uuid())
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(app.getTenant().getId(),appId))
                 .putIfNotEmpty("user_data",confId)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
@@ -552,7 +536,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
         BusinessState conf_state = businessStateService.get(confId);
@@ -589,7 +573,7 @@ public class ConfServiceImpl implements ConfService {
             }
         }
 
-        if(!isEnableConfService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.SessionService)){
             throw new AppServiceInvalidException();
         }
 
@@ -644,7 +628,7 @@ public class ConfServiceImpl implements ConfService {
         }
 
         Map<String,Object> call_business=call_state.getBusinessData();
-        Map<String,Object> conf_business=call_state.getBusinessData();
+        Map<String,Object> conf_business=conf_state.getBusinessData();
 
         Integer max_seconds = maxDuration == null ? 0 : maxDuration;
         Integer voice_mode = voiceMode == null ? 1 : voiceMode;

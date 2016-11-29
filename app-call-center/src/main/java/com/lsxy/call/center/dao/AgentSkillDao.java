@@ -20,9 +20,14 @@ public interface AgentSkillDao extends BaseDaoInterface<AgentSkill, Serializable
     public int deleteByAgent(@Param("agent") String agent);
 
     @Modifying
-    @Query("update AgentSkill a set active=:active where agent=:agent and name=:name")
-    public int updateActiveByAgent(@Param("active") Integer active,@Param("agent") String agent,@Param("name") String name);
+    @Query("update AgentSkill a set enabled=:enabled where agent=:agent and name=:name")
+    public int updateActiveByAgent(@Param("enabled") Boolean enabled,@Param("agent") String agent,@Param("name") String name);
 
-    public List<AgentSkill> findByTenantIdAndAppIdAndAgentAndActive(String tenantId,String appId,String agent,Integer active);
+    public List<AgentSkill> findByTenantIdAndAppIdAndAgentAndEnabled(String tenantId,String appId,String agent,Boolean enabled);
 
+    List<AgentSkill> findByAgent(String agentId);
+
+    List<AgentSkill> findByAgentIn(List<String> agentIds);
+
+    void deleteByAgentAndName(String agent, String name);
 }

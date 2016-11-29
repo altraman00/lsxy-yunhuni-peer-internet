@@ -4,6 +4,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -41,6 +42,9 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
 
     @Autowired
     private CallSessionService callSessionService;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;

@@ -133,7 +133,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                 RestToken restToken = (RestToken) successfulAuthentication;
                 tenantId = restToken.getTenantId();
             }
-            getSaveApiLogTask().invokeApiSaveDB(appid, payload, contentType, method, signature, apiuri,tenantId,certID);
+            getSaveApiLogTask().invokeApiSaveDB(req,appid, payload, contentType, signature,tenantId,certID);
 
             if(logger.isDebugEnabled()){
                 logger.debug("签名校验完毕,花费{}ms",(System.currentTimeMillis()-start));

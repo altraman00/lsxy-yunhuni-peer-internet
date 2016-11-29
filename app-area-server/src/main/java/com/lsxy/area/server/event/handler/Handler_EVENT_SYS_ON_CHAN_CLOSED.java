@@ -83,27 +83,25 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(businessState.getType());
 
-        if("sys_conf".equals(businessState.getType())){
+        if(BusinessState.TYPE_SYS_CONF.equals(businessState.getType())){
             voiceCdr.setJoinType(1);
         }else if(businessState.getBusinessData().get("conf_id") != null){
             productCode = ProductCode.sys_conf;
             voiceCdr.setJoinType(2);
         }
 
-        if("ivr_incoming".equals(businessState.getType())){
+        if(BusinessState.TYPE_IVR_INCOMING.equals(businessState.getType())){
             voiceCdr.setIvrType(1);
-        }else if("ivr_call".equals(businessState.getType())){
+        }else if(BusinessState.TYPE_IVR_CALL.equals(businessState.getType())){
             voiceCdr.setIvrType(2);
-        }else if("ivr_dial".equals(businessState.getType())){
+        }else if(BusinessState.TYPE_IVR_DIAL.equals(businessState.getType())){
             voiceCdr.setIvrType(2);
         }
 
         voiceCdr.setType(productCode.name());
 
         voiceCdr.setRelevanceId(businessState.getId());
-        //TODO 录音文件路径跟大小
-        voiceCdr.setRecordUrl(null);
-        voiceCdr.setRecordSize(null);
+
         voiceCdr.setFromNum(cdrSplit[7].trim());
         voiceCdr.setToNum(cdrSplit[8].trim());
         voiceCdr.setCallStartDt(getCallDate(cdrSplit[18].trim()));
