@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.config.SystemConfig;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.oss.OSSService;
@@ -66,23 +67,24 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
             return ;
         }
         //获取全局时间
-        GlobalConfig globalConfig = globalConfigService.findByTypeAndName("record_file","time");
+        GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
         int globalTime = Integer.valueOf(globalConfig.getValue());
         globalTime --;
         for(int i=0;i<tenants.size();i++) {
             //获取租户过期的时间
-            TenantConfig tenantConfig = tenantConfigService.findByTypeAndNameAndTenantId("record_file","time",tenants.get(i).getId());
-            int tenantTime = globalTime;
-            if(tenantConfig!=null){
+            TenantConfig tenantConfig = tenantConfigService.findByTypeAndNameAndTenantId(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING,tenants.get(i).getId());
+            int tenantTime = 0;
+            if(tenantConfig!=null&&StringUtil.isNotEmpty(tenantConfig.getValue())){
                 try {
                     tenantTime = Integer.valueOf(tenantConfig.getValue());
                     tenantTime--;
                 }catch (Exception e){
-                    logger.error("删除录音文件结束，[{}]租户[{}]的录音文件有效期报错",tenants.get(i).getId(),tenants.get(i).getTenantName());
+                    logger.error("获取，[{}]租户[{}]的录音文件有效期报错",tenants.get(i).getId(),tenants.get(i).getTenantName());
                 }
             }
+            int timeLong = tenantTime>0?tenantTime:globalTime;
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DAY_OF_MONTH,-tenantTime);
+            cal.add(Calendar.DAY_OF_MONTH,-timeLong);
             cal.set(Calendar.HOUR_OF_DAY, 0);
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.SECOND, 0);
@@ -103,6 +105,8 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
                         temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
                     }
                 }
+                //标识文件记录需要删除
+                temp.setIsDeleted(VoiceFileRecord.IS_DELETED_TRUE);
                 voiceFileRecordService.save(temp);
                 try {
                     voiceFileRecordService.delete(temp);

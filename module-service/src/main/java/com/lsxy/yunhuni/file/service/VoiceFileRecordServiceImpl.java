@@ -34,6 +34,13 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     }
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public long getSumSize(String tenant, String app) {
+        String sql = "select IFNULL(sum(size),0) from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and is_deleted<>1 and tenant_id=? and app_id=?";
+        return jdbcTemplate.queryForObject(sql,Long.class,tenant,app);
+    }
+
     @Override
     public Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize,String appId,String tenantId) {
         String hql = " from VoiceFileRecord obj where obj.appId=?1 and obj.tenantId=?2 ";
@@ -146,6 +153,13 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     public List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime, Date endTime) {
         String hql = " from VoiceFileRecord obj where obj.app_id=?1 and obj.tenant_id=?2 and obj.createTime<=?3 and obj.createTime>=?4";
         List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
+        return list;
+    }
+
+    @Override
+    public List<VoiceFileRecord> getListAndAppAndTenant(String app, String tenant) {
+        String hql = " from VoiceFileRecord obj where obj.app_id=?1 and obj.tenant_id=?2 and (obj.isDeleted is null or obj.isDeleted=0 )";
+        List<VoiceFileRecord> list = this.list(hql,app,tenant);
         return list;
     }
 

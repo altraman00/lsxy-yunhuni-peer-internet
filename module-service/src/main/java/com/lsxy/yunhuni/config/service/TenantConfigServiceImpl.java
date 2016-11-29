@@ -2,11 +2,8 @@ package com.lsxy.yunhuni.config.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
-import com.lsxy.yunhuni.api.config.model.GlobalConfig;
 import com.lsxy.yunhuni.api.config.model.TenantConfig;
-import com.lsxy.yunhuni.api.config.service.GlobalConfigService;
 import com.lsxy.yunhuni.api.config.service.TenantConfigService;
-import com.lsxy.yunhuni.config.dao.GlobalConfigDao;
 import com.lsxy.yunhuni.config.dao.TenantConfigDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -15,6 +15,8 @@ import java.util.Map;
  * Created by zhangxb on 2016/7/21.
  */
 public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
+    /**根据租户和用户获取对应录音文件的总大小*/
+    long getSumSize(String tenant,String app);
     /**
      * 根据文件名查找文件分页数据
      * @param pageNo 第几页
@@ -50,6 +52,8 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
      * @return
      */
     List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime,Date endTime);
+
+    List<VoiceFileRecord> getListAndAppAndTenant(String app, String tenant);
 
     List<VoiceFileRecord> getListBySessionId(String sessionId);
 
