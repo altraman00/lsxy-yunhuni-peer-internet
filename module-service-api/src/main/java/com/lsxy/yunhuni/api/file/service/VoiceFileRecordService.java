@@ -15,21 +15,23 @@ import java.util.Map;
  * Created by zhangxb on 2016/7/21.
  */
 public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
+    /** 根据租户,应用,类型,和时间区间来获取录音文件的列表数据*/
+    Page<Map> getPageList(Integer pageNo, Integer pageSize, String appId, String tenantId, String type,Date start, Date end);
+    /** 根据租户,应用,类型,和时间区间来获取统计存储文件*/
+    Map sumAndCount(String appId, String tenantId,String type,Date start,Date end);
+
+    /** 根据租户,应用获取应用*/
+    Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize, String appId, String tenantId);
+
     /** 根据租户和用户获取对应录音文件的总大小*/
     long getSumSize(String tenant,String app);
-    /** 根据租户和用户和时间区间获取统计存储文件*/
-    Map sumAndCount(String appId, String tenantId,String type,Date start,Date end);
-    /** 根据文件名查找文件分页数据*/
-    Page<VoiceFileRecord> pageList(Integer pageNo, Integer pageSize, String appId, String tenantId);
-    Page<Map> getPageList(Integer pageNo, Integer pageSize, String appId, String tenantId, String type,Date start, Date end);
-    /** 批量更新删除状态为删除*/
-    int batchDelete(String appid, String tenantId, Date startTime,Date endTime);
-    /** 获取数据*/
-    List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime,Date endTime);
+
+    /**根据sessionid获取录音文件*/
     List<VoiceFileRecord> getListBySessionId(String sessionId);
-    void batchUpdateAADelete(List<String> id,int status);
-    /** 根据创建时间，租户，区域获取录音文件AA文件存在*/
-    List<Map> getAAListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId,String areaId);
     /** 根据创建时间，租户，区域获取AA文件存在的区域*/
     List<String> getAAAreaByCreateTimeAndTenantId(Date createTime,String tenantId);
+    /** 根据创建时间，租户，区域获取录音文件AA文件存在*/
+    List<Map> getAAListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId,String areaId);
+    /** 根据记录id来更新区域文件的删除状态*/
+    void batchUpdateAADelete(List<String> id,int status);
 }

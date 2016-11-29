@@ -37,7 +37,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public long getSumSize(String tenant, String app) {
-        String sql = "select IFNULL(sum(size),0) from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and is_deleted<>1 and tenant_id=? and app_id=?";
+        String sql = "select IFNULL(sum(size),0) from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and tenant_id=? and app_id=?";
         return jdbcTemplate.queryForObject(sql,Long.class,tenant,app);
     }
 
@@ -141,12 +141,6 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             temp = fmt.format(size)+"B";
         }
         return temp;
-    }
-    @Override
-    public int batchDelete(String appid, String tenantId, Date startTime, Date endTime) {
-        String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set deleted=1 where  deleted=0 and app_id=? and tenant_id=? and create_time<=? and create_time>=?";
-        int result = jdbcTemplate.update(sql,appid,tenantId,endTime,startTime);
-        return result;
     }
 
     @Override
