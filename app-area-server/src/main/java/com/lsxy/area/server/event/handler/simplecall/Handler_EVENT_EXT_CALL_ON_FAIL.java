@@ -94,7 +94,7 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
             }
             case notify_call:{
                 //处理会话表数据
-                CallSession callSession = callSessionService.findById(state.getBusinessData().get("sessionid"));
+                CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
                 if(callSession != null){
                     callSession.setStatus(CallSession.STATUS_EXCEPTION);
                     callSessionService.save(callSession);
@@ -104,7 +104,7 @@ public class Handler_EVENT_EXT_CALL_ON_FAIL extends EventHandler{
             }
             case captcha_call:
                 //处理会话表数据
-                CallSession callSession = callSessionService.findById(state.getBusinessData().get("sessionid"));
+                CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
                 if(callSession != null){
                     callSession.setStatus(CallSession.STATUS_EXCEPTION);
                     callSessionService.save(callSession);

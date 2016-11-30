@@ -21,6 +21,8 @@ public class BusinessState implements Serializable{
     public static final String TYPE_CC_AGENT_CALL = "agent_call";
     public static final String TYPE_CC_OUT_CALL = "out_call";
 
+    public static final String SESSIONID = "sessionid";
+
     private String tenantId;
     private String appId;
     private String id;

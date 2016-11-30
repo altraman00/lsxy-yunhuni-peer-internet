@@ -145,7 +145,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
         Meeting meeting = meetingService.findById(conf_id);
         if(meeting!=null){
-            String callSessionId = businessData.get("sessionid");
+            String callSessionId = businessData.get(BusinessState.SESSIONID);
             MeetingMember meetingMember = new MeetingMember();
             meetingMember.setId(call_id);
             meetingMember.setNumber(businessData.get("to"));

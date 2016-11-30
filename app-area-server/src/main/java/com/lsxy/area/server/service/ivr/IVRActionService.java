@@ -85,6 +85,8 @@ public class IVRActionService {
     /**IVR呼入执行ivr动作前，会自动应答，所以保存ivr动作xml一次，应答后自动执行动作**/
     public static final String IVR_ANSWER_AFTER_XML_FIELD = "IVR_ANSWER_AFTER_XML";
 
+    public static final String IVR_NEXT = "next";
+
     //设置请求和传输超时时间
     private RequestConfig config =
             RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
@@ -326,7 +328,7 @@ public class IVRActionService {
             callSession.setType(CallSession.TYPE_VOICE_IVR);
             callSession.setResId(state.getResId());
             callSession = callSessionService.save(callSession);
-            businessStateService.updateInnerField(call_id,"sessionid",callSession.getId());
+            businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
             VoiceIvr voiceIvr = new VoiceIvr();
             voiceIvr.setId(call_id);
             voiceIvr.setFromNum(from);
@@ -375,7 +377,7 @@ public class IVRActionService {
                 return handleXML(call_id,ivr_action_xml,state);
             }
         }
-        String nextUrl = businessDate.get("next");
+        String nextUrl = businessDate.get(IVR_NEXT);
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl)){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
@@ -477,7 +479,7 @@ public class IVRActionService {
      * @return
      */
     private String getNextUrl(Element root){
-        String next = root.elementTextTrim("next");
+        String next = root.elementTextTrim(IVR_NEXT);
         if(StringUtils.isBlank(next)){
             next = "";
         }
