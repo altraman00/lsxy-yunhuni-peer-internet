@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -48,18 +49,37 @@ public class HangupActionHandler extends ActionHandler{
             return false;
         }
         String res_id = state.getResId();
-        Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("res_id",res_id)
-                .putIfNotEmpty("user_data",callId)
-                .put("areaId",state.getAreaId())
-                .build();
 
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
-        try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
-        } catch (Throwable e) {
-            logger.error("调用失败",e);
+
+        if(state.getBusinessData().get(IVRActionService.IVR_ANSWER_WAITTING_FIELD) != null){
+            //还在等待应答的情况下，调用拒接
+            Map<String, Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("res_id",res_id)
+                    .putIfNotEmpty("user_data",callId)
+                    .put("areaId",state.getAreaId())
+                    .build();
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_REJECT, params);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            } catch (Throwable e) {
+                logger.error("调用失败",e);
+            }
+        }else{
+            //已应答调用挂断
+            Map<String, Object> params = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("res_id",res_id)
+                    .putIfNotEmpty("user_data",callId)
+                    .put("areaId",state.getAreaId())
+                    .build();
+
+            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_DROP, params);
+            try {
+                rpcCaller.invoke(sessionContext, rpcrequest);
+            } catch (Throwable e) {
+                logger.error("调用失败",e);
+            }
         }
+
         businessStateService.updateInnerField(callId,"next",next);
         return true;
     }
