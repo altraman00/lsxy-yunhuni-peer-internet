@@ -90,7 +90,7 @@ if [ "$pull_ret"x = "Already up-to-date."x ]; then
     if [ $FORCE_INSTALL = true ]; then
         echo "安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean compile install -U $ENV_PROFILE -DskipTests=true
+        mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用INSTALL了";
     fi
@@ -99,7 +99,7 @@ else
     if [ $FORCE_CLEAN = true ]; then
         echo "清除安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean compile install -U $ENV_PROFILE -DskipTests=true
+        mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用CLEAN INSTALL了";
     fi
