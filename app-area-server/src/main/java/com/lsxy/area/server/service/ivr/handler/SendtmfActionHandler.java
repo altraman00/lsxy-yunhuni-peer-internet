@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -65,7 +66,7 @@ public class SendtmfActionHandler extends ActionHandler{
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
-        businessStateService.updateInnerField(callId,"next",next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
         return true;
     }
 }

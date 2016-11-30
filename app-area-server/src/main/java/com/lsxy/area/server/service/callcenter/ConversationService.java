@@ -359,7 +359,7 @@ public class ConversationService {
                         .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
-                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);
@@ -433,7 +433,7 @@ public class ConversationService {
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
                         .putIfNotEmpty("voice_mode",voiceMode!=null?voiceMode.toString():null)//加入后的声音模式
-                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);
@@ -652,7 +652,7 @@ public class ConversationService {
             member.setCallId(call_id);
             member.setRelevanceId(conversation_id);
             member.setStartTime(new Date());
-            member.setSessionId(businessData.get("sessionid"));
+            member.setSessionId(businessData.get(BusinessState.SESSIONID));
             member.setIsInitiator(this.isInitiator(conversation_id,call_id));
             callCenterConversationMemberService.save(member);
         }catch (Throwable t){

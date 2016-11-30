@@ -101,7 +101,7 @@ public class DialActionHandler extends ActionHandler{
         }
         try{
             //更新下一步
-            businessStateService.updateInnerField(callId,"next",next);
+            businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT,next);
             dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         }catch (Throwable t){
             logger.error("ivr拨号失败:",t);
@@ -240,7 +240,7 @@ public class DialActionHandler extends ActionHandler{
                         .putIfNotEmpty("play_file",play_file)
                         .put("play_repeat",play_repeat,"1")
                         .putIfNotEmpty("recording",recording)
-                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);

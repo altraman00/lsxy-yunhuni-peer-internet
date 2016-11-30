@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -81,7 +82,7 @@ public class PlayActionHandler extends ActionHandler{
             }
         }
 
-        businessStateService.updateInnerField(callId,"next",next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
         return true;
     }
 }

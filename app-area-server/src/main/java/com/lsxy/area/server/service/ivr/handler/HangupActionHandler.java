@@ -80,7 +80,7 @@ public class HangupActionHandler extends ActionHandler{
             }
         }
 
-        businessStateService.updateInnerField(callId,"next",next);
+        businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT,next);
         return true;
     }
 }
