@@ -104,7 +104,7 @@ if [ $IS_SPRINGBOOT = true ]; then
     if [ $TAIL_LOG = true ]; then
         tail -f /opt/yunhuni/logs/$APP_NAME.out
     else
-        sleep 20;
+        sleep 10;
         PROCESS_NUM=`ps -ef | grep $APP_NAME | grep "java" | grep -v "grep" | wc -l`
         if [ $IS_TOMCAT_DEPLOY = false ]; then
             if [ $PROCESS_NUM -eq 1 ];
