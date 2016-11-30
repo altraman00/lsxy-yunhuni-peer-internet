@@ -89,7 +89,7 @@ if [ $IS_TOMCAT_DEPLOY = true ]; then
     exit 0;
 fi
 
-if [ IS_SPRINGBOOT = true ]; then
+if [ $IS_SPRINGBOOT = true ]; then
     #先停止制定的APP服务
     echo "停止现有服务...."
     ps -ef | grep "$APP_NAME" | grep -v grep | grep -v update | grep -v tail |awk '{print $2}' | xargs kill -9
