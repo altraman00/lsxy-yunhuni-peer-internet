@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * 租户租用号码到期后自动扣费续期
+ * 月租费定时任务
  * Created by liups on 2016/9/17.
  */
 @Component
-public class ResourcesRentTask {
+public class MonthlyRentTask {
     private static final Logger logger = LoggerFactory.getLogger(RechargeStatisticsTask.class);
     @Autowired
     ResourcesRentService resourcesRentService;
@@ -30,7 +30,7 @@ public class ResourcesRentTask {
      * 每天执行，有钱就扣
      */
     @Scheduled(cron="0 30 0 * * ?")
-    public void resourcesRentTask(){
+    public void monthlyRentTask(){
         Date date=new Date();
         String day = DateUtils.formatDate(date, "yyyy-MM-dd");
         String cacheKey = "scheduled_" + Thread.currentThread().getStackTrace()[1].getClassName() + "." + Thread.currentThread().getStackTrace()[1].getMethodName() + " " + day;
@@ -55,7 +55,7 @@ public class ResourcesRentTask {
                         logger.debug("["+cacheKey+"]马上处理该任务："+cacheKey);
                     }
                     //执行语句
-                    resourcesRentService.resourcesRentTask();
+                    resourcesRentService.monthlyRentTask();
                 }else{
                     if(logger.isDebugEnabled()){
                         logger.debug("["+cacheKey+"]标记位不一致"+currentCacheValue+"  vs "+ SystemConfig.id);

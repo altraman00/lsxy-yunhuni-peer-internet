@@ -17,7 +17,7 @@ public interface CalCostService {
      * @return
      */
     BigDecimal calCost(ProductItem product, String tenantId, Long time);
-
+    BigDecimal calCost(String code, String tenantId);
     /**
      * 消费计算金额及插入消费表，或插入扣量表
      * @param cdr cdr数据 传入的cdr数据将会被继续完善相关消费信息

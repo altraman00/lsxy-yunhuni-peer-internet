@@ -15,14 +15,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
+import com.lsxy.framework.oss.FrameworkOSSConfig;
 /**
  * Created by Tandy on 2016/6/13.
  */
 @SpringBootApplication()
 @EnableScheduling
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class,
-        FrameworkMonitorConfig.class,CallCenterApiConfig.class})
+        FrameworkMonitorConfig.class,CallCenterApiConfig.class,FrameworkOSSConfig.class})
 @EnableDubboConfiguration
 public class MainClass extends AbstractSpringBootStarter {
     private static final String systemId = "app.backend";

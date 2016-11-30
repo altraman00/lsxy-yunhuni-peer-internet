@@ -11,6 +11,7 @@ public enum ConsumeCode {
     captcha_call("语音验证码"),
     notify_call("语音通知"),
     call_center("云呼叫中心"),
+    recording_memory("录音文件存储费"),
     call_voice("通话录音"),
     rent_number("号码租用"),
     rent_number_month("号码月租费"),

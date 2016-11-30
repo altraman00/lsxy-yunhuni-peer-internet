@@ -1,14 +1,12 @@
 package com.lsxy.yunhuni.product.service;
 
-import com.lsxy.yunhuni.api.consume.model.CaptchaUse;
+import com.lsxy.framework.api.billing.service.CalBillingService;
+import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.model.VoiceTimeUse;
 import com.lsxy.yunhuni.api.consume.service.CaptchaUseService;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
 import com.lsxy.yunhuni.api.consume.service.VoiceTimeUseService;
-import com.lsxy.framework.api.tenant.model.Tenant;
-import com.lsxy.framework.core.utils.JSONUtil;
-import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import com.lsxy.yunhuni.api.product.model.Product;
 import com.lsxy.yunhuni.api.product.model.ProductItem;
@@ -60,6 +58,14 @@ public class CalCostServiceImpl implements CalCostService{
             cost = calNum.multiply(productPrice.getPrice()).multiply(new BigDecimal(Double.toString(discount))).setScale(4,BigDecimal.ROUND_HALF_UP);
         }
         return cost;
+    }
+
+    @Override
+    public BigDecimal calCost(String code, String tenantId) {
+        ProductItem productItem = productItemService.getProductItemByCode(code);
+        ProductPrice productPrice = productPriceService.getAvailableProductPrice(productItem.getId());
+        BigDecimal discount = new BigDecimal(productTenantDiscountService.getDiscountByProductIdAndTenantId(productItem.getId(), tenantId));
+        return productPrice.getPrice().multiply(discount);
     }
 
     @Override
