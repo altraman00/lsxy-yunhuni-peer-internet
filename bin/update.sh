@@ -12,7 +12,11 @@ IS_TOMCAT_DEPLOY=false
 IS_SPRINGBOOT=false
 YUNHUNI_HOME=/opt/yunhuni
 TOMCAT_HOME=/opt/apach-tomcat
-NEXUS_PATH=http://10.44.185.24:8081/nexus/content/groups/public
+
+if [ -z $NEXUS_PATH ]; then
+    NEXUS_PATH=http://10.44.185.24:8081/nexus/content/groups/public
+fi
+
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
 DEPLOY_PACKAGE="jar"
