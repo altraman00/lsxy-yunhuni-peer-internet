@@ -10,10 +10,7 @@ import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.exceptions.api.ExtensionBindingToAgentException;
-import com.lsxy.framework.core.exceptions.api.ExtensionUserExistException;
-import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
-import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -209,6 +206,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new RequestIllegalArgumentException();
         }
         AppExtension extension = this.findById(extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
         if(!appId.equals(extension.getAppId())){
             throw new RequestIllegalArgumentException();
         }

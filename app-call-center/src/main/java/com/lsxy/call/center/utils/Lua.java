@@ -21,7 +21,8 @@ public class Lua {
     public static final String LOOKUPAGENTFORIDLE = loadLua("/lua/lookupAgentForIdle.lua");
 
     public static final String LOKUPQUEUE = loadLua("/lua/lookupQueue.lua");
-    
+
+    public static final String AGENTLOGIN = loadLua("/lua/agentLogin.lua");
     /**
      * 加载lua脚本
      * @param path
