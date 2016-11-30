@@ -224,7 +224,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     evalStr.add(2,CAs.getKey(condition.getId()));
                 }
                 keyCount ++;
-                //设置座席条件进参数列表
+                //设置座席条件进参数列表（注意以下两行代码顺序不能变）
                 evalStr.add(5 + suitedConditions.size(),bf.deleteCharAt(bf.length()-1).toString());
                 evalStr.add(2,aCsKey);
             }
