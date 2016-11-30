@@ -99,10 +99,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
             return true;
         }
         if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){//是ivr呼入
-            boolean iscc = conversationService.isCC(call_id);
-            if(!iscc){//不是ivr呼叫中心呼入
-                return true;
-            }
+            return true;
         }
         return false;
     }
