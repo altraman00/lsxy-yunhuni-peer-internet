@@ -311,7 +311,7 @@ public class ConfServiceImpl implements ConfService {
                                         .putIfNotEmpty("voice_mode",voiceMode==null?null:voiceMode.toString())//加入后的声音模式
                                         //TODO 这个是什么鬼dial_voice_stop_cond
                                         .putIfNotEmpty("dial_voice_stop_cond",dialVoiceStopCond==null?null:dialVoiceStopCond.toString())//自定义拨号音停止播放条件。0：振铃停止；1：接听或者挂断停止。
-                                        .putIfNotEmpty("sessionid",callSession.getId())
+                                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                                         .build())
                                     .build();
         businessStateService.save(callstate);

@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
@@ -32,8 +33,6 @@ import java.util.Map;
 @Component
 public class EnqueueHandler extends ActionHandler{
 
-    public final static String action = "enqueue";
-
     @Autowired
     private BusinessStateService businessStateService;
 
@@ -57,7 +56,7 @@ public class EnqueueHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return action;
+        return "enqueue";
     }
 
     @Override
@@ -115,7 +114,7 @@ public class EnqueueHandler extends ActionHandler{
                 }
             }
         }
-        businessStateService.updateInnerField(callId,"next",next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
         try {
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
         }catch (Throwable t){

@@ -2,6 +2,8 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -57,6 +59,7 @@ public class RecordActionHandler extends ActionHandler{
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
                 .putIfNotEmpty("max_seconds",max_duration)
                 .putIfNotEmpty("beep",beeping)
                 .putIfNotEmpty("finish_keys",finish_keys)
@@ -70,7 +73,7 @@ public class RecordActionHandler extends ActionHandler{
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
-        businessStateService.updateInnerField(callId,"next",next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
         return true;
     }
 }

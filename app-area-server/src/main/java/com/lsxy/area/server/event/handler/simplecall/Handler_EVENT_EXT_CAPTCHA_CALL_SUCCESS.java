@@ -90,7 +90,7 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
         captchaCall.setHangupSide(null);
         captchaCall.setResId(res_id);
         captchaCallService.save(captchaCall);
-        businessStateService.updateInnerField(call_id,"sessionid",callSession.getId());
+        businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
         return res;
     }
 }

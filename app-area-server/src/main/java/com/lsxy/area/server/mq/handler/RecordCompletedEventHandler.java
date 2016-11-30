@@ -40,8 +40,8 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
     }
 
     private long getCostTimelong(long start,long end){
-        long second = getTimelong(start,end);
-        return Math.round(second/60) * 60;
+        double second = getTimelong(start,end);
+        return (long)Math.ceil(second/60) * 60;
     }
 
     @Override

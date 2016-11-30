@@ -120,7 +120,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
                     break;
                 }
                 default:{
-                    String sessionId = data.get("sessionid");
+                    String sessionId = data.get(BusinessState.SESSIONID);
                     voiceCdr.setSessionId(sessionId);
                     break;
                 }

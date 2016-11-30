@@ -325,7 +325,7 @@ public class CallServiceImpl implements CallService {
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
             Map<String,String> data = new MapBuilder<String,String>()
-                    .put("sessionid",callSession.getId())
+                    .put(BusinessState.SESSIONID,callSession.getId())
                     .build();
             //将数据存到redis
             BusinessState cache = new BusinessState.Builder()
@@ -441,7 +441,7 @@ public class CallServiceImpl implements CallService {
                     .setBusinessData(new MapBuilder<String,String>()
                             .putIfNotEmpty("from",oneTelnumber)
                             .putIfNotEmpty("to",to)
-                            .putIfNotEmpty("sessionid",callSession.getId())
+                            .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                             .build())
                     .build();
             businessStateService.save(cache);

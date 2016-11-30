@@ -143,7 +143,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || (state.getClosed() != null && state.getClosed())){
+        if(state == null || (state.getClosed() != null && state.getClosed())){ 
             logger.info("会话已关闭callid={}",callId);
             return;
         }
