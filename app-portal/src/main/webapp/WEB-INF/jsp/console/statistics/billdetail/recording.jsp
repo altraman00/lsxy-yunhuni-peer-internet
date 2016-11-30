@@ -108,10 +108,9 @@
                                             <div class="col-md-2">
                                                 <select name="type" class="form-control">
                                                     <option value=""></option>
-                                                    <option value="语音回拔" <c:if test="${type=='语音回拔'}">selected="selected"</c:if> >语音回拔</option>
-                                                    <option value="语音会议"<c:if test="${type=='语音会议'}">selected="selected"</c:if> >语音会议</option>
-                                                    <option value="自定义IVR"<c:if test="${type=='自定义IVR'}">selected="selected"</c:if> >自定义IVR</option>
-                                                    <option value="呼叫中心"<c:if test="${type=='呼叫中心'}">selected="selected"</c:if> >呼叫中心</option>
+                                                    <c:forEach items="${types}" var="type1">
+                                                        <option value="${type1}" <c:if test="${type1==type}">selected="selected"</c:if> >${type1}</option>
+                                                    </c:forEach>
                                                 </select>
                                             </div>
                                             <div class="col-md-2">
