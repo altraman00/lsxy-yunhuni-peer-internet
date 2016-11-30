@@ -79,7 +79,7 @@ public class Handler_MN_CH_RF_SYNC extends RpcRequestHandler{
                 String ossUri = "tenant_res/" + map.get("tenantId") + "/record_voice/" + map.get("appId") + "/" + ymd + "/" + fileName;
                 String tempUri = "/tmp/" + fileName;
                 //进行压缩
-                ZipUtil.zip(list, fileName);
+                ZipUtil.zip(list, tempUri);
                 //上传文件
                 File file = new File(tempUri);
                 String repository = "";
