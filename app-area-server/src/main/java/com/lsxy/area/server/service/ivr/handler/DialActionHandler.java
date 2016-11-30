@@ -240,7 +240,7 @@ public class DialActionHandler extends ActionHandler{
                         .putIfNotEmpty("play_file",play_file)
                         .put("play_repeat",play_repeat,"1")
                         .putIfNotEmpty("recording",recording)
-                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);

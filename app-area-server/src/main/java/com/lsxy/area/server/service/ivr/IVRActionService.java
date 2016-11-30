@@ -326,7 +326,7 @@ public class IVRActionService {
             callSession.setType(CallSession.TYPE_VOICE_IVR);
             callSession.setResId(state.getResId());
             callSession = callSessionService.save(callSession);
-            businessStateService.updateInnerField(call_id,"sessionid",callSession.getId());
+            businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
             VoiceIvr voiceIvr = new VoiceIvr();
             voiceIvr.setId(call_id);
             voiceIvr.setFromNum(from);
