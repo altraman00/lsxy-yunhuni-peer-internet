@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,24 +140,26 @@ public class ProductController  extends AbstractRestController {
         if(StringUtils.isNotEmpty(productEditVo.getPriceItem())){
             productItem.setName(productEditVo.getPriceItem());
         }
-        PriceType priceType = PriceType.getPriceTypeById(productEditVo.getUnit());
-        if(priceType==null){
-
-        }else if(priceType.getCalType()!=productItem.getCalType()){
-            return RestResponse.failed("0000","计价单位错误");
-        }else {
-            if (productEditVo.getPrice() != null) {
-                price.setPrice(productEditVo.getPrice());
+        PriceType priceType = null;
+        if(StringUtils.isNotEmpty(productEditVo.getUnit())){
+            priceType = PriceType.getPriceTypeById(productEditVo.getUnit());
+            if(priceType==null){
+                return RestResponse.failed("0000", "计价单位错误");
+            }else if(priceType.getCalType()!=productItem.getCalType()) {
+                return RestResponse.failed("0000", "计价单位错误");
             }
-            if (priceType.getTimeUnit() != null) {
-                price.setTimeUnit(priceType.getTimeUnit());
-            }
-            if (StringUtils.isNotEmpty(priceType.getUnit())) {
-                price.setUnit(priceType.getUnit());
-            }
-            productItemService.save(productItem);
-            productPriceService.save(price);
         }
+        if (productEditVo.getPrice() != null&&productEditVo.getPrice().compareTo(new BigDecimal(0))!=-1) {
+            price.setPrice(productEditVo.getPrice());
+        }else{
+            return RestResponse.failed("0000", "价格错误");
+        }
+        if (priceType!=null&&priceType.getTimeUnit() != null&&StringUtils.isNotEmpty(priceType.getUnit())) {
+            price.setTimeUnit(priceType.getTimeUnit());
+            price.setUnit(priceType.getUnit());
+        }
+        productItemService.save(productItem);
+        productPriceService.save(price);
         return RestResponse.success("修改成功");
     }
     @RequestMapping(value = "/discount/plist/{id}",method = RequestMethod.GET)

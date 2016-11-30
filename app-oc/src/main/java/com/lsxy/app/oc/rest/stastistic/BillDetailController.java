@@ -168,9 +168,13 @@ public class BillDetailController extends AbstractRestController {
                     for (int j = 1; j <= 30; j++) {
                         Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(id);
-                        if(voiceFileRecord.getStatus()!=null&&v1.getStatus()==1){
-                            String ossUri = getOssTempUri(v1.getOssUrl());
-                            return RestResponse.success(ossUri);
+                        if(v1.getStatus()!=null){
+                            if(v1.getStatus()==1) {
+                                String ossUri = getOssTempUri(v1.getOssUrl());
+                                return RestResponse.success(ossUri);
+                            }else if(v1.getStatus()==-1){
+                                return RestResponse.failed("0000","下载失败，请稍后重试");
+                            }
                         }
                     }
                     return RestResponse.failed("0000","下载超时失败");
@@ -208,13 +212,20 @@ public class BillDetailController extends AbstractRestController {
                 }
                 //发起文件上传
                 if(flag) {
+                    VoiceFileRecord temp = voiceFileRecordService.findById(list.get(0).getId());
+                    temp.setStatus(0);
+                    voiceFileRecordService.save(temp);
                     mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceCdr.getAppId(), voiceCdr.getId(), VoiceFileRecordSyncEvent.TYPE_CDR));
                     for (int j = 1; j <= 30; j++) {
                         Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(list.get(0).getId());
-                        if(v1.getStatus()!=null&&v1.getStatus()==1){
-                            String ossUri = getOssTempUri(v1.getOssUrl());
-                            return RestResponse.success(ossUri);
+                        if(v1.getStatus()!=null){
+                            if(v1.getStatus()==1) {
+                                String ossUri = getOssTempUri(v1.getOssUrl());
+                                return RestResponse.success(ossUri);
+                            }else if(v1.getStatus()==-1){
+                                return RestResponse.failed("0000","下载失败，请稍后重试");
+                            }
                         }
                     }
                     return RestResponse.failed("0000","下载超时失败");
@@ -271,7 +282,7 @@ public class BillDetailController extends AbstractRestController {
         return list;
     }
     protected String getOssTempUri(String resource){
-        String host = SystemConfig.getProperty("global.oss.aliyun.endpoint","http://oss-cn-beijing.aliyuncs.com");
+        String host = SystemConfig.getProperty("global.oss.aliyun.endpoint.internet","http://oss-cn-beijing.aliyuncs.com");
         String accessId = SystemConfig.getProperty("global.aliyun.key","nfgEUCKyOdVMVbqQ");
         String accessKey = SystemConfig.getProperty("global.aliyun.secret","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW");
         String resource1 = SystemConfig.getProperty("global.oss.aliyun.bucket");
