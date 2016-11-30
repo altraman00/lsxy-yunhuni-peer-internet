@@ -141,6 +141,7 @@ if [ $IS_TOMCAT_DEPLOY = false ]; then
 fi
 echo "OK";
 
+
 if [ $TAIL_LOG = true ]; then
     tail -f /opt/yunhuni/logs/$APP_NAME.out
 fi
