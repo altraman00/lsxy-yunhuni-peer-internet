@@ -32,8 +32,6 @@ import java.util.Map;
 @Component
 public class EnqueueHandler extends ActionHandler{
 
-    public final static String action = "enqueue";
-
     @Autowired
     private BusinessStateService businessStateService;
 
@@ -57,7 +55,7 @@ public class EnqueueHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return action;
+        return "enqueue";
     }
 
     @Override

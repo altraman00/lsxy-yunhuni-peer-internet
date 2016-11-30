@@ -66,6 +66,8 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         if(call_id == null){
             throw new InvalidParamException("call_id=null");
         }
+        //删除等待应答标记
+        businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
         ivrActionService.doAction(call_id);
         return res;
     }
