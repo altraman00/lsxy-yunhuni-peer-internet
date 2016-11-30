@@ -96,6 +96,9 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
                 if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
                     String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("生成ossUri地址：[{}]", ossUri);
+                    }
                     return RestResponse.success(ossUri);
                 }
                 List<VoiceFileRecord> list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
@@ -107,6 +110,8 @@ public class VoiceFileRecordController extends AbstractRestController {
                 for(int i=0;i<list.size();i++){
                     VoiceFileRecord temp = list.get(i);
                     if(temp.getStatus()==null||1!=temp.getStatus()){
+                        temp.setStatus(0);
+                        voiceFileRecordService.save(temp);
                         flag=true;
                         break;
                     }
@@ -122,9 +127,13 @@ public class VoiceFileRecordController extends AbstractRestController {
                             logger.error("等待异常",e);
                         }
                         VoiceFileRecord v1 = voiceFileRecordService.findById(id);
-                        if(v1.getStatus()!=null&&v1.getStatus()==1){
-                            String ossUri = getOssTempUri(v1.getOssUrl());
-                            return RestResponse.success(ossUri);
+                        if(v1.getStatus()!=null){
+                            if(v1.getStatus()==1) {
+                                String ossUri = getOssTempUri(v1.getOssUrl());
+                                return RestResponse.success(ossUri);
+                            }else if(v1.getStatus()==-1){
+                                return RestResponse.failed("0000","下载失败，请稍后重试");
+                            }
                         }
                     }
                     return RestResponse.failed("0000","下载超时失败");
@@ -160,13 +169,20 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
                 //发起文件上传
                 if(flag) {
+                    VoiceFileRecord temp = voiceFileRecordService.findById(list.get(0).getId());
+                    temp.setStatus(0);
+                    voiceFileRecordService.save(temp);
                     mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceCdr.getAppId(), voiceCdr.getId(), VoiceFileRecordSyncEvent.TYPE_CDR));
                     for (int j = 1; j <= 30; j++) {
                         Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(list.get(0).getId());
-                        if(v1.getStatus()==1){
-                            String ossUri = getOssTempUri(v1.getOssUrl());
-                            return RestResponse.success(ossUri);
+                        if(v1.getStatus()!=null){
+                            if(v1.getStatus()==1) {
+                                String ossUri = getOssTempUri(v1.getOssUrl());
+                                return RestResponse.success(ossUri);
+                            }else if(v1.getStatus()==-1){
+                                return RestResponse.failed("0000","下载失败，请稍后重试");
+                            }
                         }
                     }
                     return RestResponse.failed("0000","下载超时失败");
