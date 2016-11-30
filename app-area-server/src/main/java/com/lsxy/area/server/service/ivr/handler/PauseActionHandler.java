@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.agentserver.IVRPauseActionEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -59,7 +60,7 @@ public class PauseActionHandler extends ActionHandler{
             }
         }
         mqService.publish(new IVRPauseActionEvent(callId,duration));
-        businessStateService.updateInnerField(callId,"next",next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
         return true;
     }
 }

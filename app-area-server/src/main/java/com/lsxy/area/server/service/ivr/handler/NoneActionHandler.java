@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.dom4j.Element;
@@ -43,7 +44,7 @@ public class NoneActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        businessStateService.updateInnerField(callId,"next",next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
         return true;
     }
 }
