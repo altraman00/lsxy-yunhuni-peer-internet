@@ -58,7 +58,20 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            sql+="AND b.type like '%"+ ProductCode.getApiCmdByRemark(type)+"%'";
+            String[] types = ProductCode.getApiCmdByRemark(type);
+            if(types.length==1){
+                sql+="AND b.type = '"+types[0]+"'";
+            }else {
+                String temp = " (";
+                for (int i = 0; i < types.length; i++) {
+                    temp+= "'"+types[i]+"'";
+                    if(i!=types.length-1){
+                        temp+=",";
+                    }
+                }
+                temp+=") ";
+                sql+="AND b.type in "+temp+"";
+            }
         }
         if(start!=null&&end!=null){
             sql+="AND b.time BETWEEN ? AND ? ";
@@ -109,7 +122,20 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            sql+="AND b.type like '%"+ ProductCode.getApiCmdByRemark(type)+"%'";
+            String[] types = ProductCode.getApiCmdByRemark(type);
+            if(types.length==1){
+                sql+="AND b.type = '"+types[0]+"'";
+            }else {
+                String temp = " (";
+                for (int i = 0; i < types.length; i++) {
+                    temp+= "'"+types[i]+"'";
+                    if(i!=types.length-1){
+                        temp+=",";
+                    }
+                }
+                temp+=") ";
+                sql+="AND b.type in "+temp+"";
+            }
         }
         if(start!=null&&end!=null){
             sql+="AND b.time BETWEEN ? AND ? ";

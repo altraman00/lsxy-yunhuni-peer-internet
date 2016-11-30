@@ -38,11 +38,11 @@ public enum ProductCode {
         }
         return null;
     }
-    public static String getApiCmdByRemark(String remark){
+    public static String[] getApiCmdByRemark(String remark){
         ProductCode[] values = ProductCode.values();
         for(ProductCode value:values){
             if(value.getRemark().equals(remark)){
-                return value.getApiCmd();
+                return value.getApiCmd().split(",");
             }
         }
         return null;
