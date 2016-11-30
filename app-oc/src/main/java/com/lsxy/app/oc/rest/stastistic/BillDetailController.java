@@ -109,8 +109,8 @@ public class BillDetailController extends AbstractRestController {
     public RestResponse voice_recording(
             @ApiParam(name = "uid",value = "用户id")
             @PathVariable String uid,
-            @ApiParam(name = "type",value = "voice_call.语音通知,duo_call.双向回拨,conf_call.会议服务,ivr_call.IVR定制服务,captcha_call.语音验证码,voice_recording.录音服务call_center呼叫中心类型")
-            @RequestParam String type,
+            @ApiParam(name = "type",value = "为空或者是返回的types里面的值")
+            @RequestParam(required = false) String type,
             @ApiParam(name = "time",value = "yyyy-MM-dd")
             @RequestParam(required=false) String time,
             @ApiParam(name = "appId",value = "应用id")
