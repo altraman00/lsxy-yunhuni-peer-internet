@@ -34,4 +34,8 @@ public interface VoiceFileRecordService extends BaseService<VoiceFileRecord> {
     List<Map> getAAListByCreateTimeAndTenantIdAndAreaId(Date createTime, String tenantId,String areaId);
     /** 根据记录id来更新区域文件的删除状态*/
     void batchUpdateAADelete(List<String> id,int status);
+    /** 根据租户，应用，获取截止到指定开始时间的录音文件*/
+    List<VoiceFileRecord> getListByTenantAndAppAndCreateTime(String tenant,String app,Date createTime);
+    /** 获取已删除记录但没有删除oss文件的记录*/
+    List<Map> getOssListByDeleted();
 }

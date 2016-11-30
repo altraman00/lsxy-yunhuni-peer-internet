@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.oss.OSSService;
@@ -102,8 +101,6 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
                             temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
                         }
                     }
-                    //标识文件记录需要删除
-                    temp.setIsDeleted(VoiceFileRecord.IS_DELETED_TRUE);
                     voiceFileRecordService.save(temp);
                     try {
                         voiceFileRecordService.delete(temp);

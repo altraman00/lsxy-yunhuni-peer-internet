@@ -176,4 +176,17 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
         List<String> list = jdbcTemplate.queryForList(sql,String.class,tenantId,createTime);
         return list;
     }
+    @Override
+    public List<VoiceFileRecord> getListByTenantAndAppAndCreateTime(String tenant, String app, Date createTime) {
+        String hql = " FROM VoiceFileRecord obj WHERE obj.tenantId=?1 AND obj.appId=?2 AND obj.createTime<=?3";
+        List list = this.list(hql, tenant,app,createTime);
+        return list;
+    }
+
+    @Override
+    public List<Map> getOssListByDeleted() {
+        String sql = " SELECT id as id ,file_key as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE deleted=1 and sync==1 and file_key is not null and file_key<>'' and (oss_deleted is null or oss_deleted<>1)";
+        List<Map> list = jdbcTemplate.queryForList(sql,Map.class);
+        return list;
+    }
 }
