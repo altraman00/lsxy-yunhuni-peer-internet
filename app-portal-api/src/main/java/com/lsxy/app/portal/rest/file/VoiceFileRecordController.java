@@ -88,13 +88,13 @@ public class VoiceFileRecordController extends AbstractRestController {
     @RequestMapping("/file/download")
     public WebAsyncTask fileDownload(String id){
         Callable<RestResponse> callable = new Callable<RestResponse>() {
-            public RestResponse call() throws Exception {
+            public RestResponse call() {
                 Tenant tenant = getCurrentAccount().getTenant();
                 VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(id);
                 if(tenant==null||voiceFileRecord==null||!tenant.getId().equals(voiceFileRecord.getTenantId())){
                     return RestResponse.failed("0000","验证失败，无法下载");
                 }
-                if(voiceFileRecord.getStatus()==1){
+                if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
                     String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
                     return RestResponse.success(ossUri);
                 }
@@ -106,7 +106,7 @@ public class VoiceFileRecordController extends AbstractRestController {
                 boolean flag = false;
                 for(int i=0;i<list.size();i++){
                     VoiceFileRecord temp = list.get(i);
-                    if(1!=temp.getStatus()){
+                    if(temp.getStatus()==null||1!=temp.getStatus()){
                         flag=true;
                         break;
                     }
@@ -115,9 +115,14 @@ public class VoiceFileRecordController extends AbstractRestController {
                 if(flag) {
                     mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceFileRecord.getAppId(), voiceFileRecord.getId(), VoiceFileRecordSyncEvent.TYPE_FILE));
                     for (int j = 1; j <= 30; j++) {
-                        Thread.sleep(j * 1000);
+                        try {
+                            logger.info("等待中"+j);
+                            Thread.sleep(j * 1000);
+                        } catch (InterruptedException e) {
+                            logger.error("等待异常",e);
+                        }
                         VoiceFileRecord v1 = voiceFileRecordService.findById(id);
-                        if(v1.getStatus()==1){
+                        if(v1.getStatus()!=null&&v1.getStatus()==1){
                             String ossUri = getOssTempUri(v1.getOssUrl());
                             return RestResponse.success(ossUri);
                         }

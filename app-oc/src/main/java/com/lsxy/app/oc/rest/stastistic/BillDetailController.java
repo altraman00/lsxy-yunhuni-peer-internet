@@ -145,7 +145,7 @@ public class BillDetailController extends AbstractRestController {
                 if(tenant==null||voiceFileRecord==null||!tenant.getId().equals(voiceFileRecord.getTenantId())){
                     return RestResponse.failed("0000","验证失败，无法下载");
                 }
-                if(voiceFileRecord.getStatus()==1){
+                if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
                     String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
                     return RestResponse.success(ossUri);
                 }
@@ -157,7 +157,7 @@ public class BillDetailController extends AbstractRestController {
                 boolean flag = false;
                 for(int i=0;i<list.size();i++){
                     VoiceFileRecord temp = list.get(i);
-                    if(1!=temp.getStatus()){
+                    if(voiceFileRecord.getStatus()==null||1!=temp.getStatus()){
                         flag=true;
                         break;
                     }
@@ -168,7 +168,7 @@ public class BillDetailController extends AbstractRestController {
                     for (int j = 1; j <= 30; j++) {
                         Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(id);
-                        if(v1.getStatus()==1){
+                        if(voiceFileRecord.getStatus()!=null&&v1.getStatus()==1){
                             String ossUri = getOssTempUri(v1.getOssUrl());
                             return RestResponse.success(ossUri);
                         }
@@ -201,7 +201,7 @@ public class BillDetailController extends AbstractRestController {
                 boolean flag = false;
                 for(int i=0;i<list.size();i++){
                     VoiceFileRecord voiceFileRecord = list.get(i);
-                    if(1!=voiceFileRecord.getStatus()){
+                    if(voiceFileRecord.getStatus()!=null&&1!=voiceFileRecord.getStatus()){
                         flag=true;
                         break;
                     }
@@ -212,7 +212,7 @@ public class BillDetailController extends AbstractRestController {
                     for (int j = 1; j <= 30; j++) {
                         Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(list.get(0).getId());
-                        if(v1.getStatus()==1){
+                        if(v1.getStatus()!=null&&v1.getStatus()==1){
                             String ossUri = getOssTempUri(v1.getOssUrl());
                             return RestResponse.success(ossUri);
                         }
