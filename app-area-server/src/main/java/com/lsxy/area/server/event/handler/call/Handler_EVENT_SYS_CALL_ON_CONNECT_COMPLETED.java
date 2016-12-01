@@ -93,7 +93,9 @@ public class Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED extends EventHandler {
                     .putIfNotEmpty("error",params.get("error"))
                     .build();
             if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(call_id);
+                ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                        .putIfNotEmpty("error", params.get("error"))
+                        .build());
             }
         }
 

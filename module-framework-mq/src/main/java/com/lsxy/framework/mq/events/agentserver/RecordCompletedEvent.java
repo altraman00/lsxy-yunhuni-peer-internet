@@ -8,6 +8,8 @@ import com.lsxy.framework.mq.topic.MQTopicConstants;
  */
 public class RecordCompletedEvent extends AbstractMQEvent {
 
+    private String recordId;
+
     private String tenantId;
 
     private String appId;
@@ -27,6 +29,11 @@ public class RecordCompletedEvent extends AbstractMQEvent {
     public RecordCompletedEvent(){
     }
 
+    public RecordCompletedEvent(String recordId,String tenantId, String appId,String areaId,String callId,
+                                String type,String url,Long startTime,Long endTime){
+        this(tenantId, appId, areaId, callId, type, url, startTime, endTime);
+        this.recordId = recordId;
+    }
     public RecordCompletedEvent(String tenantId, String appId,String areaId,String callId,
                                 String type,String url,Long startTime,Long endTime){
         this.tenantId = tenantId;
@@ -42,6 +49,14 @@ public class RecordCompletedEvent extends AbstractMQEvent {
     @Override
     public String getTopicName() {
         return MQTopicConstants.TOPIC_AREA_SERVER;
+    }
+
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     public String getTenantId() {
