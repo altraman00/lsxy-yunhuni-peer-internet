@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.agentserver.IVRPauseActionEvent;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -11,9 +12,6 @@ import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * pause指令处理器
@@ -62,13 +60,7 @@ public class PauseActionHandler extends ActionHandler{
             }
         }
         mqService.publish(new IVRPauseActionEvent(callId,duration));
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 }

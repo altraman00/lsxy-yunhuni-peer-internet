@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -68,15 +67,12 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
-        Map<String,Object> busniessData = state.getBusinessData();
-        if(busniessData == null){
-            busniessData = new HashMap<>();
-            state.setBusinessData(busniessData);
-        }
+        businessStateService.updateResId(call_id,res_id);
+        Map<String,String> busniessData = state.getBusinessData();
         //保存会话记录
         CallSession callSession = new CallSession();
-        callSession.setFromNum((String)busniessData.get("from"));
-        callSession.setToNum((String)busniessData.get("to"));
+        callSession.setFromNum(busniessData.get("from"));
+        callSession.setToNum(busniessData.get("to"));
         callSession.setStatus(CallSession.STATUS_CALLING);
         callSession.setApp(appService.findById(state.getAppId()));
         callSession.setTenant(tenantService.findById(state.getTenantId()));
@@ -89,15 +85,12 @@ public class Handler_EVENT_EXT_CAPTCHA_CALL_SUCCESS extends EventHandler {
         captchaCall.setId(call_id);
         captchaCall.setStartTime(new Date());
         captchaCall.setEndTime(null);
-        captchaCall.setFromNum((String)busniessData.get("from"));
-        captchaCall.setToNum((String)busniessData.get("to"));
+        captchaCall.setFromNum(busniessData.get("from"));
+        captchaCall.setToNum(busniessData.get("to"));
         captchaCall.setHangupSide(null);
         captchaCall.setResId(res_id);
         captchaCallService.save(captchaCall);
-
-        state.setResId(res_id);
-        busniessData.put("sessionid",callSession.getId());
-        businessStateService.save(state);
+        businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
         return res;
     }
 }

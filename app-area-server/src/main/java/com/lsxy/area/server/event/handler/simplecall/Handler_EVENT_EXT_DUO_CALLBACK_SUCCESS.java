@@ -64,17 +64,16 @@ public class Handler_EVENT_EXT_DUO_CALLBACK_SUCCESS extends EventHandler {
             throw new InvalidParamException("businessstate is null");
         }
         if(StringUtils.isNotBlank(resId)){
-            state.setResId(resId);
-            businessStateService.save(state);
+            businessStateService.updateResId(callId,resId);
             VoiceCallback duoCall = voiceCallbackService.findById(callId);
             if(duoCall != null){
                 duoCall.setResId(resId);
                 voiceCallbackService.save(duoCall);
             }
-            Map<String, Object> data = state.getBusinessData();
-            Set<Map.Entry<String, Object>> entries = data.entrySet();
-            for(Map.Entry entry:entries){
-                String sessionId = (String) entry.getValue();
+            Map<String, String> data = state.getBusinessData();
+            Set<Map.Entry<String, String>> entries = data.entrySet();
+            for(Map.Entry<String,String> entry:entries){
+                String sessionId = entry.getValue();
                 CallSession callSession = callSessionService.findById(sessionId);
                 if(callSession != null){
                     callSession.setResId(resId);
