@@ -10,10 +10,7 @@ import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.exceptions.api.ExtensionBindingToAgentException;
-import com.lsxy.framework.core.exceptions.api.ExtensionUserExistException;
-import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
-import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -166,6 +163,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     @Override
     public void delete(String extensionId, String appId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
             //获取分机锁
             ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
