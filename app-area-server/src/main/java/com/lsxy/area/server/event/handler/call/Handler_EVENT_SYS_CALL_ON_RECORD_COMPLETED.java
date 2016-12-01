@@ -7,6 +7,7 @@ import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.agentserver.RecordCompletedEvent;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -78,8 +79,9 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
 
+        String record_id = UUIDGenerator.uuid();
         try{
-            mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
+            mqService.publish(new RecordCompletedEvent(record_id,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
                     state.getType(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
@@ -89,7 +91,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
         }
 
         if(canDoivr(state,call_id)){
-            ivr(state,params,call_id);
+            ivr(record_id,state,params,call_id);
         }
         return res;
     }
@@ -104,7 +106,7 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
         return false;
     }
 
-    private void ivr(BusinessState state,Map<String,Object> params,String call_id){
+    private void ivr(String record_id, BusinessState state, Map<String, Object> params, String call_id){
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
         }
@@ -127,7 +129,10 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
                     .putIfNotEmpty("key",params.get("finish_key"))
                     .build();
             if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(call_id);
+                ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                        .putIfNotEmpty("error",params.get("error"))
+                        .putIfNotEmpty("record_id",record_id)
+                        .build());
             }
         }
     }

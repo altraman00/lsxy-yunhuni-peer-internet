@@ -124,7 +124,9 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
                     .putIfNotEmpty("key",params.get("finish_key"))
                     .build();
             if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(call_id);
+                ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                        .putIfNotEmpty("error",params.get("error"))
+                        .build());
             }
         }
     }
