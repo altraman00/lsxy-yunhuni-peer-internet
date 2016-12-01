@@ -146,9 +146,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .putIfNotEmpty("error",error)
                         .putIfNotEmpty("user_data",state.getUserdata())
                         .build();
-                if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                    ivrActionService.doAction(call_id);
-                }
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
             }
             if(StringUtils.isNotBlank(error)){
                 logger.error("IVR呼出失败",error);
@@ -164,7 +162,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .putIfNotEmpty("error",error)
                         .build();
                 if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                    ivrActionService.doAction(ivr_call_id);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
                 }
             }else{
                 BusinessState ivrState = businessStateService.get(ivr_call_id);

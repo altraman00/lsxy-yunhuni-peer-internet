@@ -86,7 +86,7 @@ public class PlayListActionHandler extends ActionHandler{
                 logger.error("调用失败",e);
             }
         }
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 }

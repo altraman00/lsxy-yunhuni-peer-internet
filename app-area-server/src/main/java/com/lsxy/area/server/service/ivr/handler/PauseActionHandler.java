@@ -60,7 +60,7 @@ public class PauseActionHandler extends ActionHandler{
             }
         }
         mqService.publish(new IVRPauseActionEvent(callId,duration));
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 }

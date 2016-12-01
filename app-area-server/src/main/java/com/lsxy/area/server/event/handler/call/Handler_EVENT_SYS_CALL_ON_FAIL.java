@@ -96,7 +96,9 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
                             .putIfNotEmpty("error","dial error")
                             .build();
                     if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                        ivrActionService.doAction(ivr_call_id);
+                        ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                                .putIfNotEmpty("error","dial error")
+                                .build());
                     }
                 }
             }

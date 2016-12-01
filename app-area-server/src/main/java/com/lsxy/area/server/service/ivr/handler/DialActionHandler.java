@@ -99,23 +99,9 @@ public class DialActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        try{
-            //更新下一步
-            businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT,next);
-            dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
-        }catch (Throwable t){
-            logger.error("ivr拨号失败:",t);
-            Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","ivr.connect_end")
-                    .putIfNotEmpty("id",callId)
-                    .putIfNotEmpty("begin_time",System.currentTimeMillis())
-                    .putIfNotEmpty("end_time",System.currentTimeMillis())
-                    .putIfNotEmpty("error","dial error")
-                    .build();
-            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(callId);
-            }
-        }
+        //更新下一步
+        businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT_FIELD,next);
+        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         return true;
     }
 
