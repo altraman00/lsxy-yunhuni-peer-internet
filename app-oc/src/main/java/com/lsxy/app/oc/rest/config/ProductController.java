@@ -160,7 +160,8 @@ public class ProductController  extends AbstractRestController {
         }else{
             return RestResponse.failed("0000", "计价单位错误");
         }
-        productItemService.save(productItem);
+        productItem = productItemService.save(productItem);
+        price.setProductItem(productItem);
         productPriceService.save(price);
         return RestResponse.success("修改成功");
     }

@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_oc_config_tenant")
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_tenant")
 public class TenantConfig extends IdEntity {
     private String tenantId;//所属租户
     private String appId;//所属租户
@@ -25,6 +25,20 @@ public class TenantConfig extends IdEntity {
     private Date expireDt;//有效期
     private String remark;//备注
     private String enabled;//是否可用
+
+    public TenantConfig() {
+    }
+
+    public TenantConfig(String tenantId, String appId, String type, String keyName, String name, String value, String enabled) {
+        this.tenantId = tenantId;
+        this.appId = appId;
+        this.type = type;
+        this.keyName = keyName;
+        this.name = name;
+        this.value = value;
+        this.enabled = enabled;
+    }
+
     @Column(name = "key_name")
     public String getKeyName() {
         return keyName;

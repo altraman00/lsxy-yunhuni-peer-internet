@@ -199,7 +199,7 @@
                                                                     <%--<p>${appExtension.telenum} </p>--%>
                                                                 <%--</c:if>--%>
                                                             <%--</c:forEach>--%>
-                                                            <p class="text-danger">（上线后平台会重新分配分机接入信息）</p>
+                                                            <%--<p class="text-danger">（上线后平台会重新分配分机接入信息）</p>--%>
                                                         </div>
                                                     </div>
                                                     </c:if>
@@ -260,16 +260,17 @@
                                                 配置存储周期
                                             </div>
                                             <div class="col-md-10 font14">
-                                                <input type="radio" name="cycle" value="0" checked/>7天免费存储
-                                                &nbsp;<input type="radio" name="cycle" value="1" />1个月
-                                                &nbsp;<input type="radio" name="cycle" value="2" />2个月
-                                                &nbsp;<input type="radio" name="cycle" value="3" />3个月
+                                                <input type="radio" name="cycle" value="7" <c:if test="${cycle==7}">checked</c:if> />7天免费存储
+                                                &nbsp;<input type="radio" name="cycle" value="30"<c:if test="${cycle==30}">checked</c:if> />1个月
+                                                &nbsp;<input type="radio" name="cycle" value="60"<c:if test="${cycle==60}">checked</c:if> />2个月
+                                                &nbsp;<input type="radio" name="cycle" value="90"<c:if test="${cycle==90}">checked</c:if> />3个月
+                                                &nbsp;<input type="radio" name="cycle" value="180"<c:if test="${cycle==180}">checked</c:if> />6个月
                                             </div>
                                         </div>
                                         <div class="row margin-bottom-20">
                                             <div class="col-md-2 font14 max-width-120"></div>
                                             <div class=" col-md-10">
-                                                <a href="" class="btn btn-primary">保存</a>
+                                                <a href="#" class="btn btn-primary" onclick="saveCycle()">保存</a>
                                             </div>
                                         </div>
                                         <%--<p class="application_info">--%>
@@ -460,6 +461,19 @@
 
 
         <script>
+            function saveCycle(){
+                var cycle = $('input[name=cycle]:checked').val();
+                bootbox.setLocale("zh_CN");
+                var h1="配置存储周期是否更改为："+ cycle;
+                bootbox.confirm(h1, function(result) {
+                    if(result){
+                        ajaxsync(ctx + "/console/app/edit/recording/"+appId,{csrfParameterName:csrfToken,'cycle':cycle},function(response1){
+                            console.info(response1);
+                            showtoast("");
+                        },"post");
+                    }
+                });
+            }
             function showTestNumBind(){
 //                showtoast('当前没有测试号码')
                 bootbox.setLocale("zh_CN");

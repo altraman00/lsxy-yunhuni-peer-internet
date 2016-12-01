@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -187,46 +188,56 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public void recordingVoiceFileTask() {
+        int globalRecording = 7;
+        Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
         GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
-        if(globalConfig!=null&&StringUtils.isNotEmpty(globalConfig.getValue())){
+        if(globalConfig!=null&&StringUtils.isNotEmpty(globalConfig.getValue())) {
             //全局录音文件存储时长时间
-            Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
-    	    Matcher matcher = pattern.matcher(globalConfig.getValue());
-            if(!matcher.matches()){
-                //配置不是正整数则结束
-                return;
+            Matcher matcher = pattern.matcher(globalConfig.getValue());
+            if (matcher.matches()) {
+                globalRecording = Integer.valueOf(globalConfig.getValue());
             }
-            int globalRecording = Integer.valueOf(globalConfig.getValue());
-            List<TenantConfig> list = tenantConfigService.getPageByTypeAndKeyName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
-            for(int i=0;i<list.size();i++){
-                TenantConfig tenantConfig = list.get(i);
-                if(StringUtils.isNotEmpty(tenantConfig.getValue())&&StringUtils.isNotEmpty(tenantConfig.getTenantId())&&StringUtils.isNotEmpty(tenantConfig.getAppId())){
-                    int tenantRecording = 0;
-                    Matcher matcher1 = pattern.matcher(globalConfig.getValue());
-                    if(matcher1.matches()){
-                        tenantRecording = Integer.valueOf(tenantConfig.getValue());
-                    }
-                    //全局配置的录音文件存储时间不收费，租户的应用下的配置如果大于全局配置的话需要收费
-                    if(tenantRecording>globalRecording){
-                        Tenant tenant = tenantService.findById(tenantConfig.getTenantId());
-                        App app = appService.findById(tenantConfig.getAppId());
-                        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.getApiCmd(),tenant.getId());
-                        if(tenant!=null&&app!=null){
-                            //获取租户应用下的录音文件 isDeleted
-                            long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
-                            long g = 1024*1024*1024;
-                            if(size>0) {
-                                long s1 = (size / g) + (g % g > 0 ? 1 : 0);
-                                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),cost.multiply(new BigDecimal(s1)),ConsumeCode.recording_memory.getName(),app.getId(),tenant);
-                                consumeService.consume(consume);
-                            }
-                        }
-                    }
+        }
+        List<TenantConfig> list = tenantConfigService.getPageByTypeAndKeyName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
+        for(int i=0;i<list.size();i++){
+            TenantConfig tenantConfig = list.get(i);
+            if(StringUtils.isNotEmpty(tenantConfig.getValue())&&StringUtils.isNotEmpty(tenantConfig.getTenantId())&&StringUtils.isNotEmpty(tenantConfig.getAppId())){
+                int tenantRecording = 0;
+                Matcher matcher1 = pattern.matcher(tenantConfig.getValue());
+                if(matcher1.matches()){
+                    tenantRecording = Integer.valueOf(tenantConfig.getValue());
+                }
+                //全局配置的录音文件存储时间不收费，租户的应用下的配置如果大于全局配置的话需要收费
+                if(tenantRecording>globalRecording){
+                    recordCost(tenantConfig.getTenantId(),tenantConfig.getAppId());
                 }
             }
         }
-    }
 
+    }
+    @Override
+    public boolean recordCost(String tenantId,String appId){
+        boolean flag = true;
+        Tenant tenant = tenantService.findById(tenantId);
+        App app = appService.findById(appId);
+        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.getApiCmd(),tenant.getId());
+        if(tenant!=null&&app!=null){
+            //获取租户应用下的录音文件 isDeleted
+            long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
+            long g = 1024*1024*1024;
+            if(size>0) {
+                long s1 = (size / g) + (g % g > 0 ? 1 : 0);
+                BigDecimal temp = cost.multiply(new BigDecimal(s1));
+                Billing billing = calBillingService.getCalBilling(tenant.getId());
+                if(billing.getBalance().compareTo(temp)==-1) {
+                    flag = false;
+                }
+                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),temp,ConsumeCode.recording_memory.getName(),app.getId(),tenant);
+                consumeService.consume(consume);
+            }
+        }
+        return flag;
+    }
     @Override
     public List<ResourcesRent> findByTenantId(String tenantId) {
         List<Integer> status = Arrays.asList(1, 2);
