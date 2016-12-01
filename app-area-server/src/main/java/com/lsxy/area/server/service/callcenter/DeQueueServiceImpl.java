@@ -132,7 +132,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId);
+                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                        .put("error","timeout").build());
             }
         }
     }
@@ -155,7 +156,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId);
+                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                        .put("error","fail").build());
             }
         }
     }

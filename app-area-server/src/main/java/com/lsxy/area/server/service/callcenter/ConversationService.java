@@ -610,7 +610,7 @@ public class ConversationService {
                 if(logger.isDebugEnabled()){
                     logger.debug("开始重新进入ivr，callid={}",callId);
                 }
-                ivrActionService.doAction(callId);
+                ivrActionService.doAction(callId,null);
             }else if(this.size(conversationId) <= 1){
                 if(logger.isDebugEnabled()){
                     logger.debug("开始呼入ivr挂断后，解散会议，callid={}",callId);
