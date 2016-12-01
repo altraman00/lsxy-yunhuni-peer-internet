@@ -157,6 +157,8 @@ public class ProductController  extends AbstractRestController {
         if (priceType!=null&&priceType.getTimeUnit() != null&&StringUtils.isNotEmpty(priceType.getUnit())) {
             price.setTimeUnit(priceType.getTimeUnit());
             price.setUnit(priceType.getUnit());
+        }else{
+            return RestResponse.failed("0000", "计价单位错误");
         }
         productItemService.save(productItem);
         productPriceService.save(price);
