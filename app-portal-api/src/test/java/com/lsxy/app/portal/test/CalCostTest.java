@@ -73,6 +73,17 @@ public class CalCostTest {
     }
 
     @Test
+    public void testIncRecharge(){
+        calBillingService.incRecharge("40288ac957e0afc80157e0b24a5b0000",new Date(),new BigDecimal(9.09));
+    }
+
+    @Test
+    public void testGetRecharge(){
+        BigDecimal amount = calBillingService.getBalance("40288ac957e0afc80157e0b24a5b0000");
+        System.out.println(amount);
+    }
+
+    @Test
     public void calAverageCall(){
         Map<String, Object> map = voiceCdrHourService.calAverageCall("1");
         System.out.println(map.get("lineAverageCallTime"));
