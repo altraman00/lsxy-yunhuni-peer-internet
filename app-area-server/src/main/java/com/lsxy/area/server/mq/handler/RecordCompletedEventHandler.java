@@ -74,6 +74,9 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
             return;
         }
         VoiceFileRecord record = new VoiceFileRecord();
+        if(message.getRecordId()!=null){
+            record.setId(message.getRecordId());
+        }
         record.setTenantId(message.getTenantId());
         record.setAppId(message.getAppId());
         record.setAreaId(message.getAreaId());

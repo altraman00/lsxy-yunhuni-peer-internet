@@ -68,7 +68,7 @@ public class Handler_EVENT_CALL_ON_ANSWER_COMPLETED extends EventHandler{
         }
         //删除等待应答标记
         businessStateService.deleteInnerField(call_id,IVRActionService.IVR_ANSWER_WAITTING_FIELD);
-        ivrActionService.doAction(call_id);
+        ivrActionService.doAction(call_id,null);
         return res;
     }
 

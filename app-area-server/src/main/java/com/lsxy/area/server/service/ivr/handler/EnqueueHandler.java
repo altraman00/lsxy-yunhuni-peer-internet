@@ -114,7 +114,7 @@ public class EnqueueHandler extends ActionHandler{
                 }
             }
         }
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT,next);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         try {
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
         }catch (Throwable t){

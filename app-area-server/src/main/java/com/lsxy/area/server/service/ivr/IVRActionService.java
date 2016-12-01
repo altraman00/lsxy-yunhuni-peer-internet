@@ -85,7 +85,11 @@ public class IVRActionService {
     /**IVR呼入执行ivr动作前，会自动应答，所以保存ivr动作xml一次，应答后自动执行动作**/
     public static final String IVR_ANSWER_AFTER_XML_FIELD = "IVR_ANSWER_AFTER_XML";
 
-    public static final String IVR_NEXT = "next";
+    /**IVR当前执行的action**/
+    public static final String IVR_ACTION_FIELD ="IVR_ACTION";
+
+    /**IVR下一步的url**/
+    public static final String IVR_NEXT_FIELD = "IVR_NEXT";
 
     //设置请求和传输超时时间
     private RequestConfig config =
@@ -238,13 +242,27 @@ public class IVRActionService {
      * @param url
      * @return
      */
-    private String getNextRequest(String call_id,String url){
+    private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
             try{
-                HttpGet get = new HttpGet(inputUrl(url,"call_id",call_id));
+                String target = inputUrl(url,"call_id",call_id);
+                if(prevAction != null){
+                    target = inputUrl(target,"type",prevAction);
+                }
+                if(prevResults != null && prevResults.size()>0){
+                    Set<Map.Entry<String,Object>> entries = prevResults.entrySet();
+                    for (Map.Entry<String,Object> entry : entries){
+                        String key = entry.getKey();
+                        String value = (String)entry.getValue();
+                        if(value!=null){
+                            target = inputUrl(target,key,value);
+                        }
+                    }
+                }
+                HttpGet get = new HttpGet(target);
                 get.setConfig(config);
                 get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
@@ -291,7 +309,7 @@ public class IVRActionService {
                                     String from, String to,String lineId,Integer iscc){
         String call_id = UUIDGenerator.uuid();
         saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId,iscc);
-        doAction(call_id);
+        doAction(call_id,null);
         return true;
     }
 
@@ -356,7 +374,7 @@ public class IVRActionService {
         }
     }
 
-    public boolean doAction(String call_id){
+    public boolean doAction(String call_id,Map<String,Object> prevResults){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
             logger.info("没有找到call_id={}的state",call_id);
@@ -377,7 +395,7 @@ public class IVRActionService {
                 return handleXML(call_id,ivr_action_xml,state);
             }
         }
-        String nextUrl = businessDate.get(IVR_NEXT);
+        String nextUrl = businessDate.get(IVR_NEXT_FIELD);
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl)){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
@@ -388,7 +406,7 @@ public class IVRActionService {
         if(nextUrl == null){//第一次
             resXML = getFirstIvr(call_id,state.getCallBackUrl(),state.getBusinessData().get("to"));
         }else{
-            resXML = getNextRequest(call_id,nextUrl);
+            resXML = getNextRequest(call_id,nextUrl,businessDate.get(IVR_ACTION_FIELD),prevResults);
         }
         if(StringUtils.isBlank(resXML)){
             return false;
@@ -423,6 +441,7 @@ public class IVRActionService {
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;
             }
+            businessStateService.updateInnerField(call_id,IVR_ACTION_FIELD,h.getAction());
             return h.handle(call_id,actionEle,getNextUrl(root));
         } catch(DocumentException e){
             logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
@@ -479,7 +498,7 @@ public class IVRActionService {
      * @return
      */
     private String getNextUrl(Element root){
-        String next = root.elementTextTrim(IVR_NEXT);
+        String next = root.elementTextTrim("next");
         if(StringUtils.isBlank(next)){
             next = "";
         }
