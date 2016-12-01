@@ -101,7 +101,7 @@ public class ProductController  extends AbstractRestController {
         return RestResponse.success("禁用产品成功");
     }
 
-    @RequestMapping(value = "price/plist",method = RequestMethod.GET)
+    @RequestMapping(value = "/price/plist",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品费用分页数据")
     public RestResponse pricePList(
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
@@ -115,7 +115,7 @@ public class ProductController  extends AbstractRestController {
         Page page1 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),tempList);
         return RestResponse.success(page1);
     }
-    @RequestMapping(value = "price/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/price/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品费用单调记录")
     public RestResponse priceOne(
             @ApiParam(name = "id",value = "费用记录id")  @PathVariable String  id
@@ -127,7 +127,7 @@ public class ProductController  extends AbstractRestController {
         ProductVo productVo = new ProductVo(price);
         return RestResponse.success(productVo);
     }
-    @RequestMapping(value = "price/edit/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/price/edit/{id}",method = RequestMethod.PUT)
     @ApiOperation(value = "修改产品费用")
     public RestResponse priceEdit(
             @ApiParam(name = "id",value = "费用记录id")  @PathVariable String  id,@RequestBody ProductEditVo productEditVo
