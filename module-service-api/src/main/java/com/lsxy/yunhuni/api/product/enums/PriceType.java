@@ -9,8 +9,8 @@ import java.util.Map;
  * Created by zhangxb on 2016/11/22.
  */
 public enum PriceType {
-    type1(2,6,"6秒","6秒"),
-    type2(2,60,"60秒","60秒"),
+    type1(2,6,"秒","6秒"),
+    type2(2,60,"秒","60秒"),
     type3(4,1,"G/月","G/月"),
     type4(1,1,"个","个"),
     type5(3,1,"月","月");
@@ -52,7 +52,7 @@ public enum PriceType {
     public static PriceType getPriceTypeById(String id){
         PriceType[] values = PriceType.values();
         for(PriceType value:values){
-            if(value.getUnit().equals(id)){
+            if(value.getKey().equals(id)){
                 return value;
             }
         }
