@@ -84,6 +84,17 @@ public class CalCostTest {
     }
 
     @Test
+    public void testIncCallCostTime(){
+        calBillingService.incCallCostTime("40288ac957e0afc80157e0b24a5b0000",new Date(),45L);
+    }
+
+    @Test
+    public void testGetIncCallCostTime(){
+        Long callCostTimeByDate = calBillingService.getCallCostTimeByDate("40288ac957e0afc80157e0b24a5b0000", new Date());
+        System.out.println(callCostTimeByDate);
+    }
+
+    @Test
     public void calAverageCall(){
         Map<String, Object> map = voiceCdrHourService.calAverageCall("1");
         System.out.println(map.get("lineAverageCallTime"));

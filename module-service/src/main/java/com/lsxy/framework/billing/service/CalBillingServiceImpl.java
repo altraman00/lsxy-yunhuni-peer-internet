@@ -151,7 +151,9 @@ public class CalBillingServiceImpl implements CalBillingService{
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
         String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
-        String rechargeStr = (String) hashOps.get(type);
+
+        Object rechargeObj = hashOps.get(type);
+        String rechargeStr = rechargeObj == null?null:rechargeObj.toString();
         if(StringUtils.isBlank(rechargeStr)){
             incrAmount = new BigDecimal(0);
         }else{
@@ -285,7 +287,8 @@ public class CalBillingServiceImpl implements CalBillingService{
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
         String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
-        String incrLongStr = (String) hashOps.get(type);
+        Object incrLongObj = hashOps.get(type);
+        String incrLongStr = incrLongObj == null?null:incrLongObj.toString();
         if(StringUtils.isBlank(incrLongStr)){
             time = 0L;
         }else{
