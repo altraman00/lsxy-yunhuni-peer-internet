@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -79,6 +80,13 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                 if(StringUtil.isBlank(appExtension.getUser()) || StringUtil.isBlank(appExtension.getPassword())){
                     throw new RequestIllegalArgumentException();
                 }
+                //只能是纯数字
+                String reg = "^\\d*$";
+                boolean b = Pattern.compile(reg).matcher(appExtension.getUser()).find();
+                if(!b){
+                    throw new RequestIllegalArgumentException();
+                }
+
                 Long ccn = app.getCallCenterNum();
                 //创建分机的用户名要加上应用编号，以区分唯一性
                 appExtension.setUser(ccn + appExtension.getUser());
@@ -155,6 +163,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     @Override
     public void delete(String extensionId, String appId) throws YunhuniApiException{
         AppExtension extension = this.findById(extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
         if(StringUtils.isNotBlank(appId) && appId.equals(extension.getAppId())){
             //获取分机锁
             ExtensionLock extensionLock = new ExtensionLock(redisCacheService,extensionId);
