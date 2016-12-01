@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ivraction.xsd">
+    <dial from="4001546646464">
+        <number>415-123-4567</number>
+        <play>ringtone.wav</play>
+        <connect play_time="1470293585">
+            <play repeat="3">warning.wav</play>
+    </connect>
+</dial>
+<next>http://yourhost/nextstep</next>
+</response>

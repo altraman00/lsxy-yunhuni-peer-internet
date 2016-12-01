@@ -131,7 +131,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
     @Override
     public Page<ResourceTelenum> getPageByNotLine(String id,String areaCode, Integer pageNo, Integer pageSize, String operator, String number) {
-        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum  where deleted=0 And usable='1' AND area_code='"+areaCode+"' AND tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 AND line_id='"+id+"') ";
+        String sql = "FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum  where deleted=0  AND area_code='"+areaCode+"' AND tel_number NOT IN (SELECT tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway WHERE deleted=0 AND line_id='"+id+"') ";
         if(StringUtils.isNotEmpty(operator)){
             sql +=" AND obj.operator like '%"+operator+"%' ";
         }
@@ -197,10 +197,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 //先给指定的号码选出数据库中对应的数据
                 if(StringUtils.isNotBlank(inFrom)){
                     //号码不为空，先看应用有没有绑定号码
-                    if(appNums == null || appNums.size()==0){
-                        throw new RuntimeException("找不到对应的号码");
-                    }
                     ResourceTelenum resultNum = null;
+//                    if(appNums == null || appNums.size()==0){
+//                        throw new RuntimeException("找不到对应的号码");
+//                    }
                     for(ResourceTelenum num:appNums){
                         if(inFrom.equals(num.getTelNumber())){
                             resultNum = num;
@@ -208,13 +208,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                         }
                     }
                     //找不出对应的绑定号码
-                    if(resultNum == null){
-                        throw new RuntimeException("找不到对应的号码");
-                    }else{
+//                    if(resultNum == null){
+//                        throw new RuntimeException("找不到对应的号码");
+//                    }else{
                         result.add(i,resultNum);
                         //下面会将这号码赋值给那些为空的号码
                         notEmptyNum = resultNum;
-                    }
+//                    }
                 }else{
                     //没指定号码直接设为空
                     result.add(i,null);

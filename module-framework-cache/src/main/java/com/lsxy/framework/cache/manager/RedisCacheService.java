@@ -1,8 +1,5 @@
 package com.lsxy.framework.cache.manager;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Set;
-
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +14,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.UnsupportedEncodingException;
+import java.util.Set;
 
 /**
  * Redis操作方法
@@ -357,6 +356,10 @@ public class RedisCacheService {
 			
 		}
 
+		public void sremove(final String key,final String... value){
+			redisTemplate.opsForSet().remove(key,value);
+		}
+
 		public void sadd(final String key, final Object ... values) {
 			redisTemplate.opsForSet().add(key, values);
 		}
@@ -364,6 +367,10 @@ public class RedisCacheService {
 		public Set smembers(final String key) {
 			Set set = redisTemplate.opsForSet().members(key);
 			return set;
+		}
+
+		public long ssize(final String key){
+			return redisTemplate.opsForSet().size(key);
 		}
 
 	public BoundHashOperations getHashOps(String key){

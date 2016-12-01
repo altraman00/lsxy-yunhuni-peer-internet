@@ -148,6 +148,9 @@ public class ResourcesRentController extends AbstractRestController{
                 }
                 temp.setAmount(bigDecimal);
                 temp = telenumOrderService.save(temp);
+                BigDecimal bigDecimal1 = new BigDecimal(100*list.size());
+                bigDecimal = bigDecimal.add(bigDecimal1);
+                temp.setAmount(bigDecimal);
                 map.put("order", temp);
                 map.put("list", list);
             }
@@ -224,6 +227,9 @@ public class ResourcesRentController extends AbstractRestController{
             }
         }
         temp = resourcesRentService.telnumNew(tenant,numIds);
+        BigDecimal bigDecimal1 = new BigDecimal(100*numIds.length);
+        bigDecimal1 = temp.getAmount().add(bigDecimal1);
+        temp.setAmount(bigDecimal1);
         return RestResponse.success(temp);
     }
 }

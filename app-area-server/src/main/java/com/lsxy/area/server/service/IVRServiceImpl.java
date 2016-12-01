@@ -126,8 +126,8 @@ public class IVRServiceImpl implements IVRService {
         //TODO
         AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from, to);
         String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber().getTelNumber();
-        LineGateway lineGateway = lineGatewayService.getBestLineGatewayByNumber(oneTelnumber);
+        String oneTelnumber = selector.getOneTelnumber();
+        String lineId = selector.getLineId();
 
         VoiceIvr voiceIvr = new VoiceIvr();
         voiceIvr.setFromNum(oneTelnumber);
@@ -140,7 +140,7 @@ public class IVRServiceImpl implements IVRService {
         CallSession callSession = new CallSession();
         callSession.setStatus(CallSession.STATUS_PREPARING);
         callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(to+"@"+lineGateway.getSipProviderIp());
+        callSession.setToNum(selector.getToUri());
         callSession.setApp(app);
         callSession.setTenant(app.getTenant());
         callSession.setRelevanceId(callId);
@@ -149,7 +149,7 @@ public class IVRServiceImpl implements IVRService {
         callSession = callSessionService.save(callSession);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
-                .putIfNotEmpty("to_uri",to+"@"+lineGateway.getSipProviderIp())
+                .putIfNotEmpty("to_uri",selector.getToUri())
                 .putIfNotEmpty("from_uri",oneTelnumber)
                 .putIfNotEmpty("max_answer_seconds",maxCallDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
@@ -170,7 +170,7 @@ public class IVRServiceImpl implements IVRService {
                                     .setId(callId)
                                     .setType("ivr_call")
                                     .setAreaId(areaId)
-                                    .setLineGatewayId(lineGateway.getId())
+                                    .setLineGatewayId(lineId)
                                     .setBusinessData(new MapBuilder<String,Object>()
                                             .putIfNotEmpty("from",from)
                                             .putIfNotEmpty("to",to)

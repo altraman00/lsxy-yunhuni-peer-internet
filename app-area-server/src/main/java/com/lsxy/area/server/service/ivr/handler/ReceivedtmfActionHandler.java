@@ -74,6 +74,10 @@ public class ReceivedtmfActionHandler extends ActionHandler{
 
         try {
             plays = playFileUtil.convertArray(state.getTenantId(),state.getAppId(),plays);
+            String play_content = null;
+            if(plays!=null && plays.size()>0){
+                play_content = JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}});
+            }
             Map<String, Object> params = new MapBuilder<String,Object>()
                     .putIfNotEmpty("res_id",res_id)
                     .putIfNotEmpty("valid_keys",valid_keys)
@@ -81,7 +85,7 @@ public class ReceivedtmfActionHandler extends ActionHandler{
                     .putIfNotEmpty("finish_keys",finish_keys)
                     .putIfNotEmpty("first_key_timeout",first_key_timeout)
                     .putIfNotEmpty("continues_keys_timeout",continues_keys_timeout)
-                    .putIfNotEmpty("play_content", JSONUtil2.objectToJson(new Object[][]{new Object[]{StringUtils.join(plays,"|"),7,""}}))
+                    .putIfNotEmpty("play_content", play_content)
                     .putIfNotEmpty("play_repeat",play_repeat)
                     .putIfNotEmpty("breaking_on_key",if_break_on_key)
                     .putIfNotEmpty("user_data",callId)
