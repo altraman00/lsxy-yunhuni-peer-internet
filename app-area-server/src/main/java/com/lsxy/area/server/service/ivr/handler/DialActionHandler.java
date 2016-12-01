@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -100,29 +99,9 @@ public class DialActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        try{
-            //更新下一步
-            Map<String,Object> businessData = state.getBusinessData();
-            if(businessData == null){
-                businessData = new HashMap<>();
-            }
-            businessData.put("next",next);
-            state.setBusinessData(businessData);
-            businessStateService.save(state);
-            dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
-        }catch (Throwable t){
-            logger.error("ivr拨号失败:",t);
-            Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","ivr.connect_end")
-                    .putIfNotEmpty("id",callId)
-                    .putIfNotEmpty("begin_time",System.currentTimeMillis())
-                    .putIfNotEmpty("end_time",System.currentTimeMillis())
-                    .putIfNotEmpty("error","dial error")
-                    .build();
-            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(callId);
-            }
-        }
+        //更新下一步
+        businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT_FIELD,next);
+        dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         return true;
     }
 
@@ -142,8 +121,6 @@ public class DialActionHandler extends ActionHandler{
 
     public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
         App app = appService.findById(appId);
-
-
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
         String to = root.elementTextTrim("number");
@@ -151,26 +128,26 @@ public class DialActionHandler extends ActionHandler{
         Integer maxDialDuration=parseInt(root.attributeValue("max_dial_duration"));
         Integer dialVoiceStopCond = parseInt(root.attributeValue("dial_voice_stop_cond"));
         String from = root.attributeValue("from");
-        Integer max_seconds=null;
-        Integer connect_mode = null;
-        boolean recording = false;
-        Integer volume1 = null;
-        Integer volume2 = null;
-        Long play_time = null;
+        String max_seconds=null;
+        String connect_mode = null;
+        String recording = null;
+        String volume1 = null;
+        String volume2 = null;
+        String play_time = null;
         String play_file=null;
-        Integer play_repeat= null;
+        String play_repeat= null;
         Element connectEle = root.element("connect");
         if(connectEle!=null){
-            max_seconds = parseInt(connectEle.attributeValue("max_duration"));
-            connect_mode = parseInt(connectEle.attributeValue("mode"));
-            recording = Boolean.parseBoolean(connectEle.attributeValue("recording"));
-            volume1 = parseInt(connectEle.attributeValue("volume1"));
-            volume2 = parseInt(connectEle.attributeValue("volume2"));
-            play_time = parseLong(connectEle.attributeValue("play_time"));
+            max_seconds = connectEle.attributeValue("max_duration");
+            connect_mode = connectEle.attributeValue("mode");
+            recording = connectEle.attributeValue("recording");
+            volume1 = connectEle.attributeValue("volume1");
+            volume2 = connectEle.attributeValue("volume2");
+            play_time = connectEle.attributeValue("play_time");
             Element playEle = connectEle.element("play");
             if(playEle != null){
                 play_file = playEle.getTextTrim();
-                play_repeat = parseInt(playEle.attributeValue("repeat"));
+                play_repeat = playEle.attributeValue("repeat");
             }
         }
 
@@ -237,19 +214,19 @@ public class DialActionHandler extends ActionHandler{
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
-                .setBusinessData(new MapBuilder<String,Object>()
+                .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
-                        .put("max_seconds",max_seconds, IVRActionService.MAX_DURATION_SEC)
-                        .put("connect_mode",connect_mode,1)
+                        .put("max_seconds",max_seconds, ""+IVRActionService.MAX_DURATION_SEC)
+                        .put("connect_mode",connect_mode,"1")
                         .putIfNotEmpty("volume1",volume1)
                         .putIfNotEmpty("volume2",volume2)
                         .putIfNotEmpty("play_time",play_time)
                         .putIfNotEmpty("play_file",play_file)
-                        .put("play_repeat",play_repeat,1)
+                        .put("play_repeat",play_repeat,"1")
                         .putIfNotEmpty("recording",recording)
-                        .putIfNotEmpty("sessionid",callSession.getId())
+                        .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
         businessStateService.save(callstate);

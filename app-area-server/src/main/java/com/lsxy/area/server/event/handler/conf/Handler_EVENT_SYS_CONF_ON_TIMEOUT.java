@@ -94,7 +94,6 @@ public class Handler_EVENT_SYS_CONF_ON_TIMEOUT extends EventHandler{
 
     private void conf(BusinessState state, String conf_id) {
         String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
 
         //开始通知开发者
         if(logger.isDebugEnabled()){

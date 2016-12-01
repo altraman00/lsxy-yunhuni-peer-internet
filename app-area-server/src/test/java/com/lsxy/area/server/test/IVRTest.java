@@ -85,7 +85,7 @@ public class IVRTest {
         System.out.println(lists.get(0).getId());
         //下一步干嘛
         int step = 1;
-        while(ivrActionService.doAction(lists.get(0).getId())){
+        while(ivrActionService.doAction(lists.get(0).getId(),null)){
             System.out.println("ivr step" + (step++));
         }
     }
@@ -97,7 +97,7 @@ public class IVRTest {
         System.out.println(lists.get(0).getId());
         //下一步干嘛
         int step = 1;
-        while(ivrActionService.doAction(lists.get(0).getId())){
+        while(ivrActionService.doAction(lists.get(0).getId(),null)){
             System.out.println("ivr step" + (step++));
         }
     }

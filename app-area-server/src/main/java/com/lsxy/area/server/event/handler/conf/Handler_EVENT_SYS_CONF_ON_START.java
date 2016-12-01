@@ -91,8 +91,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
         if(res_id!=null){
-            state.setResId(res_id);
-            businessStateService.save(state);
+            businessStateService.updateResId(conf_id,res_id);
         }
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
@@ -107,8 +106,6 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
 
     public void conversation(BusinessState state,String conversationId){
         String appId = state.getAppId();
-        String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
 
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
@@ -129,7 +126,7 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
     }
     public void conf(BusinessState state,String conf_id,String res_id){
         String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
+        Map<String,String> businessData = state.getBusinessData();
 
         //开始通知开发者
         if(logger.isDebugEnabled()){
@@ -166,12 +163,11 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
      * @param res_id
      * @param conf_id
      */
-    private void ifAutoRecording(BusinessState state, String areaId, Map<String, Object> businessData, String res_id, String conf_id){
+    private void ifAutoRecording(BusinessState state, String areaId, Map<String, String> businessData, String res_id, String conf_id){
         if(businessData == null){
             return;
         }
-        Object recording = businessData.get("recording");
-        if(recording == null || !(Boolean)recording){
+        if(!Boolean.parseBoolean(businessData.get("recording"))){
             return;
         }
         Map<String,Object> params = new MapBuilder<String,Object>()

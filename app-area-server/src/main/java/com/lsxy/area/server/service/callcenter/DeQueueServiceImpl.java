@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -74,22 +73,15 @@ public class DeQueueServiceImpl implements DeQueueService {
                     tenantId,appId,callId,queueId,result);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
         String conversation = UUIDGenerator.uuid();
-
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-            state.setBusinessData(businessData);
-        }
-        businessData.put(ConversationService.CONVERSATION_FIELD,conversation);
-        businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId,ConversationService.CONVERSATION_FIELD,conversation);
+        businessStateService.updateInnerField(callId,ConversationService.QUEUE_ID_FIELD,queueId);
 
         BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
         Integer conversationTimeout = enQueue.getConversation_timeout();
@@ -103,20 +95,22 @@ public class DeQueueServiceImpl implements DeQueueService {
                 result.getExtension().getUser(),conversationTimeout,45);
 
         conversationService.create(conversation,state.getId(),
-                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+                state.getBusinessData().get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
 
 
-        BusinessState agentState = businessStateService.get(agentCallId);
         if(reserveState != null){
-            agentState.getBusinessData().put(ConversationService.RESERVE_STATE_FIELD,reserveState);
+            businessStateService.updateInnerField(agentCallId,ConversationService.RESERVE_STATE_FIELD,reserveState);
         }
         if(playNum){
-            agentState.getBusinessData().put(ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
-            agentState.getBusinessData().put(ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
-            agentState.getBusinessData().put(ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
-        }
-        if(reserveState != null || playNum){
-            businessStateService.save(agentState);
+            if(result.getAgent().getNum() != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
+            }
+            if(preNumVoice != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
+            }
+            if(postNumVoice != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
+            }
         }
     }
 
@@ -126,7 +120,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             return;
         }
@@ -138,7 +132,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId);
+                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                        .put("error","timeout").build());
             }
         }
     }
@@ -149,7 +144,7 @@ public class DeQueueServiceImpl implements DeQueueService {
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){ 
             logger.info("会话已关闭callid={}",callId);
             return;
         }
@@ -161,7 +156,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId);
+                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                        .put("error","fail").build());
             }
         }
     }

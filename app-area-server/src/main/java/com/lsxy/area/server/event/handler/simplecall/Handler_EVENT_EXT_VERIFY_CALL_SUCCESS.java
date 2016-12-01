@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -67,13 +66,9 @@ public class Handler_EVENT_EXT_VERIFY_CALL_SUCCESS extends EventHandler {
         if(state == null){
             throw new InvalidParamException("businessstate is null");
         }
-        Map<String,Object> busniessData = state.getBusinessData();
-        if(busniessData == null){
-            busniessData = new HashMap<>();
-            state.setBusinessData(busniessData);
-        }
+        businessStateService.updateResId(call_id,res_id);
         //更新会话记录状态
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
         if(callSession != null){
             callSession.setResId(res_id);
             callSession.setStatus(CallSession.STATUS_CALLING);
@@ -85,8 +80,6 @@ public class Handler_EVENT_EXT_VERIFY_CALL_SUCCESS extends EventHandler {
             captchaCall.setResId(res_id);
             captchaCallService.save(captchaCall);
         }
-        state.setResId(res_id);
-        businessStateService.save(state);
         return res;
     }
 }
