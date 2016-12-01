@@ -101,4 +101,6 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * 创建订单
      */
     TelenumOrder telnumNew(Tenant tenant, String[] numIds);
+    /** 对录音进行扣费*/
+    boolean recordCost(String tenantId,String appId);
 }

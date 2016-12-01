@@ -13,7 +13,8 @@ public enum PriceType {
     type2(2,60,"秒","60秒"),
     type3(4,1,"G/月","G/月"),
     type4(1,1,"个","个"),
-    type5(3,1,"月","月");
+    type5(3,1,"月","月"),
+    type6(5,1,"个/月","个/月");
 
     private Integer calType;    //1、按数量，2、按时长3、按月
     private Integer timeUnit;   //单位时长(单位秒)

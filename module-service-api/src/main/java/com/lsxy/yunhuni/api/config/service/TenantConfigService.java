@@ -14,4 +14,7 @@ public interface TenantConfigService extends BaseService<TenantConfig> {
      */
     TenantConfig findByTypeAndKeyNameAndTenantIdAndAppId(String type, String keyName,String tenantId,String appId);
     List<TenantConfig> getPageByTypeAndKeyName(String type, String keyName);
+    /** 获取租户下的某个应用的录音存储时长*/
+    int getRecordingTimeByTenantIdAndAppId(String tenantId,String appId);
+
 }

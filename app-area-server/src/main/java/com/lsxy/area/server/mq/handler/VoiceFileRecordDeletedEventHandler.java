@@ -73,13 +73,12 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
             return ;
         }
         //获取全局时间
+        int globalTime = 7;
         GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
         Matcher matcher = pattern.matcher(globalConfig.getValue());
-        if(!matcher.matches()){
-            //配置不是正整数则结束
-            return;
+        if(matcher.matches()){
+            globalTime = Integer.valueOf(globalConfig.getValue());
         }
-        int globalTime = Integer.valueOf(globalConfig.getValue());
         //遍历全部用户
         for(int i=0;i<tenants.size();i++) {
             Tenant tenant1 = tenants.get(i);
