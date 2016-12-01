@@ -2,9 +2,10 @@ package com.lsxy.area.server.service.ivr;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
+import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
@@ -17,7 +18,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
@@ -111,6 +111,9 @@ public class IVRActionService {
 
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
+
+    @Autowired
+    private ConversationService conversationService;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -315,19 +318,20 @@ public class IVRActionService {
      * 询问是否接受，然后执行action
      * @return
      */
-    public boolean doActionIfAccept(App app, Tenant tenant,String res_id, String from, String to,String lineId){
+    public boolean doActionIfAccept(App app, Tenant tenant,String res_id,
+                                    String from, String to,String lineId,Integer iscc){
         String call_id = UUIDGenerator.uuid();
         boolean accept = getAcceptRequest(app.getUrl(),call_id,from);
         if(!accept){
             reject(app,res_id,call_id);
         }else{
             answer(app,res_id,call_id);
-            saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId);
+            saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId,iscc);
         }
         return true;
     }
 
-    private void saveIvrSessionCall(String call_id,App app, Tenant tenant,String res_id, String from, String to,String lineId){
+    private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, Integer iscc){
 
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
@@ -337,13 +341,15 @@ public class IVRActionService {
                 .setAppId(app.getId())
                 .setId(call_id)
                 .setResId(res_id)
-                .setType("ivr_incoming")
+                .setType(BusinessState.TYPE_IVR_INCOMING)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()
                         //incoming事件from 和 to是相反的
-                        .put("from",to)
-                        .put("to",from)
+                        .putIfNotEmpty("from",to)
+                        .putIfNotEmpty("to",from)
+                        .putIfNotEmpty(ConversationService.ISCC_FIELD,iscc)
                         .build())
                 .build();
         CallSession callSession = new CallSession();
@@ -447,9 +453,7 @@ public class IVRActionService {
         Element actionEle = null;
         try {
             Document doc = DocumentHelper.parseText(resXML);
-            if(validateXMLSchema(doc)){
-
-            }
+            validateXMLSchema(doc);
             root = doc.getRootElement();
             actionEle = getActionEle(root);
             h = handlers.get(actionEle.getName().toLowerCase());
@@ -457,22 +461,22 @@ public class IVRActionService {
                 logger.info("没有找到对应的ivr动作处理类");
                 return false;
             }
+            if(h.getAction().equals(EnqueueHandler.action)){
+                if(!conversationService.isCC(call_id)){
+                    logger.info("没有开通呼叫中心服务");
+                    return false;
+                }
+            }
             return h.handle(call_id,actionEle,getNextUrl(root));
-        } catch(DocumentException | IllegalArgumentException e){
+        } catch(DocumentException e){
             logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
             //发送ivr格式错误通知
-            String appId = state.getAppId();
-            App app = appService.findById(appId);
-            if(app == null){
-                logger.error("ivr 找不到对应的app");
-                return false;
-            }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
                     .putIfNotEmpty("id",call_id)
                     .putIfNotEmpty("user_data",state.getUserdata())
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
@@ -526,12 +530,12 @@ public class IVRActionService {
         return next;
     }
 
-    public boolean validateXMLSchema(Document doc){
+    public boolean validateXMLSchema(Document doc) throws DocumentException {
         try {
             Validator validator = schema.newValidator();
             validator.validate(new DocumentSource(doc));
         } catch (Throwable e) {
-            throw new IllegalArgumentException(e);
+            throw new DocumentException(e);
         }
         return true;
     }

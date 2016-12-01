@@ -2,12 +2,12 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.exceptions.AppOffLineException;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -15,7 +15,6 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
@@ -113,7 +112,6 @@ public class DialActionHandler extends ActionHandler{
             dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);
         }catch (Throwable t){
             logger.error("ivr拨号失败:",t);
-            App app = appService.findById(state.getAppId());
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.connect_end")
                     .putIfNotEmpty("id",callId)
@@ -121,7 +119,7 @@ public class DialActionHandler extends ActionHandler{
                     .putIfNotEmpty("end_time",System.currentTimeMillis())
                     .putIfNotEmpty("error","dial error")
                     .build();
-            if(notifyCallbackUtil.postNotifySync(app.getUrl(),notify_data,null,3)){
+            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
                 ivrActionService.doAction(callId);
             }
         }
@@ -235,7 +233,8 @@ public class DialActionHandler extends ActionHandler{
                 .setTenantId(tenantId)
                 .setAppId(appId)
                 .setId(callId)
-                .setType("ivr_dial")
+                .setType(BusinessState.TYPE_IVR_DIAL)
+                .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,Object>()

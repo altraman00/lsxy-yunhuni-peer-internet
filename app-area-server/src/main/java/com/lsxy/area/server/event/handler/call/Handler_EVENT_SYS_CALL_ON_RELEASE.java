@@ -1,10 +1,13 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
-import com.lsxy.area.server.service.ivr.IVRActionService;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -14,7 +17,6 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
@@ -45,9 +47,6 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     private NotifyCallbackUtil notifyCallbackUtil;
 
     @Autowired
-    private IVRActionService ivrActionService;
-
-    @Autowired
     private CallSessionService callSessionService;
 
     @Autowired
@@ -55,6 +54,12 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Reference
+    private CallCenterAgentService callCenterAgentService;
+
+    @Autowired
+    private ConversationService conversationService;
 
     @Override
     public String getEventName() {
@@ -85,43 +90,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
         businessStateService.delete(call_id);
-        if(StringUtils.isBlank(state.getAppId())){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());
-        }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",state.getAppId());
-        }
 
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
-        }
-        Long begin_time = null;
-        Long end_time = null;
-        Long answer_time = null;
-        if(params.get("begin_time") != null){
-            begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
-        }
-        if(params.get("end_time") != null){
-            end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
-        }
-        if(params.get("answer_time") != null){
-            answer_time = (Long.parseLong(params.get("answer_time").toString())) * 1000;
-        }
-
-        //发送呼叫结束通知
-        if(StringUtils.isNotBlank(app.getUrl())){
-            Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","ivr.call_end")
-                    .putIfNotEmpty("id",call_id)
-                    .putIfNotEmpty("begin_time",begin_time)
-                    .putIfNotEmpty("answer_time",answer_time)
-                    .putIfNotEmpty("end_time",end_time)
-                    .putIfNotEmpty("end_by",params.get("dropped_by"))
-                    .putIfNotEmpty("cause",params.get("cause"))
-                    .putIfNotEmpty("user_data",state.getUserdata())
-                    .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
         }
 
         //更新会话记录状态
@@ -132,13 +103,58 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         }
 
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
-        if(!state.getType().equalsIgnoreCase("ivr_dial")){
+        if(BusinessState.TYPE_IVR_CALL.equals(state.getType()) ||
+            BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+            Long begin_time = null;
+            Long end_time = null;
+            Long answer_time = null;
+            if(params.get("begin_time") != null){
+                begin_time = (Long.parseLong(params.get("begin_time").toString())) * 1000;
+            }
+            if(params.get("end_time") != null){
+                end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
+            }
+            if(params.get("answer_time") != null){
+                answer_time = (Long.parseLong(params.get("answer_time").toString())) * 1000;
+            }
+            //发送呼叫结束通知
+            if(StringUtils.isNotBlank(state.getCallBackUrl())){
+                Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                        .putIfNotEmpty("event","ivr.call_end")
+                        .putIfNotEmpty("id",call_id)
+                        .putIfNotEmpty("begin_time",begin_time)
+                        .putIfNotEmpty("answer_time",answer_time)
+                        .putIfNotEmpty("end_time",end_time)
+                        .putIfNotEmpty("end_by",params.get("dropped_by"))
+                        .putIfNotEmpty("cause",params.get("cause"))
+                        .putIfNotEmpty("user_data",state.getUserdata())
+                        .build();
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
+            }
+
             String ivr_dial_call_id = null;
             if(state.getBusinessData() != null){
                 ivr_dial_call_id = (String)state.getBusinessData().get("ivr_dial_call_id");
             }
             if(StringUtils.isNotBlank(ivr_dial_call_id)){
                 hugup(ivr_dial_call_id,state.getAreaId());
+            }
+
+            if(conversationService.isCC(call_id)){
+                String conversation_id = (String)state.getBusinessData().get(ConversationService.CONVERSATION_FIELD);
+                if(conversation_id != null){
+                    conversationService.logicExit(conversation_id,call_id);
+                }
+            }
+        }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
+            String agentId = (String)state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
+            if(agentId != null){
+                String reserve_state = (String)state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
+                try {
+                    callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
+                } catch (YunhuniApiException e) {
+                    logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
+                }
             }
         }
         return res;

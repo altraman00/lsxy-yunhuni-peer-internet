@@ -16,12 +16,26 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_conversation_member")
 public class CallCenterConversationMember extends IdEntity {
+    public static final String INITIATOR_TRUE = "1";
+    public static final String INITIATOR_FALSE = "0";
+
+    private String callId;
     private String relevanceId;//所属呼叫中心交谈
     private Date startTime;//发起时间
     private Date endTime;//结束时间
     private String sessionId;//加入的session
     private String joinNum;//加入的号码
     private String isInitiator;//是否发起方
+
+    @Column(name = "call_id")
+    public String getCallId() {
+        return callId;
+    }
+
+    public void setCallId(String callId) {
+        this.callId = callId;
+    }
+
     @Column(name = "relevance_id")
     public String getRelevanceId() {
         return relevanceId;

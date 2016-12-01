@@ -47,12 +47,13 @@
         <module>module-framework-monitor</module>
         <module>module-service-call-center-api</module>
         <module>app-mc</module>
+        <module>app-opensips-proxy</module>
 
     </modules>
     <packaging>pom</packaging>
     <repositories>
         <repository>
-            <id>lsxy-repo</id> 
+            <id>lsxy-repo</id>
             <name>lsxy-repo</name>
             <url>http://nexus.liushuixingyun.com/nexus/content/groups/public</url>
             <releases>
