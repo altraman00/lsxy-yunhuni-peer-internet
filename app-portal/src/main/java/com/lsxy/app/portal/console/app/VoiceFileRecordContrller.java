@@ -8,8 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.async.WebAsyncTask;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.Callable;
 
 /**
  * 录音文件
@@ -20,17 +22,27 @@ import javax.servlet.http.HttpServletRequest;
 public class VoiceFileRecordContrller extends AbstractPortalController {
     @RequestMapping("/cdr/download/{id}")
     @ResponseBody
-    public RestResponse cdrDownload(HttpServletRequest request, @PathVariable String id){
-        String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/cdr/download?id={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
+    public WebAsyncTask cdrDownload(HttpServletRequest request, @PathVariable String id){
+        Callable<RestResponse> callable = new Callable<RestResponse>() {
+            public RestResponse call() throws Exception {
+                String token = getSecurityToken(request);
+                String uri = PortalConstants.REST_PREFIX_URL + "/rest/voice_file_record/cdr/download?id={1}";
+                return RestRequest.buildSecurityRequest(token).get(uri, String.class, id);
+            }
+        };
+        return new WebAsyncTask(60000,callable);
     }
     @RequestMapping("/file/download/{id}")
     @ResponseBody
-    public RestResponse fileDownload(HttpServletRequest request, @PathVariable String id){
-        String token = getSecurityToken(request);
-        String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/file/download?id={1}";
-        return RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
+    public WebAsyncTask fileDownload(HttpServletRequest request, @PathVariable String id){
+        Callable<RestResponse> callable = new Callable<RestResponse>() {
+            public RestResponse call() throws Exception {
+                String token = getSecurityToken(request);
+                String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/file/download?id={1}";
+                return RestRequest.buildSecurityRequest(token).get(uri, String.class,id);
+            }
+        };
+        return new WebAsyncTask(600000,callable);
     }
 
 }

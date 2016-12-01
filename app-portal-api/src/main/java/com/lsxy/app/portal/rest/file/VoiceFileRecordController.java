@@ -88,7 +88,7 @@ public class VoiceFileRecordController extends AbstractRestController {
     @RequestMapping("/file/download")
     public WebAsyncTask fileDownload(String id){
         Callable<RestResponse> callable = new Callable<RestResponse>() {
-            public RestResponse call() {
+            public RestResponse call()  throws Exception{
                 Tenant tenant = getCurrentAccount().getTenant();
                 VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(id);
                 if(tenant==null||voiceFileRecord==null||!tenant.getId().equals(voiceFileRecord.getTenantId())){
@@ -120,12 +120,7 @@ public class VoiceFileRecordController extends AbstractRestController {
                 if(flag) {
                     mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceFileRecord.getAppId(), voiceFileRecord.getId(), VoiceFileRecordSyncEvent.TYPE_FILE));
                     for (int j = 1; j <= 30; j++) {
-                        try {
-                            logger.info("等待中"+j);
-                            Thread.sleep(j * 1000);
-                        } catch (InterruptedException e) {
-                            logger.error("等待异常",e);
-                        }
+                        Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(id);
                         if(v1.getStatus()!=null){
                             if(v1.getStatus()==1) {
@@ -143,7 +138,7 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
             }
         };
-        return new WebAsyncTask(callable);
+        return new WebAsyncTask(500000,callable);
     }
     @RequestMapping("/cdr/download")
     public WebAsyncTask cdrDownload(String id){
@@ -192,7 +187,7 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
             }
         };
-        return new WebAsyncTask(callable);
+        return new WebAsyncTask(500000,callable);
     }
     private List<VoiceFileRecord> getFile(String id){
         //根据cdr获取业务类型，和业务id，根据业务id和业务类型获取录音文件列表，
