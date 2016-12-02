@@ -144,12 +144,14 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         }else{
             try{
                 CallCenter callCenter = callCenterService.findById(call_id);
-                callCenter.setEndTime(new Date());
-                if(callCenter.getStartTime() != null){
-                    Long callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
-                    callCenter.setCallTimeLong(callLongTime.toString());
+                if(callCenter != null){
+                    callCenter.setEndTime(new Date());
+                    if(callCenter.getStartTime() != null){
+                        Long callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
+                        callCenter.setCallTimeLong(callLongTime.toString());
+                    }
+                    callCenterService.save(callCenter);
                 }
-                callCenterService.save(callCenter);
             }catch (Throwable t){
                 logger.error("更新CallCenter失败",t);
             }
