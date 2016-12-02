@@ -84,7 +84,7 @@ public class LineGatewayToTenantController  extends AbstractRestController {
                     return RestResponse.failed("0000", "成功执行["+(i-1)+"]条，第["+i+"]条错误：已存在");
                 } else {
                     //获取当前最大编号
-                    int re2 = lineGatewayToTenantService.getMaxPriority();
+                    int re2 = lineGatewayToTenantService.getMaxPriority(tenant.getId());
                     re2++;
                     //新建关系
                     LineGatewayToTenant lineGatewayToTenant = new LineGatewayToTenant();
@@ -106,7 +106,7 @@ public class LineGatewayToTenantController  extends AbstractRestController {
         LineGatewayToTenant lineGatewayToTenant = lineGatewayToTenantService.findById(id);
         if(lineGatewayToTenant!=null&& StringUtils.isNotEmpty(lineGatewayToTenant.getId())){
             //删除线路关系
-            lineGatewayToTenantService.removeTenantLine(id);
+            lineGatewayToTenantService.removeTenantLine(id,lineGatewayToTenant.getTenantId());
         }else{
             return RestResponse.failed("0000","线路不存在");
         }
@@ -123,11 +123,11 @@ public class LineGatewayToTenantController  extends AbstractRestController {
         if(o2==0||o2<0){
             return RestResponse.failed("0000","目标优先级必须大于0");
         }
-        int o3 = lineGatewayToTenantService.getMaxPriority();
+        LineGatewayToTenant lineGatewayToTenant = lineGatewayToTenantService.findById(id);
+        int o3 = lineGatewayToTenantService.getMaxPriority(lineGatewayToTenant.getTenantId());
         if(o2>o3){
             return RestResponse.failed("0000","目标优先级不能超过当前最大优先级");
         }
-        LineGatewayToTenant lineGatewayToTenant = lineGatewayToTenantService.findById(id);
         if(lineGatewayToTenant!=null&&StringUtils.isNotEmpty(lineGatewayToTenant.getId())) {
             int o1 = Integer.valueOf(lineGatewayToTenant.getPriority());
             if(o1==o2){
