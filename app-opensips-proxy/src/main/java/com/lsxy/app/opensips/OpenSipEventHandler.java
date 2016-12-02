@@ -39,14 +39,20 @@ public class OpenSipEventHandler extends SimpleChannelInboundHandler<DatagramPac
                 //登录
                 String[] split = body.split("::");
                 if(split.length > 0){
-                    String user = split[1];
+                    String user = split[1].trim();
+                    if(logger.isDebugEnabled()){
+                        logger.debug("登录的用户："+user);
+                    }
                     appExtensionService.login(user);
                 }
             }else if(body.contains("E_UL_AOR_DELETE")){
                 //注销
                 String[] split = body.split("::");
                 if(split.length > 0){
-                    String user = split[1];
+                    String user = split[1].trim();
+                    if(logger.isDebugEnabled()){
+                        logger.debug("注销的用户："+user);
+                    }
                     appExtensionService.logout(user);
                 }
             }
