@@ -124,7 +124,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING);
+                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE);
             if(logger.isDebugEnabled()){
                 logger.debug("排队结果:agent={}",agent);
             }
@@ -138,7 +138,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                         ExtensionState.getPrefixed(),
                         ""+AgentState.REG_EXPIRE,
                         ""+System.currentTimeMillis(),
-                        AgentState.Model.STATE_IDLE);
+                        AgentState.Model.STATE_IDLE,ExtensionState.Model.ENABLE_TRUE);
                 if(StringUtil.isNotEmpty(agent_idle)){
                     lookupQueue(tenantId,appId,conditionId,agent_idle);
                 }
@@ -181,7 +181,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             QueueLock.getPrefixed(),CQs.getPrefixed(),
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
             AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
-            conditionId==null?"":conditionId);
+            conditionId==null?"":conditionId,ExtensionState.Model.ENABLE_TRUE);
         if(logger.isDebugEnabled()){
             logger.info("[{}][{}]坐席找排队结果agent={},queueId={}",tenantId,appId,queueId);
         }

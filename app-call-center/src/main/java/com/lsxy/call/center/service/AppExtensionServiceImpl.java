@@ -11,7 +11,6 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -119,9 +117,6 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             //TODO 分机opensips注册
             opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
         }
-        //TODO 初始化状态状态
-        extensionState.setLastRegisterStatus(appExtension.getId(),200);
-
         return appExtension;
     }
 
@@ -230,11 +225,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     public void register(String extensionId) {
         Integer expire = 10 * 60 * 1000;
         ExtensionState.Model model = extensionState.new Model();
-        model.setLastRegisterStatus(200);
         model.setLastRegisterTime(System.currentTimeMillis());
         model.setRegisterExpires(expire);
+        model.setEnable(ExtensionState.Model.ENABLE_TRUE);
         extensionState.setAll(extensionId,model);
     }
-
-
 }
