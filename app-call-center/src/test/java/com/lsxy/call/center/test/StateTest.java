@@ -35,11 +35,5 @@ public class StateTest {
         agentState.setLastRegTime("test",new Date().getTime());
         System.out.println(agentState.get("test").getLastRegTime());;
 
-        extensionState.setLastAction("test",1);
-        System.out.println(extensionState.get("test").getLastAction());;
-
-        extensionState.setLastActionTime("test",new Date().getTime());
-
-        System.out.println(extensionState.get("test").getLastActionTime());;
     }
 }

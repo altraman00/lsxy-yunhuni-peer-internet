@@ -8,12 +8,27 @@ import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/21.
+ *
  */
 public interface AppExtensionDao extends BaseDaoInterface<AppExtension, Serializable> {
+    /**
+     * 列出所有的分机
+     * @param appId
+     * @return
+     */
     List<AppExtension> findByAppId(String appId);
 
+    /**
+     * 根据用户名查看分机是否存在
+     * @param user
+     * @return
+     */
     long countByUser(String user);
 
-    AppExtension findByTenantIdAndAppIdAndUser(String tenantId,String appId,String user);
-
+    /**
+     * 根据用户名查看分机
+     * @param user
+     * @return
+     */
+    AppExtension findByUser(String user);
 }

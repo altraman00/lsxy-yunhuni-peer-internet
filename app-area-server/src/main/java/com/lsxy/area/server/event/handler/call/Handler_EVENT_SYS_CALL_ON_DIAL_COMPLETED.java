@@ -1,5 +1,6 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
@@ -9,6 +10,8 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.call.center.api.model.CallCenterQueue;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -32,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -78,6 +82,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Autowired
     private PlayFileUtil playFileUtil;
+
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterQueueService callCenterQueueService;
 
     @Override
     public String getEventName() {
@@ -237,6 +245,26 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 } catch (Throwable e) {
                     logger.error("调用失败 ",e);
                 }
+            }
+            try{
+                //更新排队记录
+                String initorid = conversationService.getInitiator(conversation_id);
+                if(initorid != null){
+                    BusinessState init_state = businessStateService.get(initorid);
+                    if(init_state != null){
+                        String queueId = init_state.getBusinessData().get(ConversationService.QUEUE_ID_FIELD);
+                        if(queueId != null){
+                            CallCenterQueue callCenterQueue = callCenterQueueService.findById(queueId);
+                            if(callCenterQueue != null && callCenterQueue.getDialTime() == null){
+                                callCenterQueue.setDialTime(new Date());
+                                callCenterQueue.setResult(StringUtils.isBlank(error)?CallCenterQueue.RESULT_DIAL_SUCC:CallCenterQueue.RESULT_DIAL_FAIL);
+                                callCenterQueueService.save(callCenterQueue);
+                            }
+                        }
+                    }
+                }
+            }catch (Throwable t){
+                logger.error("更新排队记录失败",t);
             }
         }else if(BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
             //TODO

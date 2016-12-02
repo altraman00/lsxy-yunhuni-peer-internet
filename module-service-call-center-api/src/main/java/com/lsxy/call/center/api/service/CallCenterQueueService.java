@@ -7,4 +7,6 @@ import com.lsxy.framework.api.base.BaseService;
  * Created by liuws on 2016/11/14.
  */
 public interface CallCenterQueueService extends BaseService<CallCenterQueue> {
+
+    public void update(String id,CallCenterQueue queue);
 }
