@@ -72,7 +72,16 @@ public class OpenSipEventSubscriberTask {
 
                 socket.send(new DatagramPacket(bytes1, 0, bytes1.length, targetHost));
                 socket.send(new DatagramPacket(bytes2, 0, bytes2.length, targetHost));
+                byte[] buffer = new byte[1024];
 
+                DatagramPacket dp = new DatagramPacket(buffer,1024);
+                if(logger.isDebugEnabled()){
+                    logger.debug("开始接收返回值");
+                }
+                socket.receive(dp);
+                if(logger.isDebugEnabled()){
+                    logger.debug(":"+new String(dp.getData()));
+                }
             } catch (IOException e) {
                 logger.error("订阅消息发送失败",e);
             }
