@@ -1,5 +1,6 @@
 package com.lsxy.area.server.service.ivr;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
@@ -8,6 +9,8 @@ import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
 import com.lsxy.area.server.service.ivr.handler.HangupActionHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -127,6 +130,9 @@ public class IVRActionService {
 
     @Autowired
     private ConversationService conversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -336,6 +342,7 @@ public class IVRActionService {
                 .build();
         businessStateService.save(state);
         try{
+            boolean isCallCenter = iscc != null && iscc == 1;
             CallSession callSession = new CallSession();
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(to);
@@ -343,17 +350,29 @@ public class IVRActionService {
             callSession.setApp(app);
             callSession.setTenant(tenant);
             callSession.setRelevanceId(call_id);
-            callSession.setType(CallSession.TYPE_VOICE_IVR);
             callSession.setResId(state.getResId());
+            callSession.setType(isCallCenter ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
             callSession = callSessionService.save(callSession);
             businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
-            VoiceIvr voiceIvr = new VoiceIvr();
-            voiceIvr.setId(call_id);
-            voiceIvr.setFromNum(from);
-            voiceIvr.setToNum(to);
-            voiceIvr.setStartTime(new Date());
-            voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
-            voiceIvrService.save(voiceIvr);
+            if(isCallCenter){
+                CallCenter callCenter = new CallCenter();
+                callCenter.setId(call_id);
+                callCenter.setTenantId(state.getTenantId());
+                callCenter.setAppId(state.getAppId());
+                callCenter.setFromNum(from);
+                callCenter.setToNum(to);
+                callCenter.setStartTime(new Date());
+                callCenter.setType(""+CallCenter.CALL_IN);
+                callCenterService.save(callCenter);
+            }else{
+                VoiceIvr voiceIvr = new VoiceIvr();
+                voiceIvr.setId(call_id);
+                voiceIvr.setFromNum(from);
+                voiceIvr.setToNum(to);
+                voiceIvr.setStartTime(new Date());
+                voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+                voiceIvrService.save(voiceIvr);
+            }
         }catch (Throwable t){
             logger.error("保存callsession失败",t);
         }
