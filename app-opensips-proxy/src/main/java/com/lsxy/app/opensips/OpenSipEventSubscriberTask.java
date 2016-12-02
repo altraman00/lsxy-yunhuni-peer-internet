@@ -64,7 +64,7 @@ public class OpenSipEventSubscriberTask {
                 }
                 byte[] bytes1 = data1.getBytes("UTF-8");
                 socket.send(new DatagramPacket(bytes1, 0, bytes1.length, targetHost));
-                byte[] bytes2 = data1.getBytes("UTF-8");
+                byte[] bytes2 = data2.getBytes("UTF-8");
                 socket.send(new DatagramPacket(bytes2, 0, bytes2.length, targetHost));
             } catch (IOException e) {
                 logger.error("订阅消息发送失败",e);
