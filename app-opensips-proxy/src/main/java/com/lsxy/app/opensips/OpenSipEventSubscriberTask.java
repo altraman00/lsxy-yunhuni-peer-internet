@@ -53,7 +53,7 @@ public class OpenSipEventSubscriberTask {
      *opensips 每30分钟向opensips发送一次注册请求
      * 启动时注册一次
      */
-    @Scheduled(fixedDelay=30*60*1000)
+    @Scheduled(fixedDelay=20*60*1000)
     public void doSubscribed(){
         if(socket != null){
             String ip = StringUtil.getHostIp();
