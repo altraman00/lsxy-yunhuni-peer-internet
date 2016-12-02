@@ -505,10 +505,10 @@ public class ConversationService {
         if(call_business.get(ConversationService.CONVERSATION_FIELD) == null){
             businessStateService.updateInnerField(call_id,ConversationService.CONVERSATION_FIELD,conversation_id);
         }
-        businessStateService.updateInnerField(call_id,PARTNER_VOICE_MODE_FIELD,voiceMode.toString());
+        businessStateService.updateInnerField(call_id,PARTNER_VOICE_MODE_FIELD,voice_mode.toString());
         if(logger.isDebugEnabled()){
             logger.debug("完成呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
-                    call_id,conversation_id,maxDuration,playFile,voiceMode);
+                    call_id,conversation_id,maxDuration,playFile,voice_mode);
         }
         return true;
     }
@@ -644,13 +644,15 @@ public class ConversationService {
                 }
                 ivrActionService.doAction(callId,null);
             }else if(this.size(conversationId) <= 1){
-                if(logger.isDebugEnabled()){
-                    logger.debug("开始呼入ivr挂断后，解散会议，callid={}",callId);
-                }
-                try {
-                    this.dismiss(call_state.getAppId(),conversationId);
-                } catch (Throwable e) {
-                    logger.error("呼入ivr挂断后，解散会议",e);
+                if(conversation_state.getClosed() == null || !conversation_state.getClosed()){
+                    if(logger.isDebugEnabled()){
+                        logger.debug("开始呼入ivr挂断后，解散会议，callid={}",callId);
+                    }
+                    try {
+                        this.dismiss(call_state.getAppId(),conversationId);
+                    } catch (Throwable e) {
+                        logger.error("呼入ivr挂断后，解散会议",e);
+                    }
                 }
             }
         }else{
