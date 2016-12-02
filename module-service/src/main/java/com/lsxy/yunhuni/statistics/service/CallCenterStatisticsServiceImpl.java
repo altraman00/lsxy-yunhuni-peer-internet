@@ -10,7 +10,6 @@ import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
-import com.lsxy.yunhuni.api.statistics.model.DayStatics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import com.lsxy.yunhuni.statistics.dao.CallCenterStatisticsDao;
 import org.apache.commons.lang.StringUtils;
@@ -22,7 +21,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -85,7 +87,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
             Date preCreateDate = DateUtils.getPreDate(createTime);
             String preCreateDateStr = DateUtils.formatDate(preCreateDate, "yyyyMMdd");
             Date dt = DateUtils.parseDate(preCreateDateStr,"yyyyMMdd");
-            tenantStatistics = new CallCenterStatistics(tenant.getId(),null,dt, 0L, 0L,0L,0L,0L,0L,0L);
+            tenantStatistics = new CallCenterStatistics(tenant.getId(),null,dt, 0L, 0L,0L,0L,0L,0L,0L,0L);
             tenantStatistics(tenantStatistics,statisticsDate);
         }
         List<App> apps = appService.getAppsByTenantId(tenant.getId());
@@ -98,7 +100,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                 Date preAppCreateTime = DateUtils.getPreDate(appCreateTime);
                 String preAppCreateTimeStr = DateUtils.formatDate(preAppCreateTime, "yyyyMMdd");
                 Date appDt = DateUtils.parseDate(preAppCreateTimeStr,"yyyyMMdd");
-                appStatistics = new CallCenterStatistics(tenant.getId(),app.getId(),appDt, 0L, 0L,0L,0L,0L,0L,0L);
+                appStatistics = new CallCenterStatistics(tenant.getId(),app.getId(),appDt, 0L, 0L,0L,0L,0L,0L,0L,0L);
                 appStatistics(appStatistics,statisticsDate);
             }
         }
@@ -119,7 +121,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                     lastStatistics.getCallOutSuccess() + statistics.getCallOutSuccess(),
                     lastStatistics.getToManualSuccess() + statistics.getToManualSuccess(),
                     lastStatistics.getQueueNum() + statistics.getQueueNum(),
-                    lastStatistics.getQueueDuration() + statistics.getQueueDuration());
+                    lastStatistics.getQueueDuration() + statistics.getQueueDuration(),
+                    lastStatistics.getCallTimeLong() + statistics.getCallTimeLong());
             this.save(current);
             tenantStatistics(current,date);
         }
@@ -142,7 +145,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                     lastStatistics.getCallOutSuccess() + statistics.getCallOutSuccess(),
                     lastStatistics.getToManualSuccess() + statistics.getToManualSuccess(),
                     lastStatistics.getQueueNum() + statistics.getQueueNum(),
-                    lastStatistics.getQueueDuration() + statistics.getQueueDuration());
+                    lastStatistics.getQueueDuration() + statistics.getQueueDuration(),
+                    lastStatistics.getCallTimeLong() + statistics.getCallTimeLong());
             this.save(current);
             appStatistics(current,date);
         }
@@ -150,11 +154,15 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
 
 
     private CallCenterStatistics statistics(String tenantId,String appId,Date startDate,Date endDate){
-        String sql = "SELECT SUM(CASE WHEN c.type='1' THEN 1 ELSE 0) AS callIn, SUM(CASE WHEN (c.type='1' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0) AS callInSuccess, " +
-                "SUM(CASE WHEN c.type='2' THEN 1 ELSE 0) AS callOut, SUM(CASE WHEN (c.type='2' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0) AS callOutSuccess, " +
-                "SUM(CASE WHEN c.to_manual_result=1 THEN 1 ELSE 0) AS toManualSuccess, " +
-                "SUM(CASE WHEN c.to_manual_time IS NOT NULL THEN 1 ELSE 0) AS queueNum,SUM(c.to_manual_time) AS queueDuration " +
-                "FROM db_lsxy_bi_yunhuni.tb_bi_call_center c WHERE 1=1 ";
+        String sql = "SELECT IFNULL(SUM(CASE WHEN c.type='1' THEN 1 ELSE 0 END),0) AS callIn, " +
+                        "IFNULL(SUM(CASE WHEN (c.type='1' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0 END),0) AS callInSuccess, " +
+                        "IFNULL(SUM(CASE WHEN c.type='2' THEN 1 ELSE 0 END),0) AS callOut, " +
+                        "IFNULL(SUM(CASE WHEN (c.type='2' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0 END),0) AS callOutSuccess, " +
+                        "IFNULL(SUM(CASE WHEN c.to_manual_result=1 THEN 1 ELSE 0 END),0) AS toManualSuccess, " +
+                        "IFNULL(SUM(CASE WHEN c.to_manual_time IS NOT NULL THEN 1 ELSE 0 END),0) AS queueNum," +
+                        "IFNULL(SUM(c.to_manual_time),0) AS queueDuration, " +
+                        "IFNULL(SUM(c.call_time_long),0) AS callTimeLong " +
+                        "FROM db_lsxy_bi_yunhuni.tb_bi_call_center c WHERE 1=1 ";
         if(startDate != null){
             sql = sql + "AND c.end_time >= '" + DateUtils.formatDate(startDate) + "' ";
         }
@@ -196,6 +204,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         hashOps.increment("toManualSuccess", ccStatistics.getToManualSuccess());
         hashOps.increment("queueNum", ccStatistics.getQueueNum());
         hashOps.increment("queueDuration", ccStatistics.getQueueDuration());
+        hashOps.increment("callTimeLong", ccStatistics.getQueueDuration());
         if(callIn == ccStatistics.getCallIn() || callOut == ccStatistics.getCallOut()){
             redisCacheService.expire(key, 5 * 24 * 60 * 60);
         }
@@ -204,7 +213,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
     private CallCenterStatistics getIncrFromRedis(String key){
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
         Map entries = hashOps.entries();
-        CallCenterStatistics current = new CallCenterStatistics(null,null,null,0L, 0L,0L,0L,0L,0L,0L);
+        CallCenterStatistics current = new CallCenterStatistics(null,null,null,0L, 0L,0L,0L,0L,0L,0L,0L);
         try {
             BeanUtils.copyProperties2(current,entries,false);
         } catch (Exception e) {
@@ -252,7 +261,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                     statistics.getCallOutSuccess() + incr.getCallOutSuccess(),
                     statistics.getToManualSuccess() + incr.getToManualSuccess(),
                     statistics.getQueueNum() + incr.getQueueNum(),
-                    statistics.getQueueDuration() + incr.getQueueDuration());
+                    statistics.getQueueDuration() + incr.getQueueDuration(),
+                    statistics.getCallTimeLong() + incr.getCallTimeLong());
             return getTenantStatistics(nextDayStatics, date);
         }else{
             return statistics;
@@ -312,7 +322,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                     statistics.getCallOutSuccess() + incr.getCallOutSuccess(),
                     statistics.getToManualSuccess() + incr.getToManualSuccess(),
                     statistics.getQueueNum() + incr.getQueueNum(),
-                    statistics.getQueueDuration() + incr.getQueueDuration());
+                    statistics.getQueueDuration() + incr.getQueueDuration(),
+                    statistics.getCallTimeLong() + incr.getCallTimeLong());
             return getAppStatistics(nextDayStatics, date);
         }else{
             return statistics;
@@ -341,7 +352,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                         current.getCallOutSuccess() - preMonth.getCallOutSuccess(),
                         current.getToManualSuccess() - preMonth.getToManualSuccess(),
                         current.getQueueNum() - preMonth.getQueueNum(),
-                        current.getQueueDuration() - preMonth.getQueueDuration());
+                        current.getQueueDuration() - preMonth.getQueueDuration(),
+                        current.getCallTimeLong() - preMonth.getCallTimeLong());
             }else{
                 result = getIncrFromRedisByTenantId(tenantId,date);
             }
@@ -371,12 +383,14 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                         current.getCallOutSuccess() - preMonth.getCallOutSuccess(),
                         current.getToManualSuccess() - preMonth.getToManualSuccess(),
                         current.getQueueNum() - preMonth.getQueueNum(),
-                        current.getQueueDuration() - preMonth.getQueueDuration());
+                        current.getQueueDuration() - preMonth.getQueueDuration(),
+                        current.getCallTimeLong() - preMonth.getCallTimeLong());
             }else{
                 result = getIncrFromRedisByAppId(AppId,date);
             }
         }
         return result;
     }
+
 
 }

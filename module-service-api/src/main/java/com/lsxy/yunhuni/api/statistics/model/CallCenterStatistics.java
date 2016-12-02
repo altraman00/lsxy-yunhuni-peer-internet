@@ -19,18 +19,20 @@ public class CallCenterStatistics extends IdEntity {
     private String tenantId;
     private String appId;
     private Date dt;
-    private Long callIn;
-    private Long callInSuccess;
-    private Long callOut;
-    private Long callOutSuccess;
-    private Long toManualSuccess;
-    private Long queueNum;
-    private Long queueDuration;
+    private Long callIn; //呼入量
+    private Long callInSuccess; //呼入成功量
+    private Long callOut; //呼出量
+    private Long callOutSuccess; //呼出成功量
+    private Long toManualSuccess; //转接成功量
+    private Long queueNum; //排队次数
+    private Long queueDuration; //排队时长
+    private Long callTimeLong;
 
     public CallCenterStatistics() {
     }
 
-    public CallCenterStatistics(String tenantId, String appId, Date dt, Long callIn, Long callInSuccess, Long callOut, Long callOutSuccess, Long toManualSuccess, Long queueNum, Long queueDuration) {
+    public CallCenterStatistics(String tenantId, String appId, Date dt, Long callIn, Long callInSuccess, Long callOut, Long callOutSuccess,
+                                Long toManualSuccess, Long queueNum, Long queueDuration,Long callTimeLong) {
         this.tenantId = tenantId;
         this.appId = appId;
         this.dt = dt;
@@ -41,6 +43,7 @@ public class CallCenterStatistics extends IdEntity {
         this.toManualSuccess = toManualSuccess;
         this.queueNum = queueNum;
         this.queueDuration = queueDuration;
+        this.callTimeLong = callTimeLong;
     }
 
     @Column(name = "tenant_id")
@@ -131,5 +134,14 @@ public class CallCenterStatistics extends IdEntity {
 
     public void setQueueDuration(Long queueDuration) {
         this.queueDuration = queueDuration;
+    }
+
+    @Column(name = "call_time_long")
+    public Long getCallTimeLong() {
+        return callTimeLong;
+    }
+
+    public void setCallTimeLong(Long callTimeLong) {
+        this.callTimeLong = callTimeLong;
     }
 }
