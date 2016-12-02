@@ -189,7 +189,7 @@ public class DialActionHandler extends ActionHandler{
             callCenter.setFromNum(from);
             callCenter.setToNum(to);
             callCenter.setStartTime(new Date());
-            callCenter.setType(""+CallCenter.CALL_IN);
+            callCenter.setType(""+CallCenter.CALL_DIAL);
             callId = callCenterService.save(callCenter).getId();
 
             callSession = new CallSession();

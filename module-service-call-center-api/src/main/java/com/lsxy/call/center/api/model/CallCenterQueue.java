@@ -28,6 +28,7 @@ public class CallCenterQueue extends IdEntity {
     private Date inviteTime;
     private Date dialTime;
     private Date endTime;
+    private Long toManualTime;
     private String result;
     private String num;
     private String agent;
@@ -127,12 +128,22 @@ public class CallCenterQueue extends IdEntity {
         this.inviteTime = inviteTime;
     }
 
+    @Column(name = "dial_time")
     public Date getDialTime() {
         return dialTime;
     }
 
     public void setDialTime(Date dialTime) {
         this.dialTime = dialTime;
+    }
+
+    @Column(name = "to_manual_time")
+    public Long getToManualTime() {
+        return toManualTime;
+    }
+
+    public void setToManualTime(Long toManualTime) {
+        this.toManualTime = toManualTime;
     }
 
     @Column(name = "origin_call_id")
