@@ -41,7 +41,7 @@ public class Handler_MN_CH_RF_SYNC extends RpcRequestHandler{
     private RPCCaller rpcCaller;
     @Override
     public String getEventName() {
-        return ServiceConstants.MN_CH_VF_SYNC;
+        return ServiceConstants.MN_CH_RF_SYNC;
     }
 
     @Override
