@@ -1,12 +1,15 @@
 package com.lsxy.area.server.service.callcenter;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.BaseEnQueue;
+import com.lsxy.call.center.api.model.CallCenterQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -51,6 +55,9 @@ public class DeQueueServiceImpl implements DeQueueService {
 
     @Autowired
     private SessionContext sessionContext;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterQueueService callCenterQueueService;
 
     /**
      * 创建交谈，然后呼叫坐席。
@@ -94,8 +101,8 @@ public class DeQueueServiceImpl implements DeQueueService {
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
-        conversationService.create(conversation,state.getId(),
-                state.getBusinessData().get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+        conversationService.create(conversation,state.getId(),state.getTenantId(),
+                state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
 
 
         if(reserveState != null){
@@ -112,10 +119,11 @@ public class DeQueueServiceImpl implements DeQueueService {
                 businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
             }
         }
+        updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
     }
 
     @Override
-    public void timeout(String tenantId, String appId, String callId) {
+    public void timeout(String tenantId, String appId, String callId,String queueId) {
         if(logger.isDebugEnabled()){
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
@@ -136,10 +144,11 @@ public class DeQueueServiceImpl implements DeQueueService {
                         .put("error","timeout").build());
             }
         }
+        updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
     }
 
     @Override
-    public void fail(String tenantId, String appId, String callId, String reason) {
+    public void fail(String tenantId, String appId, String callId,String queueId, String reason) {
         if(logger.isDebugEnabled()){
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
@@ -160,8 +169,56 @@ public class DeQueueServiceImpl implements DeQueueService {
                         .put("error","fail").build());
             }
         }
+        updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
     }
 
+    /**
+     * 更新排队结果
+     * @param id
+     * @param callId
+     * @param conversationId
+     * @param agentId
+     * @param agentCallId
+     * @param result
+     */
+    private void updateQueue(String id,String callId,String conversationId,
+                             String agentId,String agentCallId,String result){
+        //更新排队记录
+        try{
+            if(id == null){
+                return;
+            }
+            CallCenterQueue callCenterQueue = callCenterQueueService.findById(id);
+            if(callCenterQueue == null){
+                return;
+            }
+            Date cur = new Date();
+            callCenterQueue.setRelevanceId(callId);
+            if(conversationId != null){
+                callCenterQueue.setConversation(conversationId);
+            }
+            if(agentId != null){
+                callCenterQueue.setAgent(agentId);
+            }
+            if(agentCallId != null){
+                callCenterQueue.setAgentCallId(agentCallId);
+                callCenterQueue.setInviteTime(cur);
+            }
+            callCenterQueue.setEndTime(cur);
+            callCenterQueue.setToManualTime((callCenterQueue.getStartTime().getTime() - callCenterQueue.getEndTime().getTime()) / 1000);
+            callCenterQueue.setResult(result);
+            callCenterQueueService.save(callCenterQueue);
+        }catch (Throwable t){
+            logger.error("更新排队记录失败",t);
+        }
+    }
+
+    /**
+     * 停止播放排队等待音
+     * @param area_id
+     * @param call_id
+     * @param res_id
+     */
     private void stopPlayWait(String area_id,String call_id,String res_id){
         try {
             if(conversationService.isPlayWait(call_id)){
