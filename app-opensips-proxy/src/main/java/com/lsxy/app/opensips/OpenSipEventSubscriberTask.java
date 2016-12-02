@@ -80,7 +80,9 @@ public class OpenSipEventSubscriberTask {
                 }
                 socket.receive(dp);
                 if(logger.isDebugEnabled()){
-                    logger.debug(":"+new String(dp.getData()));
+                    String info = new String(dp.getData(), 0, dp.getLength());
+
+                    logger.debug("received message :"+info);
                 }
             } catch (IOException e) {
                 logger.error("订阅消息发送失败",e);
