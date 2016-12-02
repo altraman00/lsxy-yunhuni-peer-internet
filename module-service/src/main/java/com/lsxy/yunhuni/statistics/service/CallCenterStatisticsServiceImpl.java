@@ -154,31 +154,44 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
 
 
     private CallCenterStatistics statistics(String tenantId,String appId,Date startDate,Date endDate){
+        //呼叫中心
         String sql = "SELECT IFNULL(SUM(CASE WHEN c.type='1' THEN 1 ELSE 0 END),0) AS callIn, " +
                         "IFNULL(SUM(CASE WHEN (c.type='1' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0 END),0) AS callInSuccess, " +
                         "IFNULL(SUM(CASE WHEN c.type='2' THEN 1 ELSE 0 END),0) AS callOut, " +
                         "IFNULL(SUM(CASE WHEN (c.type='2' AND c.answer_time IS NOT NULL) THEN 1 ELSE 0 END),0) AS callOutSuccess, " +
-                        "IFNULL(SUM(CASE WHEN c.to_manual_result=1 THEN 1 ELSE 0 END),0) AS toManualSuccess, " +
-                        "IFNULL(SUM(CASE WHEN c.to_manual_time IS NOT NULL THEN 1 ELSE 0 END),0) AS queueNum," +
-                        "IFNULL(SUM(c.to_manual_time),0) AS queueDuration, " +
+//                        "IFNULL(SUM(CASE WHEN c.to_manual_result=1 THEN 1 ELSE 0 END),0) AS toManualSuccess, " +
+//                        "IFNULL(SUM(CASE WHEN c.to_manual_time IS NOT NULL THEN 1 ELSE 0 END),0) AS queueNum," +
+//                        "IFNULL(SUM(c.to_manual_time),0) AS queueDuration, " +
                         "IFNULL(SUM(c.call_time_long),0) AS callTimeLong " +
                         "FROM db_lsxy_bi_yunhuni.tb_bi_call_center c WHERE 1=1 ";
+        //排队
+        String queSql = "SELECT " +
+                "COUNT(1) AS queueNum," +
+                "IFNULL(SUM(CASE WHEN c.result = 1 THEN 1 ELSE 0 END),0) AS toManualSuccess, " +
+                "IFNULL(SUM(c.queue_time),0) AS queueDuration " +
+                "FROM db_lsxy_bi_yunhuni.tb_bi_call_center_queue c WHERE 1=1 ";
         if(startDate != null){
             sql = sql + "AND c.end_time >= '" + DateUtils.formatDate(startDate) + "' ";
+            queSql = queSql + "AND c.end_time >= '" + DateUtils.formatDate(startDate) + "' ";
         }
         if(endDate != null){
             sql = sql + "AND c.end_time < '" + DateUtils.formatDate(endDate) + "' ";
+            queSql = queSql + "AND c.end_time < '" + DateUtils.formatDate(endDate) + "' ";
         }
         if(StringUtils.isNotBlank(tenantId)){
             sql = sql + "AND c.tenant_id = '" + tenantId + "' ";
+            queSql = queSql + "AND c.tenant_id = '" + tenantId + "' ";
         }
         if(StringUtils.isNotBlank(appId)){
             sql = sql + "AND c.app_id = '" + appId + "' ";
+            queSql = queSql + "AND c.app_id = '" + appId + "' ";
         }
         Map map = jdbcTemplate.queryForMap(sql);
+        Map queMap = jdbcTemplate.queryForMap(queSql);
         CallCenterStatistics current = new CallCenterStatistics();
         try {
             BeanUtils.copyProperties2(current,map,false);
+            BeanUtils.copyProperties2(current,queMap,false);
         } catch (Exception e) {
             logger.error("复制对象属性出错",e);
         }
@@ -197,17 +210,37 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
 
     private void incrIntoRedis(String key,CallCenterStatistics ccStatistics){
         BoundHashOperations hashOps = redisCacheService.getHashOps(key);
-        long callIn = hashOps.increment("callIn", ccStatistics.getCallIn());
-        hashOps.increment("callInSuccess", ccStatistics.getCallInSuccess());
-        long callOut = hashOps.increment("callOut", ccStatistics.getCallOut());
-        hashOps.increment("callOutSuccess", ccStatistics.getCallOutSuccess());
-        hashOps.increment("toManualSuccess", ccStatistics.getToManualSuccess());
-        hashOps.increment("queueNum", ccStatistics.getQueueNum());
-        hashOps.increment("queueDuration", ccStatistics.getQueueDuration());
-        hashOps.increment("callTimeLong", ccStatistics.getQueueDuration());
-        if(callIn == ccStatistics.getCallIn() || callOut == ccStatistics.getCallOut()){
-            redisCacheService.expire(key, 5 * 24 * 60 * 60);
+        if(ccStatistics.getCallIn() != null && ccStatistics.getCallIn() >0){
+            long callIn = hashOps.increment("callIn", ccStatistics.getCallIn());
+            if(callIn == ccStatistics.getCallIn()){
+                redisCacheService.expire(key, 5 * 24 * 60 * 60);
+            }
         }
+        if(ccStatistics.getCallInSuccess() != null && ccStatistics.getCallInSuccess() > 0){
+            hashOps.increment("callInSuccess", ccStatistics.getCallInSuccess());
+        }
+        if(ccStatistics.getCallOut() != null && ccStatistics.getCallOut() > 0){
+            long callOut = hashOps.increment("callOut", ccStatistics.getCallOut());
+            if(callOut == ccStatistics.getCallOut()){
+                redisCacheService.expire(key, 5 * 24 * 60 * 60);
+            }
+        }
+        if(ccStatistics.getCallOutSuccess()!=null && ccStatistics.getCallOutSuccess()>0){
+            hashOps.increment("callOutSuccess", ccStatistics.getCallOutSuccess());
+        }
+        if(ccStatistics.getToManualSuccess() != null && ccStatistics.getToManualSuccess() >0){
+            hashOps.increment("toManualSuccess", ccStatistics.getToManualSuccess());
+        }
+        if(ccStatistics.getQueueNum() != null && ccStatistics.getQueueNum() >0){
+            hashOps.increment("queueNum", ccStatistics.getQueueNum());
+        }
+        if(ccStatistics.getQueueDuration() != null && ccStatistics.getQueueDuration() > 0){
+            hashOps.increment("queueDuration", ccStatistics.getQueueDuration());
+        }
+        if(ccStatistics.getCallTimeLong() != null && ccStatistics.getCallTimeLong() > 0){
+            hashOps.increment("callTimeLong", ccStatistics.getCallTimeLong());
+        }
+
     }
 
     private CallCenterStatistics getIncrFromRedis(String key){
