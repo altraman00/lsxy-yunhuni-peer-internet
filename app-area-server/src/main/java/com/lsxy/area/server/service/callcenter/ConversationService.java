@@ -11,9 +11,9 @@ import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.exceptions.api.ConfNotExistsException;
+import com.lsxy.framework.core.exceptions.api.ConversationNotExistException;
 import com.lsxy.framework.core.exceptions.api.InvokeCallException;
-import com.lsxy.framework.core.exceptions.api.OutOfConfMaxPartsException;
+import com.lsxy.framework.core.exceptions.api.OutOfConversationMaxPartsException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -263,11 +263,11 @@ public class ConversationService {
     public boolean dismiss(String appId, String conversationId) throws YunhuniApiException {
         BusinessState state = businessStateService.get(conversationId);
         if(state == null || (state.getClosed() != null && state.getClosed())){
-            throw new ConfNotExistsException();
+            throw new ConversationNotExistException();
         }
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
-            throw new ConfNotExistsException();
+            throw new ConversationNotExistException();
         }
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",state.getResId())
@@ -440,7 +440,7 @@ public class ConversationService {
     public boolean join(String appId, String conversationId, String callId, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException{
 
         if(this.outOfParts(conversationId)){
-            throw new OutOfConfMaxPartsException();
+            throw new OutOfConversationMaxPartsException();
         }
 
         return this.enter(callId,conversationId,maxDuration,playFile,voiceMode);
@@ -551,7 +551,7 @@ public class ConversationService {
         }
     }
 
-    private void setVoiceMode(String areaId,String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
+    public void setVoiceMode(String areaId,String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conversation_state = businessStateService.get(conversationId);
         if(call_state == null || call_state.getResId() == null){

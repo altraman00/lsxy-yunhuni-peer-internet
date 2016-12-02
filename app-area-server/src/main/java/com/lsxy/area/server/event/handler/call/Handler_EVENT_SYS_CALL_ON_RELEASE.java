@@ -153,7 +153,6 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }catch (Throwable t){
                 logger.error("更新CallCenter失败",t);
             }
-
         }
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
         if(BusinessState.TYPE_IVR_CALL.equals(state.getType()) ||
