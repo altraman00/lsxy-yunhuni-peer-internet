@@ -205,6 +205,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                 callCenterQueue.setInviteTime(cur);
             }
             callCenterQueue.setEndTime(cur);
+            callCenterQueue.setToManualTime((callCenterQueue.getStartTime().getTime() - callCenterQueue.getEndTime().getTime()) / 1000);
             callCenterQueue.setResult(result);
             callCenterQueueService.save(callCenterQueue);
         }catch (Throwable t){
