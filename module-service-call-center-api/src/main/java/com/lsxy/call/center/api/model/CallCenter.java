@@ -17,6 +17,8 @@ import java.util.Date;
 public class CallCenter extends IdEntity {
     public static int CALL_UP = 2;//呼出
     public static int CALL_IN = 1;//呼入
+    public static int CALL_DIAL = 3;//拨号
+
     public static int TO_MANUAL_RESULT_SUCESS = 1;//接听
     public static int TO_MANUAL_RESULT_AGENT_FAIL = 2; //呼叫坐席失败
     public static int TO_MANUAL_RESULT_FAIL = 3; //主动放弃
