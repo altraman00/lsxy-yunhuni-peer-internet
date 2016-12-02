@@ -37,7 +37,7 @@ public class CallCenterRegisterImitator {
     @Autowired
     RedisCacheService redisCacheService;
 
-    @Scheduled(cron="0 0/3 * * * ? ")
+//    @Scheduled(cron="0 0/3 * * * ? ")
     public void extensionRegister(){
         Date date=new Date();
         String month = DateUtils.formatDate(date, "yyyy-MM-dd HH:mm");
@@ -81,7 +81,7 @@ public class CallCenterRegisterImitator {
         Iterable<AppExtension> list = appExtensionService.list();
         list.forEach(ex -> {
             try{
-                appExtensionService.register(ex.getId());
+                appExtensionService.login(ex.getUser());
             }catch (Exception e){
                 logger.error("注册分机失败",e);
             }
