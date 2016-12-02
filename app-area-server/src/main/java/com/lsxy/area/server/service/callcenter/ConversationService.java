@@ -68,9 +68,6 @@ public class ConversationService {
 
     public static final Integer IS_PLAYWAIT_TRUE = 1;
 
-    /**呼叫中心id存放的字段**/
-    public static final String CALLCENTER_ID_FIELD = "CALLCENTER_ID";
-
     /**呼叫对应的排队id存放的字段**/
     public static final String QUEUE_ID_FIELD = "QUEUE_ID";
 
@@ -201,33 +198,17 @@ public class ConversationService {
     /**
      * 发起交谈
      * @param initiator
-     * @param callCenterId
      * @param appId
      * @param maxDuration
      * @return
      * @throws YunhuniApiException
      */
-    public String create(String id,String initiator,String callCenterId, String appId, Integer maxDuration) throws YunhuniApiException {
-        App app = appService.findById(appId);
-        if(app == null){
-            throw new AppNotFoundException();
-        }
-        String areaId = areaAndTelNumSelector.getAreaId(app);
-
-        CallCenterConversation conversation = new CallCenterConversation();
-        conversation.setId(id);
-        conversation.setAppId(appId);
-        conversation.setTenantId(app.getTenant().getId());
-        conversation.setRelevanceId(callCenterId);
-        conversation.setStartTime(new Date());
-        conversation = callCenterConversationService.save(conversation);
-        String conversationId = conversation.getId();
-
+    public String create(String id,String initiator,String tenantId,String appId, String areaId,String callBackUrl, Integer maxDuration) throws YunhuniApiException {
         if(maxDuration!=null && maxDuration > MAX_DURATION){
             maxDuration = MAX_DURATION;
         }
         Map<String, Object> map = new MapBuilder<String,Object>()
-                .putIfNotEmpty("user_data",conversationId)
+                .putIfNotEmpty("user_data",id)
                 .put("max_seconds",maxDuration,MAX_DURATION)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
@@ -239,11 +220,11 @@ public class ConversationService {
         }
         //保存业务数据
         BusinessState state = new BusinessState.Builder()
-                .setTenantId(app.getTenant().getId())
-                .setAppId(app.getId())
-                .setId(conversationId)
+                .setTenantId(tenantId)
+                .setAppId(appId)
+                .setId(id)
                 .setType(BusinessState.TYPE_CC_CONVERSATION)
-                .setCallBackUrl(app.getUrl())
+                .setCallBackUrl(callBackUrl)
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
@@ -251,7 +232,18 @@ public class ConversationService {
                         .build())
                 .build();
         businessStateService.save(state);
-        return conversationId;
+        try{
+            CallCenterConversation conversation = new CallCenterConversation();
+            conversation.setId(id);
+            conversation.setAppId(appId);
+            conversation.setTenantId(tenantId);
+            conversation.setRelevanceId(initiator);
+            conversation.setStartTime(new Date());
+            callCenterConversationService.save(conversation);
+        }catch (Throwable t){
+            logger.error("保存CallCenterConversation失败",t);
+        }
+        return id;
     }
 
 
@@ -645,9 +637,9 @@ public class ConversationService {
             return;
         }
         try{
-            Map<String,String> businessData = state.getBusinessData();
             callConversationService.incrConversation(call_id,conversation_id);
             this.incrPart(conversation_id,call_id);
+            Map<String,String> businessData = state.getBusinessData();
             CallCenterConversationMember member = new CallCenterConversationMember();
             member.setCallId(call_id);
             member.setRelevanceId(conversation_id);

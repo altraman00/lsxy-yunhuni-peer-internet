@@ -18,6 +18,8 @@ import java.util.Date;
 public class CallCenterConversationMember extends IdEntity {
     public static final String INITIATOR_TRUE = "1";
     public static final String INITIATOR_FALSE = "0";
+    public static final String AGENT_TRUE = "1";
+    public static final String AGENT_FALSE = "0";
 
     private String callId;
     private String relevanceId;//所属呼叫中心交谈
@@ -26,6 +28,8 @@ public class CallCenterConversationMember extends IdEntity {
     private String sessionId;//加入的session
     private String joinNum;//加入的号码
     private String isInitiator;//是否发起方
+    private String isAgent;//是否坐席
+    private Integer mode;//说听模式
 
     @Column(name = "call_id")
     public String getCallId() {
@@ -83,5 +87,23 @@ public class CallCenterConversationMember extends IdEntity {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    @Column(name = "is_agent")
+    public String getIsAgent() {
+        return isAgent;
+    }
+
+    public void setIsAgent(String isAgent) {
+        this.isAgent = isAgent;
+    }
+
+    @Column(name = "mode")
+    public Integer getMode() {
+        return mode;
+    }
+
+    public void setMode(Integer mode) {
+        this.mode = mode;
     }
 }

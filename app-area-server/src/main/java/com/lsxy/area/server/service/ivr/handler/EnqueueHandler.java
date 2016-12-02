@@ -6,7 +6,6 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
@@ -15,6 +14,7 @@ import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -23,7 +23,6 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -80,17 +79,9 @@ public class EnqueueHandler extends ActionHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("排队={}", JSONUtil.objectToJson(enQueue));
             }
-            CallCenter callCenter = new CallCenter();
-            callCenter.setTenantId(state.getTenantId());
-            callCenter.setAppId(state.getAppId());
-            callCenter.setType(""+CallCenter.CALL_IN);
-            callCenter.setAgent(null);
-            callCenter.setStartTime(new Date());
-            callCenter.setFromNum(businessData.get("from"));
-            callCenter.setToNum(businessData.get("to"));
-            callCenter = callCenterService.save(callCenter);
-            businessStateService.updateInnerField(callId,ConversationService.CALLCENTER_ID_FIELD,callCenter.getId());
-            businessStateService.updateUserdata(callId,enQueue.getData());
+            if(StringUtil.isNotEmpty(enQueue.getData())){
+                businessStateService.updateUserdata(callId,enQueue.getData());
+            }
 
             if(enQueue.getWait_voice()!= null){
                 String playWait = enQueue.getWait_voice();
@@ -119,7 +110,7 @@ public class EnqueueHandler extends ActionHandler{
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
-            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,"调用呼叫中心排队失败");
+            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,null,"调用呼叫中心排队失败");
         }
         return true;
     }
