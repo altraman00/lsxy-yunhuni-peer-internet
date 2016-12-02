@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -60,30 +59,6 @@ public class ExtensionState {
         redisCacheService.hdel(getKey(extensionId),"agent");
     }
 
-    public Integer getLastAction(String extensionId) {
-        Object obj = redisCacheService.hget(getKey(extensionId),"lastAction");
-        if(obj == null){
-            return null;
-        }
-        return Integer.parseInt(obj.toString());
-    }
-
-    public void setLastAction(String extensionId,Integer lastAction) {
-        redisCacheService.hput(getKey(extensionId),"lastAction",lastAction.toString());
-    }
-
-    public Long getLastActionTime(String extensionId) {
-        Object obj = redisCacheService.hget(getKey(extensionId),"lastActionTime");
-        if(obj == null){
-            return null;
-        }
-        return Long.parseLong(obj.toString());
-    }
-
-    public void setLastActionTime(String extensionId,Long lastActionTime) {
-        redisCacheService.hput(getKey(extensionId),"lastActionTime",lastActionTime.toString());
-    }
-
     public Long getLastRegisterTime(String extensionId) {
         Object obj = redisCacheService.hget(getKey(extensionId),"lastRegisterTime");
         if(obj == null){
@@ -94,18 +69,6 @@ public class ExtensionState {
 
     public void setLastRegisterTime(String extensionId,Long lastRegisterTime) {
         redisCacheService.hput(getKey(extensionId),"lastRegisterTime",lastRegisterTime.toString());
-    }
-
-    public Integer getLastRegisterStatus(String extensionId) {
-        Object obj = redisCacheService.hget(getKey(extensionId),"lastRegisterStatus");
-        if(obj == null){
-            return null;
-        }
-        return Integer.parseInt(obj.toString());
-    }
-
-    public void setLastRegisterStatus(String extensionId,Integer lastRegisterStatus) {
-        redisCacheService.hput(getKey(extensionId),"lastRegisterStatus",lastRegisterStatus.toString());
     }
 
     public Integer getRegisterExpires(String extensionId) {
@@ -120,60 +83,49 @@ public class ExtensionState {
         redisCacheService.hput(getKey(extensionId),"registerExpires",registerExpires.toString());
     }
 
+    public boolean getEnable(String extensionId) {
+        Object obj = redisCacheService.hget(getKey(extensionId),"enable");
+        if(obj == null){
+            return false;
+        }
+        return obj.toString().equals(Model.ENABLE_TRUE);
+    }
+
+    public void setEnable(String extensionId,String enable) {
+        redisCacheService.hput(getKey(extensionId),"enable",enable);
+    }
+
     public void setAll(String extensionId,Model model){
         Map<String,String> map = new HashMap();
         if(StringUtil.isNotBlank(model.getAgent())){
             map.put("agent", model.getAgent());
         }
-        if(model.getLastAction() != null){
-            map.put("lastAction",model.getLastAction().toString());
-        }
-        if(model.getLastActionTime() != null){
-            map.put("lastActionTime",model.getLastActionTime().toString());
-        }
         if(model.getLastRegisterTime() != null){
             map.put("lastRegisterTime",model.getLastRegisterTime().toString());
         }
-        if(model.getLastRegisterStatus() != null){
-            map.put("lastRegisterStatus",model.getLastRegisterStatus().toString());
-        }
         if(model.getRegisterExpires() != null){
             map.put("registerExpires",model.getRegisterExpires().toString());
+        }
+        if(model.getEnable() != null){
+            map.put("enable",model.getEnable().toString());
         }
         redisCacheService.hputAll(getKey(extensionId),map);
     }
 
     public class Model implements Serializable {
+        public static final String ENABLE_TRUE = "1";
+        public static final String ENABLE_FALSE = "0";
 
         private String agent;
-        private Integer lastAction;//    last_action          int comment '最近的动作',
-        private Long lastActionTime;//    last_action_time     datetime comment '最近的动作发生的时间',
         private Long lastRegisterTime;//    last_register_time   datetime comment '最近注册成功的时间。注册成功后超过register_expires无新的成功注册，视为注册超时，当离线处理。',
-        private Integer lastRegisterStatus;//    last_register_status int comment '最近注册状态 2xx: 成功。0表示没有任何注册',
         private Integer registerExpires;//    register_expires     int comment '注册超过该时间后，需要重新中注册。该值应出现在SIP服务器返回的Register回复消息的Expires头域中。',
-
+        private String enable;
         public String getAgent() {
             return agent;
         }
 
         public void setAgent(String agent) {
             this.agent = agent;
-        }
-
-        public Integer getLastAction() {
-            return lastAction;
-        }
-
-        public void setLastAction(Integer lastAction) {
-            this.lastAction = lastAction;
-        }
-
-        public Long getLastActionTime() {
-            return lastActionTime;
-        }
-
-        public void setLastActionTime(Long lastActionTime) {
-            this.lastActionTime = lastActionTime;
         }
 
         public Long getLastRegisterTime() {
@@ -184,20 +136,20 @@ public class ExtensionState {
             this.lastRegisterTime = lastRegisterTime;
         }
 
-        public Integer getLastRegisterStatus() {
-            return lastRegisterStatus;
-        }
-
-        public void setLastRegisterStatus(Integer lastRegisterStatus) {
-            this.lastRegisterStatus = lastRegisterStatus;
-        }
-
         public Integer getRegisterExpires() {
             return registerExpires;
         }
 
         public void setRegisterExpires(Integer registerExpires) {
             this.registerExpires = registerExpires;
+        }
+
+        public String getEnable() {
+            return enable;
+        }
+
+        public void setEnable(String enable) {
+            this.enable = enable;
         }
     }
 }

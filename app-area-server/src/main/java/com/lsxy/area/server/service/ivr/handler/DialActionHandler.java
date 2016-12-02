@@ -1,11 +1,15 @@
 package com.lsxy.area.server.service.ivr.handler;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -71,6 +75,12 @@ public class DialActionHandler extends ActionHandler{
     @Autowired
     private NotifyCallbackUtil notifyCallbackUtil;
 
+    @Autowired
+    private ConversationService conversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
+
     @Override
     public String getAction() {
         return "dial";
@@ -119,7 +129,7 @@ public class DialActionHandler extends ActionHandler{
         return Long.parseLong(s);
     }
 
-    public boolean dial(String ivr_call_id,String parent_call_res_id,String appId,String tenantId, Element root){
+    public boolean dial(String ivr_call_id, String parent_call_res_id, String appId, String tenantId, Element root){
         App app = appService.findById(appId);
         //解析xml
         String ring_play_file = root.elementTextTrim("play");
@@ -167,25 +177,51 @@ public class DialActionHandler extends ActionHandler{
         String oneTelnumber = selector.getOneTelnumber();
         String lineId = selector.getLineId();
 
+        String callId = null;
 
-        VoiceIvr voiceIvr = new VoiceIvr();
-        voiceIvr.setFromNum(oneTelnumber);
-        voiceIvr.setToNum(to);
-        voiceIvr.setStartTime(new Date());
-        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
-        voiceIvr = voiceIvrService.save(voiceIvr);
-        String callId = voiceIvr.getId();
+        CallSession callSession = null;
 
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_PREPARING);
-        callSession.setFromNum(oneTelnumber);
-        callSession.setToNum(selector.getToUri());
-        callSession.setApp(app);
-        callSession.setTenant(app.getTenant());
-        callSession.setRelevanceId(callId);
-        callSession.setType(CallSession.TYPE_VOICE_IVR);
-        callSession.setResId(null);
-        callSession = callSessionService.save(callSession);
+        boolean isCC = conversationService.isCC(ivr_call_id);
+        if(isCC){
+            CallCenter callCenter = new CallCenter();
+            callCenter.setTenantId(tenantId);
+            callCenter.setAppId(appId);
+            callCenter.setFromNum(from);
+            callCenter.setToNum(to);
+            callCenter.setStartTime(new Date());
+            callCenter.setType(""+CallCenter.CALL_DIAL);
+            callId = callCenterService.save(callCenter).getId();
+
+            callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSession.setFromNum(to);
+            callSession.setToNum(from);
+            callSession.setApp(app);
+            callSession.setTenant(app.getTenant());
+            callSession.setRelevanceId(callId);
+            callSession.setResId(null);
+            callSession.setType(CallSession.TYPE_CALL_CENTER);
+            callSession = callSessionService.save(callSession);
+        }else{
+            VoiceIvr voiceIvr = new VoiceIvr();
+            voiceIvr.setFromNum(oneTelnumber);
+            voiceIvr.setToNum(to);
+            voiceIvr.setStartTime(new Date());
+            voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_CALL);
+            voiceIvr = voiceIvrService.save(voiceIvr);
+            callId = voiceIvr.getId();
+
+            callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_PREPARING);
+            callSession.setFromNum(oneTelnumber);
+            callSession.setToNum(selector.getToUri());
+            callSession.setApp(app);
+            callSession.setTenant(app.getTenant());
+            callSession.setRelevanceId(callId);
+            callSession.setType(CallSession.TYPE_VOICE_IVR);
+            callSession.setResId(null);
+            callSession = callSessionService.save(callSession);
+        }
 
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("to_uri",selector.getToUri())
@@ -215,6 +251,7 @@ public class DialActionHandler extends ActionHandler{
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
+                        .putIfNotEmpty(ConversationService.ISCC_FIELD,isCC?"1":null)
                         .putIfNotEmpty("ivr_call_id",ivr_call_id)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)

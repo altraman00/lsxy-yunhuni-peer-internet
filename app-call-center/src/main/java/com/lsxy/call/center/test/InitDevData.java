@@ -88,7 +88,6 @@ public class InitDevData {
             appExtension=appExtensionService.save(appExtension);
             String exid = appExtension.getId();
             extensionState.setAgent(exid,agent.getId());
-            extensionState.setLastRegisterStatus(exid,200);
             extensionState.setLastRegisterTime(exid,new Date().getTime());
             extensionState.setRegisterExpires(exid,10000000);
             agentState.setExtension(agent.getId(),exid);
