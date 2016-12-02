@@ -21,6 +21,12 @@ public class CallCenterConversationMember extends IdEntity {
     public static final String AGENT_TRUE = "1";
     public static final String AGENT_FALSE = "0";
 
+    public static final Integer MODE_I_O=1;//收放音
+    public static final Integer MODE_I = 2;//收音
+    public static final Integer MODE_O = 3;//放音
+    public static final Integer MODE_N = 4;//无
+    public static final Integer MODE_DEFAULT = MODE_I_O;
+
     private String callId;
     private String relevanceId;//所属呼叫中心交谈
     private Date startTime;//发起时间
