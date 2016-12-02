@@ -56,16 +56,23 @@ public class OpenSipEventSubscriberTask {
         if(socket != null){
             String ip = StringUtil.getHostIp();
             String port = SystemConfig.getProperty("app.cc.opensips.event.listener.port","9009");
+
             final String data1 = String.format(EVENT_TOPIC_EXT_LOGIN,ip,port);
             final String data2 = String.format(EVENT_TOPIC_EXT_LOGOUT,ip,port);
+
             try {
                 if(logger.isDebugEnabled()){
+                    logger.debug("doSubscribed send data :{}",targetHost);
                     logger.debug("doSubscribed send data :{}",data1);
+                    logger.debug("doSubscribed send data :{}",data2);
                 }
+
                 byte[] bytes1 = data1.getBytes("UTF-8");
-                socket.send(new DatagramPacket(bytes1, 0, bytes1.length, targetHost));
                 byte[] bytes2 = data2.getBytes("UTF-8");
+
+                socket.send(new DatagramPacket(bytes1, 0, bytes1.length, targetHost));
                 socket.send(new DatagramPacket(bytes2, 0, bytes2.length, targetHost));
+
             } catch (IOException e) {
                 logger.error("订阅消息发送失败",e);
             }
