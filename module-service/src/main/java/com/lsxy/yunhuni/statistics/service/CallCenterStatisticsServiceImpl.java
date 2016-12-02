@@ -167,8 +167,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         //排队
         String queSql = "SELECT " +
                 "COUNT(1) AS queueNum," +
-                "IFNULL(SUM(CASE WHEN c.result = 1 THEN 1 ELSE 0 END),0) AS toManualSuccess, " +
-                "IFNULL(SUM(c.queue_time),0) AS queueDuration " +
+                "IFNULL(SUM(CASE WHEN c.result = 'dail_succ' THEN 1 ELSE 0 END),0) AS toManualSuccess, " +
+                "IFNULL(SUM(c.to_manual_time),0) AS queueDuration " +
                 "FROM db_lsxy_bi_yunhuni.tb_bi_call_center_queue c WHERE 1=1 ";
         if(startDate != null){
             sql = sql + "AND c.end_time >= '" + DateUtils.formatDate(startDate) + "' ";
