@@ -72,15 +72,14 @@ public class Handler_EVENT_SYS_CALL_ON_START extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
         if(res_id!=null){
-            state.setResId(res_id);
-            businessStateService.save(state);
+            businessStateService.updateResId(call_id,res_id);
         }
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
 
         //更新会话记录状态
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+        CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
         if(callSession != null){
             callSession.setResId(res_id);
             callSession.setStatus(CallSession.STATUS_CALLING);

@@ -78,10 +78,10 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
         String event;
         switch (productCode){
             case duo_call:{
-                Map<String, Object> data = state.getBusinessData();
-                Set<Map.Entry<String, Object>> entries = data.entrySet();
-                for(Map.Entry entry:entries){
-                    String sessionId = (String) entry.getValue();
+                Map<String,String> data = state.getBusinessData();
+                Set<Map.Entry<String,String>> entries = data.entrySet();
+                for(Map.Entry<String,String> entry:entries){
+                    String sessionId = entry.getValue();
                     CallSession callSession = callSessionService.findById(sessionId);
                     if(callSession != null){
                         callSession.setStatus(CallSession.STATUS_EXCEPTION);
@@ -93,7 +93,7 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
             }
             case notify_call:{
                 //处理会话表数据
-                CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+                CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
                 if(callSession != null){
                     callSession.setStatus(CallSession.STATUS_EXCEPTION);
                     callSessionService.save(callSession);
@@ -103,7 +103,7 @@ public class Handler_EVENT_EXT_CALL_ON_TIMEOUT extends EventHandler{
             }
             case captcha_call:
                 //处理会话表数据
-                CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
+                CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
                 if(callSession != null){
                     callSession.setStatus(CallSession.STATUS_EXCEPTION);
                     callSessionService.save(callSession);

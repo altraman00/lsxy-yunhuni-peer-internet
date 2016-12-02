@@ -111,16 +111,16 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         //扣费
         calCostService.callConsume(voiceCdr);
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
-        Map<String, Object> data = businessState.getBusinessData();
+        Map<String, String> data = businessState.getBusinessData();
         if(data != null){
             switch (productCode){
                 case duo_call:{
-                    String sessionId = (String) data.get(voiceCdr.getToNum());
+                    String sessionId = data.get(voiceCdr.getToNum());
                     voiceCdr.setSessionId(sessionId);
                     break;
                 }
                 default:{
-                    String sessionId = (String) data.get("sessionid");
+                    String sessionId = data.get(BusinessState.SESSIONID);
                     voiceCdr.setSessionId(sessionId);
                     break;
                 }

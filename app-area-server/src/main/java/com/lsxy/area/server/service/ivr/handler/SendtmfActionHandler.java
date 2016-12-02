@@ -2,6 +2,7 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -11,7 +12,6 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -52,8 +52,6 @@ public class SendtmfActionHandler extends ActionHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始处理ivr[{}]动作，dtmf_code={}",getAction(),dtmf_code);
         }
-
-        Map<String,Object> businessData = state.getBusinessData();
         String res_id = state.getResId();
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
@@ -68,12 +66,7 @@ public class SendtmfActionHandler extends ActionHandler{
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 }

@@ -6,7 +6,9 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -19,7 +21,9 @@ import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.CallSession;
+import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
+import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -27,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -55,8 +60,14 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     @Autowired
     private SessionContext sessionContext;
 
-    @Reference
+    @Autowired
+    private VoiceIvrService voiceIvrService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterAgentService callCenterAgentService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
 
     @Autowired
     private ConversationService conversationService;
@@ -96,12 +107,55 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         }
 
         //更新会话记录状态
-        CallSession callSession = callSessionService.findById((String)state.getBusinessData().get("sessionid"));
-        if(callSession != null){
-            callSession.setStatus(CallSession.STATUS_OVER);
-            callSessionService.save(callSession);
+        try{
+            CallSession callSession = callSessionService.findById(state.getBusinessData().get(BusinessState.SESSIONID));
+            if(callSession != null){
+                callSession.setStatus(CallSession.STATUS_OVER);
+                callSessionService.save(callSession);
+            }
+        }catch (Throwable t){
+            logger.error("更新会话记录失败",t);
         }
+        boolean isIVR = false;
 
+        if(BusinessState.TYPE_IVR_CALL.equals(state.getType())){
+            isIVR = true;
+        }
+        if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){
+            if(!conversationService.isCC(call_id)){
+                isIVR = true;
+            }
+        }
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+            if(!conversationService.isCC(call_id)){
+                isIVR = true;
+            }
+        }
+        if(isIVR){
+            try{
+                VoiceIvr voiceIvr = voiceIvrService.findById(call_id);
+                if(voiceIvr != null){
+                    voiceIvr.setEndTime(new Date());
+                    voiceIvrService.save(voiceIvr);
+                }
+            }catch (Throwable t){
+                logger.error("更新voiceIvr失败",t);
+            }
+        }else{
+            try{
+                CallCenter callCenter = callCenterService.findById(call_id);
+                if(callCenter != null){
+                    callCenter.setEndTime(new Date());
+                    if(callCenter.getStartTime() != null){
+                        Long callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
+                        callCenter.setCallTimeLong(callLongTime.toString());
+                    }
+                    callCenterService.save(callCenter);
+                }
+            }catch (Throwable t){
+                logger.error("更新CallCenter失败",t);
+            }
+        }
         //如果ivr主动方挂断，需要同时挂断正在连接的呼叫
         if(BusinessState.TYPE_IVR_CALL.equals(state.getType()) ||
             BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
@@ -134,22 +188,22 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
             String ivr_dial_call_id = null;
             if(state.getBusinessData() != null){
-                ivr_dial_call_id = (String)state.getBusinessData().get("ivr_dial_call_id");
+                ivr_dial_call_id = state.getBusinessData().get("ivr_dial_call_id");
             }
             if(StringUtils.isNotBlank(ivr_dial_call_id)){
                 hugup(ivr_dial_call_id,state.getAreaId());
             }
 
             if(conversationService.isCC(call_id)){
-                String conversation_id = (String)state.getBusinessData().get(ConversationService.CONVERSATION_FIELD);
+                String conversation_id = state.getBusinessData().get(ConversationService.CONVERSATION_FIELD);
                 if(conversation_id != null){
                     conversationService.logicExit(conversation_id,call_id);
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
-            String agentId = (String)state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
+            String agentId = state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
             if(agentId != null){
-                String reserve_state = (String)state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
+                String reserve_state = state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
                 try {
                     callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (YunhuniApiException e) {

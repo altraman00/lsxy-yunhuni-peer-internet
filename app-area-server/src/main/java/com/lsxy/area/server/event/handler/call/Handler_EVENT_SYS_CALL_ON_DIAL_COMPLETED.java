@@ -1,5 +1,6 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
@@ -9,6 +10,8 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.call.center.api.model.CallCenterQueue;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -32,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +83,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
     @Autowired
     private PlayFileUtil playFileUtil;
 
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterQueueService callCenterQueueService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_DIAL_COMPLETED;
@@ -112,17 +119,13 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.info("call_id={},state={}",call_id,state);
         }
-        Map<String,Object> businessData = state.getBusinessData();
-
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
+        Map<String,String> businessData = state.getBusinessData();
 
         if(BusinessState.TYPE_SYS_CONF.equals(state.getType())){//该呼叫是通过(会议邀请呼叫)发起需要将呼叫加入会议
             if(StringUtils.isNotBlank(error)){
                 logger.error("将呼叫加入到会议失败{}",error);
             }else{
-                String conf_id = (String)businessData.get("conf_id");
+                String conf_id = businessData.get("conf_id");
                 if(conf_id == null){
                     throw new InvalidParamException("将呼叫加入到会议失败conf_id为null");
                 }
@@ -151,15 +154,13 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .putIfNotEmpty("error",error)
                         .putIfNotEmpty("user_data",state.getUserdata())
                         .build();
-                if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                    ivrActionService.doAction(call_id);
-                }
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
             }
             if(StringUtils.isNotBlank(error)){
                 logger.error("IVR呼出失败",error);
             }
         }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//通过ivr拨号动作发起的呼叫
-            String ivr_call_id = (String)businessData.get("ivr_call_id");
+            String ivr_call_id = businessData.get("ivr_call_id");
             if(StringUtils.isNotBlank(error)){
                 Map<String,Object> notify_data = new MapBuilder<String,Object>()
                         .putIfNotEmpty("event","ivr.connect_end")
@@ -169,22 +170,24 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .putIfNotEmpty("error",error)
                         .build();
                 if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                    ivrActionService.doAction(ivr_call_id);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
                 }
             }else{
                 BusinessState ivrState = businessStateService.get(ivr_call_id);
                 String res_id_one = ivrState.getResId();
-                Integer max_seconds = (Integer) businessData.get("max_seconds");
+                String max_seconds = businessData.get("max_seconds");
                 String res_id_two = state.getResId();
-                Integer connect_mode = (Integer) businessData.get("connect_mode");
-                Boolean recording = (Boolean)businessData.get("recording");
+                Integer connect_mode = Integer.parseInt(businessData.get("connect_mode"));
+                String recording = businessData.get("recording");
                 String record_file = null;
-                Integer local_volume = (Integer) businessData.get("volume1");
-                Integer remote_volume = (Integer) businessData.get("volume2");
-                Long schedule_play_time=(Long) businessData.get("play_time");
-                String schedule_play_file = (String) businessData.get("play_file");
-                Integer schedule_play_loop = (Integer) businessData.get("play_repeat");
-                if(recording!=null && recording){
+                String local_volume = businessData.get("volume1");
+                String remote_volume = businessData.get("volume2");
+                String schedule_play_time=businessData.get("play_time");
+                String schedule_play_file = businessData.get("play_file");
+                String schedule_play_loop = businessData.get("play_repeat");
+                if(Boolean.parseBoolean(recording)){
                     record_file = RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId());
                 }
                 try {
@@ -207,17 +210,16 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }
-                ivrState.getBusinessData().put("ivr_dial_call_id",call_id);
-                businessStateService.save(ivrState);
+                businessStateService.updateInnerField(ivr_call_id,"ivr_dial_call_id",call_id);
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
-            String conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
+            String conversation_id = businessData.get(ConversationService.CONVERSATION_FIELD);
             if(StringUtils.isNotBlank(error)){
                 conversationService.exit(conversation_id,call_id);
             }else{
-                String agent_num = (String)businessData.get(ConversationService.AGENT_NUM_FIELD);
-                String prevoice = (String)businessData.get(ConversationService.AGENT_PRENUMVOICE_FIELD);
-                String postvoice = (String)businessData.get(ConversationService.AGENT_POSTNUMVOICE_FIELD);
+                String agent_num = businessData.get(ConversationService.AGENT_NUM_FIELD);
+                String prevoice = businessData.get(ConversationService.AGENT_PRENUMVOICE_FIELD);
+                String postvoice = businessData.get(ConversationService.AGENT_POSTNUMVOICE_FIELD);
                 List<Object[]> plays = new ArrayList<>();
                 try {
                     if(StringUtil.isNotEmpty(prevoice)){
@@ -243,6 +245,26 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 } catch (Throwable e) {
                     logger.error("调用失败 ",e);
                 }
+            }
+            try{
+                //更新排队记录
+                String initorid = conversationService.getInitiator(conversation_id);
+                if(initorid != null){
+                    BusinessState init_state = businessStateService.get(initorid);
+                    if(init_state != null){
+                        String queueId = init_state.getBusinessData().get(ConversationService.QUEUE_ID_FIELD);
+                        if(queueId != null){
+                            CallCenterQueue callCenterQueue = callCenterQueueService.findById(queueId);
+                            if(callCenterQueue != null && callCenterQueue.getDialTime() == null){
+                                callCenterQueue.setDialTime(new Date());
+                                callCenterQueue.setResult(StringUtils.isBlank(error)?CallCenterQueue.RESULT_DIAL_SUCC:CallCenterQueue.RESULT_DIAL_FAIL);
+                                callCenterQueueService.save(callCenterQueue);
+                            }
+                        }
+                    }
+                }
+            }catch (Throwable t){
+                logger.error("更新排队记录失败",t);
             }
         }else if(BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
             //TODO

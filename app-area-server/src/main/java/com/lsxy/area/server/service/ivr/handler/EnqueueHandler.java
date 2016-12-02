@@ -4,8 +4,8 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
@@ -14,6 +14,7 @@ import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
@@ -22,8 +23,6 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,8 +31,6 @@ import java.util.Map;
  */
 @Component
 public class EnqueueHandler extends ActionHandler{
-
-    public final static String action = "enqueue";
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -58,7 +55,7 @@ public class EnqueueHandler extends ActionHandler{
 
     @Override
     public String getAction() {
-        return action;
+        return "enqueue";
     }
 
     @Override
@@ -74,10 +71,7 @@ public class EnqueueHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-        }
+        Map<String,String> businessData = state.getBusinessData();
         String xml = root.asXML();
         EnQueue enQueue = EnQueueDecoder.decode(xml);
 
@@ -85,17 +79,9 @@ public class EnqueueHandler extends ActionHandler{
             if(logger.isDebugEnabled()){
                 logger.debug("排队={}", JSONUtil.objectToJson(enQueue));
             }
-            CallCenter callCenter = new CallCenter();
-            callCenter.setTenantId(state.getTenantId());
-            callCenter.setAppId(state.getAppId());
-            callCenter.setType(""+CallCenter.CALL_IN);
-            callCenter.setAgent(null);
-            callCenter.setStartTime(new Date());
-            callCenter.setFromNum((String)businessData.get("from"));
-            callCenter.setToNum((String)businessData.get("to"));
-            callCenter = callCenterService.save(callCenter);
-            businessData.put(ConversationService.CALLCENTER_ID_FIELD,callCenter.getId());
-            state.setUserdata(enQueue.getData());
+            if(StringUtil.isNotEmpty(enQueue.getData())){
+                businessStateService.updateUserdata(callId,enQueue.getData());
+            }
 
             if(enQueue.getWait_voice()!= null){
                 String playWait = enQueue.getWait_voice();
@@ -113,20 +99,18 @@ public class EnqueueHandler extends ActionHandler{
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
                     rpcCaller.invoke(sessionContext, rpcrequest);
-                    businessData.put(ConversationService.IS_PLAYWAIT_FIELD,ConversationService.IS_PLAYWAIT_TRUE);
+                    businessStateService.updateInnerField(callId,ConversationService.IS_PLAYWAIT_FIELD,ConversationService.IS_PLAYWAIT_TRUE.toString());
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }
             }
         }
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         try {
-            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), (String) businessData.get("to"), callId, enQueue);
+            enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
         }catch (Throwable t){
             logger.error("调用呼叫中心排队失败",t);
-            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,"调用呼叫中心排队失败");
+            deQueueService.fail(state.getTenantId(),state.getAppId(),callId,null,"调用呼叫中心排队失败");
         }
         return true;
     }
