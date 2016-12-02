@@ -1,5 +1,6 @@
 package com.lsxy.app.opensips;
 
+import com.lsxy.framework.config.SystemConfig;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -33,7 +34,8 @@ public class OpenSipEventListenerServer {
 
             // 服务端监听在9999端口
             try {
-                b.bind(9009).sync().channel().closeFuture().await();
+                String port = SystemConfig.getProperty("app.cc.opensips.event.listener.port","9009");
+                b.bind(Integer.parseInt(port)).sync().channel().closeFuture().await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
