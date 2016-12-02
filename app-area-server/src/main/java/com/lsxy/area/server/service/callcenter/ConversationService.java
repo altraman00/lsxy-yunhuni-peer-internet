@@ -6,6 +6,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.call.center.api.model.*;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -215,6 +216,7 @@ public class ConversationService {
         }
         Map<String, Object> map = new MapBuilder<String,Object>()
                 .putIfNotEmpty("user_data",id)
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(tenantId, appId))
                 .put("max_seconds",maxDuration,MAX_DURATION)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
