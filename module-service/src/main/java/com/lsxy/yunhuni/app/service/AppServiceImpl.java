@@ -32,9 +32,10 @@ import java.util.List;
  */
 @Service
 public class AppServiceImpl extends AbstractService<App> implements AppService {
-    private static final String APP_CC_NUM_PREFIX5 = "APP_CC_NUM_PREFIX5";
-    private static final String APP_CC_NUM_PREFIX6 = "APP_CC_NUM_PREFIX6";
-    private static final String APP_CC_NUM_PREFIX7 = "APP_CC_NUM_PREFIX7";
+    private static final String APP_CC_NUM_KEY = "APP_CC_NUM";  //存在redis中的呼叫中心应用自增编号key，以hash来存
+    private static final String APP_CC_NUM_FIELD5 = "FIELD5 ";  //5位编号
+    private static final String APP_CC_NUM_FIELD6 = "FIELD6";   //6位编号
+    private static final String APP_CC_NUM_FIELD7 = "FIELD7";   //7位编号
 
     @Autowired
     private AppDao appDao;
@@ -148,7 +149,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
 
     private Long getCallCenterAppNum(){
         //5位编号
-        long incr5 = redisCacheService.incr(APP_CC_NUM_PREFIX5);
+        Long incr5 = redisCacheService.getHashOps(APP_CC_NUM_KEY).increment(APP_CC_NUM_FIELD5, 1L);
         //初始始值是10001,因为redis的incr是从1开始的，所以都加上10000
         long num5 = incr5 + 10000;
         //5位编号到59999为止
@@ -156,7 +157,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
             return num5;
         }
         //6位编号
-        long incr6 = redisCacheService.incr(APP_CC_NUM_PREFIX6);
+        long incr6 = redisCacheService.getHashOps(APP_CC_NUM_KEY).increment(APP_CC_NUM_FIELD6, 1L);
         //初始始值是600001,因为redis的incr是从1开始的，所以都加上600000
         long num6 = incr6 + 600000;
         //6位编号到699999为止
@@ -164,7 +165,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
             return num6;
         }
         //7位编号
-        long incr7 = redisCacheService.incr(APP_CC_NUM_PREFIX7);
+        long incr7 = redisCacheService.getHashOps(APP_CC_NUM_KEY).increment(APP_CC_NUM_FIELD7, 1L);
         //初始始值是7000001,因为redis的incr是从1开始的，所以都加上7000000
         long num7 = incr7 + 7000000;
         //7位编号到7999999为止
@@ -173,12 +174,6 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
         }
         //TODO 8位9位
         throw new RuntimeException("编号已满，请联系管理员");
-    }
-
-    @Override
-    public String findAppSipRegistrar(String appId) {
-        //TODO 分机注册信息
-        return "待实现";
     }
 
     @Override
