@@ -4,6 +4,7 @@ import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
@@ -12,6 +13,8 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +60,8 @@ public class CalCostTest {
 
     @Autowired
     AppService appService;
+    @Autowired
+    CallCenterStatisticsService callCenterStatisticsService;
 
     @Test
     public void testCalCost(){
@@ -70,6 +75,28 @@ public class CalCostTest {
         Date date1 = DateUtils.parseDate("2016-10-08", "yyyy-MM-dd");
         BigDecimal balance = calBillingService.getBalance("40288aca574060400157406339080002",date,date1,new BigDecimal(100.0));
         System.out.println(balance);
+    }
+
+    @Test
+    public void testIncRecharge(){
+        calBillingService.incRecharge("40288ac957e0afc80157e0b24a5b0000",new Date(),new BigDecimal(9.09));
+    }
+
+    @Test
+    public void testGetRecharge(){
+        BigDecimal amount = calBillingService.getBalance("40288ac957e0afc80157e0b24a5b0000");
+        System.out.println(amount);
+    }
+
+    @Test
+    public void testIncCallCostTime(){
+        calBillingService.incCallCostTime("40288ac957e0afc80157e0b24a5b0000",new Date(),45L);
+    }
+
+    @Test
+    public void testGetIncCallCostTime(){
+        Long callCostTimeByDate = calBillingService.getCallCostTimeByDate("40288ac957e0afc80157e0b24a5b0000", new Date());
+        System.out.println(callCostTimeByDate);
     }
 
     @Test
@@ -114,6 +141,26 @@ public class CalCostTest {
 //        app.setIsIvrService(1);
 //        app.setId("8a2bc5f65721aa160157222c8477000b");
 //        appService.findDialingTelnumber(app);
+    }
+
+    @Test
+    public void testStaticCC(){
+        Date preDate = DateUtils.getPreDate(new Date());
+        callCenterStatisticsService.dayStatistics(preDate);
+    }
+
+    @Test
+    public void testStaticCC1(){
+        CallCenterStatistics callCenterStatistics = new CallCenterStatistics("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000",new Date(),1L,1L,1L,1L,1L,1L,1L,1L);
+        callCenterStatisticsService.incrIntoRedis(callCenterStatistics,new Date());
+    }
+
+    @Test
+    public void testStaticCC2(){
+        CallCenterStatistics current = callCenterStatisticsService.getCurrentStatisticsByTenantId("40288ac9575612a30157561c7ff50004");
+        System.out.println(JSONUtil.objectToJson(current));
+        CallCenterStatistics curApp = callCenterStatisticsService.getCurrentStatisticsByAppId("40288ac957e1812e0157e18a994e0000");
+        System.out.println(JSONUtil.objectToJson(curApp));
     }
 
 }

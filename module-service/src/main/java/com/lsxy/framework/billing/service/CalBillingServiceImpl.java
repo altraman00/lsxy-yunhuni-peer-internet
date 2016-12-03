@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,7 +126,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private BigDecimal getConsume(String tenantId, Date date){
-        return getIncrAmount(tenantId,date,USE_BALANCE_PREFIX);
+        return getIncrAmount(tenantId,date, USE_BALANCE_FIELD);
     }
 
     /**
@@ -135,7 +136,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private BigDecimal getRecharge(String tenantId, Date date){
-        return getIncrAmount(tenantId,date,ADD_BALANCE_PREFIX);
+        return getIncrAmount(tenantId,date, ADD_BALANCE_FIELD);
     }
 
     /**
@@ -148,7 +149,11 @@ public class CalBillingServiceImpl implements CalBillingService{
     private BigDecimal getIncrAmount(String tenantId, Date date,String type){
         BigDecimal incrAmount;
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String rechargeStr = redisCacheService.get(type + "_" + tenantId + "_" + dateStr);
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+
+        Object rechargeObj = hashOps.get(type);
+        String rechargeStr = rechargeObj == null?null:rechargeObj.toString();
         if(StringUtils.isBlank(rechargeStr)){
             incrAmount = new BigDecimal(0);
         }else{
@@ -160,12 +165,12 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public void incRecharge(String tenantId,Date date,BigDecimal amount){
-        incAmount(tenantId,date,amount,ADD_BALANCE_PREFIX);
+        incAmount(tenantId,date,amount, ADD_BALANCE_FIELD);
     }
 
     @Override
     public void incConsume(String tenantId,Date date,BigDecimal amount){
-        incAmount(tenantId,date,amount,USE_BALANCE_PREFIX);
+        incAmount(tenantId,date,amount, USE_BALANCE_FIELD);
     }
 
     /**
@@ -176,11 +181,15 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @param type 类型（充值或消费的key前缀）
      */
     private void incAmount(String tenantId,Date date,BigDecimal amount,String type){
+        if(amount == null){
+            return;
+        }
         //以long型存金额的增量，真实金额=redis中的金额/10000
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String key = type + "_" + tenantId + "_" + dateStr;
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
         long l = amount.multiply(new BigDecimal(AMOUNT_REDIS_MULTIPLE)).setScale(0, BigDecimal.ROUND_HALF_UP).longValue();
-        long result = redisCacheService.incrBy(key, l);
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Long result = hashOps.increment(type, l);
         if(result == l){
             redisCacheService.expire(key,5 * 24 * 60 * 60);
         }
@@ -253,7 +262,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseConference(String tenantId, Date date){
-        return getIncrLong(tenantId,date, USE_CONFERENCE_PREFIX);
+        return getIncrLong(tenantId,date, USE_CONFERENCE_FIELD);
     }
 
     /**
@@ -263,7 +272,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddConference(String tenantId, Date date){
-        return getIncrLong(tenantId,date,ADD_CONFERENCE_PREFIX);
+        return getIncrLong(tenantId,date, ADD_CONFERENCE_FIELD);
     }
 
     /**
@@ -276,23 +285,26 @@ public class CalBillingServiceImpl implements CalBillingService{
     private Long getIncrLong(String tenantId, Date date,String type){
         Long time;
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String conferenceStr = redisCacheService.get(type + "_" + tenantId + "_" + dateStr);
-        if(StringUtils.isBlank(conferenceStr)){
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Object incrLongObj = hashOps.get(type);
+        String incrLongStr = incrLongObj == null?null:incrLongObj.toString();
+        if(StringUtils.isBlank(incrLongStr)){
             time = 0L;
         }else{
-            time = Long.parseLong(conferenceStr);
+            time = Long.parseLong(incrLongStr);
         }
         return time;
     }
 
     @Override
     public void incAddConference(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time,ADD_CONFERENCE_PREFIX);
+        incLong(tenantId,date,time, ADD_CONFERENCE_FIELD);
     }
 
     @Override
     public void incUseConference(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time, USE_CONFERENCE_PREFIX);
+        incLong(tenantId,date,time, USE_CONFERENCE_FIELD);
     }
 
     /**
@@ -303,9 +315,13 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @param type 类型（购买或消费的key前缀）
      */
     private void incLong(String tenantId,Date date,Long l,String type){
+        if(l == null){
+            return;
+        }
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String key = type + "_" + tenantId + "_" + dateStr;
-        long result = redisCacheService.incrBy(key, l);
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Long result = hashOps.increment(type, l);
         if(result == l){
             redisCacheService.expire(key,5 * 24 * 60 * 60);
         }
@@ -378,7 +394,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseVoice(String tenantId, Date date){
-        return getIncrLong(tenantId,date,USE_VOICE_PREFIX);
+        return getIncrLong(tenantId,date, USE_VOICE_FIELD);
     }
 
     /**
@@ -388,17 +404,17 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddVoice(String tenantId, Date date){
-        return getIncrLong(tenantId,date,ADD_VOICE_PREFIX);
+        return getIncrLong(tenantId,date, ADD_VOICE_FIELD);
     }
 
     @Override
     public void incAddVoice(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time,ADD_VOICE_PREFIX);
+        incLong(tenantId,date,time, ADD_VOICE_FIELD);
     }
 
     @Override
     public void incUseVoice(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time, USE_VOICE_PREFIX);
+        incLong(tenantId,date,time, USE_VOICE_FIELD);
     }
 
 
@@ -469,7 +485,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseSms(String tenantId, Date date){
-        return getIncrLong(tenantId,date, USE_SMS_PREFIX);
+        return getIncrLong(tenantId,date, USE_SMS_FIELD);
     }
 
     /**
@@ -479,18 +495,18 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddSms(String tenantId, Date date){
-        return getIncrLong(tenantId,date,ADD_SMS_PREFIX);
+        return getIncrLong(tenantId,date, ADD_SMS_FIELD);
     }
 
     @Override
     public void incAddSms(String tenantId,Date date,Long num){
-        incLong(tenantId,date,num,ADD_SMS_PREFIX);
+        incLong(tenantId,date,num, ADD_SMS_FIELD);
     }
 
 
     @Override
     public void incUseSms(String tenantId,Date date,Long num){
-        incLong(tenantId,date,num, USE_SMS_PREFIX);
+        incLong(tenantId,date,num, USE_SMS_FIELD);
     }
 
 
@@ -561,7 +577,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseFsize(String tenantId, Date date){
-        return getIncrLong(tenantId,date, USE_FSIZE_PREFIX);
+        return getIncrLong(tenantId,date, USE_FSIZE_FIELD);
     }
 
     /**
@@ -571,18 +587,18 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddFsize(String tenantId, Date date){
-        return getIncrLong(tenantId,date, ADD_FSIZE_PREFIX);
+        return getIncrLong(tenantId,date, ADD_FSIZE_FIELD);
     }
 
     @Override
     public void incAddFsize(String tenantId, Date date, Long size){
-        incLong(tenantId,date,size, ADD_FSIZE_PREFIX);
+        incLong(tenantId,date,size, ADD_FSIZE_FIELD);
     }
 
 
     @Override
     public void incUseFsize(String tenantId, Date date, Long size){
-        incLong(tenantId,date,size, USE_FSIZE_PREFIX);
+        incLong(tenantId,date,size, USE_FSIZE_FIELD);
     }
 
 
@@ -618,33 +634,33 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public void incCallConnect(String tenantId, Date date) {
-        incLong(tenantId,date,1L, CALL_CONNECT_PREFIX);
+        incLong(tenantId,date,1L, CALL_CONNECT_FIELD);
     }
 
     @Override
     public Long getCallConnectByDate(String tenantId, Date date) {
-        return getIncrLong(tenantId,date, CALL_CONNECT_PREFIX);
+        return getIncrLong(tenantId,date, CALL_CONNECT_FIELD);
     }
 
 
     @Override
     public void incCallSum(String tenantId, Date date) {
-        incLong(tenantId,date,1L, CALL_SUM_PREFIX);
+        incLong(tenantId,date,1L, CALL_SUM_FIELD);
     }
 
     @Override
     public Long getCallSumByDate(String tenantId, Date date) {
-        return getIncrLong(tenantId,date, CALL_SUM_PREFIX);
+        return getIncrLong(tenantId,date, CALL_SUM_FIELD);
     }
 
     @Override
     public void incCallCostTime(String tenantId, Date date,Long costTimeLong) {
-        incLong(tenantId,date,costTimeLong, CALL_COST_TIME_PREFIX);
+        incLong(tenantId,date,costTimeLong, CALL_COST_TIME_FIELD);
     }
 
     @Override
     public Long getCallCostTimeByDate(String tenantId, Date date) {
-        return getIncrLong(tenantId,date, CALL_COST_TIME_PREFIX);
+        return getIncrLong(tenantId,date, CALL_COST_TIME_FIELD);
     }
 
     @Override
