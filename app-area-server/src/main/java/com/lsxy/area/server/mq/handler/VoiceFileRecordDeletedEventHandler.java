@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.portal.VoiceFilePlayDeleteEvent;
 import com.lsxy.framework.oss.OSSService;
@@ -74,13 +73,12 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
             return ;
         }
         //获取全局时间
+        int globalTime = 7;
         GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
         Matcher matcher = pattern.matcher(globalConfig.getValue());
-        if(!matcher.matches()){
-            //配置不是正整数则结束
-            return;
+        if(matcher.matches()){
+            globalTime = Integer.valueOf(globalConfig.getValue());
         }
-        int globalTime = Integer.valueOf(globalConfig.getValue());
         //遍历全部用户
         for(int i=0;i<tenants.size();i++) {
             Tenant tenant1 = tenants.get(i);
@@ -102,8 +100,6 @@ public class VoiceFileRecordDeletedEventHandler implements MQMessageHandler<Voic
                             temp.setOssDeleted(VoiceFilePlay.DELETED_FAIL);
                         }
                     }
-                    //标识文件记录需要删除
-                    temp.setIsDeleted(VoiceFileRecord.IS_DELETED_TRUE);
                     voiceFileRecordService.save(temp);
                     try {
                         voiceFileRecordService.delete(temp);

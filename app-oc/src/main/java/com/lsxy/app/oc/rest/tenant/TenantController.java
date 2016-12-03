@@ -27,6 +27,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.AreaSip;
+import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -69,7 +70,8 @@ public class TenantController {
     public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Autowired
     private TenantService tenantService;
-
+    @Autowired
+    private TenantConfigService tenantConfigService;
     @Autowired
     private AccountService accountService;
 
@@ -800,6 +802,14 @@ public class TenantController {
         }else{
             vo.setSipRegistrar("");
         }
+        int re = tenantConfigService.getRecordingTimeByTenantIdAndAppId(app.getTenant().getId(),app.getId());
+        String temp = "";
+        if(re==7){
+            temp="7天免费存储";
+        }else if(re%30==0){
+            temp = (re/30)+"个月";
+        }
+        vo.setRecordingTime( temp);
         return RestResponse.success(vo);
     }
     @ApiOperation(value = "获取租户的app信息下的分机")

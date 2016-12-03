@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_voice_file_record")
 public class VoiceFileRecord extends IdEntity {
+    public static final String[] types = new String[]{"语音回拔","自定义IVR","语音会议","呼叫中心"};
     public final static int IS_DELETED_TRUE = 1;
     private String tenantId;//所属租户
     private String appId;//所属应用
@@ -32,15 +33,6 @@ public class VoiceFileRecord extends IdEntity {
     private BigDecimal cost;//消费金额
     private Long callTimeLong;//呼叫时长
     private Long costTimeLong;//计费时长
-    private Integer isDeleted;//是否需要做删除
-    @Column(name="is_deleted")
-    public Integer getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Integer isDeleted) {
-        this.isDeleted = isDeleted;
-    }
     @Column(name="cost")
     public BigDecimal getCost() {
         return cost;

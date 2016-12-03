@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.model.Billing;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -80,6 +82,8 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     AppService appService;
     @Autowired
     VoiceFileRecordService voiceFileRecordService;
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     @Override
     public Page<ResourcesRent> pageListByTenantId(String userName,int pageNo, int pageSize)   {
         Tenant tenant = null;
@@ -147,8 +151,36 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     public void monthlyRentTask() {
         resourcesRentTask();
         recordingVoiceFileTask();
+        agentMonthTask();
     }
+    private void agentMonthTask(){
+        Date curTime = new Date();
+        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.DAY_OF_MONTH,-timeLong);
+        cal.set(Calendar.HOUR_OF_DAY, 0);//时
+        cal.set(Calendar.MINUTE, 0);//分
+        cal.set(Calendar.SECOND, 0);//秒
+        cal.set(Calendar.MILLISECOND,0);//毫秒
+        //获取删除时间
+        Date endTime =  cal.getTime();
+        cal.add(Calendar.MONTH, -1);// 月份减1
+        Date startTime = cal.getTime();
+        List<Tenant> tenants = tenantService.getListByPage();
+        for(int i=0;i<tenants.size();i++){
+            List<App> apps = appService.getAppsByTenantId(tenants.get(i).getId());
+            for(int j=0;j<apps.size();j++){
+                long sum =  sumAgentNum(tenants.get(i).getId(),apps.get(j).getId(),startTime,endTime);
+                BigDecimal cost = calCostService.calCost(ProductCode.call_center_month.getApiCmd(),tenants.get(i).getId());
+                Consume consume = new Consume(new Date(), ConsumeCode.call_center_month.name(),cost.multiply(new BigDecimal(sum)),"应用id["+apps.get(j).getId()+"]总共有"+sum+"个坐席",apps.get(j).getId(),tenants.get(i));
+                consumeService.consume(consume);
+            }
+        }
 
+    }
+    public long sumAgentNum(String tenantId, String appId, Date startTime, Date endTime) {
+        String sql = " select count(1) from (select DISTINCT channel,name  from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_action_log where tenant_id=? and app_id and  action=1 and create_time BETWEEN ? and ? ) a" ;
+        return jdbcTemplate.queryForObject(sql,Long.class,tenantId,appId,startTime,endTime);
+    }
     @Override
     public void resourcesRentTask(){
         Date curTime = new Date();
@@ -185,46 +217,56 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
 
     @Override
     public void recordingVoiceFileTask() {
+        int globalRecording = 7;
+        Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
         GlobalConfig globalConfig = globalConfigService.findByTypeAndName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
-        if(globalConfig!=null&&StringUtils.isNotEmpty(globalConfig.getValue())){
+        if(globalConfig!=null&&StringUtils.isNotEmpty(globalConfig.getValue())) {
             //全局录音文件存储时长时间
-            Pattern pattern = Pattern.compile("^[0-9]*[1-9][0-9]*$");
-    	    Matcher matcher = pattern.matcher(globalConfig.getValue());
-            if(!matcher.matches()){
-                //配置不是正整数则结束
-                return;
+            Matcher matcher = pattern.matcher(globalConfig.getValue());
+            if (matcher.matches()) {
+                globalRecording = Integer.valueOf(globalConfig.getValue());
             }
-            int globalRecording = Integer.valueOf(globalConfig.getValue());
-            List<TenantConfig> list = tenantConfigService.getPageByTypeAndKeyName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
-            for(int i=0;i<list.size();i++){
-                TenantConfig tenantConfig = list.get(i);
-                if(StringUtils.isNotEmpty(tenantConfig.getValue())&&StringUtils.isNotEmpty(tenantConfig.getTenantId())&&StringUtils.isNotEmpty(tenantConfig.getAppId())){
-                    int tenantRecording = 0;
-                    Matcher matcher1 = pattern.matcher(globalConfig.getValue());
-                    if(matcher1.matches()){
-                        tenantRecording = Integer.valueOf(tenantConfig.getValue());
-                    }
-                    //全局配置的录音文件存储时间不收费，租户的应用下的配置如果大于全局配置的话需要收费
-                    if(tenantRecording>globalRecording){
-                        Tenant tenant = tenantService.findById(tenantConfig.getTenantId());
-                        App app = appService.findById(tenantConfig.getAppId());
-                        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.getApiCmd(),tenant.getId());
-                        if(tenant!=null&&app!=null){
-                            //获取租户应用下的录音文件 isDeleted
-                            long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
-                            long g = 1024*1024*1024;
-                            if(size>0) {
-                                long s1 = (size / g) + (g % g > 0 ? 1 : 0);
-                                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),cost.multiply(new BigDecimal(s1)),ConsumeCode.recording_memory.getName(),app.getId(),tenant);
-                                consumeService.consume(consume);
-                            }
-                        }
-                    }
+        }
+        List<TenantConfig> list = tenantConfigService.getPageByTypeAndKeyName(GlobalConfig.TYPE_RECORDING,GlobalConfig.KEY_RECORDING);
+        for(int i=0;i<list.size();i++){
+            TenantConfig tenantConfig = list.get(i);
+            if(StringUtils.isNotEmpty(tenantConfig.getValue())&&StringUtils.isNotEmpty(tenantConfig.getTenantId())&&StringUtils.isNotEmpty(tenantConfig.getAppId())){
+                int tenantRecording = 0;
+                Matcher matcher1 = pattern.matcher(tenantConfig.getValue());
+                if(matcher1.matches()){
+                    tenantRecording = Integer.valueOf(tenantConfig.getValue());
+                }
+                //全局配置的录音文件存储时间不收费，租户的应用下的配置如果大于全局配置的话需要收费
+                if(tenantRecording>globalRecording){
+                    recordCost(tenantConfig.getTenantId(),tenantConfig.getAppId());
                 }
             }
         }
-    }
 
+    }
+    @Override
+    public boolean recordCost(String tenantId,String appId){
+        boolean flag = true;
+        Tenant tenant = tenantService.findById(tenantId);
+        App app = appService.findById(appId);
+        BigDecimal cost = calCostService.calCost(ProductCode.recording_memory.getApiCmd(),tenant.getId());
+        if(tenant!=null&&app!=null){
+            //获取租户应用下的录音文件 isDeleted
+            long size = voiceFileRecordService.getSumSize(tenant.getId(),app.getId());
+            long g = 1024*1024*1024;
+            if(size>0) {
+                long s1 = (size / g) + (g % g > 0 ? 1 : 0);
+                BigDecimal temp = cost.multiply(new BigDecimal(s1));
+                Billing billing = calBillingService.getCalBilling(tenant.getId());
+                if(billing.getBalance().compareTo(temp)==-1) {
+                    flag = false;
+                }
+                Consume consume = new Consume(new Date(), ConsumeCode.recording_memory.name(),temp,ConsumeCode.recording_memory.getName(),app.getId(),tenant);
+                consumeService.consume(consume);
+            }
+        }
+        return flag;
+    }
     @Override
     public List<ResourcesRent> findByTenantId(String tenantId) {
         List<Integer> status = Arrays.asList(1, 2);

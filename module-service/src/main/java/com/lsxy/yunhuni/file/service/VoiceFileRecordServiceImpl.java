@@ -37,7 +37,7 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
 
     @Override
     public long getSumSize(String tenant, String app) {
-        String sql = "select IFNULL(sum(size),0) from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and is_deleted<>1 and tenant_id=? and app_id=?";
+        String sql = "select IFNULL(sum(size),0) from db_lsxy_bi_yunhuni.tb_bi_voice_file_record where deleted=0 and tenant_id=? and app_id=?";
         return jdbcTemplate.queryForObject(sql,Long.class,tenant,app);
     }
 
@@ -58,7 +58,20 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            sql+="AND b.type like '%"+ ProductCode.getApiCmdByRemark(type)+"%'";
+            String[] types = ProductCode.getApiCmdByRemark(type);
+            if(types.length==1){
+                sql+="AND b.type = '"+types[0]+"'";
+            }else {
+                String temp = " (";
+                for (int i = 0; i < types.length; i++) {
+                    temp+= "'"+types[i]+"'";
+                    if(i!=types.length-1){
+                        temp+=",";
+                    }
+                }
+                temp+=") ";
+                sql+="AND b.type in "+temp+"";
+            }
         }
         if(start!=null&&end!=null){
             sql+="AND b.time BETWEEN ? AND ? ";
@@ -109,7 +122,20 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             sql+=" AND b.tenantId='"+tenantId+"'";
         }
         if(StringUtils.isNotEmpty(type)){
-            sql+="AND b.type like '%"+ ProductCode.getApiCmdByRemark(type)+"%'";
+            String[] types = ProductCode.getApiCmdByRemark(type);
+            if(types.length==1){
+                sql+="AND b.type = '"+types[0]+"'";
+            }else {
+                String temp = " (";
+                for (int i = 0; i < types.length; i++) {
+                    temp+= "'"+types[i]+"'";
+                    if(i!=types.length-1){
+                        temp+=",";
+                    }
+                }
+                temp+=") ";
+                sql+="AND b.type in "+temp+"";
+            }
         }
         if(start!=null&&end!=null){
             sql+="AND b.time BETWEEN ? AND ? ";
@@ -141,19 +167,6 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
             temp = fmt.format(size)+"B";
         }
         return temp;
-    }
-    @Override
-    public int batchDelete(String appid, String tenantId, Date startTime, Date endTime) {
-        String sql = "update db_lsxy_bi_yunhuni.tb_bi_voice_file_record set deleted=1 where  deleted=0 and app_id=? and tenant_id=? and create_time<=? and create_time>=?";
-        int result = jdbcTemplate.update(sql,appid,tenantId,endTime,startTime);
-        return result;
-    }
-
-    @Override
-    public List<VoiceFileRecord> getList(String appid, String tenantId, Date startTime, Date endTime) {
-        String hql = " from VoiceFileRecord obj where obj.appId=?1 and obj.tenantId=?2 and obj.createTime<=?3 and obj.createTime>=?4";
-        List<VoiceFileRecord> list = this.list(hql,appid,tenantId,endTime,startTime);
-        return list;
     }
 
     @Override
@@ -187,6 +200,19 @@ public class VoiceFileRecordServiceImpl extends AbstractService<VoiceFileRecord>
     public List<String> getAAAreaByCreateTimeAndTenantId(Date createTime, String tenantId) {
         String sql = " SELECT DISTINCT area_id FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE tenant_id= ? AND create_time <=? AND aa_deleted<>1 ";
         List<String> list = jdbcTemplate.queryForList(sql,String.class,tenantId,createTime);
+        return list;
+    }
+    @Override
+    public List<VoiceFileRecord> getListByTenantAndAppAndCreateTime(String tenant, String app, Date createTime) {
+        String hql = " FROM VoiceFileRecord obj WHERE obj.tenantId=?1 AND obj.appId=?2 AND obj.createTime<=?3";
+        List list = this.list(hql, tenant,app,createTime);
+        return list;
+    }
+
+    @Override
+    public List<Map> getOssListByDeleted() {
+        String sql = " SELECT id as id ,file_key as ossUrl FROM db_lsxy_bi_yunhuni.tb_bi_voice_file_record WHERE deleted=1 and sync==1 and file_key is not null and file_key<>'' and (oss_deleted is null or oss_deleted<>1)";
+        List<Map> list = jdbcTemplate.queryForList(sql,Map.class);
         return list;
     }
 }

@@ -29,7 +29,7 @@ public class MonthlyRentTask {
     /**
      * 每天执行，有钱就扣
      */
-    @Scheduled(cron="0 30 0 * * ?")
+    @Scheduled(cron="4 30 0 * * ?")
     public void monthlyRentTask(){
         Date date=new Date();
         String day = DateUtils.formatDate(date, "yyyy-MM-dd");

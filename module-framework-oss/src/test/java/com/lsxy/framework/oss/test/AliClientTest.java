@@ -1,5 +1,6 @@
 package com.lsxy.framework.oss.test;
 
+import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.oss.FrameworkOSSConfig;
 import com.lsxy.framework.oss.OSSService;
 import org.junit.Test;
@@ -81,5 +82,13 @@ public class AliClientTest {
         String fileKey = "images/cc22004.png";
         String repository="yunhuni-development";
         this.ossService.deleteObject(repository,fileKey);
+    }
+    @Test
+    public void testUploadFileLocal() throws Exception {
+        String ossUri = "images/cc22004.png";
+        String repository="yunhuni-development";
+        String destFile = "d:/cc.png";
+        String fileName = UUIDGenerator.uuid() + ".zip";
+        ossService.uploadFileLocal(new File(destFile), repository, ossUri, "application/octet-stream", fileName);
     }
 }

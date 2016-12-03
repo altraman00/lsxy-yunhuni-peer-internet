@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +101,7 @@ public class ProductController  extends AbstractRestController {
         return RestResponse.success("禁用产品成功");
     }
 
-    @RequestMapping(value = "price/plist",method = RequestMethod.GET)
+    @RequestMapping(value = "/price/plist",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品费用分页数据")
     public RestResponse pricePList(
             @ApiParam(name = "pageNo",value = "第几页")  @RequestParam(defaultValue = "1")Integer pageNo,
@@ -114,7 +115,7 @@ public class ProductController  extends AbstractRestController {
         Page page1 = new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),tempList);
         return RestResponse.success(page1);
     }
-    @RequestMapping(value = "price/{id}",method = RequestMethod.GET)
+    @RequestMapping(value = "/price/{id}",method = RequestMethod.GET)
     @ApiOperation(value = "获取产品费用单调记录")
     public RestResponse priceOne(
             @ApiParam(name = "id",value = "费用记录id")  @PathVariable String  id
@@ -126,7 +127,7 @@ public class ProductController  extends AbstractRestController {
         ProductVo productVo = new ProductVo(price);
         return RestResponse.success(productVo);
     }
-    @RequestMapping(value = "price/edit/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value = "/price/edit/{id}",method = RequestMethod.PUT)
     @ApiOperation(value = "修改产品费用")
     public RestResponse priceEdit(
             @ApiParam(name = "id",value = "费用记录id")  @PathVariable String  id,@RequestBody ProductEditVo productEditVo
@@ -139,24 +140,29 @@ public class ProductController  extends AbstractRestController {
         if(StringUtils.isNotEmpty(productEditVo.getPriceItem())){
             productItem.setName(productEditVo.getPriceItem());
         }
-        PriceType priceType = PriceType.getPriceTypeById(productEditVo.getUnit());
-        if(priceType==null){
-
-        }else if(priceType.getCalType()!=productItem.getCalType()){
-            return RestResponse.failed("0000","计价单位错误");
-        }else {
-            if (productEditVo.getPrice() != null) {
-                price.setPrice(productEditVo.getPrice());
+        PriceType priceType = null;
+        if(StringUtils.isNotEmpty(productEditVo.getUnit())){
+            priceType = PriceType.getPriceTypeById(productEditVo.getUnit());
+            if(priceType==null){
+                return RestResponse.failed("0000", "计价单位错误");
+            }else if(priceType.getCalType()!=productItem.getCalType()) {
+                return RestResponse.failed("0000", "计价单位错误");
             }
-            if (priceType.getTimeUnit() != null) {
-                price.setTimeUnit(priceType.getTimeUnit());
-            }
-            if (StringUtils.isNotEmpty(priceType.getUnit())) {
-                price.setUnit(priceType.getUnit());
-            }
-            productItemService.save(productItem);
-            productPriceService.save(price);
         }
+        if (productEditVo.getPrice() != null&&productEditVo.getPrice().compareTo(new BigDecimal(0))!=-1) {
+            price.setPrice(productEditVo.getPrice());
+        }else{
+            return RestResponse.failed("0000", "价格错误");
+        }
+        if (priceType!=null&&priceType.getTimeUnit() != null&&StringUtils.isNotEmpty(priceType.getUnit())) {
+            price.setTimeUnit(priceType.getTimeUnit());
+            price.setUnit(priceType.getUnit());
+        }else{
+            return RestResponse.failed("0000", "计价单位错误");
+        }
+        productItem = productItemService.save(productItem);
+        price.setProductItem(productItem);
+        productPriceService.save(price);
         return RestResponse.success("修改成功");
     }
     @RequestMapping(value = "/discount/plist/{id}",method = RequestMethod.GET)
