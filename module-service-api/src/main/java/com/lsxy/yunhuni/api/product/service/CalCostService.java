@@ -14,12 +14,12 @@ import java.util.Date;
 public interface CalCostService {
     /**
      * 计算消费金额
-     * @param product
+     * @param productItem
      * @param tenantId
      * @param time
      * @return
      */
-    BigDecimal calCost(ProductItem product, String tenantId, Long time);
+    BigDecimal calCost(ProductItem productItem, String tenantId, Long time);
     BigDecimal calCost(String code, String tenantId);
     /**
      * 消费计算金额及插入消费表，或插入扣量表

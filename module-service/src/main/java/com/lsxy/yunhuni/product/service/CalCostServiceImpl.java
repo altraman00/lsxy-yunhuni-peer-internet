@@ -46,11 +46,11 @@ public class CalCostServiceImpl implements CalCostService{
     ProductItemService productItemService;
 
     @Override
-    public BigDecimal calCost(ProductItem product, String tenantId, Long time) {
+    public BigDecimal calCost(ProductItem productItem, String tenantId, Long time) {
         BigDecimal cost;
-        ProductPrice productPrice = productPriceService.getAvailableProductPrice(product.getId());
-        Double discount = productTenantDiscountService.getDiscountByProductIdAndTenantId(product.getId(), tenantId);
-        if(product.getCalType() == Product.CAL_TYPE_NUM){
+        ProductPrice productPrice = productPriceService.getAvailableProductPrice(productItem.getId());
+        Double discount = productTenantDiscountService.getDiscountByProductIdAndTenantId(productItem.getId(), tenantId);
+        if(productItem.getCalType() == Product.CAL_TYPE_NUM){
             //如果是计量，则只需单价*折扣
             cost = productPrice.getPrice().multiply(new BigDecimal(Double.toString(discount)));
         }else{
