@@ -33,7 +33,7 @@ import java.util.List;
 @Service
 public class AppServiceImpl extends AbstractService<App> implements AppService {
     private static final String APP_CC_NUM_KEY = "APP_CC_NUM";  //存在redis中的呼叫中心应用自增编号key，以hash来存
-    private static final String APP_CC_NUM_FIELD5 = "FIELD5 ";  //5位编号
+    private static final String APP_CC_NUM_FIELD5 = "FIELD5";  //5位编号
     private static final String APP_CC_NUM_FIELD6 = "FIELD6";   //6位编号
     private static final String APP_CC_NUM_FIELD7 = "FIELD7";   //7位编号
 
