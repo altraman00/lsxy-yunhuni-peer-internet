@@ -64,6 +64,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
         ExecutorService executorService = Executors.newFixedThreadPool(50);
         List<Future> results = new ArrayList<>();
         for(Tenant tenant:tenants){
+//            this.statisticsTenantAndApp(statisticsDate, tenant);
             results.add(executorService.submit(() -> this.statisticsTenantAndApp(statisticsDate, tenant)));
         }
         for(Future f : results){
@@ -90,7 +91,7 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
             tenantStatistics = new CallCenterStatistics(tenant.getId(),null,dt, 0L, 0L,0L,0L,0L,0L,0L,0L);
             tenantStatistics(tenantStatistics,statisticsDate);
         }
-        List<App> apps = appService.getAppsByTenantId(tenant.getId());
+        List<App> apps = appService.findAppByTenantIdAndServiceType(tenant.getId(),App.PRODUCT_CALL_CENTER);
         for(App app:apps){
             CallCenterStatistics appStatistics = callCenterStatisticsDao.findFirstByAppIdOrderByDtDesc(app.getId());
             if(appStatistics != null){
@@ -137,8 +138,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
             Date startDate =  DateUtils.nextDate(lastStatisticsDate);
             Date endDate = DateUtils.nextDate(startDate);
             // 获取统计日期内的数据
-            CallCenterStatistics statistics = statistics(null, appId, startDate, endDate);
-            CallCenterStatistics current = new CallCenterStatistics(tenantId,null,startDate,
+            CallCenterStatistics statistics = statistics(tenantId, appId, startDate, endDate);
+            CallCenterStatistics current = new CallCenterStatistics(tenantId,appId,startDate,
                     lastStatistics.getCallIn() + statistics.getCallIn(),
                     lastStatistics.getCallInSuccess() + statistics.getCallInSuccess(),
                     lastStatistics.getCallOut() + statistics.getCallOut(),

@@ -13,9 +13,6 @@ import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppOnlineActionService;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.Area;
-import com.lsxy.yunhuni.api.config.model.AreaSip;
-import com.lsxy.yunhuni.api.config.service.AreaSipService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import com.lsxy.yunhuni.api.file.service.VoiceFilePlayService;
 import org.apache.commons.lang.StringUtils;
@@ -70,7 +67,7 @@ public class AppController extends AbstractRestController {
     public RestResponse listApp(String serviceType) throws Exception{
         List<App> apps = null;
         if(StringUtils.isNotEmpty(serviceType)) {
-            apps = appService.findAppByUserNameAndServiceType(getCurrentAccount().getTenant().getId(),serviceType);
+            apps = appService.findAppByTenantIdAndServiceType(getCurrentAccount().getTenant().getId(),serviceType);
         }else{
             apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
         }

@@ -12,6 +12,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +58,8 @@ public class CalCostTest {
 
     @Autowired
     AppService appService;
+    @Autowired
+    CallCenterStatisticsService callCenterStatisticsService;
 
     @Test
     public void testCalCost(){
@@ -136,6 +139,12 @@ public class CalCostTest {
 //        app.setIsIvrService(1);
 //        app.setId("8a2bc5f65721aa160157222c8477000b");
 //        appService.findDialingTelnumber(app);
+    }
+
+    @Test
+    public void testStaticCC(){
+        Date preDate = DateUtils.getPreDate(new Date());
+        callCenterStatisticsService.dayStatistics(preDate);
     }
 
 }

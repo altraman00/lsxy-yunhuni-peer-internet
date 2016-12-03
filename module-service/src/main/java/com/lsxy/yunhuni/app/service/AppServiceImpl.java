@@ -73,7 +73,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    public List<App> findAppByUserNameAndServiceType(String tenantId, String serviceType) {
+    public List<App> findAppByTenantIdAndServiceType(String tenantId, String serviceType) {
         String hql = "from App obj where obj.tenant.id=?1 and obj.serviceType=?2 order by obj.status";
         List<App> list = this.findByCustomWithParams(hql, tenantId,serviceType);
 
