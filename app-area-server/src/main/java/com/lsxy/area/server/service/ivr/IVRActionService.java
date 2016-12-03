@@ -1,12 +1,16 @@
 package com.lsxy.area.server.service.ivr;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
+import com.lsxy.area.server.service.ivr.handler.HangupActionHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -78,6 +82,18 @@ public class IVRActionService {
 
     public static final int MAX_DURATION_SEC = 60 * 60 * 6;
 
+    /**等待应答标记**/
+    public static final String IVR_ANSWER_WAITTING_FIELD = "IVR_ANSWER_WAITTING";
+
+    /**IVR呼入执行ivr动作前，会自动应答，所以保存ivr动作xml一次，应答后自动执行动作**/
+    public static final String IVR_ANSWER_AFTER_XML_FIELD = "IVR_ANSWER_AFTER_XML";
+
+    /**IVR当前执行的action**/
+    public static final String IVR_ACTION_FIELD ="IVR_ACTION";
+
+    /**IVR下一步的url**/
+    public static final String IVR_NEXT_FIELD = "IVR_NEXT";
+
     //设置请求和传输超时时间
     private RequestConfig config =
             RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
@@ -114,6 +130,9 @@ public class IVRActionService {
 
     @Autowired
     private ConversationService conversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterService callCenterService;
 
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
@@ -161,62 +180,22 @@ public class IVRActionService {
     }
 
     /**
-     * 调用接口询问是否接受该呼叫
-     * @param url
-     * @param from
-     * @return
-     */
-    public boolean getAcceptRequest(final String url,final String call_id, final String from){
-        boolean res = false;
-        boolean success = false;
-        int re_times = 0;
-        do{
-            try{
-                HttpPost post = new HttpPost(url);
-                Map<String,Object> data = new HashMap<>();
-                data.put("action","ivr_incoming");
-                data.put("from",from);
-                data.put("call_id",call_id);
-                post.setConfig(config);
-                post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
-                StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
-                post.setEntity(se);
-                post.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
-                Future<HttpResponse> future = client.execute(post,null);
-                HttpResponse response = future.get();
-                if(logger.isDebugEnabled()){
-                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
-                }
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    String result = receiveResponse(response);
-                    if(result!=null && result.equalsIgnoreCase("accept")){
-                        res=true;
-                    }
-                    success = true;
-                }
-            }catch (Throwable t){
-                logger.error("调用{}失败",url);
-            }
-            re_times++;
-        }while (!success && re_times<=RETRY_TIMES);
-        return res;
-    }
-
-    /**
      * 调用接口询问ivr第一步干嘛
      * @param url
      * @return
      */
-    public String getFirstIvr(final String call_id,final String url){
+    public String getFirstIvr(final String call_id,final String url,String from){
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
             try{
                 HttpPost post = new HttpPost(url);
-                Map<String,Object> data = new HashMap<>();
-                data.put("action","ivr_start");
-                data.put("call_id",call_id);
+                Map<String,Object> data = new MapBuilder<String,Object>()
+                        .putIfNotEmpty("action","ivr_start")
+                        .putIfNotEmpty("call_id",call_id)
+                        .putIfNotEmpty("from",from)
+                        .build();
                 post.setConfig(config);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
@@ -269,13 +248,27 @@ public class IVRActionService {
      * @param url
      * @return
      */
-    private String getNextRequest(String call_id,String url){
+    private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
         String res = null;
         boolean success = false;
         int re_times = 0;
         do{
             try{
-                HttpGet get = new HttpGet(inputUrl(url,"call_id",call_id));
+                String target = inputUrl(url,"call_id",call_id);
+                if(prevAction != null){
+                    target = inputUrl(target,"type",prevAction);
+                }
+                if(prevResults != null && prevResults.size()>0){
+                    Set<Map.Entry<String,Object>> entries = prevResults.entrySet();
+                    for (Map.Entry<String,Object> entry : entries){
+                        String key = entry.getKey();
+                        String value = (String)entry.getValue();
+                        if(value!=null){
+                            target = inputUrl(target,key,value);
+                        }
+                    }
+                }
+                HttpGet get = new HttpGet(target);
                 get.setConfig(config);
                 get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
@@ -321,20 +314,13 @@ public class IVRActionService {
     public boolean doActionIfAccept(App app, Tenant tenant,String res_id,
                                     String from, String to,String lineId,Integer iscc){
         String call_id = UUIDGenerator.uuid();
-        boolean accept = getAcceptRequest(app.getUrl(),call_id,from);
-        if(!accept){
-            reject(app,res_id,call_id);
-        }else{
-            answer(app,res_id,call_id);
-            saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId,iscc);
-        }
+        saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId,iscc);
+        doAction(call_id,null);
         return true;
     }
 
     private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, Integer iscc){
-
         String areaId = areaAndTelNumSelector.getAreaId(app);
-
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
                 .setTenantId(tenant.getId())
@@ -345,57 +331,54 @@ public class IVRActionService {
                 .setCallBackUrl(app.getUrl())
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
-                .setBusinessData(new MapBuilder<String,Object>()
+                .setBusinessData(new MapBuilder<String,String>()
+                        //TYPE_IVR_INCOMING 才需要等待应答标记
+                        .put(IVR_ANSWER_WAITTING_FIELD,"1")
                         //incoming事件from 和 to是相反的
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
-                        .putIfNotEmpty(ConversationService.ISCC_FIELD,iscc)
+                        .putIfNotEmpty(ConversationService.ISCC_FIELD,iscc !=null ? iscc.toString():null)
                         .build())
                 .build();
-        CallSession callSession = new CallSession();
-        callSession.setStatus(CallSession.STATUS_CALLING);
-        callSession.setFromNum(to);
-        callSession.setToNum(from);
-        callSession.setApp(app);
-        callSession.setTenant(tenant);
-        callSession.setRelevanceId(call_id);
-        callSession.setType(CallSession.TYPE_VOICE_IVR);
-        callSession.setResId(state.getResId());
-        callSession = callSessionService.save(callSession);
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-            state.setBusinessData(businessData);
-        }
-        businessData.put("sessionid",callSession.getId());
         businessStateService.save(state);
-        VoiceIvr voiceIvr = new VoiceIvr();
-        voiceIvr.setId(call_id);
-        voiceIvr.setFromNum(from);
-        voiceIvr.setToNum(to);
-        voiceIvr.setStartTime(new Date());
-        voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
-        voiceIvrService.save(voiceIvr);
-    }
-
-    private void reject(App app,String res_id,String call_id){
-        String areaId = areaAndTelNumSelector.getAreaId(app);
-        Map<String, Object> params = new MapBuilder<String,Object>()
-                .put("res_id",res_id)
-                .put("user_data",call_id)
-                .put("areaId",areaId)
-                .build();
-        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_REJECT,params);
-        try {
-            rpcCaller.invoke(sessionContext, rpcrequest);
-        } catch (Throwable e) {
-            logger.error("调用失败",e);
+        try{
+            boolean isCallCenter = iscc != null && iscc == 1;
+            CallSession callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSession.setFromNum(to);
+            callSession.setToNum(from);
+            callSession.setApp(app);
+            callSession.setTenant(tenant);
+            callSession.setRelevanceId(call_id);
+            callSession.setResId(state.getResId());
+            callSession.setType(isCallCenter ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
+            callSession = callSessionService.save(callSession);
+            businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
+            if(isCallCenter){
+                CallCenter callCenter = new CallCenter();
+                callCenter.setId(call_id);
+                callCenter.setTenantId(state.getTenantId());
+                callCenter.setAppId(state.getAppId());
+                callCenter.setFromNum(from);
+                callCenter.setToNum(to);
+                callCenter.setStartTime(new Date());
+                callCenter.setType(""+CallCenter.CALL_IN);
+                callCenterService.save(callCenter);
+            }else{
+                VoiceIvr voiceIvr = new VoiceIvr();
+                voiceIvr.setId(call_id);
+                voiceIvr.setFromNum(from);
+                voiceIvr.setToNum(to);
+                voiceIvr.setStartTime(new Date());
+                voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+                voiceIvrService.save(voiceIvr);
+            }
+        }catch (Throwable t){
+            logger.error("保存callsession失败",t);
         }
-
     }
 
-    private void answer(App app,String res_id,String call_id){
-        String areaId = areaAndTelNumSelector.getAreaId(app);
+    public void answer(String res_id,String call_id,String areaId){
         Map<String, Object> params = new MapBuilder<String,Object>()
                 .put("res_id",res_id)
                 .put("max_answer_seconds",MAX_DURATION_SEC)
@@ -409,45 +392,48 @@ public class IVRActionService {
             logger.error("调用失败",e);
         }
     }
-    public boolean doAction(String call_id){
+
+    public boolean doAction(String call_id,Map<String,Object> prevResults){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
             logger.info("没有找到call_id={}的state",call_id);
             return false;
         }
 
-        if(state.getClosed()){
+        if(state.getClosed() != null && state.getClosed()){
             logger.info("IVR呼叫已关闭，call_id={}",call_id);
             return false;
         }
+        Map<String,String> businessDate = state.getBusinessData();
 
-        Map<String,Object> businessDate = state.getBusinessData();
-        if(businessDate == null){
-            businessDate = new HashMap<>();
+        //呼入,如果有IVR_ANSWER_AFTER_XML_FIELD直接执行，不需要调用next获取xml
+        if(state.getType().equals(BusinessState.TYPE_IVR_INCOMING)){
+            String ivr_action_xml = businessDate.get(IVR_ANSWER_AFTER_XML_FIELD);
+            if(StringUtil.isNotEmpty(ivr_action_xml)){
+                businessStateService.deleteInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD);
+                return handleXML(call_id,ivr_action_xml,state);
+            }
         }
-        Object nextUrl = businessDate.get("next");
-
+        String nextUrl = businessDate.get(IVR_NEXT_FIELD);
         // is "" 代表没有next，null代表第一次
-        if(nextUrl!=null && StringUtils.isBlank(nextUrl.toString())){
+        if(nextUrl!=null && StringUtils.isBlank(nextUrl)){
             logger.info("没有后续ivr动作了，call_id={}",call_id);
             hangup(state.getResId(),call_id,state.getAreaId());
             return  false;
         }
         String resXML = null;
         if(nextUrl == null){//第一次
-            String appId = state.getAppId();
-            App app = appService.findById(appId);
-            if(app == null){
-                logger.error("ivr 找不到对应的app");
-                return false;
-            }
-            resXML = getFirstIvr(call_id,app.getUrl());
+            resXML = getFirstIvr(call_id,state.getCallBackUrl(),state.getBusinessData().get("to"));
         }else{
-            resXML = getNextRequest(call_id,nextUrl.toString());
+            resXML = getNextRequest(call_id,nextUrl,businessDate.get(IVR_ACTION_FIELD),prevResults);
         }
         if(StringUtils.isBlank(resXML)){
             return false;
         }
+        return handleXML(call_id,resXML,state);
+    }
+
+    private boolean handleXML(String call_id,String resXML,BusinessState state){
         ActionHandler  h = null;
         Element root = null;
         Element actionEle = null;
@@ -461,12 +447,20 @@ public class IVRActionService {
                 logger.info("没有找到对应的ivr动作处理类");
                 return false;
             }
-            if(h.getAction().equals(EnqueueHandler.action)){
+            //呼叫中心排队
+            if(h instanceof EnqueueHandler){
                 if(!conversationService.isCC(call_id)){
                     logger.info("没有开通呼叫中心服务");
                     return false;
                 }
             }
+            //不是挂断动作且未应答，需要自动应答
+            if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
+                businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
+                answer(state.getResId(),call_id,state.getAreaId());
+                return true;
+            }
+            businessStateService.updateInnerField(call_id,IVR_ACTION_FIELD,h.getAction());
             return h.handle(call_id,actionEle,getNextUrl(root));
         } catch(DocumentException e){
             logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);

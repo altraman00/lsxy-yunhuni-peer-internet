@@ -86,7 +86,6 @@ public class ConditionTest {
             }
             String exid = UUIDGenerator.uuid();
             extensionState.setAgent(exid,agent.getId());
-            extensionState.setLastRegisterStatus(exid,200);
             extensionState.setLastRegisterTime(exid,new Date().getTime());
             extensionState.setRegisterExpires(exid,10000000);
             agentState.setExtension(agent.getId(),exid);

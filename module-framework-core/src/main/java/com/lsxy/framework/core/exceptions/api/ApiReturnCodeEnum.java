@@ -43,7 +43,10 @@ public enum ApiReturnCodeEnum {
     AgentIsBusy("080203","座席正忙"),
     ChannelNotExist("080301","通道不存在"),
     ConditionNotExist("080401","条件不存在"),
-    ConditionExpression("080402","条件表达式错误");
+    ConditionExpression("080402","条件表达式错误"),
+    ConversationNotExist("080501","交谈不存在"),
+    OutOfConversationMaxParts("080502","超过最大交谈成员数")
+    ;
 
     private String code;
     private String msg;

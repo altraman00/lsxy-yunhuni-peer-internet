@@ -109,10 +109,10 @@ public class EnQueueServiceImpl implements EnQueueService{
             queue = new CallCenterQueue();
             queue.setTenantId(tenantId);
             queue.setAppId(appId);
-            queue.setCondition(conditionId);
-            queue.setStartTime(new Date());
             //TODO 这个id 存啥
             queue.setRelevanceId("");
+            queue.setCondition(conditionId);
+            queue.setStartTime(new Date());
             queue.setNum(num);
             queue.setOriginCallId(callId);
             BaseEnQueue baseEnQueue = new BaseEnQueue();
@@ -124,7 +124,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING);
+                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE);
             if(logger.isDebugEnabled()){
                 logger.debug("排队结果:agent={}",agent);
             }
@@ -138,20 +138,11 @@ public class EnQueueServiceImpl implements EnQueueService{
                         ExtensionState.getPrefixed(),
                         ""+AgentState.REG_EXPIRE,
                         ""+System.currentTimeMillis(),
-                        AgentState.Model.STATE_IDLE);
+                        AgentState.Model.STATE_IDLE,ExtensionState.Model.ENABLE_TRUE);
                 if(StringUtil.isNotEmpty(agent_idle)){
                     lookupQueue(tenantId,appId,conditionId,agent_idle);
                 }
             }else{
-                //找到坐席修改排队状态
-                try{
-                    queue.setResult(CallCenterQueue.RESULT_SELETEED);
-                    queue.setEndTime(new Date());
-                    queue.setAgent(agent);
-                    callCenterQueueService.save(queue);
-                }catch (Throwable t){
-                    logger.info("修改排队状态失败",t);
-                }
                 try{
                     EnQueueResult result = new EnQueueResult();
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));
@@ -168,16 +159,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             }
         }catch (Throwable e){
             logger.error("排队找坐席出错",e);
-            if(queue != null && queue.getId()!=null){
-                try{
-                    queue.setResult(CallCenterQueue.RESULT_FAIL);
-                    queue.setEndTime(new Date());
-                    callCenterQueueService.save(queue);
-                }catch (Throwable t){
-                    logger.info("修改排队状态失败",t);
-                }
-            }
-            deQueueService.fail(tenantId,appId,callId,e.getMessage());
+            deQueueService.fail(tenantId,appId,callId,e.getMessage(),queue != null?queue.getId():null);
         }
     }
 
@@ -199,7 +181,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             QueueLock.getPrefixed(),CQs.getPrefixed(),
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
             AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
-            conditionId==null?"":conditionId);
+            conditionId==null?"":conditionId,ExtensionState.Model.ENABLE_TRUE);
         if(logger.isDebugEnabled()){
             logger.info("[{}][{}]坐席找排队结果agent={},queueId={}",tenantId,appId,queueId);
         }
@@ -210,14 +192,6 @@ public class EnQueueServiceImpl implements EnQueueService{
                 logger.info("[{}][{}]坐席找排队结果agent={},queue={}",tenantId,appId,queue);
             }
             if(queue != null){
-                try{
-                    queue.setResult(CallCenterQueue.RESULT_SELETEED);
-                    queue.setEndTime(new Date());
-                    queue.setAgent(agent);
-                    callCenterQueueService.save(queue);
-                }catch (Throwable t){
-                    logger.info("修改排队状态失败",t);
-                }
                 try{
                     EnQueueResult result = new EnQueueResult();
                     result.setExtension(appExtensionService.findById(agentState.getExtension(agent)));

@@ -103,7 +103,6 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
         }
-        Map<String,Object> businessData = state.getBusinessData();
         if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
                 BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
                 (BusinessState.TYPE_IVR_INCOMING.equals(state.getType())
@@ -117,10 +116,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     public void conversation(BusinessState state,String call_id){
         String appId = state.getAppId();
-        Map<String,Object> businessData = state.getBusinessData();
+        Map<String,String> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
-            conversation_id = (String)businessData.get(ConversationService.CONVERSATION_FIELD);
+            conversation_id = businessData.get(ConversationService.CONVERSATION_FIELD);
         }
         if(StringUtils.isBlank(conversation_id)){
             throw new InvalidParamException("没有找到对应的交谈信息callid={},conversationid={}",call_id,conversation_id);
@@ -133,10 +132,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
     public void conf(BusinessState state,String call_id){
         String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
+        Map<String,String> businessData = state.getBusinessData();
         String conf_id = null;
         if(businessData!=null){
-            conf_id = (String)businessData.get("conf_id");
+            conf_id = businessData.get("conf_id");
         }
         if(StringUtils.isBlank(conf_id)){
             throw new InvalidParamException("没有找到对应的会议信息callid={},confid={}",call_id,conf_id);
@@ -146,10 +145,10 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
 
         Meeting meeting = meetingService.findById(conf_id);
         if(meeting!=null){
-            String callSessionId = (String)businessData.get("sessionid");
+            String callSessionId = businessData.get(BusinessState.SESSIONID);
             MeetingMember meetingMember = new MeetingMember();
             meetingMember.setId(call_id);
-            meetingMember.setNumber((String)businessData.get("to"));
+            meetingMember.setNumber(businessData.get("to"));
             meetingMember.setJoinTime(new Date());
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);

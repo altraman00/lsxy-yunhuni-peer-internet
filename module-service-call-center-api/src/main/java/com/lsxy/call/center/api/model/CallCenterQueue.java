@@ -17,13 +17,18 @@ import java.util.Date;
 public class CallCenterQueue extends IdEntity {
     public static final String RESULT_FAIL = "fail";
     public static final String RESULT_SELETEED = "selected";
+    public static final String RESULT_DIAL_SUCC = "dail_succ";
+    public static final String RESULT_DIAL_FAIL = "dial_fail";
+
     private String tenantId;
     private String appId;
     private String condition;
     private String relevanceId;
     private Date startTime;
     private Date inviteTime;
+    private Date dialTime;
     private Date endTime;
+    private Long toManualTime;
     private String result;
     private String num;
     private String agent;
@@ -121,6 +126,24 @@ public class CallCenterQueue extends IdEntity {
 
     public void setInviteTime(Date inviteTime) {
         this.inviteTime = inviteTime;
+    }
+
+    @Column(name = "dial_time")
+    public Date getDialTime() {
+        return dialTime;
+    }
+
+    public void setDialTime(Date dialTime) {
+        this.dialTime = dialTime;
+    }
+
+    @Column(name = "to_manual_time")
+    public Long getToManualTime() {
+        return toManualTime;
+    }
+
+    public void setToManualTime(Long toManualTime) {
+        this.toManualTime = toManualTime;
     }
 
     @Column(name = "origin_call_id")

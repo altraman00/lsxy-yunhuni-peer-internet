@@ -1,12 +1,15 @@
 package com.lsxy.area.server.service.callcenter;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.BaseEnQueue;
+import com.lsxy.call.center.api.model.CallCenterQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
+import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.UUIDGenerator;
@@ -20,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -53,6 +56,9 @@ public class DeQueueServiceImpl implements DeQueueService {
     @Autowired
     private SessionContext sessionContext;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterQueueService callCenterQueueService;
+
     /**
      * 创建交谈，然后呼叫坐席。
      * 交谈创建成功事件邀请排队的客户到交谈
@@ -74,22 +80,15 @@ public class DeQueueServiceImpl implements DeQueueService {
                     tenantId,appId,callId,queueId,result);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             //抛异常后呼叫中心微服务会回滚坐席状态
             throw new IllegalStateException("会话已关闭");
         }
         String conversation = UUIDGenerator.uuid();
-
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        Map<String,Object> businessData = state.getBusinessData();
-        if(businessData == null){
-            businessData = new HashMap<>();
-            state.setBusinessData(businessData);
-        }
-        businessData.put(ConversationService.CONVERSATION_FIELD,conversation);
-        businessData.put(ConversationService.QUEUE_ID_FIELD,queueId);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId,ConversationService.CONVERSATION_FIELD,conversation);
+        businessStateService.updateInnerField(callId,ConversationService.QUEUE_ID_FIELD,queueId);
 
         BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
         Integer conversationTimeout = enQueue.getConversation_timeout();
@@ -102,31 +101,34 @@ public class DeQueueServiceImpl implements DeQueueService {
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
-        conversationService.create(conversation,state.getId(),
-                (String)businessData.get(ConversationService.CALLCENTER_ID_FIELD),state.getAppId(),conversationTimeout);
+        conversationService.create(conversation,state.getId(),state.getTenantId(),
+                state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
 
 
-        BusinessState agentState = businessStateService.get(agentCallId);
         if(reserveState != null){
-            agentState.getBusinessData().put(ConversationService.RESERVE_STATE_FIELD,reserveState);
+            businessStateService.updateInnerField(agentCallId,ConversationService.RESERVE_STATE_FIELD,reserveState);
         }
         if(playNum){
-            agentState.getBusinessData().put(ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
-            agentState.getBusinessData().put(ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
-            agentState.getBusinessData().put(ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
+            if(result.getAgent().getNum() != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
+            }
+            if(preNumVoice != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
+            }
+            if(postNumVoice != null){
+                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
+            }
         }
-        if(reserveState != null || playNum){
-            businessStateService.save(agentState);
-        }
+        updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
     }
 
     @Override
-    public void timeout(String tenantId, String appId, String callId) {
+    public void timeout(String tenantId, String appId, String callId,String queueId) {
         if(logger.isDebugEnabled()){
             logger.debug("排队超时,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){
             logger.info("会话已关闭callid={}",callId);
             return;
         }
@@ -138,18 +140,20 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId);
+                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                        .put("error","timeout").build());
             }
         }
+        updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
     }
 
     @Override
-    public void fail(String tenantId, String appId, String callId, String reason) {
+    public void fail(String tenantId, String appId, String callId,String queueId, String reason) {
         if(logger.isDebugEnabled()){
             logger.debug("排队失败,tenantId={},appId={},callId={}",tenantId,appId,callId);
         }
         BusinessState state = businessStateService.get(callId);
-        if(state == null || state.getClosed()){
+        if(state == null || (state.getClosed() != null && state.getClosed())){ 
             logger.info("会话已关闭callid={}",callId);
             return;
         }
@@ -161,11 +165,60 @@ public class DeQueueServiceImpl implements DeQueueService {
                 .build();
         if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
             if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId);
+                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                        .put("error","fail").build());
             }
+        }
+        updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
+    }
+
+    /**
+     * 更新排队结果
+     * @param id
+     * @param callId
+     * @param conversationId
+     * @param agentId
+     * @param agentCallId
+     * @param result
+     */
+    private void updateQueue(String id,String callId,String conversationId,
+                             String agentId,String agentCallId,String result){
+        //更新排队记录
+        try{
+            if(id == null){
+                return;
+            }
+            CallCenterQueue callCenterQueue = callCenterQueueService.findById(id);
+            if(callCenterQueue == null){
+                return;
+            }
+            Date cur = new Date();
+            callCenterQueue.setRelevanceId(callId);
+            if(conversationId != null){
+                callCenterQueue.setConversation(conversationId);
+            }
+            if(agentId != null){
+                callCenterQueue.setAgent(agentId);
+            }
+            if(agentCallId != null){
+                callCenterQueue.setAgentCallId(agentCallId);
+                callCenterQueue.setInviteTime(cur);
+            }
+            callCenterQueue.setEndTime(cur);
+            callCenterQueue.setToManualTime((callCenterQueue.getStartTime().getTime() - callCenterQueue.getEndTime().getTime()) / 1000);
+            callCenterQueue.setResult(result);
+            callCenterQueueService.save(callCenterQueue);
+        }catch (Throwable t){
+            logger.error("更新排队记录失败",t);
         }
     }
 
+    /**
+     * 停止播放排队等待音
+     * @param area_id
+     * @param call_id
+     * @param res_id
+     */
     private void stopPlayWait(String area_id,String call_id,String res_id){
         try {
             if(conversationService.isPlayWait(call_id)){
