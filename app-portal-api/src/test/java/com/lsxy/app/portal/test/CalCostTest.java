@@ -4,6 +4,7 @@ import com.lsxy.app.portal.MainClass;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
@@ -12,6 +13,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import com.lsxy.yunhuni.api.statistics.service.VoiceCdrHourService;
 import org.junit.Test;
@@ -145,6 +147,20 @@ public class CalCostTest {
     public void testStaticCC(){
         Date preDate = DateUtils.getPreDate(new Date());
         callCenterStatisticsService.dayStatistics(preDate);
+    }
+
+    @Test
+    public void testStaticCC1(){
+        CallCenterStatistics callCenterStatistics = new CallCenterStatistics("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000",new Date(),1L,1L,1L,1L,1L,1L,1L,1L);
+        callCenterStatisticsService.incrIntoRedis(callCenterStatistics,new Date());
+    }
+
+    @Test
+    public void testStaticCC2(){
+        CallCenterStatistics current = callCenterStatisticsService.getCurrentStatisticsByTenantId("40288ac9575612a30157561c7ff50004");
+        System.out.println(JSONUtil.objectToJson(current));
+        CallCenterStatistics curApp = callCenterStatisticsService.getCurrentStatisticsByAppId("40288ac957e1812e0157e18a994e0000");
+        System.out.println(JSONUtil.objectToJson(curApp));
     }
 
 }
