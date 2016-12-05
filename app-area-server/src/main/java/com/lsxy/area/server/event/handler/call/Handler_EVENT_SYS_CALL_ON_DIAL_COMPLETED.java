@@ -257,7 +257,12 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }
                 if(agentId != null){
                     try {
-                        callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,CallCenterAgent.STATE_TALKING,true);
+                        String preState = callCenterAgentService.getState(agentId);
+                        String curState = CallCenterAgent.STATE_TALKING;
+                        if(CallCenterAgent.STATE_FETCHING.equals(preState)){
+                            callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,curState,true);
+                            callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,preState,curState);
+                        }
                     } catch (YunhuniApiException e) {
                         logger.info("[{}][{}]agentID={}设置坐席状态失败 ",state.getTenantId(),state.getAppId(),agentId);
                     }

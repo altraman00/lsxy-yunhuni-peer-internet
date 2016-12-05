@@ -189,14 +189,17 @@ public class CallCenterUtil {
     /**
      * 坐席状态改变事件
      */
-    public void agentStateChangedEvent(String url,String agent_id,String previous_state){
+    public void agentStateChangedEvent(String url,String agent_id,String previous_state,String latest_state){
         try{
             CallCenterAgent agent = callCenterAgentService.findById(agent_id);
+            if(latest_state == null){
+                latest_state = callCenterAgentService.getState(agent_id);
+            }
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.agent.state_changed")
                     .putIfNotEmpty("name",agent.getName())
                     .putIfNotEmpty("previous_state",previous_state)
-                    .putIfNotEmpty("latest_state",agent.getState())
+                    .putIfNotEmpty("latest_state",latest_state)
                     .putIfNotEmpty("current_time",System.currentTimeMillis())
                     .build();
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
