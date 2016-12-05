@@ -117,7 +117,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
         //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
-            agent.setState(AgentState.Model.STATE_ONLINE);
+            agent.setState(CallCenterAgent.STATE_ONLINE);
         }
         //校验通道
         channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
@@ -200,7 +200,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             try{
                 //TODO 异步
                 //如果座席是空闲，触发座席找排队,此处与以上处理无关，所以不管成不成功，都返回
-                if(agent.getState().contains(AgentState.Model.STATE_IDLE)){
+                if(agent.getState().contains(CallCenterAgent.STATE_IDLE)){
                     enQueueService.lookupQueue(agent.getTenantId(), agent.getAppId(),null, agentId);
                 }
             }catch(Exception e){
@@ -251,7 +251,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             String agentId = agent.getId();
             String state = agentState.getState(agentId);
 
-            if(StringUtils.isNotBlank(state) && (state.contains(AgentState.Model.STATE_FETCHING)||state.contains(AgentState.Model.STATE_TALKING))){
+            if(StringUtils.isNotBlank(state) && (state.contains(CallCenterAgent.STATE_FETCHING)||state.contains(CallCenterAgent.STATE_TALKING))){
                 if(force){
                     //TODO
                 }else{
@@ -436,19 +436,19 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         try{
             if(!force){
                 String curState = agentState.getState(agentId);
-                if(StringUtils.isNotBlank(curState) && (curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING))){
+                if(StringUtils.isNotBlank(curState) && (curState.contains(CallCenterAgent.STATE_FETCHING)||curState.contains(CallCenterAgent.STATE_TALKING))){
                     // 座席正忙
                     throw new AgentIsBusyException();
                 }
             }
             if(state == null){
-                state = AgentState.Model.STATE_IDLE;
+                state = CallCenterAgent.STATE_IDLE;
             }
             agentState.setState(agentId,state);
         }finally {
             agentLock.unlock();
         }
-        if(state.contains(AgentState.Model.STATE_IDLE)){
+        if(state.contains(CallCenterAgent.STATE_IDLE)){
             enQueueService.lookupQueue(tenantId,appId,null,agentId);
         }
     }

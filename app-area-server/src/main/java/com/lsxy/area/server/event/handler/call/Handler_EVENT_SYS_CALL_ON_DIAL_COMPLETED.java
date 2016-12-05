@@ -11,9 +11,12 @@ import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.CallCenterQueue;
+import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.framework.api.tenant.service.TenantService;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -89,6 +92,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterAgentService callCenterAgentService;
 
     @Override
     public String getEventName() {
@@ -220,6 +226,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             if(StringUtils.isNotBlank(error)){
                 conversationService.exit(conversation_id,call_id);
             }else{
+                String agentId = businessData.get(CallCenterUtil.AGENT_ID_FIELD);
                 String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
                 String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
                 String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
@@ -247,6 +254,13 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     }
                 } catch (Throwable e) {
                     logger.error("调用失败 ",e);
+                }
+                if(agentId != null){
+                    try {
+                        callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,CallCenterAgent.STATE_TALKING,true);
+                    } catch (YunhuniApiException e) {
+                        logger.info("[{}][{}]agentID={}设置坐席状态失败 ",state.getTenantId(),state.getAppId(),agentId);
+                    }
                 }
             }
             String initorid = null;
