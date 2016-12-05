@@ -5,7 +5,8 @@ import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.SystemConfig;
-import com.lsxy.framework.core.utils.*;
+import com.lsxy.framework.core.utils.DateUtils;
+import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.portal.VoiceFileRecordSyncEvent;
 import com.lsxy.framework.web.rest.RestResponse;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.WebAsyncTask;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -50,72 +49,6 @@ public class VoiceFileRecordController extends AbstractRestController {
     private CallCenterConversationMemberService callCenterConversationMemberService;
     @Autowired
     MQService mqService;
-    /**
-     * 根据放音文件id删除放音文件
-     * @param id
-     * @return
-     */
-    @RequestMapping("/delete")
-    public RestResponse delete(String id) throws InvocationTargetException, IllegalAccessException {
-        VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(id);
-        voiceFileRecordService.delete(voiceFileRecord);
-        //删除文件
-        boolean flag = false;
-        try{
-            flag = FileUtil.delFile(path+voiceFileRecord.getUrl());
-        }catch(Exception e){}
-        logger.info(path+voiceFileRecord.getUrl()+"删除结果:"+flag);
-        return RestResponse.success(voiceFileRecord);
-    }
-
-    /**
-     * 根据应用id，删除在开始时间和结束时间区间内的录音文件
-     * @param appId 应用id
-     * @param startTime 开始时间
-     * @param endTime 结束时间
-     * @return
-     */
-    @RequestMapping("/batch/delete")
-    public RestResponse batchDelete(String appId,Date startTime,Date endTime){
-        Tenant tenant = getCurrentAccount().getTenant();
-        int result = voiceFileRecordService.batchDelete(appId,tenant.getId(),startTime,endTime);
-        if(result>0){
-            List<VoiceFileRecord> list = voiceFileRecordService.getList(appId,tenant.getId(),startTime,endTime);
-            //开始删除文件
-            for(int i=0;i<list.size();i++){
-                boolean flag = false;
-                try{
-                    flag = FileUtil.delFile(path+list.get(i).getUrl());
-                }catch(Exception e){}
-                logger.info(path+list.get(0).getUrl()+"删除结果:"+flag);
-            }
-        }else{
-           return RestResponse.failed("0000","删除失败");
-        }
-        return RestResponse.success(result);
-    }
-    /**
-     * 批量下载
-     * @param appId
-     * @param startTime
-     * @param endTime
-     * @return
-     */
-    @RequestMapping("/batch/download")
-    public RestResponse batchDownload(String appId,Date startTime,Date endTime){
-        Tenant tenant = getCurrentAccount().getTenant();
-        List<VoiceFileRecord> list = voiceFileRecordService.getList(appId,tenant.getId(),startTime,endTime);
-        //生成文件名 开始时间yyyyMMdd+结束时间yyyyMMdd+随机数(3位)+文件类型后缀
-        String fileName = path+DateUtils.formatDate(startTime,"yyyyMMdd")+"-"+DateUtils.formatDate(endTime,"yyyyMMdd")+"-"+RandomNumberUtil.randomLong(3)+".zip";
-        List<String> orgins = new ArrayList();
-        for(int i=0;i<list.size();i++){
-            orgins.add(path+list.get(i).getName());
-        }
-        //进行压缩
-        ZipUtil.zip(orgins,fileName);
-        //返回zip文件的完整路径
-        return RestResponse.success(fileName);
-    }
 
     /**
      * 根据应用id和开始时间，结束时间统计区间内文件数量total和文件总大小size
@@ -152,30 +85,20 @@ public class VoiceFileRecordController extends AbstractRestController {
         Page<Map> page = voiceFileRecordService.getPageList(pageNo,pageSize,appId,tenant.getId(),type,start,end);
         return RestResponse.success(page);
     }
-    /**
-     * 根据名字和应用id查询用户名下的录音文件
-     * @param pageNo 第几页
-     * @param pageSize 每页记录数
-     * @param appId 应用id
-     * @return
-     */
-    @RequestMapping("/plist")
-    public RestResponse pageList(Integer pageNo,Integer pageSize ,String appId){
-        Tenant tenant = getCurrentAccount().getTenant();
-        Page<VoiceFileRecord> page = voiceFileRecordService.pageList(pageNo,pageSize,appId,tenant.getId());
-        return RestResponse.success(page);
-    }
     @RequestMapping("/file/download")
     public WebAsyncTask fileDownload(String id){
         Callable<RestResponse> callable = new Callable<RestResponse>() {
-            public RestResponse call() throws Exception {
+            public RestResponse call()  throws Exception{
                 Tenant tenant = getCurrentAccount().getTenant();
                 VoiceFileRecord voiceFileRecord = voiceFileRecordService.findById(id);
                 if(tenant==null||voiceFileRecord==null||!tenant.getId().equals(voiceFileRecord.getTenantId())){
                     return RestResponse.failed("0000","验证失败，无法下载");
                 }
-                if(voiceFileRecord.getStatus()==1){
+                if(voiceFileRecord.getStatus()!=null&&voiceFileRecord.getStatus()==1){
                     String ossUri = getOssTempUri(voiceFileRecord.getOssUrl());
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("生成ossUri地址：[{}]", ossUri);
+                    }
                     return RestResponse.success(ossUri);
                 }
                 List<VoiceFileRecord> list = voiceFileRecordService.getListBySessionId(voiceFileRecord.getSessionId());
@@ -186,7 +109,9 @@ public class VoiceFileRecordController extends AbstractRestController {
                 boolean flag = false;
                 for(int i=0;i<list.size();i++){
                     VoiceFileRecord temp = list.get(i);
-                    if(1!=temp.getStatus()){
+                    if(temp.getStatus()==null||1!=temp.getStatus()){
+                        temp.setStatus(0);
+                        voiceFileRecordService.save(temp);
                         flag=true;
                         break;
                     }
@@ -197,9 +122,13 @@ public class VoiceFileRecordController extends AbstractRestController {
                     for (int j = 1; j <= 30; j++) {
                         Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(id);
-                        if(v1.getStatus()==1){
-                            String ossUri = getOssTempUri(v1.getOssUrl());
-                            return RestResponse.success(ossUri);
+                        if(v1.getStatus()!=null){
+                            if(v1.getStatus()==1) {
+                                String ossUri = getOssTempUri(v1.getOssUrl());
+                                return RestResponse.success(ossUri);
+                            }else if(v1.getStatus()==-1){
+                                return RestResponse.failed("0000","下载失败，请稍后重试");
+                            }
                         }
                     }
                     return RestResponse.failed("0000","下载超时失败");
@@ -209,7 +138,7 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
             }
         };
-        return new WebAsyncTask(callable);
+        return new WebAsyncTask(500000,callable);
     }
     @RequestMapping("/cdr/download")
     public WebAsyncTask cdrDownload(String id){
@@ -235,13 +164,20 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
                 //发起文件上传
                 if(flag) {
+                    VoiceFileRecord temp = voiceFileRecordService.findById(list.get(0).getId());
+                    temp.setStatus(0);
+                    voiceFileRecordService.save(temp);
                     mqService.publish(new VoiceFileRecordSyncEvent(tenant.getId(), voiceCdr.getAppId(), voiceCdr.getId(), VoiceFileRecordSyncEvent.TYPE_CDR));
                     for (int j = 1; j <= 30; j++) {
                         Thread.sleep(j * 1000);
                         VoiceFileRecord v1 = voiceFileRecordService.findById(list.get(0).getId());
-                        if(v1.getStatus()==1){
-                            String ossUri = getOssTempUri(v1.getOssUrl());
-                            return RestResponse.success(ossUri);
+                        if(v1.getStatus()!=null){
+                            if(v1.getStatus()==1) {
+                                String ossUri = getOssTempUri(v1.getOssUrl());
+                                return RestResponse.success(ossUri);
+                            }else if(v1.getStatus()==-1){
+                                return RestResponse.failed("0000","下载失败，请稍后重试");
+                            }
                         }
                     }
                     return RestResponse.failed("0000","下载超时失败");
@@ -251,7 +187,7 @@ public class VoiceFileRecordController extends AbstractRestController {
                 }
             }
         };
-        return new WebAsyncTask(callable);
+        return new WebAsyncTask(500000,callable);
     }
     private List<VoiceFileRecord> getFile(String id){
         //根据cdr获取业务类型，和业务id，根据业务id和业务类型获取录音文件列表，

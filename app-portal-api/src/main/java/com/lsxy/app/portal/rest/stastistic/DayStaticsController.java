@@ -3,7 +3,10 @@ package com.lsxy.app.portal.rest.stastistic;
 import com.lsxy.app.portal.base.AbstractRestController;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
 import com.lsxy.yunhuni.api.statistics.model.DayStatics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +24,8 @@ import java.util.Map;
 public class DayStaticsController extends AbstractRestController {
     @Autowired
     CalBillingService calBillingService;
-
+    @Autowired
+    CallCenterStatisticsService callCenterStatisticsService;
     /**
      * 获取当天，当月，或总的统计数据
      * @param type day month all
@@ -51,22 +55,32 @@ public class DayStaticsController extends AbstractRestController {
     }
 
     /**
-     * 根据租户id，应用id，开始时间和结束时间来获取统计数据
+     * 根据租户id，应用id来获取统计数据
      * @param appId
-     * @param startTime
-     * @param endTime
      * @return
      */
     @RequestMapping("/call_center/get")
-    public RestResponse getAmong(String appId,String startTime,String endTime){
+    public RestResponse getAmong(String appId){
+        String id = getCurrentAccount().getTenant().getId();
+        CallCenterStatistics incStatics;
+        if(StringUtils.isBlank(appId)){
+            incStatics = callCenterStatisticsService.getIncStaticsOfCurrentMonthByTenantId(id);
+        }else{
+            incStatics = callCenterStatisticsService.getIncStaticsOfCurrentMonthByAppId(appId);
+        }
+        if(incStatics == null){
+            incStatics = new CallCenterStatistics(null,null,null,0L,0L,0L,0L,0L,0L,0L,0L);
+        }
         Map map = new HashMap<>();
-        map.put("callIn","100");//呼入量
-        map.put("callOut","100");//呼出量
-        map.put("transferSuccess","100");//转接成功
-        map.put("formTime","1000");//排队时间
-        map.put("callTime","1000");//平均通话时长
-        map.put("callFail","1000");//呼入流失率
+        map.put("callIn",incStatics.getCallIn());//呼入量
+        map.put("callOut",incStatics.getCallOut());//呼出量
+        map.put("transferSuccess",incStatics.getToManualSuccess());//转接成功
+        map.put("formTime",incStatics.getQueueNum()==0?0:Math.round((double)incStatics.getQueueDuration()/incStatics.getQueueNum()));//排队时间
+        long callSuccess = incStatics.getCallInSuccess() + incStatics.getCallOutSuccess();
+        map.put("callTime",callSuccess == 0?0:Math.round((double)incStatics.getCallTimeLong()/callSuccess));//平均通话时长
+        map.put("callFail",incStatics.getCallIn()==0?0:Math.round((double)(incStatics.getCallInSuccess()*100)/incStatics.getCallIn()));//呼入流失率
         return RestResponse.success(map);
+
     }
 
 }

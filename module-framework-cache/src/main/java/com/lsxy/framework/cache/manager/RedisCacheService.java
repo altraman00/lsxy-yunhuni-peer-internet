@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -428,4 +429,8 @@ public class RedisCacheService {
 		public void hdel(final String key,final String field){
 			redisTemplate.opsForHash().delete(key,field);
 		}
+
+	public BoundHashOperations getHashOps(String key){
+        return redisTemplate.boundHashOps(key);
+    }
 }

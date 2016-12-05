@@ -14,4 +14,5 @@ public interface ProductService extends BaseService<Product> {
      * @return
      */
     Product getProductByCode(String code);
+
 }
