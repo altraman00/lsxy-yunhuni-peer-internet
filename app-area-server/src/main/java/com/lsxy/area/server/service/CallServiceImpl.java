@@ -249,11 +249,24 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
+        BusinessState state = businessStateService.get(callId);
+
+        if(state == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getClosed()!= null && state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
-        BusinessState businessState = businessStateService.get(callId);
         Map<String, Object> params = new MapBuilder<String, Object>()
-                .put("res_id",businessState.getResId())
-                .put("user_data ",businessState.getId())
+                .put("res_id",state.getResId())
+                .put("user_data ",state.getId())
                 .put("areaId ",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK_CANCEL, params);
