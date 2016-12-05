@@ -15,6 +15,7 @@ import com.lsxy.call.center.states.state.ExtensionState;
 import com.lsxy.call.center.states.statics.ACs;
 import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.utils.ExpressionUtils;
+import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
@@ -117,7 +118,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         }
         //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
-            agent.setState(AgentState.Model.STATE_ONLINE);
+            agent.setState(CallCenterAgent.STATE_ONLINE);
         }
         //校验通道
         channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
@@ -184,23 +185,55 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             //写入登录日志
             agentActionLogService.agentLogin(agent);
             //转成lua?
-            //TODO 设置座席分机
-            agentState.setExtension(agentId,extensionId);
-            agentState.setState(agentId,agent.getState());
-            agentState.setLastRegTime(agentId,System.currentTimeMillis());
-            agentState.setLastTime(agentId,System.currentTimeMillis());
-            //TODO 设置分机座席
-            extensionState.setAgent(extensionId,agentId);
-            suitedConditions.parallelStream().forEach(condition -> {
-                //TODO 设置条件座席
-                cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
-                //TODO 设置座席条件
-                aCs.add(agentId,condition.getId(),condition.getPriority());
-            });
+//            //TODO 设置座席分机
+//            agentState.setExtension(agentId,extensionId);
+//            agentState.setLastRegTime(agentId,System.currentTimeMillis());
+//            agentState.setLastTime(agentId,System.currentTimeMillis());
+//            agentState.setState(agentId,agent.getState());
+//            //TODO 设置分机座席
+//            extensionState.setAgent(extensionId,agentId);
+//            suitedConditions.parallelStream().forEach(condition -> {
+//                //TODO 设置条件座席
+//                cAs.add(condition.getId(),agentId,conditionScore.get(condition.getId()));
+//                //TODO 设置座席条件
+//                aCs.add(agentId,condition.getId(),condition.getPriority());
+//            });
+            //lua 实现
+            int keyCount = 2;
+            List<String> evalStr = new LinkedList<>();
+            //座席状态key
+            evalStr.add(AgentState.getKey(agentId));
+            //分机状态key
+            evalStr.add(ExtensionState.getKey(extensionId));
+            //座席状态各个属性
+            evalStr.add("extension," + extensionId + ",lastRegTime," + System.currentTimeMillis() + ",lastTime," + System.currentTimeMillis());
+            //因为不知道传进来的state会不会包含","号，所以单独分出来
+            evalStr.add(agent.getState());
+            //分机的座席
+            evalStr.add(agentId);
+            if(suitedConditions != null && suitedConditions.size()>0){
+                String aCsKey = ACs.getKey(agentId);
+                StringBuffer bf = new StringBuffer();
+                for(int i = 0;i<suitedConditions.size();i++){
+                    keyCount ++;
+                    Condition condition = suitedConditions.get(i);
+                    //设置座席条件
+                    bf.append(condition.getPriority() + "," + condition.getId() + ",");
+                    //设置条件座席（注意以下两行代码顺序不能变）
+                    evalStr.add(5 + i,conditionScore.get(condition.getId()) + "," + agentId);
+                    evalStr.add(2,CAs.getKey(condition.getId()));
+                }
+                keyCount ++;
+                //设置座席条件进参数列表（注意以下两行代码顺序不能变）
+                evalStr.add(5 + suitedConditions.size(),bf.deleteCharAt(bf.length()-1).toString());
+                evalStr.add(2,aCsKey);
+            }
+            redisCacheService.eval(Lua.AGENTLOGIN,keyCount ,evalStr.toArray(new String[0]));
+
             try{
                 //TODO 异步
                 //如果座席是空闲，触发座席找排队,此处与以上处理无关，所以不管成不成功，都返回
-                if(agent.getState().contains(AgentState.Model.STATE_IDLE)){
+                if(agent.getState().contains(CallCenterAgent.STATE_IDLE)){
                     enQueueService.lookupQueue(agent.getTenantId(), agent.getAppId(),null, agentId);
                 }
             }catch(Exception e){
@@ -251,7 +284,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             String agentId = agent.getId();
             String state = agentState.getState(agentId);
 
-            if(StringUtils.isNotBlank(state) && (state.contains(AgentState.Model.STATE_FETCHING)||state.contains(AgentState.Model.STATE_TALKING))){
+            if(StringUtils.isNotBlank(state) && (state.contains(CallCenterAgent.STATE_FETCHING)||state.contains(CallCenterAgent.STATE_TALKING))){
                 if(force){
                     //TODO
                 }else{
@@ -436,19 +469,19 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         try{
             if(!force){
                 String curState = agentState.getState(agentId);
-                if(StringUtils.isNotBlank(curState) && (curState.contains(AgentState.Model.STATE_FETCHING)||curState.contains(AgentState.Model.STATE_TALKING))){
+                if(StringUtils.isNotBlank(curState) && (curState.contains(CallCenterAgent.STATE_FETCHING)||curState.contains(CallCenterAgent.STATE_TALKING))){
                     // 座席正忙
                     throw new AgentIsBusyException();
                 }
             }
             if(state == null){
-                state = AgentState.Model.STATE_IDLE;
+                state = CallCenterAgent.STATE_IDLE;
             }
             agentState.setState(agentId,state);
         }finally {
             agentLock.unlock();
         }
-        if(state.contains(AgentState.Model.STATE_IDLE)){
+        if(state.contains(CallCenterAgent.STATE_IDLE)){
             enQueueService.lookupQueue(tenantId,appId,null,agentId);
         }
     }

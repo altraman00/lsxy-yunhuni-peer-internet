@@ -1,11 +1,13 @@
 package com.lsxy.app.opensips;
 
+import com.lsxy.framework.config.SystemConfig;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,6 +19,8 @@ import javax.annotation.PostConstruct;
 public class OpenSipEventListenerServer {
     private static final Logger logger = LoggerFactory.getLogger(OpenSipEventListenerServer.class);
 
+    @Autowired
+    OpenSipEventHandler openSipEventHandler;
 
     @PostConstruct
     public void startListener() throws InterruptedException {
@@ -29,11 +33,12 @@ public class OpenSipEventListenerServer {
             EventLoopGroup group = new NioEventLoopGroup();
             b.group(group)
                     .channel(NioDatagramChannel.class)
-                    .handler(new OpenSipEventHandler());
+                    .handler(openSipEventHandler);
 
             // 服务端监听在9999端口
             try {
-                b.bind(9009).sync().channel().closeFuture().await();
+                String port = SystemConfig.getProperty("app.cc.opensips.event.listener.port","9009");
+                b.bind(Integer.parseInt(port)).sync().channel().closeFuture().await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

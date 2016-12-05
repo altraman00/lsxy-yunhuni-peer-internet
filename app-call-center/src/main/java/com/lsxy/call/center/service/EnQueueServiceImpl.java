@@ -124,7 +124,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                     ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                    AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE);
+                    CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE);
             if(logger.isDebugEnabled()){
                 logger.debug("排队结果:agent={}",agent);
             }
@@ -138,7 +138,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                         ExtensionState.getPrefixed(),
                         ""+AgentState.REG_EXPIRE,
                         ""+System.currentTimeMillis(),
-                        AgentState.Model.STATE_IDLE,ExtensionState.Model.ENABLE_TRUE);
+                        CallCenterAgent.STATE_IDLE,ExtensionState.Model.ENABLE_TRUE);
                 if(StringUtil.isNotEmpty(agent_idle)){
                     lookupQueue(tenantId,appId,conditionId,agent_idle);
                 }
@@ -150,7 +150,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     deQueueService.success(tenantId,appId,callId,queue.getId(),result);
                 }catch (Throwable t1){
                     try{
-                        agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                        agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     }catch (Throwable t2){
                         logger.info("",t2);
                     }
@@ -180,7 +180,7 @@ public class EnQueueServiceImpl implements EnQueueService{
             ExtensionState.getPrefixed(),AgentLock.getKey(agent),
             QueueLock.getPrefixed(),CQs.getPrefixed(),
             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-            AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING,
+                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,
             conditionId==null?"":conditionId,ExtensionState.Model.ENABLE_TRUE);
         if(logger.isDebugEnabled()){
             logger.info("[{}][{}]坐席找排队结果agent={},queueId={}",tenantId,appId,queueId);
@@ -199,7 +199,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     deQueueService.success(tenantId,appId,queue.getOriginCallId(),queueId,result);
                 }catch (Throwable t1){
                     try{
-                        agentState.setState(agent,AgentState.Model.STATE_IDLE);
+                        agentState.setState(agent,CallCenterAgent.STATE_IDLE);
                     }catch (Throwable t2){
                         logger.info("",t2);
                     }

@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -54,8 +53,7 @@ public class OpenSipEventSubscriberTask {
      *opensips 每30分钟向opensips发送一次注册请求
      * 启动时注册一次
      */
-    @Scheduled(fixedDelay=30*60*1000)
-    @PostConstruct
+    @Scheduled(fixedDelay=20*60*1000)
     public void doSubscribed(){
         if(socket != null){
             String ip = StringUtil.getHostIp();
