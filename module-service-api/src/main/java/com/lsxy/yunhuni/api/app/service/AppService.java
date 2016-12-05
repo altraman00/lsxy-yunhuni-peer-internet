@@ -24,7 +24,7 @@ public interface AppService extends BaseService<App> {
      * @param tenantId 租户id
      * @return
      */
-    List<App> findAppByUserNameAndServiceType(String tenantId,String serviceType)  ;
+    List<App> findAppByTenantIdAndServiceType(String tenantId, String serviceType)  ;
     /**
      * 获取分页信息
      * @param tenantId 租户id
@@ -74,13 +74,6 @@ public interface AppService extends BaseService<App> {
      * @param app
      */
     App create(App app);
-
-    /**
-     * 获取分机注册信息
-     * @param appId
-     * @return
-     */
-    String findAppSipRegistrar(String appId);
 
     boolean enabledService(String tenantId,String appId,ServiceType service);
 }

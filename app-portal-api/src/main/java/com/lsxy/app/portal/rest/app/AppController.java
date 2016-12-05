@@ -133,7 +133,7 @@ public class AppController extends AbstractRestController {
     public RestResponse listApp(String serviceType) throws Exception{
         List<App> apps = null;
         if(StringUtils.isNotEmpty(serviceType)) {
-            apps = appService.findAppByUserNameAndServiceType(getCurrentAccount().getTenant().getId(),serviceType);
+            apps = appService.findAppByTenantIdAndServiceType(getCurrentAccount().getTenant().getId(),serviceType);
         }else{
             apps = appService.findAppByUserName(getCurrentAccount().getTenant().getId());
         }
