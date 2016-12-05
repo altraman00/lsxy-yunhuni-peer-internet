@@ -4,6 +4,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -104,7 +105,7 @@ public class Handler_EVENT_SYS_CALL_ON_CONF_COMPLETED extends EventHandler {
         Map<String,String> businessData = state.getBusinessData();
         String conversation_id = null;
         if(businessData!=null){
-            conversation_id = businessData.get(ConversationService.CONVERSATION_FIELD);
+            conversation_id = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
         }
         if(StringUtils.isBlank(conversation_id)){
             throw new InvalidParamException("没有找到对应的交谈信息callid={},conversation_id={}",call_id,conversation_id);

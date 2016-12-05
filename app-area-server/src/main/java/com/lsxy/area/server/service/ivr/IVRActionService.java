@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.AreaAndTelNumSelector;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.handler.ActionHandler;
 import com.lsxy.area.server.service.ivr.handler.EnqueueHandler;
@@ -312,14 +313,14 @@ public class IVRActionService {
      * @return
      */
     public boolean doActionIfAccept(App app, Tenant tenant,String res_id,
-                                    String from, String to,String lineId,Integer iscc){
+                                    String from, String to,String lineId,boolean iscc){
         String call_id = UUIDGenerator.uuid();
         saveIvrSessionCall(call_id,app,tenant,res_id,from,to,lineId,iscc);
         doAction(call_id,null);
         return true;
     }
 
-    private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, Integer iscc){
+    private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, boolean iscc){
         String areaId = areaAndTelNumSelector.getAreaId(app);
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
@@ -337,12 +338,11 @@ public class IVRActionService {
                         //incoming事件from 和 to是相反的
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
-                        .putIfNotEmpty(ConversationService.ISCC_FIELD,iscc !=null ? iscc.toString():null)
+                        .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,iscc ? CallCenterUtil.ISCC_TRUE:null)
                         .build())
                 .build();
         businessStateService.save(state);
         try{
-            boolean isCallCenter = iscc != null && iscc == 1;
             CallSession callSession = new CallSession();
             callSession.setStatus(CallSession.STATUS_CALLING);
             callSession.setFromNum(to);
@@ -351,10 +351,10 @@ public class IVRActionService {
             callSession.setTenant(tenant);
             callSession.setRelevanceId(call_id);
             callSession.setResId(state.getResId());
-            callSession.setType(isCallCenter ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
+            callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
             callSession = callSessionService.save(callSession);
             businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
-            if(isCallCenter){
+            if(iscc){
                 CallCenter callCenter = new CallCenter();
                 callCenter.setId(call_id);
                 callCenter.setTenantId(state.getTenantId());
