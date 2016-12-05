@@ -126,10 +126,6 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
 
-        callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation,
-                CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
-                state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),agentCallId);
-
         callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
