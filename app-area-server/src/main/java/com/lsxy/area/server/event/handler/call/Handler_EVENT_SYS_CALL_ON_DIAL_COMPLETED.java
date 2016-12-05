@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -83,6 +84,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
     @Autowired
     private PlayFileUtil playFileUtil;
 
+    @Autowired
+    private CallCenterUtil callCenterUtil;
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
@@ -213,13 +216,13 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 businessStateService.updateInnerField(ivr_call_id,"ivr_dial_call_id",call_id);
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
-            String conversation_id = businessData.get(ConversationService.CONVERSATION_FIELD);
+            String conversation_id = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
             if(StringUtils.isNotBlank(error)){
                 conversationService.exit(conversation_id,call_id);
             }else{
-                String agent_num = businessData.get(ConversationService.AGENT_NUM_FIELD);
-                String prevoice = businessData.get(ConversationService.AGENT_PRENUMVOICE_FIELD);
-                String postvoice = businessData.get(ConversationService.AGENT_POSTNUMVOICE_FIELD);
+                String agent_num = businessData.get(CallCenterUtil.AGENT_NUM_FIELD);
+                String prevoice = businessData.get(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
+                String postvoice = businessData.get(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
                 List<Object[]> plays = new ArrayList<>();
                 try {
                     if(StringUtil.isNotEmpty(prevoice)){
@@ -246,13 +249,16 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                     logger.error("调用失败 ",e);
                 }
             }
+            String initorid = null;
+            BusinessState init_state = null;
+            String queueId = null;
             try{
                 //更新排队记录
-                String initorid = conversationService.getInitiator(conversation_id);
+                initorid = conversationService.getInitiator(conversation_id);
                 if(initorid != null){
-                    BusinessState init_state = businessStateService.get(initorid);
+                    init_state = businessStateService.get(initorid);
                     if(init_state != null){
-                        String queueId = init_state.getBusinessData().get(ConversationService.QUEUE_ID_FIELD);
+                        queueId = init_state.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD);
                         if(queueId != null){
                             CallCenterQueue callCenterQueue = callCenterQueueService.findById(queueId);
                             if(callCenterQueue != null && callCenterQueue.getDialTime() == null){
@@ -266,6 +272,24 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
             }catch (Throwable t){
                 logger.error("更新排队记录失败",t);
             }
+
+            if(initorid!= null && init_state != null && queueId!=null){
+                if(StringUtil.isNotEmpty(error)){
+                    callCenterUtil.sendQueueFailEvent(init_state.getCallBackUrl(),
+                            queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                            init_state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
+                            init_state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
+                            CallCenterUtil.QUEUE_FAIL_HANGUP,
+                            initorid,call_id,init_state.getUserdata());
+                }else{
+                    callCenterUtil.sendQueueSuccessEvent(init_state.getCallBackUrl(),
+                            queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                            init_state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
+                            init_state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
+                            initorid,call_id,init_state.getUserdata());
+                }
+            }
+
         }else if(BusinessState.TYPE_CC_OUT_CALL.equals(state.getType())){
             //TODO
         }
