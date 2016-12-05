@@ -603,7 +603,7 @@ public class ConversationService {
         callConversationService.decrConversation(callId,conversationId);
 
         if(call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
-            callCenterUtil.agentEnterConversationEvent(call_state.getCallBackUrl(),
+            callCenterUtil.agentExitConversationEvent(call_state.getCallBackUrl(),
                     call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),conversationId);
         }
 
@@ -646,6 +646,9 @@ public class ConversationService {
         }
     }
 
+    /**
+     * 呼叫加入交谈成功
+     * **/
     public void join(String conversation_id,String call_id){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
@@ -682,6 +685,7 @@ public class ConversationService {
             callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
                     businessData.get(CallCenterUtil.AGENT_ID_FIELD),conversation_id);
         }
+        callCenterUtil.conversationPartsChangedEvent(state.getCallBackUrl(),conversation_id);
     }
     private void hangup(String res_id,String call_id,String area_id){
         Map<String, Object> params = new MapBuilder<String,Object>()
