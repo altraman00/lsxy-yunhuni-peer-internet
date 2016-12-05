@@ -9,5 +9,5 @@ import java.io.Serializable;
  * Created by liups on 2016/8/27.
  */
 public interface ProductPriceDao extends BaseDaoInterface<ProductPrice, Serializable> {
-    ProductPrice findFirstByProductIdAndStatusOrderByPriorityDesc(String productId, int statusValid);
+    ProductPrice findFirstByProductItemIdAndStatusOrderByPriorityDesc(String productItemId, int statusValid);
 }

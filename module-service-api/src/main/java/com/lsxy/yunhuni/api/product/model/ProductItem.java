@@ -6,19 +6,37 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 
 /**
- * 产品表
- * Created by liups on 2016/8/27.
+ * 产品子项目
+ * Created by zhangxb on 2016/8/27.
  */
 @Entity
 @Where(clause = "deleted=0")
-@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product")
-public class Product extends IdEntity {
-    public static int CAL_TYPE_NUM = 1;
-    public static int CAL_TYPE_TIME = 2;
+@Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_product_item")
+public class ProductItem extends IdEntity {
+    private Product product;//所属产品类别
     private String name;    //产品名称
     private String code;    //一次写入，不可修改，涉及到编程
+    private Integer calType;    //1、按数量，2、按时长
     private String remark;
     private Integer status;//是否可用1是0否
+    @Column(name = "cal_type")
+    public Integer getCalType() {
+        return calType;
+    }
+
+    public void setCalType(Integer calType) {
+        this.calType = calType;
+    }
+    @OneToOne
+    @JoinColumn(name = "product_id")
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     @Column(name = "status")
     public Integer getStatus() {
         return status;
