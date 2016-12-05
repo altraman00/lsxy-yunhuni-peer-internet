@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
@@ -42,6 +43,8 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     VoiceCdrService voiceCdrService;
     @Autowired
     CalBillingService calBillingService;
+    @Autowired
+    ConversationService conversationService;
 
     @Override
     public String getEventName() {
@@ -81,6 +84,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         voiceCdr.setLineId(businessState.getLineGatewayId());
         //产品编码，可根据些判断此cdr是哪个产品的cdr
 
+
         ProductCode productCode = ProductCode.changeApiCmdToProductCode(businessState.getType());
 
         if(BusinessState.TYPE_SYS_CONF.equals(businessState.getType())){
@@ -91,7 +95,11 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         }
 
         if(BusinessState.TYPE_IVR_INCOMING.equals(businessState.getType())){
-            voiceCdr.setIvrType(1);
+            if(conversationService.isCC(businessState)){
+                productCode = ProductCode.call_center;
+            }else{
+                voiceCdr.setIvrType(1);
+            }
         }else if(BusinessState.TYPE_IVR_CALL.equals(businessState.getType())){
             voiceCdr.setIvrType(2);
         }else if(BusinessState.TYPE_IVR_DIAL.equals(businessState.getType())){
