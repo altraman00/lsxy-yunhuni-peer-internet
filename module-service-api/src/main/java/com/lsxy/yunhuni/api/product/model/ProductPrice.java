@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 /**
- * 产品资费表
+ * 产品计费项资费表
  * Created by liups on 2016/8/27.
  */
 @Entity
@@ -58,7 +58,7 @@ public class ProductPrice extends IdEntity {
         this.price = price;
     }
 
-    @Column(name = "STATUS")
+    @Column(name = "status")
     public Integer getStatus() {
         return status;
     }
