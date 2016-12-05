@@ -70,7 +70,9 @@ public class CallCenterUtil {
     public static final String AGENT_POSTNUMVOICE_FIELD = "AGENT_POSTNUMVOICE";
     /**交谈成员收放音模式存放的字段**/
     public static final String PARTNER_VOICE_MODE_FIELD = "PARTNER_VOICE_MODE";
+    /**通道id存放的字段**/
     public static final String CHANNEL_ID_FIELD = "CHANNEL_ID";
+    /**条件id存放的字段**/
     public static final String CONDITION_ID_FIELD = "CONDITION_ID";
 
 
@@ -272,8 +274,8 @@ public class CallCenterUtil {
      * @param agent_call_id
      */
     public void conversationEndEvent(String url,String conversation,String type,Long begin_time,
-                                     String record_file,String record_duration,String end_reason,
-                                     String queue_id,String channel_id,String agent_call_id){
+                                      String record_file,String record_duration,String end_reason,
+                                      String queue_id,String channel_id,String agent_call_id){
         try{
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","callcenter.conversation.end")
@@ -291,6 +293,18 @@ public class CallCenterUtil {
             notifyCallbackUtil.postNotify(url,notify_data,null,3);
         }catch (Throwable t){
             logger.error("发送交谈结束事件失败",t);
+        }
+    }
+
+    public void conversationPartsChangedEvent(String url,String conversation){
+        try{
+            Map<String,Object> notify_data = new MapBuilder<String,Object>()
+                    .putIfNotEmpty("event","callcenter.conversation.parts_changed")
+                    .putIfNotEmpty("id",conversation)
+                    .build();
+            notifyCallbackUtil.postNotify(url,notify_data,null,3);
+        }catch (Throwable t){
+            logger.error("发送交谈成员变化事件失败",t);
         }
     }
 }
