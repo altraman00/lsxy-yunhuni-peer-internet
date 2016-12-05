@@ -184,7 +184,7 @@ public class ConversationService {
         }
         Map<String, Object> map = new MapBuilder<String,Object>()
                 .putIfNotEmpty("user_data",id)
-                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(tenantId, appId))
+                //.putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(tenantId, appId))
                 .put("max_seconds",maxDuration,MAX_DURATION)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
@@ -537,6 +537,34 @@ public class ConversationService {
             rpcCaller.invoke(sessionContext, rpcrequest);
         } catch (Throwable e) {
             logger.error("调用将呼叫退出会议失败",e);
+        }
+    }
+
+    public void startRecord(String conversationId){
+        BusinessState conversation_state = businessStateService.get(conversationId);
+        startRecord(conversation_state);
+    }
+
+    public void startRecord(BusinessState state){
+        if(state == null || state.getResId() == null){
+            return;
+        }
+        if(state.getClosed() != null && state.getClosed()){
+            return;
+        }
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",state.getResId())
+                .putIfNotEmpty("max_seconds",MAX_DURATION)
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
+                .putIfNotEmpty("user_data",state.getId())
+                .putIfNotEmpty("areaId",state.getAreaId())
+                .build();
+
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            logger.error("启动交谈录音失败",e);
         }
     }
 

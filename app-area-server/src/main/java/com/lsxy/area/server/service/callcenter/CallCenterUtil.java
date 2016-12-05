@@ -75,6 +75,8 @@ public class CallCenterUtil {
     /**条件id存放的字段**/
     public static final String CONDITION_ID_FIELD = "CONDITION_ID";
 
+    public static final String CONVERSATION_STARTED_FIELD = "CONVERSATION_STARTED";
+    public static final String CONVERSATION_STARTED_TRUE = "1";
 
     @Autowired
     private BusinessStateService businessStateService;
