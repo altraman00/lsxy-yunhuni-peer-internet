@@ -103,6 +103,11 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                 }
                 throw new AuthenticationCredentialsNotFoundException("没有找到授权凭证");
             }
+            if (logger.isDebugEnabled()) {
+                logger.debug("CertID:" + certID+";");
+                logger.debug("Timestamp:" + timestamp+";");
+                logger.debug("AppID:" + appid+";");
+            }
 
             // Authorization header is in the form <public_access_key>:<signature>
             String apiuri = request.getRequestURI();
