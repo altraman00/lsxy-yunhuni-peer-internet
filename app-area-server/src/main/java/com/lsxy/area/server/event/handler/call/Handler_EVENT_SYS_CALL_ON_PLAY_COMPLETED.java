@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
@@ -91,7 +92,7 @@ public class Handler_EVENT_SYS_CALL_ON_PLAY_COMPLETED extends EventHandler{
             boolean isPlaywait = conversationService.isPlayWait(call_id);
             if(isPlaywait){
                 //等待音播放完成需要移除等待音标记
-                businessStateService.deleteInnerField(call_id,ConversationService.IS_PLAYWAIT_FIELD);
+                businessStateService.deleteInnerField(call_id, CallCenterUtil.IS_PLAYWAIT_FIELD);
             }
             if(!isPlaywait){//不是ivr呼叫中心排队
                 return true;

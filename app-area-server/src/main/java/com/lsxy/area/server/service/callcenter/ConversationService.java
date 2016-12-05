@@ -58,42 +58,6 @@ public class ConversationService {
 
     private static final String CONVERSATION_PARTS_COUNTER_KEY_PREFIX = "callcenter.conversation_parts_";
 
-    /**交谈发起者的call_id的存放属性**/
-    public static final String INITIATOR_FIELD = "CONVERSATION_INITIATOR";
-
-    /**呼叫所属的交谈的id的存放属性**/
-    public static final String CONVERSATION_FIELD = "CONVERSATION_ID";
-
-    /**ivr呼叫是否呼叫中心标记存放的字段**/
-    public static final String ISCC_FIELD = "ISCC";
-
-    /**是否正在播放排队等待音标记存放的字段**/
-    public static final String IS_PLAYWAIT_FIELD = "IS_PLAYWAIT";
-
-    public static final Integer IS_PLAYWAIT_TRUE = 1;
-
-    /**呼叫对应的排队id存放的字段**/
-    public static final String QUEUE_ID_FIELD = "QUEUE_ID";
-
-    /**坐席挂机后的状态存放的字段**/
-    public static final String RESERVE_STATE_FIELD = "RESERVE_STATE";
-
-    /**坐席呼叫对应的坐席id存放的字段**/
-    public static final String AGENT_ID_FIELD = "AGENT_ID";
-
-    /**坐席工号存放的字段**/
-    public static final String AGENT_NUM_FIELD = "AGENT_NUM";
-
-    /**坐席播放工号前的音存放的字段**/
-    public static final String AGENT_PRENUMVOICE_FIELD = "AGENT_PRENUMVOICE";
-
-    /**坐席播放工号后的音存放的字段**/
-    public static final String AGENT_POSTNUMVOICE_FIELD = "AGENT_POSTNUMVOICE";
-
-    /**交谈成员收放音模式存放的字段**/
-    public static final String PARTNER_VOICE_MODE_FIELD = "PARTNER_VOICE_MODE";
-
-    /****/
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -133,6 +97,9 @@ public class ConversationService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Value(value = "${app.cc.opensips.ip}")
     private String sip_address;
 
@@ -159,7 +126,7 @@ public class ConversationService {
         }
         BusinessState state = businessStateService.get(conversation);
         if(state != null && state.getBusinessData()!= null){
-            String initiator = state.getBusinessData().get(INITIATOR_FIELD);
+            String initiator = state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
             if(initiator != null && initiator.equals(callId)){
                 return CallCenterConversationMember.INITIATOR_TRUE;
             }
@@ -177,8 +144,8 @@ public class ConversationService {
         }
         BusinessState state = businessStateService.get(callId);
         if(state != null && state.getBusinessData()!= null){
-            String iscc = state.getBusinessData().get(ISCC_FIELD);
-            return iscc !=null && Integer.parseInt(iscc) == 1;
+            String iscc = state.getBusinessData().get(CallCenterUtil.ISCC_FIELD);
+            return iscc !=null && iscc.equals(CallCenterUtil.ISCC_TRUE);
         }
         return false;
     }
@@ -189,8 +156,8 @@ public class ConversationService {
         }
         BusinessState state = businessStateService.get(callId);
         if(state != null && state.getBusinessData()!= null){
-            String playWait = state.getBusinessData().get(IS_PLAYWAIT_FIELD);
-            return playWait !=null && Integer.parseInt(playWait) == IS_PLAYWAIT_TRUE;
+            String playWait = state.getBusinessData().get(CallCenterUtil.IS_PLAYWAIT_FIELD);
+            return playWait !=null && playWait.equals(CallCenterUtil.IS_PLAYWAIT_TRUE);
         }
         return false;
     }
@@ -198,7 +165,7 @@ public class ConversationService {
     public String getInitiator(String conversation){
         BusinessState state = businessStateService.get(conversation);
         if(state != null && state.getBusinessData()!= null){
-            return state.getBusinessData().get(INITIATOR_FIELD);
+            return state.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
         }
         return null;
     }
@@ -235,7 +202,7 @@ public class ConversationService {
                 .setCallBackUrl(callBackUrl)
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,String>()
-                        .putIfNotEmpty(INITIATOR_FIELD,initiator)//交谈发起者的callid
+                        .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)//交谈发起者的callid
                         .put("max_seconds",maxDuration!=null?maxDuration.toString():null,""+MAX_DURATION)//交谈最大持续时长
                         .build())
                 .build();
@@ -296,7 +263,7 @@ public class ConversationService {
      * @return
      * @throws YunhuniApiException
      */
-    public String inviteAgent(String appId, String conversationId,String agentId,
+    public String inviteAgent(String appId, String conversationId,String agentId,String agentName,String extension,
                          String telnum,String type,String user,
                           Integer maxDuration, Integer maxDialDuration) throws YunhuniApiException{
         String callId = UUIDGenerator.uuid();
@@ -351,8 +318,10 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
-                        .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
-                        .putIfNotEmpty(ConversationService.AGENT_ID_FIELD,agentId)
+                        .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
+                        .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
+                        .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
+                        .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
@@ -424,11 +393,11 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
-                        .putIfNotEmpty(ConversationService.CONVERSATION_FIELD,conversationId)
+                        .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件
-                        .putIfNotEmpty(PARTNER_VOICE_MODE_FIELD,voiceMode==null?null:voiceMode.toString())//加入后的声音模式
+                        .putIfNotEmpty(CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voiceMode==null?null:voiceMode.toString())//加入后的声音模式
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                         .build())
                 .build();
@@ -480,8 +449,8 @@ public class ConversationService {
             max_seconds = Integer.parseInt(conversation_business.get("max_seconds"));
         }
 
-        if(call_business != null && call_business.get(PARTNER_VOICE_MODE_FIELD)!=null){
-            voice_mode = Integer.parseInt(call_business.get(PARTNER_VOICE_MODE_FIELD));
+        if(call_business != null && call_business.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD)!=null){
+            voice_mode = Integer.parseInt(call_business.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD));
         }
 
         if(call_business != null && call_business.get("play_file")!=null){
@@ -493,7 +462,7 @@ public class ConversationService {
                 .putIfNotEmpty("res_id",call_state.getResId())
                 .putIfNotEmpty("conf_res_id",conversation_state.getResId())
                 .put("max_seconds",max_seconds,MAX_DURATION)
-                .putIfNotEmpty(PARTNER_VOICE_MODE_FIELD,voice_mode)
+                .putIfNotEmpty(CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voice_mode)
                 .putIfNotEmpty("play_file",play_file)
                 .putIfNotEmpty("user_data",call_id)
                 .putIfNotEmpty("areaId", conversation_state.getAreaId())
@@ -504,10 +473,10 @@ public class ConversationService {
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
-        if(call_business.get(ConversationService.CONVERSATION_FIELD) == null){
-            businessStateService.updateInnerField(call_id,ConversationService.CONVERSATION_FIELD,conversation_id);
+        if(call_business.get(CallCenterUtil.CONVERSATION_FIELD) == null){
+            businessStateService.updateInnerField(call_id,CallCenterUtil.CONVERSATION_FIELD,conversation_id);
         }
-        businessStateService.updateInnerField(call_id,PARTNER_VOICE_MODE_FIELD,voice_mode.toString());
+        businessStateService.updateInnerField(call_id,CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voice_mode.toString());
         if(logger.isDebugEnabled()){
             logger.debug("完成呼叫加入交谈call_id={},conversation_id={},maxDuration={},playFile={},voiceMode={}",
                     call_id,conversation_id,maxDuration,playFile,voice_mode);
@@ -588,7 +557,7 @@ public class ConversationService {
         } catch (Exception e) {
             throw new InvokeCallException(e);
         }
-        businessStateService.updateInnerField(callId,PARTNER_VOICE_MODE_FIELD,voiceMode.toString());
+        businessStateService.updateInnerField(callId,CallCenterUtil.PARTNER_VOICE_MODE_FIELD,voiceMode.toString());
     }
 
     /**
@@ -632,6 +601,12 @@ public class ConversationService {
         }
         //退出呼叫所在的交谈
         callConversationService.decrConversation(callId,conversationId);
+
+        if(call_state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
+            callCenterUtil.agentEnterConversationEvent(call_state.getCallBackUrl(),
+                    call_state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD),conversationId);
+        }
+
         if(callConversationService.size(callId) > 0){
             //TODO 回到上一次交谈
             if(logger.isDebugEnabled()) {
@@ -680,10 +655,10 @@ public class ConversationService {
         if(conversation==null){
             return;
         }
+        Map<String,String> businessData = state.getBusinessData();
         try{
             callConversationService.incrConversation(call_id,conversation_id);
             this.incrPart(conversation_id,call_id);
-            Map<String,String> businessData = state.getBusinessData();
             CallCenterConversationMember member = new CallCenterConversationMember();
             member.setCallId(call_id);
             member.setRelevanceId(conversation_id);
@@ -691,17 +666,21 @@ public class ConversationService {
             member.setSessionId(businessData.get(BusinessState.SESSIONID));
             member.setJoinNum(businessData.get("to"));
             member.setIsInitiator(this.isInitiator(conversation_id,call_id));
-            if(businessData.get(AGENT_ID_FIELD) != null){
+            if(businessData.get(CallCenterUtil.AGENT_ID_FIELD) != null){
                 member.setIsAgent(CallCenterConversationMember.AGENT_FALSE);
             }else{
                 member.setIsAgent(CallCenterConversationMember.AGENT_TRUE);
             }
-            if(StringUtil.isNotEmpty(businessData.get(PARTNER_VOICE_MODE_FIELD))){
-                member.setMode(Integer.parseInt(businessData.get(PARTNER_VOICE_MODE_FIELD)));
+            if(StringUtil.isNotEmpty(businessData.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD))){
+                member.setMode(Integer.parseInt(businessData.get(CallCenterUtil.PARTNER_VOICE_MODE_FIELD)));
             }
             callCenterConversationMemberService.save(member);
         }catch (Throwable t){
             logger.error("处理加入交谈失败",t);
+        }
+        if(state.getType().equals(BusinessState.TYPE_CC_AGENT_CALL)){
+            callCenterUtil.agentEnterConversationEvent(state.getCallBackUrl(),
+                    businessData.get(CallCenterUtil.AGENT_ID_FIELD),conversation_id);
         }
     }
     private void hangup(String res_id,String call_id,String area_id){
