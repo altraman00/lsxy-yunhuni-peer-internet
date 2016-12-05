@@ -51,7 +51,7 @@ public class ConversationService {
     public static final int MAX_DURATION = 60 * 60 * 6;
 
     /**key的过期时间 秒**/
-    public static final int EXPIRE = 60 * 60 * 12;
+    public static final int EXPIRE = MAX_DURATION + 60 * 10;
 
     private static final String CONVERSATION_PARTS_COUNTER_KEY_PREFIX = "callcenter.conversation_parts_";
 
@@ -140,6 +140,10 @@ public class ConversationService {
             return false;
         }
         BusinessState state = businessStateService.get(callId);
+        return isCC(state);
+    }
+
+    public boolean isCC(BusinessState state){
         if(state != null && state.getBusinessData()!= null){
             String iscc = state.getBusinessData().get(CallCenterUtil.ISCC_FIELD);
             return iscc !=null && iscc.equals(CallCenterUtil.ISCC_TRUE);

@@ -53,7 +53,7 @@ public class ConfServiceImpl implements ConfService {
     public static final int MAX_DURATION = 60 * 60 * 6;
 
     /**key的过期时间 秒**/
-    public static final int EXPIRE = 60 * 60 * 12;
+    public static final int EXPIRE = MAX_DURATION + 60 * 10;
 
     private static final String CONF_PARTS_COUNTER_KEY_PREFIX = "conf_parts_";
 
