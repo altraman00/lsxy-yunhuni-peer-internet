@@ -18,6 +18,13 @@ import java.util.List;
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_bi_call_center_agent")
 public class CallCenterAgent extends IdEntity {
 
+    public static final String STATE_ONLINE = "online";
+    public static final String STATE_IDLE = "idle";
+    public static final String STATE_FETCHING = "fetching";
+    public static final String STATE_TALKING = "talking";
+    public static final String STATE_BUSY = "busy";
+    public static final String STATE_AWAY = "away";
+
     private String tenantId;
     private String appId;
     private String channel;

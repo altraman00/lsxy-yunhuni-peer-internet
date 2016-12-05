@@ -1,6 +1,7 @@
 package com.lsxy.call.center.test;
 
 import com.lsxy.call.center.CallCenterMainClass;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.Condition;
 import com.lsxy.call.center.api.service.ConditionService;
 import com.lsxy.call.center.states.lock.AgentLock;
@@ -75,7 +76,7 @@ public class LuaTest {
                             CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                             ExtensionState.getPrefixed(),AgentLock.getPrefixed(),
                             ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                            AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING));
+                            CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING));
                     System.out.println(System.currentTimeMillis() -start);
                     latch.countDown();
                 }
@@ -95,7 +96,7 @@ public class LuaTest {
                 ExtensionState.getPrefixed(),AgentLock.getKey(agent),
                 QueueLock.getPrefixed(), CQs.getPrefixed(),
                 ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
-                AgentState.Model.STATE_IDLE,AgentState.Model.STATE_FETCHING);
+                CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
 
         System.out.println(queueId);
         System.out.println(System.currentTimeMillis() -start);

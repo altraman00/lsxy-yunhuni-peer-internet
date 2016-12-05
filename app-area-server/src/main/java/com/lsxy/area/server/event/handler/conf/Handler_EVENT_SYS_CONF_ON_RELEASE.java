@@ -5,6 +5,7 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenterConversation;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
@@ -63,6 +64,9 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterConversationService callCenterConversationService;
 
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_RELEASE;
@@ -105,14 +109,20 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     }
 
     private void conversation(BusinessState state, Map<String, Object> params, String conversation_id) {
+        CallCenterConversation conversation = null;
         try{
-            CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
+            conversation = callCenterConversationService.findById(conversation_id);
             if(conversation!=null){
                 conversation.setEndTime(new Date());
                 callCenterConversationService.save(conversation);
             }
         }catch (Throwable t){
             logger.error("更新交谈记录失败",t);
+        }
+        if(conversation!=null){
+            callCenterUtil.conversationEndEvent(state.getCallBackUrl(),conversation_id,
+                    CallCenterUtil.CONVERSATION_TYPE_QUEUE,
+                    conversation.getStartTime().getTime(),null,null,null,null,null,null);
         }
     }
 

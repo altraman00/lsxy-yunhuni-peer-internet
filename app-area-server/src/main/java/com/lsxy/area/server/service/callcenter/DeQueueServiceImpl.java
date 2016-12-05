@@ -56,6 +56,9 @@ public class DeQueueServiceImpl implements DeQueueService {
     @Autowired
     private SessionContext sessionContext;
 
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
@@ -87,8 +90,8 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         String conversation = UUIDGenerator.uuid();
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        businessStateService.updateInnerField(callId,ConversationService.CONVERSATION_FIELD,conversation);
-        businessStateService.updateInnerField(callId,ConversationService.QUEUE_ID_FIELD,queueId);
+        businessStateService.updateInnerField(callId,CallCenterUtil.CONVERSATION_FIELD,conversation);
+        businessStateService.updateInnerField(callId,CallCenterUtil.QUEUE_ID_FIELD,queueId);
 
         BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
         Integer conversationTimeout = enQueue.getConversation_timeout();
@@ -98,6 +101,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         String postNumVoice = enQueue.getPost_num_voice();
 
         String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
+                result.getAgent().getName(),result.getExtension().getId(),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
@@ -106,20 +110,30 @@ public class DeQueueServiceImpl implements DeQueueService {
 
 
         if(reserveState != null){
-            businessStateService.updateInnerField(agentCallId,ConversationService.RESERVE_STATE_FIELD,reserveState);
+            businessStateService.updateInnerField(agentCallId,CallCenterUtil.RESERVE_STATE_FIELD,reserveState);
         }
         if(playNum){
             if(result.getAgent().getNum() != null){
-                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_NUM_FIELD,result.getAgent().getNum());
+                businessStateService.updateInnerField(agentCallId,CallCenterUtil.AGENT_NUM_FIELD,result.getAgent().getNum());
             }
             if(preNumVoice != null){
-                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_PRENUMVOICE_FIELD,preNumVoice);
+                businessStateService.updateInnerField(agentCallId,CallCenterUtil.AGENT_PRENUMVOICE_FIELD,preNumVoice);
             }
             if(postNumVoice != null){
-                businessStateService.updateInnerField(agentCallId,ConversationService.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
+                businessStateService.updateInnerField(agentCallId,CallCenterUtil.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
             }
         }
         updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
+
+        callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation,
+                CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
+                state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),agentCallId);
+
+        callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
+                queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
+                state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
+                callId,agentCallId,state.getUserdata());
     }
 
     @Override
@@ -133,16 +147,17 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .putIfNotEmpty("event","callcenter.enqueue.timeout")
-                .putIfNotEmpty("id",callId)
-                .putIfNotEmpty("user_data",state.getUserdata())
-                .build();
-        if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
-                        .put("error","timeout").build());
-            }
+
+        callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
+                queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
+                state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
+                CallCenterUtil.QUEUE_FAIL_TIMEOUT,
+                callId,null,state.getUserdata());
+
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+            ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                    .put("error",CallCenterUtil.QUEUE_FAIL_TIMEOUT).build());
         }
         updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
     }
@@ -158,16 +173,17 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                .putIfNotEmpty("event","callcenter.enqueue.fail")
-                .putIfNotEmpty("id",callId)
-                .putIfNotEmpty("user_data",state.getUserdata())
-                .build();
-        if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
-                ivrActionService.doAction(callId,new MapBuilder<String,Object>()
-                        .put("error","fail").build());
-            }
+
+        callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
+                queueId,CallCenterUtil.QUEUE_TYPE_IVR,
+                state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
+                state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
+                CallCenterUtil.QUEUE_FAIL_ERROR,
+                callId,null,state.getUserdata());
+
+        if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
+            ivrActionService.doAction(callId,new MapBuilder<String,Object>()
+                    .put("error",CallCenterUtil.QUEUE_FAIL_ERROR).build());
         }
         updateQueue(queueId,callId,null,null,null,CallCenterQueue.RESULT_FAIL);
     }
@@ -205,7 +221,7 @@ public class DeQueueServiceImpl implements DeQueueService {
                 callCenterQueue.setInviteTime(cur);
             }
             callCenterQueue.setEndTime(cur);
-            callCenterQueue.setToManualTime((callCenterQueue.getStartTime().getTime() - callCenterQueue.getEndTime().getTime()) / 1000);
+            callCenterQueue.setToManualTime((callCenterQueue.getEndTime().getTime() - callCenterQueue.getStartTime().getTime()) / 1000);
             callCenterQueue.setResult(result);
             callCenterQueueService.save(callCenterQueue);
         }catch (Throwable t){
