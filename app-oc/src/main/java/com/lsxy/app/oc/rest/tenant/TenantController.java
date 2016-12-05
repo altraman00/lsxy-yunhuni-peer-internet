@@ -1059,7 +1059,8 @@ public class TenantController {
         map.put("callOut",incStatics.getCallOut());//呼出量
         map.put("transferSuccess",incStatics.getToManualSuccess());//转接成功
         map.put("formTime",incStatics.getQueueNum()==0?0:Math.round((double)incStatics.getQueueDuration()/incStatics.getQueueNum()));//排队时间
-        map.put("callTime",incStatics.getQueueDuration());//平均通话时长
+        long callSuccess = incStatics.getCallInSuccess() + incStatics.getCallOutSuccess();
+        map.put("callTime",callSuccess == 0?0:Math.round((double)incStatics.getCallTimeLong()/callSuccess));//平均通话时长
         map.put("callFail",incStatics.getCallIn()==0?0:Math.round((double)(incStatics.getCallInSuccess()*100)/incStatics.getCallIn()));//呼入流失率
         return RestResponse.success(map);
     }
