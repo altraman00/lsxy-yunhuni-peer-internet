@@ -1,10 +1,13 @@
 package com.lsxy.area.server.event.handler.conf;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.model.CallCenterConversation;
+import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -57,6 +60,9 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     @Autowired
     private ConfService confService;
 
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationService callCenterConversationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_RELEASE;
@@ -99,15 +105,23 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
     }
 
     private void conversation(BusinessState state, Map<String, Object> params, String conversation_id) {
-        //TODO
+        try{
+            CallCenterConversation conversation = callCenterConversationService.findById(conversation_id);
+            if(conversation!=null){
+                conversation.setEndTime(new Date());
+                callCenterConversationService.save(conversation);
+            }
+        }catch (Throwable t){
+            logger.error("更新交谈记录失败",t);
+        }
     }
 
     private void conf(BusinessState state,Map<String,Object> params,String conf_id){
         String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
+        Map<String,String> businessData = state.getBusinessData();
         Boolean auto_hangup = Boolean.FALSE;
         if(businessData!=null){
-            auto_hangup = (Boolean)businessData.get("auto_hangup");
+            auto_hangup = Boolean.parseBoolean(businessData.get("auto_hangup"));
         }
         if(auto_hangup != null && auto_hangup){
             handupParts(conf_id);
@@ -145,10 +159,14 @@ public class Handler_EVENT_SYS_CONF_ON_RELEASE extends EventHandler{
             logger.debug("处理{}事件完成",getEventName());
         }
 
-        Meeting meeting = meetingService.findById(conf_id);
-        if(meeting!=null){
-            meeting.setEndTime(new Date());
-            meetingService.save(meeting);
+        try{
+            Meeting meeting = meetingService.findById(conf_id);
+            if(meeting!=null){
+                meeting.setEndTime(new Date());
+                meetingService.save(meeting);
+            }
+        }catch (Throwable t){
+            logger.error("更新会议记录失败",t);
         }
     }
     private void handupParts(String confId) {

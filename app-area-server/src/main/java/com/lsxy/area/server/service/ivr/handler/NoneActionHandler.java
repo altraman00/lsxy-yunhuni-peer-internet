@@ -2,13 +2,12 @@ package com.lsxy.area.server.service.ivr.handler;
 
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
+import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 /**
  * none指令处理器
@@ -45,10 +44,7 @@ public class NoneActionHandler extends ActionHandler{
             logger.info("没有找到call_id={}的state",callId);
             return false;
         }
-        Map<String,Object> businessData = state.getBusinessData();
-        businessData.put("next",next);
-        state.setBusinessData(businessData);
-        businessStateService.save(state);
+        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         return true;
     }
 }

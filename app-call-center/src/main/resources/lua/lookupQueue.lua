@@ -11,6 +11,7 @@ local cur_time = tonumber(ARGV[2])
 local idle = ARGV[3]
 local fetching = ARGV[4]
 local target_condition = ARGV[5]
+local extension_enable = ARGV[6]
 
 local array_to_map = function(_array)
     local _map ={}
@@ -38,12 +39,8 @@ if(agent and agent['state'] == idle
         and (agent['lastRegTime'] + agent_reg_expire) >= cur_time)
 then
     local extension = array_to_map(redis.call('HGETALL',extension_state_key_prefix..agent['extension']))
-    redis.log(redis.LOG_WARNING,extension['lastRegisterStatus'])
-    redis.log(redis.LOG_WARNING,extension['lastRegisterTime'])
-    redis.log(redis.LOG_WARNING,extension['registerExpires'])
-    if(extension and extension['lastRegisterStatus']
-            and extension['lastRegisterTime'] and extension['registerExpires']
-            and (extension['lastRegisterTime'] + extension['registerExpires']) >= cur_time)
+    redis.log(redis.LOG_WARNING,extension['enable'])
+    if(extension and extension['enable'] and extension['enable'] == extension_enable)
     then
         local ok = redis.call('setnx',agent_lock_key, '1')
         redis.log(redis.LOG_WARNING,ok)

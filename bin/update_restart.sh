@@ -28,6 +28,7 @@ FORCE_INSTALL=false
 FORCE_CLEAN=true
 #是否需要在最后TAIL LOG
 TAIL_LOG=false
+source /etc/profile
 
 while getopts "A:P:H:STILDC" opt; do
   case $opt in
@@ -73,7 +74,7 @@ then
    exit 1;
 fi
 
-export MAVEN_OPTS="-Xms256m -Xmx512m"
+export MAVEN_OPTS="$MAVEN_OPTS -Xms256m -Xmx512m"
 echo "MAVEN 构建参数：$MAVEN_OPTS"
 #先停止制定的APP服务
 echo "停止现有服务...."
@@ -90,7 +91,7 @@ if [ "$pull_ret"x = "Already up-to-date."x ]; then
     if [ $FORCE_INSTALL = true ]; then
         echo "安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean compile install -U $ENV_PROFILE -DskipTests=true
+        mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用INSTALL了";
     fi
@@ -99,7 +100,7 @@ else
     if [ $FORCE_CLEAN = true ]; then
         echo "清除安装模块代码"
         cd $YUNHUNI_HOME
-        mvn clean compile install -U $ENV_PROFILE -DskipTests=true
+        mvn clean compile install -U $ENV_PROFILE -DskipTests=true -pl $APP_NAME -am
     else
         echo "已经是最新代码了 不用CLEAN INSTALL了";
     fi
