@@ -279,7 +279,7 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                             queueId,CallCenterUtil.QUEUE_TYPE_IVR,
                             init_state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                             init_state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
-                            CallCenterUtil.QUEUE_FAIL_HANGUP,
+                            CallCenterUtil.QUEUE_FAIL_CALLFAIL,
                             initorid,call_id,init_state.getUserdata());
                 }else{
                     callCenterUtil.sendQueueSuccessEvent(init_state.getCallBackUrl(),
