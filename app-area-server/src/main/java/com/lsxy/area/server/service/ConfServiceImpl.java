@@ -552,7 +552,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
-                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(app.getTenant().getId(),appId))
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(conf_state.getTenantId(),appId))
                 .putIfNotEmpty("user_data",confId)
                 .putIfNotEmpty("areaId",areaId)
                 .build();

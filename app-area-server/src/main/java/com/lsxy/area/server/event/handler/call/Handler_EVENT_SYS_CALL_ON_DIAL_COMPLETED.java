@@ -292,6 +292,23 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 logger.error("更新排队记录失败",t);
             }
 
+            /**交谈成员为2时，视为交谈开始**/
+            if(conversationService.size(conversation_id) == 2){
+                BusinessState conversationState = businessStateService.get(conversation_id);
+                if(conversationState != null &&
+                        (conversationState.getClosed()== null || !conversationState.getClosed()) &&
+                        conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
+                    businessStateService.updateInnerField(conversation_id,
+                            CallCenterUtil.CONVERSATION_STARTED_FIELD,CallCenterUtil.CONVERSATION_STARTED_TRUE);
+                    //开始录音
+                    conversationService.startRecord(conversationState);
+                    //交谈开始事件
+                    callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation_id,
+                            CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
+                            state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),call_id);
+                }
+            }
+
             if(initorid!= null && init_state != null && queueId!=null){
                 if(StringUtil.isNotEmpty(error)){
                     callCenterUtil.sendQueueFailEvent(init_state.getCallBackUrl(),
