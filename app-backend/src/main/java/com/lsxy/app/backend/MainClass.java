@@ -10,7 +10,6 @@ import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
 import com.lsxy.framework.oss.FrameworkOSSConfig;
-import com.lsxy.framework.web.web.AbstractSpringBootWebStarter;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
