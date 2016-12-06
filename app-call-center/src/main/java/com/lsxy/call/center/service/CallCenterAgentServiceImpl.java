@@ -296,7 +296,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             agentSkillService.deleteByAgent(agentId);
             try {
-                this.delete(agentId);
+                this.delete(agent);
                 //写入注销日志
                 agentActionLogService.agentLogout(agent);
             } catch (Exception e) {
@@ -429,6 +429,10 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 }else{
                     throw new ExtensionBindingToAgentException();
                 }
+            }
+            String oldExtension = agentState.getExtension(agent.getId());
+            if(StringUtils.isNotBlank(oldExtension)){
+                extensionState.deleteAgent(agent.getId());
             }
             extensionState.setAgent(extensionId,agent.getId());
             agentState.setExtension(agent.getId(),extensionId);
