@@ -109,7 +109,6 @@ public class EnQueueServiceImpl implements EnQueueService{
             queue = new CallCenterQueue();
             queue.setTenantId(tenantId);
             queue.setAppId(appId);
-            //TODO 这个id 存啥
             queue.setRelevanceId("");
             queue.setCondition(conditionId);
             queue.setStartTime(new Date());
@@ -126,10 +125,13 @@ public class EnQueueServiceImpl implements EnQueueService{
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
                     CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE);
             if(logger.isDebugEnabled()){
-                logger.debug("排队结果:agent={}",agent);
+                logger.debug("[{}][{}]callid={}排队结果:agent={}",tenantId,appId,callId,agent);
             }
             if(StringUtil.isEmpty(agent)){
                 //没有找到可用坐席
+                if(logger.isDebugEnabled()){
+                    logger.debug("[{}][{}]callid={}发布排队超时事件",tenantId,appId,callId);
+                }
                 cQs.add(conditionId,queue.getId());
                 mqService.publish(new EnqueueTimeoutEvent(conditionId,queue.getId(),
                         tenantId,appId,callId,condition.getQueueTimeout() * 1000));
@@ -158,7 +160,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 }
             }
         }catch (Throwable e){
-            logger.error("排队找坐席出错",e);
+            logger.info("[{}][{}]callid={}排队找坐席出错:{}",tenantId,appId,callId,e.getMessage());
             deQueueService.fail(tenantId,appId,callId,e.getMessage(),queue != null?queue.getId():null);
         }
     }
