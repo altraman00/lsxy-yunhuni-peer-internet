@@ -44,17 +44,7 @@ public class ReceivedtmfActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root,String next) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
-        }
-
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
-
+    public boolean handle(String callId,BusinessState state, Element root,String next) {
         String valid_keys = root.attributeValue("valid_keys");
         String max_keys = root.attributeValue("max_keys");
         String finish_keys = root.attributeValue("finish_keys");
@@ -64,10 +54,6 @@ public class ReceivedtmfActionHandler extends ActionHandler{
         String if_break_on_key = root.attributeValue("if_break_on_key");
         List<String> plays = getPlay(root);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，valid_keys={},max_keys={},finish_keys={}",
-                    getAction(),valid_keys,max_keys,finish_keys);
-        }
         String res_id = state.getResId();
         try {
             plays = playFileUtil.convertArray(state.getTenantId(),state.getAppId(),plays);
