@@ -89,18 +89,17 @@ public class Handler_EVENT_SYS_CALL_ON_FAIL extends EventHandler{
             if(businessData != null){
                 String ivr_call_id = businessData.get("ivr_call_id");
                 if(StringUtil.isNotEmpty(ivr_call_id)){
-                    Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                            .putIfNotEmpty("event","ivr.connect_end")
-                            .putIfNotEmpty("id",ivr_call_id)
-                            .putIfNotEmpty("begin_time",System.currentTimeMillis())
-                            .putIfNotEmpty("end_time",System.currentTimeMillis())
-                            .putIfNotEmpty("error","dial error")
+                    Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                            .putIfNotEmpty("event", "ivr.connect_end")
+                            .putIfNotEmpty("id", ivr_call_id)
+                            .putIfNotEmpty("begin_time", System.currentTimeMillis())
+                            .putIfNotEmpty("end_time", System.currentTimeMillis())
+                            .putIfNotEmpty("error", "dial error")
                             .build();
-                    if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                        ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
-                                .putIfNotEmpty("error","dial error")
-                                .build());
-                    }
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())||
