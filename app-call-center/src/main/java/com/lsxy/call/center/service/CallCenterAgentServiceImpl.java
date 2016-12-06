@@ -176,7 +176,9 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                     obj.setAppId(agent.getAppId());
                     obj.setAgent(agentId);
                     agentSkillService.save(obj);
-                    skillScore.put(obj.getName(),obj.getScore());
+                    if(obj.getEnabled()){
+                        skillScore.put(obj.getName(),obj.getScore());
+                    }
                 }
 
                 //查询指定通道下所有条件集合，查出匹配的条件
@@ -548,12 +550,15 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             });
             Collection<AgentSkill> newSkills = skillMap.values();
             Map<String,Integer> skillScore = new HashMap<>();
-            newSkills.parallelStream().forEach(skill -> skillScore.put(skill.getName(),skill.getScore()));
+            newSkills.parallelStream().forEach(skill -> {
+                if(skill.getEnabled()){
+                    skillScore.put(skill.getName(),skill.getScore());
+                }
+            });
             //查询指定通道下所有条件集合，查出匹配的条件
             setSuitedConditionsAndConditionScore(agent, suitedConditions, conditionScore, skillScore);
 
             Set<String> oldConditionIds = aCs.getAll(agentId);
-            Set<String> removeConditionIds = new HashSet<>();
 
             suitedConditions.parallelStream().forEach(condition -> {
                 oldConditionIds.remove(condition.getId());
@@ -562,7 +567,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 //TODO 设置座席条件
                 aCs.add(agentId,condition.getId(),condition.getPriority());
             });
-            removeConditionIds.parallelStream().forEach(cId -> {
+            oldConditionIds.parallelStream().forEach(cId -> {
                 cAs.remove(cId,agentId);
                 aCs.remove(agentId,cId);
             });
