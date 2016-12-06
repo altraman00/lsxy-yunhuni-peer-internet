@@ -432,7 +432,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             String oldExtension = agentState.getExtension(agent.getId());
             if(StringUtils.isNotBlank(oldExtension)){
-                extensionState.deleteAgent(agent.getId());
+                extensionState.deleteAgent(oldExtension);
             }
             extensionState.setAgent(extensionId,agent.getId());
             agentState.setExtension(agent.getId(),extensionId);
