@@ -66,9 +66,6 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(appId == null){
             throw new RequestIllegalArgumentException();
         }
-        if(condition.getChannelId() == null){
-            throw new RequestIllegalArgumentException();
-        }
         if(!ExpressionUtils.validSortExpression(condition.getSortExpression())){
             throw new ConditionExpressionException();
         }
@@ -78,20 +75,21 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
         if(!appService.enabledService(tenantId, appId, ServiceType.CallCenter)){
             throw new AppServiceInvalidException();
         }
-        //通道是否存在
-        Channel channel = channelService.findById(condition.getChannelId());
-        if(channel == null){
-            throw new ChannelNotExistException();
-        }
+
         if(condition.getId() != null){
             Condition oldCondition = this.findById(condition.getId());
             if(oldCondition == null){
-                throw new ChannelNotExistException();
+                throw new ConditionNotExistException();
             }
             if(!oldCondition.getTenantId().equals(tenantId)){
-                throw new ChannelNotExistException();
+                throw new ConditionNotExistException();
             }
             if(!oldCondition.getAppId().equals(appId)){
+                throw new ConditionNotExistException();
+            }
+            //通道是否存在
+            Channel channel = channelService.findById(oldCondition.getChannelId());
+            if(channel == null){
                 throw new ChannelNotExistException();
             }
             ModifyConditionLock lock = new ModifyConditionLock(redisCacheService,condition.getId());
@@ -138,6 +136,14 @@ public class ConditionServiceImpl extends AbstractService<Condition> implements 
                 throw t;
             }
         }else{
+            if(condition.getChannelId() == null){
+                throw new RequestIllegalArgumentException();
+            }
+            //通道是否存在
+            Channel channel = channelService.findById(condition.getChannelId());
+            if(channel == null){
+                throw new ChannelNotExistException();
+            }
             condition.setTenantId(tenantId);
             condition.setAppId(appId);
             condition = super.save(condition);
