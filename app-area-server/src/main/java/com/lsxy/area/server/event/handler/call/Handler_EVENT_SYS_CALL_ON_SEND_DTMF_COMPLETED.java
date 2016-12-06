@@ -86,12 +86,11 @@ public class Handler_EVENT_SYS_CALL_ON_SEND_DTMF_COMPLETED extends EventHandler{
                     .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("error",params.get("error"))
                     .build();
-            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
-                        .putIfNotEmpty("error",params.get("error"))
-                        .build());
-            }
+            notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3);
         }
+        ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                .putIfNotEmpty("error",params.get("error"))
+                .build());
         return res;
     }
 }

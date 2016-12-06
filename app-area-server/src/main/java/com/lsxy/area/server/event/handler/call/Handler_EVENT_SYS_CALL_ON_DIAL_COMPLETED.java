@@ -178,11 +178,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .putIfNotEmpty("end_time",System.currentTimeMillis())
                         .putIfNotEmpty("error",error)
                         .build();
-                if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
-                            .putIfNotEmpty("error","dial error")
-                            .build());
-                }
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                        .putIfNotEmpty("error","dial error")
+                        .build());
             }else{
                 BusinessState ivrState = businessStateService.get(ivr_call_id);
                 String res_id_one = ivrState.getResId();
