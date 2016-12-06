@@ -81,8 +81,14 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
 
         String record_id = UUIDGenerator.uuid();
         try{
+            String type = state.getType();
+            if(BusinessState.TYPE_IVR_INCOMING.equals(type)){
+                if(conversationService.isCC(state)){
+                    type = BusinessState.TYPE_CC_INCOMING;
+                }
+            }
             mqService.publish(new RecordCompletedEvent(record_id,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
-                    state.getType(),(String)params.get("record_file"),
+                    type,(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
         }catch (Throwable t){
