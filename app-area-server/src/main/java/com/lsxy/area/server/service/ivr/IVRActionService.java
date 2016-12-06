@@ -396,14 +396,15 @@ public class IVRActionService {
     public boolean doAction(String call_id,Map<String,Object> prevResults){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            logger.info("没有找到call_id={}的state",call_id);
+            logger.info("callId={}没有找到state",call_id);
             return false;
         }
 
         if(state.getClosed() != null && state.getClosed()){
-            logger.info("IVR呼叫已关闭，call_id={}",call_id);
+            logger.info("[{}][{}]callId={}IVR呼叫已关闭",state.getTenantId(),state.getAppId(),call_id);
             return false;
         }
+
         Map<String,String> businessDate = state.getBusinessData();
 
         //呼入,如果有IVR_ANSWER_AFTER_XML_FIELD直接执行，不需要调用next获取xml
@@ -417,7 +418,7 @@ public class IVRActionService {
         String nextUrl = businessDate.get(IVR_NEXT_FIELD);
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl)){
-            logger.info("没有后续ivr动作了，call_id={}",call_id);
+            logger.info("[{}][{}]没有后续ivr动作了，call_id={}",state.getTenantId(),state.getAppId(),call_id);
             hangup(state.getResId(),call_id,state.getAreaId());
             return  false;
         }
@@ -444,13 +445,13 @@ public class IVRActionService {
             actionEle = getActionEle(root);
             h = handlers.get(actionEle.getName().toLowerCase());
             if(h == null){
-                logger.info("没有找到对应的ivr动作处理类");
+                logger.info("[{}][{}]callId={}没有找到对应的ivr动作处理类",state.getTenantId(),state.getAppId(),call_id);
                 return false;
             }
             //呼叫中心排队
             if(h instanceof EnqueueHandler){
                 if(!conversationService.isCC(call_id)){
-                    logger.info("没有开通呼叫中心服务");
+                    logger.info("[{}][{}]callId={}没有开通呼叫中心服务",state.getTenantId(),state.getAppId(),call_id);
                     return false;
                 }
             }
@@ -461,9 +462,12 @@ public class IVRActionService {
                 return true;
             }
             businessStateService.updateInnerField(call_id,IVR_ACTION_FIELD,h.getAction());
-            return h.handle(call_id,actionEle,getNextUrl(root));
+            if(logger.isDebugEnabled()){
+                logger.debug("[{}][{}]开始处理ivr动作，callId={},ivr={}",state.getTenantId(),state.getAppId(),call_id,h.getAction());
+            }
+            return h.handle(call_id,state,actionEle,getNextUrl(root));
         } catch(DocumentException e){
-            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
+            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             //发送ivr格式错误通知
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
@@ -474,7 +478,7 @@ public class IVRActionService {
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
-            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
+            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             return false;
         }
     }

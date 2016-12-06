@@ -11,7 +11,6 @@ import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -59,36 +58,20 @@ public class EnqueueHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root,String next) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作",getAction());
-        }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
+    public boolean handle(String callId,BusinessState state, Element root,String next) {
         Map<String,String> businessData = state.getBusinessData();
         String xml = root.asXML();
         EnQueue enQueue = EnQueueDecoder.decode(xml);
-
         if(enQueue!=null){
-            if(logger.isDebugEnabled()){
-                logger.debug("排队={}", JSONUtil.objectToJson(enQueue));
-            }
             if(StringUtil.isNotEmpty(enQueue.getData())){
                 businessStateService.updateUserdata(callId,enQueue.getData());
             }
-
             if(enQueue.getWait_voice()!= null){
                 String playWait = enQueue.getWait_voice();
                 try {
                     playWait = playFileUtil.convert(state.getTenantId(),state.getAppId(),playWait);
                     if(logger.isDebugEnabled()){
-                        logger.debug("开始播放排队等待音={}", playWait);
+                        logger.debug("[][]callid={}开始播放排队等待音={}",state.getTenantId(),state.getAppId(),callId, playWait);
                     }
                     Map<String, Object> params = new MapBuilder<String,Object>()
                             .putIfNotEmpty("res_id",state.getResId())
