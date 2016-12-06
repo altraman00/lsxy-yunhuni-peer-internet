@@ -165,8 +165,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .build();
                 notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
             }
-            if(StringUtils.isNotBlank(error)){
-                logger.error("IVR呼出失败",error);
+            if(StringUtils.isBlank(error)){
+                ivrActionService.doAction(call_id,null);
             }
         }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//通过ivr拨号动作发起的呼叫
             String ivr_call_id = businessData.get("ivr_call_id");
@@ -178,11 +178,10 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .putIfNotEmpty("end_time",System.currentTimeMillis())
                         .putIfNotEmpty("error",error)
                         .build();
-                if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
-                            .putIfNotEmpty("error","dial error")
-                            .build());
-                }
+                notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                        .putIfNotEmpty("error","dial error")
+                        .build());
             }else{
                 BusinessState ivrState = businessStateService.get(ivr_call_id);
                 String res_id_one = ivrState.getResId();
@@ -257,7 +256,12 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }
                 if(agentId != null){
                     try {
-                        callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,CallCenterAgent.STATE_TALKING,true);
+                        String preState = callCenterAgentService.getState(agentId);
+                        String curState = CallCenterAgent.STATE_TALKING;
+                        if(CallCenterAgent.STATE_FETCHING.equals(preState)){
+                            callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,curState,true);
+                            callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,preState,curState);
+                        }
                     } catch (YunhuniApiException e) {
                         logger.info("[{}][{}]agentID={}设置坐席状态失败 ",state.getTenantId(),state.getAppId(),agentId);
                     }
@@ -285,6 +289,23 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                 }
             }catch (Throwable t){
                 logger.error("更新排队记录失败",t);
+            }
+
+            /**交谈成员为2时，视为交谈开始**/
+            if(conversationService.size(conversation_id) == 2){
+                BusinessState conversationState = businessStateService.get(conversation_id);
+                if(conversationState != null &&
+                        (conversationState.getClosed()== null || !conversationState.getClosed()) &&
+                        conversationState.getBusinessData().get(CallCenterUtil.CONVERSATION_STARTED_FIELD) == null){
+                    businessStateService.updateInnerField(conversation_id,
+                            CallCenterUtil.CONVERSATION_STARTED_FIELD,CallCenterUtil.CONVERSATION_STARTED_TRUE);
+                    //开始录音
+                    conversationService.startRecord(conversationState);
+                    //交谈开始事件
+                    callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation_id,
+                            CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
+                            state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),call_id);
+                }
             }
 
             if(initorid!= null && init_state != null && queueId!=null){

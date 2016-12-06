@@ -12,10 +12,7 @@ import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
 import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
-import com.lsxy.framework.core.exceptions.api.ConversationNotExistException;
-import com.lsxy.framework.core.exceptions.api.InvokeCallException;
-import com.lsxy.framework.core.exceptions.api.OutOfConversationMaxPartsException;
-import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -54,7 +51,7 @@ public class ConversationService {
     public static final int MAX_DURATION = 60 * 60 * 6;
 
     /**key的过期时间 秒**/
-    public static final int EXPIRE = 60 * 60 * 12;
+    public static final int EXPIRE = MAX_DURATION + 60 * 10;
 
     private static final String CONVERSATION_PARTS_COUNTER_KEY_PREFIX = "callcenter.conversation_parts_";
 
@@ -143,6 +140,10 @@ public class ConversationService {
             return false;
         }
         BusinessState state = businessStateService.get(callId);
+        return isCC(state);
+    }
+
+    public boolean isCC(BusinessState state){
         if(state != null && state.getBusinessData()!= null){
             String iscc = state.getBusinessData().get(CallCenterUtil.ISCC_FIELD);
             return iscc !=null && iscc.equals(CallCenterUtil.ISCC_TRUE);
@@ -183,7 +184,7 @@ public class ConversationService {
         }
         Map<String, Object> map = new MapBuilder<String,Object>()
                 .putIfNotEmpty("user_data",id)
-                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(tenantId, appId))
+                //.putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(tenantId, appId))
                 .put("max_seconds",maxDuration,MAX_DURATION)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
@@ -425,12 +426,23 @@ public class ConversationService {
         }
         BusinessState call_state = businessStateService.get(call_id);
         BusinessState conversation_state = businessStateService.get(conversation_id);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conversation_state == null || conversation_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conversation_state.getAppId())){
             //不合法的参数
             throw new IllegalArgumentException();
@@ -500,8 +512,14 @@ public class ConversationService {
             logger.info("(call_state == null || call_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
             return;
         }
+        if(call_state.getClosed() != null && call_state.getClosed()){
+            return;
+        }
         if(conversation_state == null || conversation_state.getResId() == null){
             logger.info("(conversation_state == null || conversation_state.getResId() == null)conversationId={},callId={}",conversationId,callId);
+            return;
+        }
+        if(conversation_state.getClosed() != null && conversation_state.getClosed()){
             return;
         }
         if(!call_state.getAppId().equals(conversation_state.getAppId())){
@@ -522,15 +540,54 @@ public class ConversationService {
         }
     }
 
+    public void startRecord(String conversationId){
+        BusinessState conversation_state = businessStateService.get(conversationId);
+        startRecord(conversation_state);
+    }
+
+    public void startRecord(BusinessState state){
+        if(state == null || state.getResId() == null){
+            return;
+        }
+        if(state.getClosed() != null && state.getClosed()){
+            return;
+        }
+        Map<String,Object> params = new MapBuilder<String,Object>()
+                .putIfNotEmpty("res_id",state.getResId())
+                .putIfNotEmpty("max_seconds",MAX_DURATION)
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
+                .putIfNotEmpty("user_data",state.getId())
+                .putIfNotEmpty("areaId",state.getAreaId())
+                .build();
+
+        RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CONF_RECORD, params);
+        try {
+            rpcCaller.invoke(sessionContext, rpcrequest);
+        } catch (Exception e) {
+            logger.error("启动交谈录音失败",e);
+        }
+    }
+
     public void setVoiceMode(String areaId,String conversationId, String callId, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conversation_state = businessStateService.get(conversationId);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conversation_state == null || conversation_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conversation_state.getClosed()!= null && conversation_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conversation_state.getAppId())){
             throw new IllegalArgumentException();
         }

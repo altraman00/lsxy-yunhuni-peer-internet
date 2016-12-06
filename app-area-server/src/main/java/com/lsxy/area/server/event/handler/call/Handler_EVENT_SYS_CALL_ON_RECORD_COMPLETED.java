@@ -81,8 +81,14 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
 
         String record_id = UUIDGenerator.uuid();
         try{
+            String type = state.getType();
+            if(BusinessState.TYPE_IVR_INCOMING.equals(type)){
+                if(conversationService.isCC(state)){
+                    type = BusinessState.TYPE_CC_INCOMING;
+                }
+            }
             mqService.publish(new RecordCompletedEvent(record_id,state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
-                    state.getType(),(String)params.get("record_file"),
+                    type,(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
         }catch (Throwable t){
@@ -120,20 +126,19 @@ public class Handler_EVENT_SYS_CALL_ON_RECORD_COMPLETED extends EventHandler{
             end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
         if(StringUtils.isNotBlank(state.getCallBackUrl())){
-            Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","ivr.record_end")
-                    .putIfNotEmpty("id",call_id)
-                    .putIfNotEmpty("begin_time",begin_time)
-                    .putIfNotEmpty("end_time",end_time)
-                    .putIfNotEmpty("error",params.get("error"))
-                    .putIfNotEmpty("key",params.get("finish_key"))
+            Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                    .putIfNotEmpty("event", "ivr.record_end")
+                    .putIfNotEmpty("id", call_id)
+                    .putIfNotEmpty("begin_time", begin_time)
+                    .putIfNotEmpty("end_time", end_time)
+                    .putIfNotEmpty("error", params.get("error"))
+                    .putIfNotEmpty("key", params.get("finish_key"))
                     .build();
-            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
-                        .putIfNotEmpty("error",params.get("error"))
-                        .putIfNotEmpty("record_id",record_id)
-                        .build());
-            }
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
         }
+        ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                .putIfNotEmpty("error",params.get("error"))
+                .putIfNotEmpty("record_id",record_id)
+                .build());
     }
 }

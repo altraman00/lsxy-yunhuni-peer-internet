@@ -96,11 +96,10 @@ public class Handler_EVENT_SYS_CALL_ON_TIMEOUT extends EventHandler{
                             .putIfNotEmpty("end_time",System.currentTimeMillis())
                             .putIfNotEmpty("error","dial error")
                             .build();
-                    if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                        ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
-                                .putIfNotEmpty("error","dial error")
-                                .build());
-                    }
+                    notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
+                    ivrActionService.doAction(ivr_call_id,new MapBuilder<String,Object>()
+                            .putIfNotEmpty("error","dial error")
+                            .build());
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())||

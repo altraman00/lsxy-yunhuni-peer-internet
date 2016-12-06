@@ -487,6 +487,11 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
     }
 
     @Override
+    public String getState(String agentId){
+        String state = agentState.getState(agentId);
+        return state;
+    }
+    @Override
     public void skills(String tenantId, String appId, String agentName, List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException{
         if(StringUtils.isBlank(agentName)){
             throw new RequestIllegalArgumentException();

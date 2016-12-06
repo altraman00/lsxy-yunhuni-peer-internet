@@ -36,21 +36,8 @@ public class HangupActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root,String next) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作",getAction());
-        }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
+    public boolean handle(String callId,BusinessState state, Element root,String next) {
         String res_id = state.getResId();
-
-
         if(state.getBusinessData().get(IVRActionService.IVR_ANSWER_WAITTING_FIELD) != null){
             //还在等待应答的情况下，调用拒接
             Map<String, Object> params = new MapBuilder<String,Object>()
