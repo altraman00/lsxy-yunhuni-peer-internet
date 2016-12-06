@@ -83,21 +83,20 @@ public class Handler_EVENT_SYS_CALL_ON_RECEIVE_DTMF_COMPLETED extends EventHandl
             end_time = (Long.parseLong(params.get("end_time").toString())) * 1000;
         }
         if(StringUtils.isNotBlank(state.getCallBackUrl())){
-            Map<String,Object> notify_data = new MapBuilder<String,Object>()
-                    .putIfNotEmpty("event","ivr.get_end")
-                    .putIfNotEmpty("id",call_id)
-                    .putIfNotEmpty("begin_time",begin_time)
-                    .putIfNotEmpty("end_time",end_time)
-                    .putIfNotEmpty("error",params.get("error"))
-                    .putIfNotEmpty("keys",params.get("keys"))
+            Map<String, Object> notify_data = new MapBuilder<String, Object>()
+                    .putIfNotEmpty("event", "ivr.get_end")
+                    .putIfNotEmpty("id", call_id)
+                    .putIfNotEmpty("begin_time", begin_time)
+                    .putIfNotEmpty("end_time", end_time)
+                    .putIfNotEmpty("error", params.get("error"))
+                    .putIfNotEmpty("keys", params.get("keys"))
                     .build();
-            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
-                        .putIfNotEmpty("keys",params.get("keys"))
-                        .putIfNotEmpty("error",params.get("error"))
-                        .build());
-            }
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
         }
+        ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                .putIfNotEmpty("keys",params.get("keys"))
+                .putIfNotEmpty("error",params.get("error"))
+                .build());
 
         return res;
     }

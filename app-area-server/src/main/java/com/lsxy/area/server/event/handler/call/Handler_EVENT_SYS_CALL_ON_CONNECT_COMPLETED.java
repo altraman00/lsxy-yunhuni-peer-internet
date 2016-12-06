@@ -92,12 +92,11 @@ public class Handler_EVENT_SYS_CALL_ON_CONNECT_COMPLETED extends EventHandler {
                     .putIfNotEmpty("end_time",end_time)
                     .putIfNotEmpty("error",params.get("error"))
                     .build();
-            if(notifyCallbackUtil.postNotifySync(state.getCallBackUrl(),notify_data,null,3)){
-                ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
-                        .putIfNotEmpty("error", params.get("error"))
-                        .build());
-            }
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
         }
+        ivrActionService.doAction(call_id,new MapBuilder<String,Object>()
+                .putIfNotEmpty("error", params.get("error"))
+                .build());
 
         if(logger.isDebugEnabled()){
             logger.debug("双通道连接结束通知发送成功");
