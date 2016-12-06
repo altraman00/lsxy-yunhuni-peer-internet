@@ -120,10 +120,14 @@ public class AgentController extends AbstractAPIController {
         String state = (String) map.get("state");
         //TODO 校验数据有效性
         if(StringUtils.isBlank(state)){
-            throw new RuntimeException("状态不能为空");
+            throw new RequestIllegalArgumentException();
         }
-        callCenterAgentService.state(appId,agentName,state);
-        return ApiGatewayResponse.success();
+        if(state.equals("busy") || state.equals("away") || state.equals("idle") || state.startsWith("busy/") || state.startsWith("away/")){
+            callCenterAgentService.state(appId,agentName,state);
+            return ApiGatewayResponse.success();
+        }else{
+            throw new RequestIllegalArgumentException();
+        }
     }
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/skills",method = RequestMethod.POST)
