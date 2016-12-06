@@ -165,8 +165,8 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         .build();
                 notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,null,3);
             }
-            if(StringUtils.isNotBlank(error)){
-                logger.error("IVR呼出失败",error);
+            if(StringUtils.isBlank(error)){
+                ivrActionService.doAction(call_id,null);
             }
         }else if(BusinessState.TYPE_IVR_DIAL.equals(state.getType())){//通过ivr拨号动作发起的呼叫
             String ivr_call_id = businessData.get("ivr_call_id");
