@@ -627,6 +627,8 @@ public class CalBillingServiceImpl implements CalBillingService{
                         currentStatics.getCallConnect() - preMonthDayStatics.getCallConnect(),
                         currentStatics.getCallSum() - preMonthDayStatics.getCallSum(),
                         currentStatics.getCallCostTime() - preMonthDayStatics.getCallCostTime());
+            }else if(currentStatics != null){
+                result = currentStatics;
             }else{
                 result = getIncStaticsOfCurrentDay(tenantId);
             }
