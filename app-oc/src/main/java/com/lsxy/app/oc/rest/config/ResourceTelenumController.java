@@ -314,7 +314,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),resourceTelenum.getLine().getId());
+        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),resourceTelenum.getLineId());
         LineVo lineVo = new LineVo();
         try {
             EntityUtils.copyProperties(lineVo,telnumToLineGateway);
@@ -336,7 +336,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        String lineId = resourceTelenum.getLine()!=null?resourceTelenum.getLine().getId():"";
+        String lineId = resourceTelenum.getLineId()!=null?resourceTelenum.getLineId():"";
         Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,lineId,resourceTelenum.getTelNumber());
         List<LineVo> list = new ArrayList<>();
         List<TelnumToLineGateway> list2 = page.getResult();
