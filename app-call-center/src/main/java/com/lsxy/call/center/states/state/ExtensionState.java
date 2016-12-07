@@ -112,6 +112,10 @@ public class ExtensionState {
         redisCacheService.hputAll(getKey(extensionId),map);
     }
 
+    public void delete(String extensionId) {
+        redisCacheService.del(getKey(extensionId));
+    }
+
     public class Model implements Serializable {
         public static final String ENABLE_TRUE = "1";
         public static final String ENABLE_FALSE = "0";
