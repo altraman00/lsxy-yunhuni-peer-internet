@@ -244,8 +244,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
             }
             return agentId;
-        }catch(Exception e){
-            throw e;
         }finally{
             extensionLock.unlock();
         }
@@ -284,16 +282,25 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         boolean lock = agentLock.lock();
         if(!lock){
             //获取锁失败
-            throw new ExtensionBindingToAgentException();
+            throw new AgentIsBusyException();
         }
         try{
+            if(logger.isDebugEnabled()){
+                logger.debug("开始注销座席：{}",agentName);
+            }
             String agentId = agent.getId();
             String state = agentState.getState(agentId);
 
             if(StringUtils.isNotBlank(state) && (state.contains(CallCenterAgent.STATE_FETCHING)||state.contains(CallCenterAgent.STATE_TALKING))){
                 if(force){
                     //TODO
+                    if(logger.isDebugEnabled()){
+                        logger.debug("强行注销座席：{}",agentName);
+                    }
                 }else{
+                    if(logger.isDebugEnabled()){
+                        logger.debug("座席正忙：{}",agentName);
+                    }
                     // 座席正忙
                     throw new AgentIsBusyException();
                 }
@@ -320,8 +327,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 });
             }
             aCs.delete(agentId);
-        }catch(Exception e){
-            throw e;
         }finally {
             agentLock.unlock();
         }
@@ -442,8 +447,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             extensionState.setAgent(extensionId,agent.getId());
             agentState.setExtension(agent.getId(),extensionId);
-        }catch(Exception e){
-            throw e;
         }finally {
             extensionLock.unlock();
         }
@@ -492,8 +495,6 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 state = CallCenterAgent.STATE_IDLE;
             }
             agentState.setState(agentId,state);
-        }catch(Exception e){
-            throw e;
         }finally {
             agentLock.unlock();
         }
