@@ -1,8 +1,7 @@
 package com.lsxy.call.center.service;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.opensips.service.OpensipsService;
+import com.lsxy.call.center.api.opensips.service.OpensipsExtensionService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.states.lock.ExtensionLock;
@@ -11,7 +10,6 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -23,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -46,8 +43,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     ExtensionState extensionState;
     @Autowired
     AppService appService;
-    @Reference(timeout=3000,check = false,lazy = true)
-    private OpensipsService opensipsService;
+    @Autowired
+    private OpensipsExtensionService opensipsExtensionService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -61,7 +58,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         return appExtensionDao.countByUser(user) > 0;
     }
 
-    //注册
+    //创建
     @Override
     public AppExtension create(String appId,AppExtension appExtension) throws YunhuniApiException {
         App app = appService.findById(appId);
@@ -117,43 +114,11 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         this.save(appExtension);
         if(AppExtension.TYPE_SIP.equals(appExtension.getType())){
             //TODO 分机opensips注册
-            opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
+            opensipsExtensionService.createExtension(appExtension.getUser(),appExtension.getPassword());
         }
-        //TODO 初始化状态状态
-        extensionState.setLastRegisterStatus(appExtension.getId(),200);
-
         return appExtension;
     }
 
-    //鉴权
-    @Override
-    public boolean login(String tenantId,String appId,String user,String pass){
-        if(StringUtil.isEmpty(tenantId)){
-            return false;
-        }
-        if(StringUtil.isEmpty(appId)){
-            return false;
-        }
-        if(StringUtil.isEmpty(user)){
-            return false;
-        }
-        if(StringUtil.isEmpty(pass)){
-            return false;
-        }
-        AppExtension appExtension = null;
-        try{
-            appExtension = appExtensionDao.findByTenantIdAndAppIdAndUser(tenantId,appId,user);
-        }catch (Throwable t){
-            logger.error("",t);
-        }
-        if(appExtension == null){
-            return false;
-        }
-        if(pass.equals(appExtension.getPassword())){
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public List<AppExtension> findByAppId(String appId) {
@@ -186,7 +151,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                     }
                     if(AppExtension.TYPE_SIP.equals(extension.getType())){
                         //TODO 分机opensips删除
-                        opensipsService.deleteExtension(extension.getUser());
+                        opensipsExtensionService.deleteExtension(extension.getUser());
                     }
                     redisCacheService.del(extensionId);
                 }else{
@@ -217,6 +182,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new RequestIllegalArgumentException();
         }
         AppExtension extension = this.findById(extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
         if(!appId.equals(extension.getAppId())){
             throw new RequestIllegalArgumentException();
         }
@@ -224,13 +192,21 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
     @Override
-    public void register(String extensionId) {
-        Integer expire = 10 * 60 * 1000;
-        ExtensionState.Model model = extensionState.new Model();
-        model.setLastRegisterStatus(200);
-        model.setLastRegisterTime(System.currentTimeMillis());
-        model.setRegisterExpires(expire);
-        extensionState.setAll(extensionId,model);
+    public void login(String user) {
+        AppExtension appExtension = appExtensionDao.findByUser(user);
+//        Integer expire = 10 * 60 * 1000;
+//        ExtensionState.Model model = extensionState.new Model();
+//        model.setLastRegisterTime(System.currentTimeMillis());
+//        model.setRegisterExpires(expire);
+//        model.setEnable(ExtensionState.Model.ENABLE_TRUE);
+//        extensionState.setAll(appExtension.getId(),model);
+        extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_TRUE);
+    }
+
+    @Override
+    public void logout(String user) {
+        AppExtension appExtension = appExtensionDao.findByUser(user);
+        extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_FALSE);
     }
 
 

@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * opensips 注册信息
  * Created by liups on 2016/11/24.
  */
 @Entity

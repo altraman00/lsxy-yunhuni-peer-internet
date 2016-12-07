@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.CallCenter;
@@ -195,15 +196,15 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
 
             if(conversationService.isCC(call_id)){
-                String conversation_id = state.getBusinessData().get(ConversationService.CONVERSATION_FIELD);
+                String conversation_id = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
                 if(conversation_id != null){
                     conversationService.logicExit(conversation_id,call_id);
                 }
             }
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
-            String agentId = state.getBusinessData().get(ConversationService.AGENT_ID_FIELD);
+            String agentId = state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD);
             if(agentId != null){
-                String reserve_state = state.getBusinessData().get(ConversationService.RESERVE_STATE_FIELD);
+                String reserve_state = state.getBusinessData().get(CallCenterUtil.RESERVE_STATE_FIELD);
                 try {
                     callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
                 } catch (YunhuniApiException e) {

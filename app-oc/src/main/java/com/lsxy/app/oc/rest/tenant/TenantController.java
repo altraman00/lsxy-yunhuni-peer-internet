@@ -777,12 +777,13 @@ public class TenantController {
         TenantAppVO vo = new TenantAppVO(app);
         List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
-        AreaSip areaSip = app.getAreaSip();
-        if(areaSip!=null){
-            vo.setSipRegistrar(app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
-        }else{
-            vo.setSipRegistrar("");
-        }
+//        AreaSip areaSip = app.getAreaSip();
+//        if(areaSip!=null){
+//            vo.setSipRegistrar(app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
+//        }else{
+//            vo.setSipRegistrar("");
+//        }
+        vo.setSipRegistrar(SystemConfig.getProperty("app.cc.opensips.domain"));
         return RestResponse.success(vo);
     }
     @ApiOperation(value = "获取租户的app信息下的分机")

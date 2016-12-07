@@ -88,13 +88,12 @@ public class InitDevData {
             appExtension=appExtensionService.save(appExtension);
             String exid = appExtension.getId();
             extensionState.setAgent(exid,agent.getId());
-            extensionState.setLastRegisterStatus(exid,200);
             extensionState.setLastRegisterTime(exid,new Date().getTime());
             extensionState.setRegisterExpires(exid,10000000);
             agentState.setExtension(agent.getId(),exid);
             agentState.setLastRegTime(agent.getId(),new Date().getTime());
             agentState.setLastTime(agent.getId(),new Date().getTime());
-            agentState.setState(agent.getId(),AgentState.Model.STATE_IDLE);
+            agentState.setState(agent.getId(),CallCenterAgent.STATE_IDLE);
         }
         Condition condition = new Condition();
         condition.setTenantId(channel.getTenantId());
