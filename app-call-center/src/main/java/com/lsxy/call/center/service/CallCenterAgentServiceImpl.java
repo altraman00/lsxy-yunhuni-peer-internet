@@ -244,6 +244,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
 
             }
             return agentId;
+        }catch(Exception e){
+            throw e;
         }finally{
             extensionLock.unlock();
         }
@@ -318,6 +320,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 });
             }
             aCs.delete(agentId);
+        }catch(Exception e){
+            throw e;
         }finally {
             agentLock.unlock();
         }
@@ -438,6 +442,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             extensionState.setAgent(extensionId,agent.getId());
             agentState.setExtension(agent.getId(),extensionId);
+        }catch(Exception e){
+            throw e;
         }finally {
             extensionLock.unlock();
         }
@@ -486,6 +492,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 state = CallCenterAgent.STATE_IDLE;
             }
             agentState.setState(agentId,state);
+        }catch(Exception e){
+            throw e;
         }finally {
             agentLock.unlock();
         }
