@@ -7,6 +7,7 @@ import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
@@ -46,6 +47,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     TelnumToLineGatewayService telnumToLineGatewayService;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private LineGatewayService lineGatewayService;
     @Override
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
         return this.resourceTelenumDao;
@@ -126,6 +129,22 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         hql+=" ORDER BY obj.createTime DESC ";
         Page page = this.pageList(hql,pageNo,pageSize);
+        //获取绑定线路
+        List<ResourceTelenum> result = page.getResult();
+        Set<String> lineIds = new HashSet<>();
+        for(ResourceTelenum telenum:result){
+            if(StringUtils.isNotBlank(telenum.getLineId())){
+                lineIds.add(telenum.getLineId());
+            }
+        }
+        List<LineGateway> lines = lineGatewayService.findByIds(lineIds);
+        Map<String,LineGateway> map = new HashMap<>();
+        for(LineGateway line:lines){
+            map.put(line.getId(),line);
+        }
+        for(ResourceTelenum telenum:result){
+            telenum.setLine(map.get(telenum.getId()));
+        }
         return page;
     }
 
@@ -337,7 +356,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 //一条号码有且只有在一条线路上可主叫或者可被叫
                 if("1".equals(telnumToLineGateway.getIsCalled())||"1".equals(telnumToLineGateway.getIsDialing())){
                     //设置归属线路
-                    resourceTelenum.setLine(lineGateway);
+                    resourceTelenum.setLineId(lineGateway.getId());
                     this.save(resourceTelenum);
                 }
             }

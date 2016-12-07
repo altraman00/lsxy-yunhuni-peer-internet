@@ -214,7 +214,7 @@ public class LineGatewayController extends AbstractRestController {
                 //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                 if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
                     //删除归属线路关系
-                    resourceTelenum1.setLine(null);
+                    resourceTelenum1.setLineId(null);
                     //设置号码不可主叫不可被叫
                     resourceTelenum1.setIsCalled("0");
                     resourceTelenum1.setIsDialing("0");
@@ -301,14 +301,14 @@ public class LineGatewayController extends AbstractRestController {
                     //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                     if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
                         //本身有归属线路
-                        if(resourceTelenum1.getLine()!=null&&!lineGateway.getId().equals(resourceTelenum1.getLine().getId())){
-                            TelnumToLineGateway telnumToLineGateway12 = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum1.getTelNumber(),resourceTelenum1.getLine().getId());
+                        if(resourceTelenum1.getLineId()!=null&&!lineGateway.getId().equals(resourceTelenum1.getLineId())){
+                            TelnumToLineGateway telnumToLineGateway12 = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum1.getTelNumber(),resourceTelenum1.getLineId());
                             telnumToLineGateway12.setIsCalled("0");
                             telnumToLineGateway12.setIsDialing("0");
                             telnumToLineGatewayService.save(telnumToLineGateway12);
                         }
                         //删除归属线路关系
-                        resourceTelenum1.setLine(null);
+                        resourceTelenum1.setLineId(null);
                         //设置号码不可主叫不可被叫
                         resourceTelenum1.setIsCalled("0");
                         resourceTelenum1.setIsDialing("0");
@@ -377,14 +377,14 @@ public class LineGatewayController extends AbstractRestController {
                     //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                     if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
                         //本身有归属线路
-                        if(resourceTelenum1.getLine()!=null&&!lineGateway.getId().equals(resourceTelenum1.getLine().getId())){
-                            TelnumToLineGateway telnumToLineGateway12 = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum1.getTelNumber(),resourceTelenum1.getLine().getId());
+                        if(resourceTelenum1.getLineId()!=null&&!lineGateway.getId().equals(resourceTelenum1.getLineId())){
+                            TelnumToLineGateway telnumToLineGateway12 = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum1.getTelNumber(),resourceTelenum1.getLineId());
                             telnumToLineGateway12.setIsCalled("0");
                             telnumToLineGateway12.setIsDialing("0");
                             telnumToLineGatewayService.save(telnumToLineGateway12);
                         }
                         //修正归属线路关系
-                        resourceTelenum1.setLine(lineGateway);
+                        resourceTelenum1.setLineId(lineGateway.getId());
                         resourceTelenum1.setIsCalled(telnumToLineGateway.getIsCalled());
                         resourceTelenum1.setIsDialing(telnumToLineGateway.getIsDialing());
                         resourceTelenumService.save(resourceTelenum1);
@@ -394,9 +394,9 @@ public class LineGatewayController extends AbstractRestController {
                     //判断号码线路关系中是否是归属线路，是的话，删除归属线路关系
                     if(resourceTelenum1!=null&&StringUtils.isNotEmpty(resourceTelenum1.getId())){
                         //当前号码的归属线路是当前线路，删除归属线路关系
-                        if(resourceTelenum1.getLine()!=null&&lineGateway.getId().equals(resourceTelenum1.getLine().getId())){
+                        if(resourceTelenum1.getLineId()!=null&&lineGateway.getId().equals(resourceTelenum1.getLineId())){
                             //删除归属线路关系
-                            resourceTelenum1.setLine(lineGateway);
+                            resourceTelenum1.setLineId(lineGateway.getId());
                             //设置号码不可主叫不可被叫
                             resourceTelenum1.setIsCalled("0");
                             resourceTelenum1.setIsDialing("0");
@@ -471,7 +471,7 @@ public class LineGatewayController extends AbstractRestController {
             ResourceTelenum resourceTelenum = null;
             if(telnumVo.getIsCalled()==1||telnumVo.getIsDialing()==1) {//是归属线路
                 resourceTelenum = new ResourceTelenum(
-                        telnumVo.getTelNumber(), telnumVo.getCallUri(), telnumVo.getOperator(), lineGateway.getAreaCode(), lineGateway, telnumVo.getAmount()
+                        telnumVo.getTelNumber(), telnumVo.getCallUri(), telnumVo.getOperator(), lineGateway.getAreaCode(), lineGateway.getId(), telnumVo.getAmount()
                         , telnumVo.getIsCalled() + "", telnumVo.getIsDialing() + "", "0", lineGateway.getAreaId());
             }else{//不是归属线路
                 resourceTelenum = new ResourceTelenum(
@@ -586,7 +586,7 @@ public class LineGatewayController extends AbstractRestController {
                             ResourceTelenum resourceTelenum = null;
                             if("1".equals(isCalled)||"1".equals(isDialing)) {//是归属线路
                                 //创建号码对象
-                                resourceTelenum = new ResourceTelenum(telnum, callUri, operator, areaCode, lineGateway, amount, isCalled, isDialing, "0", lineGateway.getAreaId());
+                                resourceTelenum = new ResourceTelenum(telnum, callUri, operator, areaCode, lineGateway.getId(), amount, isCalled, isDialing, "0", lineGateway.getAreaId());
                             }else{//不是归属线路
                                 resourceTelenum = new ResourceTelenum(telnum, callUri, operator, areaCode, null, amount, isCalled, isDialing, "0", lineGateway.getAreaId());
                             }
