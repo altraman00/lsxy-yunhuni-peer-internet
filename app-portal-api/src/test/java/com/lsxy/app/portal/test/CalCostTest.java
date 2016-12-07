@@ -10,6 +10,7 @@ import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.product.service.CalCostService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
@@ -161,6 +162,14 @@ public class CalCostTest {
         System.out.println(JSONUtil.objectToJson(current));
         CallCenterStatistics curApp = callCenterStatisticsService.getCurrentStatisticsByAppId("40288ac957e1812e0157e18a994e0000");
         System.out.println(JSONUtil.objectToJson(curApp));
+    }
+
+    @Test
+    public void testResourcesRentService(){
+        System.out.println("start:" + System.currentTimeMillis());
+        List<ResourcesRent> rents = resourcesRentService.findByTenantId("8a2a6a4a576f874001576f99fbac000e");
+        rents.parallelStream().forEach(rent -> System.out.println(rent.getResourceTelenum().getTelNumber()));
+        System.out.println("end:" + System.currentTimeMillis());
     }
 
 }
