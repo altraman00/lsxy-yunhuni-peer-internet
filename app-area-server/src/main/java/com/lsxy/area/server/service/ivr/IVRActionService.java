@@ -212,7 +212,7 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -282,7 +282,7 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(get,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
