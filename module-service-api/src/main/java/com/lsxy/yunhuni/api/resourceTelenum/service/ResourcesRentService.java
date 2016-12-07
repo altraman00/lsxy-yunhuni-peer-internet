@@ -72,7 +72,7 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * @param id
      * @return
      */
-    List<ResourcesRent> findByTenantId(String id);
+    List<ResourceTelenum> findByTenantId(String id);
     /**
      * 释放号码
      */

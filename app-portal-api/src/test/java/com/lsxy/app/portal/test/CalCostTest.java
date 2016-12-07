@@ -167,8 +167,8 @@ public class CalCostTest {
     @Test
     public void testResourcesRentService(){
         System.out.println("start:" + System.currentTimeMillis());
-        List<ResourcesRent> rents = resourcesRentService.findByTenantId("8a2a6a4a576f874001576f99fbac000e");
-        rents.parallelStream().forEach(rent -> System.out.println(rent.getResourceTelenum().getTelNumber()));
+        List<ResourceTelenum> telnums = resourcesRentService.findByTenantId("8a2a6a4a576f874001576f99fbac000e");
+        telnums.parallelStream().forEach(telnum -> System.out.println(telnum.getTelNumber()));
         System.out.println("end:" + System.currentTimeMillis());
     }
 

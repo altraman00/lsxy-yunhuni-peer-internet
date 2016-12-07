@@ -7,6 +7,7 @@ import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -93,4 +94,11 @@ public interface ResourceTelenumService extends BaseService<ResourceTelenum> {
      * 释放
      */
     void release(String id);
+
+    /**
+     * 根据Ids查找号码资源
+     * @param ids
+     * @return
+     */
+    List<ResourceTelenum> findByIds(Collection<String> ids);
 }
