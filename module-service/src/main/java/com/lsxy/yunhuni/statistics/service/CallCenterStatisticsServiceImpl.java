@@ -388,6 +388,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                         current.getQueueNum() - preMonth.getQueueNum(),
                         current.getQueueDuration() - preMonth.getQueueDuration(),
                         current.getCallTimeLong() - preMonth.getCallTimeLong());
+            }else if(current != null){
+                result = current;
             }else{
                 result = getIncrFromRedisByTenantId(tenantId,date);
             }
@@ -419,6 +421,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
                         current.getQueueNum() - preMonth.getQueueNum(),
                         current.getQueueDuration() - preMonth.getQueueDuration(),
                         current.getCallTimeLong() - preMonth.getCallTimeLong());
+            }else if(current != null){
+                result = current;
             }else{
                 result = getIncrFromRedisByAppId(AppId,date);
             }
