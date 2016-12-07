@@ -143,7 +143,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             map.put(line.getId(),line);
         }
         for(ResourceTelenum telenum:result){
-            telenum.setLine(map.get(telenum.getId()));
+            telenum.setLine(map.get(telenum.getLineId()));
         }
         return page;
     }
