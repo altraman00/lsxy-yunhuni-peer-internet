@@ -3,6 +3,7 @@ package com.lsxy.area.server.event.handler.call;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.rpc.api.RPCCaller;
@@ -41,6 +42,9 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
     @Autowired
     private ConversationService conversationService;
 
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_RINGING;
@@ -74,7 +78,7 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
         ){
             /**开始判断振铃前是否客户挂断了呼叫，挂断了要同时挂断被叫的坐席**/
             Map<String,String> businessData = state.getBusinessData();
-            String conversation = businessData.get(ConversationService.CONVERSATION_FIELD);
+            String conversation = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
             BusinessState conversationState = businessStateService.get(conversation);
             if(logger.isDebugEnabled()){
                 logger.info("开始判断振铃前是否客户挂断了呼叫1:{}",conversationState);
@@ -84,13 +88,19 @@ public class Handler_EVENT_SYS_CALL_ON_RINGING extends EventHandler{
                 return res;
             }
             if(conversationState.getBusinessData()!=null){
-                String initiator = conversationState.getBusinessData().get(ConversationService.INITIATOR_FIELD);
+                String initiator = conversationState.getBusinessData().get(CallCenterUtil.INITIATOR_FIELD);
                 if(initiator != null){
                     BusinessState initiatorState = businessStateService.get(initiator);
                     if(logger.isDebugEnabled()){
                         logger.info("开始判断振铃前是否客户挂断了呼叫2:{}",initiatorState);
                     }
                     if(initiatorState!=null && initiatorState.getClosed() != null && initiatorState.getClosed()){
+                        callCenterUtil.sendQueueFailEvent(initiatorState.getCallBackUrl(),
+                                initiatorState.getBusinessData().get(CallCenterUtil.QUEUE_ID_FIELD),CallCenterUtil.QUEUE_TYPE_IVR,
+                                initiatorState.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
+                                initiatorState.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
+                                CallCenterUtil.QUEUE_FAIL_HANGUP,
+                                initiator,null,initiatorState.getUserdata());
                         conversationService.logicExit(conversation,state.getId());
                         return res;
                     }

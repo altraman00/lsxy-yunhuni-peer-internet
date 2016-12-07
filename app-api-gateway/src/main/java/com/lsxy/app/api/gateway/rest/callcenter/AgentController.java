@@ -3,10 +3,10 @@ package com.lsxy.app.api.gateway.rest.callcenter;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
+import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentSkillOptsVO;
 import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentSkillVO;
 import com.lsxy.app.api.gateway.rest.callcenter.vo.AgentVO;
 import com.lsxy.call.center.api.model.CallCenterAgent;
-import com.lsxy.call.center.api.operations.AgentSkillOperationDTO;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
 import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -121,19 +120,25 @@ public class AgentController extends AbstractAPIController {
         String state = (String) map.get("state");
         //TODO 校验数据有效性
         if(StringUtils.isBlank(state)){
-            throw new RuntimeException("状态不能为空");
+            throw new RequestIllegalArgumentException();
         }
-        callCenterAgentService.state(appId,agentName,state);
-        return ApiGatewayResponse.success();
+        if(state.equals("busy") || state.equals("away") || state.equals("idle") || state.startsWith("busy/") || state.startsWith("away/")){
+            callCenterAgentService.state(appId,agentName,state);
+            return ApiGatewayResponse.success();
+        }else{
+            throw new RequestIllegalArgumentException();
+        }
     }
 
     @RequestMapping(value = "/{account_id}/callcenter/agent/{agent_name}/skills",method = RequestMethod.POST)
     public ApiGatewayResponse skills(HttpServletRequest request, @RequestHeader("AppID") String appId,
-                                    @PathVariable("agent_name") String agentName,@RequestBody List<AgentSkillOperationDTO> skillOpts) throws YunhuniApiException {
+                                    @PathVariable("agent_name") String agentName,@RequestBody AgentSkillOptsVO skillOpts) throws YunhuniApiException {
         //TODO 校验数据有效性
-
+        if(skillOpts.getOpts() == null || skillOpts.getOpts().size() == 0){
+            throw new RequestIllegalArgumentException();
+        }
         App app = appService.findById(appId);
-        callCenterAgentService.skills(app.getTenant().getId(),appId,agentName,skillOpts);
+        callCenterAgentService.skills(app.getTenant().getId(),appId,agentName,skillOpts.getOpts());
         return ApiGatewayResponse.success();
     }
 

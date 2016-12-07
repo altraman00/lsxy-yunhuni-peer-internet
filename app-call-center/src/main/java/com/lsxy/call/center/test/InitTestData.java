@@ -93,7 +93,7 @@ public class InitTestData {
             agentState.setExtension(agent.getId(),exid);
             agentState.setLastRegTime(agent.getId(),new Date().getTime());
             agentState.setLastTime(agent.getId(),new Date().getTime());
-            agentState.setState(agent.getId(),AgentState.Model.STATE_IDLE);
+            agentState.setState(agent.getId(),CallCenterAgent.STATE_IDLE);
         }
         Condition condition = new Condition();
         condition.setTenantId(channel.getTenantId());

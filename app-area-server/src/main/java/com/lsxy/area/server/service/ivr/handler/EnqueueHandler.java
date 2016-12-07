@@ -3,7 +3,7 @@ package com.lsxy.area.server.service.ivr.handler;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.EnQueue;
@@ -99,12 +99,14 @@ public class EnqueueHandler extends ActionHandler{
                             .build();
                     RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL_PLAY_START, params);
                     rpcCaller.invoke(sessionContext, rpcrequest);
-                    businessStateService.updateInnerField(callId,ConversationService.IS_PLAYWAIT_FIELD,ConversationService.IS_PLAYWAIT_TRUE.toString());
+                    businessStateService.updateInnerField(callId, CallCenterUtil.IS_PLAYWAIT_FIELD,CallCenterUtil.IS_PLAYWAIT_TRUE);
                 } catch (Throwable e) {
                     logger.error("调用失败",e);
                 }
             }
         }
+        businessStateService.updateInnerField(callId,CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel());
+        businessStateService.updateInnerField(callId,CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId());
         businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
         try {
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);

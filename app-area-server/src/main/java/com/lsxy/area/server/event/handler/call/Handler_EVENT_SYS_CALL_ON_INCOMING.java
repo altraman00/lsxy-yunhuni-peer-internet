@@ -133,13 +133,13 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.error("找不到对应的APP:{}", params);
             return res;
         }
-        Integer isCallCenter = null;
+        boolean isCallCenter = false;
         if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
             if(app.getIsCallCenter() == null || app.getIsCallCenter() != 1){
                 logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
                 return res;
             }
-            isCallCenter = 1;
+            isCallCenter = true;
         }else{
             if(!appService.enabledService(tenant.getId(),app.getId(), ServiceType.IvrService)){
                 logger.info("[{}][{}]没有开通ivr",tenant.getId(),app.getId());
@@ -178,41 +178,44 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String checkBlackNum = from;
         //TODO 座席呼平台多少位？
         //TODO 如何判断座席
-        if(from.length() >= 7 && from.length() <= 8){
-            //固话不带区号，加上区号
-            from = lineGateway.getAreaCode() + from;
-        }else if(from.length() >= 11 && from.length() <= 12){
-            //手机或固话
-            if(from.startsWith("0") || from.startsWith("1")){
-                if(from.startsWith("01")){
-                    if((!from.startsWith("010")) && from.length() == 12){
-                        //手机号加0
-                        from = from.substring(1);
-                        checkBlackNum = from;
-                    }else if(from.startsWith("010")){
-                        checkBlackNum = from.substring(3);
-                    }else{
-                        throw new RuntimeException(new NumberNotAllowToCallException());
+        //TODO 用于座席呼入压力测试,所以把"system"排除掉
+        if(!from.contains("system")){
+            if(from.length() >= 7 && from.length() <= 8){
+                //固话不带区号，加上区号
+                from = lineGateway.getAreaCode() + from;
+            }else if(from.length() >= 11 && from.length() <= 12){
+                //手机或固话
+                if(from.startsWith("0") || from.startsWith("1")){
+                    if(from.startsWith("01")){
+                        if((!from.startsWith("010")) && from.length() == 12){
+                            //手机号加0
+                            from = from.substring(1);
+                            checkBlackNum = from;
+                        }else if(from.startsWith("010")){
+                            checkBlackNum = from.substring(3);
+                        }else{
+                            throw new RuntimeException(new NumberNotAllowToCallException());
+                        }
+                    }else if(from.startsWith("1")){
+                        if(from.length() == 11){
+                            checkBlackNum = from;
+                        }else{
+                            throw new RuntimeException(new NumberNotAllowToCallException());
+                        }
+                    } else{
+                        String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
+                        if(StringUtils.isNotBlank(areaCode)){
+                            checkBlackNum = from.substring(areaCode.length());
+                        }else{
+                            throw new RuntimeException(new NumberNotAllowToCallException());
+                        }
                     }
-                }else if(from.startsWith("1")){
-                    if(from.length() == 11){
-                        checkBlackNum = from;
-                    }else{
-                        throw new RuntimeException(new NumberNotAllowToCallException());
-                    }
-                } else{
-                    String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
-                    if(StringUtils.isNotBlank(areaCode)){
-                        checkBlackNum = from.substring(areaCode.length());
-                    }else{
-                        throw new RuntimeException(new NumberNotAllowToCallException());
-                    }
+                }else{
+                    throw new RuntimeException(new NumberNotAllowToCallException());
                 }
             }else{
                 throw new RuntimeException(new NumberNotAllowToCallException());
             }
-        }else{
-            throw new RuntimeException(new NumberNotAllowToCallException());
         }
         boolean isBlackNum = apiGwRedBlankNumService.isBlackNum(checkBlackNum);
         if(isBlackNum){

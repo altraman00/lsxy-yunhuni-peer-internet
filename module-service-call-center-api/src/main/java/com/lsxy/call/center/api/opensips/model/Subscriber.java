@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
+ * opensips 用户表
  * Created by liups on 2016/11/24.
  */
 @Entity

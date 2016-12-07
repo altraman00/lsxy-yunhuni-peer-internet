@@ -1,8 +1,7 @@
 package com.lsxy.call.center.service;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.opensips.service.OpensipsService;
+import com.lsxy.call.center.api.opensips.service.OpensipsExtensionService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.states.lock.ExtensionLock;
@@ -44,8 +43,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     ExtensionState extensionState;
     @Autowired
     AppService appService;
-    @Reference(timeout=3000,check = false,lazy = true)
-    private OpensipsService opensipsService;
+    @Autowired
+    private OpensipsExtensionService opensipsExtensionService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -115,7 +114,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         this.save(appExtension);
         if(AppExtension.TYPE_SIP.equals(appExtension.getType())){
             //TODO 分机opensips注册
-            opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
+            opensipsExtensionService.createExtension(appExtension.getUser(),appExtension.getPassword());
         }
         return appExtension;
     }
@@ -152,7 +151,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                     }
                     if(AppExtension.TYPE_SIP.equals(extension.getType())){
                         //TODO 分机opensips删除
-                        opensipsService.deleteExtension(extension.getUser());
+                        opensipsExtensionService.deleteExtension(extension.getUser());
                     }
                     redisCacheService.del(extensionId);
                 }else{
@@ -183,6 +182,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
             throw new RequestIllegalArgumentException();
         }
         AppExtension extension = this.findById(extensionId);
+        if(extension == null){
+            throw new ExtensionNotExistException();
+        }
         if(!appId.equals(extension.getAppId())){
             throw new RequestIllegalArgumentException();
         }
