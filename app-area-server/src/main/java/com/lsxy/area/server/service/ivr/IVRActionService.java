@@ -37,7 +37,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
@@ -94,10 +94,6 @@ public class IVRActionService {
 
     /**IVR下一步的url**/
     public static final String IVR_NEXT_FIELD = "IVR_NEXT";
-
-    //设置请求和传输超时时间
-    private RequestConfig config =
-            RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -159,7 +155,19 @@ public class IVRActionService {
         }
     }
     private void initClient(){
-        client = HttpAsyncClients.createDefault();
+        client = HttpAsyncClientBuilder.create()
+                .setDefaultRequestConfig(
+                        RequestConfig.custom()
+                                .setConnectionRequestTimeout(5000)
+                                .setSocketTimeout(5000)
+                                .setConnectTimeout(5000).build())
+                //总共最多1000并发
+                .setMaxConnTotal(1000)
+                //每个host最多100并发
+                .setMaxConnPerRoute(100)
+                //禁用cookies
+                .disableCookieManagement()
+                .build();
         client.start();
     }
     private void initHandler(){
@@ -197,7 +205,6 @@ public class IVRActionService {
                         .putIfNotEmpty("call_id",call_id)
                         .putIfNotEmpty("from",from)
                         .build();
-                post.setConfig(config);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
                 post.setEntity(se);
@@ -270,7 +277,6 @@ public class IVRActionService {
                     }
                 }
                 HttpGet get = new HttpGet(target);
-                get.setConfig(config);
                 get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(get,null);
