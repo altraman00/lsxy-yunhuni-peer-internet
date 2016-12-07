@@ -6,21 +6,16 @@ import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.callcenter.vo.ExtensionVO;
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.call.center.api.service.AppExtensionService;
-import com.lsxy.framework.core.exceptions.api.RequestIllegalArgumentException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.Page;
-import com.lsxy.framework.core.utils.StringUtil;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,5 +81,8 @@ public class ExtensionController extends AbstractAPIController {
         return ApiGatewayResponse.success(page);
     }
 
-
+    @RequestMapping(value = "/{account_id}/callcenter/extensionlisttest",method = RequestMethod.GET)
+    public ApiGatewayResponse extensionlisttest(HttpServletRequest request,@RequestHeader("AppID") String appId) throws YunhuniApiException {
+        return ApiGatewayResponse.success(appExtensionService.exs(appId));
+    }
 }
