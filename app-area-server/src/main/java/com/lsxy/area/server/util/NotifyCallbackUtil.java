@@ -108,8 +108,10 @@ public class NotifyCallbackUtil {
                     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                         success = true;
                     }
+                    if(logger.isDebugEnabled()){
+                        logger.info("url={},http notify response statue = {}",url,response.getStatusLine().getStatusCode());
+                    }
                     if(!success){
-                        logger.error("发送事件通知失败http status={}",response.getStatusLine().getStatusCode());
                         if(retry >0){
                             logger.info("开始重试");
                             postNotify(url,data,retry-1);
@@ -119,7 +121,7 @@ public class NotifyCallbackUtil {
 
                 @Override
                 public void failed(Exception e) {
-                    logger.error("发送事件通知失败",e);
+                    logger.error("url={}发送事件通知失败",url,e);
                     if(retry >0){
                         logger.info("开始重试");
                         postNotify(url,data,retry-1);
@@ -129,7 +131,7 @@ public class NotifyCallbackUtil {
 
                 @Override
                 public void cancelled() {
-                    logger.error("发送事件通知被取消");
+                    logger.error("url={}发送事件通知被取消",url);
                     if(retry >0){
                         logger.info("开始重试");
                         postNotify(url,data,retry-1);
