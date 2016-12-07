@@ -1,8 +1,7 @@
 package com.lsxy.call.center.service;
 
-import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.call.center.api.model.AppExtension;
-import com.lsxy.call.center.api.opensips.service.OpensipsService;
+import com.lsxy.call.center.api.opensips.service.OpensipsExtensionService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.dao.AppExtensionDao;
 import com.lsxy.call.center.states.lock.ExtensionLock;
@@ -11,7 +10,6 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.cache.manager.RedisCacheService;
 import com.lsxy.framework.core.exceptions.api.*;
-import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.yunhuni.api.app.model.App;
@@ -45,8 +43,8 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     ExtensionState extensionState;
     @Autowired
     AppService appService;
-    @Reference(timeout=3000,check = false,lazy = true)
-    private OpensipsService opensipsService;
+    @Autowired
+    private OpensipsExtensionService opensipsExtensionService;
 
     @Override
     public BaseDaoInterface<AppExtension, Serializable> getDao() {
@@ -116,7 +114,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         this.save(appExtension);
         if(AppExtension.TYPE_SIP.equals(appExtension.getType())){
             //TODO 分机opensips注册
-            opensipsService.createExtension(appExtension.getUser(),appExtension.getPassword());
+            opensipsExtensionService.createExtension(appExtension.getUser(),appExtension.getPassword());
         }
         return appExtension;
     }
@@ -153,7 +151,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                     }
                     if(AppExtension.TYPE_SIP.equals(extension.getType())){
                         //TODO 分机opensips删除
-                        opensipsService.deleteExtension(extension.getUser());
+                        opensipsExtensionService.deleteExtension(extension.getUser());
                     }
                     redisCacheService.del(extensionId);
                 }else{

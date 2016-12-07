@@ -1,5 +1,5 @@
 import com.lsxy.app.opensips.OpensipsMain;
-import com.lsxy.call.center.api.opensips.service.OpensipsService;
+import com.lsxy.call.center.api.opensips.service.OpensipsExtensionService;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,10 +18,10 @@ public class OpensipsProxyTest {
         System.setProperty("spring.config.location","classpath:"+ Constants.DEFAULT_CONFIG_FILE);
     }
     @Autowired
-    OpensipsService opensipsService;
+    OpensipsExtensionService opensipsExtensionService;
     @Test
     public void testOpensipsProxy(){
-        opensipsService.createExtension("456791132","123456");
+        opensipsExtensionService.createExtension("456791132","123456");
     }
 
 }
