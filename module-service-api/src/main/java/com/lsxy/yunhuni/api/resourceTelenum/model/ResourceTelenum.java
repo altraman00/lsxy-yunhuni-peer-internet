@@ -32,7 +32,7 @@ public class ResourceTelenum extends IdEntity{
     private String callUri;//呼出URI,
     private String source;//来源
     private String usable;//是否可用
-    private LineGateway line; //所属线路
+    private String lineId; //所属线路
     private String operator;//运营商
     private String provider;//供应商
     private String remark;//备注
@@ -43,6 +43,12 @@ public class ResourceTelenum extends IdEntity{
     private String isCalled;//可被叫
     private String isThrough;//可透传
     private String type;//1采购线路0租户自带
+
+    @Transient
+    private String appId;
+    @Transient
+    private LineGateway line;
+
     @Column(name = "is_through")
     public String getIsThrough() {
         return isThrough;
@@ -118,15 +124,13 @@ public class ResourceTelenum extends IdEntity{
     public void setUsable(String usable) {
         this.usable = usable;
     }
-    @OneToOne
-    @JoinColumn(name = "line_id")
-    @NotFound(action = NotFoundAction.IGNORE)
-    public LineGateway getLine() {
-        return line;
+    @Column(name = "line_id")
+    public String getLineId() {
+        return lineId;
     }
 
-    public void setLine(LineGateway line) {
-        this.line = line;
+    public void setLineId(String lineId) {
+        this.lineId = lineId;
     }
 
     @Column(name = "amount")
@@ -201,24 +205,24 @@ public class ResourceTelenum extends IdEntity{
         this.remark = remark;
     }
 
-    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,LineGateway line, String amount) {
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount) {
         this.operator = operator;
         this.areaCode = areaCode;
         this.amount = new BigDecimal(amount);
         this.callUri = callUri;
         this.telNumber = telNumber;
-        this.line = line;
+        this.lineId = lineId;
         this.status =0;//未被租用
         this.usable = "0";//不可用
         this.type = "1";//采购线路
     }
-    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,LineGateway line, String amount,String isCalled,String isDialing,String isThrough,String areaId) {
+    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount,String isCalled,String isDialing,String isThrough,String areaId) {
         this.operator = operator;
         this.areaCode = areaCode;
         this.amount = new BigDecimal(amount);
         this.callUri = callUri;
         this.telNumber = telNumber;
-        this.line = line;
+        this.lineId = lineId;
         this.status =0;//未被租用
         this.usable = "0";//不可用
         this.type = "1";//采购线路
@@ -228,5 +232,23 @@ public class ResourceTelenum extends IdEntity{
         this.areaId = areaId;
     }
     public ResourceTelenum() {
+    }
+
+    @Transient
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    @Transient
+    public LineGateway getLine() {
+        return line;
+    }
+
+    public void setLine(LineGateway line) {
+        this.line = line;
     }
 }

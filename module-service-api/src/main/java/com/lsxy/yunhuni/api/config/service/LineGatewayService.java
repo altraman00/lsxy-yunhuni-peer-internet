@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -23,4 +24,6 @@ public interface LineGatewayService extends BaseService<LineGateway> {
     Page<LineGateway> getPage(Integer pageNo,Integer pageSize,String operator, String isThrough, String status, String isPublicLine,String order);
     Page<LineGateway> getNotTenantPage(Integer pageNo,Integer pageSize,String tenantId,String operator, String line);
     int batchModify(String[] sql);
+
+    List<LineGateway> findByIds(Collection<String> ids);
 }
