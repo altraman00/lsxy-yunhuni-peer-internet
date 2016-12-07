@@ -2,11 +2,11 @@ package com.lsxy.call.center.api.service;
 
 import com.lsxy.call.center.api.model.AppExtension;
 import com.lsxy.framework.api.base.BaseService;
-import com.lsxy.framework.core.exceptions.api.ExtensionUserExistException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.Page;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhangxb on 2016/10/21.
@@ -66,4 +66,6 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      * @param user
      */
     void logout(String user);
+
+    List<Map<String,Object>> exs(String appId);
 }

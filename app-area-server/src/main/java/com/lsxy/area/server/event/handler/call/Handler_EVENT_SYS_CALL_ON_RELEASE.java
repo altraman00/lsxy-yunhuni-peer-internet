@@ -215,8 +215,11 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 }
                 String reserve_state = state.getBusinessData().get(CallCenterUtil.RESERVE_STATE_FIELD);
                 try {
+                    if(logger.isDebugEnabled()){
+                        logger.info("[{}][{}]坐席挂机agentId={}",state.getTenantId(),state.getAppId(),agentId);
+                    }
                     callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
-                } catch (YunhuniApiException e) {
+                } catch (Throwable e) {
                     logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
                 }
                 try {
