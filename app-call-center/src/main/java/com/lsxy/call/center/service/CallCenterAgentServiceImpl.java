@@ -119,6 +119,8 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
         //初始化座席状态
         if(StringUtils.isBlank(agent.getState())){
             agent.setState(CallCenterAgent.STATE_ONLINE);
+        }else if(!agent.getState().equals("busy") && !agent.getState().equals("away") && !agent.getState().equals("idle") && !agent.getState().startsWith("busy/") && !agent.getState().startsWith("away/")){
+            throw new RequestIllegalArgumentException();
         }
         //校验通道
         channelService.findOne(agent.getTenantId(), agent.getAppId(), agent.getChannel());
@@ -296,7 +298,7 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             }
             agentSkillService.deleteByAgent(agentId);
             try {
-                this.delete(agentId);
+                this.delete(agent);
                 //写入注销日志
                 agentActionLogService.agentLogout(agent);
             } catch (Exception e) {
@@ -429,6 +431,10 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
                 }else{
                     throw new ExtensionBindingToAgentException();
                 }
+            }
+            String oldExtension = agentState.getExtension(agent.getId());
+            if(StringUtils.isNotBlank(oldExtension)){
+                extensionState.deleteAgent(oldExtension);
             }
             extensionState.setAgent(extensionId,agent.getId());
             agentState.setExtension(agent.getId(),extensionId);
@@ -578,6 +584,5 @@ public class CallCenterAgentServiceImpl extends AbstractService<CallCenterAgent>
             });
         }
     }
-
 
 }

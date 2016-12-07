@@ -1,7 +1,6 @@
 package com.lsxy.app.opensips;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.lsxy.call.center.api.opensips.service.OpensipsService;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
