@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -61,4 +62,11 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
      * @return
      */
     ResourceTelenum findByCallUri(String callUri);
+
+    /**
+     *
+     * @param ids
+     * @return
+     */
+    List<ResourceTelenum> findByIdIn(Collection<String> ids);
 }
