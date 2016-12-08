@@ -464,6 +464,9 @@ public class IVRActionService {
             //不是挂断动作且未应答，需要自动应答
             if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
                 businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
+                if(logger.isDebugEnabled()){
+                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(call_id),call_id);
+                }
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;
             }

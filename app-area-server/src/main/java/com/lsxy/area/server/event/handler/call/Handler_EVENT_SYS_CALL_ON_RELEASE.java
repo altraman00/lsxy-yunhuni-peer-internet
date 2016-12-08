@@ -199,6 +199,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
 
             if(conversationService.isCC(call_id)){
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}]客户挂机callid={}",state.getTenantId(),state.getAppId(),call_id);
+                }
                 String conversation_id = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
                 if(conversation_id != null){
                     conversationService.logicExit(conversation_id,call_id);
