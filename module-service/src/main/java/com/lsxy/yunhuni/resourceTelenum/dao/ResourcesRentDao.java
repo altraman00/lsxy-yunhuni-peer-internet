@@ -67,6 +67,4 @@ public interface ResourcesRentDao extends BaseDaoInterface<ResourcesRent, Serial
     @Query("update ResourcesRent rent set rent.rentExpire=:expireTime where rent.id=:id")
     void updateResourceRentExpireTime(@Param("id") String id,@Param("expireTime") Date expireTime);
 
-    @Query(value = "SELECT rent.app_id,rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.tenant_id = :tenantId AND rent.rent_status IN (1,2) AND rent.deleted = 0",nativeQuery = true)
-    List<Object[]> findByTenantIdAndRentStatusIn(@Param("tenantId") String tenantId);
 }

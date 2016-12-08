@@ -68,12 +68,6 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
     void resourcesRentTask();
 
     /**
-     * 获取租户租用的号码
-     * @param id
-     * @return
-     */
-    List<ResourceTelenum> findByTenantId(String id);
-    /**
      * 释放号码
      */
     void release(String id);
@@ -93,4 +87,5 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
      * 创建订单
      */
     TelenumOrder telnumNew(Tenant tenant, String[] numIds);
+
 }

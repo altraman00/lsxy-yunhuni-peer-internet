@@ -159,21 +159,6 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
     }
 
     @Override
-    public List<ResourceTelenum> findByTenantId(String tenantId) {
-        Map<String,String> map = new HashMap<>();
-        List<Object[]> arrs = resourcesRentDao.findByTenantIdAndRentStatusIn(tenantId);
-        arrs.parallelStream().forEach(arr-> {
-            if(arr[1] != null && StringUtils.isNotBlank(arr[1].toString())){
-                map.put(arr[1].toString(),arr[0] == null?null:arr[0].toString());
-            }
-        });
-        Set<String> numIds = map.keySet();
-        List<ResourceTelenum> telnums = resourceTelenumService.findByIds(numIds);
-        telnums.parallelStream().forEach(telnum -> telnum.setAppId(map.get(telnum.getId())));
-        return telnums;
-    }
-
-    @Override
     @CacheEvict(value = "entity", key = "'entity_' + #id", beforeInvocation = true)
     public void release(String id) {
         ResourcesRent resourcesRent = this.findById(id);
@@ -273,4 +258,6 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         telenumOrder = telenumOrderService.save(telenumOrder);
         return telenumOrder;
     }
+
+
 }
