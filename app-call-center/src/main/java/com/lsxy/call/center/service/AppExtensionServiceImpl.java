@@ -200,7 +200,9 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
 //        model.setRegisterExpires(expire);
 //        model.setEnable(ExtensionState.Model.ENABLE_TRUE);
 //        extensionState.setAll(appExtension.getId(),model);
-        extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_TRUE);
+        if(appExtension != null){
+            extensionState.setEnable(appExtension.getId(),ExtensionState.Model.ENABLE_TRUE);
+        }
     }
 
     @Override
