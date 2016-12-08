@@ -76,12 +76,6 @@ public interface ResourcesRentService extends BaseService<ResourcesRent> {
     void recordingVoiceFileTask();
 
     /**
-     * 获取租户租用的号码
-     * @param id
-     * @return
-     */
-    List<ResourceTelenum> findByTenantId(String id);
-    /**
      * 释放号码
      */
     void release(String id);
