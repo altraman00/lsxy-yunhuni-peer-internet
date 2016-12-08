@@ -220,7 +220,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
         if(exs1 != null && exs1.size()>0){
             for (AppExtension ex : exs1){
                 Map<String,Object> map = new HashMap<>();
-                map.put(ex.getId(),extensionState.get(ex.getId()));
+                map.put(ex.getId(),extensionState.getEnable(ex.getId()));
                 exs.add(map);
             }
         }
