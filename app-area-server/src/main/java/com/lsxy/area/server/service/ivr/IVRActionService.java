@@ -194,6 +194,7 @@ public class IVRActionService {
      * @return
      */
     public String getFirstIvr(final String call_id,final String url,String from){
+        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -223,6 +224,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
+        if(logger.isDebugEnabled()){
+            logger.info("url={},callid={},ivr回调耗时:{}ms",(System.currentTimeMillis()-start));
+        }
         return res;
     }
 
@@ -257,6 +261,7 @@ public class IVRActionService {
      * @return
      */
     private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
+        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -293,6 +298,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
+        if(logger.isDebugEnabled()){
+            logger.info("url={},callid={},ivr回调耗时:{}ms",(System.currentTimeMillis()-start));
+        }
         return res;
     }
 
