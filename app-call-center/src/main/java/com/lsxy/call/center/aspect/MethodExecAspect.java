@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class MethodExecAspect {
     private static final Logger logger = LoggerFactory.getLogger(MethodExecAspect.class);
 
-    private static final long ONE_MINUTE = 20;
+    private static final long ONE_MINUTE = 10;
 
     public static final String POINT = "target(com.lsxy.framework.api.base.BaseService)";
 
