@@ -20,7 +20,7 @@ public class MethodExecAspect {
 
     private static final long ONE_MINUTE = 10;
 
-    public static final String POINT = "execution( * com.lsxy..*.*(..))";
+    public static final String POINT = "target(com.lsxy.framework.api.base.BaseService)";
 
     /**
      * 统计方法执行耗时Around环绕通知
