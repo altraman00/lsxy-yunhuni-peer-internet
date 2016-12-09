@@ -3,12 +3,14 @@ package com.lsxy.area.server.test;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.api.IVRService;
-import com.lsxy.area.api.exceptions.YunhuniApiException;
 import com.lsxy.area.server.AreaServerMainClass;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.Constants;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
@@ -17,6 +19,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.junit.Test;
@@ -76,13 +79,13 @@ public class IVRTest {
         String res_id = UUIDGenerator.uuid();
         String from = "13692206627";
         String to = "8675522730043";
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,null);
+        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,null,false);
 
         List<VoiceIvr> lists = (List<VoiceIvr>)voiceIvrService.list("from VoiceIvr order by createTime desc");
         System.out.println(lists.get(0).getId());
         //下一步干嘛
         int step = 1;
-        while(ivrActionService.doAction(lists.get(0).getId())){
+        while(ivrActionService.doAction(lists.get(0).getId(),null)){
             System.out.println("ivr step" + (step++));
         }
     }
@@ -94,7 +97,7 @@ public class IVRTest {
         System.out.println(lists.get(0).getId());
         //下一步干嘛
         int step = 1;
-        while(ivrActionService.doAction(lists.get(0).getId())){
+        while(ivrActionService.doAction(lists.get(0).getId(),null)){
             System.out.println("ivr step" + (step++));
         }
     }
@@ -120,4 +123,38 @@ public class IVRTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void testParse2() throws DocumentException, InterruptedException {
+        Thread.sleep(1000);
+
+        String xml ="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<response>\n" +
+                "<enqueue\n" +
+                "        channel=\"40288ae2586b014801586b0171520000\"\n" +
+                "        wait_voice=\"3.wav\"\n" +
+                "        ring_mode=\"4\"\n" +
+                "        play_num=\"true\"\n" +
+                "        pre_num_voice=\"坐席.wav\"\n" +
+                "        post_num_voice=\"为您服务.wav\"\n" +
+                "        data=\"your data whatever here!\">\n" +
+                "    <route>\n" +
+                "        <condition id=\"40288ae2586b014801586b01f10c157d\"></condition>\n" +
+                "    </route>\n" +
+                "</enqueue>\n" +
+                "<next>http://101.200.135.23:8085/ivr.php?step=receive</next>\n" +
+                "</response>\n";
+
+        try {
+            System.out.println(ivrActionService.validateXMLSchema(DocumentHelper.parseText(xml)));
+            Document document = DocumentHelper.parseText(xml);
+            xml = document.getRootElement().element("enqueue").asXML();
+            System.out.println(JSONUtil.objectToJson(EnQueueDecoder.decode(xml)));
+        } catch (DocumentException e) {
+            System.out.println("出错鸟");
+            e.printStackTrace();
+        }
+    }
+
+
 }

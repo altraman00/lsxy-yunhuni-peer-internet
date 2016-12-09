@@ -4,9 +4,11 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.area.server.util.RecordFileUtil;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
-import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
@@ -58,6 +60,9 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
     @Autowired
     private MeetingService meetingService;
 
+    @Autowired
+    private ConversationService conversationService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CONF_ON_START;
@@ -86,15 +91,21 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             throw new InvalidParamException("businessstate is null");
         }
         if(res_id!=null){
-            state.setResId(res_id);
-            businessStateService.save(state);
+            businessStateService.updateResId(conf_id,res_id);
         }
         if(logger.isDebugEnabled()){
             logger.info("confi_id={},state={}",conf_id,state);
         }
+        if(BusinessState.TYPE_CC_CONVERSATION.equals(state.getType())){
+            conversation(state,conf_id);
+        }else{
+            conf(state,conf_id,res_id);
+        }
+        return res;
+    }
+
+    public void conversation(BusinessState state,String conversationId){
         String appId = state.getAppId();
-        String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
 
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
@@ -104,18 +115,31 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
 
+        String initiator = conversationService.getInitiator(conversationId);
+        if(initiator != null){
+            try {
+                conversationService.join(appId,conversationId,initiator,null,null,null);
+            } catch (YunhuniApiException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void conf(BusinessState state,String conf_id,String res_id){
+        String user_data = state.getUserdata();
+        Map<String,String> businessData = state.getBusinessData();
+
         //开始通知开发者
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议创建成功通知给开发者");
         }
-        if(StringUtils.isNotBlank(app.getUrl())){
+        if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.create.succ")
                     .putIfNotEmpty("id",conf_id)
                     .putIfNotEmpty("begin_time",System.currentTimeMillis())
                     .putIfNotEmpty("user_data",user_data)
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }
 
         if(logger.isDebugEnabled()){
@@ -124,35 +148,32 @@ public class Handler_EVENT_SYS_CONF_ON_START extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        ifAutoRecording(state.getAreaId(),businessData,res_id,conf_id);
+        ifAutoRecording(state,state.getAreaId(),businessData,res_id,conf_id);
         Meeting meeting = meetingService.findById(conf_id);
         if(meeting != null){
             meeting.setResId(res_id);
             meeting.setStartTime(new Date());
             meetingService.save(meeting);
         }
-        return res;
     }
-
     /**
      * 创建会议是否自动录音
+     * @param state
      * @param businessData
      * @param res_id
      * @param conf_id
      */
-    private void ifAutoRecording(String areaId,Map<String,Object> businessData,String res_id,String conf_id){
+    private void ifAutoRecording(BusinessState state, String areaId, Map<String, String> businessData, String res_id, String conf_id){
         if(businessData == null){
             return;
         }
-        Object recording = businessData.get("recording");
-        if(recording == null || !(Boolean)recording){
+        if(!Boolean.parseBoolean(businessData.get("recording"))){
             return;
         }
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",res_id)
                 .putIfNotEmpty("max_seconds",businessData.get("max_seconds"))
-                //TODO 文件名如何定
-                .putIfNotEmpty("record_file", UUIDGenerator.uuid())
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(state.getTenantId(),state.getAppId()))
                 .putIfNotEmpty("user_data",conf_id)
                 .put("areaId",areaId)
                 .build();

@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>org.springframework.boot</groupId>-->
@@ -49,11 +49,6 @@
 
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.lsxy</groupId>
             <artifactId>module-service-api</artifactId>
         </dependency>
         <dependency>
@@ -80,12 +75,26 @@
 
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-cache</artifactId>
+            <artifactId>module-framework-monitor</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.lsxy</groupId>
-            <artifactId>module-framework-monitor</artifactId>
+            <artifactId>module-service-call-center-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-dubbo</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.lsxy</groupId>
+            <artifactId>module-framework-oss</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,6 +1,7 @@
 package com.lsxy.framework.tenant.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
+import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.api.tenant.model.*;
 import com.lsxy.framework.api.tenant.service.AccountService;
 import com.lsxy.framework.api.tenant.service.TenantService;
@@ -12,9 +13,9 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.tenant.dao.RealnameCorpDao;
 import com.lsxy.framework.tenant.dao.RealnamePrivateDao;
 import com.lsxy.framework.tenant.dao.TenantDao;
-import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.yunhuni.api.file.model.VoiceFilePlay;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,16 +71,22 @@ public class TenantServiceImpl extends AbstractService<Tenant> implements Tenant
 
     @Override
     public Tenant createTenant(Account account) {
-        long incTid = cacheManager.incr(INCREASE_TID);
+        String incTid = getTid();
         Tenant tenant = new Tenant();
         tenant.setTenantName(account.getUserName());
         tenant.setRegisterUserId(account.getId());
         tenant.setIsRealAuth(Tenant.AUTH_NO); //设为未实名认证状态
-        tenant.setTenantUid(DateUtils.getTime("yyyyMMdd")+ incTid);
-        if(incTid >= 9999){
-            cacheManager.del(INCREASE_TID);
-        }
+        tenant.setTenantUid(incTid);
+
         return this.save(tenant);
+    }
+
+    //获取用户Tid
+    private String getTid(){
+        long incTid = cacheManager.incr(INCREASE_TID);
+        //生成用户Tid
+        String incTidStr = DateUtils.getTime("yyyyMMdd") + incTid;
+        return incTidStr;
     }
 
     @Override

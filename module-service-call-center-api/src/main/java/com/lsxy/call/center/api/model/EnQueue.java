@@ -2,11 +2,14 @@ package com.lsxy.call.center.api.model;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+import java.io.Serializable;
+
 /**
  * Created by liuws on 2016/10/29.
  */
 @XStreamAlias("enqueue")
-public class EnQueue {
+public class EnQueue implements Serializable{
     @XStreamAsAttribute
     private String channel;
 
@@ -15,6 +18,9 @@ public class EnQueue {
 
     @XStreamAsAttribute
     private Integer conversation_timeout;
+
+    @XStreamAsAttribute
+    private String choice;
 
     @XStreamAsAttribute
     private String reserve_state;
@@ -48,6 +54,9 @@ public class EnQueue {
 
     private Route route;
 
+    public EnQueue(){
+        
+    }
     public String getChannel() {
         return channel;
     }
@@ -70,6 +79,14 @@ public class EnQueue {
 
     public void setConversation_timeout(Integer conversation_timeout) {
         this.conversation_timeout = conversation_timeout;
+    }
+
+    public String getChoice() {
+        return choice;
+    }
+
+    public void setChoice(String choice) {
+        this.choice = choice;
     }
 
     public String getReserve_state() {
@@ -160,9 +177,12 @@ public class EnQueue {
         this.route = route;
     }
 
-    public class Route{
+    public class Route  implements Serializable{
         private Condition condition;
 
+        public Route(){
+
+        }
         public Condition getCondition() {
             return condition;
         }
@@ -171,10 +191,13 @@ public class EnQueue {
             this.condition = condition;
         }
     }
-    public class Condition{
+    public class Condition  implements Serializable{
         @XStreamAsAttribute
         private String id;
 
+        public Condition(){
+
+        }
         public String getId() {
             return id;
         }

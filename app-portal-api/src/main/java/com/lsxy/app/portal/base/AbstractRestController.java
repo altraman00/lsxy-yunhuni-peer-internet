@@ -58,7 +58,7 @@ public abstract class AbstractRestController {
     }
 
     protected String getOssTempUri(String resource){
-        String host = SystemConfig.getProperty("global.oss.aliyun.endpoint","http://oss-cn-beijing.aliyuncs.com");
+        String host = SystemConfig.getProperty("global.oss.aliyun.endpoint.internet","http://oss-cn-beijing.aliyuncs.com");
         String accessId = SystemConfig.getProperty("global.aliyun.key","nfgEUCKyOdVMVbqQ");
         String accessKey = SystemConfig.getProperty("global.aliyun.secret","HhmxAMZ2jCrE0fTa2kh9CLXF9JPcOW");
         String resource1 = SystemConfig.getProperty("global.oss.aliyun.bucket");

@@ -6,7 +6,7 @@ import com.lsxy.framework.api.base.BaseDaoInterface;
 import java.io.Serializable;
 
 /**
- * Created by zhangxb on 2016/11/11.
+ * Created by liuws on 2016/11/18.
  */
-public interface CallCenterConversationMemberDao  extends BaseDaoInterface<CallCenterConversationMember, Serializable> {
+public interface CallCenterConversationMemberDao extends BaseDaoInterface<CallCenterConversationMember, Serializable> {
 }
