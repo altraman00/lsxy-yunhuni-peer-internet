@@ -14,6 +14,13 @@ import javax.persistence.Table;
 @Where(clause = "deleted=0")
 @Table(schema = "db_lsxy_bi_yunhuni",name="tb_oc_telnum_to_linegateway")
 public class TelnumToLineGateway extends IdEntity {
+    public static final String ISDIALING_TRUE = "1";
+    public static final String ISDIALING_FALSE = "0";
+    public static final String ISCALLED_TRUE = "1";
+    public static final String ISCALLED_FALSE = "0";
+    public static final String ISTHROUGH_TRUE = "1";
+    public static final String ISTHROUGH_FALSE = "0";
+
     private String telNumber;//号码
     private String lineId;//'所属线路网关'
     private String provider;//'供应商'
