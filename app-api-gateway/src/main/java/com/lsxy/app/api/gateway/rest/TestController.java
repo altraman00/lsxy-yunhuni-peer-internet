@@ -129,7 +129,7 @@ public class TestController {
                         logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
                     }
                 }catch (Exception ex){
-
+                    logger.error("出现异常",ex);
                 }
             }
             if(logger.isDebugEnabled()){
