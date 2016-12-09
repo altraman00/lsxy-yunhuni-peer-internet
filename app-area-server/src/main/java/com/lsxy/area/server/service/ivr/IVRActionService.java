@@ -213,7 +213,8 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -224,7 +225,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        logger.info("url={},callid={},ivr回调耗时:{}ms",url,call_id,(System.currentTimeMillis()-start));
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
@@ -285,7 +288,8 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(get,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -296,7 +300,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        logger.info("url={},callid={},ivr回调耗时:{}ms",url,call_id,(System.currentTimeMillis()-start));
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
