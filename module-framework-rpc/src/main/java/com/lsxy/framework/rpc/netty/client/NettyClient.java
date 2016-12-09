@@ -51,7 +51,7 @@ public class NettyClient extends AbstractClient{
         Session session = null;
         String host = getHost(serverUrl);
         int port = getPort(serverUrl);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup(500);
 
         try {
             Bootstrap b = new Bootstrap(); // (1)
