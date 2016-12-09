@@ -224,7 +224,7 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        logger.info("url={},callid={},ivr回调耗时:{}ms",(System.currentTimeMillis()-start));
+        logger.info("url={},callid={},ivr回调耗时:{}ms",url,call_id,(System.currentTimeMillis()-start));
         return res;
     }
 
@@ -296,7 +296,7 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        logger.info("url={},callid={},ivr回调耗时:{}ms",(System.currentTimeMillis()-start));
+        logger.info("url={},callid={},ivr回调耗时:{}ms",url,call_id,(System.currentTimeMillis()-start));
         return res;
     }
 
