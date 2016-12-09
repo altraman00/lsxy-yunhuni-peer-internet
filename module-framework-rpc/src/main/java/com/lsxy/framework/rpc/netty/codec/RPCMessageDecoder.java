@@ -239,9 +239,8 @@ public class RPCMessageDecoder extends ByteToMessageDecoder{
             in.readBytes(sessionPartByteBuffer,43);
             String sessionId = sessionPartByteBuffer.readBytes(32).toString(CharsetUtil.UTF_8);
             long timestamp = sessionPartByteBuffer.readLong();
-            if(logger.isDebugEnabled()){
-                logger.debug("========>收到消息[{}]花费{} ms",sessionId,System.currentTimeMillis() - timestamp);
-            }
+
+            logger.info("收到RPC消息[{}]花费{} ms",sessionId,System.currentTimeMillis() - timestamp);
 
             String rpcMethod = sessionPartByteBuffer.readBytes(3).toString(CharsetUtil.UTF_8);
             sessionPartByteBuffer.clear();

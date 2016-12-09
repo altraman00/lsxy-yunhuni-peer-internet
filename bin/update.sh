@@ -12,6 +12,7 @@ IS_TOMCAT_DEPLOY=false
 IS_SPRINGBOOT=false
 YUNHUNI_HOME=/opt/yunhuni
 TOMCAT_HOME=/opt/apach-tomcat
+BUILDNUM=""
 
 source /etc/profile
 
@@ -23,7 +24,7 @@ fi
 TAIL_LOG=false
 DEPLOY_PACKAGE="jar"
 JAVA_OPTS=""
-while getopts "A:P:H:M:O:STLD" opt; do
+while getopts "A:P:H:M:O:B:STLD" opt; do
   case $opt in
     A)
       APP_NAME="$OPTARG"
@@ -53,6 +54,9 @@ while getopts "A:P:H:M:O:STLD" opt; do
     O)
       JAVA_OPTS="$OPTARG";
       ;;
+    B)
+      BUILDNUM="-$OPTARG";
+      ;;
 
     \?)
       echo "Invalid option: -$OPTARG"
@@ -61,9 +65,9 @@ while getopts "A:P:H:M:O:STLD" opt; do
 done
 
 if [ $ENV = "test" ]; then
-    VERSION=TEST-SNAPSHOT
+    VERSION="TEST$BUILDNUM-SNAPSHOT"
 elif [ $ENV = "development" ]; then
-    VERSION=DEV-SNAPSHOT
+    VERSION="DEV$BUILDNUM-SNAPSHOT"
 fi
 
 echo "下载最新版本组件包"

@@ -213,7 +213,8 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -224,7 +225,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        logger.info("url={},callid={},ivr回调耗时:{}ms",url,call_id,(System.currentTimeMillis()-start));
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
@@ -285,7 +288,8 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(get,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -296,7 +300,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
-        logger.info("url={},callid={},ivr回调耗时:{}ms",url,call_id,(System.currentTimeMillis()-start));
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
@@ -349,6 +355,7 @@ public class IVRActionService {
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
                         .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,iscc ? CallCenterUtil.ISCC_TRUE:null)
+                        .put("startime",""+System.currentTimeMillis())
                         .build())
                 .build();
         businessStateService.save(state);
@@ -469,7 +476,7 @@ public class IVRActionService {
             if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
                 businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
                 if(logger.isDebugEnabled()){
-                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(call_id),call_id);
+                    logger.info("调用应答isCallcenter={}，callid={},耗时={}",conversationService.isCC(call_id),call_id,System.currentTimeMillis() - Long.parseLong(state.getBusinessData().get("startime")));
                 }
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;
@@ -480,6 +487,7 @@ public class IVRActionService {
             }
             return h.handle(call_id,state,actionEle,getNextUrl(root));
         } catch(DocumentException e){
+            logger.error("",e);
             logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             //发送ivr格式错误通知
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
@@ -491,6 +499,7 @@ public class IVRActionService {
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
+            logger.error("",e);
             logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             return false;
         }

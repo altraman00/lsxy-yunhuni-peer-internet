@@ -6,7 +6,6 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +24,7 @@ public class TestIncomingZB {
         if(logger.isDebugEnabled()){
             logger.debug("请求语音通知指令,存入REDIS:{} - {}  - " ,to,timestamp);
         }
-        redisCacheService.set(to,timestamp+"");
+        redisCacheService.set("TestIncomingZB::"+to,timestamp+"",100);
     }
 
 
@@ -36,7 +35,7 @@ public class TestIncomingZB {
         if(StringUtil.isNotEmpty(to)){
             to = to.substring(4);
         }
-        String requestTimestamp = redisCacheService.get(to);
+        String requestTimestamp = redisCacheService.get("TestIncomingZB::"+to);
         long now = System.currentTimeMillis();
         if(StringUtil.isNotEmpty(requestTimestamp)){
             Long ltt = Long.parseLong(requestTimestamp);
