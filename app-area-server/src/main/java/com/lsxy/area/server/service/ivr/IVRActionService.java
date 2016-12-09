@@ -349,6 +349,7 @@ public class IVRActionService {
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
                         .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,iscc ? CallCenterUtil.ISCC_TRUE:null)
+                        .put("startime",""+System.currentTimeMillis())
                         .build())
                 .build();
         businessStateService.save(state);
@@ -469,7 +470,7 @@ public class IVRActionService {
             if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
                 businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
                 if(logger.isDebugEnabled()){
-                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(call_id),call_id);
+                    logger.info("调用应答isCallcenter={}，callid={},",conversationService.isCC(call_id),call_id,System.currentTimeMillis() - Long.parseLong(state.getBusinessData().get("starttime")));
                 }
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;
