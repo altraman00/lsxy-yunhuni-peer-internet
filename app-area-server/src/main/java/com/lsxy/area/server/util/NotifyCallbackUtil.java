@@ -110,8 +110,9 @@ public class NotifyCallbackUtil {
                         success = true;
                     }
                     if(logger.isDebugEnabled()){
-                        logger.info("url={},http notify response statue = {},耗时:{}ms"
-                                ,url,response.getStatusLine().getStatusCode(),(System.currentTimeMillis() - start));
+                        logger.info("url={},status={}"
+                                ,url,response.getStatusLine().getStatusCode());
+                        logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                     }
                     if(!success){
                         if(retry >0){
