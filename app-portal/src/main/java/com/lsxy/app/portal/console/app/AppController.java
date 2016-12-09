@@ -102,8 +102,7 @@ public class AppController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/get/{1}/recording/time";
         mav.addObject("cycle",RestRequest.buildSecurityRequest(token).get(uri, Integer.class,id).getData());
-
-//        AreaSip areaSip = app.getAreaSip();
+        //        AreaSip areaSip = app.getAreaSip();
 //        if(areaSip!=null){
 //            mav.addObject("sipRegistrar",app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
 //        }else{
