@@ -37,7 +37,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
@@ -94,10 +94,6 @@ public class IVRActionService {
 
     /**IVR下一步的url**/
     public static final String IVR_NEXT_FIELD = "IVR_NEXT";
-
-    //设置请求和传输超时时间
-    private RequestConfig config =
-            RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
 
     @Autowired
     private BusinessStateService businessStateService;
@@ -159,7 +155,19 @@ public class IVRActionService {
         }
     }
     private void initClient(){
-        client = HttpAsyncClients.createDefault();
+        client = HttpAsyncClientBuilder.create()
+                .setDefaultRequestConfig(
+                        RequestConfig.custom()
+                                .setConnectionRequestTimeout(5000)
+                                .setSocketTimeout(5000)
+                                .setConnectTimeout(5000).build())
+                //总共最多1000并发
+                .setMaxConnTotal(1000)
+                //每个host最多100并发
+                .setMaxConnPerRoute(100)
+                //禁用cookies
+                .disableCookieManagement()
+                .build();
         client.start();
     }
     private void initHandler(){
@@ -186,6 +194,7 @@ public class IVRActionService {
      * @return
      */
     public String getFirstIvr(final String call_id,final String url,String from){
+        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -197,7 +206,6 @@ public class IVRActionService {
                         .putIfNotEmpty("call_id",call_id)
                         .putIfNotEmpty("from",from)
                         .build();
-                post.setConfig(config);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
                 post.setEntity(se);
@@ -205,7 +213,8 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -216,6 +225,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
@@ -250,6 +262,7 @@ public class IVRActionService {
      * @return
      */
     private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
+        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -270,13 +283,13 @@ public class IVRActionService {
                     }
                 }
                 HttpGet get = new HttpGet(target);
-                get.setConfig(config);
                 get.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 get.setHeader("accept",ACCEPT_TYPE_TEXT_PLAIN);
                 Future<HttpResponse> future = client.execute(get,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("http ivr response statue = {}",response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -287,6 +300,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
@@ -396,14 +412,15 @@ public class IVRActionService {
     public boolean doAction(String call_id,Map<String,Object> prevResults){
         BusinessState state = businessStateService.get(call_id);
         if(state == null){
-            logger.info("没有找到call_id={}的state",call_id);
+            logger.info("callId={}没有找到state",call_id);
             return false;
         }
 
         if(state.getClosed() != null && state.getClosed()){
-            logger.info("IVR呼叫已关闭，call_id={}",call_id);
+            logger.info("[{}][{}]callId={}IVR呼叫已关闭",state.getTenantId(),state.getAppId(),call_id);
             return false;
         }
+
         Map<String,String> businessDate = state.getBusinessData();
 
         //呼入,如果有IVR_ANSWER_AFTER_XML_FIELD直接执行，不需要调用next获取xml
@@ -417,7 +434,7 @@ public class IVRActionService {
         String nextUrl = businessDate.get(IVR_NEXT_FIELD);
         // is "" 代表没有next，null代表第一次
         if(nextUrl!=null && StringUtils.isBlank(nextUrl)){
-            logger.info("没有后续ivr动作了，call_id={}",call_id);
+            logger.info("[{}][{}]没有后续ivr动作了，call_id={}",state.getTenantId(),state.getAppId(),call_id);
             hangup(state.getResId(),call_id,state.getAreaId());
             return  false;
         }
@@ -444,26 +461,32 @@ public class IVRActionService {
             actionEle = getActionEle(root);
             h = handlers.get(actionEle.getName().toLowerCase());
             if(h == null){
-                logger.info("没有找到对应的ivr动作处理类");
+                logger.info("[{}][{}]callId={}没有找到对应的ivr动作处理类",state.getTenantId(),state.getAppId(),call_id);
                 return false;
             }
             //呼叫中心排队
             if(h instanceof EnqueueHandler){
                 if(!conversationService.isCC(call_id)){
-                    logger.info("没有开通呼叫中心服务");
+                    logger.info("[{}][{}]callId={}没有开通呼叫中心服务",state.getTenantId(),state.getAppId(),call_id);
                     return false;
                 }
             }
             //不是挂断动作且未应答，需要自动应答
             if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
                 businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
+                if(logger.isDebugEnabled()){
+                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(call_id),call_id);
+                }
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;
             }
             businessStateService.updateInnerField(call_id,IVR_ACTION_FIELD,h.getAction());
-            return h.handle(call_id,actionEle,getNextUrl(root));
+            if(logger.isDebugEnabled()){
+                logger.debug("[{}][{}]开始处理ivr动作，callId={},ivr={}",state.getTenantId(),state.getAppId(),call_id,h.getAction());
+            }
+            return h.handle(call_id,state,actionEle,getNextUrl(root));
         } catch(DocumentException e){
-            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
+            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             //发送ivr格式错误通知
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","ivr.format_error")
@@ -474,7 +497,7 @@ public class IVRActionService {
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
-            logger.error("处理ivr动作指令出错,appID="+state.getAppId(),e);
+            logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             return false;
         }
     }

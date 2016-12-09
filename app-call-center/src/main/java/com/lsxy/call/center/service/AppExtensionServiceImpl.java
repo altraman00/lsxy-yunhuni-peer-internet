@@ -21,7 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -212,4 +215,18 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
     }
 
 
+
+    @Override
+    public List<Map<String,Object>> exs(String appId){
+        List<Map<String,Object>> exs = new ArrayList<>();
+        List<AppExtension> exs1 = this.findByAppId(appId);
+        if(exs1 != null && exs1.size()>0){
+            for (AppExtension ex : exs1){
+                Map<String,Object> map = new HashMap<>();
+                map.put(ex.getId(),extensionState.getEnable(ex.getId()));
+                exs.add(map);
+            }
+        }
+        return exs;
+    }
 }

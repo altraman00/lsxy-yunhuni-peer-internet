@@ -98,18 +98,7 @@ public class DialActionHandler extends ActionHandler{
      * @return
      */
     @Override
-    public boolean handle(String callId, Element root,String next) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
-        }
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作",getAction());
-        }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
+    public boolean handle(String callId,BusinessState state, Element root,String next) {
         //更新下一步
         businessStateService.updateInnerField(callId,IVRActionService.IVR_NEXT_FIELD,next);
         dial(callId,state.getResId(),state.getAppId(),state.getTenantId(),root);

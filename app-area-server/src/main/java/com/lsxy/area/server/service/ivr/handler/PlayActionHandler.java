@@ -44,24 +44,11 @@ public class PlayActionHandler extends ActionHandler{
     }
 
     @Override
-    public boolean handle(String callId, Element root,String next) {
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr动作，callId={},ivr={}",callId,getAction());
-        }
-        BusinessState state = businessStateService.get(callId);
-        if(state == null){
-            logger.info("没有找到call_id={}的state",callId);
-            return false;
-        }
+    public boolean handle(String callId,BusinessState state, Element root,String next) {
         String finish_keys = root.attributeValue("finish_keys");
         List<String> plays = new ArrayList<String>();
         if(StringUtils.isNotBlank(root.getTextTrim())){
             plays.add(root.getTextTrim());
-        }
-
-        if(logger.isDebugEnabled()){
-            logger.debug("开始处理ivr[{}]动作，finish_keys={},play={}",
-                    getAction(),finish_keys,plays);
         }
         String res_id = state.getResId();
         if(plays!=null && plays.size()>0){

@@ -7,6 +7,7 @@ import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.service.ivr.IVRActionService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.call.center.api.model.BaseEnQueue;
+import com.lsxy.call.center.api.model.CallCenterAgent;
 import com.lsxy.call.center.api.model.CallCenterQueue;
 import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
@@ -125,15 +126,13 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
 
-        callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation,
-                CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
-                state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),agentCallId);
-
         callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
                 state.getBusinessData().get(CallCenterUtil.CONDITION_ID_FIELD),
                 callId,agentCallId,state.getUserdata());
+
+        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),result.getAgent().getId(), CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING);
     }
 
     @Override

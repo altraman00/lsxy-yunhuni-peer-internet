@@ -21,9 +21,6 @@ public class CallConversationService {
 
     private static final String CONVERSATION_PARTS_COUNTER_KEY_PREFIX = "callcenter.call_conversations_";
 
-    /**key的过期时间 秒**/
-    public static final int EXPIRE = 60 * 60 * 12;
-
     @Autowired
     private RedisCacheService redisCacheService;
 
@@ -42,13 +39,13 @@ public class CallConversationService {
     public void incrConversation(String callId,String conversation){
         String key = key(callId);
         redisCacheService.sadd(key,conversation);
-        redisCacheService.expire(key,EXPIRE);
+        redisCacheService.expire(key,ConversationService.EXPIRE);
     }
 
     public void decrConversation(String callId,String conversation){
         String key = key(callId);
         redisCacheService.sremove(key,conversation);
-        redisCacheService.expire(key,EXPIRE);
+        redisCacheService.expire(key,ConversationService.EXPIRE);
     }
 
     /**

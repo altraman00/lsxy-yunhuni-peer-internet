@@ -53,7 +53,7 @@ public class ConfServiceImpl implements ConfService {
     public static final int MAX_DURATION = 60 * 60 * 6;
 
     /**key的过期时间 秒**/
-    public static final int EXPIRE = 60 * 60 * 12;
+    public static final int EXPIRE = MAX_DURATION + 60 * 10;
 
     private static final String CONF_PARTS_COUNTER_KEY_PREFIX = "conf_parts_";
 
@@ -184,21 +184,25 @@ public class ConfServiceImpl implements ConfService {
             throw new AppServiceInvalidException();
         }
 
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.sys_conf.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
-
         BusinessState state = businessStateService.get(confId);
 
         if(state == null){
             throw new ConfNotExistsException();
         }
 
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getClosed()!= null && state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
             throw new ConfNotExistsException();
         }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
 
         Map<String, Object> params = new MapBuilder<String,Object>()
@@ -249,6 +253,15 @@ public class ConfServiceImpl implements ConfService {
         if(state == null){
             throw new ConfNotExistsException();
         }
+
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getClosed()!= null && state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!appId.equals(state.getAppId())){
             //不能跨app操作
             throw new ConfNotExistsException();
@@ -365,15 +378,27 @@ public class ConfServiceImpl implements ConfService {
         }
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",call_state.getResId())
@@ -416,8 +441,13 @@ public class ConfServiceImpl implements ConfService {
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         playFiles = playFileUtil.convertArray(app.getTenant().getId(),appId,playFiles);
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
@@ -456,8 +486,13 @@ public class ConfServiceImpl implements ConfService {
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
@@ -499,8 +534,13 @@ public class ConfServiceImpl implements ConfService {
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         Map<String,String> businessData = conf_state.getBusinessData();
         if(maxDuration == null && businessData!=null){
             String duration = businessData.get("max_seconds");
@@ -512,7 +552,7 @@ public class ConfServiceImpl implements ConfService {
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
                 .putIfNotEmpty("max_seconds",maxDuration)
-                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(app.getTenant().getId(),appId))
+                .putIfNotEmpty("record_file", RecordFileUtil.getRecordFileUrl(conf_state.getTenantId(),appId))
                 .putIfNotEmpty("user_data",confId)
                 .putIfNotEmpty("areaId",areaId)
                 .build();
@@ -545,8 +585,13 @@ public class ConfServiceImpl implements ConfService {
         BusinessState conf_state = businessStateService.get(confId);
 
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
         Map<String,Object> params = new MapBuilder<String,Object>()
                 .putIfNotEmpty("res_id",conf_state.getResId())
@@ -587,12 +632,22 @@ public class ConfServiceImpl implements ConfService {
 
         BusinessState call_state = businessStateService.get(callId);
         BusinessState conf_state = businessStateService.get(confId);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             throw new IllegalArgumentException();
         }
@@ -619,12 +674,22 @@ public class ConfServiceImpl implements ConfService {
     public boolean confEnter(String call_id, String conf_id, Integer maxDuration, String playFile, Integer voiceMode) throws YunhuniApiException {
         BusinessState call_state = businessStateService.get(call_id);
         BusinessState conf_state = businessStateService.get(conf_id);
-        if(call_state == null || call_state.getResId() == null){
-            throw new IllegalArgumentException();
+        if(call_state ==null || call_state.getResId() == null){
+            throw new SystemBusyException();
         }
+
+        if(call_state.getClosed()!= null && call_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(conf_state == null || conf_state.getResId() == null){
-            throw new IllegalArgumentException();
+            throw new SystemBusyException();
         }
+
+        if(conf_state.getClosed()!= null && conf_state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         if(!call_state.getAppId().equals(conf_state.getAppId())){
             //不合法的参数
             throw new IllegalArgumentException();

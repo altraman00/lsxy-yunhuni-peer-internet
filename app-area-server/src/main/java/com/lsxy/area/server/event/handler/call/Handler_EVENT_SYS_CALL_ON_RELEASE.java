@@ -73,6 +73,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
     @Autowired
     private ConversationService conversationService;
 
+    @Autowired
+    private CallCenterUtil callCenterUtil;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_ON_RELEASE;
@@ -196,6 +199,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
             }
 
             if(conversationService.isCC(call_id)){
+                if(logger.isDebugEnabled()){
+                    logger.info("[{}][{}]客户挂机callid={}",state.getTenantId(),state.getAppId(),call_id);
+                }
                 String conversation_id = state.getBusinessData().get(CallCenterUtil.CONVERSATION_FIELD);
                 if(conversation_id != null){
                     conversationService.logicExit(conversation_id,call_id);
@@ -204,11 +210,29 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         }else if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType())){
             String agentId = state.getBusinessData().get(CallCenterUtil.AGENT_ID_FIELD);
             if(agentId != null){
+                String preState = null;
+                String curState = null;
+                try {
+                    preState = callCenterAgentService.getState(agentId);
+                } catch (YunhuniApiException e) {
+                }
                 String reserve_state = state.getBusinessData().get(CallCenterUtil.RESERVE_STATE_FIELD);
                 try {
+                    if(logger.isDebugEnabled()){
+                        logger.info("[{}][{}]坐席挂机agentId={}",state.getTenantId(),state.getAppId(),agentId);
+                    }
                     callCenterAgentService.state(state.getTenantId(),state.getAppId(),agentId,reserve_state,true);
-                } catch (YunhuniApiException e) {
+                } catch (Throwable e) {
                     logger.error("坐席挂机事件设置坐席状态失败agent="+agentId,e);
+                }
+                try {
+                    curState = callCenterAgentService.getState(agentId);
+                } catch (YunhuniApiException e) {
+                }
+                if(preState!=null && curState != null){
+                    if(!preState.equals(curState)){
+                        callCenterUtil.agentStateChangedEvent(state.getCallBackUrl(),agentId,preState, curState);
+                    }
                 }
             }
         }
