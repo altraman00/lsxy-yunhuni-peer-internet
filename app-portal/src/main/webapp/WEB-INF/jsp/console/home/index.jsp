@@ -394,7 +394,7 @@
                 }
             }
 
-            $('#'+id+"_cost1").html(cost[0]+'.<span class="small-font-size" ">'+cost2+'</span>');
+            $('#'+id+"_cost1").html(cost[0]+'.<span class="small-font-size" >'+cost2+'</span>');
             $('#'+id+"_costTime").html(result.data.costTime);
             $('#'+id+"_session").html(result.data.session);
             if(id=='today'){

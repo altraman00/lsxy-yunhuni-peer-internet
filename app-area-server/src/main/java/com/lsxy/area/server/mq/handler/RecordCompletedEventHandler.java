@@ -4,6 +4,8 @@ import com.lsxy.framework.mq.api.MQMessageHandler;
 import com.lsxy.framework.mq.events.agentserver.RecordCompletedEvent;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
+import com.lsxy.yunhuni.api.product.service.CalCostService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
 
     @Autowired
     private VoiceFileRecordService voiceFileRecordService;
+    @Autowired
+    private CalCostService calCostService;
 
     private long getTimelong(long start,long end){
         long second = end - start;
@@ -37,11 +41,6 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
 
     private long getRecordSize(long start,long end){
         return SIZE_PRESECOND * getTimelong(start,end);
-    }
-
-    private long getCostTimelong(long start,long end){
-        double second = getTimelong(start,end);
-        return (long)Math.ceil(second/60) * 60;
     }
 
     @Override
@@ -84,9 +83,8 @@ public class RecordCompletedEventHandler implements MQMessageHandler<RecordCompl
         record.setSessionCode(message.getType());
         record.setUrl(message.getUrl());
         record.setCallTimeLong(getTimelong(message.getStarTime(),message.getEndTime()));
-        record.setCostTimeLong(getCostTimelong(message.getStarTime(),message.getEndTime()));
-        //TODO 录音扣费金额
-        record.setCost(new BigDecimal(0));
+        // 录音扣费金额,录音扣费时长
+        calCostService.recordConsume(record);
         record.setSize(getRecordSize(message.getStarTime(),message.getEndTime()));
         voiceFileRecordService.save(record);
     }
