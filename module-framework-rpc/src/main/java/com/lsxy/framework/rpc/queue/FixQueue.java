@@ -26,6 +26,8 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class FixQueue implements Runnable{
 
+    //修正队列中的消息过期时间 2分钟
+    private static final long FIX_EXPIRED = 2*60*1000;
     @Autowired
     private SessionContext sessionContext;
 
@@ -85,6 +87,13 @@ public class FixQueue implements Runnable{
 
             while((message = queue.take())!=null){
                 try {
+
+                    long timeoffset = (System.currentTimeMillis() - message.getTimestamp());
+                    if(timeoffset >= FIX_EXPIRED){
+                        logger.error("[FIX]消息过期（{}）丢失:{}",FIX_EXPIRED,message);
+                        continue;
+                    }
+
                     message.tryWriteMark();
                     logger.info("[FIX]尝试重新发送消息:{}",message);
                     Session session = sessionContext.getRightSession(message);

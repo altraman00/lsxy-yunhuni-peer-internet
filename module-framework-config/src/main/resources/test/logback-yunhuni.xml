@@ -71,6 +71,7 @@
 
 
     <logger name="com.lsxy" level="DEBUG" additivity="true" />
+    <logger name="com.lsxy.framework.rpc.netty.codec" level="ERROR" additivity="true" />
     <logger name="com.lsxy.framework.rpc" level="DEBUG" additivity="true" />
     <logger name="com.lsxy.framework.config" level="INFO" additivity="true" />
     <logger name="com.lsxy.framework.monitor" level="INFO" additivity="true" />
