@@ -240,7 +240,7 @@ public class RPCMessageDecoder extends ByteToMessageDecoder{
             String sessionId = sessionPartByteBuffer.readBytes(32).toString(CharsetUtil.UTF_8);
             long timestamp = sessionPartByteBuffer.readLong();
 
-            logger.info("收到RPC消息[{}]花费{} ms",sessionId,System.currentTimeMillis() - timestamp);
+
 
             String rpcMethod = sessionPartByteBuffer.readBytes(3).toString(CharsetUtil.UTF_8);
             sessionPartByteBuffer.clear();
@@ -249,6 +249,7 @@ public class RPCMessageDecoder extends ByteToMessageDecoder{
                 logger.debug("timestamp is :" + timestamp);
                 logger.debug("decode message 's method is [{}]",rpcMethod);
             }
+            logger.info("收到RPC消息[{}][{}]花费{} ms",sessionId,rpcMethod,System.currentTimeMillis() - timestamp);
 
             //看是request 还是 response
             if(rpcMethod.equals("RQ:")){

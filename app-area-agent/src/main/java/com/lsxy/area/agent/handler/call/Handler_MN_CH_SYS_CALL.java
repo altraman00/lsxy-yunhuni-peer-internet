@@ -38,7 +38,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         RPCResponse response = RPCResponse.buildResponse(request);
-
+        return null;
 //        Commander cticlient = cticlientContext.getAvalibleClient();
 //        if(cticlient == null) {
 //            response.setMessage(RPCResponse.STATE_EXCEPTION);
@@ -99,11 +99,11 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 //                    }
 //                }
 //            });
-            response.setMessage(RPCResponse.STATE_OK);
+//            response.setMessage(RPCResponse.STATE_OK);
 //        } catch (IOException e) {
 //            logger.error("创建资源失败",e);
 //            response.setMessage(RPCResponse.STATE_EXCEPTION);
 //        }
-        return response;
+//        return response;
     }
 }
