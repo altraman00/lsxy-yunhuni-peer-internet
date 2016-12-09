@@ -153,7 +153,7 @@ public class AppExtensionServiceImpl extends AbstractService<AppExtension> imple
                         //TODO 分机opensips删除
                         opensipsExtensionService.deleteExtension(extension.getUser());
                     }
-                    redisCacheService.del(extensionId);
+                    extensionState.delete(extensionId);
                 }else{
                     throw new ExtensionBindingToAgentException();
                 }
