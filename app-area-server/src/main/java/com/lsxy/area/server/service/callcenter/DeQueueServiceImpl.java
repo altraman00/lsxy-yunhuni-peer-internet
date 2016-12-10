@@ -96,8 +96,9 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         String conversation = UUIDGenerator.uuid();
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        businessStateService.updateInnerField(callId,CallCenterUtil.CONVERSATION_FIELD,conversation);
-        businessStateService.updateInnerField(callId,CallCenterUtil.QUEUE_ID_FIELD,queueId);
+
+        businessStateService.updateInnerField(callId,2,
+                CallCenterUtil.CONVERSATION_FIELD,CallCenterUtil.QUEUE_ID_FIELD,conversation,queueId);
 
         BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
         Integer conversationTimeout = enQueue.getConversation_timeout();
@@ -142,7 +143,7 @@ public class DeQueueServiceImpl implements DeQueueService {
         }catch (Throwable t){
             logger.error("incrIntoRedis失败",t);
         }
-        
+
         callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),

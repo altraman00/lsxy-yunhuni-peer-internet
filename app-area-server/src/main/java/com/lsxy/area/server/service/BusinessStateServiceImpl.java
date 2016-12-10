@@ -189,6 +189,28 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     }
 
     @Override
+    public void updateInnerField(String id,int keycount,String... params){
+        if(keycount <= 0){
+            throw new NumberFormatException();
+        }
+        if(params.length != keycount * 2 ){//键值不匹配
+            throw new IllegalArgumentException();
+        }
+        String key = getKey(id);
+        try{
+            Map<String,String> map = new HashMap<>();
+            for (int i = 0; i < keycount; i++) {
+                map.put(getInnerField(params[i]),params[i+keycount]);
+            }
+            if(map.size()>0){
+                redisCacheService.hputAll(key,map);
+                redisCacheService.expire(key,EXPIRE_START);
+            }
+        }catch (Throwable t){
+            logger.error("update business state 失败",t);
+        }
+    }
+    @Override
     public void deleteInnerField(String id,String field){
         String key = getKey(id);
         try{
