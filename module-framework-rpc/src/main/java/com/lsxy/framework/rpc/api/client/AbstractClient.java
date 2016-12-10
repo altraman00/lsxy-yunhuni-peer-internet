@@ -6,14 +6,16 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.Session;
-import com.lsxy.framework.rpc.exceptions.*;
+import com.lsxy.framework.rpc.exceptions.ClientBindException;
+import com.lsxy.framework.rpc.exceptions.ClientConnecException;
+import com.lsxy.framework.rpc.exceptions.HaveNoExpectedRPCResponseException;
+import com.lsxy.framework.rpc.exceptions.RequestTimeOutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,7 +45,7 @@ public abstract class AbstractClient implements Client{
 
     @Override
     public void bind() {
-        executorService = Executors.newFixedThreadPool(serverUrls.length);
+//        executorService = Executors.newFixedThreadPool(serverUrls.length);
         for (String serverUrl:serverUrls) {
             ServerDeamonTask task = new ServerDeamonTask(serverUrl,this.areaid);
             //刚刚开始就执行一次绑定
@@ -62,7 +64,7 @@ public abstract class AbstractClient implements Client{
             } catch (ClientBindException e) {
                 logger.error("客户端连接失败:{}   {}",serverUrl,e.getMessage());
             }
-            executorService.submit(task);
+//            executorService.submit(task);
         }
     }
 

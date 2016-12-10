@@ -1,16 +1,18 @@
 package com.lsxy.framework.rpc.netty.client;
 
-import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
-import com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder;
-import com.lsxy.framework.rpc.netty.codec.RPCMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
@@ -64,9 +66,22 @@ public class NettyClient extends AbstractClient{
                 public void initChannel(SocketChannel ch) throws Exception {
 //                    ch.pipeline().addLast();
                     ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast("decoder", new RPCMessageDecoder());
-                    pipeline.addLast("encoder", new RPCMessageEncoder());
-                    pipeline.addLast("handler", handler.getIoHandler());
+//                    pipeline.addLast("decoder", new RPCMessageDecoder());
+//                    pipeline.addLast("encoder", new RPCMessageEncoder());
+//                    pipeline.addLast("handler", handler.getIoHandler());
+                    pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
+                    pipeline.addLast("decoder", new StringDecoder());
+                    pipeline.addLast("encoder", new StringEncoder());
+
+                    ch.pipeline().addLast(new SimpleChannelInboundHandler<String>(){
+
+                        @Override
+                        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+                            long timestamp = Long.parseLong(msg);
+                            logger.info("收到消回复消息["+msg+"]耗时:"+(System.currentTimeMillis() - timestamp)+"ms");
+
+                        }
+                    });
                 }
             });
 
@@ -97,9 +112,9 @@ public class NettyClient extends AbstractClient{
 
             if(f.isSuccess() && f.channel().isActive()){
                 logger.info("客户端连接成功,准备发送注册客户端命令");
-                session = new NettyClientSession(f.channel(),handler,serverUrl);
-                f.channel().attr(SESSION_ID).set(session.getId());
-               this.doConnect(session);
+//                session = new NettyClientSession(f.channel(),handler,serverUrl);
+//                f.channel().attr(SESSION_ID).set(session.getId());
+                doTestRequest(100,1000000000,f.channel());
             }
 
 
@@ -123,5 +138,30 @@ public class NettyClient extends AbstractClient{
         assert serverUrl!=null;
         return serverUrl.substring(0, serverUrl.indexOf(":"));
     }
+
+
+
+    public void doTestRequest(int threads,int count,Channel channel){
+
+        for(int i=0;i<threads ; i++){
+            final int k = i;
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for(int j = 0;j<count;j++){
+                        try {
+                            channel.writeAndFlush(System.currentTimeMillis()+"\n");
+                            Thread.currentThread().sleep(1);
+                        } catch (Exception ex) {
+                            logger.error("RPC 异常",ex);
+                        }
+                    }
+                }
+            });
+            t.setName("test-"+i);
+            t.start();
+        }
+    }
+
 
 }
