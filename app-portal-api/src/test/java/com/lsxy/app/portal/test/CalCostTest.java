@@ -163,7 +163,7 @@ public class CalCostTest {
     @Test
     public void testStaticCC1(){
         CallCenterStatistics callCenterStatistics = new CallCenterStatistics("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000",new Date(),1L,1L,1L,1L,1L,1L,1L,1L);
-        callCenterStatisticsService.incrIntoRedis(callCenterStatistics,new Date());
+        callCenterStatisticsService.incrIntoRedis(callCenterStatistics);
     }
 
     @Test
