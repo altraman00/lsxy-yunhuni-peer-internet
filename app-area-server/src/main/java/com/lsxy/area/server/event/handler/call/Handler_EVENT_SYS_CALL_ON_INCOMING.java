@@ -1,12 +1,10 @@
 package com.lsxy.area.server.event.handler.call;
 
-import com.lsxy.area.api.BusinessStateService;
-import com.lsxy.area.api.ConfService;
-import com.lsxy.area.api.exceptions.NumberNotAllowToCallException;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.ivr.IVRActionService;
-import com.lsxy.area.server.util.NotifyCallbackUtil;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.core.exceptions.api.NumberNotAllowToCallException;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -14,9 +12,9 @@ import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
-import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.TelnumLocationService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
@@ -24,8 +22,6 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TelnumToLineGatewayService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.TestNumBindService;
-import com.lsxy.yunhuni.api.session.service.CallSessionService;
-import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -45,16 +41,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     private static final Logger logger = LoggerFactory.getLogger(Handler_EVENT_SYS_CALL_ON_INCOMING.class);
 
     @Autowired
-    private BusinessStateService businessStateService;
-
-    @Autowired
     private AppService appService;
-
-    @Autowired
-    private ConfService confService;
-
-    @Autowired
-    private NotifyCallbackUtil notifyCallbackUtil;
 
     @Autowired
     private TestNumBindService testNumBindService;
@@ -65,17 +52,11 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
     @Autowired
     private IVRActionService ivrActionService;
 
-    @Autowired
-    private LineGatewayService lineGatewayService;
-
     @Value("${portal.test.call.number}")
     private String testNum;
 
     @Autowired
-    private CallSessionService callSessionService;
-
-    @Autowired
-    private VoiceIvrService voiceIvrService;
+    private TenantServiceSwitchService tenantServiceSwitchService;
 
     @Autowired
     private ResourceTelenumService resourceTelenumService;
@@ -144,7 +125,6 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
                 return res;
             }
         }
-
         if(tenant == null){
             logger.error("找不到对应的租户:{}",params);
             return res;
@@ -153,8 +133,23 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
             logger.error("找不到对应的APP:{}", params);
             return res;
         }
-
-        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId());
+        boolean isCallCenter = false;
+        if(app.getServiceType().equals(App.PRODUCT_CALL_CENTER)){
+            if(app.getIsCallCenter() == null || app.getIsCallCenter() != 1){
+                logger.info("[{}][{}]没有开通呼叫中心",tenant.getId(),app.getId());
+                return res;
+            }
+            isCallCenter = true;
+        }else{
+            if(!appService.enabledService(tenant.getId(),app.getId(), ServiceType.IvrService)){
+                logger.info("[{}][{}]没有开通ivr",tenant.getId(),app.getId());
+                return res;
+            }
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
+        }
+        ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),isCallCenter);
         return res;
     }
 
@@ -183,41 +178,44 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String checkBlackNum = from;
         //TODO 座席呼平台多少位？
         //TODO 如何判断座席
-        if(from.length() >= 7 && from.length() <= 8){
-            //固话不带区号，加上区号
-            from = lineGateway.getAreaCode() + from;
-        }else if(from.length() >= 11 && from.length() <= 12){
-            //手机或固话
-            if(from.startsWith("0") || from.startsWith("1")){
-                if(from.startsWith("01")){
-                    if((!from.startsWith("010")) && from.length() == 12){
-                        //手机号加0
-                        from = from.substring(1);
-                        checkBlackNum = from;
-                    }else if(from.startsWith("010")){
-                        checkBlackNum = from.substring(3);
-                    }else{
-                        throw new RuntimeException(new NumberNotAllowToCallException());
+        //TODO 用于座席呼入压力测试,所以把"system"排除掉
+        if(!from.contains("system")){
+            if(from.length() >= 7 && from.length() <= 8){
+                //固话不带区号，加上区号
+                from = lineGateway.getAreaCode() + from;
+            }else if(from.length() >= 11 && from.length() <= 12){
+                //手机或固话
+                if(from.startsWith("0") || from.startsWith("1")){
+                    if(from.startsWith("01")){
+                        if((!from.startsWith("010")) && from.length() == 12){
+                            //手机号加0
+                            from = from.substring(1);
+                            checkBlackNum = from;
+                        }else if(from.startsWith("010")){
+                            checkBlackNum = from.substring(3);
+                        }else{
+                            throw new RuntimeException(new NumberNotAllowToCallException());
+                        }
+                    }else if(from.startsWith("1")){
+                        if(from.length() == 11){
+                            checkBlackNum = from;
+                        }else{
+                            throw new RuntimeException(new NumberNotAllowToCallException());
+                        }
+                    } else{
+                        String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
+                        if(StringUtils.isNotBlank(areaCode)){
+                            checkBlackNum = from.substring(areaCode.length());
+                        }else{
+                            throw new RuntimeException(new NumberNotAllowToCallException());
+                        }
                     }
-                }else if(from.startsWith("1")){
-                    if(from.length() == 11){
-                        checkBlackNum = from;
-                    }else{
-                        throw new RuntimeException(new NumberNotAllowToCallException());
-                    }
-                } else{
-                    String areaCode = telNumLocationService.getAreaCodeOfTelephone(from);
-                    if(StringUtils.isNotBlank(areaCode)){
-                        checkBlackNum = from.substring(areaCode.length());
-                    }else{
-                        throw new RuntimeException(new NumberNotAllowToCallException());
-                    }
+                }else{
+                    throw new RuntimeException(new NumberNotAllowToCallException());
                 }
             }else{
                 throw new RuntimeException(new NumberNotAllowToCallException());
             }
-        }else{
-            throw new RuntimeException(new NumberNotAllowToCallException());
         }
         boolean isBlackNum = apiGwRedBlankNumService.isBlackNum(checkBlackNum);
         if(isBlackNum){

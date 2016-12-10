@@ -217,7 +217,7 @@
                         <div class="modal-body">
                             <div class="number_info">
                                 1.会员根据需要租用不同功能的号码，号码功能包括呼入和呼出功能。<br/>
-                                2.租用号码时，每个号码需要一次性收取一定的费用作为号码的使用费。<br/>
+                                2.租用号码时，每个号码需要一次性收取一定的费用作为资源占用费和100元的号码月租费。<br/>
                                 3.租用后自动进入我的号码列表，应用上线时可选择购买的号码进行绑定。<br/>
                                 4.每次最多只能租用5个号码。<br/>
                             </div>
@@ -347,6 +347,9 @@
                                 </div>
 
                                 <div class="col-md-12 remove-padding" v-if="paystatus==0">
+                                    <div class="number_info">
+                                        每个号码需要收取100元作为当前月份的月租费，以后月租费统一在月初收取。
+                                    </div>
                                     <h5 class="modal-title orange">
                                         你选择的号码
                                     </h5>
@@ -362,6 +365,8 @@
                                         </tr>
                                         </thead>
                                         <tbody id="pay-modal2">
+                                        </tbody>
+                                        <tbody>
                                         <tr v-for="item in shoplist" >
                                             <td>{{ item.phone }}</td>
                                             <td class="text-center">{{ isCall[item.call] }}</td>
@@ -434,7 +439,7 @@
             shop: [],
             shoplist: [],
             phonelist: [],
-            paylist:[],
+            paylist:[]
         },
         watch: {
             'shop': function (v) {
@@ -484,6 +489,7 @@
                 this.serach = {name: '', phone: -1, place: -1}
             },
             clearpay: function(){
+                this.shop = []
                 this.paystatus = 0
                 this.paylist = []
             },
@@ -563,7 +569,7 @@
                 }else if(this.orderby==4){
                     order = "amount:0";
                 }
-                var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:nowPage,pageSize:listRows,telnum:this.serach.name,type:this.serach.phone,areaCode:this.serach.place,order:order};
+                var params = {'${_csrf.parameterName}':'${_csrf.token}','pageNo':nowPage,'pageSize':listRows,'telnum':this.serach.name,'type':this.serach.phone,'areaCode':this.serach.place,'order':order};
                 var self =this;
                 ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
                     var re = result.data.result;
@@ -594,7 +600,8 @@
         return false;
     }
 
-
+    var gnowPage = 1;
+    var glistRows = 5;
     //分页
     function modalPage() {
         if(vue.serach.name==-1){
@@ -606,14 +613,14 @@
         if(vue.serach.place==-1){
             vue.serach.place='';
         }
-        var params = {'${_csrf.parameterName}':'${_csrf.token}',pageNo:1,pageSize:1,telnum:vue.serach.name,type:vue.serach.phone,areaCode:vue.serach.place,order:''};
+        var params = {'${_csrf.parameterName}':'${_csrf.token}','pageNo':gnowPage,'pageSize':glistRows,'telnum':vue.serach.name,'type':vue.serach.phone,'eaCode':vue.serach.place,'order':''};
         //获取数据总数
         var count = 0;
         ajaxsync("${ctx}/console/telenum/callnum/telnum/plist",params,function(result) {
             count = result.data.totalCount;
         });
         //每页显示数量
-        var listRow = 5;
+        var listRow = glistRows;
         //显示多少个分页按钮
         var showPageCount = 4;
         //指定id，创建分页标签
@@ -733,6 +740,7 @@
             showtoast('您的订单尚未支付，请及时付款！');
 //        }
 //        noPay();
+        $('#pay-modal2').html('');
     }
 
     /**

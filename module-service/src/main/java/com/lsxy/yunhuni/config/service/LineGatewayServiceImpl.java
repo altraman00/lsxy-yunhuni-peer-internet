@@ -18,6 +18,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -90,7 +91,7 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
         if(StringUtils.isNotEmpty(line)){
             hql += " AND obj.lineNumber like '%"+line+"%' ";
         }
-        hql += " AND obj.id NOT IN (select a.lineGateway.id from LineGatewayToTenant a where deleted=0 AND tenantId='"+tenantId+"') ";
+        hql += " AND obj.id NOT IN (select a.lineGateway.id from LineGatewayToTenant a where deleted=0 AND tenantId='"+tenantId+"') order by obj.createTime desc";
         Page page = this.pageList(hql,pageNo,pageSize);
         return page;
     }
@@ -113,6 +114,11 @@ public class LineGatewayServiceImpl extends AbstractService<LineGateway> impleme
             }
         }
         return result;
+    }
+
+    @Override
+    public List<LineGateway> findByIds(Collection<String> ids) {
+        return lineGatewayDao.findByIdIn(ids);
     }
 
 

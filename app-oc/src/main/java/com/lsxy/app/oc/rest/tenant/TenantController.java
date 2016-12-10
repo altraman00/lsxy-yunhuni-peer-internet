@@ -27,6 +27,7 @@ import com.lsxy.yunhuni.api.apicertificate.service.ApiCertificateService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.config.model.AreaSip;
+import com.lsxy.yunhuni.api.config.service.TenantConfigService;
 import com.lsxy.yunhuni.api.consume.enums.ConsumeCode;
 import com.lsxy.yunhuni.api.consume.model.Consume;
 import com.lsxy.yunhuni.api.consume.service.ConsumeService;
@@ -49,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -70,63 +70,48 @@ public class TenantController {
     public static final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Autowired
     private TenantService tenantService;
-
+    @Autowired
+    private TenantConfigService tenantConfigService;
     @Autowired
     private AccountService accountService;
-
     @Autowired
     private ApiCertificateService apiCertificateService;
-
     @Autowired
     private CalBillingService calBillingService;
-
     @Autowired
     private VoiceCdrMonthService voiceCdrMonthService;
-
     @Autowired
     private ConsumeMonthService consumeMonthService;
-
     @Autowired
     private RechargeMonthService rechargeMonthService;
-
     @Autowired
     private VoiceCdrDayService voiceCdrDayService;
-
     @Autowired
     private ConsumeDayService consumeDayService;
-
     @Autowired
     private ApiCallDayService apiCallDayService;
-
     @Autowired
     private RechargeService rechargeService;
-
     @Autowired
     private ConsumeService consumeService;
-
     @Autowired
     private RealnameCorpService realnameCorpService;
-
     @Autowired
     private RealnamePrivateService realnamePrivateService;
-
     @Autowired
     private MQService mqService;
-
     @Autowired
     private AppService appService;
-
     @Autowired
     private TestNumBindService testNumBindService;
-
     @Autowired
     private VoiceFilePlayService voiceFilePlayService;
-
     @Autowired
     private VoiceFileRecordService voiceFileRecordService;
-
     @Autowired
     private TenantServiceSwitchService tenantServiceSwitchService;
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
 
     @Autowired
     private ApiCallMonthService apiCallMonthService;
@@ -795,12 +780,21 @@ public class TenantController {
         TenantAppVO vo = new TenantAppVO(app);
         List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
-        AreaSip areaSip = app.getAreaSip();
-        if(areaSip!=null){
-            vo.setSipRegistrar(app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
-        }else{
-            vo.setSipRegistrar("");
+//        AreaSip areaSip = app.getAreaSip();
+//        if(areaSip!=null){
+//            vo.setSipRegistrar(app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
+//        }else{
+//            vo.setSipRegistrar("");
+//        }
+        vo.setSipRegistrar(SystemConfig.getProperty("app.cc.opensips.domain"));
+        int re = tenantConfigService.getRecordingTimeByTenantIdAndAppId(app.getTenant().getId(),app.getId());
+        String temp = "";
+        if(re==7){
+            temp="7天免费存储";
+        }else if(re%30==0){
+            temp = (re/30)+"个月";
         }
+        vo.setRecordingTime( temp);
         return RestResponse.success(vo);
     }
     @ApiOperation(value = "获取租户的app信息下的分机")
@@ -1063,13 +1057,23 @@ public class TenantController {
             @ApiParam(name = "id",value="租户id")@PathVariable String id,
             @ApiParam(name = "appId",value="应用id")@RequestParam(required = false) String appId
     ){
+        CallCenterStatistics incStatics;
+        if(StringUtils.isBlank(appId)){
+            incStatics = callCenterStatisticsService.getIncStaticsOfCurrentMonthByTenantId(id);
+        }else{
+            incStatics = callCenterStatisticsService.getIncStaticsOfCurrentMonthByAppId(appId);
+        }
+        if(incStatics == null){
+            incStatics = new CallCenterStatistics(null,null,null,0L,0L,0L,0L,0L,0L,0L,0L);
+        }
         Map map = new HashMap<>();
-        map.put("callIn","100");//呼入量
-        map.put("callOut","100");//呼出量
-        map.put("transferSuccess","100");//转接成功
-        map.put("formTime","1000");//排队时间
-        map.put("callTime","1000");//平均通话时长
-        map.put("callFail","1000");//呼入流失率
+        map.put("callIn",incStatics.getCallIn());//呼入量
+        map.put("callOut",incStatics.getCallOut());//呼出量
+        map.put("transferSuccess",incStatics.getToManualSuccess());//转接成功
+        map.put("formTime",incStatics.getQueueNum()==0?0:Math.round((double)incStatics.getQueueDuration()/incStatics.getQueueNum()));//排队时间
+        long callSuccess = incStatics.getCallInSuccess() + incStatics.getCallOutSuccess();
+        map.put("callTime",callSuccess == 0?0:Math.round((double)incStatics.getCallTimeLong()/callSuccess));//平均通话时长
+        map.put("callFail",incStatics.getCallIn()==0?0:Math.round((double)(incStatics.getCallInSuccess()*100)/incStatics.getCallIn()));//呼入流失率
         return RestResponse.success(map);
     }
     @ApiOperation(value = "用户中心的应用的呼叫中心统计数据")

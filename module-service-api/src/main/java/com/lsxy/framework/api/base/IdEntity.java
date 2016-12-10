@@ -91,6 +91,7 @@ public abstract class IdEntity implements Serializable{
 		this.lastTime = lastTime;
 	}
 
+	@JsonIgnore
 	@Column(name="delete_time")
 	public Date getDeleteTime() {
 		return deleteTime;
@@ -100,6 +101,7 @@ public abstract class IdEntity implements Serializable{
 		this.deleteTime = deleteTime;
 	}
 
+	@JsonIgnore
 	@Column(name="sortno")
 	public Long getSortNo() {
 		return sortNo;
@@ -109,6 +111,7 @@ public abstract class IdEntity implements Serializable{
 		this.sortNo = sortNo;
 	}
 
+	@JsonIgnore
 	@Column(name="version")
 	public int getVersion() {
 		return version;

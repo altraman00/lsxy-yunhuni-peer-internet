@@ -4,13 +4,13 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.CallService;
-import com.lsxy.area.api.exceptions.*;
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.StasticsCounter;
 import com.lsxy.area.server.test.TestIncomingZB;
 import com.lsxy.area.server.util.PlayFileUtil;
-import com.lsxy.framework.api.tenant.model.TenantServiceSwitch;
+import com.lsxy.area.server.util.RecordFileUtil;
 import com.lsxy.framework.api.tenant.service.TenantServiceSwitchService;
+import com.lsxy.framework.core.exceptions.api.*;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.JSONUtil2;
 import com.lsxy.framework.core.utils.MapBuilder;
@@ -21,7 +21,7 @@ import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
-import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import com.lsxy.yunhuni.api.config.service.ApiGwRedBlankNumService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -102,58 +102,6 @@ public class CallServiceImpl implements CallService {
     @Autowired
     private AreaAndTelNumSelector areaAndTelNumSelector;
 
-    private boolean isEnableDuoCallService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsVoiceCallback() == null || serviceSwitch.getIsVoiceCallback() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsVoiceCallback() == null || app.getIsVoiceCallback() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isEnableVoiceDirectlyService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch !=null && (serviceSwitch.getIsVoiceDirectly() == null || serviceSwitch.getIsVoiceDirectly() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsVoiceDirectly() == null || app.getIsVoiceDirectly() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
-
-    private boolean isEnableVoiceValidateService(String tenantId,String appId){
-        try {
-            TenantServiceSwitch serviceSwitch = tenantServiceSwitchService.findOneByTenant(tenantId);
-            if(serviceSwitch != null && (serviceSwitch.getIsVoiceValidate() == null || serviceSwitch.getIsVoiceValidate() != 1)){
-                return false;
-            }
-            App app = appService.findById(appId);
-            if(app.getIsVoiceValidate() == null || app.getIsVoiceValidate() != 1){
-                return false;
-            }
-        } catch (Throwable e) {
-            logger.error("判断是否开启service失败",e);
-            return false;
-        }
-        return true;
-    }
-
     @Override
     public String call(String from, String to, int maxAnswerSec, int maxRingSec) throws YunhuniApiException {
 
@@ -191,7 +139,7 @@ public class CallServiceImpl implements CallService {
     @Override
     public String duoCallback(String ip,String appId,String from1,String to1,String from2,String to2,String ring_tone,Integer ring_tone_mode,
                               Integer max_dial_duration,Integer max_call_duration ,Boolean recording,Integer record_mode,String user_data) throws YunhuniApiException {
-        String apiCmd = "duo_call";
+        String apiCmd = BusinessState.TYPE_DUO_CALL;
         String duocCallId;
         if(apiGwRedBlankNumService.isRedNum(to1) || apiGwRedBlankNumService.isRedNum(to2)){
             throw new NumberNotAllowToCallException();
@@ -206,7 +154,7 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
-        if(!isEnableDuoCallService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceCallback)){
             throw new AppServiceInvalidException();
         }
 
@@ -254,15 +202,14 @@ public class CallServiceImpl implements CallService {
         }
         //录音
         if(recording != null && recording){
-            //TODO 录音文件名称
-            params.put("record_file ",duocCallId);
+            params.put("record_file ", RecordFileUtil.getRecordFileUrl(app.getTenant().getId(),appId));
             params.put("record_mode",record_mode);
             params.put("record_format ",1);
         }
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK, params);
         try {
-            Map<String,Object> data = new MapBuilder<String,Object>()
+            Map<String,String> data = new MapBuilder<String,String>()
                     .put(to1_uri,callSession.getId())
                     .put(to2_uri,callSession2.getId())
                     .build();
@@ -302,11 +249,24 @@ public class CallServiceImpl implements CallService {
                 throw new IPNotInWhiteListException();
             }
         }
+        BusinessState state = businessStateService.get(callId);
+
+        if(state == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getResId() == null){
+            throw new SystemBusyException();
+        }
+
+        if(state.getClosed()!= null && state.getClosed()){
+            throw new SystemBusyException();
+        }
+
         String areaId = areaAndTelNumSelector.getAreaId(app);
-        BusinessState businessState = businessStateService.get(callId);
         Map<String, Object> params = new MapBuilder<String, Object>()
-                .put("res_id",businessState.getResId())
-                .put("user_data ",businessState.getId())
+                .put("res_id",state.getResId())
+                .put("user_data ",state.getId())
                 .put("areaId ",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK_CANCEL, params);
@@ -322,7 +282,7 @@ public class CallServiceImpl implements CallService {
     @Override
     public String notifyCall(String ip, String appId, String from,String to,String play_file,List<List<Object>> play_content,
                              Integer repeat,Integer max_dial_duration,String user_data) throws YunhuniApiException{
-        String apiCmd = "notify_call";
+        String apiCmd = BusinessState.TYPE_NOTIFY_CALL;
         String callId;
         if(apiGwRedBlankNumService.isRedNum(to)){
             throw new NumberNotAllowToCallException();
@@ -338,7 +298,7 @@ public class CallServiceImpl implements CallService {
             }
         }
 
-        if(!isEnableVoiceDirectlyService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceDirectly)){
             throw new AppServiceInvalidException();
         }
 
@@ -377,8 +337,8 @@ public class CallServiceImpl implements CallService {
 
         try {
             RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_NOTIFY_CALL, params);
-            Map<String,Object> data = new MapBuilder<String,Object>()
-                    .put("sessionid",callSession.getId())
+            Map<String,String> data = new MapBuilder<String,String>()
+                    .put(BusinessState.SESSIONID,callSession.getId())
                     .build();
             //将数据存到redis
             BusinessState cache = new BusinessState.Builder()
@@ -403,84 +363,6 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    @Deprecated
-    public String captchaCall(String ip, String appId, String from,String to,String verify_code,
-                              String max_dial_duration,String max_keys,List<String> files,String user_data) throws YunhuniApiException{
-        if(apiGwRedBlankNumService.isRedNum(to)){
-            throw new NumberNotAllowToCallException();
-        }
-        App app = appService.findById(appId);
-        if(app == null){
-            throw new AppNotFoundException();
-        }
-
-        String whiteList = app.getWhiteList();
-        if(StringUtils.isNotBlank(whiteList.trim())){
-            if(!whiteList.contains(ip)){
-                throw new IPNotInWhiteListException();
-            }
-        }
-        if(!isEnableVoiceValidateService(app.getTenant().getId(),appId)){
-            throw new AppServiceInvalidException();
-        }
-
-        boolean isAmountEnough = calCostService.isCallTimeRemainOrBalanceEnough(ProductCode.captcha_call.getApiCmd(), app.getTenant().getId());
-        if(!isAmountEnough){
-            throw new BalanceNotEnoughException();
-        }
-
-        //TODO 获取线路IP和端口
-        //TODO 待定
-        String callId = UUIDGenerator.uuid();
-        //TODO
-        AreaAndTelNumSelector.Selector selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, from,to);
-        String areaId = selector.getAreaId();
-        String oneTelnumber = selector.getOneTelnumber();
-        String lineId = selector.getLineId();
-
-        Map<String, Object> params = new MapBuilder<String, Object>()
-                .putIfNotEmpty("to_uri",selector.getToUri())
-                .putIfNotEmpty("from_uri",oneTelnumber)
-                .putIfNotEmpty("max_ring_seconds",max_dial_duration)
-                .putIfNotEmpty("valid_keys",verify_code)
-                .putIfNotEmpty("max_keys",max_keys)
-                .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("areaId",areaId)
-                .build();
-
-        files = playFileUtil.convertArray(app.getTenant().getId(),appId,files);
-
-        if(files!= null && files .size()>0){
-            Object[][] plays = new Object[][]{new Object[]{StringUtils.join(files,"|"),7,""}};
-            params.put("play_content", JSONUtil2.objectToJson(plays));
-        }
-        try {
-            //找到合适的区域代理
-            RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_CAPTCHA_CALL, params);
-            rpcCaller.invoke(sessionContext, rpcrequest);
-            //将数据存到redis
-            BusinessState cache = new BusinessState.Builder()
-                    .setTenantId(app.getTenant().getId())
-                    .setAppId(app.getId())
-                    .setId(callId)
-                    .setType("captcha_call")
-                    .setCallBackUrl(app.getUrl())
-                    .setUserdata(user_data)
-                    .setAreaId(areaId)
-                    .setLineGatewayId(lineId)
-                    .setBusinessData(new MapBuilder<String,Object>()
-                            .put("from",oneTelnumber)
-                            .put("to",to)
-                            .build())
-                    .build();
-            businessStateService.save(cache);
-            return callId;
-        }catch(Exception ex){
-            throw new InvokeCallException(ex);
-        }
-    }
-
-    @Override
     public String verifyCall(String ip, String appId, String from, String to, Integer maxDialDuration, String verifyCode, String playFile, Integer repeat, String userData) throws YunhuniApiException {
 
         if(apiGwRedBlankNumService.isRedNum(to)){
@@ -498,7 +380,7 @@ public class CallServiceImpl implements CallService {
             }
         }
 
-        if(!isEnableVoiceValidateService(app.getTenant().getId(),appId)){
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.VoiceValidate)){
             throw new AppServiceInvalidException();
         }
 
@@ -564,15 +446,15 @@ public class CallServiceImpl implements CallService {
                     .setTenantId(app.getTenant().getId())
                     .setAppId(app.getId())
                     .setId(callId)
-                    .setType("verify_call")
+                    .setType(BusinessState.TYPE_VERIFY_CALL)
                     .setCallBackUrl(app.getUrl())
                     .setUserdata(userData)
                     .setAreaId(areaId)
                     .setLineGatewayId(lineId)
-                    .setBusinessData(new MapBuilder<String,Object>()
+                    .setBusinessData(new MapBuilder<String,String>()
                             .putIfNotEmpty("from",oneTelnumber)
                             .putIfNotEmpty("to",to)
-                            .putIfNotEmpty("sessionid",callSession.getId())
+                            .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
                             .build())
                     .build();
             businessStateService.save(cache);

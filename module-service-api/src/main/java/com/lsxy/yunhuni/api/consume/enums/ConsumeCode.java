@@ -11,10 +11,12 @@ public enum ConsumeCode {
     captcha_call("语音验证码"),
     notify_call("语音通知"),
     call_center("云呼叫中心"),
+    recording_memory("录音文件存储费"),
     call_voice("通话录音"),
     rent_number("号码租用"),
     rent_number_month("号码月租费"),
-    flat_balance("平账");
+    flat_balance("平账"),
+    call_center_month("云呼叫中心-坐席月租费");
 
     private String name;
     ConsumeCode(String name){

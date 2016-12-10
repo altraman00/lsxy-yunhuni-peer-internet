@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -61,4 +62,17 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
      * @return
      */
     ResourceTelenum findByCallUri(String callUri);
+
+    /**
+     *
+     * @param ids
+     * @return
+     */
+    List<ResourceTelenum> findByIdIn(Collection<String> ids);
+
+    @Query(value = "SELECT rent.app_id,rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.tenant_id = :tenantId AND rent.res_data IN (:froms) AND rent.rent_status IN (1,2) AND rent.deleted = 0",nativeQuery = true)
+    List<Object[]> findResIdByTenantIdAndResDataInFromRent(@Param("tenantId") String tenantId,@Param("froms") List<String> froms);
+
+    @Query(value = "SELECT rent.app_id,rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.tenant_id = :tenantId AND (rent.app_id = :appId OR rent.app_id IS NULL) AND rent.rent_status IN (1,2) AND rent.deleted = 0",nativeQuery = true)
+    List<Object[]> findResIdByTenantIdAndAppIdFromRent(@Param("tenantId") String tenantId, @Param("appId") String appId);
 }

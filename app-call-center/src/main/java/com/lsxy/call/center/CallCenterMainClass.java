@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Created by tandy on 16/7/19.
@@ -26,10 +27,11 @@ import org.springframework.context.annotation.Import;
         FrameworkCacheConfig.class, YunhuniApiConfig.class,
         YunhuniServiceConfig.class, FrameworkMQConfig.class, FrameworkMonitorConfig.class, CallCenterApiConfig.class,CallCenterServiceConfig.class})
 @EnableDubboConfiguration
+@EnableAsync
 public class CallCenterMainClass extends AbstractSpringBootStarter {
 
 
-    private static final String systemId = "call.center";
+    private static final String systemId = "app.cc";
     static {
         System.setProperty("systemId",systemId);
     }

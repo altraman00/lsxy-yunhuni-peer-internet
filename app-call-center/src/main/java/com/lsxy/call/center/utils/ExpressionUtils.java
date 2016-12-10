@@ -5,6 +5,7 @@ import com.lsxy.call.center.expression.ExpressionFactory;
 import com.lsxy.call.center.expression.tokens.DataType;
 import com.lsxy.call.center.expression.tokens.Valuable;
 import com.lsxy.framework.core.utils.StringUtil;
+import org.springframework.util.DigestUtils;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -27,7 +28,7 @@ public final class ExpressionUtils {
     private ExpressionUtils(){}
 
     private static String getVarName(String varName){
-        return VAR_PREFIX + varName.hashCode();
+        return VAR_PREFIX + DigestUtils.md5DigestAsHex(varName.getBytes());
     }
 
     private static void setVariable(Expression expression,Map<String,Integer> vars){
@@ -101,7 +102,7 @@ public final class ExpressionUtils {
         return value.getNumberValue().longValue();
     }
 
-    public static boolean invalidWhereExpression(String str){
+    public static boolean validWhereExpression(String str){
         if(StringUtil.isBlank(str)){
             return false;
         }
@@ -120,7 +121,7 @@ public final class ExpressionUtils {
         return true;
     }
 
-    public static boolean invalidSortExpression(String str){
+    public static boolean validSortExpression(String str){
         if(StringUtil.isBlank(str)){
             return false;
         }

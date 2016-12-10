@@ -213,26 +213,31 @@ public class ResourceTelenumController extends AbstractRestController {
             if(lineGateway==null||StringUtils.isEmpty(lineGateway.getId())){
                 return RestResponse.failed("0000","所选线路不存在");
             }
+        }else{
+            //无线路时
+            telnumTVo.setIsCalled(0);
+            telnumTVo.setIsDialing(0);
+            telnumTVo.setIsThrough(0);
         }
         //如果有选择租户，则检验租户是否存在
         Tenant tenant = null;
         //线路是租户自带线路时，必选租户
-        if("0".equals(telnumTVo.getType())){
-            if (StringUtils.isEmpty(telnumTVo.getTenantId())) {
-                return RestResponse.failed("0000", "所选租户不能为空");
-            }
-            tenant = tenantService.findById(telnumTVo.getTenantId());
-            if (tenant == null || StringUtils.isEmpty(tenant.getId())) {
-                return RestResponse.failed("0000", "所选租户不存在");
-            }
-        }else {
+//        if("0".equals(telnumTVo.getType())){
+//            if (StringUtils.isEmpty(telnumTVo.getTenantId())) {
+//                return RestResponse.failed("0000", "所选租户不能为空");
+//            }
+//            tenant = tenantService.findById(telnumTVo.getTenantId());
+//            if (tenant == null || StringUtils.isEmpty(tenant.getId())) {
+//                return RestResponse.failed("0000", "所选租户不存在");
+//            }
+//        }else {
             if (StringUtils.isNotEmpty(telnumTVo.getTenantId())) {
                 tenant = tenantService.findById(telnumTVo.getTenantId());
                 if (tenant == null || StringUtils.isEmpty(tenant.getId())) {
                     return RestResponse.failed("0000", "所选租户不存在");
                 }
             }
-        }
+//        }
         //拷贝对象
         ResourceTelenum resourceTelenum = new ResourceTelenum();
         try {
@@ -240,7 +245,7 @@ public class ResourceTelenumController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","新增线路失败");
         }
-        resourceTelenum.setUsable("0");//设置不可用
+        resourceTelenum.setUsable(ResourceTelenum.USABLE_FALSE);//设置不可用
         //如果绑定线路的话，需要为号码设置区号
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())) {
             //验证运营商
@@ -283,7 +288,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        resourceTelenum.setUsable("1");
+        resourceTelenum.setUsable(ResourceTelenum.USABLE_TRUE);
         resourceTelenumService.save(resourceTelenum);
         return RestResponse.success("启用号码成功");
     }
@@ -296,7 +301,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        resourceTelenum.setUsable("0");
+        resourceTelenum.setUsable(ResourceTelenum.USABLE_FALSE);
         resourceTelenumService.save(resourceTelenum);
         return RestResponse.success("禁用号码成功");
     }
@@ -309,7 +314,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),resourceTelenum.getLine().getId());
+        TelnumToLineGateway telnumToLineGateway = telnumToLineGatewayService.findByTelNumberAndLineId(resourceTelenum.getTelNumber(),resourceTelenum.getLineId());
         LineVo lineVo = new LineVo();
         try {
             EntityUtils.copyProperties(lineVo,telnumToLineGateway);
@@ -331,7 +336,8 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,resourceTelenum.getLine().getId(),resourceTelenum.getTelNumber());
+        String lineId = resourceTelenum.getLineId()!=null?resourceTelenum.getLineId():"";
+        Page page = telnumToLineGatewayService.getIsNotNullPage(pageNo,pageSize,lineId,resourceTelenum.getTelNumber());
         List<LineVo> list = new ArrayList<>();
         List<TelnumToLineGateway> list2 = page.getResult();
         for(int i=0;i<list2.size();i++){
