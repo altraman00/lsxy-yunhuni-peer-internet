@@ -120,6 +120,7 @@ public class NettyClient extends AbstractClient{
             }
 
 
+
             // Wait until the connection is closed.
 //            f.channel().closeFuture().sync();
         }catch(Exception ex){
