@@ -150,7 +150,7 @@ public class NettyClient extends AbstractClient{
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for(int j = 0;j<count;j++){
+                    while(true){
                         try {
                             channel.writeAndFlush(System.currentTimeMillis() + "\n").await();
                         } catch (Exception ex) {
