@@ -13,6 +13,7 @@ import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.product.enums.ProductCode;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -75,7 +76,7 @@ public class Handler_EVENT_SYS_CONF_ON_RECORD_COMPLETED extends EventHandler {
 
         try{
             mqService.publish(new RecordCompletedEvent(state.getTenantId(),state.getAppId(),state.getAreaId(),state.getId(),
-                    state.getType(),(String)params.get("record_file"),
+                    ProductCode.changeApiCmdToProductCode(state.getType()).name(),(String)params.get("record_file"),
                     Long.parseLong((String)params.get("begin_time")),Long.parseLong((String)params.get("end_time"))
             ));
         }catch (Throwable t){
