@@ -200,8 +200,8 @@ public class CallCenterStatisticsServiceImpl extends AbstractService<CallCenterS
     }
 
     @Override
-    public void incrIntoRedis(CallCenterStatistics callCenterStatistics,Date date) {
-        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+    public void incrIntoRedis(CallCenterStatistics callCenterStatistics) {
+        String dateStr = DateUtils.formatDate(callCenterStatistics.getDt(), "yyyyMMdd");
         String tenantKey = CC_STATISTICS_TENANT_PREFIX + callCenterStatistics.getTenantId() + "_" + dateStr;
         String appKey = CC_STATISTICS_APP_PREFIX + callCenterStatistics.getAppId() + "_" + dateStr;
         incrIntoRedis(tenantKey,callCenterStatistics);
