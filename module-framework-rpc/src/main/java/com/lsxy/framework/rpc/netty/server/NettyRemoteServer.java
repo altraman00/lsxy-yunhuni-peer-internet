@@ -80,7 +80,7 @@ public class NettyRemoteServer implements RemoteServer {
                             long timestamp = Long.parseLong(msg);
                             logger.info("收到消息["+msg+"]耗时:"+(System.currentTimeMillis() - timestamp)+"ms");
                             // 返回客户端消息 - 我已经接收到了你的消息
-                            ctx.writeAndFlush(System.currentTimeMillis()+"\n").await();
+//                            ctx.write(System.currentTimeMillis()+"\n");
                         }
                     });
 
