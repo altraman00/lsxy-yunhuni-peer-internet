@@ -22,6 +22,7 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -88,6 +89,7 @@ public class EnqueueHandler extends ActionHandler{
                 }
             }
         }
+        businessStateService.updateInnerField(callId,CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime());
         businessStateService.updateInnerField(callId,CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel());
         businessStateService.updateInnerField(callId,CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId());
         businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);

@@ -28,6 +28,8 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -131,6 +133,8 @@ public class IVRActionService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
 
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
     private Map<String,ActionHandler> handlers = new HashMap<>();
 
     private Schema schema = null;
@@ -380,6 +384,13 @@ public class IVRActionService {
                 callCenter.setStartTime(new Date());
                 callCenter.setType(""+CallCenter.CALL_IN);
                 callCenterService.save(callCenter);
+
+                try{
+                    callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
+                            new Date()).setCallIn(1L).build());
+                }catch (Throwable t){
+                    logger.error("incrIntoRedis失败",t);
+                }
             }else{
                 VoiceIvr voiceIvr = new VoiceIvr();
                 voiceIvr.setId(call_id);

@@ -25,6 +25,8 @@ import com.lsxy.yunhuni.api.session.model.CallSession;
 import com.lsxy.yunhuni.api.session.model.VoiceIvr;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -75,6 +77,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
 
     @Autowired
     private CallCenterUtil callCenterUtil;
+
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
 
     @Override
     public String getEventName() {
@@ -150,11 +155,22 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
                 CallCenter callCenter = callCenterService.findById(call_id);
                 if(callCenter != null){
                     callCenter.setEndTime(new Date());
+                    Long callLongTime  = null;
                     if(callCenter.getStartTime() != null){
-                        Long callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
+                        callLongTime = (new Date().getTime() - callCenter.getStartTime().getTime()) / 1000;
                         callCenter.setCallTimeLong(callLongTime.toString());
                     }
                     callCenterService.save(callCenter);
+                    if(callLongTime != null){
+                        try{
+                            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                    .setCallTimeLong(callLongTime)
+                                    .build());
+                        }catch (Throwable t){
+                            logger.error("incrIntoRedis失败",t);
+                        }
+                    }
                 }
             }catch (Throwable t){
                 logger.error("更新CallCenter失败",t);

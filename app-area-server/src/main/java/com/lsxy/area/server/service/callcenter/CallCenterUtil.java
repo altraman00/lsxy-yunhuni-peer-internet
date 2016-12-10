@@ -78,6 +78,9 @@ public class CallCenterUtil {
     public static final String CONVERSATION_STARTED_FIELD = "CONVERSATION_STARTED";
     public static final String CONVERSATION_STARTED_TRUE = "1";
 
+    /**记录排队开始时间字段**/
+    public static final String ENQUEUE_START_TIME_FIELD = "ENQUEUE_START_TIME_FIELD";
+
     @Autowired
     private BusinessStateService businessStateService;
 

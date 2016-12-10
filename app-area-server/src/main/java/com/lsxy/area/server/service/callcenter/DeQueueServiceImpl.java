@@ -19,6 +19,8 @@ import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,9 @@ public class DeQueueServiceImpl implements DeQueueService {
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
+
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
 
     /**
      * 创建交谈，然后呼叫坐席。
@@ -126,6 +131,18 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
 
+        try{
+            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                    .setQueueNum(1L)
+                    .setQueueDuration((System.currentTimeMillis()
+                            - Long.parseLong(state.getBusinessData()
+                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                    .build());
+        }catch (Throwable t){
+            logger.error("incrIntoRedis失败",t);
+        }
+        
         callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
                 state.getBusinessData().get(CallCenterUtil.CHANNEL_ID_FIELD),
@@ -146,6 +163,18 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+
+        try{
+            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                    .setQueueNum(1L)
+                    .setQueueDuration((System.currentTimeMillis()
+                            - Long.parseLong(state.getBusinessData()
+                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                    .build());
+        }catch (Throwable t){
+            logger.error("incrIntoRedis失败",t);
+        }
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -172,6 +201,18 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+
+        try{
+            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                    .setQueueNum(1L)
+                    .setQueueDuration((System.currentTimeMillis()
+                            - Long.parseLong(state.getBusinessData()
+                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                    .build());
+        }catch (Throwable t){
+            logger.error("incrIntoRedis失败",t);
+        }
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
