@@ -154,6 +154,7 @@ public class NettyClient extends AbstractClient{
                     while(true){
                         try {
                             channel.writeAndFlush(System.currentTimeMillis() + "\n").await();
+                            Thread.currentThread().sleep(10);
                         } catch (Exception ex) {
                             logger.error("RPC 异常",ex);
                         }
