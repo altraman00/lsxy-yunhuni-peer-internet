@@ -38,9 +38,31 @@ public class AgentSkillServiceImpl extends AbstractService<AgentSkill> implement
 
     @Override
     public List<AgentSkill> findByAgent(String tenantId,String appId,String agentId){
-        String sql = "select name,level from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_skill " +
-                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and agent=\""+agentId+"\" and active = 1 and deleted = 0";
+        String sql = "select name,score from db_lsxy_bi_yunhuni.tb_bi_call_center_agent_skill " +
+                "where tenant_id=\""+tenantId+"\" and app_id=\""+appId+"\" and agent=\""+agentId+"\" and enabled = 1 and deleted = 0";
 
         return jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<AgentSkill>(AgentSkill.class));
     }
+
+    @Override
+    public void deleteByAgent(String agentId) {
+        agentSkillDao.deleteByAgent(agentId);
+    }
+
+    @Override
+    public List<AgentSkill> findAllByAgent(String agentId) {
+        return agentSkillDao.findByAgent(agentId);
+    }
+
+    @Override
+    public List<AgentSkill> findAllByAgents(List<String> agentIds) {
+        return agentSkillDao.findByAgentIn(agentIds);
+    }
+
+    @Override
+    public void deleteByAgentAndName(String agent, String name) {
+        agentSkillDao.deleteByAgentAndName(agent,name);
+    }
+
+
 }

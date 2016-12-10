@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * Created by zhangxb on 2016/10/22.
@@ -16,6 +17,8 @@ import javax.persistence.Table;
 public class CallCenter extends IdEntity {
     public static int CALL_UP = 2;//呼出
     public static int CALL_IN = 1;//呼入
+    public static int CALL_DIAL = 3;//拨号
+
     public static int TO_MANUAL_RESULT_SUCESS = 1;//接听
     public static int TO_MANUAL_RESULT_AGENT_FAIL = 2; //呼叫坐席失败
     public static int TO_MANUAL_RESULT_FAIL = 3; //主动放弃
@@ -25,11 +28,11 @@ public class CallCenter extends IdEntity {
     @Column( name = "app_id")
     private String appId;
     @Column( name = "start_time")
-    private String startTime;//发起时间
+    private Date startTime;//发起时间
     @Column( name = "answer_time")
-    private String answerTime;//接听时间
+    private Date answerTime;//接听时间
     @Column( name = "end_time")
-    private String endTime;//结束时间
+    private Date endTime;//结束时间
     @Column( name = "call_time_long")
     private String callTimeLong;//通话时间
     @Column( name = "from_num")
@@ -65,27 +68,27 @@ public class CallCenter extends IdEntity {
         this.appId = appId;
     }
 
-    public String getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(String startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
-    public String getAnswerTime() {
+    public Date getAnswerTime() {
         return answerTime;
     }
 
-    public void setAnswerTime(String answerTime) {
+    public void setAnswerTime(Date answerTime) {
         this.answerTime = answerTime;
     }
 
-    public String getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(String endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 

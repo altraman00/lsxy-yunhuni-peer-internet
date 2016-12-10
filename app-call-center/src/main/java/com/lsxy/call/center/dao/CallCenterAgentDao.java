@@ -12,4 +12,5 @@ import java.util.List;
  */
 public interface CallCenterAgentDao extends BaseDaoInterface<CallCenterAgent, Serializable> {
 
+    CallCenterAgent findByAppIdAndName(String appId, String name);
 }

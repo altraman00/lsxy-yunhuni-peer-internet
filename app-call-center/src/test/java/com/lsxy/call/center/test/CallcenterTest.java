@@ -4,6 +4,7 @@ import com.lsxy.call.center.CallCenterMainClass;
 import com.lsxy.call.center.api.model.EnQueue;
 import com.lsxy.call.center.api.service.AppExtensionService;
 import com.lsxy.call.center.api.service.CallCenterAgentService;
+import com.lsxy.call.center.api.service.EnQueueService;
 import com.lsxy.call.center.api.utils.EnQueueDecoder;
 import com.lsxy.framework.config.Constants;
 import org.junit.Test;
@@ -27,6 +28,9 @@ public class CallcenterTest {
 
     @Autowired
     private AppExtensionService appExtensionService;
+
+    @Autowired
+    private EnQueueService enQueueService;
 
     static {
         //将 spring boot 的默认配置文件设置为系统配置文件
@@ -107,7 +111,7 @@ public class CallcenterTest {
 
     @Test
     public void test4(){
-        callCenterAgentService.logout(callCenterAgentService.pageList(1,1).getResult().get(0).getId());
+//        callCenterAgentService.logout(app.getTenant().getId(), appId, channel, callCenterAgentService.pageList(1,1).getResult().get(0).getId(), force);
     }
 
     @Test
@@ -136,6 +140,6 @@ public class CallcenterTest {
                 "        </condition>\n" +
                 "    </filter>\n" +
                 "</enqueue>");
-        callCenterAgentService.enqueue("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","",enQueue);
+        enQueueService.lookupAgent("40288ac9575612a30157561c7ff50004","40288ac957e1812e0157e18a994e0000","","",enQueue);
     }
 }

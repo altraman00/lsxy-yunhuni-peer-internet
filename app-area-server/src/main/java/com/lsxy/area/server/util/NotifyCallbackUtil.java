@@ -8,7 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,14 +35,21 @@ public class NotifyCallbackUtil {
 
     private CloseableHttpAsyncClient client = null;
 
-
-    //设置请求和传输超时时间
-    private RequestConfig config =
-            RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000).setConnectTimeout(10000).build();
-
     @PostConstruct
     public void init(){
-        client = HttpAsyncClients.createDefault();
+        client = HttpAsyncClientBuilder.create()
+                .setDefaultRequestConfig(
+                        RequestConfig.custom()
+                                .setConnectionRequestTimeout(5000)
+                                .setSocketTimeout(5000)
+                                .setConnectTimeout(5000).build())
+                //总共最多1000并发
+                .setMaxConnTotal(1000)
+                //每个host最多100并发
+                .setMaxConnPerRoute(100)
+                //禁用cookies
+                .disableCookieManagement()
+                .build();
         client.start();
     }
     @PreDestroy
@@ -86,15 +93,10 @@ public class NotifyCallbackUtil {
      * @return
      */
     public void postNotify(final String url, final Map<String,Object> data,final Integer timeout,final int retry){
+        long start = System.currentTimeMillis();
         try{
             HttpPost post = new HttpPost(url);
-            RequestConfig c = this.config;
-            if(timeout != null){
-                c = RequestConfig.custom().setConnectionRequestTimeout(timeout*1000).setSocketTimeout(timeout*1000)
-                        .setConnectTimeout(timeout*1000).build();
-            }
             data.put("action","event_notify");
-            post.setConfig(c);
             post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
             StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
             post.setEntity(se);
@@ -107,8 +109,12 @@ public class NotifyCallbackUtil {
                     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                         success = true;
                     }
+                    if(logger.isDebugEnabled()){
+                        logger.info("url={},status={}"
+                                ,url,response.getStatusLine().getStatusCode());
+                        logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+                    }
                     if(!success){
-                        logger.error("发送事件通知失败http status={}",response.getStatusLine().getStatusCode());
                         if(retry >0){
                             logger.info("开始重试");
                             postNotify(url,data,retry-1);
@@ -118,7 +124,7 @@ public class NotifyCallbackUtil {
 
                 @Override
                 public void failed(Exception e) {
-                    logger.error("发送事件通知失败",e);
+                    logger.error("url={}发送事件通知失败",url,e);
                     if(retry >0){
                         logger.info("开始重试");
                         postNotify(url,data,retry-1);
@@ -128,7 +134,7 @@ public class NotifyCallbackUtil {
 
                 @Override
                 public void cancelled() {
-                    logger.error("发送事件通知被取消");
+                    logger.error("url={}发送事件通知被取消",url);
                     if(retry >0){
                         logger.info("开始重试");
                         postNotify(url,data,retry-1);
@@ -142,16 +148,10 @@ public class NotifyCallbackUtil {
 
     public boolean postNotifySync(final String url, final Map<String,Object> data,final Integer timeout,int retry){
         boolean success = false;
-        RequestConfig c = this.config;
-        if(timeout != null){
-            c = RequestConfig.custom().setConnectionRequestTimeout(timeout*1000).setSocketTimeout(timeout*1000)
-                    .setConnectTimeout(timeout*1000).build();
-        }
         data.put("action","event_notify");
         do{
             try{
                 HttpPost post = new HttpPost(url);
-                post.setConfig(c);
                 post.setHeader(HTTP.CONTENT_TYPE, APPLICATION_JSON);
                 StringEntity se = new StringEntity(JSONUtil2.objectToJson(data));
                 post.setEntity(se);

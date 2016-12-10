@@ -7,7 +7,6 @@ import com.lsxy.framework.config.SystemConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -50,6 +49,19 @@ public class FrameworkCacheConfigNotSpringBoot {
         return template;
     }
 
+
+    @Bean(name="businessRedisTemplate")
+    public RedisTemplate<String, String> hashAndSetRedisTemplate(
+            RedisConnectionFactory factory) {
+        final RedisTemplate template = new RedisTemplate();
+        template.setKeySerializer(template.getStringSerializer());
+        template.setHashKeySerializer(template.getStringSerializer());
+
+        template.setHashValueSerializer(template.getStringSerializer());
+        template.setValueSerializer(template.getStringSerializer());
+        template.setConnectionFactory(factory);
+        return template;
+    }
 
     public JedisPoolConfig getJedisPoolConfig(){
         JedisPoolConfig jpc = new JedisPoolConfig();

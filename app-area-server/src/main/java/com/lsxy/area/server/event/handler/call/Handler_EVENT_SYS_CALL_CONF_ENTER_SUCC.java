@@ -1,17 +1,22 @@
 package com.lsxy.area.server.event.handler.call;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.api.ConfService;
 import com.lsxy.area.server.event.EventHandler;
+import com.lsxy.area.server.service.callcenter.CallCenterUtil;
+import com.lsxy.area.server.service.callcenter.CallConversationService;
+import com.lsxy.area.server.service.callcenter.ConversationService;
 import com.lsxy.area.server.util.NotifyCallbackUtil;
+import com.lsxy.call.center.api.service.CallCenterConversationMemberService;
+import com.lsxy.call.center.api.service.CallCenterConversationService;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.exceptions.InvalidParamException;
-import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.model.Meeting;
 import com.lsxy.yunhuni.api.session.model.MeetingMember;
@@ -57,6 +62,18 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
     @Autowired
     private ConfService confService;
 
+    @Autowired
+    private ConversationService conversationService;
+
+    @Autowired
+    private CallConversationService callConversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationService callCenterConversationService;
+
+    @Reference(lazy = true,check = false,timeout = 3000)
+    private CallCenterConversationMemberService callCenterConversationMemberService;
+
     @Override
     public String getEventName() {
         return Constants.EVENT_SYS_CALL_CONF_ENTER_SUCC;
@@ -87,36 +104,54 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("call_id={},state={}",call_id,state);
         }
+        if(BusinessState.TYPE_CC_AGENT_CALL.equals(state.getType()) ||
+                BusinessState.TYPE_CC_OUT_CALL.equals(state.getType()) ||
+                (BusinessState.TYPE_IVR_INCOMING.equals(state.getType())
+                        &&  conversationService.isCC(call_id))){
+            conversation(state,call_id);
+        }else{
+            conf(state,call_id);
+        }
+        return res;
+    }
 
+    public void conversation(BusinessState state,String call_id){
         String appId = state.getAppId();
-        String user_data = state.getUserdata();
-        Map<String,Object> businessData = state.getBusinessData();
-        String conf_id = null;
+        Map<String,String> businessData = state.getBusinessData();
+        String conversation_id = null;
         if(businessData!=null){
-            conf_id = (String)businessData.get("conf_id");
+            conversation_id = businessData.get(CallCenterUtil.CONVERSATION_FIELD);
         }
-        if(StringUtils.isBlank(conf_id)){
-            throw new InvalidParamException("没有找到对应的会议信息callid={},confid={}",call_id,conf_id);
+        if(StringUtils.isBlank(conversation_id)){
+            throw new InvalidParamException("没有找到对应的交谈信息callid={},conversationid={}",call_id,conversation_id);
         }
-
         if(StringUtils.isBlank(appId)){
             throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
         }
-        App app = appService.findById(state.getAppId());
-        if(app == null){
-            throw new InvalidParamException("没有找到对应的app信息appId={}",appId);
+        conversationService.join(conversation_id,call_id);
+    }
+
+    public void conf(BusinessState state,String call_id){
+        String user_data = state.getUserdata();
+        Map<String,String> businessData = state.getBusinessData();
+        String conf_id = null;
+        if(businessData!=null){
+            conf_id = businessData.get("conf_id");
+        }
+        if(StringUtils.isBlank(conf_id)){
+            throw new InvalidParamException("没有找到对应的会议信息callid={},confid={}",call_id,conf_id);
         }
         //会议成员增加
         confService.incrPart(conf_id,call_id);
 
         Meeting meeting = meetingService.findById(conf_id);
         if(meeting!=null){
-            String callSessionId = (String)businessData.get("sessionid");
+            String callSessionId = businessData.get(BusinessState.SESSIONID);
             MeetingMember meetingMember = new MeetingMember();
             meetingMember.setId(call_id);
-            meetingMember.setNumber((String)businessData.get("to"));
+            meetingMember.setNumber(businessData.get("to"));
             meetingMember.setJoinTime(new Date());
-            if(state.getType().equalsIgnoreCase("ivr_incoming")){
+            if(BusinessState.TYPE_IVR_INCOMING.equals(state.getType())){
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_CALL);
             }else{
                 meetingMember.setJoinType(MeetingMember.JOINTYPE_INVITE);
@@ -133,7 +168,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("开始发送会议加入通知给开发者");
         }
-        if(StringUtils.isNotBlank(app.getUrl())){
+        if(StringUtils.isNotBlank(state.getCallBackUrl())){
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
                     .putIfNotEmpty("event","conf.joined")
                     .putIfNotEmpty("id",conf_id)
@@ -142,7 +177,7 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
                     .putIfNotEmpty("part_uri",null)
                     .putIfNotEmpty("user_data",user_data)
                     .build();
-            notifyCallbackUtil.postNotify(app.getUrl(),notify_data,3);
+            notifyCallbackUtil.postNotify(state.getCallBackUrl(),notify_data,3);
         }
         if(logger.isDebugEnabled()){
             logger.debug("会议加入通知发送成功");
@@ -150,8 +185,5 @@ public class Handler_EVENT_SYS_CALL_CONF_ENTER_SUCC extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("处理{}事件完成",getEventName());
         }
-        return res;
     }
-
-
 }

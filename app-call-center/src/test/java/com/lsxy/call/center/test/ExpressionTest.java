@@ -43,4 +43,9 @@ public class ExpressionTest {
         countDownLatch.await();
         System.out.println(System.currentTimeMillis() - start);
     }
+
+    @Test
+    public void test2(){
+        System.out.println(ExpressionUtils.validWhereExpression("has(\"技能一\") && get(\"技能2\") == 60;"));;
+    }
 }
