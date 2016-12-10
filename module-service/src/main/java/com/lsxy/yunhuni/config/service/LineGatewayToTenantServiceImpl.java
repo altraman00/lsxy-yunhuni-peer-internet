@@ -73,7 +73,7 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
     }
     @Override
     public int getMaxPriority(String tenantId) {
-        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant WHERE deleted=0 and tenatn_id=?";
+        String sql = " SELECT IFNULL(MAX(priority),0) FROM db_lsxy_bi_yunhuni.tb_oc_linegateway_to_tenant WHERE deleted=0 and tenant_id=?";
         int result = jdbcTemplate.queryForObject(sql,Integer.class,tenantId);
         return result;
     }
