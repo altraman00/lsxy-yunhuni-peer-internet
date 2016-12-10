@@ -188,6 +188,12 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         updateField(id,getInnerField(field),value);
     }
 
+    /****
+     * 批量修改 state里的map的属性
+     * @param id
+     * @param keycount key的数量，key后面是value
+     * @param params   key和value 的 数组
+     */
     @Override
     public void updateInnerField(String id,int keycount,String... params){
         if(keycount <= 0){
