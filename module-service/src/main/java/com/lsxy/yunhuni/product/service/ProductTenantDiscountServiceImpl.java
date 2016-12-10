@@ -37,4 +37,9 @@ public class ProductTenantDiscountServiceImpl extends AbstractService<ProductTen
         }
         return discount;
     }
+
+    @Override
+    public ProductTenantDiscount findByProductIdAndTenantId(String productId, String tenantId) {
+        return productTenantDiscountDao.findByProductIdAndTenantId(productId,tenantId);
+    }
 }

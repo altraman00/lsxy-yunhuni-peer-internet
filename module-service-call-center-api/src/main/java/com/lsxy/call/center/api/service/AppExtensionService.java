@@ -21,15 +21,6 @@ public interface AppExtensionService extends BaseService<AppExtension> {
      */
     AppExtension create(String appId,AppExtension appExtension) throws YunhuniApiException;
 
-    /**
-     * 分机登录
-     * @param tenantId
-     * @param appId
-     * @param user
-     * @param pass
-     * @return
-     */
-    boolean login(String tenantId,String appId,String user,String pass);
 
     /**
      * 根据应用id获取对于的分机
@@ -65,10 +56,16 @@ public interface AppExtensionService extends BaseService<AppExtension> {
     AppExtension findOne(String appId, String extensionId) throws YunhuniApiException;
 
     /**
-     * 分机注册
-     * @param extensionId
+     * 分机登录
+     * @param user
      */
-    void register(String extensionId);
+    void login(String user);
+
+    /**
+     * 分机注销
+     * @param user
+     */
+    void logout(String user);
 
     List<Map<String,Object>> exs(String appId);
 }

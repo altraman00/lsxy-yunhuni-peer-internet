@@ -9,6 +9,7 @@ import com.lsxy.framework.core.AbstractSpringBootStarter;
 import com.lsxy.framework.dubbo.EnableDubboConfiguration;
 import com.lsxy.framework.monitor.FrameworkMonitorConfig;
 import com.lsxy.framework.mq.FrameworkMQConfig;
+import com.lsxy.framework.oss.FrameworkOSSConfig;
 import com.lsxy.yunhuni.YunhuniServiceConfig;
 import com.lsxy.yunhuni.api.YunhuniApiConfig;
 import org.springframework.boot.SpringApplication;
@@ -22,7 +23,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication()
 @EnableScheduling
 @Import({FrameworkApiConfig.class,FrameworkServiceConfig.class, FrameworkCacheConfig.class, YunhuniApiConfig.class, YunhuniServiceConfig.class, FrameworkMQConfig.class,
-        FrameworkMonitorConfig.class,CallCenterApiConfig.class})
+        FrameworkMonitorConfig.class,CallCenterApiConfig.class,FrameworkOSSConfig.class})
 @EnableDubboConfiguration
 public class MainClass extends AbstractSpringBootStarter {
     private static final String systemId = "app.backend";

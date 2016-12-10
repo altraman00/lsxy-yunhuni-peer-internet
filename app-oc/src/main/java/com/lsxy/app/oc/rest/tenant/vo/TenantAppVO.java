@@ -34,7 +34,7 @@ public class TenantAppVO implements Serializable {
     private BigDecimal consume;
     private Long sessionCount;
     private Long amongDuration;
-
+    private String recordingTime;
     private List<String> testPhone;
     private String sipRegistrar;//分机信息
     public TenantAppVO(){}
@@ -46,6 +46,14 @@ public class TenantAppVO implements Serializable {
         } catch (InvocationTargetException e) {
             logger.error("复制类属性异常",e);
         }
+    }
+
+    public String getRecordingTime() {
+        return recordingTime;
+    }
+
+    public void setRecordingTime(String recordingTime) {
+        this.recordingTime = recordingTime;
     }
 
     public String getSipRegistrar() {

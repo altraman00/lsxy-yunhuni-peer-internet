@@ -16,12 +16,24 @@ import java.util.Date;
 @Where(clause = "deleted=0")
 @Table(schema="db_lsxy_bi_yunhuni",name = "tb_oc_config_global")
 public class GlobalConfig extends IdEntity {
+    public static final String TYPE_RECORDING = "recording";
+    public static final String KEY_RECORDING = "recording";
     private String type;//配置项类型
+    private String keyName;//标识名
     private String name;//配置项名称
     private String value;//配置项值
     private Date expireDt;//配置项有效期
     private String remark;//备注
     private String enabled;//on off
+    @Column(name = "key_name")
+    public String getKeyName() {
+        return keyName;
+    }
+
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
+    }
+
     @Column(name = "type")
     public String getType() {
         return type;

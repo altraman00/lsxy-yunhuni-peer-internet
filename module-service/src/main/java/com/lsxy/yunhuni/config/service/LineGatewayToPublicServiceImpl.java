@@ -105,7 +105,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
         for (LineGatewayToPublic ltp:ltps){
             LineGateway lineGateway = ltp.getLineGateway();
             //TODO 判断线路是否可用
-            if("1".equals(lineGateway.getStatus())){
+            if(LineGateway.STATUS_USABLE.equals(lineGateway.getStatus())){
                 lineGateway.setPriority(ltp.getPriority());
                 lineGateways.add(lineGateway);
             }
@@ -131,7 +131,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
         lineGatewayToPublic.setPriority(re2);
         this.save(lineGatewayToPublic);
         //修改线路状态标识为加入全局
-        lineGateway.setIsPublicLine("1");
+        lineGateway.setIsPublicLine(LineGateway.ISPUBLICLINE_TRUE);
         lineGatewayService.save(lineGateway);
     }
 
@@ -147,7 +147,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
         //修改对应线路关系
         LineGateway lineGateway = lineGatewayToPublic.getLineGateway();
         if(lineGateway!=null){
-            lineGateway.setIsPublicLine("0");
+            lineGateway.setIsPublicLine(LineGateway.ISPUBLICLINE_FALSE);
             lineGatewayService.save(lineGateway);
         }
         //修正优先级

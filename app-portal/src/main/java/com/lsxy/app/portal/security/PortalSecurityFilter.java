@@ -11,7 +11,9 @@ import javax.servlet.annotation.WebFilter;
 /**
  * Created by Tandy on 2016/6/8.
  */
-@WebFilter(filterName = "securityFilter", urlPatterns = "/console/*")
+@WebFilter(filterName = "securityFilter", urlPatterns = "/console/*",
+        asyncSupported = true //支持异步Servlet
+)
 public class PortalSecurityFilter extends SecurityFilter {
     private static final Log logger = LogFactory.getLog(PortalSecurityFilter.class);
 

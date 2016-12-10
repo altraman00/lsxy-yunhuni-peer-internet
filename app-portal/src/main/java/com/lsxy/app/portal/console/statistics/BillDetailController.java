@@ -84,8 +84,9 @@ public class BillDetailController extends AbstractPortalController {
     public ModelAndView recording(HttpServletRequest request, @RequestParam(defaultValue = "1") Integer pageNo, @RequestParam(defaultValue = "20") Integer pageSize,
                                   String time, String appId,String type){
         ModelAndView mav = new ModelAndView();
-        Map<String,String> map = init(request,time,appId);
+        Map map = init(request,time,appId);
         map.put("type",type);
+        map.put("types",VoiceFileRecord.types);
         mav.addAllObjects(map);
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL+"/rest/voice_file_record/sum?appId={1}&type={2}&startTime={3}&endTime={4}";

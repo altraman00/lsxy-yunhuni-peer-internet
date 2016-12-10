@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,9 +51,10 @@ public class CalBillingServiceImpl implements CalBillingService{
         if(logger.isDebugEnabled()){
             logger.info("获取余额,tenantId:{}",tenantId);
         }
-        BigDecimal balance;
         Date date = new Date();
-        Date preDate = DateUtils.getPreDate(date);
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+
         Billing billing = billingService.findBillingByTenantId(tenantId);
         if(billing == null){
             throw new RuntimeException("用户账务表不存在");
@@ -61,20 +63,30 @@ public class CalBillingServiceImpl implements CalBillingService{
             logger.info("用户账务表：{}", JSONUtil.objectToJson(billing));
         }
         Date balanceDate = billing.getBalanceDate();
-        String balanceDateStr = null;
-        if(balanceDate != null){
-            balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
-        }
-        String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
-        if(preDateStr.equals(balanceDateStr)){
-            //昨日结算
-            balance = getBalanceByPreDateSum(tenantId, date, billing.getBalance());
-        }else{
-            //前日结算
-            balance = getBalanceByPrePreDateSum(tenantId, date, billing.getBalance());
-        }
+        String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
+        balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
 
-        return balance;
+        return getBalanceByDate(tenantId,date,balanceDate,billing.getBalance());
+    }
+
+    /**
+     * 迭代获取余额
+     * @param tenantId
+     * @param date 获取的日期
+     * @param lastBalanceDate 最后结算日期
+     * @param lastBalance 最后结算金额
+     * @return
+     */
+    private BigDecimal getBalanceByDate(String tenantId,Date date,Date lastBalanceDate,BigDecimal lastBalance){
+        if(date.getTime() > lastBalanceDate.getTime()){
+            Date newBalanceDate = DateUtils.nextDate(lastBalanceDate);
+            BigDecimal consume = getConsume(tenantId, newBalanceDate);
+            BigDecimal recharge = getRecharge(tenantId, newBalanceDate);
+            BigDecimal newBalance =  lastBalance.add(recharge).subtract(consume);
+            return getBalanceByDate(tenantId, date, newBalanceDate, newBalance);
+        }else{
+            return lastBalance;
+        }
     }
 
     @Override
@@ -86,37 +98,6 @@ public class CalBillingServiceImpl implements CalBillingService{
         return lastBalance.add(recharge).subtract(consume);
     }
 
-    /**
-     * 获取余额（结算+充值-消费）
-     * @param tenantId
-     * @param date
-     * @param sumBalance
-     * @return
-     */
-    private BigDecimal getBalanceByPreDateSum(String tenantId, Date date, BigDecimal sumBalance) {
-        BigDecimal consume = getConsume(tenantId, date);
-        BigDecimal recharge = getRecharge(tenantId, date);
-        return sumBalance.add(recharge).subtract(consume);
-    }
-
-    /**
-     * 获取余额（结算+充值-消费+前一天充值-前一天消费）
-     * @param tenantId
-     * @param date
-     * @param sumBalance
-     * @return
-     */
-    private BigDecimal getBalanceByPrePreDateSum(String tenantId, Date date, BigDecimal sumBalance) {
-        BigDecimal balance;
-        BigDecimal consume = getConsume(tenantId, date);
-        BigDecimal recharge = getRecharge(tenantId, date);
-        Date preDate = DateUtils.getPreDate(date);
-        BigDecimal preDateConsume = getConsume(tenantId, preDate);
-        BigDecimal preDateRecharge = getRecharge(tenantId, preDate);
-        balance = sumBalance.add(recharge).subtract(consume).add(preDateRecharge).subtract(preDateConsume);
-        return balance;
-    }
-
 
     /**
      * 从redis中获取当天的消费
@@ -125,7 +106,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private BigDecimal getConsume(String tenantId, Date date){
-        return getIncrAmount(tenantId,date,USE_BALANCE_PREFIX);
+        return getIncrAmount(tenantId,date, USE_BALANCE_FIELD);
     }
 
     /**
@@ -135,7 +116,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private BigDecimal getRecharge(String tenantId, Date date){
-        return getIncrAmount(tenantId,date,ADD_BALANCE_PREFIX);
+        return getIncrAmount(tenantId,date, ADD_BALANCE_FIELD);
     }
 
     /**
@@ -148,7 +129,11 @@ public class CalBillingServiceImpl implements CalBillingService{
     private BigDecimal getIncrAmount(String tenantId, Date date,String type){
         BigDecimal incrAmount;
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String rechargeStr = redisCacheService.get(type + "_" + tenantId + "_" + dateStr);
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+
+        Object rechargeObj = hashOps.get(type);
+        String rechargeStr = rechargeObj == null?null:rechargeObj.toString();
         if(StringUtils.isBlank(rechargeStr)){
             incrAmount = new BigDecimal(0);
         }else{
@@ -160,12 +145,12 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public void incRecharge(String tenantId,Date date,BigDecimal amount){
-        incAmount(tenantId,date,amount,ADD_BALANCE_PREFIX);
+        incAmount(tenantId,date,amount, ADD_BALANCE_FIELD);
     }
 
     @Override
     public void incConsume(String tenantId,Date date,BigDecimal amount){
-        incAmount(tenantId,date,amount,USE_BALANCE_PREFIX);
+        incAmount(tenantId,date,amount, USE_BALANCE_FIELD);
     }
 
     /**
@@ -176,11 +161,15 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @param type 类型（充值或消费的key前缀）
      */
     private void incAmount(String tenantId,Date date,BigDecimal amount,String type){
+        if(amount == null){
+            return;
+        }
         //以long型存金额的增量，真实金额=redis中的金额/10000
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String key = type + "_" + tenantId + "_" + dateStr;
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
         long l = amount.multiply(new BigDecimal(AMOUNT_REDIS_MULTIPLE)).setScale(0, BigDecimal.ROUND_HALF_UP).longValue();
-        long result = redisCacheService.incrBy(key, l);
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Long result = hashOps.increment(type, l);
         if(result == l){
             redisCacheService.expire(key,5 * 24 * 60 * 60);
         }
@@ -192,59 +181,40 @@ public class CalBillingServiceImpl implements CalBillingService{
      */
     @Override
     public Long getConference(String tenantId) {
-        Long conference;
         Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
+
         Billing billing = billingService.findBillingByTenantId(tenantId);
         if(billing == null){
             throw new RuntimeException("用户账务表不存在");
         }
         Date balanceDate = billing.getBalanceDate();
-        String balanceDateStr = null;
-        if(balanceDate != null){
-            DateUtils.formatDate(balanceDate, "yyyyMMdd");
-        }
-        Date preDate = DateUtils.getPreDate(date);
-        String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
-        if(preDateStr.equals(balanceDateStr)){
-            //昨日结算
-            conference = getConferenceByPreDateSum(tenantId, date, billing.getConferenceRemain());
+        String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
+        balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
+        return getConferenceByDate(tenantId,date,balanceDate,billing.getConferenceRemain());
+    }
+
+
+    /**
+     * 迭代获取会议余量
+     * @param tenantId
+     * @param date 获取的日期
+     * @param lastBalanceDate 最后结算时间
+     * @param lastConference 最后结算余量
+     * @return
+     */
+    private Long getConferenceByDate(String tenantId,Date date,Date lastBalanceDate,Long lastConference){
+        if(date.getTime() > lastBalanceDate.getTime()){
+            Date newBalanceDate = DateUtils.nextDate(lastBalanceDate);
+            Long useConference = getUseConference(tenantId, date);
+            Long addConference = getAddConference(tenantId, date);
+            Long newConference =  lastConference + addConference - useConference;
+            return getConferenceByDate(tenantId, date, newBalanceDate, newConference);
         }else{
-            //前日结算
-            conference = getConferenceByPrePreDateSum(tenantId, date, billing.getConferenceRemain());
+            return lastConference;
         }
-
-        return conference;
     }
-
-    /**
-     * 获取会议余量（昨日结算+昨日购买-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param sumConference
-     * @return
-     */
-    private Long getConferenceByPreDateSum(String tenantId, Date date, Long sumConference) {
-        Long useConference = getUseConference(tenantId, date);
-        Long addConference = getAddConference(tenantId, date);
-        return sumConference + addConference - useConference;
-    }
-
-    /**
-     * 获取会议余量（前日结算+前日购买-前日消费+昨日购买-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param sumConference
-     * @return
-     */
-    private Long getConferenceByPrePreDateSum(String tenantId, Date date, Long sumConference) {
-        Long useConference = getUseConference(tenantId, date);
-        Long addConference = getAddConference(tenantId, date);
-        Date preDate = DateUtils.getPreDate(date);
-        Long preUseConference = getUseConference(tenantId, preDate);
-        Long preAddConference = getAddConference(tenantId, preDate);
-        return sumConference + addConference - useConference + preAddConference - preUseConference;
-    }
-
 
     /**
      * 从redis中获取当天的会议使用量
@@ -253,7 +223,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseConference(String tenantId, Date date){
-        return getIncrLong(tenantId,date, USE_CONFERENCE_PREFIX);
+        return getIncrLong(tenantId,date, USE_CONFERENCE_FIELD);
     }
 
     /**
@@ -263,7 +233,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddConference(String tenantId, Date date){
-        return getIncrLong(tenantId,date,ADD_CONFERENCE_PREFIX);
+        return getIncrLong(tenantId,date, ADD_CONFERENCE_FIELD);
     }
 
     /**
@@ -276,23 +246,26 @@ public class CalBillingServiceImpl implements CalBillingService{
     private Long getIncrLong(String tenantId, Date date,String type){
         Long time;
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String conferenceStr = redisCacheService.get(type + "_" + tenantId + "_" + dateStr);
-        if(StringUtils.isBlank(conferenceStr)){
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Object incrLongObj = hashOps.get(type);
+        String incrLongStr = incrLongObj == null?null:incrLongObj.toString();
+        if(StringUtils.isBlank(incrLongStr)){
             time = 0L;
         }else{
-            time = Long.parseLong(conferenceStr);
+            time = Long.parseLong(incrLongStr);
         }
         return time;
     }
 
     @Override
     public void incAddConference(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time,ADD_CONFERENCE_PREFIX);
+        incLong(tenantId,date,time, ADD_CONFERENCE_FIELD);
     }
 
     @Override
     public void incUseConference(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time, USE_CONFERENCE_PREFIX);
+        incLong(tenantId,date,time, USE_CONFERENCE_FIELD);
     }
 
     /**
@@ -303,9 +276,13 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @param type 类型（购买或消费的key前缀）
      */
     private void incLong(String tenantId,Date date,Long l,String type){
+        if(l == null){
+            return;
+        }
         String dateStr = DateUtils.getTime(date,"yyyyMMdd");
-        String key = type + "_" + tenantId + "_" + dateStr;
-        long result = redisCacheService.incrBy(key, l);
+        String key = BILLING_DAY_PREFIX + "_" + tenantId + "_" + dateStr;
+        BoundHashOperations hashOps = redisCacheService.getHashOps(key);
+        Long result = hashOps.increment(type, l);
         if(result == l){
             redisCacheService.expire(key,5 * 24 * 60 * 60);
         }
@@ -317,59 +294,39 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public Long getVoice(String tenantId) {
-        Long voice;
         Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
         Billing billing = billingService.findBillingByTenantId(tenantId);
         if(billing == null){
             throw new RuntimeException("用户账务表不存在");
         }
         Date balanceDate = billing.getBalanceDate();
-        String balanceDateStr = null;
-        if(balanceDate != null){
-            DateUtils.formatDate(balanceDate, "yyyyMMdd");
-        }
-        Date preDate = DateUtils.getPreDate(date);
-        String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
-        if(preDateStr.equals(balanceDateStr)){
-            //昨日结算
-            voice = getVoiceByPreDateSum(tenantId, date, billing.getVoiceRemain());
+        String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
+        balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
+
+        return getVoiceByDate(tenantId,date,balanceDate,billing.getVoiceRemain());
+    }
+
+    /**
+     * 迭代获取语音余量
+     * @param tenantId
+     * @param date 获取的日期
+     * @param lastBalanceDate 最后结算时间
+     * @param lastVoice 最后结算余量
+     * @return
+     */
+    private Long getVoiceByDate(String tenantId,Date date,Date lastBalanceDate,Long lastVoice){
+        if(date.getTime() > lastBalanceDate.getTime()){
+            Date newBalanceDate = DateUtils.nextDate(lastBalanceDate);
+            Long useVoice = getUseVoice(tenantId, date);
+            Long addVoice = getAddVoice(tenantId, date);
+            Long newVoice = lastVoice + addVoice - useVoice;
+            return getVoiceByDate(tenantId, date, newBalanceDate, newVoice);
         }else{
-            //前日结算
-            voice = getVoiceByPrePreDateSum(tenantId, date, billing.getVoiceRemain());
+            return lastVoice;
         }
-
-        return voice;
     }
-
-    /**
-     * 获取语音余量（昨日结算+昨日购买-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param sumVoice
-     * @return
-     */
-    private Long getVoiceByPreDateSum(String tenantId, Date date, Long sumVoice) {
-        Long useVoice = getUseVoice(tenantId, date);
-        Long addVoice = getAddVoice(tenantId, date);
-        return sumVoice + addVoice - useVoice;
-    }
-
-    /**
-     * 获取语音余量（前日结算+前日购买-前日消费+昨日购买-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param sumVoice
-     * @return
-     */
-    private Long getVoiceByPrePreDateSum(String tenantId, Date date, Long sumVoice) {
-        Long useVoice = getUseVoice(tenantId, date);
-        Long addVoice = getAddVoice(tenantId, date);
-        Date preDate = DateUtils.getPreDate(date);
-        Long preUseVoice = getUseVoice(tenantId, preDate);
-        Long preAddVoice = getAddVoice(tenantId, preDate);
-        return sumVoice + addVoice - useVoice + preAddVoice - preUseVoice;
-    }
-
 
     /**
      * 从redis中获取当天的语音使用量
@@ -378,7 +335,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseVoice(String tenantId, Date date){
-        return getIncrLong(tenantId,date,USE_VOICE_PREFIX);
+        return getIncrLong(tenantId,date, USE_VOICE_FIELD);
     }
 
     /**
@@ -388,17 +345,17 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddVoice(String tenantId, Date date){
-        return getIncrLong(tenantId,date,ADD_VOICE_PREFIX);
+        return getIncrLong(tenantId,date, ADD_VOICE_FIELD);
     }
 
     @Override
     public void incAddVoice(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time,ADD_VOICE_PREFIX);
+        incLong(tenantId,date,time, ADD_VOICE_FIELD);
     }
 
     @Override
     public void incUseVoice(String tenantId,Date date,Long time){
-        incLong(tenantId,date,time, USE_VOICE_PREFIX);
+        incLong(tenantId,date,time, USE_VOICE_FIELD);
     }
 
 
@@ -408,59 +365,39 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public Long getSms(String tenantId) {
-        Long sms;
         Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
         Billing billing = billingService.findBillingByTenantId(tenantId);
         if(billing == null){
             throw new RuntimeException("用户账务表不存在");
         }
         Date balanceDate = billing.getBalanceDate();
-        String balanceDateStr = null;
-        if(balanceDate != null){
-            DateUtils.formatDate(balanceDate, "yyyyMMdd");
-        }
-        Date preDate = DateUtils.getPreDate(date);
-        String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
-        if(preDateStr.equals(balanceDateStr)){
-            //昨日结算
-            sms = getSmsByPreDateSum(tenantId, date, billing.getSmsRemain());
+        String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
+        balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
+        return getSmsByDate(tenantId,date,balanceDate,billing.getSmsRemain());
+    }
+
+
+    /**
+     * 迭代获取短信余量
+     * @param tenantId
+     * @param date 获取的日期
+     * @param lastBalanceDate 最后结算时间
+     * @param lastSms 最后结算余量
+     * @return
+     */
+    private Long getSmsByDate(String tenantId,Date date,Date lastBalanceDate,Long lastSms){
+        if(date.getTime() > lastBalanceDate.getTime()){
+            Date newBalanceDate = DateUtils.nextDate(lastBalanceDate);
+            Long useSms = getUseSms(tenantId, date);
+            Long addSms = getAddSms(tenantId, date);
+            Long newSms =  lastSms + addSms - useSms;
+            return getSmsByDate(tenantId, date, newBalanceDate, newSms);
         }else{
-            //前日结算
-            sms = getSmsByPrePreDateSum(tenantId, date, billing.getSmsRemain());
+            return lastSms;
         }
-
-        return sms;
     }
-
-    /**
-     * 获取短信余量（昨日结算+昨日购买-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param sumSms
-     * @return
-     */
-    private Long getSmsByPreDateSum(String tenantId, Date date, Long sumSms) {
-        Long useSms = getUseSms(tenantId, date);
-        Long addSms = getAddSms(tenantId, date);
-        return sumSms + addSms - useSms;
-    }
-
-    /**
-     * 获取短信余量（前日结算+前日购买-前日消费+昨日购买-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param sumSms
-     * @return
-     */
-    private Long getSmsByPrePreDateSum(String tenantId, Date date, Long sumSms) {
-        Long useSms = getUseSms(tenantId, date);
-        Long addSms = getAddSms(tenantId, date);
-        Date preDate = DateUtils.getPreDate(date);
-        Long preUseSms = getUseSms(tenantId, preDate);
-        Long preAddSms = getAddSms(tenantId, preDate);
-        return sumSms + addSms - useSms + preAddSms - preUseSms;
-    }
-
 
     /**
      * 从redis中获取当天的短信使用量
@@ -469,7 +406,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseSms(String tenantId, Date date){
-        return getIncrLong(tenantId,date, USE_SMS_PREFIX);
+        return getIncrLong(tenantId,date, USE_SMS_FIELD);
     }
 
     /**
@@ -479,18 +416,18 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddSms(String tenantId, Date date){
-        return getIncrLong(tenantId,date,ADD_SMS_PREFIX);
+        return getIncrLong(tenantId,date, ADD_SMS_FIELD);
     }
 
     @Override
     public void incAddSms(String tenantId,Date date,Long num){
-        incLong(tenantId,date,num,ADD_SMS_PREFIX);
+        incLong(tenantId,date,num, ADD_SMS_FIELD);
     }
 
 
     @Override
     public void incUseSms(String tenantId,Date date,Long num){
-        incLong(tenantId,date,num, USE_SMS_PREFIX);
+        incLong(tenantId,date,num, USE_SMS_FIELD);
     }
 
 
@@ -500,59 +437,38 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public Long getFsize(String tenantId) {
-        Long size;
         Date date = new Date();
+        String dateStr = DateUtils.formatDate(date, "yyyyMMdd");
+        date = DateUtils.parseDate(dateStr,"yyyyMMdd");
         Billing billing = billingService.findBillingByTenantId(tenantId);
         if(billing == null){
             throw new RuntimeException("用户账务表不存在");
         }
         Date balanceDate = billing.getBalanceDate();
-        String balanceDateStr = null;
-        if(balanceDate != null){
-            DateUtils.formatDate(balanceDate, "yyyyMMdd");
-        }
-        Date preDate = DateUtils.getPreDate(date);
-        String preDateStr = DateUtils.formatDate(preDate, "yyyyMMdd");
-        if(preDateStr.equals(balanceDateStr)){
-            //昨日结算
-            size = getFsizeByPreDateSum(tenantId, date, billing.getFileRemainSize());
+        String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
+        balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
+        return getFsizeByDate(tenantId,date,balanceDate,billing.getFileRemainSize());
+    }
+
+    /**
+     * 迭代获取容量剩余余量
+     * @param tenantId
+     * @param date 获取的日期
+     * @param lastBalanceDate 最后结算时间
+     * @param lastFsize 最后结算余量
+     * @return
+     */
+    private Long getFsizeByDate(String tenantId,Date date,Date lastBalanceDate,Long lastFsize){
+        if(date.getTime() > lastBalanceDate.getTime()){
+            Date newBalanceDate = DateUtils.nextDate(lastBalanceDate);
+            Long useSize = getUseFsize(tenantId, date);
+            Long addSize = getAddFsize(tenantId, date);
+            Long newFsize =  lastFsize + addSize - useSize;
+            return getFsizeByDate(tenantId, date, newBalanceDate, newFsize);
         }else{
-            //前日结算
-            size = getFsizeByPrePreDateSum(tenantId, date, billing.getFileRemainSize());
+            return lastFsize;
         }
-
-        return size;
     }
-
-    /**
-     * 获取容量剩余（昨日结算+昨日增加-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param fileRemainSize
-     * @return
-     */
-    private Long getFsizeByPreDateSum(String tenantId, Date date, Long fileRemainSize) {
-        Long useSize = getUseFsize(tenantId, date);
-        Long addSize = getAddFsize(tenantId, date);
-        return fileRemainSize + addSize - useSize;
-    }
-
-    /**
-     * 获取容量剩余（前日结算+前日增加-前日消费+昨日增加-昨日消费）
-     * @param tenantId
-     * @param date
-     * @param fileRemainSize
-     * @return
-     */
-    private Long getFsizeByPrePreDateSum(String tenantId, Date date, Long fileRemainSize) {
-        Long useSize = getUseFsize(tenantId, date);
-        Long addSize = getAddFsize(tenantId, date);
-        Date preDate = DateUtils.getPreDate(date);
-        Long preUseSize = getUseFsize(tenantId, preDate);
-        Long preAddSize = getAddFsize(tenantId, preDate);
-        return fileRemainSize + addSize - useSize + preAddSize - preUseSize;
-    }
-
 
     /**
      * 从redis中获取当天的容量使用量
@@ -561,7 +477,7 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getUseFsize(String tenantId, Date date){
-        return getIncrLong(tenantId,date, USE_FSIZE_PREFIX);
+        return getIncrLong(tenantId,date, USE_FSIZE_FIELD);
     }
 
     /**
@@ -571,18 +487,18 @@ public class CalBillingServiceImpl implements CalBillingService{
      * @return
      */
     private Long getAddFsize(String tenantId, Date date){
-        return getIncrLong(tenantId,date, ADD_FSIZE_PREFIX);
+        return getIncrLong(tenantId,date, ADD_FSIZE_FIELD);
     }
 
     @Override
     public void incAddFsize(String tenantId, Date date, Long size){
-        incLong(tenantId,date,size, ADD_FSIZE_PREFIX);
+        incLong(tenantId,date,size, ADD_FSIZE_FIELD);
     }
 
 
     @Override
     public void incUseFsize(String tenantId, Date date, Long size){
-        incLong(tenantId,date,size, USE_FSIZE_PREFIX);
+        incLong(tenantId,date,size, USE_FSIZE_FIELD);
     }
 
 
@@ -618,33 +534,33 @@ public class CalBillingServiceImpl implements CalBillingService{
 
     @Override
     public void incCallConnect(String tenantId, Date date) {
-        incLong(tenantId,date,1L, CALL_CONNECT_PREFIX);
+        incLong(tenantId,date,1L, CALL_CONNECT_FIELD);
     }
 
     @Override
     public Long getCallConnectByDate(String tenantId, Date date) {
-        return getIncrLong(tenantId,date, CALL_CONNECT_PREFIX);
+        return getIncrLong(tenantId,date, CALL_CONNECT_FIELD);
     }
 
 
     @Override
     public void incCallSum(String tenantId, Date date) {
-        incLong(tenantId,date,1L, CALL_SUM_PREFIX);
+        incLong(tenantId,date,1L, CALL_SUM_FIELD);
     }
 
     @Override
     public Long getCallSumByDate(String tenantId, Date date) {
-        return getIncrLong(tenantId,date, CALL_SUM_PREFIX);
+        return getIncrLong(tenantId,date, CALL_SUM_FIELD);
     }
 
     @Override
     public void incCallCostTime(String tenantId, Date date,Long costTimeLong) {
-        incLong(tenantId,date,costTimeLong, CALL_COST_TIME_PREFIX);
+        incLong(tenantId,date,costTimeLong, CALL_COST_TIME_FIELD);
     }
 
     @Override
     public Long getCallCostTimeByDate(String tenantId, Date date) {
-        return getIncrLong(tenantId,date, CALL_COST_TIME_PREFIX);
+        return getIncrLong(tenantId,date, CALL_COST_TIME_FIELD);
     }
 
     @Override
@@ -711,6 +627,8 @@ public class CalBillingServiceImpl implements CalBillingService{
                         currentStatics.getCallConnect() - preMonthDayStatics.getCallConnect(),
                         currentStatics.getCallSum() - preMonthDayStatics.getCallSum(),
                         currentStatics.getCallCostTime() - preMonthDayStatics.getCallCostTime());
+            }else if(currentStatics != null){
+                result = currentStatics;
             }else{
                 result = getIncStaticsOfCurrentDay(tenantId);
             }
@@ -727,21 +645,24 @@ public class CalBillingServiceImpl implements CalBillingService{
             String tenantId = tenant.getId();
             Billing billing = billingService.findBillingByTenantId(tenantId);
             Date balanceDate = billing.getBalanceDate();
+            String balanceDateStr = DateUtils.formatDate(balanceDate, "yyyyMMdd");
+            balanceDate = DateUtils.parseDate(balanceDateStr,"yyyyMMdd");
+
             if(balanceDate.getTime() < date.getTime()){
                 //TODO 统计余额
                 BigDecimal balance = this.getBalance(tenantId, balanceDate,date, billing.getBalance());
                 billing.setBalance(balance);
                 //TODO 统计语音通知
-                Long voice = this.getVoiceByPreDateSum(tenantId, date, billing.getVoiceRemain());
+                Long voice = this.getVoiceByDate(tenantId, date,balanceDate, billing.getVoiceRemain());
                 billing.setVoiceRemain(voice);
                 //TODO 统计会议
-                Long conference = this.getConferenceByPreDateSum(tenantId, date, billing.getConferenceRemain());
+                Long conference = this.getConferenceByDate(tenantId, date,balanceDate, billing.getConferenceRemain());
                 billing.setConferenceRemain(conference);
                 //TODO 统计短信
-                Long sms = this.getSmsByPreDateSum(tenantId, date, billing.getSmsRemain());
+                Long sms = this.getSmsByDate(tenantId, date,balanceDate, billing.getSmsRemain());
                 billing.setSmsRemain(sms);
                 //TODO 统计容量
-                Long size = this.getFsizeByPreDateSum(tenantId, date, billing.getFileRemainSize());
+                Long size = this.getFsizeByDate(tenantId, date,balanceDate, billing.getFileRemainSize());
                 billing.setFileRemainSize(size);
                 //更新结算时间
                 billing.setBalanceDate(date);
