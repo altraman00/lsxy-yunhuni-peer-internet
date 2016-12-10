@@ -114,9 +114,7 @@ public class NettyClient extends AbstractClient{
                 logger.info("客户端连接成功,准备发送注册客户端命令");
 //                session = new NettyClientSession(f.channel(),handler,serverUrl);
 //                f.channel().attr(SESSION_ID).set(session.getId());
-                synchronized (f.channel()) {
-                    doTestRequest(20, 1000000000, f.channel());
-                }
+                doTestRequest(20, 1000000000, f.channel());
             }
 
 
@@ -152,7 +150,9 @@ public class NettyClient extends AbstractClient{
                 public void run() {
                     for(int j = 0;j<count;j++){
                         try {
-                            channel.writeAndFlush(System.currentTimeMillis()+"\n");
+                            synchronized (channel) {
+                                channel.writeAndFlush(System.currentTimeMillis() + "\n");
+                            }
 //                            Thread.currentThread().sleep(1);
                         } catch (Exception ex) {
                             logger.error("RPC 异常",ex);
