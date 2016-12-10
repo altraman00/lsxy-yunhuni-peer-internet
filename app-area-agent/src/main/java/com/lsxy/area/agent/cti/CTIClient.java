@@ -21,7 +21,7 @@ import java.util.Set;
  * CTI 客户端启动器  需要配合JNI使用
  */
 @Component
-@Profile(value={"test","production", "development","localdev"})
+@Profile(value={"production", "development","localdev"})
 public class CTIClient implements RpcEventListener{
 
 
