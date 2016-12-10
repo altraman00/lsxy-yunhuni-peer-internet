@@ -78,7 +78,9 @@ public class NettyClient extends AbstractClient{
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
                             long timestamp = Long.parseLong(msg);
-                            logger.info("收到消回复消息["+msg+"]耗时:"+(System.currentTimeMillis() - timestamp)+"ms");
+                            synchronized (logger) {
+                                logger.info("收到消回复消息[" + msg + "]耗时:" + (System.currentTimeMillis() - timestamp) + "ms");
+                            }
 
                         }
                     });
