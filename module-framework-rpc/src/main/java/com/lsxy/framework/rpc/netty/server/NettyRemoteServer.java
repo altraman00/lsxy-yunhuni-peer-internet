@@ -79,8 +79,11 @@ public class NettyRemoteServer implements RemoteServer {
                             // 收到消息直接打印输出
                             long timestamp = Long.parseLong(msg);
                             logger.info("收到消息["+msg+"]耗时:"+(System.currentTimeMillis() - timestamp)+"ms");
+                            String retMsg = System.currentTimeMillis()+"";
+                            long sendTime = System.currentTimeMillis();
                             // 返回客户端消息 - 我已经接收到了你的消息
-//                            ctx.write(System.currentTimeMillis()+"\n");
+                            ctx.write(retMsg+"\n").awaitUninterruptibly();
+                            logger.info("回复消息:{},耗时:{}ms",retMsg,System.currentTimeMillis()-sendTime);
                         }
                     });
 
