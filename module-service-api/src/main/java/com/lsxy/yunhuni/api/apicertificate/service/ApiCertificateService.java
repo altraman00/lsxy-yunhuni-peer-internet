@@ -27,10 +27,10 @@ public interface ApiCertificateService extends BaseService<ApiCertificate> {
 
     /**
      * 根据用户名来改变用户鉴权账号（凭证）的secretKey
-     * @param userName 用户名
+     * @param cert 鉴权账号
      * @return 新生成的secretKey
      */
-    String changeSecretKeyByUserName(String userName) throws MatchMutiEntitiesException;
+    String changeSecretKey(ApiCertificate cert) throws MatchMutiEntitiesException;
 
 
     /**
