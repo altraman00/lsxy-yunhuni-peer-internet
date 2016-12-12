@@ -463,8 +463,14 @@
         <script>
             function saveCycle(){
                 var cycle = $('input[name=cycle]:checked').val();
+                var cycleName = '';
+                if(cycle==7){
+                    cycleName = "7天";
+                }else if(cycle%30==0&&cycle/30>0){
+                    cycleName = cycle/30 +"个月";
+                }
                 bootbox.setLocale("zh_CN");
-                var h1="配置存储周期是否更改为："+ cycle+" 天";
+                var h1="配置存储周期是否更改为："+ cycleName;
                 bootbox.confirm(h1, function(result) {
                     if(result){
                         ajaxsync(ctx + "/console/app/edit/recording/"+appId,{csrfParameterName:csrfToken,'cycle':cycle},function(response1){

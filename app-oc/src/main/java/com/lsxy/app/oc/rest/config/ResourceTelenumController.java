@@ -245,7 +245,7 @@ public class ResourceTelenumController extends AbstractRestController {
         }catch (Exception e){
             return RestResponse.failed("0000","新增线路失败");
         }
-        resourceTelenum.setUsable("0");//设置不可用
+        resourceTelenum.setUsable(ResourceTelenum.USABLE_FALSE);//设置不可用
         //如果绑定线路的话，需要为号码设置区号
         if(lineGateway!=null&&StringUtils.isNotEmpty(lineGateway.getId())) {
             //验证运营商
@@ -288,7 +288,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        resourceTelenum.setUsable("1");
+        resourceTelenum.setUsable(ResourceTelenum.USABLE_TRUE);
         resourceTelenumService.save(resourceTelenum);
         return RestResponse.success("启用号码成功");
     }
@@ -301,7 +301,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null){
             return RestResponse.failed("0000","记录不存在");
         }
-        resourceTelenum.setUsable("0");
+        resourceTelenum.setUsable(ResourceTelenum.USABLE_FALSE);
         resourceTelenumService.save(resourceTelenum);
         return RestResponse.success("禁用号码成功");
     }

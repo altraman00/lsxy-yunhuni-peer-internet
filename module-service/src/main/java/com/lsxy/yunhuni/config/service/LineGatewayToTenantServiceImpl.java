@@ -48,7 +48,7 @@ public class LineGatewayToTenantServiceImpl extends AbstractService<LineGatewayT
             for(LineGatewayToTenant ltt:list){
                 LineGateway lineGateway = ltt.getLineGateway();
                 //TODO 判断线路是否可用
-                if("1".equals(lineGateway.getStatus())){
+                if(LineGateway.STATUS_USABLE.equals(lineGateway.getStatus())){
                     lineGateway.setPriority(ltt.getPriority());
                     lineGateways.add(lineGateway);
                 }

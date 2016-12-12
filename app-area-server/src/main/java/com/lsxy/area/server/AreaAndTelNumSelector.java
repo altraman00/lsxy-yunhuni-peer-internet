@@ -169,12 +169,12 @@ public class AreaAndTelNumSelector {
 
     private TelnumSortEntity getTelnumSortEntity(String to, ResourceTelenum svTelnumber, LineGateway lg, TelnumToLineGateway telnumToLineGateway) {
         TelnumSortEntity entity = null;
-        if("1".equals(telnumToLineGateway.getIsDialing())){
+        if(TelnumToLineGateway.ISDIALING_TRUE.equals(telnumToLineGateway.getIsDialing())){
             //主叫
             entity = new TelnumSortEntity(svTelnumber.getCallUri(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),
                     lg.getSipProviderDomain(),lg.getSipProviderIp(),lg.getId(),lg.getPriority());
-        }else if("1".equals(telnumToLineGateway.getIsThrough())){
+        }else if(TelnumToLineGateway.ISTHROUGH_TRUE.equals(telnumToLineGateway.getIsThrough())){
             //透传
             entity = new TelnumSortEntity(svTelnumber.getTelNumber(),
                     telnumLocationService.solveNum(to,lg.getTelAreaRule(),lg.getMobileAreaRule(),lg.getAreaCode()),

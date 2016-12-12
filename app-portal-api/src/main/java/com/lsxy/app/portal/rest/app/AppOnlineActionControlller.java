@@ -77,12 +77,12 @@ public class AppOnlineActionControlller extends AbstractRestController {
                     Map<String,Object> map = new HashMap<>();
                     map.put("phone",telNumber.getTelNumber());
                     //获取相关属性
-                    map.put("isCalled",StringUtils.isBlank(telNumber.getIsCalled())?"0":telNumber.getIsCalled());
+                    map.put("isCalled",StringUtils.isBlank(telNumber.getIsCalled())?ResourceTelenum.ISCALLED_FALSE:telNumber.getIsCalled());
                     //如果有可呼入的号码
-                    if("1".equals(telNumber.getIsCalled())){
+                    if(ResourceTelenum.ISCALLED_TRUE.equals(telNumber.getIsCalled())){
                         hasCalled = true;
                     }
-                    if("1".equals(telNumber.getIsDialing()) || "1".equals(telNumber.getIsThrough())){
+                    if(ResourceTelenum.ISDIALING_TRUE.equals(telNumber.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telNumber.getIsThrough())){
                         map.put("isDialing","1");
                     }else{
                         map.put("isDialing","0");

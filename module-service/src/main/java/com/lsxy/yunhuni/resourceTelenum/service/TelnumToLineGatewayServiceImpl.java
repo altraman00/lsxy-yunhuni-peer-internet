@@ -160,7 +160,7 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
         });
         for(int i=0;i<ids.length;i++){
             ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(ids[i]);
-            resourceTelenum.setIsThrough("1");
+            resourceTelenum.setIsThrough(ResourceTelenum.ISTHROUGH_TRUE);
             resourceTelenumService.save(resourceTelenum);
         }
     }
@@ -236,9 +236,9 @@ public class TelnumToLineGatewayServiceImpl extends AbstractService<TelnumToLine
     public void modify(LineGateway lineGateway,String isThrough1,String isThrough2) {
         lineGatewayService.save(lineGateway);
         //如果线路可透传状况发生变化，则需要维护线路中号码的可透传情况
-        if("0".equals(isThrough1)&&"1".equals(isThrough2)){
+        if(LineGateway.ISTHROUGH_FALSE.equals(isThrough1)&&LineGateway.ISTHROUGH_TRUE.equals(isThrough2)){
             //对透传进行处理
-            this.updateIsThrough(lineGateway.getId(),"0");
+            this.updateIsThrough(lineGateway.getId(),LineGateway.ISTHROUGH_FALSE);
             //更新号码的状态
             this.batchUpCall(lineGateway.getId());
         }

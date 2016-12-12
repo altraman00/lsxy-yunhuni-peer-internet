@@ -21,9 +21,15 @@ public class ResourceTelenum extends IdEntity{
     public static final int STATUS_LOCK = 2;//临时被锁定
     public static final int STATUS_RENTED = 1; //已被租用
     public static final int STATUS_FREE = 0;    //未被租用
-    public static final String USABLE_TRUE = "1";    //未被租用
-    public static final String USABLE_FALSE = "0";    //未被租用
+    public static final String USABLE_TRUE = "1";    //可用
+    public static final String USABLE_FALSE = "0";    //不可用
     public static final String[] OPERATORS = {"中国电信","中国移动","中国联通"};
+    public static final String ISDIALING_TRUE = "1";
+    public static final String ISDIALING_FALSE = "0";
+    public static final String ISCALLED_TRUE = "1";
+    public static final String ISCALLED_FALSE = "0";
+    public static final String ISTHROUGH_TRUE = "1";
+    public static final String ISTHROUGH_FALSE = "0";
 
     private Integer status;//1:已被租用 0:未被租用
     private String telNumber;//号码
