@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
@@ -119,6 +120,11 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         //扣费
         if(voiceCdr.getCallAckDt() != null){
             calCostService.callConsume(voiceCdr);
+        }else{
+            voiceCdr.setCostTimeLong(0L);
+            voiceCdr.setCost(BigDecimal.ZERO);
+            voiceCdr.setDeduct(0L);
+            voiceCdr.setCostType(VoiceCdr.COST_TYPE_COST);
         }
         //sessionId和一些与具体业务相关的信息根据不同的产品业务进行设置
         Map<String, String> data = businessState.getBusinessData();
@@ -137,7 +143,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             }
         }
         if(logger.isDebugEnabled()){
-            logger.info("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
+            logger.debug("插入cdr数据：{}", JSONUtil.objectToJson(voiceCdr));
         }
 
         calBillingService.incCallSum(voiceCdr.getTenantId(),voiceCdr.getCallEndDt());

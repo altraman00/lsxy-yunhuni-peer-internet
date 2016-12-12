@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class MethodExecAspect {
     private static final Logger logger = LoggerFactory.getLogger(MethodExecAspect.class);
 
-    private static final long ONE_MINUTE = 20;
+    private static final long ONE_MINUTE = 10;
 
     public static final String POINT = "target(com.lsxy.framework.api.base.BaseService)";
 
@@ -28,16 +28,12 @@ public class MethodExecAspect {
      * @return
      */
     @Around(POINT)
-    public Object timeAround(ProceedingJoinPoint joinPoint) {
+    public Object timeAround(ProceedingJoinPoint joinPoint) throws Throwable {
         Object obj = null;
         Object[] args = joinPoint.getArgs();
         long startTime = System.currentTimeMillis();
 
-        try {
-            obj = joinPoint.proceed(args);
-        } catch (Throwable e) {
-            logger.error("统计某方法执行耗时环绕通知出错", e);
-        }
+        obj = joinPoint.proceed(args);
 
         // 获取执行的方法名
         long endTime = System.currentTimeMillis();

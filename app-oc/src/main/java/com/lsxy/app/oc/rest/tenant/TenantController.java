@@ -780,7 +780,7 @@ public class TenantController {
         TenantAppVO vo = new TenantAppVO(app);
         List<TestNumBind> tests = testNumBindService.findByTenant(tenant,appId);
         vo.setTestPhone(tests.parallelStream().parallel().map(t -> t.getNumber()).collect(Collectors.toList()));
-        //        AreaSip areaSip = app.getAreaSip();
+//        AreaSip areaSip = app.getAreaSip();
 //        if(areaSip!=null){
 //            vo.setSipRegistrar(app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
 //        }else{

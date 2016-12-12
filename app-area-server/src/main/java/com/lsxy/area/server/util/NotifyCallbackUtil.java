@@ -93,6 +93,7 @@ public class NotifyCallbackUtil {
      * @return
      */
     public void postNotify(final String url, final Map<String,Object> data,final Integer timeout,final int retry){
+        long start = System.currentTimeMillis();
         try{
             HttpPost post = new HttpPost(url);
             data.put("action","event_notify");
@@ -109,7 +110,9 @@ public class NotifyCallbackUtil {
                         success = true;
                     }
                     if(logger.isDebugEnabled()){
-                        logger.info("url={},http notify response statue = {}",url,response.getStatusLine().getStatusCode());
+                        logger.info("url={},status={}"
+                                ,url,response.getStatusLine().getStatusCode());
+                        logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
                     }
                     if(!success){
                         if(retry >0){

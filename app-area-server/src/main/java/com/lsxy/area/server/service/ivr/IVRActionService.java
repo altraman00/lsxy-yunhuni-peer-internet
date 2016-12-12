@@ -194,6 +194,7 @@ public class IVRActionService {
      * @return
      */
     public String getFirstIvr(final String call_id,final String url,String from){
+        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -212,7 +213,8 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(post,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -223,6 +225,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
@@ -257,6 +262,7 @@ public class IVRActionService {
      * @return
      */
     private String getNextRequest(String call_id,String url,String prevAction,Map<String,Object> prevResults){
+        long start = System.currentTimeMillis();
         String res = null;
         boolean success = false;
         int re_times = 0;
@@ -282,7 +288,8 @@ public class IVRActionService {
                 Future<HttpResponse> future = client.execute(get,null);
                 HttpResponse response = future.get();
                 if(logger.isDebugEnabled()){
-                    logger.info("url={},http ivr response statue = {}",url,response.getStatusLine().getStatusCode());
+                    logger.info("url={},status={}"
+                            ,url,response.getStatusLine().getStatusCode());
                 }
                 if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                     res = receiveResponse(response);
@@ -293,6 +300,9 @@ public class IVRActionService {
             }
             re_times++;
         }while (!success && re_times<=RETRY_TIMES);
+        if(logger.isDebugEnabled()){
+            logger.info("url={},耗时:{}ms",url,(System.currentTimeMillis() - start));
+        }
         return res;
     }
 
@@ -464,6 +474,9 @@ public class IVRActionService {
             //不是挂断动作且未应答，需要自动应答
             if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
                 businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
+                if(logger.isDebugEnabled()){
+                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(call_id),call_id);
+                }
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;
             }

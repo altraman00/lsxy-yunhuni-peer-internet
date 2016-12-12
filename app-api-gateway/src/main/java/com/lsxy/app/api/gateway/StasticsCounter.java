@@ -4,19 +4,16 @@ import com.lsxy.framework.core.statistics.AsbstractStatisticCounter;
 import com.lsxy.framework.core.statistics.MarkField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tandy on 16/8/9.
  */
-@Component
-@EnableScheduling
-@Profile(value = {"test"})
+//@Component
+//@EnableScheduling
+//@Profile(value = {"test"})
 public class StasticsCounter extends AsbstractStatisticCounter {
     private static final Logger logger = LoggerFactory.getLogger(StasticsCounter.class);
     //收到区域管理器响应次数

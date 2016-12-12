@@ -9,6 +9,7 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestRequest;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.config.model.AreaSip;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TestNumBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,8 +102,7 @@ public class AppController extends AbstractPortalController {
         String token = getSecurityToken(request);
         String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/get/{1}/recording/time";
         mav.addObject("cycle",RestRequest.buildSecurityRequest(token).get(uri, Integer.class,id).getData());
-
-//        AreaSip areaSip = app.getAreaSip();
+        //        AreaSip areaSip = app.getAreaSip();
 //        if(areaSip!=null){
 //            mav.addObject("sipRegistrar",app.getAreaSip().getRegistrarIp()+":"+app.getAreaSip().getRegistrarPort());
 //        }else{
@@ -149,6 +149,13 @@ public class AppController extends AbstractPortalController {
             return RestResponse.failed("0011","当前应用正在运营中，请将其下线后进行删除");
         }
 
+    }
+    @RequestMapping("/edit/recording/{id}")
+    @ResponseBody
+    public RestResponse edit(HttpServletRequest request,@PathVariable String id,int cycle){
+        String token = getSecurityToken(request);
+        String uri = PortalConstants.REST_PREFIX_URL  + "/rest/app/edit/{1}/recording/{2}";
+        return RestRequest.buildSecurityRequest(token).get(uri, String.class, id,cycle);
     }
     /**
      * 新建应用
