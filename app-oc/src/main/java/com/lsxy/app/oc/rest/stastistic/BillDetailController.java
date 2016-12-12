@@ -14,6 +14,8 @@ import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.mq.api.MQService;
 import com.lsxy.framework.mq.events.portal.VoiceFileRecordSyncEvent;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.app.model.App;
+import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.file.model.VoiceFileRecord;
 import com.lsxy.yunhuni.api.file.service.VoiceFileRecordService;
 import com.lsxy.yunhuni.api.product.enums.ProductCode;
@@ -57,6 +59,8 @@ public class BillDetailController extends AbstractRestController {
     MQService mqService;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    AppService appService;
     /**
      * 会话详单查询
      * @param pageNo 第几页
@@ -131,7 +135,12 @@ public class BillDetailController extends AbstractRestController {
         Map re = new HashMap();
         re.put("page",page);
         re.put("total",map);
-        re.put("types",VoiceFileRecord.types);
+        String serviceType = "";
+        if(StringUtils.isNotEmpty(appId)) {
+            App app = appService.findById(appId);
+            serviceType = app.getServiceType();
+        }
+        re.put("types",VoiceFileRecord.getRecordType(serviceType));
         return RestResponse.success(re);
     }
     @RequestMapping(value = "/{uid}/file/download/{id}" ,method = RequestMethod.GET)
