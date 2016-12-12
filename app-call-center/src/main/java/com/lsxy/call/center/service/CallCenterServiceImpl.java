@@ -40,10 +40,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.endTime > '"+startTime+"' ";
+            hql += " AND  obj.endTime >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.endTime < '"+endTime+"' ";
+            hql += " AND  obj.endTime <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -69,10 +69,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.endTime > '"+startTime+"' ";
+            hql += " AND  obj.endTime >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.endTime < '"+endTime+"' ";
+            hql += " AND  obj.endTime <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -98,10 +98,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             sql += " AND  app_id='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            sql += " AND  end_time > '"+startTime+"' ";
+            sql += " AND  end_time >= '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            sql += " AND  end_time < '"+endTime+"' ";
+            sql += " AND  end_time <= '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             sql += " AND  type='"+type+"' ";
