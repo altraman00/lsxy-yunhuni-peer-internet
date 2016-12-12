@@ -125,7 +125,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                     ""+AgentState.REG_EXPIRE,""+System.currentTimeMillis(),
                     CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,ExtensionState.Model.ENABLE_TRUE);
             if(logger.isDebugEnabled()){
-                logger.debug("[{}][{}]callid={}排队结果:agent={}",tenantId,appId,callId,agent);
+                logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agent,queue.getId());
             }
             if(StringUtil.isEmpty(agent)){
                 //没有找到可用坐席
@@ -185,13 +185,13 @@ public class EnQueueServiceImpl implements EnQueueService{
                 CallCenterAgent.STATE_IDLE,CallCenterAgent.STATE_FETCHING,
             conditionId==null?"":conditionId,ExtensionState.Model.ENABLE_TRUE);
         if(logger.isDebugEnabled()){
-            logger.info("[{}][{}]坐席找排队结果agent={},queueId={}",tenantId,appId,queueId);
+            logger.debug("[{}][{}]排队结果:agent={}",tenantId,appId,agent);
         }
         if(queueId != null){
             //找到排队，修改排队状态
             CallCenterQueue queue = callCenterQueueService.findById(queueId);
             if(logger.isDebugEnabled()){
-                logger.info("[{}][{}]坐席找排队结果agent={},queue={}",tenantId,appId,queue);
+                logger.debug("[{}][{}]排队结果:agent={},queueid={}",tenantId,appId,agent,queue.getId());
             }
             if(queue != null){
                 try{
