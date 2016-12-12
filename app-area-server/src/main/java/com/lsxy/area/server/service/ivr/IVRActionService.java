@@ -341,6 +341,46 @@ public class IVRActionService {
     }
 
     private void saveIvrSessionCall(String call_id, App app, Tenant tenant, String res_id, String from, String to, String lineId, boolean iscc){
+        try{
+            CallSession callSession = new CallSession();
+            callSession.setStatus(CallSession.STATUS_CALLING);
+            callSession.setFromNum(to);
+            callSession.setToNum(from);
+            callSession.setApp(app);
+            callSession.setTenant(tenant);
+            callSession.setRelevanceId(call_id);
+            callSession.setResId(res_id);
+            callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
+            callSession = callSessionService.save(callSession);
+            businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
+            if(iscc){
+                CallCenter callCenter = new CallCenter();
+                callCenter.setId(call_id);
+                callCenter.setTenantId(tenant.getId());
+                callCenter.setAppId(app.getId());
+                callCenter.setFromNum(from);
+                callCenter.setToNum(to);
+                callCenter.setStartTime(new Date());
+                callCenter.setType(""+CallCenter.CALL_IN);
+                callCenterService.save(callCenter);
+                try{
+                    callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(tenant.getId(),app.getId(),
+                            new Date()).setCallIn(1L).build());
+                }catch (Throwable t){
+                    logger.error("incrIntoRedis失败",t);
+                }
+            }else{
+                VoiceIvr voiceIvr = new VoiceIvr();
+                voiceIvr.setId(call_id);
+                voiceIvr.setFromNum(from);
+                voiceIvr.setToNum(to);
+                voiceIvr.setStartTime(new Date());
+                voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
+                voiceIvrService.save(voiceIvr);
+            }
+        }catch (Throwable t){
+            logger.error("保存callsession失败",t);
+        }
         String areaId = areaAndTelNumSelector.getAreaId(app);
         //保存业务数据，后续事件要用到
         BusinessState state = new BusinessState.Builder()
@@ -358,51 +398,11 @@ public class IVRActionService {
                         //incoming事件from 和 to是相反的
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
-                        .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,iscc ? CallCenterUtil.ISCC_TRUE:null)
+                        .putIfWhere(CallCenterUtil.CALLCENTER_FIELD,iscc,call_id)
+                        .putIfWhere(CallCenterUtil.ISCC_FIELD,iscc,CallCenterUtil.ISCC_TRUE)
                         .build())
                 .build();
         businessStateService.save(state);
-        try{
-            CallSession callSession = new CallSession();
-            callSession.setStatus(CallSession.STATUS_CALLING);
-            callSession.setFromNum(to);
-            callSession.setToNum(from);
-            callSession.setApp(app);
-            callSession.setTenant(tenant);
-            callSession.setRelevanceId(call_id);
-            callSession.setResId(state.getResId());
-            callSession.setType(iscc ? CallSession.TYPE_CALL_CENTER:CallSession.TYPE_VOICE_IVR);
-            callSession = callSessionService.save(callSession);
-            businessStateService.updateInnerField(call_id,BusinessState.SESSIONID,callSession.getId());
-            if(iscc){
-                CallCenter callCenter = new CallCenter();
-                callCenter.setId(call_id);
-                callCenter.setTenantId(state.getTenantId());
-                callCenter.setAppId(state.getAppId());
-                callCenter.setFromNum(from);
-                callCenter.setToNum(to);
-                callCenter.setStartTime(new Date());
-                callCenter.setType(""+CallCenter.CALL_IN);
-                callCenterService.save(callCenter);
-
-                try{
-                    callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics.Builder(state.getTenantId(),state.getAppId(),
-                            new Date()).setCallIn(1L).build());
-                }catch (Throwable t){
-                    logger.error("incrIntoRedis失败",t);
-                }
-            }else{
-                VoiceIvr voiceIvr = new VoiceIvr();
-                voiceIvr.setId(call_id);
-                voiceIvr.setFromNum(from);
-                voiceIvr.setToNum(to);
-                voiceIvr.setStartTime(new Date());
-                voiceIvr.setIvrType(VoiceIvr.IVR_TYPE_INCOMING);
-                voiceIvrService.save(voiceIvr);
-            }
-        }catch (Throwable t){
-            logger.error("保存callsession失败",t);
-        }
     }
 
     public void answer(String res_id,String call_id,String areaId){

@@ -44,6 +44,8 @@ public class CallCenterUtil {
 
     /**交谈发起者的call_id的存放属性**/
     public static final String INITIATOR_FIELD = "CONVERSATION_INITIATOR";
+    /**CALLCENTER ID存放字段**/
+    public static final String CALLCENTER_FIELD = "CALLCENTER_ID";
     /**呼叫所属的交谈的id的存放属性**/
     public static final String CONVERSATION_FIELD = "CONVERSATION_ID";
     /**ivr呼叫是否呼叫中心标记存放的字段**/
@@ -80,6 +82,8 @@ public class CallCenterUtil {
 
     /**记录排队开始时间字段**/
     public static final String ENQUEUE_START_TIME_FIELD = "ENQUEUE_START_TIME_FIELD";
+
+
 
     @Autowired
     private BusinessStateService businessStateService;

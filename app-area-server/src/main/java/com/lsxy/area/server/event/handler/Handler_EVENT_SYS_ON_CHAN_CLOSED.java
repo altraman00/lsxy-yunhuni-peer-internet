@@ -4,6 +4,8 @@ import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
 import com.lsxy.area.server.service.callcenter.ConversationService;
+import com.lsxy.call.center.api.model.CallCenter;
+import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
@@ -46,6 +48,8 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     CalBillingService calBillingService;
     @Autowired
     ConversationService conversationService;
+    @Autowired
+    private CallCenterService callCenterService;
 
     @Override
     public String getEventName() {
@@ -105,6 +109,20 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
             voiceCdr.setIvrType(2);
         }else if(BusinessState.TYPE_IVR_DIAL.equals(businessState.getType())){
             voiceCdr.setIvrType(2);
+        }
+
+        if(productCode == ProductCode.call_center){
+            String callCenterId = conversationService.getCallCenter(businessState);
+            if(callCenterId != null){
+                try{
+                    CallCenter callCenter = callCenterService.findById(callCenterId);
+                    if(callCenter != null && callCenter.getType()!= null){
+                        voiceCdr.setIvrType(Integer.parseInt(callCenter.getType()));
+                    }
+                }catch (Throwable t){
+                    logger.error("设置cdr的呼入呼出类型失败",t);
+                }
+            }
         }
 
         voiceCdr.setType(productCode.name());
