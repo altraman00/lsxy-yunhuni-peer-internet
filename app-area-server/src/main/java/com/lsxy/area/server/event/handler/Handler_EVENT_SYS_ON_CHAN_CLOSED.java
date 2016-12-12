@@ -1,5 +1,6 @@
 package com.lsxy.area.server.event.handler;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.lsxy.area.api.BusinessState;
 import com.lsxy.area.api.BusinessStateService;
 import com.lsxy.area.server.event.EventHandler;
@@ -48,7 +49,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
     CalBillingService calBillingService;
     @Autowired
     ConversationService conversationService;
-    @Autowired
+    @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
 
     @Override
