@@ -36,9 +36,8 @@ public interface CallCenterStatisticsService extends BaseService<CallCenterStati
     /**
      * 往redis中插入实时数据
      * @param callCenterStatistics
-     * @param date
      */
-    void incrIntoRedis(CallCenterStatistics callCenterStatistics,Date date);
+    void incrIntoRedis(CallCenterStatistics callCenterStatistics);
 
     /**
      * 获取当前时间的租户的统计数据
