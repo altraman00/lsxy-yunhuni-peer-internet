@@ -82,10 +82,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             hql +=" and obj.telNumber like '%"+telnum+"%'";
         }
         if(StringUtils.isNotEmpty(type)){
-            if("callin".equals(type)){
-                hql += " AND obj.isDialing=1 ";
-            }else if("callout".equals(type)){
-                hql += " AND (obj.isThrough=1 or obj.isThrough=1 )";
+            if("callin".equals(type)){//可呼入即可被叫
+                hql += " AND obj.isCalled=1 ";
+            }else if("callout".equals(type)){//可呼出即可透传或可主叫
+                hql += " AND (obj.isDialing=1 or obj.isThrough=1 )";
             }
         }
         if(StringUtils.isNotEmpty(areaCode)){
