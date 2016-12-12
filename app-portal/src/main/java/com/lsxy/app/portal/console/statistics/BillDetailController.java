@@ -344,7 +344,7 @@ public class BillDetailController extends AbstractPortalController {
             }
         }else{
             App app = (App)getAppById(request,appId).getData();
-            map.put("serviceType",appList.get(0).getServiceType());
+            map.put("serviceType",app.getServiceType());
         }
         map.put("appId",appId);
         if(StringUtils.isEmpty(time)){
