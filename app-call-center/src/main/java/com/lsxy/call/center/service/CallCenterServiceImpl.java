@@ -32,7 +32,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
 
     @Override
     public Page<CallCenter> pList(Integer pageNo,Integer pageSize,String tenantId, String appId, String startTime, String endTime, String type,String callnum, String agent) {
-        String hql = " FROM CallCenter obj where deleted=0 ";
+        String hql = " FROM CallCenter obj where 1=1 ";
         if(StringUtil.isNotEmpty(tenantId)){
             hql += " AND  obj.tenantId='"+tenantId+"' ";
         }
@@ -40,10 +40,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.startTime='"+startTime+"' ";
+            hql += " AND  obj.endTime > '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.startTime='"+endTime+"' ";
+            hql += " AND  obj.endTime < '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -52,15 +52,16 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND ( obj.fromNum='"+callnum+"' OR obj.toNum='"+callnum+"'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
-            hql += " AND  obj.agent like '%"+agent+"'%";
+            hql += " AND  obj.agent = '"+agent+"'";
         }
-        Page<CallCenter> page = this.pageList(pageNo,pageSize);
+        hql += " order by obj.endTime desc";
+        Page<CallCenter> page = this.pageList(hql,pageNo,pageSize);
         return page;
     }
 
     @Override
     public List<CallCenter> getAllList(String tenantId, String appId, String startTime, String endTime, String type, String callnum, String agent) {
-        String hql = " FROM CallCenter obj where deleted=0 ";
+        String hql = " FROM CallCenter obj where 1=1 ";
         if(StringUtil.isNotEmpty(tenantId)){
             hql += " AND  obj.tenantId='"+tenantId+"' ";
         }
@@ -68,10 +69,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND  obj.appId='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            hql += " AND  obj.startTime='"+startTime+"' ";
+            hql += " AND  obj.endTime > '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            hql += " AND  obj.startTime='"+endTime+"' ";
+            hql += " AND  obj.endTime < '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             hql += " AND  obj.type='"+type+"' ";
@@ -80,8 +81,9 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             hql += " AND ( obj.fromNum='"+callnum+"' OR obj.toNum='"+callnum+"'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
-            hql += " AND  obj.agent like '%"+agent+"'%";
+            hql += " AND  obj.agent = '"+agent+"'";
         }
+        hql += " order by obj.endTime desc";
         List<CallCenter> list = this.list(hql);
         return list;
     }
@@ -96,10 +98,10 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             sql += " AND  app_id='"+appId+"' ";
         }
         if(StringUtil.isNotEmpty(startTime)){
-            sql += " AND  start_time='"+startTime+"' ";
+            sql += " AND  end_time > '"+startTime+"' ";
         }
         if(StringUtil.isNotEmpty(endTime)){
-            sql += " AND  start_time='"+endTime+"' ";
+            sql += " AND  end_time < '"+endTime+"' ";
         }
         if(StringUtil.isNotEmpty(type)){
             sql += " AND  type='"+type+"' ";
@@ -108,7 +110,7 @@ public class CallCenterServiceImpl extends AbstractService<CallCenter> implement
             sql += " AND ( obj.from_num='"+callnum+"' OR obj.to_num='"+callnum+"'  ) ";
         }
         if(StringUtil.isNotEmpty(agent)){
-            sql += " AND  agent like '%"+agent+"'%";
+            sql += " AND  agent = '"+agent+"'";
         }
         Map result = this.jdbcTemplate.queryForMap(sql);
         return result;
