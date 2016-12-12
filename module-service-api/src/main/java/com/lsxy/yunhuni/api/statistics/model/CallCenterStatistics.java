@@ -144,4 +144,66 @@ public class CallCenterStatistics extends IdEntity {
     public void setCallTimeLong(Long callTimeLong) {
         this.callTimeLong = callTimeLong;
     }
+
+    public static class Builder {
+        private String tenantId;
+        private String appId;
+        private Date dt;
+        private Long callIn; //呼入量
+        private Long callInSuccess; //呼入成功量
+        private Long callOut; //呼出量
+        private Long callOutSuccess; //呼出成功量
+        private Long toManualSuccess; //转接成功量
+        private Long queueNum; //排队次数
+        private Long queueDuration; //排队时长
+        private Long callTimeLong;
+        public Builder(String tenantId, String appId, Date dt) {
+            this.tenantId = tenantId;
+            this.appId = appId;
+            this.dt = dt;
+        }
+
+        public Builder setCallIn(Long callIn) {
+            this.callIn = callIn;
+            return this;
+        }
+
+        public Builder setCallInSuccess(Long callInSuccess) {
+            this.callInSuccess = callInSuccess;
+            return this;
+        }
+
+        public Builder setCallOut(Long callOut) {
+            this.callOut = callOut;
+            return this;
+        }
+
+        public Builder setCallOutSuccess(Long callOutSuccess) {
+            this.callOutSuccess = callOutSuccess;
+            return this;
+        }
+
+        public Builder setToManualSuccess(Long toManualSuccess) {
+            this.toManualSuccess = toManualSuccess;
+            return this;
+        }
+
+        public Builder setQueueNum(Long queueNum) {
+            this.queueNum = queueNum;
+            return this;
+        }
+
+        public Builder setQueueDuration(Long queueDuration) {
+            this.queueDuration = queueDuration;
+            return this;
+        }
+
+        public Builder setCallTimeLong(Long callTimeLong) {
+            this.callTimeLong = callTimeLong;
+            return this;
+        }
+        public CallCenterStatistics build(){
+            return new CallCenterStatistics(tenantId,appId,dt,callIn,callInSuccess,callOut,callOutSuccess,toManualSuccess,queueNum,queueDuration,callTimeLong);
+        }
+    }
 }

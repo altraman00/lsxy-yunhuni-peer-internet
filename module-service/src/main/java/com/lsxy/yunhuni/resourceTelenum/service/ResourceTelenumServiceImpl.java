@@ -204,7 +204,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 //判断用户的号码是否合格，合格则放到可用号码列表中
                 if(resIds.size() == 1){
                     ResourceTelenum telnum = this.findById(resIds.get(0));
-                    if(telnum != null && "1".equals(telnum.getUsable())&& ("1".equals(telnum.getIsDialing()) || "1".equals(telnum.getIsThrough()))
+                    if(telnum != null && ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
                             &&telnum.getAreaId() !=null && telnum.getAreaId().equals(app.getArea().getId())){
                         availableNums.add(telnum);
                     }
@@ -212,7 +212,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                     List<ResourceTelenum> findNums = this.findByIds(resIds);
                     if(availableNums != null){
                         for(ResourceTelenum telnum:findNums){
-                            if(telnum != null && "1".equals(telnum.getUsable())&& ("1".equals(telnum.getIsDialing()) || "1".equals(telnum.getIsThrough()))
+                            if(telnum != null && ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
                                     &&telnum.getAreaId() !=null && telnum.getAreaId().equals(app.getArea().getId())){
                                 availableNums.add(telnum);
                             }
@@ -258,7 +258,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 for(ResourceTelenum telnum:telnums){
                     if(telnum != null && telnum.getAppId() != null && telnum.getAppId().equals(app.getId())){
                         // 判断是否是可呼出号码
-                        if("1".equals(telnum.getUsable())&& ("1".equals(telnum.getIsDialing()) || "1".equals(telnum.getIsThrough()))){
+                        if(ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))){
                             availableNum = telnum;
                             break;
                         }
@@ -269,7 +269,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                         if(telnum != null && telnum.getAppId() == null){
                             // 判断是否是同一个区域
                             //判断是否是可呼出号码
-                            if("1".equals(telnum.getUsable())&& ("1".equals(telnum.getIsDialing()) || "1".equals(telnum.getIsThrough()))
+                            if(ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
                                     && telnum.getAreaId().equals(app.getArea().getId())){
                                 availableNum = telnum;
                                 break;
@@ -387,7 +387,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 telnumToLineGateway = new TelnumToLineGateway(resourceTelenum.getTelNumber(), lineGateway.getId(), resourceTelenum.getIsDialing(), resourceTelenum.getIsCalled(),resourceTelenum.getIsThrough(), resourceTelenum.getType());
                 telnumToLineGatewayService.save(telnumToLineGateway);
                 //一条号码有且只有在一条线路上可主叫或者可被叫
-                if("1".equals(telnumToLineGateway.getIsCalled())||"1".equals(telnumToLineGateway.getIsDialing())){
+                if(TelnumToLineGateway.ISCALLED_TRUE.equals(telnumToLineGateway.getIsCalled())||TelnumToLineGateway.ISDIALING_TRUE.equals(telnumToLineGateway.getIsDialing())){
                     //设置归属线路
                     resourceTelenum.setLineId(lineGateway.getId());
                     this.save(resourceTelenum);
@@ -399,7 +399,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);//设置被租用
             this.save(resourceTelenum);
             //判断是否需要添加号码租户的关系
-            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
         }else{
             resourceTelenum.setTenant(null);//没有租户
@@ -426,7 +426,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
             //新建租用关系
-            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
             resourceTelenum.setTenant(tenant);
@@ -448,7 +448,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
             //新建租用关系
-            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源","1",new Date(),ResourcesRent.RENT_STATUS_UNUSED);
+            ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
             resourceTelenum.setTenant(tenant);
