@@ -20,7 +20,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Set;
@@ -138,7 +137,7 @@ public class SignatureAuthFilter extends OncePerRequestFilter{
                 RestToken restToken = (RestToken) successfulAuthentication;
                 tenantId = restToken.getTenantId();
             }
-            getSaveApiLogTask().invokeApiSaveDB(req,appid, payload, contentType, signature,tenantId,certID);
+            getSaveApiLogTask().invokeApiSaveDB(req.getRequestURI(),req.getMethod(),appid, payload, contentType, signature,tenantId,certID);
 
             if(logger.isDebugEnabled()){
                 logger.debug("签名校验完毕,花费{}ms",(System.currentTimeMillis()-start));
