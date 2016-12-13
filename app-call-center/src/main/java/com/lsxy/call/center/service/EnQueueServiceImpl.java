@@ -12,6 +12,8 @@ import com.lsxy.call.center.states.statics.CAs;
 import com.lsxy.call.center.states.statics.CQs;
 import com.lsxy.call.center.utils.Lua;
 import com.lsxy.framework.cache.manager.RedisCacheService;
+import com.lsxy.framework.core.exceptions.api.ChannelNotExistException;
+import com.lsxy.framework.core.exceptions.api.ConditionNotExistException;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.framework.core.utils.StringUtil;
@@ -52,7 +54,7 @@ public class EnQueueServiceImpl implements EnQueueService{
     @Autowired
     private RedisCacheService redisCacheService;
 
-    @Reference(lazy = true,check = false,timeout = 3000)
+    @Reference(lazy = true,check = false,timeout = 30000)
     private DeQueueService deQueueService;
 
     @Autowired
@@ -93,17 +95,30 @@ public class EnQueueServiceImpl implements EnQueueService{
             if(enQueue == null){
                 throw new IllegalArgumentException("enQueue 不能为null");
             }
-            Channel channel = channelService.findOne(tenantId,appId,enQueue.getChannel());
+            Channel channel = channelService.findById(enQueue.getChannel());
             if(channel == null){
-                throw new IllegalArgumentException("通道不存在");
+                throw new ChannelNotExistException();
             }
+            if(!tenantId.equals(channel.getTenantId())){
+                throw new ChannelNotExistException();
+            }
+            if(!appId.equals(channel.getAppId())){
+                throw new ChannelNotExistException();
+            }
+
             String conditionId = enQueue.getRoute().getCondition().getId();
-            Condition condition = conditionService.findOne(tenantId,appId,conditionId);
+            Condition condition = conditionService.findById(conditionId);
             if(condition == null){
-                throw new IllegalArgumentException("条件不存在");
+                throw new ConditionNotExistException();
+            }
+            if(!tenantId.equals(condition.getTenantId())){
+                throw new ConditionNotExistException();
+            }
+            if(!appId.equals(condition.getAppId())){
+                throw new ConditionNotExistException();
             }
             if(!condition.getChannelId().equals(channel.getId())){
-                throw new IllegalArgumentException("条件-通道不匹配");
+                throw new ConditionNotExistException();
             }
             //创建排队记录
             queue = new CallCenterQueue();
@@ -134,7 +149,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 }
                 cQs.add(conditionId,queue.getId());
                 mqService.publish(new EnqueueTimeoutEvent(conditionId,queue.getId(),
-                        tenantId,appId,callId,condition.getQueueTimeout() * 1000));
+                        tenantId,appId,callId,(condition.getQueueTimeout() == null?0:condition.getQueueTimeout()) * 1000));
                 String agent_idle = (String)redisCacheService.eval(Lua.LOOKUPAGENTFORIDLE,3,
                         CAs.getKey(condition.getId()),AgentState.getPrefixed(),
                         ExtensionState.getPrefixed(),

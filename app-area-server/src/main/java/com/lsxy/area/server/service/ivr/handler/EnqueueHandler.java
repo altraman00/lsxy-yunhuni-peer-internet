@@ -35,7 +35,7 @@ public class EnqueueHandler extends ActionHandler{
     @Autowired
     private BusinessStateService businessStateService;
 
-    @Reference(lazy = true,check = false,timeout = 3000)
+    @Reference(lazy = true,check = false,timeout = 30000)
     private EnQueueService enQueueService;
 
     @Reference(lazy = true,check = false,timeout = 3000)
