@@ -100,7 +100,10 @@ public class DeQueueServiceImpl implements DeQueueService {
         businessStateService.updateInnerField(callId,2,
                 CallCenterUtil.CONVERSATION_FIELD,CallCenterUtil.QUEUE_ID_FIELD,conversation,queueId);
 
-        BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
+        BaseEnQueue enQueue = result.getBaseEnQueue();
+        if(enQueue == null){
+            enQueue = conversationService.getEnqueue(queueId);
+        }
         Integer conversationTimeout = enQueue.getConversation_timeout();
         String reserveState = enQueue.getReserve_state();
         boolean playNum = enQueue.isPlay_num();
