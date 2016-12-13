@@ -2,10 +2,9 @@ package com.lsxy.area.server.test;
 
 import com.lsxy.area.server.AreaAndTelNumSelector;
 import com.lsxy.area.server.AreaServerMainClass;
-import com.lsxy.framework.api.tenant.model.Tenant;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.exceptions.api.AppOffLineException;
-import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import org.junit.Test;
@@ -60,7 +59,7 @@ public class SelectorTest {
         AreaAndTelNumSelector.Selector selector = null;
         try {
             selector = areaAndTelNumSelector.getTelnumberAndAreaId(app, "02066304057", "02082241195");
-        } catch (AppOffLineException e) {
+        } catch (YunhuniApiException e) {
             e.printStackTrace();
         }
 //        System.out.println(JSONUtil.objectToJson(selector));
