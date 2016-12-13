@@ -51,10 +51,10 @@ public class QueueBatchInserter extends Thread{
                         logger.info("批量入库size={}",stack.size());
                     }
                     callCenterQueueService.save(stack);
-                    stack.clear();
                     if(logger.isDebugEnabled()){
                         logger.info("批量入库size={},完成",stack.size());
                     }
+                    stack.clear();
                 }
                 if(e == null){
                     try {
