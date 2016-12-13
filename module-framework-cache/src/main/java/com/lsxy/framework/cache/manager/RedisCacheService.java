@@ -1,8 +1,8 @@
 package com.lsxy.framework.cache.manager;
 
 import com.lsxy.framework.cache.exceptions.TransactionExecFailedException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
@@ -35,7 +35,7 @@ public class RedisCacheService {
     //默认超时时间（毫秒）
 //    public static final long DEFAULT_TIME_OUT = 3000;
 
-	private final static Log logger = LogFactory.getLog(RedisCacheService.class);
+	private static final Logger logger = LoggerFactory.getLogger(RedisCacheService.class);
 
 	@Autowired
 	@Qualifier("businessRedisTemplate")
@@ -48,7 +48,15 @@ public class RedisCacheService {
 	}
 
 	private Object eval(final Jedis jedis, final String script,final int keyCount,final String... params){
-		return jedis.eval(script,keyCount,params);
+		long start = 0;
+		if(logger.isDebugEnabled()){
+			start = System.currentTimeMillis();
+		}
+		Object obj = jedis.eval(script,keyCount,params);
+		if(logger.isDebugEnabled()){
+			logger.info("执行redis script耗时={}",(System.currentTimeMillis() - start));
+		}
+		return obj;
 	}
 
 	public Object eval(final String script,final int keyCount,final String... params){
