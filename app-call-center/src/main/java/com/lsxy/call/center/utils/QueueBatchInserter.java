@@ -20,7 +20,7 @@ public class QueueBatchInserter extends Thread{
 
     private static final Logger logger = LoggerFactory.getLogger(QueueBatchInserter.class);
 
-    private LinkedBlockingQueue<CallCenterQueue> queue = new LinkedBlockingQueue<>(5000);
+    private LinkedBlockingQueue<CallCenterQueue> queue = new LinkedBlockingQueue<>(1000);
 
     @Autowired
     private CallCenterQueueService callCenterQueueService;
@@ -47,11 +47,14 @@ public class QueueBatchInserter extends Thread{
                     stack.add(e);
                 }
                 if((e == null && stack.size() > 0) || stack.size() >= 50){
-                    logger.info("批量入库size={}",stack.size());
-                    long start = System.currentTimeMillis();
+                    if(logger.isDebugEnabled()){
+                        logger.info("批量入库size={}",stack.size());
+                    }
                     callCenterQueueService.save(stack);
-                    logger.info("s4={}",(System.currentTimeMillis() - start));
                     stack.clear();
+                    if(logger.isDebugEnabled()){
+                        logger.info("批量入库size={},完成",stack.size());
+                    }
                 }
                 if(e == null){
                     try {

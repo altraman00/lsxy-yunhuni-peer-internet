@@ -92,7 +92,10 @@ public class EnQueueServiceImpl implements EnQueueService{
     }
 
     private void publishTimeoutEvent(Condition condition,String queueId,String callId){
-        long start = System.currentTimeMillis();
+        long start = 0;
+        if(logger.isDebugEnabled()){
+            start = System.currentTimeMillis();
+        }
         mqService.publish(new EnqueueTimeoutEvent(condition.getId(),
                 queueId,
                 condition.getTenantId(),
@@ -100,7 +103,7 @@ public class EnQueueServiceImpl implements EnQueueService{
                 callId,
                 (condition.getQueueTimeout() == null ? 0 : condition.getQueueTimeout()) * 1000));
         if(logger.isDebugEnabled()){
-            logger.debug("s3=发布排队超时事件，耗时={}",(System.currentTimeMillis() - start));
+            logger.debug("发布排队超时事件，耗时={}",(System.currentTimeMillis() - start));
         }
     }
 

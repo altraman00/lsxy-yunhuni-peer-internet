@@ -17,7 +17,7 @@ public class CQSBatchInserter extends Thread{
 
     private static final Logger logger = LoggerFactory.getLogger(CQSBatchInserter.class);
 
-    private LinkedBlockingQueue<Entity> queue = new LinkedBlockingQueue<>(5000);
+    private LinkedBlockingQueue<Entity> queue = new LinkedBlockingQueue<>(1000);
 
     @Autowired
     private CQs cQs;
@@ -47,9 +47,7 @@ public class CQSBatchInserter extends Thread{
                     }
                     continue;
                 }
-                long start = System.currentTimeMillis();
                 cQs.add(e.getConditionId(), e.getQueueId());
-                logger.info("s2={}",(System.currentTimeMillis() - start));
             }catch (Throwable t){
                 logger.error("add CQS失败",t);
             }
