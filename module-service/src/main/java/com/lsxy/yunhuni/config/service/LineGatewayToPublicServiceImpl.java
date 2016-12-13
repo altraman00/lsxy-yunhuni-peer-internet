@@ -137,6 +137,7 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public void removePublic(String id) {
+        int o3 = this.getMaxPriority();
         LineGatewayToPublic lineGatewayToPublic = this.findById(id);
         //删除线路关系
         try {
@@ -151,7 +152,6 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
             lineGatewayService.save(lineGateway);
         }
         //修正优先级
-        int o3 = this.getMaxPriority();
         if(o3!=lineGatewayToPublic.getPriority()){
             int re = upPriority(lineGatewayToPublic.getPriority(),o3,null);
             if(re==-1){
