@@ -1,16 +1,19 @@
 package com.lsxy.framework.rpc.api;
 
+import com.lsxy.framework.core.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+
+import static java.lang.System.currentTimeMillis;
 
 /**
  * Created by tandy on 16/8/2.
  * 用于传输的消息体
  *
  */
-public class RPCMessage {
+public abstract class RPCMessage implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(RPCMessage.class);
     // 会话标识 请求对象和响应对象是匹配的
     private String sessionid;
@@ -33,7 +36,7 @@ public class RPCMessage {
      */
     public void tryWriteMark(){
         tryTimes ++;
-        lastTryTimestamp = System.currentTimeMillis();
+        lastTryTimestamp = currentTimeMillis();
     }
 
     public String getSessionid() {
@@ -138,4 +141,52 @@ public class RPCMessage {
         return result;
     }
 
+
+    /**
+     * 序列化方法
+     * @return
+     */
+    public String getSerializeString(){
+        String result = this.serialize();
+        return result;
+    }
+    /**
+     * 串行化抽象方法
+     * @return
+     */
+    public abstract String serialize();
+
+
+    public static RPCMessage unserialize(String msg){
+        RPCMessage rpcMessage = null;
+        if(StringUtil.isNotEmpty(msg)){
+            if(msg.startsWith("RQ")){
+                rpcMessage = RPCRequest.unserialize(msg);
+            }else if (msg.startsWith("RP")){
+                rpcMessage = RPCResponse.unserialize(msg);
+            }
+        }
+        return rpcMessage;
+    }
+
+//    public static RPCMessage buildFromBase64(String base64){
+//        if(logger.isDebugEnabled()){
+//            logger.debug("序列化RPC MESSAGE:"+base64);
+//        }
+//        long startdt = System.currentTimeMillis();
+//        byte[] bytes = Base64.decodeBase64(base64);
+//        RPCMessage message = null;
+//        try {
+//            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(bytes));
+//            message = (RPCMessage) objectInputStream.readObject();
+//            if(logger.isDebugEnabled()){
+//                logger.debug("反序列化RPC对象耗时：{}ms",System.currentTimeMillis() - startdt);
+//            }
+//
+//            return message;
+//        } catch (Exception e) {
+//            logger.error("RPC序列化异常:"+base64,e);
+//        }
+//        return message;
+//    }
 }

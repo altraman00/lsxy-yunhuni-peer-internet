@@ -1,5 +1,7 @@
 package com.lsxy.framework.rpc.netty.client;
 
+import com.lsxy.framework.rpc.api.RPCMessage;
+import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
@@ -77,9 +79,9 @@ public class NettyClient extends AbstractClient{
 
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-                            long timestamp = Long.parseLong(msg);
+                            RPCMessage rpcMessage = RPCMessage.unserialize(msg);
                             synchronized (logger) {
-                                logger.info("收到消回复消息[" + msg + "]耗时:" + (System.currentTimeMillis() - timestamp) + "ms");
+                                logger.info("收到消回复消息[" + msg + "]耗时:" + (System.currentTimeMillis() - rpcMessage.getTimestamp()) + "ms");
                             }
 
                         }
@@ -153,7 +155,8 @@ public class NettyClient extends AbstractClient{
                 public void run() {
                     while(true){
                         try {
-                            channel.writeAndFlush(System.currentTimeMillis() + "\n").await();
+                            RPCRequest request = RPCRequest.newRequest("MN_CH_TEST_ECHO","value=001");
+                            channel.writeAndFlush(request.serialize() + "\n").await();
                             Thread.currentThread().sleep(10);
                         } catch (Exception ex) {
                             logger.error("RPC 异常",ex);

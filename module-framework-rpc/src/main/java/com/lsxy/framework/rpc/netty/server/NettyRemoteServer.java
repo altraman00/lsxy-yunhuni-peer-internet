@@ -1,5 +1,8 @@
 package com.lsxy.framework.rpc.netty.server;
 
+import com.lsxy.framework.rpc.api.RPCMessage;
+import com.lsxy.framework.rpc.api.RPCRequest;
+import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
@@ -76,13 +79,15 @@ public class NettyRemoteServer implements RemoteServer {
                     channel.pipeline().addLast(new SimpleChannelInboundHandler<String>(){
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+                            RPCMessage rpcMessage = RPCMessage.unserialize(msg);
                             // 收到消息直接打印输出
-                            long timestamp = Long.parseLong(msg);
-                            logger.info("收到消息["+msg+"]耗时:"+(System.currentTimeMillis() - timestamp)+"ms");
+                            logger.info("收到消息["+msg+"]耗时:"+(System.currentTimeMillis() - rpcMessage.getTimestamp())+"ms");
                             String retMsg = System.currentTimeMillis()+"";
                             long sendTime = System.currentTimeMillis();
+                            RPCResponse response = RPCResponse.buildResponse((RPCRequest) rpcMessage);
+                            response.setMessage(RPCResponse.STATE_OK);
                             // 返回客户端消息 - 我已经接收到了你的消息
-                            ctx.writeAndFlush(retMsg+"\n").await();
+                            ctx.writeAndFlush(response.serialize()+"\n").await();
                             logger.info("回复消息:{},耗时:{}ms",retMsg,System.currentTimeMillis()-sendTime);
                         }
                     });
