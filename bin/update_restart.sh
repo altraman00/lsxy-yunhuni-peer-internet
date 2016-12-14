@@ -75,7 +75,7 @@ then
    exit 1;
 fi
 
-export MAVEN_OPTS="$MAVEN_OPTS -Xms1024m -Xmx1024m"
+export MAVEN_OPTS="$MAVEN_OPTS -Xms512m -Xmx512m"
 echo "MAVEN 构建参数：$MAVEN_OPTS"
 #先停止制定的APP服务
 echo "停止现有服务...."
