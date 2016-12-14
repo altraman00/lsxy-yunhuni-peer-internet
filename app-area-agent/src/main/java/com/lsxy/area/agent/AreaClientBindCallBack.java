@@ -38,8 +38,8 @@ public class AreaClientBindCallBack implements ClientBindCallback {
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for(int j = 0;j<count;j++){
-                        String param = "Thread=test-"+k+"&Count="+j;
+                    while(true){
+                        String param = "Thread=test-"+k;
                         RPCRequest rpcRequest = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,param);
                         try {
                             rpcCaller.invoke(sessionContext,rpcRequest);
