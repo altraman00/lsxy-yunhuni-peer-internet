@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,7 +58,7 @@ public class ResourcesRentController extends AbstractRestController {
         //获取该租户下的所有号码信息
         Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(tenant.getId(),pageNo,pageSize);
         List<ResourcesRent> list1 = page.getResult();
-        List<ResourcesRent> list2 = page.getResult();
+        List<ResourcesRent> list2 = new ArrayList<>();
         for(int i = 0; i < list1.size();i ++){
             ResourcesRent rent = list1.get(i);
             ResourceTelenum telenum = rent.getResourceTelenum();
