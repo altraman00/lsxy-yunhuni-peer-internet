@@ -25,8 +25,8 @@ public class AreaClientBindCallBack implements ClientBindCallback {
     @Override
     public void doCallback(Session session) throws Exception {
         logger.info("连接服务器成功，开始进行压测");
-        int threads = 1;
-        int count = 1;
+        int threads = 100;
+        int count = 10000000;
         doTestRequest(threads,count);
     }
 
