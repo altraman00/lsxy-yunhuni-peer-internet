@@ -6,17 +6,21 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.exceptions.MatchMutiEntitiesException;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.framework.web.rest.RestResponse;
+import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by zhangxb on 2016/10/29.
@@ -32,6 +36,8 @@ public class ResourcesRentController extends AbstractRestController {
     ResourceTelenumService resourceTelenumService;
     @Autowired
     TenantService tenantService;
+    @Autowired
+    LineGatewayService lineGatewayService;
     /**
      * 获取租户的呼入号码分页数据
      * @param pageNo
@@ -50,7 +56,18 @@ public class ResourcesRentController extends AbstractRestController {
         }
         //获取该租户下的所有号码信息
         Page<ResourcesRent> page = resourcesRentService.pageListByTenantId(tenant.getId(),pageNo,pageSize);
-        return RestResponse.success(page);
+        List<ResourcesRent> list1 = page.getResult();
+        List<ResourcesRent> list2 = page.getResult();
+        for(int i = 0; i < list1.size();i ++){
+            ResourcesRent rent = list1.get(i);
+            ResourceTelenum telenum = rent.getResourceTelenum();
+            if(telenum !=null && StringUtils.isNotEmpty(telenum.getLineId())){
+                telenum.setLine(lineGatewayService.findById(telenum.getLineId()));
+                rent.setResourceTelenum(telenum);
+            }
+            list2.add(rent);
+        }//long start, long totalSize, int pageSize, List<T> data
+        return RestResponse.success(new Page(page.getStartIndex(),page.getTotalCount(),page.getPageSize(),list2));
     }
 //    @ApiOperation(value = "号码列表")
 //    @RequestMapping(value = "/list/{id}",method = RequestMethod.GET)
