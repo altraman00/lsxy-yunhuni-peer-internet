@@ -118,7 +118,7 @@ public class NettyClient extends AbstractClient{
                 logger.info("客户端连接成功,准备发送注册客户端命令");
 //                session = new NettyClientSession(f.channel(),handler,serverUrl);
 //                f.channel().attr(SESSION_ID).set(session.getId());
-                doTestRequest(100, 1000000000, f.channel());
+                doTestRequest(50, 1000000000, f.channel());
             }
 
 
