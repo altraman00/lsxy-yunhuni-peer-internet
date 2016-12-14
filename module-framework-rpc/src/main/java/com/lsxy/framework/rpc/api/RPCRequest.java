@@ -198,7 +198,7 @@ public class RPCRequest extends  RPCMessage{
 
 	public static RPCRequest unserialize(String str){
 		RPCRequest request = null;
-		if(StringUtil.isNotEmpty(str) && str.matches("RQ:\\w{32}\\s\\d{13}+\\s\\w+\\s[\\w|&|?|%|=|\\u4E00-\\u9FA5]*")){
+		if(StringUtil.isNotEmpty(str) && str.matches("RQ:\\w{32}\\s\\d{13}+\\s\\w+\\s.*")){
 			request = new RPCRequest();
 			String[] parts = str.split(" ");
 			request.setSessionid(parts[0].substring(3));
