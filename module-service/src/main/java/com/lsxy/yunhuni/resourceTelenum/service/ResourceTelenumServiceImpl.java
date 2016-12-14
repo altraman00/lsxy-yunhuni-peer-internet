@@ -8,6 +8,8 @@ import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
@@ -29,6 +31,7 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 全局号码资源service
@@ -49,6 +52,11 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private LineGatewayService lineGatewayService;
+    @Autowired
+    LineGatewayToTenantService lineGatewayToTenantService;
+    @Autowired
+    LineGatewayToPublicService lineGatewayToPublicService;
+
     @Override
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
         return this.resourceTelenumDao;
@@ -76,32 +84,85 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public Page getPageByFreeNumber(Integer pageNo, Integer pageSize, String telnum, String type, String areaCode, String order) {
-        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' and obj.usable=1";
-        if(StringUtils.isNotEmpty(telnum)){
-            hql +=" and obj.telNumber like '%"+telnum+"%'";
+    public Page getFreeNumberPage(String tenantId,Integer pageNo, Integer pageSize, String telNum, String type, String areaCode, String order) {
+        //查找租户私有线路
+        List<LineGateway> lineGateways = lineGatewayToTenantService.findLineGatewayByTenantId(tenantId);
+        if(lineGateways == null || lineGateways.size() == 0){
+            //如果没有私有线路，找公共线路
+            lineGateways = lineGatewayToPublicService.findAllLineGateway();
         }
-        if(StringUtils.isNotEmpty(type)){
-            if("callin".equals(type)){
-                hql += " AND obj.isDialing=1 ";
-            }else if("callout".equals(type)){
-                hql += " AND (obj.isThrough=1 or obj.isThrough=1 )";
-            }
+        if(lineGateways == null || lineGateways.size() == 0){
+            //没有线路，则抛出异常
+            throw new RuntimeException("没有可用线路");
+        }
+        //所拥有的线路ID列表
+        List<String> lineIds = lineGateways.parallelStream().map(LineGateway::getId).collect(Collectors.toList());
+
+        String numSql = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.usable=1 AND tel_number <> :testNum ";
+        if(StringUtils.isNotEmpty(telNum)){
+            numSql += " and num.tel_number = :telNum";
         }
         if(StringUtils.isNotEmpty(areaCode)){
-            hql += " AND obj.areaCode='"+areaCode+"' ";
+            numSql += " AND num.area_code= :areaCode";
         }
+        String ttlSql = "SELECT DISTINCT ttl.tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway ttl WHERE ttl.line_id  IN (:lineIds) AND ttl.deleted = 0 ";
+        if(StringUtils.isNotEmpty(type)){
+            if("callin".equals(type)){
+                ttlSql += " AND ttl.is_dialing=1 ";
+            }else if("callout".equals(type)){
+                ttlSql += " AND (ttl.is_through=1 or ttl.is_through=1 ) ";
+            }
+        }
+        //查询总数
+        String countSql = "SELECT COUNT(1) FROM " +
+                " (" + numSql +") a " +
+                "  INNER JOIN " +
+                "  ( " + ttlSql +") b " +
+                "  ON a.tel_number = b.tel_number ";
+        Query countQuery = getEm().createNativeQuery(countSql);
+        countQuery.setParameter("testNum",testCallNumber);
+        countQuery.setParameter("lineIds",lineIds);
+        if(StringUtils.isNotEmpty(telNum)){
+            countQuery.setParameter("telNum",testCallNumber);
+        }
+        if(StringUtils.isNotEmpty(areaCode)){
+            countQuery.setParameter("areaCode",areaCode);
+        }
+        long total = ((BigInteger) countQuery.getSingleResult()).longValue();
+        if(total == 0){
+            return new Page();
+        }
+
+        //查询分页数据
+        String resultSql = "SELECT * FROM " +
+                " (" + numSql +") a " +
+                "  INNER JOIN " +
+                "  ( " + ttlSql +") b " +
+                "  ON a.tel_number = b.tel_number ";
         if(StringUtils.isNotEmpty(order)){
             if("amount:1".equals(order)){
-                hql += " order by obj.amount desc ";
+                resultSql += " order by a.amount desc ";
             }else if("amount:0".equals(order)){
-                hql += " order by obj.amount ";
+                resultSql += " order by a.amount ";
             }
         }else{
-            hql += " order by obj.createTime desc ";
+            resultSql += " order by a.create_time desc ";
         }
-        Page pgae = this.pageList(hql,pageNo,pageSize);
-        return pgae;
+        Query query = getEm().createNativeQuery(resultSql, ResourceTelenum.class);
+        query.setParameter("testNum",testCallNumber);
+        query.setParameter("lineIds",lineIds);
+        if(StringUtils.isNotEmpty(telNum)){
+            query.setParameter("telNum",testCallNumber);
+        }
+        if(StringUtils.isNotEmpty(areaCode)){
+            query.setParameter("areaCode",areaCode);
+        }
+        int start = (pageNo - 1) * pageSize;
+        query.setMaxResults(pageSize);
+        query.setFirstResult(start);
+        List resultList = query.getResultList();
+
+        return new Page(start,total,pageSize,resultList);
     }
 
     @Override

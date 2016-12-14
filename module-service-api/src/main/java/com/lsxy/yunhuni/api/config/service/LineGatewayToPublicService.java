@@ -16,6 +16,8 @@ public interface LineGatewayToPublicService extends BaseService<LineGatewayToPub
     Page<LineGatewayToPublic> getPage(Integer pageNo, Integer pageSize, String operator, String isThrough, String status, String isPublicLine, String order);
 
     List<LineGateway> findAllLineGatewayByAreaId(String areaId);
+    List<LineGateway> findAllLineGateway();
+
     void deleteLine(String line);
 
     /**
@@ -28,4 +30,5 @@ public interface LineGatewayToPublicService extends BaseService<LineGatewayToPub
     void removePublic(String id);
 
     int upPriority(int o1,int o2,String line);
+
 }

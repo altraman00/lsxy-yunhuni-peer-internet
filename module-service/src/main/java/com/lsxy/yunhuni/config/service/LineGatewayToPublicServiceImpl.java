@@ -100,8 +100,20 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
 
     @Override
     public List<LineGateway> findAllLineGatewayByAreaId(String areaId) {
-        List<LineGateway> lineGateways = new ArrayList<>();
         List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaId(areaId);
+        List<LineGateway> lineGateways = getLineGateways(ltps);
+        return lineGateways;
+    }
+
+    @Override
+    public List<LineGateway> findAllLineGateway() {
+        Iterable<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findAll();
+        List<LineGateway> lineGateways = getLineGateways(ltps);
+        return lineGateways;
+    }
+
+    private List<LineGateway> getLineGateways(Iterable<LineGatewayToPublic> ltps) {
+        List<LineGateway> lineGateways = new ArrayList<>();
         for (LineGatewayToPublic ltp:ltps){
             LineGateway lineGateway = ltp.getLineGateway();
             //TODO 判断线路是否可用

@@ -18,6 +18,9 @@ public interface LineGatewayToTenantService extends BaseService<LineGatewayToTen
      * @return
      */
     List<LineGateway> findByTenantIdAndAreaId(String tenantId,String areaId);
+
+    List<LineGateway> findLineGatewayByTenantId(String tenantId);
+
     Page<LineGatewayToTenant> getPage(String tenantId,Integer pageNo, Integer pageSize);
     long findByLineIdAndTenantId(String lineId,String tenantId);
     int getMaxPriority(String tenantId);
@@ -29,4 +32,5 @@ public interface LineGatewayToTenantService extends BaseService<LineGatewayToTen
      * 移除私有线路
      */
     void removeTenantLine(String id,String tenantId);
+
 }
