@@ -123,7 +123,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         countQuery.setParameter("testNum",testCallNumber);
         countQuery.setParameter("lineIds",lineIds);
         if(StringUtils.isNotEmpty(telNum)){
-            countQuery.setParameter("telNum",testCallNumber);
+            countQuery.setParameter("telNum",telNum);
         }
         if(StringUtils.isNotEmpty(areaCode)){
             countQuery.setParameter("areaCode",areaCode);
@@ -152,7 +152,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         query.setParameter("testNum",testCallNumber);
         query.setParameter("lineIds",lineIds);
         if(StringUtils.isNotEmpty(telNum)){
-            query.setParameter("telNum",testCallNumber);
+            query.setParameter("telNum",telNum);
         }
         if(StringUtils.isNotEmpty(areaCode)){
             query.setParameter("areaCode",areaCode);
