@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -45,7 +46,7 @@ public abstract class AbstractClient implements Client{
 
     @Override
     public void bind() {
-//        executorService = Executors.newFixedThreadPool(serverUrls.length);
+        executorService = Executors.newFixedThreadPool(serverUrls.length);
         for (String serverUrl:serverUrls) {
             ServerDeamonTask task = new ServerDeamonTask(serverUrl,this.areaid);
             //刚刚开始就执行一次绑定
@@ -64,7 +65,7 @@ public abstract class AbstractClient implements Client{
             } catch (ClientBindException e) {
                 logger.error("客户端连接失败:{}   {}",serverUrl,e.getMessage());
             }
-//            executorService.submit(task);
+            executorService.submit(task);
         }
     }
 

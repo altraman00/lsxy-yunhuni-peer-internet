@@ -5,15 +5,17 @@ import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.handler.RpcRequestHandler;
 import com.lsxy.framework.rpc.api.session.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import static com.lsxy.utils.MyInterceptorClassName.logger;
 
 /**
  * Created by liuws on 2016/8/29.
  */
 @Component
 public class Handler_MN_CH_TEST_ECHO extends RpcRequestHandler{
+
+    private static final Logger logger = LoggerFactory.getLogger(Handler_MN_CH_TEST_ECHO.class);
 
     @Override
     public String getEventName() {
@@ -30,5 +32,9 @@ public class Handler_MN_CH_TEST_ECHO extends RpcRequestHandler{
         response.setTimestamp(request.getTimestamp());
         response.setMessage(RPCResponse.STATE_OK);
         return response;
+    }
+
+    public static void main(String[] args) {
+
     }
 }
