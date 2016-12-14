@@ -35,15 +35,16 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
     }
 
     @ChannelHandler.Sharable
-    class IOHandler extends SimpleChannelInboundHandler<RPCMessage>{
+    class IOHandler extends SimpleChannelInboundHandler<String>{
 
         private final Logger logger = LoggerFactory.getLogger(IOHandler.class);
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, RPCMessage msg) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+            RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
-                logger.debug("收到消息:{}" ,msg);
+                logger.info("收到消息[" + msg + "]耗时:" + (System.currentTimeMillis() - rpcMessage.getTimestamp()) + "ms");
             }
-            process(ctx, msg);
+            process(ctx, rpcMessage);
         }
 
         @Override

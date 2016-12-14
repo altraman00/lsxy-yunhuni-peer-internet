@@ -1,6 +1,5 @@
 package com.lsxy.framework.rpc.netty.client;
 
-import com.lsxy.framework.rpc.api.RPCMessage;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
 import com.lsxy.framework.rpc.api.session.Session;
@@ -75,17 +74,7 @@ public class NettyClient extends AbstractClient{
                     pipeline.addLast("decoder", new StringDecoder());
                     pipeline.addLast("encoder", new StringEncoder());
 
-                    ch.pipeline().addLast(new SimpleChannelInboundHandler<String>(){
-
-                        @Override
-                        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-                            RPCMessage rpcMessage = RPCMessage.unserialize(msg);
-                            synchronized (logger) {
-                                logger.info("收到消回复消息[" + msg + "]耗时:" + (System.currentTimeMillis() - rpcMessage.getTimestamp()) + "ms");
-                            }
-
-                        }
-                    });
+                    ch.pipeline().addLast(handler.getIoHandler());
                 }
             });
 
