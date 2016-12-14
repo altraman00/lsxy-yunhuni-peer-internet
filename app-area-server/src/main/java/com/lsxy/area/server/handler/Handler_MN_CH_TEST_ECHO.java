@@ -34,7 +34,4 @@ public class Handler_MN_CH_TEST_ECHO extends RpcRequestHandler{
         return response;
     }
 
-    public static void main(String[] args) {
-
-    }
 }
