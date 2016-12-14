@@ -33,7 +33,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private SimpleChannelInboundHandler<RPCMessage> ioHandler = new IOHandle();
+    private SimpleChannelInboundHandler<String> ioHandler = new IOHandle();
 
     private AttributeKey<String> SESSION_ID = AttributeKey.valueOf("sessionid");
 
@@ -50,13 +50,14 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
 
 
     @ChannelHandler.Sharable
-    class IOHandle extends SimpleChannelInboundHandler<RPCMessage>{
+    class IOHandle extends SimpleChannelInboundHandler<String>{
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, RPCMessage message) throws Exception {
+        protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+            RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
-                logger.debug("收到消息:" + message);
+                logger.debug("收到消息["+msg+"]耗时:"+(System.currentTimeMillis() - rpcMessage.getTimestamp())+"ms");
             }
-            process(ctx, message);
+            process(ctx, rpcMessage);
 
 //
 //            if(message instanceof RPCRequest){
@@ -180,7 +181,7 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
         return session;
     }
 
-    public SimpleChannelInboundHandler<RPCMessage> getIoHandler() {
+    public SimpleChannelInboundHandler<String> getIoHandler() {
         return ioHandler;
     }
 }
