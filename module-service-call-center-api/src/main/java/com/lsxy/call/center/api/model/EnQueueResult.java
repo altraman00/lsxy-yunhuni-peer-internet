@@ -12,6 +12,7 @@ public class EnQueueResult implements Serializable {
 
     private AppExtension extension;
     private CallCenterAgent agent;
+    private BaseEnQueue baseEnQueue;
 
     public CallCenterAgent getAgent() {
         return agent;
@@ -27,6 +28,14 @@ public class EnQueueResult implements Serializable {
 
     public void setExtension(AppExtension extension) {
         this.extension = extension;
+    }
+
+    public BaseEnQueue getBaseEnQueue() {
+        return baseEnQueue;
+    }
+
+    public void setBaseEnQueue(BaseEnQueue baseEnQueue) {
+        this.baseEnQueue = baseEnQueue;
     }
 
     @Override

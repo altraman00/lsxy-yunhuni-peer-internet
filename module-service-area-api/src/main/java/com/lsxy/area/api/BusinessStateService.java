@@ -20,6 +20,8 @@ public interface BusinessStateService {
 
     public void updateInnerField(String id,String field,String value);
 
+    public void updateInnerField(String id,int keycount,String... params);
+
     public void deleteInnerField(String id,String field);
 
     public void delete(String id);

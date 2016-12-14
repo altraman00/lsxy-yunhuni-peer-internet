@@ -26,7 +26,7 @@ public class IVRCallInputDTO extends CommonDTO{
     @NotNull
     @Min(1)
     @Max(60 * 60 * 6)
-    private Integer maxCallDuration;//最大会议时间（秒）
+    private Integer maxCallDuration;//最大通话时间（秒）
 
     @JsonProperty("max_dial_duration")
     @Min(1)

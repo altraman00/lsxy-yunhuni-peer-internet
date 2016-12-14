@@ -33,6 +33,8 @@ import com.lsxy.framework.rpc.exceptions.InvalidParamException;
 import com.lsxy.yunhuni.api.app.service.AppService;
 import com.lsxy.yunhuni.api.session.service.CallSessionService;
 import com.lsxy.yunhuni.api.session.service.VoiceIvrService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -100,6 +102,9 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
 
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterService callCenterService;
+
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
 
     @Override
     public String getEventName() {
@@ -323,6 +328,16 @@ public class Handler_EVENT_SYS_CALL_ON_DIAL_COMPLETED extends EventHandler{
                         }catch (Throwable t){
                             logger.error("更新CallCenter失败",t);
                         }
+
+                        try{
+                            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                                    .setToManualSuccess(1L)
+                                    .build());
+                        }catch (Throwable t){
+                            logger.error("incrIntoRedis失败",t);
+                        }
+
                         //交谈开始事件
                         callCenterUtil.conversationBeginEvent(state.getCallBackUrl(),conversation_id,
                                 CallCenterUtil.CONVERSATION_TYPE_QUEUE,queueId,
