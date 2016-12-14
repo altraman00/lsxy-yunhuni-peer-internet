@@ -25,8 +25,8 @@ public class AreaClientBindCallBack implements ClientBindCallback {
     @Override
     public void doCallback(Session session) throws Exception {
         logger.info("连接服务器成功，开始进行压测");
-        int threads = 50;
-        int count = 1000;
+        int threads = 1;
+        int count = 1;
         doTestRequest(threads,count);
     }
 
@@ -38,8 +38,8 @@ public class AreaClientBindCallBack implements ClientBindCallback {
             Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while(true){
-                        String param = "Thread=test-"+k;
+                    for(int j = 0;j<count;j++){
+                        String param = "Thread=test-"+k+"&Count="+j;
                         RPCRequest rpcRequest = RPCRequest.newRequest(ServiceConstants.MN_CH_TEST_ECHO,param);
                         try {
                             rpcCaller.invoke(sessionContext,rpcRequest);

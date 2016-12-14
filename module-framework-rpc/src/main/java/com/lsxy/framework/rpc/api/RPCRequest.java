@@ -214,7 +214,7 @@ public class RPCRequest extends  RPCMessage{
 	public static void main(String[] args) {
 		String value = "RQ:12341234123412341234123412341234 1481705348021 SDFSDFSDF_SDFSDF value1=哈哈哈";
 //		Pattern pt = Pattern.compile("RQ:\\w[32]\\s\\w+\\s.*");
-		System.out.println(value.matches("RQ:\\w{32}\\s\\d{13}+\\s\\w+\\s[\\w|&|?|%|=|\\u4E00-\\u9FA5]*"));
+		System.out.println(value.matches("RQ:\\w{32}\\s\\d{13}+\\s\\w+\\s.*"));
 		String[] parts = value.split(" ");
 		String sessionid = parts[0].substring(3);
 		String timestamp = parts[1];
