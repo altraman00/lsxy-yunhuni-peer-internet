@@ -40,6 +40,9 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
         private final Logger logger = LoggerFactory.getLogger(IOHandler.class);
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+            if(logger.isDebugEnabled()){
+                logger.debug("收到消息:{}",msg);
+            }
             RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
                 logger.info("收到消息[" + msg + "]耗时:" + (System.currentTimeMillis() - rpcMessage.getTimestamp()) + "ms");
