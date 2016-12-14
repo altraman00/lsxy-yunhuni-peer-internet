@@ -98,8 +98,11 @@ public class DeQueueServiceImpl implements DeQueueService {
             throw new IllegalStateException("会话已关闭");
         }
         String conversation = UUIDGenerator.uuid();
+
+        //停止播放排队等待音
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
 
+        //更新排队的call的所属交谈id和排队id
         businessStateService.updateInnerField(callId,
                 CallCenterUtil.CONVERSATION_FIELD,conversation,CallCenterUtil.QUEUE_ID_FIELD,queueId);
 
@@ -109,19 +112,24 @@ public class DeQueueServiceImpl implements DeQueueService {
         }
         Integer conversationTimeout = enQueue.getConversation_timeout();
 
+        //开始呼叫坐席
         String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
                 result.getAgent().getName(),result.getExtension().getId(),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
+        //开始创建交谈
         conversationService.create(conversation,state.getId(),state.getTenantId(),
                 state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
 
+        //设置坐席的businessstate
         setAgentState(agentCallId,enQueue,result);
 
+        //更新排队结果
         updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
 
         try{
+            //更新呼叫中心统计数据
             callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
                     .Builder(state.getTenantId(),state.getAppId(),new Date())
                     .setQueueNum(1L)
