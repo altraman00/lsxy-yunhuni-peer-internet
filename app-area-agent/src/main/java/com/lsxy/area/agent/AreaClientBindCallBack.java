@@ -55,7 +55,7 @@ public class AreaClientBindCallBack implements ClientBindCallback {
                 try {
                     RPCRequest request = RPCRequest.newRequest("MN_CH_TEST_ECHO","t="+tNo+"&c="+(++j));
                     session.write(request);
-                    Thread.currentThread().sleep(1);
+                    Thread.currentThread().sleep(5);
                 } catch (Exception ex) {
                     logger.error("RPC 异常",ex);
                 }
