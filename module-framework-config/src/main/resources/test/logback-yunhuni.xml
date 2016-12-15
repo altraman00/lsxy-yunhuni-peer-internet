@@ -70,8 +70,8 @@
     </appender>
 
 
-    <root level="ERROR">
-        <appender-ref ref="ASYNC_STDOUT" />
+    <root level="ERROR">√
+        <!--<appender-ref ref="ASYNC_STDOUT" />-->
         <!--<appender-ref ref="gelf" />-->
         <!--<appender-ref ref="ROLLINGFILE"/>-->
     </root>
