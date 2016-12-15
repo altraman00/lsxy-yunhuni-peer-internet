@@ -19,6 +19,13 @@
         </encoder>
     </appender>
 
+    <appender name="SYNC_ROLLING_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STDOUT"/>
+        <queueSize>1024</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+
     <!-- 按照每天生成日志文件 -->
     <appender name="ROLLINGFILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
         <Prudent>true</Prudent>
@@ -65,8 +72,8 @@
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="gelf" />
-        <appender-ref ref="ROLLINGFILE"/>
+        <!--<appender-ref ref="gelf" />-->
+        <!--<appender-ref ref="ROLLINGFILE"/>-->
     </root>
 
 
