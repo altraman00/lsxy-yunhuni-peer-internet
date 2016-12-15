@@ -1,8 +1,7 @@
 package com.lsxy.framework.rpc.netty;
 
-import com.lsxy.framework.rpc.api.RPCHandler;
 import com.lsxy.framework.rpc.api.AbstractSession;
-import com.lsxy.framework.rpc.api.RPCMessage;
+import com.lsxy.framework.rpc.api.RPCHandler;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOutboundBuffer;
@@ -39,7 +38,7 @@ public abstract class NettySession extends AbstractSession {
             int bufferSize = ob.size();
             long totalPendingWriteBytes = ob.totalPendingWriteBytes();
             if(logger.isDebugEnabled()){
-                logger.debug("write msg ["+ ((RPCMessage)object).getSessionid()+"] outbound buffer params nioBufferCount={},nioBufferSize={},bufferSize={},totalPendingWriteBytes={}",nioBufferCount,nioBufferSize,bufferSize,totalPendingWriteBytes);
+                logger.debug("write msg ["+ object+"] outbound buffer params nioBufferCount={},nioBufferSize={},bufferSize={},totalPendingWriteBytes={}",nioBufferCount,nioBufferSize,bufferSize,totalPendingWriteBytes);
             }
         }
         //在此做限流控制，默认 ChannelOutboundBuffer  默认高水位是64K，低水位是32K
