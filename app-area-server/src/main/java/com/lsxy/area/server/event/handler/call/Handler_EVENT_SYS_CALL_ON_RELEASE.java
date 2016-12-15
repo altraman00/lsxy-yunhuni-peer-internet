@@ -102,7 +102,9 @@ public class Handler_EVENT_SYS_CALL_ON_RELEASE extends EventHandler{
         String call_id = (String)params.get("user_data");
 
         if(StringUtils.isBlank(call_id)){
-            throw new InvalidParamException("call_id is null");
+            //throw new InvalidParamException("call_id is null");
+            logger.info("call_id is null");
+            return null;
         }
 
         BusinessState state = businessStateService.get(call_id);
