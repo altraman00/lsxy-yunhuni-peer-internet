@@ -29,7 +29,12 @@ public abstract class NettySession extends AbstractSession {
 
     @Override
     public void concreteWrite(Object object) throws SessionWriteException {
-        channel.writeAndFlush(object);
+        //在此做限流控制，默认 ChannelOutboundBuffer  默认高水位是64K，低水位是32K
+        if(channel.isWritable()) {
+            channel.writeAndFlush(object);
+        }else{
+            throw new SessionWriteException("并发量过大，消息被丢弃："+object);
+        }
     }
 
     @Override

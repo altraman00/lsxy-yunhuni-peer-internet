@@ -62,7 +62,8 @@ public class NettyClientHandler extends AbstractClientRPCHandler {
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            logger.error("出现了异常:{}",cause);
+            cause.printStackTrace();
+            logger.error("出现了异常:",cause);
         }
     }
 

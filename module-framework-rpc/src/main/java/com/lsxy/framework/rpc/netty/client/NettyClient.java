@@ -54,7 +54,7 @@ public class NettyClient extends AbstractClient{
         Session session = null;
         String host = getHost(serverUrl);
         int port = getPort(serverUrl);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(500);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
             Bootstrap b = new Bootstrap(); // (1)
@@ -62,6 +62,8 @@ public class NettyClient extends AbstractClient{
             b.group(workerGroup); // (2)
             b.channel(NioSocketChannel.class); // (3)
             b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+            //设置outbindbuffer的高低水位，可根据需要调整
+            b.option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(32 * 1024, 64 * 1024));
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
