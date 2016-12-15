@@ -46,11 +46,9 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
         Commander cticlient = cticlientContext.getAvalibleClient();
         if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
+            return null;
         }
         try {
             Map<String, Object> params = request.getParamMap();
@@ -73,7 +71,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_ON_START,e);
+                        logger.error("CTI发送事件"+Constants.EVENT_SYS_CALL_ON_START+"失败",e);
                     }
                 }
 
@@ -88,7 +86,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_FAIL,e);
+                        logger.error("CTI发送事件"+Constants.EVENT_SYS_CALL_ON_FAIL+"失败",e);
                     }
                 }
 
@@ -103,15 +101,13 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_TIMEOUT,e);
+                        logger.error("CTI发送事件["+Constants.EVENT_SYS_CALL_ON_TIMEOUT+"]失败",e);
                     }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
         } catch (IOException e) {
-            logger.error("创建资源失败",e);
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
+            logger.error("创建资源失败:"+request,e);
         }
-        return response;
+        return null;
     }
 }
