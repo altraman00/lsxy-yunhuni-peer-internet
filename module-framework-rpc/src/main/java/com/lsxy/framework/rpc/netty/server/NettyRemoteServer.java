@@ -43,7 +43,7 @@ public class NettyRemoteServer implements RemoteServer {
             logger.debug("开始启动区域管理服务器....");
         }
         EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup(500);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup);

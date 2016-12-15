@@ -1,6 +1,5 @@
 package com.lsxy.framework.rpc.netty.client;
 
-import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
 import com.lsxy.framework.rpc.api.session.Session;
 import com.lsxy.framework.rpc.api.session.SessionContext;
@@ -133,31 +132,6 @@ public class NettyClient extends AbstractClient{
     private String getHost(String serverUrl) {
         assert serverUrl!=null;
         return serverUrl.substring(0, serverUrl.indexOf(":"));
-    }
-
-
-
-    public void doTestRequest(int threads,int count,Channel channel){
-
-        for(int i=0;i<threads ; i++){
-            final int k = i;
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(true){
-                        try {
-                            RPCRequest request = RPCRequest.newRequest("MN_CH_TEST_ECHO","value=001");
-                            channel.writeAndFlush(request.serialize() + "\n").await();
-                            Thread.currentThread().sleep(10);
-                        } catch (Exception ex) {
-                            logger.error("RPC 异常",ex);
-                        }
-                    }
-                }
-            });
-            t.setName("test-"+i);
-            t.start();
-        }
     }
 
 

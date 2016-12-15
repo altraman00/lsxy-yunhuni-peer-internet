@@ -53,45 +53,14 @@ public class NettyServerHandler extends AbstractServerRPCHandler {
     class IOHandle extends SimpleChannelInboundHandler<String>{
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-            if(logger.isDebugEnabled()){
-                logger.debug("收到消息：{}",msg);
-            }
+//            if(logger.isDebugEnabled()){
+//                logger.debug("收到消息：{}",msg);
+//            }
             RPCMessage rpcMessage = RPCMessage.unserialize(msg);
             if(logger.isDebugEnabled()){
                 logger.debug("收到消息["+msg+"]耗时:"+(System.currentTimeMillis() - rpcMessage.getTimestamp())+"ms");
             }
             process(ctx, rpcMessage);
-
-//
-//            if(message instanceof RPCRequest){
-//                RPCRequest request = (RPCRequest) message;
-//                RPCResponse response = null;
-//                if(request.getName().equals(ServiceConstants.CH_MN_CONNECT)){
-//                    response = doConnect(iosession,request);
-//                }else{
-//                    Session session = remoteServer.getSessionContext().getSessionInTheContextObject(iosession.hashCode());
-//                    response = serviceHandler.handleService(request,session);
-//                }
-//
-//                logger.debug("<<"+request);
-//                if(response!=null){
-//                    logger.debug(">>"+response);
-//                    iosession.write(response);
-//                }
-//            }
-//            if(message instanceof RPCResponse){
-//                RPCResponse response = (RPCResponse) message;
-//                logger.debug(">>[NM]"+response);
-//                RequestListener rl = requestListeners.get(response.getSessionid());
-//                if(rl != null){
-//                    rl.recivedResponse(response);
-//                    removeRequestListener(rl);
-//                }else{
-//                    logger.debug("收到响应【"+response.getSessionid()+"】");
-//                    remoteServer.getRpcCaller().putResponse(response);
-//                }
-//
-//            }
         }
         @Override
         public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
