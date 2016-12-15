@@ -35,22 +35,31 @@ public class AreaClientBindCallBack implements ClientBindCallback {
 
         for(int i=0;i<threads ; i++){
             final int k = i;
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(true){
-                        try {
-                            RPCRequest request = RPCRequest.newRequest("MN_CH_TEST_ECHO","value=001");
-                            session.write(request);
-                            Thread.currentThread().sleep(10);
-                        } catch (Exception ex) {
-                            logger.error("RPC 异常",ex);
-                        }
-                    }
-                }
-            });
+            Thread t = new Thread(new RunTask(i,session));
             t.setName("test-"+i);
             t.start();
+        }
+    }
+
+    class RunTask implements Runnable{
+        private int tNo;
+        private Session session;
+        public RunTask(int t,Session session){
+            this.tNo = t;
+            this.session = session;
+        }
+        @Override
+        public void run() {
+            int j = 0;
+            while(true){
+                try {
+                    RPCRequest request = RPCRequest.newRequest("MN_CH_TEST_ECHO","t="+tNo+"&c="+(++j));
+                    session.write(request);
+                    Thread.currentThread().sleep(10);
+                } catch (Exception ex) {
+                    logger.error("RPC 异常",ex);
+                }
+            }
         }
     }
 
