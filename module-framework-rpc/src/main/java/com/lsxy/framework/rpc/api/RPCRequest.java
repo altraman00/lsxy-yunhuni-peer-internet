@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 
 /**
@@ -20,13 +21,18 @@ public class RPCRequest extends  RPCMessage{
 	private static final String EQ_ENCODE = "%3D";
 	private static final String AND_ENCODE = "%26";
 
+	private final static Pattern eq_pattern = Pattern.compile(EQ);
+	private final static Pattern and_pattern = Pattern.compile(AND);
+	private final static Pattern eqencode_pattern = Pattern.compile(EQ_ENCODE);
+	private final static Pattern andencode_pattern = Pattern.compile(AND_ENCODE);
+
 	private String name;		//RQ
 	private String param;		//PM
 
-	
+
 	private Map<String,Object> paramMap;		//参数解析后放入map中以方便调用
-	
-	
+
+
 	public String getParam() {
 		return param;
 	}
@@ -44,7 +50,7 @@ public class RPCRequest extends  RPCMessage{
 		String sBody = this.getBodyAsString();
 		return "R["+this.getSessionid()+"]["+ this.getTimestamp()+"]["+this.name+"]["+this.tryTimes+"]["+this.lastTryTimestamp+"]>>PM:" + this.param+">>SESSIONID:"+this.getSessionid() + ">>BODY:"+sBody;
 	}
-	
+
 	/**
 	 * 解析
 	 */
@@ -101,9 +107,9 @@ public class RPCRequest extends  RPCMessage{
 	 * 		@see ServiceConstants 请求名称
 	 * @param params
 	 * 		参数使用url参数方案  param01=001&param002=002
-     * @return
+	 * @return
 	 * 			返回请求对象
-     */
+	 */
 	public static RPCRequest newRequest(String name,String params) {
 		RPCRequest request = new RPCRequest();
 		request.setSessionid(UUIDGenerator.uuid());
@@ -144,15 +150,30 @@ public class RPCRequest extends  RPCMessage{
 	 * 将=转化为%3D
 	 * &转为%26
 	 * @return
-     */
+	 */
 	public static String encode(String value){
-		return value.replaceAll(EQ,EQ_ENCODE).replaceAll(AND,AND_ENCODE);
+		if(value == null){
+			return null;
+		}
+		if(value.indexOf(EQ) > -1){
+			value = eq_pattern.matcher(value).replaceAll(EQ_ENCODE);
+		}
+		if(value.indexOf(AND) > -1){
+			value = and_pattern.matcher(value).replaceAll(AND_ENCODE);
+		}
+		return value;
 	}
 
 	public static String decode(String value){
 		if(value == null){
 			return null;
 		}
-		return value.replaceAll(EQ_ENCODE,EQ).replaceAll(AND_ENCODE,AND);
+		if(value.indexOf(EQ_ENCODE) > -1){
+			value = eqencode_pattern.matcher(value).replaceAll(EQ);
+		}
+		if(value.indexOf(AND_ENCODE) > -1){
+			value = andencode_pattern.matcher(value).replaceAll(AND);
+		}
+		return value;
 	}
 }

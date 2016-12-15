@@ -22,6 +22,7 @@ import org.dom4j.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -34,7 +35,7 @@ public class EnqueueHandler extends ActionHandler{
     @Autowired
     private BusinessStateService businessStateService;
 
-    @Reference(lazy = true,check = false,timeout = 3000)
+    @Reference(lazy = true,check = false,timeout = 30000)
     private EnQueueService enQueueService;
 
     @Reference(lazy = true,check = false,timeout = 3000)
@@ -88,9 +89,13 @@ public class EnqueueHandler extends ActionHandler{
                 }
             }
         }
-        businessStateService.updateInnerField(callId,CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel());
-        businessStateService.updateInnerField(callId,CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId());
-        businessStateService.updateInnerField(callId, IVRActionService.IVR_NEXT_FIELD,next);
+
+        businessStateService.updateInnerField(callId,
+                CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
+                CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
+                CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
+                IVRActionService.IVR_NEXT_FIELD,next);
+
         try {
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);
         }catch (Throwable t){

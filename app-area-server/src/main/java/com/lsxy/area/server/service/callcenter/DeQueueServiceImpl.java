@@ -13,18 +13,23 @@ import com.lsxy.call.center.api.model.EnQueueResult;
 import com.lsxy.call.center.api.service.CallCenterQueueService;
 import com.lsxy.call.center.api.service.DeQueueService;
 import com.lsxy.framework.core.utils.MapBuilder;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.core.utils.UUIDGenerator;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.ServiceConstants;
 import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.statistics.model.CallCenterStatistics;
+import com.lsxy.yunhuni.api.statistics.service.CallCenterStatisticsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,6 +68,9 @@ public class DeQueueServiceImpl implements DeQueueService {
     @Reference(lazy = true,check = false,timeout = 3000)
     private CallCenterQueueService callCenterQueueService;
 
+    @Autowired
+    private CallCenterStatisticsService callCenterStatisticsService;
+
     /**
      * 创建交谈，然后呼叫坐席。
      * 交谈创建成功事件邀请排队的客户到交谈
@@ -90,41 +98,48 @@ public class DeQueueServiceImpl implements DeQueueService {
             throw new IllegalStateException("会话已关闭");
         }
         String conversation = UUIDGenerator.uuid();
+
+        //停止播放排队等待音
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
-        businessStateService.updateInnerField(callId,CallCenterUtil.CONVERSATION_FIELD,conversation);
-        businessStateService.updateInnerField(callId,CallCenterUtil.QUEUE_ID_FIELD,queueId);
 
-        BaseEnQueue enQueue = conversationService.getEnqueue(queueId);
+        //更新排队的call的所属交谈id和排队id
+        businessStateService.updateInnerField(callId,
+                CallCenterUtil.CONVERSATION_FIELD,conversation,CallCenterUtil.QUEUE_ID_FIELD,queueId);
+
+        BaseEnQueue enQueue = result.getBaseEnQueue();
+        if(enQueue == null){
+            enQueue = conversationService.getEnqueue(queueId);
+        }
         Integer conversationTimeout = enQueue.getConversation_timeout();
-        String reserveState = enQueue.getReserve_state();
-        boolean playNum = enQueue.isPlay_num();
-        String preNumVoice = enQueue.getPre_num_voice();
-        String postNumVoice = enQueue.getPost_num_voice();
 
+        //开始呼叫坐席
         String agentCallId = conversationService.inviteAgent(appId,conversation,result.getAgent().getId(),
                 result.getAgent().getName(),result.getExtension().getId(),
                 result.getExtension().getTelnum(),result.getExtension().getType(),
                 result.getExtension().getUser(),conversationTimeout,45);
 
+        //开始创建交谈
         conversationService.create(conversation,state.getId(),state.getTenantId(),
                 state.getAppId(),state.getAreaId(),state.getCallBackUrl(),conversationTimeout);
 
+        //设置坐席的businessstate
+        setAgentState(agentCallId,enQueue,result);
 
-        if(reserveState != null){
-            businessStateService.updateInnerField(agentCallId,CallCenterUtil.RESERVE_STATE_FIELD,reserveState);
-        }
-        if(playNum){
-            if(result.getAgent().getNum() != null){
-                businessStateService.updateInnerField(agentCallId,CallCenterUtil.AGENT_NUM_FIELD,result.getAgent().getNum());
-            }
-            if(preNumVoice != null){
-                businessStateService.updateInnerField(agentCallId,CallCenterUtil.AGENT_PRENUMVOICE_FIELD,preNumVoice);
-            }
-            if(postNumVoice != null){
-                businessStateService.updateInnerField(agentCallId,CallCenterUtil.AGENT_POSTNUMVOICE_FIELD,postNumVoice);
-            }
-        }
+        //更新排队结果
         updateQueue(queueId,callId,conversation,result.getAgent().getId(),agentCallId,CallCenterQueue.RESULT_SELETEED);
+
+        try{
+            //更新呼叫中心统计数据
+            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                    .setQueueNum(1L)
+                    .setQueueDuration((System.currentTimeMillis()
+                            - Long.parseLong(state.getBusinessData()
+                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                    .build());
+        }catch (Throwable t){
+            logger.error("incrIntoRedis失败",t);
+        }
 
         callCenterUtil.sendQueueSelectedAgentEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -146,6 +161,18 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+
+        try{
+            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                    .setQueueNum(1L)
+                    .setQueueDuration((System.currentTimeMillis()
+                            - Long.parseLong(state.getBusinessData()
+                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                    .build());
+        }catch (Throwable t){
+            logger.error("incrIntoRedis失败",t);
+        }
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -172,6 +199,18 @@ public class DeQueueServiceImpl implements DeQueueService {
             return;
         }
         stopPlayWait(state.getAreaId(),state.getId(),state.getResId());
+
+        try{
+            callCenterStatisticsService.incrIntoRedis(new CallCenterStatistics
+                    .Builder(state.getTenantId(),state.getAppId(),new Date())
+                    .setQueueNum(1L)
+                    .setQueueDuration((System.currentTimeMillis()
+                            - Long.parseLong(state.getBusinessData()
+                            .get(CallCenterUtil.ENQUEUE_START_TIME_FIELD)))/1000)
+                    .build());
+        }catch (Throwable t){
+            logger.error("incrIntoRedis失败",t);
+        }
 
         callCenterUtil.sendQueueFailEvent(state.getCallBackUrl(),
                 queueId,CallCenterUtil.QUEUE_TYPE_IVR,
@@ -248,5 +287,33 @@ public class DeQueueServiceImpl implements DeQueueService {
         } catch (Throwable e) {
             logger.error("调用失败",e);
         }
+    }
+
+    private void setAgentState(String agentCallId, BaseEnQueue enQueue,EnQueueResult result){
+        List<String> innerFields = new ArrayList<>();
+        String reserveState = enQueue.getReserve_state();
+        boolean playNum = enQueue.isPlay_num();
+        String preNumVoice = enQueue.getPre_num_voice();
+        String postNumVoice = enQueue.getPost_num_voice();
+        if(StringUtil.isNotEmpty(reserveState)){
+            innerFields.add(CallCenterUtil.RESERVE_STATE_FIELD);
+            innerFields.add(reserveState);
+
+        }
+        if(playNum){
+            if(StringUtil.isNotEmpty(result.getAgent().getNum())){
+                innerFields.add(CallCenterUtil.AGENT_NUM_FIELD);
+                innerFields.add(result.getAgent().getNum());
+            }
+            if(StringUtil.isNotEmpty(preNumVoice)){
+                innerFields.add(CallCenterUtil.AGENT_PRENUMVOICE_FIELD);
+                innerFields.add(preNumVoice);
+            }
+            if(StringUtil.isNotEmpty(postNumVoice)){
+                innerFields.add(CallCenterUtil.AGENT_POSTNUMVOICE_FIELD);
+                innerFields.add(postNumVoice);
+            }
+        }
+        businessStateService.updateInnerField(agentCallId,innerFields);
     }
 }
