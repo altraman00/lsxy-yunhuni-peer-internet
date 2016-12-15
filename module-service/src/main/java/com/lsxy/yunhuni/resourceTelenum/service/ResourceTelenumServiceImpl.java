@@ -2,6 +2,7 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
@@ -56,6 +57,8 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     LineGatewayToTenantService lineGatewayToTenantService;
     @Autowired
     LineGatewayToPublicService lineGatewayToPublicService;
+    @Autowired
+    TenantService tenantService;
 
     @Override
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
@@ -100,7 +103,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
 
         String numSql = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.usable=1 AND tel_number <> :testNum ";
         if(StringUtils.isNotEmpty(telNum)){
-            numSql += " and num.tel_number = :telNum";
+            numSql += " and num.tel_number LIKE :telNum";
         }
         if(StringUtils.isNotEmpty(areaCode)){
             numSql += " AND num.area_code= :areaCode";
@@ -123,7 +126,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         countQuery.setParameter("testNum",testCallNumber);
         countQuery.setParameter("lineIds",lineIds);
         if(StringUtils.isNotEmpty(telNum)){
-            countQuery.setParameter("telNum",telNum);
+            countQuery.setParameter("telNum","%"+ telNum + "%");
         }
         if(StringUtils.isNotEmpty(areaCode)){
             countQuery.setParameter("areaCode",areaCode);
@@ -152,7 +155,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         query.setParameter("testNum",testCallNumber);
         query.setParameter("lineIds",lineIds);
         if(StringUtils.isNotEmpty(telNum)){
-            query.setParameter("telNum",telNum);
+            query.setParameter("telNum","%"+ telNum + "%");
         }
         if(StringUtils.isNotEmpty(areaCode)){
             query.setParameter("areaCode",areaCode);
@@ -189,25 +192,39 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             hql += " AND obj.usable='"+status+"' ";
         }
         if(StringUtils.isNotEmpty(number)){
-            hql += " AND obj.telNumber = '"+number+"' ";
+            hql += " AND obj.telNumber like '%"+number+"%' ";
         }
         hql+=" ORDER BY obj.createTime DESC ";
         Page page = this.pageList(hql,pageNo,pageSize);
-        //获取绑定线路
         List<ResourceTelenum> result = page.getResult();
         Set<String> lineIds = new HashSet<>();
+        Set<String> tenantIds = new HashSet<>();
         for(ResourceTelenum telenum:result){
             if(StringUtils.isNotBlank(telenum.getLineId())){
                 lineIds.add(telenum.getLineId());
             }
+            if(StringUtils.isNotBlank(telenum.getTenantId())){
+                tenantIds.add(telenum.getTenantId());
+            }
         }
+        //获取绑定线路
         List<LineGateway> lines = lineGatewayService.findByIds(lineIds);
-        Map<String,LineGateway> map = new HashMap<>();
-        for(LineGateway line:lines){
-            map.put(line.getId(),line);
-        }
+        //获取绑定租户
+        List<Tenant> tenants = tenantService.findByIds(tenantIds);
+
         for(ResourceTelenum telenum:result){
-            telenum.setLine(map.get(telenum.getLineId()));
+            for(LineGateway line:lines){
+                if(line.getId().equals(telenum.getLineId())){
+                    telenum.setLine(line);
+                    break;
+                }
+            }
+            for(Tenant tenant:tenants){
+                if(tenant.getId().equals(telenum.getTenantId())){
+                    telenum.setTenant(tenant);
+                    break;
+                }
+            }
         }
         return page;
     }
@@ -308,39 +325,39 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tenant_id IS NOT NULL  AND obj.tel_number IN ("+innums+") ";
+        String sql = " FROM (select DISTINCT obj.tenant_id,a.tenant_name FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tenant_id IS NOT NULL  AND obj.tel_number IN ("+innums+") ";
         if(StringUtils.isNotEmpty(tenantName)){
             sql += " AND  a.tenant_name LIKE '%"+tenantName+"%'";
         }
         sql += " ) b ";
         String countSql = " SELECT COUNT(1) "+sql;
-        String pageSql = " SELECT b.tenant_id "+sql;
+        String pageSql = " SELECT b.tenant_id AS tenantId,b.tenant_name AS tenantName"+sql;
         int total = jdbcTemplate.queryForObject(countSql,Integer.class);
         if(total == 0){
             return new Page<>(start,total,pageSize,null);
         }
         pageSql += " limit "+start+","+pageSize+" ";
         //获取得到租户
-        List<String> list = jdbcTemplate.queryForList(pageSql,String.class);
-        System.out.println(list);
+        List<Map<String, Object>> tenantIdlist = jdbcTemplate.queryForList(pageSql);
+//        System.out.println(list);
         String sql2 = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") ";
         Query query2 = em.createNativeQuery(sql2,ResourceTelenum.class);
-        List<ResourceTelenum> list2 = query2.getResultList();
+        List<ResourceTelenum> telenumList = query2.getResultList();
         List<Map> result = new ArrayList<>();
-        for(int j=0;j<list.size();j++) {
+        for(int j=0;j<tenantIdlist.size();j++) {
             Map map = null;
             List<Map> list3= new ArrayList<>();
-            for (int i = 0; i < list2.size(); i++) {
-                Tenant tenant = list2.get(i).getTenant();
-                if(tenant!=null&&list.get(j).equals(tenant.getId())){
+            for (int i = 0; i < telenumList.size(); i++) {
+                String tenantId = telenumList.get(i).getTenantId();
+                if(tenantId!=null&&tenantIdlist.get(j).get("tenantId").equals(tenantId)){
                     if(map==null) {
                         map = new HashMap();
-                        map.put("tenantId", list2.get(i).getTenant().getId());
-                        map.put("tenantName", list2.get(i).getTenant().getTenantName());
+                        map.put("tenantId", tenantId);
+                        map.put("tenantName", tenantIdlist.get(j).get("tenantName"));
                     }
                     Map temp = new HashMap<>();
-                    temp.put("numberId",list2.get(i).getId());
-                    temp.put("number",list2.get(i).getTelNumber());
+                    temp.put("numberId",telenumList.get(i).getId());
+                    temp.put("number",telenumList.get(i).getTelNumber());
                     list3.add(temp);
                 }
             }
@@ -394,14 +411,14 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
         }
         if(tenant!=null) {
-            resourceTelenum.setTenant(tenant);//绑定租户
+            resourceTelenum.setTenantId(tenant.getId());//绑定租户
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);//设置被租用
             this.save(resourceTelenum);
             //判断是否需要添加号码租户的关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
         }else{
-            resourceTelenum.setTenant(null);//没有租户
+            resourceTelenum.setTenantId(null);//没有租户
             resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);//设置没被租用
             this.save(resourceTelenum);
         }
@@ -428,7 +445,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
-            resourceTelenum.setTenant(tenant);
+            resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }else if(tenantType==0&& isEditNum){//只更改手机号码
@@ -450,7 +467,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
-            resourceTelenum.setTenant(tenant);
+            resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }
@@ -467,7 +484,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
         resourcesRentService.save(resourcesRent);
-        resourceTelenum.setTenant(null);
+        resourceTelenum.setTenantId(null);
         resourceTelenum.setStatus(0);
         this.save(resourceTelenum);
     }
@@ -475,5 +492,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public List<ResourceTelenum> findByIds(Collection<String> ids) {
         return resourceTelenumDao.findByIdIn(ids);
+    }
+
+    @Override
+    public List<ResourceTelenum> findByTelNumbers(Collection<String> telNumbers) {
+        return resourceTelenumDao.findByTelNumberIn(telNumbers);
     }
 }

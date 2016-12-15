@@ -77,4 +77,6 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
     @Query(value = " SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND (num.app_id = :appId OR num.app_id IS NULL) " +
             " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.deleted = 0 LIMIT 1",nativeQuery = true)
     ResourceTelenum findCallingTelnumByTenantIdAndAppId(@Param("tenantId") String tenantId, @Param("appId") String appId, @Param("areaId") String areaId);
+
+    List<ResourceTelenum> findByTelNumberIn(Collection<String> telNumbers);
 }

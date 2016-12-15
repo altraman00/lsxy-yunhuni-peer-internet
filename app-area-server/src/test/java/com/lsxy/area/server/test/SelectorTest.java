@@ -99,7 +99,10 @@ public class SelectorTest {
         List<LineGatewayVO> gs = lineGatewayToPublicService.findAllLineGatewayByAreaId("area001");
         List<String> collect = gs.stream().map(LineGatewayVO::getId).collect(Collectors.toList());
         for(int i=0;i<10;i++){
+            Long start = System.currentTimeMillis();
             ResourceTelenum num = resourceTelenumService.findOneFreeDialingNumber(collect);
+            Long end = System.currentTimeMillis();
+            System.out.println("****************************************************方法执行时间："  + (end-start) + "ms");
             System.out.println(num.getTelNumber());
         }
     }

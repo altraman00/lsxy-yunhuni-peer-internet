@@ -196,7 +196,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         for(String num : nums){
             ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(num);
             if(resourceTelenum != null){
-                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenant().getId())){
+                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenantId())){
                    //是这个租户，则查询租用记录，有没有正在用的
                    ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
                    if(resourcesRent == null){

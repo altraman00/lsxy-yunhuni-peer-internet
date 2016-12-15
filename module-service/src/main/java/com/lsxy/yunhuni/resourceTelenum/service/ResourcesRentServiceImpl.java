@@ -275,7 +275,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
         this.save(resourcesRent);
         ResourceTelenum resourceTelenum =  resourcesRent.getResourceTelenum();
-        resourceTelenum.setTenant(null);
+        resourceTelenum.setTenantId(null);
         resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);
         resourceTelenumService.save(resourceTelenum);
     }
@@ -290,7 +290,7 @@ public class ResourcesRentServiceImpl extends AbstractService<ResourcesRent> imp
         for (int i = 0; i < list.size(); i++) {
             ResourceTelenum resourceTelenum = list.get(i).getTelnum();
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
-            resourceTelenum.setTenant(tenant);
+            resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum = resourceTelenumService.save(resourceTelenum);
             ResourcesRent resourcesRent = new ResourcesRent();
             resourcesRent.setTenant(tenant);
