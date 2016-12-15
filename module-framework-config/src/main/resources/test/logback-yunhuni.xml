@@ -19,12 +19,6 @@
         </encoder>
     </appender>
 
-    <appender name="ASYNC_ROLLINGFILE" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="ROLLINGFILE"/>
-        <queueSize>1024</queueSize>
-        <discardingThreshold>0</discardingThreshold>
-    </appender>
-
 
     <!-- 按照每天生成日志文件 -->
     <appender name="ROLLINGFILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -43,6 +37,14 @@
             <MaxFileSize>2GB</MaxFileSize>
         </triggeringPolicy>
     </appender>
+
+    <appender name="ASYNC_ROLLINGFILE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ROLLINGFILE"/>
+        <queueSize>1024</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+    </appender>
+
+
 
     <appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
         <host>tcp:graylog.yunhuni.cn</host>
