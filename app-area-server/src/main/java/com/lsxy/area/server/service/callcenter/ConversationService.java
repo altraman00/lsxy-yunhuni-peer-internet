@@ -170,6 +170,22 @@ public class ConversationService {
         }
         return null;
     }
+
+    public String getCallCenter(String callId){
+        BusinessState state = businessStateService.get(callId);
+        return getCallCenter(state);
+    }
+
+    public String getCallCenter(BusinessState state){
+        if(state == null){
+            return null;
+        }
+        if(state.getBusinessData() == null){
+            return null;
+        }
+        return state.getBusinessData().get(CallCenterUtil.CALLCENTER_FIELD);
+    }
+
     /**
      * 发起交谈
      * @param initiator
@@ -204,6 +220,7 @@ public class ConversationService {
                 .setAreaId(areaId)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(CallCenterUtil.INITIATOR_FIELD,initiator)//交谈发起者的callid
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(initiator))
                         .put("max_seconds",maxDuration!=null?maxDuration.toString():null,""+MAX_DURATION)//交谈最大持续时长
                         .build())
                 .build();
@@ -323,6 +340,7 @@ public class ConversationService {
                         .putIfNotEmpty(CallCenterUtil.AGENT_ID_FIELD,agentId)
                         .putIfNotEmpty(CallCenterUtil.AGENT_NAME_FIELD,agentName)
                         .putIfNotEmpty(CallCenterUtil.AGENT_EXTENSION_FIELD,extension)
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
                         .putIfNotEmpty("from",from)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty(BusinessState.SESSIONID,callSession.getId())
@@ -395,6 +413,7 @@ public class ConversationService {
                 .setLineGatewayId(lineId)
                 .setBusinessData(new MapBuilder<String,String>()
                         .putIfNotEmpty(CallCenterUtil.CONVERSATION_FIELD,conversationId)
+                        .putIfNotEmpty(CallCenterUtil.CALLCENTER_FIELD,getCallCenter(conversationId))
                         .putIfNotEmpty("from",oneTelnumber)
                         .putIfNotEmpty("to",to)
                         .putIfNotEmpty("play_file",playFile)//加入后在交谈中播放这个文件

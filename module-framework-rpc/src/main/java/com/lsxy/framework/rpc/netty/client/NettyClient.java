@@ -124,6 +124,8 @@ public class NettyClient extends AbstractClient{
     }
 
 
+
+
     private int getPort(String serverUrl) {
         assert serverUrl!=null;
         return Integer.parseInt(serverUrl.substring(serverUrl.indexOf(":") + 1));

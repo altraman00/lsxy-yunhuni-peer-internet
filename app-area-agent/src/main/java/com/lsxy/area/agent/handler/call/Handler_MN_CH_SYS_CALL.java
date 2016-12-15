@@ -38,7 +38,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         RPCResponse response = RPCResponse.buildResponse(request);
-        return null;
+        return response;
 //        Commander cticlient = cticlientContext.getAvalibleClient();
 //        if(cticlient == null) {
 //            response.setMessage(RPCResponse.STATE_EXCEPTION);
@@ -74,7 +74,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
 //                    logger.error("调用sys.call失败call_id={},result={}",call_id,rpcError);
 //                    RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
 //                            new MapBuilder<String,Object>()
-//                                    .put("method",Constants.EVENT_SYS_CALL_ON_FAIL)
+//                                    .put("method", Constants.EVENT_SYS_CALL_ON_FAIL)
 //                                    .put("user_data",call_id)
 //                                    .build());
 //                    try {
