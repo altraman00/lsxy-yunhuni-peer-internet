@@ -309,5 +309,7 @@ public abstract class AbstractService<T extends IdEntity> implements BaseService
         return totalCount;
     }
 
-
+    public Iterable<T> save(Iterable<T> list){
+        return getDao().save(list);
+    }
 }

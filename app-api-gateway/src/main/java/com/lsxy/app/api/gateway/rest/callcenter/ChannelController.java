@@ -6,11 +6,13 @@ import com.lsxy.app.api.gateway.response.ApiGatewayResponse;
 import com.lsxy.app.api.gateway.rest.AbstractAPIController;
 import com.lsxy.app.api.gateway.rest.ConfController;
 import com.lsxy.call.center.api.service.ConditionService;
+import com.lsxy.framework.core.exceptions.api.AppServiceInvalidException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.call.center.api.model.Channel;
 import com.lsxy.call.center.api.service.ChannelService;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.app.service.ServiceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class ChannelController extends AbstractAPIController {
             logger.debug("创建通道API参数,accountId={},appId={},dto={}",accountId,appId,dto);
         }
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         Channel channel = new Channel();
         channel.setRemark(dto.getRemark());
         channel = channelService.save(app.getTenant().getId(),appId,channel);
@@ -62,6 +67,9 @@ public class ChannelController extends AbstractAPIController {
             logger.debug("删除通道API参数,accountId={},appId={},id={}",accountId,appId,id);
         }
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         channelService.delete(app.getTenant().getId(),app.getId(),id);
         return ApiGatewayResponse.success(true);
     }
@@ -73,6 +81,9 @@ public class ChannelController extends AbstractAPIController {
             logger.debug("通道列表API参数,accountId={},appId={},id={}",accountId,appId);
         }
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         return ApiGatewayResponse.success(channelService.getAll(app.getTenant().getId(),app.getId()));
     }
 
@@ -84,6 +95,9 @@ public class ChannelController extends AbstractAPIController {
             logger.debug("获取通道API参数,accountId={},appId={},id={}",accountId,appId,id);
         }
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         return ApiGatewayResponse.success(channelService.findOne(app.getTenant().getId(),app.getId(),id));
     }
 
@@ -95,6 +109,9 @@ public class ChannelController extends AbstractAPIController {
             logger.debug("条件列表API参数,accountId={},appId={},channelId={}",accountId,appId,channel_id);
         }
         App app = appService.findById(appId);
+        if(!appService.enabledService(app.getTenant().getId(),appId, ServiceType.CallCenter)){
+            throw new AppServiceInvalidException();
+        }
         return ApiGatewayResponse.success(conditionService.getAll(app.getTenant().getId(),app.getId(),channel_id));
     }
 }

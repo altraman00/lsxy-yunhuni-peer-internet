@@ -149,7 +149,7 @@ public class CallServiceImpl implements CallService {
             throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
-        if(StringUtils.isNotBlank(whiteList.trim())){
+        if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
                 throw new IPNotInWhiteListException();
             }
@@ -244,7 +244,7 @@ public class CallServiceImpl implements CallService {
             throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
-        if(StringUtils.isNotBlank(whiteList.trim())){
+        if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
                 throw new IPNotInWhiteListException();
             }
@@ -292,7 +292,7 @@ public class CallServiceImpl implements CallService {
             throw new AppNotFoundException();
         }
         String whiteList = app.getWhiteList();
-        if(StringUtils.isNotBlank(whiteList.trim())){
+        if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
                 throw new IPNotInWhiteListException();
             }
@@ -374,7 +374,7 @@ public class CallServiceImpl implements CallService {
         }
 
         String whiteList = app.getWhiteList();
-        if(StringUtils.isNotBlank(whiteList.trim())){
+        if(StringUtils.isNotBlank(whiteList)){
             if(!whiteList.contains(ip)){
                 throw new IPNotInWhiteListException();
             }
