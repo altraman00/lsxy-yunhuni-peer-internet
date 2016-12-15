@@ -38,6 +38,7 @@ public abstract class NettySession extends AbstractSession {
             int bufferSize = ob.size();
             long totalPendingWriteBytes = ob.totalPendingWriteBytes();
             if(logger.isDebugEnabled()){
+
                 logger.debug("write msg ["+ object+"] outbound buffer params nioBufferCount={},nioBufferSize={},bufferSize={},totalPendingWriteBytes={}",nioBufferCount,nioBufferSize,bufferSize,totalPendingWriteBytes);
             }
         }
