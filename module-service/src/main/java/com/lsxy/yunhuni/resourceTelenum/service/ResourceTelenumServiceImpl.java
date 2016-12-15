@@ -189,7 +189,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             hql += " AND obj.usable='"+status+"' ";
         }
         if(StringUtils.isNotEmpty(number)){
-            hql += " AND obj.telNumber like '%"+number+"%' ";
+            hql += " AND obj.telNumber = '"+number+"' ";
         }
         hql+=" ORDER BY obj.createTime DESC ";
         Page page = this.pageList(hql,pageNo,pageSize);
@@ -250,38 +250,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //当用户指定了号码
             if(notBlankFrom.size() > 0){
-                List<String> resIds = new ArrayList<>();
                 //查出用户指定的号码
-                List<Object[]> rentResult = resourceTelenumDao.findResIdByTenantIdAndResDataInFromRent(app.getTenant().getId(), notBlankFrom);
-                if(rentResult != null){
-                    for(Object[] arr:rentResult){
-                        //查出的租用信息要绑定当前应用，或都是没有应用绑定，才是有效的
-                        if(arr[1] != null && (arr[0] == null || app.getId().equals(arr[0]))){
-                            resIds.add(arr[1].toString());
-                        }
-                    }
-                }
-                List<ResourceTelenum> availableNums = new ArrayList<>();
-                //判断用户的号码是否合格，合格则放到可用号码列表中
-                if(resIds.size() == 1){
-                    ResourceTelenum telnum = this.findById(resIds.get(0));
-                    if(telnum != null && ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
-                            &&telnum.getAreaId() !=null && telnum.getAreaId().equals(app.getArea().getId())){
-                        availableNums.add(telnum);
-                    }
-                }else if(resIds.size() > 1){
-                    List<ResourceTelenum> findNums = this.findByIds(resIds);
-                    if(availableNums != null){
-                        for(ResourceTelenum telnum:findNums){
-                            if(telnum != null && ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
-                                    &&telnum.getAreaId() !=null && telnum.getAreaId().equals(app.getArea().getId())){
-                                availableNums.add(telnum);
-                            }
-                        }
-                    }
-                }
+                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getArea().getId());
                 //可用号码列表不为空
-                if(availableNums.size() > 0){
+                if(availableNums == null || availableNums.size() > 0){
                     for(String fr:from){
                         if(StringUtils.isBlank(fr)){
                             result.add(availableNums.get(0));
@@ -304,41 +276,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，选租户应用下的号码，或者租户下不被应用绑定的号码
         if(result.size() == 0){
-            ResourceTelenum availableNum = null;
-            Map<String,String> map = new HashMap<>();
-            List<Object[]> arrs = resourceTelenumDao.findResIdByTenantIdAndAppIdFromRent(app.getTenant().getId(),app.getId());
-            if(arrs != null){
-                arrs.parallelStream().forEach(arr-> {
-                    if(arr[1] != null && StringUtils.isNotBlank(arr[1].toString())){
-                        map.put(arr[1].toString(),arr[0] == null?null:arr[0].toString());
-                    }
-                });
-                Set<String> numIds = map.keySet();
-                List<ResourceTelenum> telnums = this.findByIds(numIds);
-                telnums.parallelStream().forEach(telnum -> telnum.setAppId(map.get(telnum.getId())));
-                for(ResourceTelenum telnum:telnums){
-                    if(telnum != null && telnum.getAppId() != null && telnum.getAppId().equals(app.getId())){
-                        // 判断是否是可呼出号码
-                        if(ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))){
-                            availableNum = telnum;
-                            break;
-                        }
-                    }
-                }
-                if(availableNum == null){
-                    for(ResourceTelenum telnum:telnums){
-                        if(telnum != null && telnum.getAppId() == null){
-                            // 判断是否是同一个区域
-                            //判断是否是可呼出号码
-                            if(ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
-                                    && telnum.getAreaId().equals(app.getArea().getId())){
-                                availableNum = telnum;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getArea().getId());
             if(availableNum == null){
                 availableNum = this.findOneFreeDialingNumber(lineIds);
             }

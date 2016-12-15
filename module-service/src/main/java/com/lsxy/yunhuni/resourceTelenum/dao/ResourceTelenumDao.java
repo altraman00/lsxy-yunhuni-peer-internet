@@ -70,9 +70,11 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
      */
     List<ResourceTelenum> findByIdIn(Collection<String> ids);
 
-    @Query(value = "SELECT rent.app_id,rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.tenant_id = :tenantId AND rent.res_data IN (:froms) AND rent.rent_status IN (1,2) AND rent.deleted = 0",nativeQuery = true)
-    List<Object[]> findResIdByTenantIdAndResDataInFromRent(@Param("tenantId") String tenantId,@Param("froms") List<String> froms);
+    @Query(value = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND num.tel_number IN (:froms) AND (num.app_id = :appId OR num.app_id IS NULL)  " +
+            " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.deleted = 0",nativeQuery = true)
+    List<ResourceTelenum> findCallingTelnumByTenantIdAndAppIdAndTelnum(@Param("tenantId") String tenantId, @Param("froms") List<String> froms, @Param("appId") String appId, @Param("areaId") String areaId);
 
-    @Query(value = "SELECT rent.app_id,rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.tenant_id = :tenantId AND (rent.app_id = :appId OR rent.app_id IS NULL) AND rent.rent_status IN (1,2) AND rent.deleted = 0",nativeQuery = true)
-    List<Object[]> findResIdByTenantIdAndAppIdFromRent(@Param("tenantId") String tenantId, @Param("appId") String appId);
+    @Query(value = " SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.tenant_id=:tenantId AND (num.app_id = :appId OR num.app_id IS NULL) " +
+            " AND num.usable='1' AND (num.is_dialing = '1' OR  num.is_through = '1') AND num.area_id = :areaId AND num.deleted = 0 LIMIT 1",nativeQuery = true)
+    ResourceTelenum findCallingTelnumByTenantIdAndAppId(@Param("tenantId") String tenantId, @Param("appId") String appId, @Param("areaId") String areaId);
 }
