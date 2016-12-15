@@ -10,6 +10,7 @@ import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.billing.service.CalBillingService;
 import com.lsxy.framework.core.utils.DateUtils;
 import com.lsxy.framework.core.utils.JSONUtil;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.RPCResponse;
 import com.lsxy.framework.rpc.api.event.Constants;
@@ -59,11 +60,7 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        logger.info("正在处理{}",getEventName());
         Object cdrObj = request.getParamMap().get("data");
-        if(logger.isDebugEnabled()){
-            logger.info("开始处理CDR数据：{}",cdrObj);
-        }
         if(cdrObj == null){
             throw new InvalidParamException("cdr数据为空");
         }
@@ -74,14 +71,20 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
         String[] cdrSplit = cdrOriginalTemp.split(",");
 
         BusinessState businessState;
-        String cdr_additionalinfo2 = cdrSplit[25].trim();
-        if(StringUtils.isNotBlank(cdr_additionalinfo2)){
-            businessState = businessStateService.get(cdr_additionalinfo2);
-        }else{
-            throw new InvalidParamException("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
+        String call_id = cdrSplit[25].trim();
+        if(StringUtil.isBlank(call_id)){
+            //throw new InvalidParamException("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
+            logger.info("CDR没有业务数据字段，可能是非法调用：{}", cdrObj);
+            return null;
         }
+
+        if(logger.isDebugEnabled()){
+            logger.info("开始处理CDR数据：{}",cdrObj);
+        }
+
+        businessState = businessStateService.get(call_id);
+
         if(businessState == null){
-//            voiceCdrService.save(voiceCdr);
             throw new InvalidParamException("返回CDR找不到关联的业务数据,cdr.id：{}",voiceCdr.getId());
         }
         voiceCdr.setAreaId(businessState.getAreaId());

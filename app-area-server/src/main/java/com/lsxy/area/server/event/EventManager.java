@@ -63,9 +63,9 @@ public class EventManager {
         try{
             return handler.handle(request,session);
         }catch (InvalidParamException e){
-            logger.error("非法调用参数:"+e.getMessage(),e);
+            logger.error("非法调用参数:"+request,e);
         }catch (Throwable t){
-            logger.error("处理失败",t);
+            logger.error("处理失败"+request,t);
         }
         return null;
     }
