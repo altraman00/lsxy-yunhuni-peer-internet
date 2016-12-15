@@ -4,6 +4,7 @@ import com.lsxy.framework.rpc.api.RPCHandler;
 import com.lsxy.framework.rpc.api.AbstractSession;
 import com.lsxy.framework.rpc.exceptions.SessionWriteException;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelOutboundBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,17 @@ public abstract class NettySession extends AbstractSession {
 
     @Override
     public void concreteWrite(Object object) throws SessionWriteException {
+
+        if(logger.isDebugEnabled()){
+            ChannelOutboundBuffer ob = channel.unsafe().outboundBuffer();
+            int nioBufferCount = ob.nioBufferCount();
+            long nioBufferSize = ob.nioBufferSize();
+            int bufferSize = ob.size();
+            long totalPendingWriteBytes = ob.totalPendingWriteBytes();
+            if(logger.isDebugEnabled()){
+                logger.debug("outbound buffer params nioBufferCount={},nioBufferSize={},bufferSize={},totalPendingWriteBytes={}",nioBufferCount,nioBufferSize,bufferSize,totalPendingWriteBytes);
+            }
+        }
         //在此做限流控制，默认 ChannelOutboundBuffer  默认高水位是64K，低水位是32K
         if(channel.isWritable()) {
             channel.writeAndFlush(object);
