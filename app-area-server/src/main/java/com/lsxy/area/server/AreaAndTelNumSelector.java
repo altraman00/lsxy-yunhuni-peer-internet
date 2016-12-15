@@ -8,6 +8,7 @@ import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.Area;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.model.LineGatewayVO;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
@@ -59,7 +60,7 @@ public class AreaAndTelNumSelector {
         List<TelnumSortEntity> to2Num = new ArrayList<>();
         if(app.getStatus() == app.STATUS_ONLINE){
             //查找租户私有线路
-            List<LineGateway> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getArea().getId());
+            List<LineGatewayVO> lineGateways = lineGatewayToTenantService.findByTenantIdAndAreaId(app.getTenant().getId(),app.getArea().getId());
             if(lineGateways == null || lineGateways.size() == 0){
                 //如果没有私有线路，找公共线路
                 lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(app.getArea().getId());
@@ -69,7 +70,7 @@ public class AreaAndTelNumSelector {
                 throw new NotAvailableLineException();
             }
             //所拥有的线路ID列表
-            List<String> lineIds = lineGateways.parallelStream().map(LineGateway::getId).collect(Collectors.toList());
+            List<String> lineIds = lineGateways.parallelStream().map(LineGatewayVO::getId).collect(Collectors.toList());
 
             List<ResourceTelenum> telnumber;
             if(isDuoCall){
@@ -119,7 +120,7 @@ public class AreaAndTelNumSelector {
                 if(callNum == null){
                     throw new UserNumberHasNotAvailableLineException();
                 }
-                List<LineGateway> lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(areaId);
+                List<LineGatewayVO> lineGateways = lineGatewayToPublicService.findAllLineGatewayByAreaId(areaId);
                 if(isDuoCall){
                     addToTelnumSortEntity(to1, to2, lineGateways, to1Num, to2Num, callNum);
                 }else{
@@ -133,7 +134,7 @@ public class AreaAndTelNumSelector {
         return selector;
     }
 
-    private void addToTelnumSortEntity(String to1, String to2, List<LineGateway> lineGateways, List<TelnumSortEntity> to1Num, List<TelnumSortEntity> to2Num, ResourceTelenum callTelnumber) throws YunhuniApiException {
+    private void addToTelnumSortEntity(String to1, String to2, List<LineGatewayVO> lineGateways, List<TelnumSortEntity> to1Num, List<TelnumSortEntity> to2Num, ResourceTelenum callTelnumber) throws YunhuniApiException {
         List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(callTelnumber.getTelNumber());
         //租户拥有的线路和号码能呼出的线路进行一次交集计算，并组装数据
         lineGateways.parallelStream().forEach(lg -> {
@@ -154,7 +155,7 @@ public class AreaAndTelNumSelector {
         }
     }
 
-    private void addToTelnumSortEntity(String to, List<LineGateway> lineGateways, List<TelnumSortEntity> toNum, ResourceTelenum telenum) throws YunhuniApiException {
+    private void addToTelnumSortEntity(String to, List<LineGatewayVO> lineGateways, List<TelnumSortEntity> toNum, ResourceTelenum telenum) throws YunhuniApiException {
         List<TelnumToLineGateway> ttgs = telnumToLineGatewayService.getDialingLinesByNumber(telenum.getTelNumber());
         //租户拥有的线路和号码能呼出的线路进行一次交集计算，并组装数据
         lineGateways.parallelStream().forEach(lg -> {
@@ -170,7 +171,7 @@ public class AreaAndTelNumSelector {
         }
     }
 
-    private TelnumSortEntity getTelnumSortEntity(String to, ResourceTelenum svTelnumber, LineGateway lg, TelnumToLineGateway telnumToLineGateway) {
+    private TelnumSortEntity getTelnumSortEntity(String to, ResourceTelenum svTelnumber, LineGatewayVO lg, TelnumToLineGateway telnumToLineGateway) {
         TelnumSortEntity entity = null;
         if(TelnumToLineGateway.ISDIALING_TRUE.equals(telnumToLineGateway.getIsDialing())){
             //主叫

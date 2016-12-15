@@ -4,6 +4,7 @@ import com.lsxy.framework.api.base.BaseService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
+import com.lsxy.yunhuni.api.config.model.LineGatewayVO;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface LineGatewayToPublicService extends BaseService<LineGatewayToPub
     int findByLindId(String lindId);
     Page<LineGatewayToPublic> getPage(Integer pageNo, Integer pageSize, String operator, String isThrough, String status, String isPublicLine, String order);
 
-    List<LineGateway> findAllLineGatewayByAreaId(String areaId);
+    List<LineGatewayVO> findAllLineGatewayByAreaId(String areaId);
     List<LineGateway> findAllLineGateway();
 
     void deleteLine(String line);

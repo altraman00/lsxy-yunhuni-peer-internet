@@ -5,6 +5,7 @@ import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.model.LineGatewayToPublic;
+import com.lsxy.yunhuni.api.config.model.LineGatewayVO;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
 import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
 import com.lsxy.yunhuni.config.dao.LineGatewayToPublicDao;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Query;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -99,20 +101,20 @@ public class LineGatewayToPublicServiceImpl extends AbstractService<LineGatewayT
     }
 
     @Override
-    public List<LineGateway> findAllLineGatewayByAreaId(String areaId) {
-        List<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findByLineGateway_AreaId(areaId);
-        List<LineGateway> lineGateways = getLineGateways(ltps);
-        return lineGateways;
+    public List<LineGatewayVO> findAllLineGatewayByAreaId(String areaId) {
+        String sql = "SELECT line.*,ltp.priority AS priority FROM db_lsxy_bi_yunhuni.tb_oc_config_line_gateway line " +
+                "INNER JOIN db_lsxy_bi_yunhuni.tb_oc_linegateway_to_public ltp " +
+                "ON ltp.line_id = line.id " +
+                "WHERE line.area_id= :areaId AND line.status='1' AND line.deleted = 0 AND ltp.deleted = 0";
+        Query query = this.getEm().createNativeQuery(sql, "lineGatewayVO");
+        query.setParameter("areaId",areaId);
+        List resultList = query.getResultList();
+        return resultList;
     }
 
     @Override
     public List<LineGateway> findAllLineGateway() {
         Iterable<LineGatewayToPublic> ltps = lineGatewayToPublicDao.findAll();
-        List<LineGateway> lineGateways = getLineGateways(ltps);
-        return lineGateways;
-    }
-
-    private List<LineGateway> getLineGateways(Iterable<LineGatewayToPublic> ltps) {
         List<LineGateway> lineGateways = new ArrayList<>();
         for (LineGatewayToPublic ltp:ltps){
             LineGateway lineGateway = ltp.getLineGateway();

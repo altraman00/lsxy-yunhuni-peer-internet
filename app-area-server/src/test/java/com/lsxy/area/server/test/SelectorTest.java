@@ -5,8 +5,13 @@ import com.lsxy.area.server.AreaServerMainClass;
 import com.lsxy.framework.config.Constants;
 import com.lsxy.framework.core.exceptions.api.AppOffLineException;
 import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
+import com.lsxy.framework.core.utils.JSONUtil;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.app.service.AppService;
+import com.lsxy.yunhuni.api.config.model.LineGateway;
+import com.lsxy.yunhuni.api.config.model.LineGatewayVO;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +70,19 @@ public class SelectorTest {
 //        System.out.println(JSONUtil.objectToJson(selector));
         Long end = System.currentTimeMillis();
         System.out.println("方法执行时间："  + (end-start) + "ms");
+    }
+
+    @Autowired
+    LineGatewayToPublicService lineGatewayToPublicService;
+
+    @Autowired
+    LineGatewayToTenantService lineGatewayToTenantService;
+    @Test
+    public void testFindLine(){
+//        lineGatewayToPublicService.findAllLineGatewayByAreaId("area001");
+        List area001 = lineGatewayToTenantService.findByTenantIdAndAreaId("40288ac9575612a30157561c7ff50004", "area001");
+//        List<LineGatewayVO> lineGatewayByTenantId = lineGatewayToPublicService.findAllLineGatewayByAreaId("area001");
+        System.out.println(JSONUtil.objectToJson(area001));
     }
 
 }
