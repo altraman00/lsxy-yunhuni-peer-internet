@@ -20,7 +20,7 @@ import com.lsxy.yunhuni.api.resourceTelenum.service.ResourceTelenumService;
 import com.lsxy.yunhuni.api.resourceTelenum.service.ResourcesRentService;
 import com.lsxy.yunhuni.app.dao.AppDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -177,7 +177,7 @@ public class AppServiceImpl extends AbstractService<App> implements AppService {
     }
 
     @Override
-    @CacheEvict(value = "entity", key = "'entity_' + #tenantId + #appId + #service.code")
+    @Cacheable(value = "entity", key = "'entity_' + #tenantId + #appId + #service.code")
     public boolean enabledService(String tenantId, String appId, ServiceType service) {
         if(tenantId == null){
             return false;

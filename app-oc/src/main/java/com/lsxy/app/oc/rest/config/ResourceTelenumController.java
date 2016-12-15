@@ -9,6 +9,7 @@ import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.core.utils.BeanUtils;
 import com.lsxy.framework.core.utils.EntityUtils;
 import com.lsxy.framework.core.utils.Page;
+import com.lsxy.framework.core.utils.StringUtil;
 import com.lsxy.framework.web.rest.RestResponse;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
@@ -137,13 +138,13 @@ public class ResourceTelenumController extends AbstractRestController {
         }
         Tenant tenant = null;
         int tenantType = 0;
-        if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&(resourceTelenum.getTenant()==null)){
+        if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&(resourceTelenum.getTenantId()==null)){
             tenant = tenantService.findById(telnumTVo.getTenantId());
             if(tenant==null || StringUtils.isEmpty(tenant.getId())){
                 return RestResponse.failed("0000","所选租户不存在");
             }
             tenantType = 1;//原来没有租户，新加租户
-        }else if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&!resourceTelenum.getTenant().getId().equals(telnumTVo.getTenantId())){
+        }else if(StringUtils.isNotEmpty(telnumTVo.getTenantId())&&!resourceTelenum.getTenantId().equals(telnumTVo.getTenantId())){
             tenant = tenantService.findById(telnumTVo.getTenantId());
             if(tenant==null || StringUtils.isEmpty(tenant.getId())){
                 return RestResponse.failed("0000","所选租户不存在");
@@ -266,6 +267,14 @@ public class ResourceTelenumController extends AbstractRestController {
         ResourceTelenum resourceTelenum = resourceTelenumService.findById(id);
         if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
             return RestResponse.failed("0000","号码不存在");
+        }
+        if(StringUtil.isNotBlank(resourceTelenum.getTenantId())){
+            Tenant tenant = tenantService.findById(resourceTelenum.getTenantId());
+            resourceTelenum.setTenant(tenant);
+        }
+        if(StringUtil.isNotBlank(resourceTelenum.getLineId())){
+            LineGateway line = lineGatewayService.findById(resourceTelenum.getLineId());
+            resourceTelenum.setLine(line);
         }
         return RestResponse.success(resourceTelenum);
     }
