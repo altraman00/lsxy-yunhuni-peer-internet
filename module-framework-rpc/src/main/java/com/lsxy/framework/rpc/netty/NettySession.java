@@ -45,7 +45,12 @@ public abstract class NettySession extends AbstractSession {
         if(channel.isWritable()) {
             channel.writeAndFlush(object);
         }else{
-            throw new SessionWriteException("并发量过大，消息被丢弃："+object);
+            ChannelOutboundBuffer ob = channel.unsafe().outboundBuffer();
+            int nioBufferCount = ob.nioBufferCount();
+            long nioBufferSize = ob.nioBufferSize();
+            int bufferSize = ob.size();
+            long totalPendingWriteBytes = ob.totalPendingWriteBytes();
+            throw new SessionWriteException("rpc message channel unwritable：["+object+"] (nioBufferCount="+nioBufferCount+",nioBufferSize="+nioBufferSize+",bufferSize="+bufferSize+",totalPendingWriteBytes="+totalPendingWriteBytes+")");
         }
     }
 
