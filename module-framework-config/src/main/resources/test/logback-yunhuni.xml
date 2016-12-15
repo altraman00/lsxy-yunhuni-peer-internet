@@ -73,9 +73,9 @@
 
 
     <root level="INFO">
-        <!--<appender-ref ref="ASYNC_STDOUT" />-->
+        <appender-ref ref="STDOUT" />
         <!--<appender-ref ref="gelf" />-->
-        <appender-ref ref="ASYNC_ROLLINGFILE"/>
+        <!--<appender-ref ref="ASYNC_ROLLINGFILE"/>-->
     </root>
 
 
