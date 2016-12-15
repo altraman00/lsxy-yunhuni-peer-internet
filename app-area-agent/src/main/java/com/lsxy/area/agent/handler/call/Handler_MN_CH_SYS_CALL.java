@@ -47,9 +47,6 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            return null;
-        }
         try {
             Map<String, Object> params = request.getParamMap();
             String call_id = (String)params.get("user_data");
@@ -71,7 +68,7 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件"+Constants.EVENT_SYS_CALL_ON_START+"失败",e);
+                        logger.error("CTI发送事件%s,失败", Constants.EVENT_SYS_CALL_ON_START,e);
                     }
                 }
 
@@ -80,13 +77,13 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     logger.error("调用sys.call失败call_id={},result={}",call_id,rpcError);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method", Constants.EVENT_SYS_CALL_ON_FAIL)
+                                    .put("method",Constants.EVENT_SYS_CALL_ON_FAIL)
                                     .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件"+Constants.EVENT_SYS_CALL_ON_FAIL+"失败",e);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_FAIL,e);
                     }
                 }
 
@@ -95,18 +92,18 @@ public class Handler_MN_CH_SYS_CALL extends RpcRequestHandler{
                     logger.error("调用sys.call超时call_id={}",call_id);
                     RPCRequest req = RPCRequest.newRequest(ServiceConstants.CH_MN_CTI_EVENT,
                             new MapBuilder<String,Object>()
-                                    .put("method",Constants.EVENT_SYS_CALL_ON_TIMEOUT)
+                                    .put("method", Constants.EVENT_SYS_CALL_ON_TIMEOUT)
                                     .put("user_data",call_id)
                                     .build());
                     try {
                         rpcCaller.invoke(sessionContext,req);
                     } catch (Exception e) {
-                        logger.error("CTI发送事件["+Constants.EVENT_SYS_CALL_ON_TIMEOUT+"]失败",e);
+                        logger.error("CTI发送事件%s,失败",Constants.EVENT_SYS_CALL_ON_TIMEOUT,e);
                     }
                 }
             });
-        } catch (IOException e) {
-            logger.error("创建资源失败:"+request,e);
+        } catch (Throwable e) {
+            logger.error("创建资源失败",e);
         }
         return null;
     }

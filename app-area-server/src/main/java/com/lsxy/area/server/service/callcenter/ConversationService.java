@@ -316,7 +316,7 @@ public class ConversationService {
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
         try {
@@ -390,7 +390,7 @@ public class ConversationService {
                 .put("max_answer_seconds",maxDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);

@@ -36,13 +36,7 @@ public class Handler_MN_CH_SYS_CALL_CONF_EXIT extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
 
         Map<String, Object> params = request.getParamMap();
         String res_id = (String)params.get("res_id");
@@ -68,11 +62,9 @@ public class Handler_MN_CH_SYS_CALL_CONF_EXIT extends RpcRequestHandler{
                     logger.error("调用sys.call.conf_exit超时call_id={}",call_id);
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("调用资源操作失败",e);
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
         }
-        return response;
+        return null;
     }
 }
