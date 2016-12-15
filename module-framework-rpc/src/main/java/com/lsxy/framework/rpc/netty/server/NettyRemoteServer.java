@@ -3,12 +3,14 @@ package com.lsxy.framework.rpc.netty.server;
 import com.lsxy.framework.rpc.api.server.AbstractServerRPCHandler;
 import com.lsxy.framework.rpc.api.server.RemoteServer;
 import com.lsxy.framework.rpc.exceptions.RemoteServerStartException;
-import com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder;
-import com.lsxy.framework.rpc.netty.codec.RPCMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,9 +65,13 @@ public class NettyRemoteServer implements RemoteServer {
                     });
 
                     ChannelPipeline pipeline = channel.pipeline();
-
-                    pipeline.addLast("decoder",new RPCMessageDecoder());
-                    pipeline.addLast("encoder",new RPCMessageEncoder());
+////
+////                    pipeline.addLast("decoder",new RPCMessageDecoder());
+////                    pipeline.addLast("encoder",new RPCMessageEncoder());
+                    channel.pipeline().addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
+                    // 字符串解码 和 编码
+                     pipeline.addLast("decoder", new StringDecoder());
+                     pipeline.addLast("encoder", new StringEncoder());
 
                     channel.pipeline().addLast(handler.getIoHandler());
 

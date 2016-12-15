@@ -81,6 +81,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
      */
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
+        long start = System.currentTimeMillis();
         RPCResponse res = null;
         Map<String,Object> params = request.getParamMap();
         if(MapUtils.isEmpty(params)){
@@ -157,6 +158,7 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         if(logger.isDebugEnabled()){
             logger.debug("[{}][{}]开始处理ivr",tenant.getId(),app.getId());
         }
+        logger.info("incoming找号码耗时:{}",(System.currentTimeMillis() - start));
         ivrActionService.doActionIfAccept(app,tenant,res_id,from,to,calledLine.getId(),isCallCenter);
         return res;
     }

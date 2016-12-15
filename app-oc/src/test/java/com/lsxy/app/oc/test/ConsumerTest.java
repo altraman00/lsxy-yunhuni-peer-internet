@@ -39,8 +39,8 @@ public class ConsumerTest {
     @Test
     public void testSendMsg(){
         String token = login();
-        String tenantid="40288aca574060400157406339080002";
-        String url = restPrefixUrl + "/tenant/tenants/"+tenantid+"/consumes?year=2016&month=7&pageNo=1&pageSize=1";
+        String tenantid="8a2bc67257282a250157282b75740000";
+        String url = restPrefixUrl + "/tenant/tenants/"+tenantid+"/consumes?year=2016&month=9&pageNo=1&pageSize=10";
 
 //        @RequestParam Integer year,
 //        @RequestParam Integer month,
