@@ -215,10 +215,12 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                        if("1".equals(resourceTelenum.getIsCalled())){
                            isCalled = true;
                        }
-
                        resourcesRent.setApp(app);
                        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
                        resourcesRentService.save(resourcesRent);
+                       //更新号码信息，设置应用
+                       resourceTelenum.setAppId(app.getId());
+                       resourceTelenumService.save( resourceTelenum);
                    }
                 }else{
                     //如果号码被占用，则抛出异常
@@ -273,6 +275,10 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
                     rent.setApp(null);
                     resourcesRentService.save(rent);
+                    //更新号码信息，清除应用
+                    ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+                    resourceTelenum.setAppId(null);
+                    resourceTelenumService.save( resourceTelenum);
                 }
             }
             return app;

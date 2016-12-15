@@ -49,9 +49,8 @@ public class ResourceTelenum extends IdEntity{
     private String isCalled;//可被叫
     private String isThrough;//可透传
     private String type;//1采购线路0租户自带
-
-    @Transient
     private String appId;
+
     @Transient
     private LineGateway line;
 
@@ -211,7 +210,16 @@ public class ResourceTelenum extends IdEntity{
         this.remark = remark;
     }
 
-    public ResourceTelenum(String telNumber,String callUri,String operator, String areaCode,String lineId, String amount) {
+    @Column(name = "app_id")
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public ResourceTelenum(String telNumber, String callUri, String operator, String areaCode, String lineId, String amount) {
         this.operator = operator;
         this.areaCode = areaCode;
         this.amount = new BigDecimal(amount);
@@ -238,15 +246,6 @@ public class ResourceTelenum extends IdEntity{
         this.areaId = areaId;
     }
     public ResourceTelenum() {
-    }
-
-    @Transient
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
     }
 
     @Transient

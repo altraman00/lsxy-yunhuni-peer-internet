@@ -29,7 +29,7 @@ public interface ResourceTelenumDao  extends BaseDaoInterface<ResourceTelenum, S
      * @param expireTime 过期时间
      */
     @Modifying
-    @Query(value = "UPDATE db_lsxy_bi_yunhuni.tb_oc_resource_telenum num SET num.status=0 , num.tenant_id=NULL WHERE num.id IN " +
+    @Query(value = "UPDATE db_lsxy_bi_yunhuni.tb_oc_resource_telenum num SET num.status=0 , num.tenant_id=NULL,num.app_id=NULL WHERE num.id IN " +
             "(SELECT rent.res_id FROM db_lsxy_bi_yunhuni.tb_bi_resources_rent rent WHERE rent.deleted=0 AND rent.rent_expire<:expireTime AND rent.res_type=1 AND rent.rent_status IN (1,2))",nativeQuery = true)
     void cleanExpireResourceTelnum(@Param("expireTime") Date expireTime);
 
