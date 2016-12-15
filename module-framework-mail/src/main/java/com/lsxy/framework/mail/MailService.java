@@ -91,9 +91,9 @@ public class MailService {
 			// 构造MimeMessage并设定基本的值，创建消息对象
 			MimeMessage msg = new MimeMessage(session);
 			//设置自定义发件人昵称
-			String nickname = "壹云";
+			String nickname = "壹耘";
 			try {
-				nickname = javax.mail.internet.MimeUtility.encodeText(SystemConfig.getProperty("global.mail.sender.nickname","壹云"));
+				nickname = javax.mail.internet.MimeUtility.encodeText(SystemConfig.getProperty("global.mail.sender.nickname","壹耘"));
 			} catch (UnsupportedEncodingException e) {
 				logger.error("编码异常",e);
 			}

@@ -30,6 +30,7 @@ FORCE_CLEAN=true
 TAIL_LOG=false
 source /etc/profile
 
+
 while getopts "A:P:H:STILDC" opt; do
   case $opt in
     A)
@@ -74,7 +75,7 @@ then
    exit 1;
 fi
 
-export MAVEN_OPTS="$MAVEN_OPTS -Xms256m -Xmx512m"
+export MAVEN_OPTS="$MAVEN_OPTS -Xms512m -Xmx512m"
 echo "MAVEN 构建参数：$MAVEN_OPTS"
 #先停止制定的APP服务
 echo "停止现有服务...."
@@ -139,6 +140,7 @@ if [ $IS_TOMCAT_DEPLOY = false ]; then
     fi
 fi
 echo "OK";
+
 
 if [ $TAIL_LOG = true ]; then
     tail -f /opt/yunhuni/logs/$APP_NAME.out

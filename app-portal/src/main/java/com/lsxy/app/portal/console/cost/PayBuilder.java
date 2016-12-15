@@ -14,8 +14,8 @@ import java.util.Map;
  * Created by liups on 2016/7/23.
  */
 public class PayBuilder {
-    public static String SUBJECT = "壹云充值";
-    public static String BODY = "壹云充值";
+    public static String SUBJECT = "壹耘充值";
+    public static String BODY = "壹耘充值";
 
     /**
      * 构建支付宝跳转Html

@@ -355,6 +355,7 @@ public class IVRActionService {
                         .putIfNotEmpty("from",to)
                         .putIfNotEmpty("to",from)
                         .putIfNotEmpty(CallCenterUtil.ISCC_FIELD,iscc ? CallCenterUtil.ISCC_TRUE:null)
+                        .put("startime",""+System.currentTimeMillis())
                         .build())
                 .build();
         businessStateService.save(state);
@@ -475,7 +476,7 @@ public class IVRActionService {
             if(! (h instanceof HangupActionHandler) && state.getBusinessData().get(IVR_ANSWER_WAITTING_FIELD) !=null){
                 businessStateService.updateInnerField(call_id,IVR_ANSWER_AFTER_XML_FIELD,resXML);
                 if(logger.isDebugEnabled()){
-                    logger.info("调用应答isCallcenter={}，callid={}",conversationService.isCC(call_id),call_id);
+                    logger.info("调用应答isCallcenter={}，callid={},耗时={}",conversationService.isCC(call_id),call_id,System.currentTimeMillis() - Long.parseLong(state.getBusinessData().get("startime")));
                 }
                 answer(state.getResId(),call_id,state.getAreaId());
                 return true;
@@ -486,6 +487,7 @@ public class IVRActionService {
             }
             return h.handle(call_id,state,actionEle,getNextUrl(root));
         } catch(DocumentException e){
+            logger.error("",e);
             logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             //发送ivr格式错误通知
             Map<String,Object> notify_data = new MapBuilder<String,Object>()
@@ -497,6 +499,7 @@ public class IVRActionService {
             hangup(state.getResId(),call_id,state.getAreaId());
             return false;
         } catch (Throwable e) {
+            logger.error("",e);
             logger.info("[{}][{}]callId={}处理ivr动作指令出错:{}",state.getTenantId(),state.getAppId(),call_id,e.getMessage());
             return false;
         }

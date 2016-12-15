@@ -1,16 +1,19 @@
 package com.lsxy.framework.rpc.netty.client;
 
-import com.lsxy.framework.rpc.api.session.SessionContext;
+import com.lsxy.framework.rpc.api.RPCRequest;
 import com.lsxy.framework.rpc.api.client.AbstractClient;
 import com.lsxy.framework.rpc.api.session.Session;
+import com.lsxy.framework.rpc.api.session.SessionContext;
 import com.lsxy.framework.rpc.exceptions.ClientBindException;
-import com.lsxy.framework.rpc.netty.codec.RPCMessageDecoder;
-import com.lsxy.framework.rpc.netty.codec.RPCMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
@@ -55,17 +58,25 @@ public class NettyClient extends AbstractClient{
 
         try {
             Bootstrap b = new Bootstrap(); // (1)
+
             b.group(workerGroup); // (2)
             b.channel(NioSocketChannel.class); // (3)
             b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+            //设置outbindbuffer的高低水位，可根据需要调整
+            b.option(ChannelOption.WRITE_BUFFER_WATER_MARK, new WriteBufferWaterMark(512 * 1024, 1024 * 1024));
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
 //                    ch.pipeline().addLast();
                     ChannelPipeline pipeline = ch.pipeline();
-                    pipeline.addLast("decoder", new RPCMessageDecoder());
-                    pipeline.addLast("encoder", new RPCMessageEncoder());
-                    pipeline.addLast("handler", handler.getIoHandler());
+//                    pipeline.addLast("decoder", new RPCMessageDecoder());
+//                    pipeline.addLast("encoder", new RPCMessageEncoder());
+//                    pipeline.addLast("handler", handler.getIoHandler());
+                    pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
+                    pipeline.addLast("decoder", new StringDecoder());
+                    pipeline.addLast("encoder", new StringEncoder());
+
+                    ch.pipeline().addLast(handler.getIoHandler());
                 }
             });
 
@@ -102,6 +113,7 @@ public class NettyClient extends AbstractClient{
             }
 
 
+
             // Wait until the connection is closed.
 //            f.channel().closeFuture().sync();
         }catch(Exception ex){
@@ -122,5 +134,31 @@ public class NettyClient extends AbstractClient{
         assert serverUrl!=null;
         return serverUrl.substring(0, serverUrl.indexOf(":"));
     }
+
+
+
+    public void doTestRequest(int threads,int count,Channel channel){
+
+        for(int i=0;i<threads ; i++){
+            final int k = i;
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(true){
+                        try {
+                            RPCRequest request = RPCRequest.newRequest("MN_CH_TEST_ECHO","value=001");
+                            channel.writeAndFlush(request.serialize() + "\n").await();
+                            Thread.currentThread().sleep(10);
+                        } catch (Exception ex) {
+                            logger.error("RPC 异常",ex);
+                        }
+                    }
+                }
+            });
+            t.setName("test-"+i);
+            t.start();
+        }
+    }
+
 
 }
