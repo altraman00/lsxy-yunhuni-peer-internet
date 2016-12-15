@@ -44,7 +44,7 @@ public abstract class AbstractSession implements Session {
             if(logger.isDebugEnabled()){
                 logger.debug("write rpc message length is :{}",msg.length());
             }
-            concreteWrite(msg + "\n");
+            concreteWrite(msg);
         } else {
             logger.error("通道无效,无法写入对象,该对象将会进入FIX队列:{}", object);
             throw new SessionWriteException("通道无效,无法写入对象");

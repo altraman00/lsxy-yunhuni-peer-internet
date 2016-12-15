@@ -38,13 +38,12 @@ public abstract class NettySession extends AbstractSession {
             int bufferSize = ob.size();
             long totalPendingWriteBytes = ob.totalPendingWriteBytes();
             if(logger.isDebugEnabled()){
-
                 logger.debug("write msg ["+ object+"] outbound buffer params nioBufferCount={},nioBufferSize={},bufferSize={},totalPendingWriteBytes={}",nioBufferCount,nioBufferSize,bufferSize,totalPendingWriteBytes);
             }
         }
         //在此做限流控制，默认 ChannelOutboundBuffer  默认高水位是64K，低水位是32K
         if(channel.isWritable()) {
-            channel.writeAndFlush(object);
+            channel.writeAndFlush(object + "\n");
         }else{
             ChannelOutboundBuffer ob = channel.unsafe().outboundBuffer();
             int nioBufferCount = ob.nioBufferCount();
