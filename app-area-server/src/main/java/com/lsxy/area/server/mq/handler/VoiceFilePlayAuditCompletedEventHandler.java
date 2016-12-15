@@ -97,7 +97,7 @@ public class VoiceFilePlayAuditCompletedEventHandler implements MQMessageHandler
         }else{
             areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         }
-        params.put("areaId ",areaId);
+        params.put("areaId",areaId);
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_VF_SYNC,params);
         request.setBody(param);
         try {

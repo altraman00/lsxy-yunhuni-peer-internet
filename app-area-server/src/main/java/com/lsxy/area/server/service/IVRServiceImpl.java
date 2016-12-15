@@ -136,7 +136,7 @@ public class IVRServiceImpl implements IVRService {
                 .putIfNotEmpty("max_answer_seconds",maxCallDuration)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .putIfNotEmpty("areaId ",areaId)
+                .putIfNotEmpty("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);
