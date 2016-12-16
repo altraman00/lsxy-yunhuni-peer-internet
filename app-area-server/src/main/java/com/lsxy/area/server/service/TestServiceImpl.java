@@ -68,22 +68,9 @@ public class TestServiceImpl implements TestService {
 
 
     @Override
-    public void testPresure(int threads){
+    public void testPresure(int threads,int count){
         for(int i=0;i<threads;i++){
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(true) {
-                        RPCRequest request = RPCRequest.unserialize("RQ:4bbe6d916ca4ea057808dc970b15d2a6 1481858234226 MN_CH_SYS_CALL max_answer_seconds=21600&from_uri=system@area001.area.oneyun.com&to_uri=1000492@123.57.157.32&areaId=area001&max_ring_seconds=45&user_data=eba182f997aa287dc45ea13b709ba48b&");
-                        try {
-                            rpcCaller.invoke(sessionContext, request);
-                            Thread.currentThread().sleep(10);
-                        } catch (Exception ex) {
-                            logger.error("调用异常：" + ex);
-                        }
-                    }
-                }
-            });
+            Thread thread = new Thread(new CallTask(count));
             thread.setName("test-"+i);
             thread.start();
         }
@@ -98,24 +85,14 @@ public class TestServiceImpl implements TestService {
 
         @Override
         public void run() {
-            int c = count;
-            long starttime = System.currentTimeMillis();
-            while(c -- > 0){
+            for(int i=0;i<count;i++){
+                RPCRequest request = RPCRequest.unserialize("RQ:4bbe6d916ca4ea057808dc970b15d2a6 1481858234226 MN_CH_SYS_CALL max_answer_seconds=21600&from_uri=system@area001.area.oneyun.com&to_uri=1000492@123.57.157.32&areaId=area001&max_ring_seconds=45&user_data=eba182f997aa287dc45ea13b709ba48b&");
                 try {
-                    long startdt = System.currentTimeMillis();
-                    String to = Thread.currentThread().getId() + "_" + c + "_" + startdt;
-                    /*统计请求次数指标*/
-
-                    String xx = callService.call("1234",to,10,10);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("[{}]收到返回值:{},共花费:{}ms", c , xx, System.currentTimeMillis() - startdt);
-                    }
-                }catch (Exception ex){
-                    logger.error("出现异常",ex);
+                    rpcCaller.invoke(sessionContext, request);
+                    Thread.currentThread().sleep(10);
+                } catch (Exception ex) {
+                    logger.error("调用异常：" + ex);
                 }
-            }
-            if(logger.isDebugEnabled()){
-                logger.debug("当前线程{}测试完毕,总共用时:{}ms",Thread.currentThread().getName(),System.currentTimeMillis() - starttime);
             }
         }
     }
