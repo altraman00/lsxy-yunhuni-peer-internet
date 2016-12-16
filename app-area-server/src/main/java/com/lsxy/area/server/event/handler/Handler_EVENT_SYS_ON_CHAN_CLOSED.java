@@ -135,9 +135,11 @@ public class Handler_EVENT_SYS_ON_CHAN_CLOSED extends EventHandler{
 
         voiceCdr.setFromNum(cdrSplit[7].trim());
         voiceCdr.setToNum(cdrSplit[8].trim());
-        voiceCdr.setCallStartDt(getCallDate(cdrSplit[18].trim()));
+        Date callStartDate = getCallDate(cdrSplit[18].trim());
+        voiceCdr.setCallStartDt(callStartDate == null?new Date():callStartDate);
         voiceCdr.setCallAckDt(getCallDate(cdrSplit[19].trim()));
-        voiceCdr.setCallEndDt(getCallDate(cdrSplit[20].trim()));
+        Date callEndDate = getCallDate(cdrSplit[20].trim());
+        voiceCdr.setCallEndDt(callEndDate == null?new Date():callEndDate);
         voiceCdr.setCallTimeLong(Long.parseLong(cdrSplit[21].trim()));
         //扣费
         if(voiceCdr.getCallAckDt() != null){
