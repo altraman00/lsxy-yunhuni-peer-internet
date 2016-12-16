@@ -90,9 +90,11 @@ public class EnqueueHandler extends ActionHandler{
             }
         }
 
-        businessStateService.updateInnerField(callId,4,CallCenterUtil.ENQUEUE_START_TIME_FIELD,
-                CallCenterUtil.CHANNEL_ID_FIELD,CallCenterUtil.CONDITION_ID_FIELD,IVRActionService.IVR_NEXT_FIELD,
-                ""+new Date().getTime(),enQueue.getChannel(),enQueue.getRoute().getCondition().getId(),next);
+        businessStateService.updateInnerField(callId,
+                CallCenterUtil.ENQUEUE_START_TIME_FIELD,""+new Date().getTime(),
+                CallCenterUtil.CHANNEL_ID_FIELD,enQueue.getChannel(),
+                CallCenterUtil.CONDITION_ID_FIELD,enQueue.getRoute().getCondition().getId(),
+                IVRActionService.IVR_NEXT_FIELD,next);
 
         try {
             enQueueService.lookupAgent(state.getTenantId(), state.getAppId(), businessData.get("to"), callId, enQueue);

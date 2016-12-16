@@ -196,7 +196,7 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
         for(String num : nums){
             ResourceTelenum resourceTelenum = resourceTelenumService.findByTelNumber(num);
             if(resourceTelenum != null){
-                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenant().getId())){
+                if(resourceTelenum.getStatus()== ResourceTelenum.STATUS_RENTED && tenant.getId().equals(resourceTelenum.getTenantId())){
                    //是这个租户，则查询租用记录，有没有正在用的
                    ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumIdAndStatus(resourceTelenum.getId(),ResourcesRent.RENT_STATUS_UNUSED);
                    if(resourcesRent == null){
@@ -215,10 +215,12 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                        if("1".equals(resourceTelenum.getIsCalled())){
                            isCalled = true;
                        }
-
                        resourcesRent.setApp(app);
                        resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_USING);
                        resourcesRentService.save(resourcesRent);
+                       //更新号码信息，设置应用
+                       resourceTelenum.setAppId(app.getId());
+                       resourceTelenumService.save( resourceTelenum);
                    }
                 }else{
                     //如果号码被占用，则抛出异常
@@ -273,6 +275,10 @@ public class AppOnlineActionServiceImpl extends AbstractService<AppOnlineAction>
                     rent.setRentStatus(ResourcesRent.RENT_STATUS_UNUSED);
                     rent.setApp(null);
                     resourcesRentService.save(rent);
+                    //更新号码信息，清除应用
+                    ResourceTelenum resourceTelenum = rent.getResourceTelenum();
+                    resourceTelenum.setAppId(null);
+                    resourceTelenumService.save( resourceTelenum);
                 }
             }
             return app;

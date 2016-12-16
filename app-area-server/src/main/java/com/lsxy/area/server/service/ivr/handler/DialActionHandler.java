@@ -12,7 +12,7 @@ import com.lsxy.area.server.util.PlayFileUtil;
 import com.lsxy.call.center.api.model.CallCenter;
 import com.lsxy.call.center.api.service.CallCenterService;
 import com.lsxy.framework.api.tenant.service.TenantService;
-import com.lsxy.framework.core.exceptions.api.AppOffLineException;
+import com.lsxy.framework.core.exceptions.api.YunhuniApiException;
 import com.lsxy.framework.core.utils.MapBuilder;
 import com.lsxy.framework.rpc.api.RPCCaller;
 import com.lsxy.framework.rpc.api.RPCRequest;
@@ -160,7 +160,7 @@ public class DialActionHandler extends ActionHandler{
         AreaAndTelNumSelector.Selector selector;
         try {
             selector = areaAndTelNumSelector.getTelnumberAndAreaId(app,from,to);
-        } catch (AppOffLineException e) {
+        } catch (YunhuniApiException e) {
             return false;
         }
         String areaId = selector.getAreaId();
@@ -221,7 +221,7 @@ public class DialActionHandler extends ActionHandler{
                 .put("max_answer_seconds",maxCallDuration, IVRActionService.MAX_DURATION_SEC)
                 .putIfNotEmpty("max_ring_seconds",maxDialDuration)
                 .putIfNotEmpty("user_data",callId)
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
                 .build();
 
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_SYS_CALL, params);

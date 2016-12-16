@@ -10,6 +10,4 @@ import java.util.List;
 public interface CallCenterQueueService extends BaseService<CallCenterQueue> {
 
     public void update(String id,CallCenterQueue queue);
-
-    public void save(List<CallCenterQueue> qs);
 }

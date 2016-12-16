@@ -32,6 +32,8 @@ public enum ApiReturnCodeEnum {
     PlayFileNotExists("010005","放音文件不存在或未审核"),
     CallNotExists("020000","呼叫不存在"),
     NumberNotAllowToCall("020001","号码不允许呼叫"),
+    NotAvailableLine("020002","没有可用线路"),
+    UserNumberHasNotAvailableLine("020002","用户号码没有可用线路"),
     ConfNotExists("030000","会议不存在"),
     OutOfConfMaxParts("030001","超过最大与会数"),
     DuoCallbackNumIsSample("070000","双向回拔的号码不能是同一号码"),

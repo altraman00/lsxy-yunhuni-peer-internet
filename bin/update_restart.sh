@@ -30,6 +30,7 @@ FORCE_CLEAN=true
 TAIL_LOG=false
 source /etc/profile
 
+
 while getopts "A:P:H:STILDC" opt; do
   case $opt in
     A)
@@ -139,7 +140,6 @@ if [ $IS_TOMCAT_DEPLOY = false ]; then
     fi
 fi
 echo "OK";
-
 
 
 if [ $TAIL_LOG = true ]; then

@@ -72,12 +72,10 @@ public class RPCCaller {
 		if(logger.isDebugEnabled()){
 			logger.debug(">>"+response);
 		}
-		this.putResponse(response);
 		RPCRequest request = this.getRequest(response.getSessionid());
-
 		this.fireRequestListener(response);
-
 		if(request != null){
+			this.putResponse(response);
 //			if(logger.isDebugEnabled()){
 //				if(!request.getName().equals(ServiceConstants.CH_MN_HEARTBEAT_ECHO) || SystemConfig.getProperty("area.agent.log.show.heartbeat","true").equals("true")) {
 //					logger.debug("通知请求对象该醒了:{}", request);

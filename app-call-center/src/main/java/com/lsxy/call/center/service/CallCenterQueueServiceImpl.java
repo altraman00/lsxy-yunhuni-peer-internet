@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -77,10 +78,12 @@ public class CallCenterQueueServiceImpl extends AbstractService<CallCenterQueue>
     }
 
     @Override
-    public void save(List<CallCenterQueue> qs) {
+    public Iterable<CallCenterQueue> save(Iterable<CallCenterQueue> qs) {
         StringBuilder sql = new StringBuilder("INSERT INTO `db_lsxy_bi_yunhuni`.`tb_bi_call_center_queue` VALUES ");
         List<String> rows = new ArrayList<>();
-        for (CallCenterQueue queue: qs) {
+        Iterator<CallCenterQueue> iterator = qs.iterator();
+        while (iterator.hasNext()) {
+            CallCenterQueue queue = iterator.next();
             String[] colums = new String[]{
                     getValue(queue.getId(),String.class),
                     getValue(queue.getTenantId(),String.class),
@@ -114,5 +117,6 @@ public class CallCenterQueueServiceImpl extends AbstractService<CallCenterQueue>
         }
         sql.append(StringUtils.join(rows,","));
         em.createNativeQuery(sql.toString()).executeUpdate();
+        return null;
     }
 }
