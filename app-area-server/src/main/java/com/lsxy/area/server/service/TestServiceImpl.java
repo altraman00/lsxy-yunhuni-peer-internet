@@ -87,7 +87,7 @@ public class TestServiceImpl implements TestService {
         @Override
         public void run() {
             for(int i=0;i<count;i++){
-                RPCRequest request = RPCRequest.unserialize("RQ:"+ UUIDGenerator.uuid()+" "+System.currentTimeMillis()+" MN_CH_SYS_CALL max_answer_seconds=21600&from_uri=system@area001.area.oneyun.com&to_uri=1000492@123.57.157.32&areaId=area001&max_ring_seconds=45&user_data=eba182f997aa287dc45ea13b709ba48b&");
+                RPCRequest request = RPCRequest.unserialize("RQ:"+ UUIDGenerator.uuid()+" "+System.currentTimeMillis()+" MN_CH_TEST_ECHO max_answer_seconds=21600&from_uri=system@area001.area.oneyun.com&to_uri=1000492@123.57.157.32&areaId=area001&max_ring_seconds=45&user_data=eba182f997aa287dc45ea13b709ba48b&");
                 try {
                     rpcCaller.invoke(sessionContext, request);
                     Thread.currentThread().sleep(10);
