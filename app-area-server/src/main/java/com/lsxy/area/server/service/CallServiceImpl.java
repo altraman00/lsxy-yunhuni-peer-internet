@@ -267,7 +267,7 @@ public class CallServiceImpl implements CallService {
         Map<String, Object> params = new MapBuilder<String, Object>()
                 .put("res_id",state.getResId())
                 .put("user_data ",state.getId())
-                .put("areaId ",areaId)
+                .put("areaId",areaId)
                 .build();
         RPCRequest rpcrequest = RPCRequest.newRequest(ServiceConstants.MN_CH_EXT_DUO_CALLBACK_CANCEL, params);
         try {
