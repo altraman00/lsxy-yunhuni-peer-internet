@@ -117,7 +117,7 @@ public class VoiceFileRecordSyncEventHandler implements MQMessageHandler<VoiceFi
             return;
 //            areaId = SystemConfig.getProperty("area.server.test.area.id", "area001");
         }
-        params.put("areaId ",areaId);
+        params.put("areaId",areaId);
         RPCRequest request = RPCRequest.newRequest(ServiceConstants.MN_CH_RF_SYNC,params);
         request.setBody(param);
         try {

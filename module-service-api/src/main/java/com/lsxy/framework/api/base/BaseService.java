@@ -28,5 +28,7 @@ public interface BaseService<T>{
 	public Page pageList(String hql, int pageNo, int pageSize, Object... params);
 
 	public T findUnique(String hql, Object... params) throws MatchMutiEntitiesException;
+
+	public Iterable<T> save(Iterable<T> list);
 	
 }

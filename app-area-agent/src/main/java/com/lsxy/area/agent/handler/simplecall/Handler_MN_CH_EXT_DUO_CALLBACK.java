@@ -47,13 +47,7 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
 
     @Override
     public RPCResponse handle(RPCRequest request, Session session) {
-        RPCResponse response = RPCResponse.buildResponse(request);
-
         Commander cticlient = cticlientContext.getAvalibleClient();
-        if(cticlient == null) {
-            response.setMessage(RPCResponse.STATE_EXCEPTION);
-            return response;
-        }
 
         if(logger.isDebugEnabled()){
             logger.debug("handler process_MN_CH_EXT_DUO_CALLBACK:{}",request);
@@ -124,11 +118,10 @@ public class Handler_MN_CH_EXT_DUO_CALLBACK extends RpcRequestHandler{
                     }
                 }
             });
-            response.setMessage(RPCResponse.STATE_OK);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             logger.error("操作CTI资源异常{}",request,e);
         }
 
-        return response;
+        return null;
     }
 }

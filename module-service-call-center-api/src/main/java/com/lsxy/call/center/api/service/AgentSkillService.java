@@ -7,7 +7,7 @@ import java.util.List;
  * Created by zhangxb on 2016/10/22.
  */
 public interface AgentSkillService extends BaseService<AgentSkill> {
-    List<AgentSkill> findByAgent(String tenantId, String appId, String agentId);
+    List<AgentSkill> findEnabledByAgent(String agentId);
 
     void deleteByAgent(String agentId);
 

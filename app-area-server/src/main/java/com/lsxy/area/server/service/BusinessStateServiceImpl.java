@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -191,22 +192,18 @@ public class BusinessStateServiceImpl implements BusinessStateService {
     /****
      * 批量修改 state里的map的属性
      * @param id
-     * @param keycount key的数量，key后面是value
-     * @param params   key和value 的 数组
+     * @param params key1,value1,key2,value2的 数组
      */
     @Override
-    public void updateInnerField(String id,int keycount,String... params){
-        if(keycount <= 0){
-            throw new NumberFormatException();
-        }
-        if(params.length != keycount * 2 ){//键值不匹配
+    public void updateInnerField(String id,String... params){
+        if(params == null || params.length == 0 || params.length%2 != 0){//键值不匹配
             throw new IllegalArgumentException();
         }
         String key = getKey(id);
         try{
             Map<String,String> map = new HashMap<>();
-            for (int i = 0; i < keycount; i++) {
-                map.put(getInnerField(params[i]),params[i+keycount]);
+            for (int i = 0,len = params.length; i < len; i=i+2) {
+                map.put(getInnerField(params[i]),params[i+1]);
             }
             if(map.size()>0){
                 redisCacheService.hputAll(key,map);
@@ -215,6 +212,14 @@ public class BusinessStateServiceImpl implements BusinessStateService {
         }catch (Throwable t){
             logger.error("update business state 失败",t);
         }
+    }
+
+    @Override
+    public void updateInnerField(String id,List<String> params){
+        if(params ==null || params.size()==0){
+            throw new IllegalArgumentException();
+        }
+        this.updateInnerField(id,params.toArray(new String[params.size()]));
     }
     @Override
     public void deleteInnerField(String id,String field){

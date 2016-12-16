@@ -92,7 +92,15 @@ public class Handler_EVENT_SYS_CALL_ON_INCOMING extends EventHandler{
         String to_uri = (String)params.get("to_uri");//被叫号码sip地址
         String begin_time = (String)params.get("begin_time");
         String to = resourceTelenumService.findNumByCallUri(to_uri);//被叫号码
+        if(to ==null){
+            logger.info("被叫号码不存在{}",request);
+            return null;
+        }
         LineGateway calledLine = telnumToLineGatewayService.getCalledLineByNumber(to);
+        if(calledLine == null){
+            logger.info("线路不存在{}",request);
+            return null;
+        }
         String from = resolveFromTelNum(from_uri,calledLine);//主叫号码
 
         Tenant tenant = null;

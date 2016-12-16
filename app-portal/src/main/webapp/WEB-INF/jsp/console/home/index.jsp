@@ -183,10 +183,10 @@
                                             <p>
                                                 <span class="iconfont icon-oc-secrekey smallicon inline-block develop-icon"></span>
                                                 <span class="index-key"><strong>密钥:</strong></span>
-                                                <span class="index-api secretkey" >${homeVO.secretKey}</span>
+                                                <span id="secretkey" class="index-api secretkey" >${homeVO.secretKey}</span>
                                             <span>
                                               <a class='reset_confirm'><i class="iconfont icon-resert smallicon inline-block develop-icon"></i>重新生成</a>
-                                              <a id="copysecrekey"  ><i class="iconfont icon-oc-small-copy" style="font-size: 1.6=="></i>复制</a>
+                                              <a id="copysecrekey"  ><i class="iconfont icon-oc-small-copy"></i>复制</a>
                                             </span>
                                             <span>
                                               <a class='tips-error tips-key'></a>
@@ -195,7 +195,7 @@
                                             <p>
                                                 <span class="iconfont icon-oc-certid smallicon inline-block develop-icon"></span>
                                                 <span class="index-key"><strong>鉴权账号:</strong></span>
-                                                <span class="index-api certid" >${homeVO.certId}</span>
+                                                <span class="index-api certid" id="certid">${homeVO.certId}</span>
                                             <span>
                                               <a id="copycertid" ><i class="iconfont icon-oc-small-copy inline-block develop-icon"></i>复制</a>
                                             </span>
@@ -818,15 +818,15 @@
 
     // 点击的时候调用 copyTextToClipboard() 方法就好了.
     copyapiBtn.onclick = function() {
-        copyTextToClipboard('${homeVO.restApi}')
+        copyTextToClipboard($("#restapi").html())
     }
 
     copysecrekeyBtn.onclick = function() {
-        copyTextToClipboard('${homeVO.secretKey}')
+        copyTextToClipboard($("#secretkey").html())
     }
 
     copycertidBtn.onclick = function() {
-        copyTextToClipboard('${homeVO.certId}')
+        copyTextToClipboard($("#certid").html())
     }
 
 

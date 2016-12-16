@@ -2,12 +2,15 @@ package com.lsxy.yunhuni.resourceTelenum.service;
 
 import com.lsxy.framework.api.base.BaseDaoInterface;
 import com.lsxy.framework.api.tenant.model.Tenant;
+import com.lsxy.framework.api.tenant.service.TenantService;
 import com.lsxy.framework.base.AbstractService;
 import com.lsxy.framework.config.SystemConfig;
 import com.lsxy.framework.core.utils.Page;
 import com.lsxy.yunhuni.api.app.model.App;
 import com.lsxy.yunhuni.api.config.model.LineGateway;
 import com.lsxy.yunhuni.api.config.service.LineGatewayService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToPublicService;
+import com.lsxy.yunhuni.api.config.service.LineGatewayToTenantService;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourceTelenum;
 import com.lsxy.yunhuni.api.resourceTelenum.model.ResourcesRent;
 import com.lsxy.yunhuni.api.resourceTelenum.model.TelnumToLineGateway;
@@ -29,6 +32,7 @@ import javax.persistence.Query;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 全局号码资源service
@@ -49,6 +53,13 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private LineGatewayService lineGatewayService;
+    @Autowired
+    LineGatewayToTenantService lineGatewayToTenantService;
+    @Autowired
+    LineGatewayToPublicService lineGatewayToPublicService;
+    @Autowired
+    TenantService tenantService;
+
     @Override
     public BaseDaoInterface<ResourceTelenum, Serializable> getDao() {
         return this.resourceTelenumDao;
@@ -76,32 +87,85 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     }
 
     @Override
-    public Page getPageByFreeNumber(Integer pageNo, Integer pageSize, String telnum, String type, String areaCode, String order) {
-        String hql = "  FROM ResourceTelenum obj WHERE obj.status = '"+ResourceTelenum.STATUS_FREE+"' and obj.usable=1";
-        if(StringUtils.isNotEmpty(telnum)){
-            hql +=" and obj.telNumber like '%"+telnum+"%'";
+    public Page getFreeNumberPage(String tenantId,Integer pageNo, Integer pageSize, String telNum, String type, String areaCode, String order) {
+        //查找租户私有线路
+        List<LineGateway> lineGateways = lineGatewayToTenantService.findLineGatewayByTenantId(tenantId);
+        if(lineGateways == null || lineGateways.size() == 0){
+            //如果没有私有线路，找公共线路
+            lineGateways = lineGatewayToPublicService.findAllLineGateway();
         }
-        if(StringUtils.isNotEmpty(type)){
-            if("callin".equals(type)){
-                hql += " AND obj.isDialing=1 ";
-            }else if("callout".equals(type)){
-                hql += " AND (obj.isThrough=1 or obj.isThrough=1 )";
-            }
+        if(lineGateways == null || lineGateways.size() == 0){
+            //没有线路，则抛出异常
+            throw new RuntimeException("没有可用线路");
+        }
+        //所拥有的线路ID列表
+        List<String> lineIds = lineGateways.parallelStream().map(LineGateway::getId).collect(Collectors.toList());
+
+        String numSql = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum num WHERE num.deleted=0 AND num.status = 0 AND num.usable=1 AND tel_number <> :testNum ";
+        if(StringUtils.isNotEmpty(telNum)){
+            numSql += " and num.tel_number LIKE :telNum";
         }
         if(StringUtils.isNotEmpty(areaCode)){
-            hql += " AND obj.areaCode='"+areaCode+"' ";
+            numSql += " AND num.area_code= :areaCode";
         }
+        String ttlSql = "SELECT DISTINCT ttl.tel_number FROM db_lsxy_bi_yunhuni.tb_oc_telnum_to_linegateway ttl WHERE ttl.line_id  IN (:lineIds) AND ttl.deleted = 0 ";
+        if(StringUtils.isNotEmpty(type)){
+            if("callin".equals(type)){
+                ttlSql += " AND ttl.is_dialing=1 ";
+            }else if("callout".equals(type)){
+                ttlSql += " AND (ttl.is_through=1 or ttl.is_through=1 ) ";
+            }
+        }
+        //查询总数
+        String countSql = "SELECT COUNT(1) FROM " +
+                " (" + numSql +") a " +
+                "  INNER JOIN " +
+                "  ( " + ttlSql +") b " +
+                "  ON a.tel_number = b.tel_number ";
+        Query countQuery = getEm().createNativeQuery(countSql);
+        countQuery.setParameter("testNum",testCallNumber);
+        countQuery.setParameter("lineIds",lineIds);
+        if(StringUtils.isNotEmpty(telNum)){
+            countQuery.setParameter("telNum","%"+ telNum + "%");
+        }
+        if(StringUtils.isNotEmpty(areaCode)){
+            countQuery.setParameter("areaCode",areaCode);
+        }
+        long total = ((BigInteger) countQuery.getSingleResult()).longValue();
+        if(total == 0){
+            return new Page();
+        }
+
+        //查询分页数据
+        String resultSql = "SELECT * FROM " +
+                " (" + numSql +") a " +
+                "  INNER JOIN " +
+                "  ( " + ttlSql +") b " +
+                "  ON a.tel_number = b.tel_number ";
         if(StringUtils.isNotEmpty(order)){
             if("amount:1".equals(order)){
-                hql += " order by obj.amount desc ";
+                resultSql += " order by a.amount desc ";
             }else if("amount:0".equals(order)){
-                hql += " order by obj.amount ";
+                resultSql += " order by a.amount ";
             }
         }else{
-            hql += " order by obj.createTime desc ";
+            resultSql += " order by a.create_time desc ";
         }
-        Page pgae = this.pageList(hql,pageNo,pageSize);
-        return pgae;
+        Query query = getEm().createNativeQuery(resultSql, ResourceTelenum.class);
+        query.setParameter("testNum",testCallNumber);
+        query.setParameter("lineIds",lineIds);
+        if(StringUtils.isNotEmpty(telNum)){
+            query.setParameter("telNum","%"+ telNum + "%");
+        }
+        if(StringUtils.isNotEmpty(areaCode)){
+            query.setParameter("areaCode",areaCode);
+        }
+        int start = (pageNo - 1) * pageSize;
+        query.setMaxResults(pageSize);
+        query.setFirstResult(start);
+        List resultList = query.getResultList();
+
+        return new Page(start,total,pageSize,resultList);
     }
 
     @Override
@@ -132,21 +196,35 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         hql+=" ORDER BY obj.createTime DESC ";
         Page page = this.pageList(hql,pageNo,pageSize);
-        //获取绑定线路
         List<ResourceTelenum> result = page.getResult();
         Set<String> lineIds = new HashSet<>();
+        Set<String> tenantIds = new HashSet<>();
         for(ResourceTelenum telenum:result){
             if(StringUtils.isNotBlank(telenum.getLineId())){
                 lineIds.add(telenum.getLineId());
             }
+            if(StringUtils.isNotBlank(telenum.getTenantId())){
+                tenantIds.add(telenum.getTenantId());
+            }
         }
+        //获取绑定线路
         List<LineGateway> lines = lineGatewayService.findByIds(lineIds);
-        Map<String,LineGateway> map = new HashMap<>();
-        for(LineGateway line:lines){
-            map.put(line.getId(),line);
-        }
+        //获取绑定租户
+        List<Tenant> tenants = tenantService.findByIds(tenantIds);
+
         for(ResourceTelenum telenum:result){
-            telenum.setLine(map.get(telenum.getLineId()));
+            for(LineGateway line:lines){
+                if(line.getId().equals(telenum.getLineId())){
+                    telenum.setLine(line);
+                    break;
+                }
+            }
+            for(Tenant tenant:tenants){
+                if(tenant.getId().equals(telenum.getTenantId())){
+                    telenum.setTenant(tenant);
+                    break;
+                }
+            }
         }
         return page;
     }
@@ -189,38 +267,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
             //当用户指定了号码
             if(notBlankFrom.size() > 0){
-                List<String> resIds = new ArrayList<>();
                 //查出用户指定的号码
-                List<Object[]> rentResult = resourceTelenumDao.findResIdByTenantIdAndResDataInFromRent(app.getTenant().getId(), notBlankFrom);
-                if(rentResult != null){
-                    for(Object[] arr:rentResult){
-                        //查出的租用信息要绑定当前应用，或都是没有应用绑定，才是有效的
-                        if(arr[1] != null && (arr[0] == null || app.getId().equals(arr[0]))){
-                            resIds.add(arr[1].toString());
-                        }
-                    }
-                }
-                List<ResourceTelenum> availableNums = new ArrayList<>();
-                //判断用户的号码是否合格，合格则放到可用号码列表中
-                if(resIds.size() == 1){
-                    ResourceTelenum telnum = this.findById(resIds.get(0));
-                    if(telnum != null && ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
-                            &&telnum.getAreaId() !=null && telnum.getAreaId().equals(app.getArea().getId())){
-                        availableNums.add(telnum);
-                    }
-                }else if(resIds.size() > 1){
-                    List<ResourceTelenum> findNums = this.findByIds(resIds);
-                    if(availableNums != null){
-                        for(ResourceTelenum telnum:findNums){
-                            if(telnum != null && ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
-                                    &&telnum.getAreaId() !=null && telnum.getAreaId().equals(app.getArea().getId())){
-                                availableNums.add(telnum);
-                            }
-                        }
-                    }
-                }
+                List<ResourceTelenum> availableNums = resourceTelenumDao.findCallingTelnumByTenantIdAndAppIdAndTelnum(app.getTenant().getId(), notBlankFrom,app.getId(),app.getArea().getId());
                 //可用号码列表不为空
-                if(availableNums.size() > 0){
+                if(availableNums == null || availableNums.size() > 0){
                     for(String fr:from){
                         if(StringUtils.isBlank(fr)){
                             result.add(availableNums.get(0));
@@ -243,41 +293,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         }
         //经过以上处理后，返回号码结果还是空的话，则不根据传入的from来选号码，选租户应用下的号码，或者租户下不被应用绑定的号码
         if(result.size() == 0){
-            ResourceTelenum availableNum = null;
-            Map<String,String> map = new HashMap<>();
-            List<Object[]> arrs = resourceTelenumDao.findResIdByTenantIdAndAppIdFromRent(app.getTenant().getId(),app.getId());
-            if(arrs != null){
-                arrs.parallelStream().forEach(arr-> {
-                    if(arr[1] != null && StringUtils.isNotBlank(arr[1].toString())){
-                        map.put(arr[1].toString(),arr[0] == null?null:arr[0].toString());
-                    }
-                });
-                Set<String> numIds = map.keySet();
-                List<ResourceTelenum> telnums = this.findByIds(numIds);
-                telnums.parallelStream().forEach(telnum -> telnum.setAppId(map.get(telnum.getId())));
-                for(ResourceTelenum telnum:telnums){
-                    if(telnum != null && telnum.getAppId() != null && telnum.getAppId().equals(app.getId())){
-                        // 判断是否是可呼出号码
-                        if(ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))){
-                            availableNum = telnum;
-                            break;
-                        }
-                    }
-                }
-                if(availableNum == null){
-                    for(ResourceTelenum telnum:telnums){
-                        if(telnum != null && telnum.getAppId() == null){
-                            // 判断是否是同一个区域
-                            //判断是否是可呼出号码
-                            if(ResourceTelenum.USABLE_TRUE.equals(telnum.getUsable())&& (ResourceTelenum.ISDIALING_TRUE.equals(telnum.getIsDialing()) || ResourceTelenum.ISTHROUGH_TRUE.equals(telnum.getIsThrough()))
-                                    && telnum.getAreaId().equals(app.getArea().getId())){
-                                availableNum = telnum;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            ResourceTelenum availableNum = resourceTelenumDao.findCallingTelnumByTenantIdAndAppId(app.getTenant().getId(), app.getId(), app.getArea().getId());
             if(availableNum == null){
                 availableNum = this.findOneFreeDialingNumber(lineIds);
             }
@@ -309,39 +325,39 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
                 }
             }
         }
-        String sql = " FROM (select DISTINCT obj.tenant_id FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tenant_id IS NOT NULL  AND obj.tel_number IN ("+innums+") ";
+        String sql = " FROM (select DISTINCT obj.tenant_id,a.tenant_name FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj LEFT JOIN db_lsxy_base.tb_base_tenant a on a.id=obj.tenant_id WHERE obj.deleted=0 AND obj.tenant_id IS NOT NULL  AND obj.tel_number IN ("+innums+") ";
         if(StringUtils.isNotEmpty(tenantName)){
             sql += " AND  a.tenant_name LIKE '%"+tenantName+"%'";
         }
         sql += " ) b ";
         String countSql = " SELECT COUNT(1) "+sql;
-        String pageSql = " SELECT b.tenant_id "+sql;
+        String pageSql = " SELECT b.tenant_id AS tenantId,b.tenant_name AS tenantName"+sql;
         int total = jdbcTemplate.queryForObject(countSql,Integer.class);
         if(total == 0){
             return new Page<>(start,total,pageSize,null);
         }
         pageSql += " limit "+start+","+pageSize+" ";
         //获取得到租户
-        List<String> list = jdbcTemplate.queryForList(pageSql,String.class);
-        System.out.println(list);
+        List<Map<String, Object>> tenantIdlist = jdbcTemplate.queryForList(pageSql);
+//        System.out.println(list);
         String sql2 = "SELECT * FROM db_lsxy_bi_yunhuni.tb_oc_resource_telenum obj WHERE obj.deleted=0 AND tel_number IN ("+innums+") ";
         Query query2 = em.createNativeQuery(sql2,ResourceTelenum.class);
-        List<ResourceTelenum> list2 = query2.getResultList();
+        List<ResourceTelenum> telenumList = query2.getResultList();
         List<Map> result = new ArrayList<>();
-        for(int j=0;j<list.size();j++) {
+        for(int j=0;j<tenantIdlist.size();j++) {
             Map map = null;
             List<Map> list3= new ArrayList<>();
-            for (int i = 0; i < list2.size(); i++) {
-                Tenant tenant = list2.get(i).getTenant();
-                if(tenant!=null&&list.get(j).equals(tenant.getId())){
+            for (int i = 0; i < telenumList.size(); i++) {
+                String tenantId = telenumList.get(i).getTenantId();
+                if(tenantId!=null&&tenantIdlist.get(j).get("tenantId").equals(tenantId)){
                     if(map==null) {
                         map = new HashMap();
-                        map.put("tenantId", list2.get(i).getTenant().getId());
-                        map.put("tenantName", list2.get(i).getTenant().getTenantName());
+                        map.put("tenantId", tenantId);
+                        map.put("tenantName", tenantIdlist.get(j).get("tenantName"));
                     }
                     Map temp = new HashMap<>();
-                    temp.put("numberId",list2.get(i).getId());
-                    temp.put("number",list2.get(i).getTelNumber());
+                    temp.put("numberId",telenumList.get(i).getId());
+                    temp.put("number",telenumList.get(i).getTelNumber());
                     list3.add(temp);
                 }
             }
@@ -395,14 +411,14 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             }
         }
         if(tenant!=null) {
-            resourceTelenum.setTenant(tenant);//绑定租户
+            resourceTelenum.setTenantId(tenant.getId());//绑定租户
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);//设置被租用
             this.save(resourceTelenum);
             //判断是否需要添加号码租户的关系
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
         }else{
-            resourceTelenum.setTenant(null);//没有租户
+            resourceTelenum.setTenantId(null);//没有租户
             resourceTelenum.setStatus(ResourceTelenum.STATUS_FREE);//设置没被租用
             this.save(resourceTelenum);
         }
@@ -429,7 +445,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
-            resourceTelenum.setTenant(tenant);
+            resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }else if(tenantType==0&& isEditNum){//只更改手机号码
@@ -451,7 +467,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
             ResourcesRent resourcesRent1 = new ResourcesRent(tenant,resourceTelenum,"号码资源",ResourcesRent.RESTYPE_TELENUM,new Date(),ResourcesRent.RENT_STATUS_UNUSED);
             resourcesRentService.save(resourcesRent1);
             //修改号码租用关系
-            resourceTelenum.setTenant(tenant);
+            resourceTelenum.setTenantId(tenant.getId());
             resourceTelenum.setStatus(ResourceTelenum.STATUS_RENTED);
             this.save(resourceTelenum);
         }
@@ -468,7 +484,7 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
         ResourcesRent resourcesRent = resourcesRentService.findByResourceTelenumId(resourceTelenum.getId());
         resourcesRent.setRentStatus(ResourcesRent.RENT_STATUS_RELEASE);
         resourcesRentService.save(resourcesRent);
-        resourceTelenum.setTenant(null);
+        resourceTelenum.setTenantId(null);
         resourceTelenum.setStatus(0);
         this.save(resourceTelenum);
     }
@@ -476,5 +492,10 @@ public class ResourceTelenumServiceImpl extends AbstractService<ResourceTelenum>
     @Override
     public List<ResourceTelenum> findByIds(Collection<String> ids) {
         return resourceTelenumDao.findByIdIn(ids);
+    }
+
+    @Override
+    public List<ResourceTelenum> findByTelNumbers(Collection<String> telNumbers) {
+        return resourceTelenumDao.findByTelNumberIn(telNumbers);
     }
 }
