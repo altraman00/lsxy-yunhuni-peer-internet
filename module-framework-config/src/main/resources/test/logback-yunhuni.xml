@@ -65,7 +65,7 @@
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <!--<appender-ref ref="gelf" />-->
+        <appender-ref ref="gelf" />
         <appender-ref ref="ROLLINGFILE"/>
     </root>
 
