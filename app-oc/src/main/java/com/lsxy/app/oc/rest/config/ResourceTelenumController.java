@@ -267,6 +267,7 @@ public class ResourceTelenumController extends AbstractRestController {
         if(resourceTelenum==null||StringUtils.isEmpty(resourceTelenum.getId())){
             return RestResponse.failed("0000","号码不存在");
         }
+        resourceTelenum.setLine(lineGatewayService.findById(resourceTelenum.getLineId()));
         return RestResponse.success(resourceTelenum);
     }
     @ApiOperation(value = "删除号码")
