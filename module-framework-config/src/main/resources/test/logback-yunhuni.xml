@@ -39,7 +39,7 @@
 
     <appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
         <host>tcp:10.163.3.165</host>
-        <port>9999</port>
+        <port>12205</port>
         <version>1.1</version>
         <facility>java-test</facility>
         <extractStackTrace>true</extractStackTrace>
